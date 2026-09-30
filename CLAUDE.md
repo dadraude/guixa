@@ -1,27 +1,47 @@
-# Guixa — app per a una cooperativa d'alimentació
+# Guixa — app for a food cooperative
 
-Projecte desenvolupat amb **Spec-Driven Development (SDD)**, pas a pas i en sessions curtes.
+Built with **Spec-Driven Development (SDD)**, step by step, in short sessions,
+using Matt Pocock's skills (`mattpocock-skills` plugin). See `docs/adr/0001-sdd-workflow-with-mattpocock-skills.md`.
 
-## Flux SDD
+## SDD workflow
 
-1. **Visió** (`docs/visio.md`) — què és la cooperativa, qui fa servir l'app, què NO farem.
-2. **Principis** (`docs/principis.md`) — decisions tècniques i regles que valen per a tot el projecte.
-3. Per a cada funcionalitat, una carpeta `specs/NNN-nom/` amb:
-   - `spec.md` — el QUÈ i el PER QUÈ (històries d'usuari, criteris d'acceptació). Sense detalls tècnics.
-   - `pla.md` — el COM (model de dades, pantalles, API, decisions).
-   - `tasques.md` — llista de tasques petites i verificables, amb `[ ]` / `[x]`.
-4. **Implementació** — una o poques tasques per sessió, amb tests.
+1. **Vision** (`docs/vision.md`): what the cooperative is, who uses the app, what we will NOT build.
+   Worked out with `/grill-with-docs`.
+2. **Principles** (`docs/principles.md`): technical decisions and rules for the whole project.
+   Worked out with `/grill-with-docs`; significant decisions become ADRs.
+3. For each feature:
+   1. `/grill-with-docs`: interview until the feature is clear; updates `CONTEXT.md` and `docs/adr/`.
+   2. `/to-spec`: writes `specs/NNN-name/spec.md` (`Status: draft`) — problem, user stories,
+      implementation and testing decisions.
+   3. **The user approves the spec** (`Status: approved`). No tickets and no code before that.
+   4. `/to-tickets`: splits the spec into vertical-slice tickets in Linear (project Guixa).
+   5. `/implement`: one or a few tickets per session, test-first (`/tdd`), then `/code-review`.
 
-No s'escriu codi d'una funcionalitat fins que la seva `spec.md` i `pla.md` estan aprovades per l'usuari.
-Les decisions rellevants es registren a `docs/decisions/NNN-titol.md` (ADR curt).
+Domain vocabulary lives in `CONTEXT.md`; decisions in `docs/adr/NNNN-title.md`.
 
-## Regles de sessió
+## Session rules
 
-- Cada sessió té **un sol objectiu** petit (p. ex. "escriure spec 001", "tasques 3-4 de 002").
-- A l'inici: llegir `ESTAT.md`.
-- Al final: deixar la feina tancada (res a mitges), actualitzar `ESTAT.md` amb el que s'ha fet i el següent pas concret, fer commit i push a `origin` (github.com:draude/guixa).
-- Si l'objectiu no hi cap, partir-lo i tancar la part feta.
+- Each session has **one small goal** (e.g. "write spec 001", "tickets DRA-3 and DRA-4").
+- At the start: read `STATUS.md`.
+- At the end: leave nothing half-done, update `STATUS.md` with what was done and the concrete
+  next step, commit and push to `origin` (github.com:draude/guixa).
+- If the goal doesn't fit, split it and close the finished part.
 
-## Idioma
+## Language
 
-Documentació i converses en català.
+- Conversation with the user: **Catalan**.
+- Everything generated (docs, specs, ADRs, tickets, code, comments, commit messages, file names): **English**.
+
+## Agent skills
+
+### Issue tracker
+
+Specs in the repo (`specs/NNN-name/spec.md`); tickets in Linear (team Draude, project Guixa). See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Default five labels (needs-triage, needs-info, ready-for-agent, ready-for-human, wontfix), created in Linear. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context: `CONTEXT.md` + `docs/adr/` at the repo root. See `docs/agents/domain.md`.
