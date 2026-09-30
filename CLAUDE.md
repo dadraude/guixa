@@ -19,7 +19,7 @@ Les decisions rellevants es registren a `docs/decisions/NNN-titol.md` (ADR curt)
 
 - Cada sessió té **un sol objectiu** petit (p. ex. "escriure spec 001", "tasques 3-4 de 002").
 - A l'inici: llegir `ESTAT.md`.
-- Al final: deixar la feina tancada (res a mitges), actualitzar `ESTAT.md` amb el que s'ha fet i el següent pas concret, i fer commit.
+- Al final: deixar la feina tancada (res a mitges), actualitzar `ESTAT.md` amb el que s'ha fet i el següent pas concret, fer commit i push a `origin` (github.com:draude/guixa).
 - Si l'objectiu no hi cap, partir-lo i tancar la part feta.
 
 ## Idioma
