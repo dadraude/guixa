@@ -10,14 +10,17 @@
   `CONTEXT.md` started (households, members, commissions, order cycle, producer orders, boxes,
   balances). Open question: data migration from the current software.
 
+- **Session 4 (2026-09-30):** principles written in `docs/principles.md` with
+  `/grill-with-docs`: Laravel + Inertia + Vue 3 (TS) monolith with offline islands for packing
+  boxes and recording payments (ADR 0002); plain VPS with PostgreSQL and Redis, Horizon,
+  Deployer from GitHub Actions (ADR 0003); magic link + optional password, invitation-only;
+  Pest + Vitest + Playwright, blocking CI. `CONTEXT.md`: invitation, inactive household.
+  Open questions: backup strategy and data migration.
+
 ## Next step
 
-**Session 4 — Principles:** run `/grill-with-docs` to write `docs/principles.md`
-(significant decisions become ADRs).
+**Session 5 — First feature:** run `/grill-with-docs` on the first feature to spec. Suggested
+start: households, members and commissions (invitations, magic link, permissions), since every
+other feature depends on it. Then `/to-spec` for `specs/001-...`.
 
-Starting questions:
-1. Tech stack (language, framework, database) and why.
-2. Hosting and budget; who maintains it after launch.
-3. Authentication for members (email magic link, password, …).
-4. Testing strategy and quality rules (TDD, CI).
-5. Data protection (personal data of members, GDPR) and backups.
+Still open (not blocking): backup strategy, data migration from the current software.

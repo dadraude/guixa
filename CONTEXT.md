@@ -14,6 +14,14 @@ _Avoid_: Consumer unit, family, account, unitat de consum
 A person who belongs to a household and uses the app with their own login.
 _Avoid_: User, sòcia (ambiguous between person and household)
 
+**Invitation**:
+The email the membership commission sends to a new member so they can join their household; there is no open sign-up.
+_Avoid_: Registration, sign-up
+
+**Inactive household**:
+A household that has left the cooperative; its data and balance are kept, and it can no longer place orders.
+_Avoid_: Deleted household, former member
+
 **Commission**:
 A stable group of members in charge of one area of the cooperative's work (e.g. orders, treasury, boxes, cleaning).
 _Avoid_: Committee, team, shift
