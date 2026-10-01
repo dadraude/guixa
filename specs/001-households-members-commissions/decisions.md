@@ -42,8 +42,8 @@ administrators.
 ## Commissions and roles
 
 - Commissions are fully dynamic (create, rename, delete). The membership role and
-  administrators manage them and who is in each one. Deleting a commission removes its
-  members and roles, after confirmation.
+  administrators manage them and who is in each one. A commission can only be deleted when
+  it has no members; its roles go with it.
 - Four **roles** fixed in code:
   - **Orders:** catalogue, producers, order cycles, producer deadlines.
   - **Boxes:** packing boxes.
