@@ -31,10 +31,15 @@
   path (invitation → password → magic-link code). Dev and tests temporarily on MySQL
   (production stays PostgreSQL), noted in `principles.md`.
 
+- **Session 6b (2026-10-02):** spec 001 reviewed with the user and **approved**. Changes:
+  **owner** (the Artisan-created administrator; only one who manages administrators, cannot be
+  deactivated from the app), household number is an auto-increment ID (name editable),
+  every member sees all commissions and their members. `CONTEXT.md` and `decisions.md`
+  updated.
+
 ## Next step
 
-**Session 7:** the user reviews `specs/001-households-members-commissions/spec.md` (check
-especially the shared sign-in identity for member + administrator and the open question on
-removing administrators) and sets `Status: approved`; then `/to-tickets` for spec 001.
+**Session 7:** `/to-tickets` for `specs/001-households-members-commissions/spec.md` (Linear,
+project Guixa, label `ready-for-agent`).
 
 Still open (not blocking): backup strategy, data migration from the current software.

@@ -31,15 +31,20 @@ A person who can do everything in the app without belonging to any household; it
 _Catalan (UI)_: administrador/a
 _Avoid_: Superadmin, root, admin member
 
+**Owner**:
+The one administrator created from the server when the app is installed; only the owner creates, deactivates and reactivates other administrators, and the owner cannot be deactivated from the app.
+_Catalan (UI)_: propietari/ària
+_Avoid_: Superadmin, main administrator, root
+
 **Inactive member**:
 A member who has left the cooperative while their household stays; they can no longer sign in and leave all commissions, but their history is kept. All members of an inactive household are inactive.
 _Catalan (UI)_: membre inactiu
 _Avoid_: Deleted member, removed member
 
 **Household number**:
-A unique, never-reused number given to each household by a member with the membership role, used to label boxes and in lists.
+A unique number assigned automatically to each household when it is created (its auto-increment ID), never edited or reused, used to label boxes and in lists.
 _Catalan (UI)_: número d'unitat familiar
-_Avoid_: Household ID, member number
+_Avoid_: Household ID, member number, box number
 
 **Commission**:
 A group of members in charge of an area of the cooperative's work (e.g. orders, treasury, boxes, cleaning); it grants permissions only through the roles it holds. Every household is expected to have at least one member in a commission.

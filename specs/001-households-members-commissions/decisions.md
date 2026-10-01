@@ -56,3 +56,17 @@ administrators.
   members with the membership role about households that don't; it blocks nothing.
 - Any member of any commission sees the directory with contact details. Other members only
   see their own household.
+
+## Spec review (2026-10-02)
+
+- Confirmed: one sign-in identity per email, with a member and/or an administrator profile.
+- Kept: rate limits on sign-in, responses that never reveal whether an email exists, no
+  invitations to an email that already belongs to a member, and deactivation ends sessions.
+- **Owner:** the administrator created with the Artisan command (exactly one). Only the owner
+  creates, deactivates and reactivates other administrators; the owner cannot be deactivated
+  from the app.
+- **Household number:** the household's auto-increment ID, assigned on creation, never chosen,
+  edited or reused (replaces "chosen by a member with the membership role"). The name stays
+  editable.
+- Every member sees all commissions and the names of their members; contact details still
+  follow the directory rule.

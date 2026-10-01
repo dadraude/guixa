@@ -1,6 +1,6 @@
 # 001 — Households, members and commissions
 
-Status: draft
+Status: approved
 
 Decisions come from [`decisions.md`](decisions.md) (grilling session of 2026-10-01). Terms are
 defined in [`CONTEXT.md`](../../CONTEXT.md); see also
@@ -20,9 +20,11 @@ invited, and there must be a way out if the people managing membership lose acce
 
 Guixa gets the membership foundation every later feature builds on:
 
-- An **administrator**, outside any household, bootstraps the app and can always do
-  everything. The first one is created from the command line; more can be created in the app.
-- Members with the **membership** role create **households** (name and **household number**)
+- An **administrator**, outside any household, can always do everything. The first one, the
+  **owner**, is created from the command line and is the only one who manages the other
+  administrators; the owner can never be deactivated from the app.
+- Members with the **membership** role create **households** (with a name; the app assigns
+  the **household number**)
   and send **invitations** by email. There is no open sign-up.
 - An invited person accepts the invitation, confirms their name and sets a password, and
   becomes a **member** of the household. From then on they sign in with a **magic link**
@@ -40,149 +42,160 @@ Guixa gets the membership foundation every later feature builds on:
 
 ### Bootstrap and administrators
 
-1. As the person installing Guixa, I want to create the first administrator with a command on
-   the server, so that someone can sign in to an empty app.
+1. As the person installing Guixa, I want to create the owner with a command on the server,
+   so that someone can sign in to an empty app.
 2. As a new administrator, I want to receive a sign-in email, so that I can reach the app
    without knowing a password yet.
 3. As a new administrator, I want to be asked to set a password on my first access, so that
    both sign-in methods always work for me.
-4. As an administrator, I want to create other administrators in the app, so that the
-   cooperative does not depend on a single person or on server access.
-5. As an administrator, I want to do everything any role allows, so that I can fix any
+4. As the owner, I want to create other administrators in the app, so that the cooperative
+   does not depend on a single person or on server access.
+5. As the owner, I want to deactivate an administrator, so that people who no longer help
+   with administration lose that access while their history is kept.
+6. As the owner, I want to reactivate an inactive administrator, so that a returning helper
+   does not need a new account.
+7. As the owner, I want to be the only one who can create, deactivate and reactivate
+   administrators, so that administrators cannot remove each other or me.
+8. As the owner, I want to be impossible to deactivate or remove from the app, so that the
+   cooperative always keeps a way in.
+9. As an administrator, I want to do everything any role allows, so that I can fix any
    problem or recover from a lock-out.
-6. As an administrator, I want to not belong to any household and not place orders, so that
+10. As an administrator, I want to not belong to any household and not place orders, so that
    administration is not mixed with being a member.
-7. As a person who is both a member and an administrator with the same email, I want to
+11. As a person who is both a member and an administrator with the same email, I want to
    choose which one to act as after signing in, so that I use the right permissions for the
    task.
-8. As a person who is both, I want to switch between acting as a member and as an
+12. As a person who is both, I want to switch between acting as a member and as an
    administrator without signing in again, so that changing hats is quick.
-9. As a person who is both, I want to always see which one I am acting as, so that I do not
+13. As a person who is both, I want to always see which one I am acting as, so that I do not
    make changes with the wrong permissions by mistake.
 
 ### Sign-in
 
-10. As a member, I want to ask for a magic link by typing my email, so that I can sign in
+14. As a member, I want to ask for a magic link by typing my email, so that I can sign in
     without remembering a password.
-11. As a member, I want the magic link to expire after 15 minutes and work only once, so that
+15. As a member, I want the magic link to expire after 15 minutes and work only once, so that
     an old email cannot be used to get into my account.
-12. As a member who asked for the link on my computer but reads email on my phone, I want to
+16. As a member who asked for the link on my computer but reads email on my phone, I want to
     type the 6-digit code from the email on the computer, so that I sign in on the device
     where I asked for it.
-13. As a member, I want to sign in with my email and password, so that I can get in without
+17. As a member, I want to sign in with my email and password, so that I can get in without
     waiting for an email.
-14. As a member who forgot my password, I want to sign in with a magic link and then change
+18. As a member who forgot my password, I want to sign in with a magic link and then change
     my password, so that I do not need a separate reset flow.
-15. As a member, I want my session to last for weeks, so that I am not asked to sign in every
+19. As a member, I want my session to last for weeks, so that I am not asked to sign in every
     time I open the app on my phone.
-16. As a member, I want to sign out, so that nobody else can use my session on a shared
+20. As a member, I want to sign out, so that nobody else can use my session on a shared
     device.
-17. As a person typing an email that does not belong to anyone, I want to see the same
+21. As a person typing an email that does not belong to anyone, I want to see the same
     message as for a known email, so that the app does not reveal who is a member.
-18. As the cooperative, I want repeated sign-in attempts and wrong codes to be throttled, so
+22. As the cooperative, I want repeated sign-in attempts and wrong codes to be throttled, so
     that passwords and codes cannot be guessed.
-19. As an inactive member, I want to be refused when I try to sign in, so that people who
+23. As an inactive member, I want to be refused when I try to sign in, so that people who
     left no longer access the cooperative's data.
 
 ### Invitations
 
-20. As a member with the membership role, I want to invite a person by email to a household,
+24. As a member with the membership role, I want to invite a person by email to a household,
     so that they can join it without open sign-up.
-21. As an invited person, I want to open the invitation, confirm my name and set a password,
+25. As an invited person, I want to open the invitation, confirm my name and set a password,
     so that my account is ready and I am signed in.
-22. As an invited person, I want the invitation to be valid for 7 days and usable once, so
+26. As an invited person, I want the invitation to be valid for 7 days and usable once, so
     that a forgotten email cannot be used later by someone else.
-23. As an invited person opening an expired or used invitation, I want a clear message telling
+27. As an invited person opening an expired or used invitation, I want a clear message telling
     me to ask the membership commission for a new one, so that I know what to do.
-24. As a member with the membership role, I want to see pending invitations, so that I know
+28. As a member with the membership role, I want to see pending invitations, so that I know
     who has not joined yet.
-25. As a member with the membership role, I want to resend an invitation, so that someone who
+29. As a member with the membership role, I want to resend an invitation, so that someone who
     lost it or let it expire can join; the previous link stops working.
-26. As a member with the membership role, I want to cancel an invitation, so that a mistaken
+30. As a member with the membership role, I want to cancel an invitation, so that a mistaken
     or no longer wanted invitation cannot be used.
-27. As a member with the membership role, I want to be stopped from inviting an email that
+31. As a member with the membership role, I want to be stopped from inviting an email that
     already belongs to a member, so that one person does not end up with two accounts.
 
 ### Households
 
-28. As a member with the membership role, I want to create a household with a name and a
-    household number, so that new families can join the cooperative.
-29. As a member with the membership role, I want the app to reject a household number already
-    used by any household, active or inactive, so that numbers on boxes are never ambiguous.
-30. As a member with the membership role, I want to edit a household's name and number, so
-    that I can fix mistakes; a number can still never be one used before.
-31. As a member with the membership role, I want to see all households with their numbers and
+32. As a member with the membership role, I want to create a household with a name, so that
+    new families can join the cooperative.
+33. As a member with the membership role, I want the app to give each new household the next
+    household number automatically, never reused, so that numbers on boxes are never
+    ambiguous.
+34. As a member with the membership role, I want to edit a household's name, so that I can fix
+    mistakes; its number never changes.
+35. As a member with the membership role, I want to see all households with their numbers and
     members, active and inactive, so that I can manage membership.
-32. As a member with the membership role, I want to deactivate a household that leaves the
+36. As a member with the membership role, I want to deactivate a household that leaves the
     cooperative, so that it can no longer order while its history is kept.
-33. As a member with the membership role, I want deactivating a household to make all its
+37. As a member with the membership role, I want deactivating a household to make all its
     members inactive, so that nobody from it keeps access.
-34. As a member with the membership role, I want to reactivate an inactive household with the
+38. As a member with the membership role, I want to reactivate an inactive household with the
     same number, so that a family coming back keeps its history.
-35. As a member with the membership role, I want to reactivate the members of a reactivated
+39. As a member with the membership role, I want to reactivate the members of a reactivated
     household one by one, so that only the people actually returning get access again.
-36. As a member, I want to see my own household and its members, so that I know who shares
+40. As a member, I want to see my own household and its members, so that I know who shares
     our orders and balance.
 
 ### Members
 
-37. As a member, I want to edit my own name, phone and password, so that my details stay
+41. As a member, I want to edit my own name, phone and password, so that my details stay
     correct.
-38. As a member, I want to change my email and confirm the new address from a link sent to
+42. As a member, I want to change my email and confirm the new address from a link sent to
     it, so that I cannot lock myself out with a typo.
-39. As a member with the membership role, I want to edit any member's name, email and phone,
+43. As a member with the membership role, I want to edit any member's name, email and phone,
     so that I can fix details for people who cannot do it themselves; the email changes
     without confirmation.
-40. As a member with the membership role, I want to move a member to another household, so
+44. As a member with the membership role, I want to move a member to another household, so
     that people who change household stay in the cooperative; past orders and balance stay
     with the old household.
-41. As a member with the membership role, I want to deactivate a member who leaves while their
+45. As a member with the membership role, I want to deactivate a member who leaves while their
     household stays, so that they can no longer sign in.
-42. As a member with the membership role, I want deactivating a member to remove them from
+46. As a member with the membership role, I want deactivating a member to remove them from
     every commission and end their open sessions, so that they lose access at once.
-43. As a member with the membership role, I want to reactivate an inactive member, so that a
+47. As a member with the membership role, I want to reactivate an inactive member, so that a
     person who comes back keeps their history.
-44. As a member with the membership role, I want to be prevented from reactivating a member of
+48. As a member with the membership role, I want to be prevented from reactivating a member of
     an inactive household, so that the household is reactivated first.
 
 ### Commissions and roles
 
-45. As a member with the membership role, I want to create a commission with a name, so that
+49. As a member with the membership role, I want to create a commission with a name, so that
     the app follows how the cooperative organises its work.
-46. As a member with the membership role, I want to rename a commission, so that names stay
+50. As a member with the membership role, I want to rename a commission, so that names stay
     up to date when the cooperative reorganises.
-47. As a member with the membership role, I want to delete a commission only when it has no
+51. As a member with the membership role, I want to delete a commission only when it has no
     members, so that nobody loses permissions by surprise.
-48. As a member with the membership role, I want to add active members to a commission and
+52. As a member with the membership role, I want to add active members to a commission and
     remove them, so that the app knows who does each job.
-49. As an administrator, I want to manage commissions and their members too, so that I can
+53. As an administrator, I want to manage commissions and their members too, so that I can
     act when the membership commission cannot.
-50. As an administrator, I want to assign and remove the orders, boxes, treasury and
+54. As an administrator, I want to assign and remove the orders, boxes, treasury and
     membership roles on each commission, so that permissions are under my control.
-51. As an administrator, I want a commission to hold several roles and a role to be held by
+55. As an administrator, I want a commission to hold several roles and a role to be held by
     several commissions, so that merged or split commissions can be modelled without code
     changes.
-52. As a member with the membership role, I want to be unable to assign roles, so that the
+56. As a member with the membership role, I want to be unable to assign roles, so that the
     membership role cannot grant itself or others more permissions.
-53. As a member, I want to get every role of every commission I belong to, so that I can do my
+57. As a member, I want to get every role of every commission I belong to, so that I can do my
     commission's work.
-54. As a member, I want to see which commissions I belong to and which roles they give me, so
+58. As a member, I want to see which commissions I belong to and which roles they give me, so
     that I understand what I can do in the app.
-55. As anyone, I want deleting a commission to remove only its role assignments, never the
+59. As a member, I want to see every commission and who is in it, so that I know whom to
+    contact about each area of the cooperative's work.
+60. As anyone, I want deleting a commission to remove only its role assignments, never the
     roles themselves, so that other commissions keep working.
 
 ### Directory and warnings
 
-56. As a member of any commission, I want a directory of all households and members with
+61. As a member of any commission, I want a directory of all households and members with
     their contact details, so that I can reach people for commission work.
-57. As a member who is not in any commission, I want to see only my own household, so that
+62. As a member who is not in any commission, I want to see only my own household, so that
     other people's contact details are kept private.
-58. As a member with the membership role, I want to see which active households have no member
+63. As a member with the membership role, I want to see which active households have no member
     in any commission, so that I can encourage them to take part; nothing is blocked.
 
 ### Language
 
-59. As a member, I want every screen and email in Catalan, using the agreed words
+64. As a member, I want every screen and email in Catalan, using the agreed words
     ("unitat familiar", "membre", "comissió", "rol", "invitació"…), so that the app speaks
     the cooperative's language.
 
@@ -199,11 +212,16 @@ Guixa gets the membership foundation every later feature builds on:
   administrator can still sign in, but only as administrator.
 - **Administrator** has no household, cannot hold a member profile's permissions and places no
   orders. A global authorization rule lets administrators pass every check.
-- A console command creates an administrator from an email and name and sends them a magic
-  link. Administrators created in the app are also sent a magic link. An administrator with no
-  password is sent to a "set your password" screen after signing in and cannot continue until
-  they set one.
-- Removing or deactivating administrators is not part of this spec (see Further Notes).
+- The **owner** is the administrator created by a console command from an email and name;
+  the command sends them a magic link and refuses to run if an owner already exists. There is
+  exactly one owner.
+- Only the owner creates, deactivates and reactivates other administrators. The owner cannot
+  be deactivated or removed from the app; changing the owner is done on the server.
+- Administrators created in the app are sent a magic link. An administrator with no password
+  is sent to a "set your password" screen after signing in and cannot continue until they set
+  one.
+- An **inactive administrator** cannot act as administrator (and cannot sign in unless they
+  also have an active member profile); deactivation ends their open administrator sessions.
 
 ### Sign-in
 
@@ -216,8 +234,8 @@ Guixa gets the membership foundation every later feature builds on:
 - The sign-in screen offers both ways; there is no separate "forgot password" flow.
 - Responses never reveal whether an email exists. Link requests, password attempts and code
   attempts are rate-limited per email and per IP.
-- Inactive members cannot sign in (unless also administrators, as above). Deactivation
-  invalidates the member's existing sessions.
+- Inactive members cannot sign in (unless also active administrators, as above).
+  Deactivation invalidates the member's existing sessions.
 - Sessions are long-lived (weeks) as stated in the principles.
 
 ### Invitations
@@ -238,9 +256,9 @@ Guixa gets the membership foundation every later feature builds on:
 
 ### Households and members
 
-- **Household:** name, household number (positive integer), active flag. The number is
-  unique among all households ever created and can never be reused: changing a household's
-  number keeps the old one reserved, so the app keeps a record of every number ever assigned.
+- **Household:** household number, editable name, active flag. The household number is the
+  household's auto-increment ID: assigned by the database on creation, never chosen, edited
+  or reused.
 - Deactivating a household deactivates all its members and removes them from commissions.
   When balances exist (a later spec), deactivation with a non-zero balance will require a
   warning and confirmation as stated in the principles; this spec only leaves room for that.
@@ -265,6 +283,8 @@ Guixa gets the membership foundation every later feature builds on:
 - Only administrators assign or remove roles on commissions.
 - Only active members can be added to a commission; deactivating a member removes them from
   all commissions.
+- Every member can see the list of commissions and the names of who is in each one. Contact
+  details still follow the directory rule below.
 - A single authorization module answers "does this member have role X?" from their active
   commissions; it is the only place that knows how roles reach members, and every policy
   uses it.
@@ -293,8 +313,8 @@ Guixa gets the membership foundation every later feature builds on:
   what is observable from outside: status, redirects, Inertia page and props, session errors,
   database state, emails sent (mail fake) and whether the user is signed in. No tests of
   internal classes, models or private helpers.
-- The console command that creates the first administrator is tested with Pest through the
-  command interface (output, created administrator, email sent).
+- The console command that creates the owner is tested with Pest through the command
+  interface (output, created owner, email sent, refusal when an owner exists).
 - Time-dependent rules (15-minute magic link, 7-day invitation, email confirmation) are tested
   by moving the clock, not by waiting.
 - Each permission rule is tested from both sides: an allowed actor succeeds and a forbidden
@@ -311,7 +331,7 @@ Guixa gets the membership foundation every later feature builds on:
 
 - Orders, catalogue, producers, order cycles, boxes, balances, payments and charges (later
   specs). The balance warning when deactivating a household arrives with balances.
-- Removing or deactivating administrators.
+- Changing the owner from the app (done on the server).
 - Open sign-up, social or SSO sign-in, two-factor authentication.
 - Deleting or anonymising households or members.
 - Notifications about households without a commission member beyond the in-app warning.
@@ -324,9 +344,7 @@ Guixa gets the membership foundation every later feature builds on:
 ## Further Notes
 
 - The sign-in identity shared by member and administrator profiles is this spec's reading of
-  ADR 0004 ("the same email can be both… the person chooses which one to act as"). If the
-  user prefers fully separate accounts with separate passwords, this decision must change
-  before approval.
-- Open: how administrators are removed. Until decided, it can be done from the server.
+  ADR 0004 ("the same email can be both… the person chooses which one to act as"), confirmed in
+  the spec review of 2026-10-02.
 - The MySQL exception is recorded in `principles.md` as temporary; this spec must not
   introduce anything that only works on MySQL.
