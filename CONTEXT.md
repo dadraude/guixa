@@ -7,8 +7,9 @@ A food cooperative of 20–60 households that buys from producers through a week
 ### Membership
 
 **Household**:
-The consumer unit of the cooperative; it owns orders and is what the cooperative counts as a member.
-_Avoid_: Consumer unit, family, account, unitat de consum
+The consumer unit of the cooperative (a family, a shared flat or a single person); it owns orders and is what the cooperative counts as a member.
+_Catalan (UI)_: unitat familiar
+_Avoid_: Consumer unit, family, account, unitat de consum, caixa
 
 **Member**:
 A person who belongs to a household and uses the app with their own login.
@@ -57,8 +58,9 @@ A producer whose products can be ordered in a given order cycle.
 _Avoid_: Enabled producer, available producer
 
 **Order**:
-What one household asks for in one order cycle; it can be edited until it is sent to each producer.
-_Avoid_: Basket, cart, purchase
+What one household asks for in one order cycle; it is saved as it is filled in and can be edited until each producer's ordering closes, with no separate submit step.
+_Catalan (UI)_: comanda
+_Avoid_: Basket, cart, purchase, cistella
 
 **Producer deadline**:
 The planned moment, per producer and order cycle, when ordering from that producer closes; the orders commission can close earlier or extend it.
@@ -70,6 +72,7 @@ _Avoid_: Consolidated order, purchase order
 
 **Box**:
 The goods one household actually receives in one order cycle, with real quantities and weights recorded when packing.
+_Catalan (UI)_: caixa
 _Avoid_: Basket, delivery, cistella
 
 **Catalogue**:
