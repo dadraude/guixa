@@ -22,17 +22,17 @@ administrators.
   (administrators), so both ways always work. It can be changed later. A forgotten password
   is handled by signing in with the magic link.
 - **Invitations:** valid 7 days, single use. On opening it the member confirms their name and
-  sets a password. The membership commission sees pending invitations and can resend (the
+  sets a password. Members with the membership role see pending invitations and can resend (the
   previous link stops working) or cancel them.
 
 ## Households and members
 
-- **Household:** name and household number. The number is chosen by the membership
-  commission, unique across all households (including inactive ones) and never reused.
-- **Member:** name, email, optional phone. Belongs to exactly one household; the membership
-  commission can move them to another household (orders and balance stay with the old one).
+- **Household:** name and household number. The number is chosen by a member with the
+  membership role, unique across all households (including inactive ones) and never reused.
+- **Member:** name, email, optional phone. Belongs to exactly one household; members with the
+  membership role can move them to another household (orders and balance stay with the old one).
 - Members edit their own name, phone and password; changing their email requires confirming
-  the new address. The membership commission can edit everything, including the email
+  the new address. Members with the membership role can edit everything, including the email
   without confirmation.
 - **Inactive member:** cannot sign in, leaves all commissions, history is kept; can be
   reactivated. Deactivating a household makes all its members inactive.
@@ -53,6 +53,6 @@ administrators.
 - Only administrators assign roles to commissions. A commission holds zero or more roles; a
   role can be held by several commissions. All members of a commission share its roles.
 - Every household should have at least one member in some commission. The app only warns the
-  membership commission about households that don't; it blocks nothing.
+  members with the membership role about households that don't; it blocks nothing.
 - Any member of any commission sees the directory with contact details. Other members only
   see their own household.
