@@ -26,10 +26,15 @@
   "unitat familiar", order = "comanda" with no separate cart, box = "caixa"…); definitions
   now say permissions come from roles, not commissions. `README.md` added.
 
+- **Session 6 (2026-10-02):** `/to-spec` wrote `specs/001-households-members-commissions/spec.md`
+  (`Status: draft`). Test seam agreed: Pest feature tests at the HTTP level plus one Playwright
+  path (invitation → password → magic-link code). Dev and tests temporarily on MySQL
+  (production stays PostgreSQL), noted in `principles.md`.
+
 ## Next step
 
-**Session 6:** run `/to-spec` from `specs/001-households-members-commissions/decisions.md` to
-write `specs/001-households-members-commissions/spec.md` (`Status: draft`), then the user
-reviews and approves it.
+**Session 7:** the user reviews `specs/001-households-members-commissions/spec.md` (check
+especially the shared sign-in identity for member + administrator and the open question on
+removing administrators) and sets `Status: approved`; then `/to-tickets` for spec 001.
 
 Still open (not blocking): backup strategy, data migration from the current software.

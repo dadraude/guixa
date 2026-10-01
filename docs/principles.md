@@ -14,6 +14,9 @@ Technical decisions and rules for the whole project. Domain terms are defined in
 - **Monolith: Laravel + Inertia + Vue 3 (TypeScript)** on **PostgreSQL**. One codebase,
   server-side routing, policies and validation; no separate API. See
   [ADR 0002](adr/0002-laravel-inertia-monolith-with-offline-islands.md).
+  - **Temporary exception:** development and tests run on **MySQL** until a PostgreSQL
+    instance is available; production stays on PostgreSQL. Migrations and queries must stay
+    portable (no engine-specific SQL or column types).
 - **No real-time.** Orders have no shared stock limits, so plain request/response is enough.
 - **Offline only where needed:** packing **boxes** and recording **payments** must work
   without a reliable connection (the cooperative's premises have poor coverage).
