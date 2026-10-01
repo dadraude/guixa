@@ -22,6 +22,8 @@
   ADR 0004 (fixed roles assigned to dynamic commissions, administrator outside households);
   `CONTEXT.md`: administrator, inactive member, household number, role, commission updated;
   `principles.md`: password now required when accepting the invitation.
+  Glossary review started: household ("unitat familiar"), order ("comanda", no separate
+  cart) and box ("caixa") agreed, each with its Catalan UI word. `README.md` added.
 
 ## Next step
 
@@ -29,4 +31,5 @@
 write `specs/001-households-members-commissions/spec.md` (`Status: draft`), then the user
 reviews and approves it.
 
-Still open (not blocking): backup strategy, data migration from the current software.
+Still open (not blocking): review the rest of the glossary terms (member, commission, role,
+order cycle, producer, balance…), backup strategy, data migration from the current software.
