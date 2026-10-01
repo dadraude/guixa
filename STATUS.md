@@ -47,10 +47,18 @@
   temporary MySQL exception is dropped); PHP 8.5 and Node 22 LTS. `principles.md` and spec 001
   updated.
 
+- **Session 7 (2026-10-02):** `/to-tickets` split spec 001 into 14 vertical-slice tickets in
+  Linear (project Guixa, `ready-for-agent`, native blocking relations): DRA-10 skeleton and CI
+  → DRA-11 owner + magic link → DRA-12 sign-in screen, DRA-13 administrators, DRA-14
+  households → DRA-15 invitations → DRA-16 pending invitations, DRA-17 profile switch,
+  DRA-18 commissions, DRA-19 own profile → DRA-20 roles (opens membership work to the
+  membership role) → DRA-21 edit/move members, DRA-22 deactivate/reactivate, DRA-23
+  directory + warning + Playwright path. Until DRA-20, membership work is administrator-only
+  through one shared "can manage membership" rule.
+
 ## Next step
 
-**Session 7:** `/to-tickets` for `specs/001-households-members-commissions/spec.md` (Linear,
-project Guixa, label `ready-for-agent`). The first ticket should be the project skeleton
-(starter kit, Sail, CI) where code-level conventions get settled.
+**Session 8:** `/implement` DRA-10 (project skeleton and CI: starter kit, Sail, Fortify
+trimmed, Catalan translations, UUIDv7, CI), test-first, then `/code-review`.
 
 Still open (not blocking): backup strategy, data migration from the current software.
