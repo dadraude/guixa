@@ -39,7 +39,7 @@ A group of members in charge of an area of the cooperative's work (e.g. orders, 
 _Avoid_: Committee, team, shift
 
 **Role**:
-A fixed set of permissions (e.g. orders, boxes, treasury, membership) that an administrator assigns to commissions; a commission can hold several roles and a role can be held by several commissions. All members of a commission share its roles.
+A fixed set of permissions defined by the app (e.g. orders, boxes, treasury, membership) that an administrator assigns to commissions; a commission can hold several roles and a role can be held by several commissions. All members of a commission share its roles.
 _Avoid_: Permission group, profile, coordinator
 
 ### Ordering
