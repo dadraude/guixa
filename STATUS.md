@@ -37,6 +37,10 @@
   every member sees all commissions and their members. `CONTEXT.md` and `decisions.md`
   updated.
 
+- **Session 6c (2026-10-02):** ADR 0005: UUIDv7 primary keys whenever possible; household
+  number is a separate auto-increment column. `principles.md`, spec 001 and `CONTEXT.md`
+  updated.
+
 ## Next step
 
 **Session 7:** `/to-tickets` for `specs/001-households-members-commissions/spec.md` (Linear,

@@ -256,9 +256,11 @@ Guixa gets the membership foundation every later feature builds on:
 
 ### Households and members
 
-- **Household:** household number, editable name, active flag. The household number is the
-  household's auto-increment ID: assigned by the database on creation, never chosen, edited
-  or reused.
+- **Household:** household number, editable name, active flag. The household number is an
+  auto-increment column separate from the UUIDv7 primary key (ADR 0005): assigned by the
+  database on creation, never chosen, edited or reused.
+- Every table in this spec uses UUIDv7 primary keys (ADR 0005); membership of commissions and
+  role assignments are pivot tables with composite keys.
 - Deactivating a household deactivates all its members and removes them from commissions.
   When balances exist (a later spec), deactivation with a non-zero balance will require a
   warning and confirmation as stated in the principles; this spec only leaves room for that.

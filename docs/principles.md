@@ -31,6 +31,8 @@ Technical decisions and rules for the whole project. Domain terms are defined in
   processing offline syncs. Jobs are dispatched after the transaction commits. Cache and
   sessions also live in Redis. No external queue service. See
   [ADR 0003](adr/0003-plain-vps-with-redis-queue.md).
+- **Primary keys** are UUIDv7 whenever possible; numbers people read (e.g. household number)
+  are separate columns. See [ADR 0005](adr/0005-uuidv7-primary-keys.md).
 - **Money** is stored as integer cents. **Time zone** is `Europe/Madrid`.
 - **UI language:** Catalan only, but every user-facing string lives in Laravel/Vue
   translation files so more languages can be added later. Code and docs are in English.

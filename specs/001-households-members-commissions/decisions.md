@@ -65,7 +65,7 @@ administrators.
 - **Owner:** the administrator created with the Artisan command (exactly one). Only the owner
   creates, deactivates and reactivates other administrators; the owner cannot be deactivated
   from the app.
-- **Household number:** the household's auto-increment ID, assigned on creation, never chosen,
+- **Household number:** an auto-increment number (separate from the UUIDv7 primary key, ADR 0005), assigned on creation, never chosen,
   edited or reused (replaces "chosen by a member with the membership role"). The name stays
   editable.
 - Every member sees all commissions and the names of their members; contact details still

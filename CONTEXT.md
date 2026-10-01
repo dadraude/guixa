@@ -42,7 +42,7 @@ _Catalan (UI)_: membre inactiu
 _Avoid_: Deleted member, removed member
 
 **Household number**:
-A unique number assigned automatically to each household when it is created (its auto-increment ID), never edited or reused, used to label boxes and in lists.
+A unique number assigned automatically to each household when it is created (an auto-increment number, not the household's internal ID), never edited or reused, used to label boxes and in lists.
 _Catalan (UI)_: número d'unitat familiar
 _Avoid_: Household ID, member number, box number
 
