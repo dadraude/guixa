@@ -59,7 +59,7 @@ administrators.
 
 ## Spec review (2026-10-02)
 
-- Confirmed: one sign-in identity per email, with a member and/or an administrator profile.
+- Confirmed: one user (sign-in identity) per email, with a member and/or an administrator profile.
 - Kept: rate limits on sign-in, responses that never reveal whether an email exists, no
   invitations to an email that already belongs to a member, and deactivation ends sessions.
 - **Owner:** the administrator created with the Artisan command (exactly one). Only the owner

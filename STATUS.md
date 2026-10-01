@@ -41,9 +41,16 @@
   number is a separate auto-increment column. `principles.md`, spec 001 and `CONTEXT.md`
   updated.
 
+- **Session 6d (2026-10-02):** `/grill-with-docs` on project-wide technical decisions:
+  Laravel 13 Vue starter kit with Fortify plus our own magic link (ADR 0006); `User` is the
+  sign-in identity (`CONTEXT.md`); Laravel Sail locally; PostgreSQL everywhere again (the
+  temporary MySQL exception is dropped); PHP 8.5 and Node 22 LTS. `principles.md` and spec 001
+  updated.
+
 ## Next step
 
 **Session 7:** `/to-tickets` for `specs/001-households-members-commissions/spec.md` (Linear,
-project Guixa, label `ready-for-agent`).
+project Guixa, label `ready-for-agent`). The first ticket should be the project skeleton
+(starter kit, Sail, CI) where code-level conventions get settled.
 
 Still open (not blocking): backup strategy, data migration from the current software.

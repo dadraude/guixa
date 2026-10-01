@@ -14,7 +14,12 @@ _Avoid_: Consumer unit, family, account, unitat de consum, caixa
 **Member**:
 A person who belongs to a household and uses the app with their own login.
 _Catalan (UI)_: membre
-_Avoid_: User, sòcia (ambiguous between person and household)
+_Avoid_: Sòcia (ambiguous between person and household); "user" when the member is meant
+
+**User**:
+The sign-in identity of a person (email and password), to which a member and/or an administrator are attached; it is never a synonym of member.
+_Catalan (UI)_: (not shown; the UI says membre or administrador/a)
+_Avoid_: Account, login
 
 **Invitation**:
 The email a member with the membership role sends to a new member so they can join their household; there is no open sign-up.

@@ -20,7 +20,7 @@ time-ordered, they keep index inserts nearly sequential, unlike random UUIDv4.
 ## Consequences
 
 - Foreign keys are UUID columns. Migrations use Laravel's portable UUID column types, so the
-  same schema runs on MySQL (temporary dev/test) and PostgreSQL (production).
+  schema stays portable across database engines.
 - Numbers people read or write (such as the **household number**) are separate columns, never
   the primary key.
 - Exceptions only where a key adds nothing or the framework owns the table: pivot tables use

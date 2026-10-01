@@ -14,9 +14,10 @@ Technical decisions and rules for the whole project. Domain terms are defined in
 - **Monolith: Laravel + Inertia + Vue 3 (TypeScript)** on **PostgreSQL**. One codebase,
   server-side routing, policies and validation; no separate API. See
   [ADR 0002](adr/0002-laravel-inertia-monolith-with-offline-islands.md).
-  - **Temporary exception:** development and tests run on **MySQL** until a PostgreSQL
-    instance is available; production stays on PostgreSQL. Migrations and queries must stay
-    portable (no engine-specific SQL or column types).
+- **Base:** Laravel 13 from the official **Vue starter kit** (Inertia, Tailwind, shadcn-vue,
+  Wayfinder). Sign-in uses **Fortify** for passwords and rate limits; the magic link and
+  invitations are our own code. See [ADR 0006](adr/0006-vue-starter-kit-with-fortify.md).
+- **Versions:** PHP 8.5 and Node 22 LTS, the same locally, in CI and on the VPS.
 - **No real-time.** Orders have no shared stock limits, so plain request/response is enough.
 - **Offline only where needed:** packing **boxes** and recording **payments** must work
   without a reliable connection (the cooperative's premises have poor coverage).
@@ -48,6 +49,11 @@ Technical decisions and rules for the whole project. Domain terms are defined in
 - **Monitoring:** Laravel emails the maintainer on errors and failed jobs (Horizon shows
   queue details); a free external uptime check watches the site and a scheduler heartbeat.
 
+## Local development
+
+- **Laravel Sail** (Docker) runs PHP, PostgreSQL, Redis and Mailpit, so every developer and
+  agent gets the same environment with one command. Production does not use Docker.
+
 ## Access
 
 - No open sign-up: the membership commission creates **households** and invites **members**
@@ -61,7 +67,8 @@ Technical decisions and rules for the whole project. Domain terms are defined in
 ## Quality
 
 - **Test-first** (`/tdd`) for every ticket.
-  - **Pest** feature tests against a real PostgreSQL are the main safety net.
+  - **Pest** feature tests against a real PostgreSQL are the main safety net (a PostgreSQL
+    service container in CI).
   - **Vitest** for client-side logic, especially offline storage and sync.
   - **Playwright** for the offline flows and a few critical end-to-end paths.
 - **CI (GitHub Actions) blocks merging** unless all pass: tests, Pint, Larastan (high level),

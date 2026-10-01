@@ -203,8 +203,9 @@ Guixa gets the membership foundation every later feature builds on:
 
 ### Identity, administrators and members
 
-- One **sign-in identity** per email address holds the credentials (email, password). A
-  **member** profile and an **administrator** profile can each be attached to it; a person
+- One **user** (the sign-in identity, see `CONTEXT.md`) per email address holds the
+  credentials (email, password). A **member** profile and an **administrator** profile can
+  each be attached to it; a person
   with both chooses one after signing in and can switch later. The profile in use is kept in
   the session and shown in the layout.
 - Consequences: one password per person, whichever profile they use; changing a member's
@@ -229,7 +230,7 @@ Guixa gets the membership foundation every later feature builds on:
   valid 15 minutes, bound to the browser session that asked for it. Opening the link on any
   device signs in that device; typing the code is only accepted in the requesting session.
   Using either consumes the token. Requesting a new link invalidates earlier unused ones.
-- **Password:** standard email + password sign-in; any minimum length is enforced with
+- **Password:** standard email + password sign-in through Fortify (ADR 0006); any minimum length is enforced with
   Laravel's password rules.
 - The sign-in screen offers both ways; there is no separate "forgot password" flow.
 - Responses never reveal whether an email exists. Link requests, password attempts and code
@@ -248,7 +249,7 @@ Guixa gets the membership foundation every later feature builds on:
 - **Resend** creates a new token and expiry; the previous link stops working. **Cancel**
   makes the link unusable.
 - **Accepting** asks for the name (pre-filled if given when inviting) and a password, creates
-  the member in the invitation's household (attaching to an existing sign-in identity if the
+  the member in the invitation's household (attaching to an existing user if the
   email already belongs to an administrator), marks the invitation accepted and signs the
   person in.
 - Invitation, magic link and email-change emails are sent through the queue after the
@@ -305,9 +306,9 @@ Guixa gets the membership foundation every later feature builds on:
   from `CONTEXT.md`.
 - Server-side validation and policies on every action; pages are Inertia + Vue 3 (TS). None
   of these screens work offline.
-- Development and tests temporarily run on **MySQL** because no PostgreSQL instance is
-  available yet; production stays on PostgreSQL. Migrations and queries must therefore stay
-  portable (no engine-specific SQL or column types).
+- Built on the Laravel Vue starter kit with Fortify (ADR 0006): registration, two-factor
+  authentication and password reset are disabled and their screens removed; the magic link,
+  the code and invitations are our own code.
 
 ## Testing Decisions
 
@@ -322,8 +323,7 @@ Guixa gets the membership foundation every later feature builds on:
 - Each permission rule is tested from both sides: an allowed actor succeeds and a forbidden
   one (member without the role, membership role trying to assign roles, inactive member…) is
   refused.
-- Tests run against a real database: **MySQL for now** (temporary, see Implementation
-  Decisions), switching to PostgreSQL when an instance is available.
+- Tests run against a real PostgreSQL database (Sail locally, a service container in CI).
 - **One Playwright test** for the critical end-to-end path: open an invitation → confirm name
   and set password → sign out → request a magic link → sign in by typing the 6-digit code.
 - Prior art: none yet; this is the first feature of the codebase, so its tests set the
@@ -345,8 +345,6 @@ Guixa gets the membership foundation every later feature builds on:
 
 ## Further Notes
 
-- The sign-in identity shared by member and administrator profiles is this spec's reading of
+- The user shared by member and administrator profiles is this spec's reading of
   ADR 0004 ("the same email can be both… the person chooses which one to act as"), confirmed in
   the spec review of 2026-10-02.
-- The MySQL exception is recorded in `principles.md` as temporary; this spec must not
-  introduce anything that only works on MySQL.
