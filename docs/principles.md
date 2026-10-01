@@ -47,7 +47,8 @@ Technical decisions and rules for the whole project. Domain terms are defined in
 
 - No open sign-up: the membership commission creates **households** and invites **members**
   by email.
-- Members sign in with a **magic link** by email or, optionally, a **password** they set.
+- Members sign in with a **magic link** by email or with a **password**. Setting the password
+  is required when accepting the **invitation**, so both ways always work.
   Sessions are long-lived (weeks), so offline screens keep working on a phone.
 - Permissions come from **commission** membership and are enforced with Laravel policies on
   the server.

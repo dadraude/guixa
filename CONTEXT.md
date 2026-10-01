@@ -22,9 +22,25 @@ _Avoid_: Registration, sign-up
 A household that has left the cooperative; its data and balance are kept, and it can no longer place orders.
 _Avoid_: Deleted household, former member
 
+**Administrator**:
+A person who can do everything in the app without belonging to any household; it is not a member and places no orders.
+_Avoid_: Superadmin, root, admin member
+
+**Inactive member**:
+A member who has left the cooperative while their household stays; they can no longer sign in and leave all commissions, but their history is kept. All members of an inactive household are inactive.
+_Avoid_: Deleted member, removed member
+
+**Household number**:
+A unique, never-reused number the membership commission gives each household, used to label boxes and in lists.
+_Avoid_: Household ID, member number
+
 **Commission**:
-A stable group of members in charge of one area of the cooperative's work (e.g. orders, treasury, boxes, cleaning).
+A group of members in charge of an area of the cooperative's work (e.g. orders, treasury, boxes, cleaning); it grants permissions only through the roles it holds. Every household is expected to have at least one member in a commission.
 _Avoid_: Committee, team, shift
+
+**Role**:
+A fixed set of permissions (e.g. orders, boxes, treasury, membership) that an administrator assigns to commissions; a commission can hold several roles and a role can be held by several commissions. All members of a commission share its roles.
+_Avoid_: Permission group, profile, coordinator
 
 ### Ordering
 

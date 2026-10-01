@@ -17,10 +17,16 @@
   Pest + Vitest + Playwright, blocking CI. `CONTEXT.md`: invitation, inactive household.
   Open questions: backup strategy and data migration.
 
+- **Session 5 (2026-10-01):** `/grill-with-docs` on the first feature (households, members,
+  commissions). Decisions in `specs/001-households-members-commissions/decisions.md`;
+  ADR 0004 (fixed roles assigned to dynamic commissions, administrator outside households);
+  `CONTEXT.md`: administrator, inactive member, household number, role, commission updated;
+  `principles.md`: password now required when accepting the invitation.
+
 ## Next step
 
-**Session 5 — First feature:** run `/grill-with-docs` on the first feature to spec. Suggested
-start: households, members and commissions (invitations, magic link, permissions), since every
-other feature depends on it. Then `/to-spec` for `specs/001-...`.
+**Session 6:** run `/to-spec` from `specs/001-households-members-commissions/decisions.md` to
+write `specs/001-households-members-commissions/spec.md` (`Status: draft`), then the user
+reviews and approves it.
 
 Still open (not blocking): backup strategy, data migration from the current software.
