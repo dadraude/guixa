@@ -15,6 +15,9 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->foreignUuid('user_id')->constrained()->cascadeOnDelete();
             $table->string('token_hash', 64)->unique();
+            // Only set when the link was asked for from the sign-in screen: the
+            // code is then accepted in that browser session alone.
+            $table->string('code_hash', 64)->nullable();
             $table->timestamp('expires_at');
             $table->timestamp('used_at')->nullable();
             $table->timestamps();

@@ -10,18 +10,20 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
 
 /**
- * A single-use sign-in token sent by email. Only its hash is stored.
+ * A single-use sign-in token sent by email, optionally with a 6-digit code.
+ * Only their hashes are stored.
  *
  * @property string $id
  * @property string $user_id
  * @property string $token_hash
+ * @property string|null $code_hash
  * @property Carbon $expires_at
  * @property Carbon|null $used_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read User $user
  */
-#[Fillable(['token_hash', 'expires_at'])]
+#[Fillable(['token_hash', 'code_hash', 'expires_at'])]
 class MagicLink extends Model
 {
     use HasUuids;

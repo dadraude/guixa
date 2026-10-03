@@ -26,6 +26,18 @@ test('users cannot sign in with a wrong password', function () {
     $this->assertGuest();
 });
 
+test('a wrong password does not reveal whether the email exists', function () {
+    $user = User::factory()->create();
+
+    $this->post(route('login.store'), ['email' => $user->email, 'password' => 'wrong-password'])
+        ->assertSessionHasErrors(['email' => __('auth.failed')]);
+
+    $this->post(route('login.store'), ['email' => 'nobody@example.com', 'password' => 'wrong-password'])
+        ->assertSessionHasErrors(['email' => __('auth.failed')]);
+
+    $this->assertGuest();
+});
+
 test('users can sign out', function () {
     $user = User::factory()->create();
 

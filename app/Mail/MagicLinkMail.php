@@ -14,7 +14,13 @@ class MagicLinkMail extends Mailable implements ShouldQueueAfterCommit
 {
     use Queueable, SerializesModels;
 
-    public function __construct(public readonly string $url) {}
+    /**
+     * @param  string|null  $code  The 6-digit code, when the link was asked for from the sign-in screen.
+     */
+    public function __construct(
+        public readonly string $url,
+        public readonly ?string $code = null,
+    ) {}
 
     public function envelope(): Envelope
     {

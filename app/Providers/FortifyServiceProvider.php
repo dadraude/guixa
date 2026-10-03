@@ -40,14 +40,21 @@ class FortifyServiceProvider extends ServiceProvider
     }
 
     /**
-     * Configure rate limiting.
+     * Configure rate limiting. Password attempts, magic-link requests and
+     * code attempts share one limit per email and one per IP address. The
+     * code form has no email field, so it counts against the email the
+     * session asked a link for.
      */
     private function configureRateLimiting(): void
     {
         RateLimiter::for('login', function (Request $request) {
-            $throttleKey = Str::transliterate(Str::lower($request->input(Fortify::username())).'|'.$request->ip());
+            $email = $request->input(Fortify::username()) ?? $request->session()->get('magic_link.email');
+            $throttleKey = Str::transliterate(Str::lower(is_string($email) ? $email : '').'|'.$request->ip());
 
-            return Limit::perMinute(5)->by($throttleKey);
+            return [
+                Limit::perMinute(5)->by($throttleKey),
+                Limit::perMinute(20)->by('ip|'.$request->ip()),
+            ];
         });
     }
 }

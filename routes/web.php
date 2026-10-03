@@ -5,9 +5,16 @@ use App\Http\Controllers\Auth\SetPasswordController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::get('magic-link/{token}', [MagicLinkController::class, 'show'])
-    ->middleware('guest')
-    ->name('magic-link.show');
+Route::middleware('guest')->group(function () {
+    Route::post('magic-link', [MagicLinkController::class, 'store'])
+        ->middleware('throttle:login')
+        ->name('magic-link.store');
+    Route::get('magic-link/code', [MagicLinkController::class, 'code'])->name('magic-link.code');
+    Route::post('magic-link/code', [MagicLinkController::class, 'storeCode'])
+        ->middleware('throttle:login')
+        ->name('magic-link.code.store');
+    Route::get('magic-link/{token}', [MagicLinkController::class, 'show'])->name('magic-link.show');
+});
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/', function (Request $request) {

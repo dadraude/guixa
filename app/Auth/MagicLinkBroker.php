@@ -5,36 +5,56 @@ namespace App\Auth;
 use App\Mail\MagicLinkMail;
 use App\Models\MagicLink;
 use App\Models\User;
+use Illuminate\Contracts\Session\Session;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 /**
  * Issues and consumes magic links: single-use sign-in tokens, valid for
- * 15 minutes, of which only the hash is stored.
+ * 15 minutes, of which only the hash is stored. A link asked for from a
+ * browser session also carries a 6-digit code that is accepted in that
+ * session alone. Using either the link or the code uses up both.
  */
 class MagicLinkBroker
 {
     public const int MINUTES_VALID = 15;
 
+    private const string SESSION_KEY = 'magic_link.id';
+
     /**
-     * Email the user a new magic link. Earlier unused links stop working.
-     * The email is queued once the surrounding transaction commits.
+     * Email the user a new magic link, with a code bound to the given session
+     * if there is one. Earlier unused links stop working. The email is queued
+     * once the surrounding transaction commits.
      */
-    public function send(User $user): void
+    public function send(User $user, ?Session $session = null): void
     {
         $token = Str::random(64);
+        $code = $session === null ? null : str_pad((string) random_int(0, 999_999), 6, '0', STR_PAD_LEFT);
 
-        DB::transaction(function () use ($user, $token) {
+        $link = DB::transaction(function () use ($user, $token, $code) {
             $user->magicLinks()->whereNull('used_at')->delete();
 
-            $user->magicLinks()->create([
+            return $user->magicLinks()->create([
                 'token_hash' => self::hash($token),
+                'code_hash' => $code === null ? null : self::hash($code),
                 'expires_at' => now()->addMinutes(self::MINUTES_VALID),
             ]);
         });
 
-        Mail::to($user)->queue(new MagicLinkMail(route('magic-link.show', ['token' => $token])));
+        $session?->put(self::SESSION_KEY, $link->id);
+
+        Mail::to($user)->queue(new MagicLinkMail(route('magic-link.show', ['token' => $token]), $code));
+    }
+
+    /**
+     * Forget any code the session was waiting for, so that a request for an
+     * unknown email leaves nothing usable behind.
+     */
+    public function forget(Session $session): void
+    {
+        $session->forget(self::SESSION_KEY);
     }
 
     /**
@@ -43,12 +63,37 @@ class MagicLinkBroker
      */
     public function consume(string $token): ?User
     {
-        return DB::transaction(function () use ($token) {
-            $link = MagicLink::query()
-                ->usable()
-                ->where('token_hash', self::hash($token))
-                ->lockForUpdate()
-                ->first();
+        return $this->useUp(MagicLink::query()->where('token_hash', self::hash($token)));
+    }
+
+    /**
+     * Use up the link this session asked for if the code matches, and return
+     * its user; null otherwise.
+     */
+    public function consumeCode(Session $session, string $code): ?User
+    {
+        $id = $session->get(self::SESSION_KEY);
+
+        if (! is_string($id)) {
+            return null;
+        }
+
+        $user = $this->useUp(MagicLink::query()->whereKey($id)->where('code_hash', self::hash($code)));
+
+        if ($user !== null) {
+            $this->forget($session);
+        }
+
+        return $user;
+    }
+
+    /**
+     * @param  Builder<MagicLink>  $query
+     */
+    private function useUp(Builder $query): ?User
+    {
+        return DB::transaction(function () use ($query) {
+            $link = $query->usable()->lockForUpdate()->first();
 
             if ($link === null) {
                 return null;
@@ -60,8 +105,8 @@ class MagicLinkBroker
         });
     }
 
-    private static function hash(string $token): string
+    private static function hash(string $secret): string
     {
-        return hash('sha256', $token);
+        return hash_hmac('sha256', $secret, (string) config('app.key'));
     }
 }
