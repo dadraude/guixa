@@ -16,8 +16,8 @@ test('the sign-in page renders in Catalan', function () {
     expect(__('Log in'))->toBe('Inicia la sessió');
 });
 
-test('the home page redirects to the dashboard', function () {
-    $this->get(route('home'))->assertRedirect(route('dashboard'));
+test('the home page sends guests to the sign-in page', function () {
+    $this->get(route('home'))->assertRedirect(route('login'));
 });
 
 test('there is no registration', function () {
@@ -71,6 +71,7 @@ test('every user-facing string has a Catalan translation', function () {
     $catalan = json_decode(file_get_contents(lang_path('ca.json')), true);
 
     $files = collect(File::allFiles(resource_path('js')))
+        ->merge(File::allFiles(resource_path('views')))
         ->merge(File::allFiles(app_path()))
         ->reject(fn ($file) => Str::contains($file->getPathname(), ['/routes/', '/actions/', '/wayfinder/']));
 

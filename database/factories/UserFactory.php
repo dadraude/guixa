@@ -42,4 +42,34 @@ class UserFactory extends Factory
             'email_verified_at' => null,
         ]);
     }
+
+    /**
+     * Indicate that the user has not set a password yet.
+     */
+    public function withoutPassword(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'password' => null,
+        ]);
+    }
+
+    /**
+     * Give the user an administrator profile.
+     */
+    public function administrator(bool $active = true): static
+    {
+        return $this->afterCreating(function (User $user) use ($active) {
+            $user->administrator()->create(['is_active' => $active]);
+        });
+    }
+
+    /**
+     * Make the user the owner: the administrator created from the command line.
+     */
+    public function owner(): static
+    {
+        return $this->afterCreating(function (User $user) {
+            $user->administrator()->create(['is_owner' => true]);
+        });
+    }
 }

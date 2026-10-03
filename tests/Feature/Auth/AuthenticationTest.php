@@ -12,7 +12,7 @@ test('users can sign in with their password', function () {
     ]);
 
     $this->assertAuthenticatedAs($user);
-    $response->assertRedirect(route('dashboard', absolute: false));
+    $response->assertRedirect(route('home', absolute: false));
 });
 
 test('users cannot sign in with a wrong password', function () {
