@@ -16,7 +16,7 @@ test('the sign-in page renders in Catalan', function () {
     expect(__('Log in'))->toBe('Inicia la sessió');
 });
 
-test('the home page sends people to sign in', function () {
+test('the home page redirects to the dashboard', function () {
     $this->get(route('home'))->assertRedirect(route('dashboard'));
 });
 
@@ -76,9 +76,9 @@ test('every user-facing string has a Catalan translation', function () {
 
     $missing = $files
         ->flatMap(function ($file) {
-            preg_match_all("/(?<![\w.])(?:t|__)\(\s*'((?:[^'\\\\]|\\\\.)+)'/", $file->getContents(), $matches);
+            preg_match_all("/(?<![\w.])(?:t|__)\(\s*(?:'((?:[^'\\\\]|\\\\.)+)'|\"((?:[^\"\\\\]|\\\\.)+)\")/", $file->getContents(), $matches);
 
-            return $matches[1];
+            return array_filter(array_merge($matches[1], $matches[2]), fn ($key) => $key !== '');
         })
         ->map(fn (string $key) => stripslashes($key))
         ->unique()
@@ -87,4 +87,12 @@ test('every user-facing string has a Catalan translation', function () {
         ->all();
 
     expect($missing)->toBe([]);
+});
+
+test('the stubs generate UUID primary keys', function () {
+    expect(file_get_contents(base_path('stubs/model.stub')))
+        ->toContain('use Illuminate\\Database\\Eloquent\\Concerns\\HasUuids;')
+        ->toContain('use HasUuids;')
+        ->and(file_get_contents(base_path('stubs/migration.create.stub')))
+        ->toContain("\$table->uuid('id')->primary();");
 });

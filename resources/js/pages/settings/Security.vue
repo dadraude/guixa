@@ -9,10 +9,9 @@ import { Label } from '@/components/ui/label';
 import { t } from '@/lib/i18n';
 import { edit } from '@/routes/security';
 
-// oxfmt-ignore
 type Props = {
     passwordRules: string;
-} ;
+};
 
 const props = defineProps<Props>();
 
