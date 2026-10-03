@@ -37,6 +37,10 @@ class MagicLinkBroker
         $code = $session === null ? null : str_pad((string) random_int(0, 999_999), 6, '0', STR_PAD_LEFT);
 
         $link = DB::transaction(function () use ($user, $token, $code) {
+            // Lock the user so that concurrent requests issue links one at a
+            // time and only the newest stays usable.
+            User::query()->whereKey($user->id)->lockForUpdate()->first();
+
             $user->magicLinks()->whereNull('used_at')->delete();
 
             return $user->magicLinks()->create([

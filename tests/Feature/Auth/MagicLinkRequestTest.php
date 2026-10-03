@@ -92,9 +92,7 @@ test('the code is refused in a different session', function () {
 test('a wrong code is refused', function () {
     User::factory()->create(['email' => 'marta@example.com']);
     $mail = requestMagicLink();
-    $wrong = str_pad((string) (((int) $mail->code + 1) % 1000000), 6, '0', STR_PAD_LEFT);
-
-    $this->post(route('magic-link.code.store'), ['code' => $wrong])
+    $this->post(route('magic-link.code.store'), ['code' => wrongCode($mail)])
         ->assertSessionHasErrors(['code' => __('The code is not valid or has expired.')]);
 
     $this->assertGuest();
@@ -188,16 +186,60 @@ test('repeated link requests are throttled', function () {
         ->assertTooManyRequests();
 });
 
+/**
+ * A 6-digit code that is surely not the one in this email.
+ */
+function wrongCode(MagicLinkMail $mail): string
+{
+    return str_pad((string) (((int) $mail->code + 1) % 1000000), 6, '0', STR_PAD_LEFT);
+}
+
 test('repeated wrong codes are throttled', function () {
     User::factory()->create(['email' => 'marta@example.com']);
-    requestMagicLink();
+    $mail = requestMagicLink();
 
     foreach (range(1, 4) as $attempt) {
-        $this->post(route('magic-link.code.store'), ['code' => '000000']);
+        $this->post(route('magic-link.code.store'), ['code' => wrongCode($mail)]);
     }
 
-    $this->post(route('magic-link.code.store'), ['code' => '000000'])
+    $this->post(route('magic-link.code.store'), ['code' => wrongCode($mail)])
         ->assertTooManyRequests();
+});
+
+test('an email sent along with the code does not dodge the throttle', function () {
+    User::factory()->create(['email' => 'marta@example.com']);
+    $mail = requestMagicLink();
+
+    foreach (range(1, 4) as $attempt) {
+        $this->post(route('magic-link.code.store'), ['code' => wrongCode($mail), 'email' => "other{$attempt}@example.com"]);
+    }
+
+    $this->post(route('magic-link.code.store'), ['code' => wrongCode($mail), 'email' => 'yet-another@example.com'])
+        ->assertTooManyRequests();
+});
+
+test('an email saved with capital letters can still ask for a link', function () {
+    $user = User::factory()->create(['email' => 'marta@example.com']);
+
+    $this->actingAs($user)
+        ->patch(route('profile.update'), ['name' => $user->name, 'email' => 'Marta.Puig@Example.com'])
+        ->assertSessionHasNoErrors();
+    auth()->logout();
+
+    expect($user->fresh()->email)->toBe('marta.puig@example.com');
+
+    $mail = requestMagicLink('Marta.Puig@Example.com');
+
+    expect($mail?->hasTo('marta.puig@example.com'))->toBeTrue();
+});
+
+test('an email that differs only in capital letters is taken', function () {
+    User::factory()->create(['email' => 'marta@example.com']);
+    $other = User::factory()->create();
+
+    $this->actingAs($other)
+        ->patch(route('profile.update'), ['name' => $other->name, 'email' => 'MARTA@example.com'])
+        ->assertSessionHasErrors('email');
 });
 
 test('requests from many emails on one address are throttled', function () {
