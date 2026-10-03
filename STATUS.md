@@ -79,13 +79,19 @@
   home; `/` sends administrators there and others to the dashboard; the header shows
   "acting as administrator". Reviewed with `/code-review` and findings fixed.
 
+- **Session 10 (2026-10-04):** DRA-11 and DRA-12 merged (PR #3, including the Copilot review
+  fixes). DRA-13 implemented test-first (owner manages administrators): the owner lists,
+  creates (magic link queued after commit), deactivates and reactivates administrators; the
+  owner cannot be targeted. Sessions end through a middleware that signs out, on the next
+  request, any user who may not sign in (`User::canSignIn()`), so it works with Redis sessions
+  and remember-me cookies; magic link, code and password sign-in refuse inactive
+  administrators. `manage-administrators` is excluded from `Gate::before`, so only the owner
+  passes it. Emails are unique ignoring case (`LOWER(email)` index).
+
 ## Next step
 
-**Before session 10:** merge the DRA-10 PR, then the DRA-11/DRA-12 PR (retarget it to `main`
-first), and move the three tickets to Done. Make the `ci` check required for `main`.
+**Before session 11:** open the DRA-13 PR, merge it once CI is green and move DRA-13 to Done.
 
-**Session 10:** `/implement` DRA-13 (owner manages administrators). It must also stop an
-inactive administrator from signing in (magic link, code and password do not check
-`is_active` yet; spec "Identity, administrators and members").
+**Session 11:** `/implement` DRA-14 (households).
 
 Still open (not blocking): backup strategy, data migration from the current software.

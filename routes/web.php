@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdministratorController;
 use App\Http\Controllers\Auth\MagicLinkController;
 use App\Http\Controllers\Auth\SetPasswordController;
 use Illuminate\Http\Request;
@@ -31,6 +32,13 @@ Route::middleware(['auth'])->group(function () {
 
     Route::middleware('can:administer')->prefix('admin')->name('admin.')->group(function () {
         Route::inertia('/', 'admin/Home')->name('home');
+
+        Route::middleware('can:manage-administrators')->prefix('administrators')->name('administrators.')->group(function () {
+            Route::get('/', [AdministratorController::class, 'index'])->name('index');
+            Route::post('/', [AdministratorController::class, 'store'])->name('store');
+            Route::post('{administrator}/deactivate', [AdministratorController::class, 'deactivate'])->name('deactivate');
+            Route::post('{administrator}/reactivate', [AdministratorController::class, 'reactivate'])->name('reactivate');
+        });
     });
 });
 

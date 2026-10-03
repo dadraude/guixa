@@ -27,7 +27,7 @@ class MagicLinkController extends Controller
 
         $user = User::where('email', $email)->first();
 
-        if ($user === null) {
+        if ($user === null || ! $user->canSignIn()) {
             $this->magicLinks->forget($request->session());
         } else {
             $this->magicLinks->send($user, $request->session());
@@ -64,7 +64,7 @@ class MagicLinkController extends Controller
 
         $user = $this->magicLinks->consumeCode($request->session(), $code);
 
-        if ($user === null) {
+        if ($user === null || ! $user->canSignIn()) {
             throw ValidationException::withMessages([
                 'code' => __('The code is not valid or has expired.'),
             ]);
@@ -89,7 +89,7 @@ class MagicLinkController extends Controller
     {
         $user = $this->magicLinks->consume($token);
 
-        if ($user === null) {
+        if ($user === null || ! $user->canSignIn()) {
             return to_route('login')->with('status', __('This link has expired or has already been used.'));
         }
 

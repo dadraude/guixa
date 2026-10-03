@@ -15,4 +15,5 @@ export type ActingAs = 'administrator' | 'member';
 export type Auth = {
     user: User;
     actingAs: ActingAs | null;
+    isOwner: boolean;
 };

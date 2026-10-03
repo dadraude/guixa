@@ -42,6 +42,7 @@ class HandleInertiaRequests extends Middleware
             'name' => config('app.name'),
             'auth' => [
                 'user' => $user,
+                'isOwner' => $user?->isOwner() === true,
                 'actingAs' => match (true) {
                     $user === null => null,
                     $user->isActingAsAdministrator() => 'administrator',

@@ -2,6 +2,7 @@
 
 use App\Models\User;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Timebox;
 
 test('users can sign in with their password', function () {
     $user = User::factory()->create();
@@ -57,4 +58,24 @@ test('sign-in attempts are rate limited', function () {
         'email' => $user->email,
         'password' => 'wrong-password',
     ])->assertTooManyRequests();
+});
+
+test('every password attempt is timeboxed, so response time does not reveal whether the email exists', function () {
+    $timebox = new class extends Timebox
+    {
+        /** @var list<int> */
+        public array $durations = [];
+
+        public function call(callable $callback, int $microseconds)
+        {
+            $this->durations[] = $microseconds;
+
+            return parent::call($callback, 0);
+        }
+    };
+    $this->app->instance(Timebox::class, $timebox);
+
+    $this->post(route('login.store'), ['email' => 'nobody@example.com', 'password' => 'wrong-password']);
+
+    expect($timebox->durations)->toBe([200_000]);
 });
