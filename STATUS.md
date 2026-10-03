@@ -60,8 +60,8 @@
   Vue starter kit trimmed to password sign-in (no registration, password reset, two-factor,
   passkeys, email verification, account deletion or welcome page); Pest on PostgreSQL;
   `User` with UUIDv7 key and stubs that make UUIDs the default; Europe/Madrid, `ca` locale,
-  four-week sessions, Redis for sessions, cache and queue; Sail with PostgreSQL, Redis and
-  Mailpit; all UI text in `lang/ca.json` and `lang/ca/*.php` (Vue uses `t()` from
+  four-week sessions, Redis for sessions, cache and queue; Herd for PHP with DBngin PostgreSQL and
+  Redis (replaced Sail); all UI text in `lang/ca.json` and `lang/ca/*.php` (Vue uses `t()` from
   `@/lib/i18n`, and a test fails on a missing translation); CI on GitHub Actions (Pest, Pint,
   Larastan level 7, Oxlint/Oxfmt, vue-tsc). The kit's Vite+ replaces ESLint and Prettier
   (ADR 0007). Reviewed with `/code-review` and findings fixed.
