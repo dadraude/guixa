@@ -71,8 +71,9 @@ Technical decisions and rules for the whole project. Domain terms are defined in
     service container in CI).
   - **Vitest** for client-side logic, especially offline storage and sync.
   - **Playwright** for the offline flows and a few critical end-to-end paths.
-- **CI (GitHub Actions) blocks merging** unless all pass: tests, Pint, Larastan (high level),
-  ESLint, Prettier and `vue-tsc`.
+- **CI (GitHub Actions) blocks merging** unless all pass: tests, Pint, Larastan (level 7),
+  Oxlint and Oxfmt (through Vite+, the starter kit's own linter and formatter, used instead of
+  ESLint and Prettier, see ADR 0007) and `vue-tsc`.
 
 ## Data
 
