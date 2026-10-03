@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Auth\MagicLinkBroker;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
@@ -48,7 +49,7 @@ class FortifyServiceProvider extends ServiceProvider
     private function configureRateLimiting(): void
     {
         RateLimiter::for('login', function (Request $request) {
-            $email = $request->input(Fortify::username()) ?? $request->session()->get('magic_link.email');
+            $email = $request->input(Fortify::username()) ?? $request->session()->get(MagicLinkBroker::EMAIL_SESSION_KEY);
             $throttleKey = Str::transliterate(Str::lower(is_string($email) ? $email : '').'|'.$request->ip());
 
             return [

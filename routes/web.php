@@ -14,6 +14,7 @@ Route::middleware('guest')->group(function () {
         ->middleware('throttle:login')
         ->name('magic-link.code.store');
     Route::get('magic-link/{token}', [MagicLinkController::class, 'show'])->name('magic-link.show');
+    Route::post('magic-link/{token}', [MagicLinkController::class, 'consume'])->name('magic-link.consume');
 });
 
 Route::middleware(['auth'])->group(function () {

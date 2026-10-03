@@ -130,7 +130,7 @@ test('using the link consumes the code', function () {
     User::factory()->create(['email' => 'marta@example.com']);
     $mail = requestMagicLink();
 
-    $this->get($mail->url)->assertRedirect(route('home'));
+    $this->post($mail->url)->assertRedirect(route('home'));
     auth()->logout();
 
     $this->post(route('magic-link.code.store'), ['code' => $mail->code])
@@ -146,7 +146,7 @@ test('using the code consumes the link', function () {
     $this->post(route('magic-link.code.store'), ['code' => $mail->code]);
     auth()->logout();
 
-    $this->get($mail->url)->assertRedirect(route('login'));
+    $this->post($mail->url)->assertRedirect(route('login'));
 
     $this->assertGuest();
 });
@@ -157,7 +157,7 @@ test('the link opened on another device signs that device in', function () {
 
     $this->flushSession();
 
-    $this->get($mail->url)->assertRedirect(route('home'));
+    $this->post($mail->url)->assertRedirect(route('home'));
 
     $this->assertAuthenticatedAs($user);
 });
@@ -169,10 +169,10 @@ test('a newer request invalidates the older link and code', function () {
 
     $this->post(route('magic-link.code.store'), ['code' => $first->code === $second->code ? 'x' : $first->code])
         ->assertSessionHasErrors('code');
-    $this->get($first->url)->assertRedirect(route('login'));
+    $this->post($first->url)->assertRedirect(route('login'));
     $this->assertGuest();
 
-    $this->get($second->url)->assertRedirect(route('home'));
+    $this->post($second->url)->assertRedirect(route('home'));
     $this->assertAuthenticated();
 });
 

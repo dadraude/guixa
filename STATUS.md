@@ -66,13 +66,26 @@
   Larastan level 7, Oxlint/Oxfmt, vue-tsc). The kit's Vite+ replaces ESLint and Prettier
   (ADR 0007). Reviewed with `/code-review` and findings fixed.
 
+- **Session 9 (2026-10-03):** DRA-11 and DRA-12 implemented test-first in one PR stacked on
+  the DRA-10 PR (Linear "In Progress", PR linked). `guixa:create-owner {email} {name}` creates
+  the owner (administrator profile, no password; a partial unique index keeps one owner) and
+  queues a magic link after commit. Magic links: HMAC-hashed token, 15 minutes, single use, a
+  new one invalidates older ones; opening the link shows a one-click confirmation (POST) so
+  mail scanners cannot spend it. From the sign-in screen the email also carries a 6-digit
+  code accepted only in the requesting session; the response is the same for unknown emails.
+  Password, link and code attempts share Fortify's `login` limiter (5/min per email+IP,
+  20/min per IP). A user without a password is held on "set your password". `Gate::before`
+  lets active administrators pass every check; `can:administer` guards the administrator
+  home; `/` sends administrators there and others to the dashboard; the header shows
+  "acting as administrator". Reviewed with `/code-review` and findings fixed.
+
 ## Next step
 
-**Before session 9:** merge the DRA-10 PR once CI is green, move DRA-10 to Done, and make the
-`ci` check required in the GitHub branch protection for `main` (CI only blocks merging once
-that is set).
+**Before session 10:** merge the DRA-10 PR, then the DRA-11/DRA-12 PR (retarget it to `main`
+first), and move the three tickets to Done. Make the `ci` check required for `main`.
 
-**Session 9:** `/implement` DRA-11 (create the owner and sign in with a magic link),
-test-first, then `/code-review`.
+**Session 10:** `/implement` DRA-13 (owner manages administrators). It must also stop an
+inactive administrator from signing in (magic link, code and password do not check
+`is_active` yet; spec "Identity, administrators and members").
 
 Still open (not blocking): backup strategy, data migration from the current software.

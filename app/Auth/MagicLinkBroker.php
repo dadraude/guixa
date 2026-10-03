@@ -13,7 +13,7 @@ use Illuminate\Support\Str;
 
 /**
  * Issues and consumes magic links: single-use sign-in tokens, valid for
- * 15 minutes, of which only the hash is stored. A link asked for from a
+ * 15 minutes, of which the database stores only the hash. A link asked for from a
  * browser session also carries a 6-digit code that is accepted in that
  * session alone. Using either the link or the code uses up both.
  */
@@ -22,6 +22,9 @@ class MagicLinkBroker
     public const int MINUTES_VALID = 15;
 
     private const string SESSION_KEY = 'magic_link.id';
+
+    /** The email the session last asked a link for; sign-in throttling counts against it. */
+    public const string EMAIL_SESSION_KEY = 'magic_link.email';
 
     /**
      * Email the user a new magic link, with a code bound to the given session

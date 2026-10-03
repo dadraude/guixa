@@ -8,11 +8,10 @@ use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
-use Illuminate\Queue\SerializesModels;
 
 class MagicLinkMail extends Mailable implements ShouldQueueAfterCommit
 {
-    use Queueable, SerializesModels;
+    use Queueable;
 
     /**
      * @param  string|null  $code  The 6-digit code, when the link was asked for from the sign-in screen.

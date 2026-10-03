@@ -15,8 +15,6 @@ use Inertia\Response;
 
 class MagicLinkController extends Controller
 {
-    private const string EMAIL_KEY = 'magic_link.email';
-
     public function __construct(private readonly MagicLinkBroker $magicLinks) {}
 
     /**
@@ -35,7 +33,7 @@ class MagicLinkController extends Controller
             $this->magicLinks->send($user, $request->session());
         }
 
-        $request->session()->put(self::EMAIL_KEY, $email);
+        $request->session()->put(MagicLinkBroker::EMAIL_SESSION_KEY, $email);
 
         return to_route('magic-link.code')->with('status', __('If this address belongs to someone in the cooperative, we have emailed them a link and a code to log in.'));
     }
@@ -45,7 +43,7 @@ class MagicLinkController extends Controller
      */
     public function code(Request $request): Response|RedirectResponse
     {
-        $email = $request->session()->get(self::EMAIL_KEY);
+        $email = $request->session()->get(MagicLinkBroker::EMAIL_SESSION_KEY);
 
         if (! is_string($email)) {
             return to_route('login');
@@ -76,9 +74,18 @@ class MagicLinkController extends Controller
     }
 
     /**
+     * Ask for one click before using the link up, so that mail scanners and
+     * link previews that open it do not spend it.
+     */
+    public function show(string $token): Response
+    {
+        return Inertia::render('auth/MagicLinkConfirm', ['token' => $token]);
+    }
+
+    /**
      * Sign in the device that opened the link.
      */
-    public function show(Request $request, string $token): RedirectResponse
+    public function consume(Request $request, string $token): RedirectResponse
     {
         $user = $this->magicLinks->consume($token);
 
@@ -93,7 +100,7 @@ class MagicLinkController extends Controller
     {
         Auth::login($user, remember: true);
 
-        $request->session()->forget(self::EMAIL_KEY);
+        $request->session()->forget(MagicLinkBroker::EMAIL_SESSION_KEY);
         $request->session()->regenerate();
 
         return redirect()->intended(route('home'));
