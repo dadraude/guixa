@@ -30,10 +30,10 @@ test('an active administrator who is not the owner reaches the administrator hom
         ->assertOk();
 });
 
-test('an inactive administrator cannot reach the administrator home', function () {
+test('an inactive administrator is signed out instead of reaching the administrator home', function () {
     $admin = User::factory()->administrator(active: false)->create();
 
-    $this->actingAs($admin)->get(route('admin.home'))->assertForbidden();
+    $this->actingAs($admin)->get(route('admin.home'))->assertRedirect(route('login'));
 });
 
 test('a user without an administrator profile cannot reach the administrator home', function () {

@@ -23,29 +23,29 @@ write and approve its spec, split it into tickets in Linear, then implement test
 
 ## Run locally
 
-You need Docker, PHP 8.5 with Composer, and Node 22. [Laravel Sail](https://laravel.com/docs/sail)
-runs the app with PostgreSQL, Redis and Mailpit.
+You need [Laravel Herd](https://herd.laravel.com) (PHP 8.5, Composer, Node 22) and
+[DBngin](https://dbngin.com) running PostgreSQL 18 and Redis. Herd serves the app at `http://guixa.test`.
 
 ```sh
 composer install
 npm install
 cp .env.example .env
-vendor/bin/sail up -d
-vendor/bin/sail artisan key:generate
-vendor/bin/sail artisan migrate
-vendor/bin/sail npm run dev
+php artisan key:generate
+php artisan migrate
+npm run dev
 ```
 
-The app is at <http://localhost> and the emails it sends are at <http://localhost:8025>.
+The app is at <http://guixa.test> and the emails it sends show up in Herd's mail panel (if enabled).
+Create the `guixa` and `testing` databases in DBngin's PostgreSQL first.
 
 Checks (the same ones CI runs; it blocks merging unless all pass):
 
 ```sh
-vendor/bin/sail pest                          # tests, against PostgreSQL
-vendor/bin/sail bin pint --test               # PHP style
-vendor/bin/sail bin phpstan analyse           # Larastan
-vendor/bin/sail npm run check                 # Oxlint and Oxfmt (Vite+)
-vendor/bin/sail npm run types:check           # vue-tsc
+vendor/bin/pest                          # tests, against PostgreSQL
+vendor/bin/pint --test               # PHP style
+vendor/bin/phpstan analyse           # Larastan
+npm run check                 # Oxlint and Oxfmt (Vite+)
+npm run types:check           # vue-tsc
 ```
 
 User-facing text lives in `lang/ca.json` and `lang/ca/*.php`. In Vue, wrap strings with

@@ -3,16 +3,21 @@
 namespace App\Providers;
 
 use App\Auth\MagicLinkBroker;
+use App\Models\User;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
+use Illuminate\Support\Timebox;
 use Inertia\Inertia;
 use Laravel\Fortify\Fortify;
 
 class FortifyServiceProvider extends ServiceProvider
 {
+    private const int MINIMUM_SIGN_IN_MICROSECONDS = 200_000;
+
     /**
      * Register any application services.
      */
@@ -27,6 +32,7 @@ class FortifyServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureViews();
+        $this->configureAuthentication();
         $this->configureRateLimiting();
     }
 
@@ -38,6 +44,37 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::loginView(fn (Request $request) => Inertia::render('auth/Login', [
             'status' => $request->session()->get('status'),
         ]));
+    }
+
+    /**
+     * Password sign-in refuses people who may not sign in, such as inactive
+     * administrators, with the same error as a wrong password. Every attempt
+     * takes at least as long as Laravel's own guard, so response time does
+     * not reveal whether the email exists either.
+     */
+    private function configureAuthentication(): void
+    {
+        Fortify::authenticateUsing(fn (Request $request): ?User => app(Timebox::class)->call(
+            fn (Timebox $timebox): ?User => $this->authenticate($request, $timebox),
+            self::MINIMUM_SIGN_IN_MICROSECONDS,
+        ));
+    }
+
+    private function authenticate(Request $request, Timebox $timebox): ?User
+    {
+        $user = User::where('email', Str::lower((string) $request->input(Fortify::username())))->first();
+
+        if ($user === null || $user->password === null || ! $user->canSignIn()) {
+            return null;
+        }
+
+        if (! Hash::check((string) $request->input('password'), $user->password)) {
+            return null;
+        }
+
+        $timebox->returnEarly();
+
+        return $user;
     }
 
     /**

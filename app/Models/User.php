@@ -69,6 +69,25 @@ class User extends Authenticatable
     }
 
     /**
+     * Whether the user is the active owner, the only administrator who
+     * manages the other administrators.
+     */
+    public function isOwner(): bool
+    {
+        return $this->administrator?->is_owner === true && $this->isActingAsAdministrator();
+    }
+
+    /**
+     * Whether the user may sign in. An inactive administrator may not; once
+     * members exist, one with an active member profile will be allowed to
+     * sign in as a member.
+     */
+    public function canSignIn(): bool
+    {
+        return ! $this->administrator()->where('is_active', false)->exists();
+    }
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>

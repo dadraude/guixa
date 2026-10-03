@@ -51,8 +51,8 @@ Technical decisions and rules for the whole project. Domain terms are defined in
 
 ## Local development
 
-- **Laravel Sail** (Docker) runs PHP, PostgreSQL, Redis and Mailpit, so every developer and
-  agent gets the same environment with one command. Production does not use Docker.
+- **Laravel Herd** serves PHP; **DBngin** runs PostgreSQL and Redis locally (no Docker). CI uses a
+  PostgreSQL service container. Production does not use Docker.
 
 ## Access
 

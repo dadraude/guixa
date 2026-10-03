@@ -323,7 +323,7 @@ Guixa gets the membership foundation every later feature builds on:
 - Each permission rule is tested from both sides: an allowed actor succeeds and a forbidden
   one (member without the role, membership role trying to assign roles, inactive member…) is
   refused.
-- Tests run against a real PostgreSQL database (Sail locally, a service container in CI).
+- Tests run against a real PostgreSQL database (DBngin locally, a service container in CI).
 - **One Playwright test** for the critical end-to-end path: open an invitation → confirm name
   and set password → sign out → request a magic link → sign in by typing the 6-digit code.
 - Prior art: none yet; this is the first feature of the codebase, so its tests set the

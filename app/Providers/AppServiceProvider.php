@@ -12,6 +12,8 @@ use Illuminate\Validation\Rules\Password;
 
 class AppServiceProvider extends ServiceProvider
 {
+    private const array OWNER_ONLY_ABILITIES = ['manage-administrators'];
+
     /**
      * Register any application services.
      */
@@ -30,14 +32,18 @@ class AppServiceProvider extends ServiceProvider
     }
 
     /**
-     * An active administrator passes every authorization check. Abilities
-     * reserved to administrators are defined as false for everyone else.
+     * An active administrator passes every authorization check, except the
+     * owner-only abilities, which are decided by their own definition.
+     * Abilities reserved to administrators are defined as false for everyone else.
      */
     protected function configureAuthorization(): void
     {
-        Gate::before(fn (User $user) => $user->isActingAsAdministrator() ? true : null);
+        Gate::before(fn (User $user, string $ability) => $user->isActingAsAdministrator() && ! in_array($ability, self::OWNER_ONLY_ABILITIES, true)
+            ? true
+            : null);
 
         Gate::define('administer', fn (User $user) => false);
+        Gate::define('manage-administrators', fn (User $user) => $user->isOwner());
     }
 
     /**
