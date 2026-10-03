@@ -56,9 +56,23 @@
   directory + warning + Playwright path. Until DRA-20, membership work is administrator-only
   through one shared "can manage membership" rule.
 
+- **Session 8 (2026-10-03):** DRA-10 implemented (PR open, Linear "In Progress"): Laravel 13
+  Vue starter kit trimmed to password sign-in (no registration, password reset, two-factor,
+  passkeys, email verification, account deletion or welcome page); Pest on PostgreSQL;
+  `User` with UUIDv7 key and stubs that make UUIDs the default; Europe/Madrid, `ca` locale,
+  four-week sessions, Redis for sessions, cache and queue; Sail with PostgreSQL, Redis and
+  Mailpit; all UI text in `lang/ca.json` and `lang/ca/*.php` (Vue uses `t()` from
+  `@/lib/i18n`, and a test fails on a missing translation); CI on GitHub Actions (Pest, Pint,
+  Larastan level 7, Oxlint/Oxfmt, vue-tsc). The kit's Vite+ replaces ESLint and Prettier
+  (ADR 0007). Reviewed with `/code-review` and findings fixed.
+
 ## Next step
 
-**Session 8:** `/implement` DRA-10 (project skeleton and CI: starter kit, Sail, Fortify
-trimmed, Catalan translations, UUIDv7, CI), test-first, then `/code-review`.
+**Before session 9:** merge the DRA-10 PR once CI is green, move DRA-10 to Done, and make the
+`ci` check required in the GitHub branch protection for `main` (CI only blocks merging once
+that is set).
+
+**Session 9:** `/implement` DRA-11 (create the owner and sign in with a magic link),
+test-first, then `/code-review`.
 
 Still open (not blocking): backup strategy, data migration from the current software.
