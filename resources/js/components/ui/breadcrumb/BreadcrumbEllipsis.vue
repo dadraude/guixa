@@ -2,6 +2,7 @@
 import type { HTMLAttributes } from "vue"
 import { MoreHorizontal } from "@lucide/vue"
 import { cn } from "@/lib/utils"
+import { t } from "@/lib/i18n"
 
 const props = defineProps<{
   class?: HTMLAttributes["class"]
@@ -18,6 +19,6 @@ const props = defineProps<{
     <slot>
       <MoreHorizontal class="size-4" />
     </slot>
-    <span class="sr-only">More</span>
+    <span class="sr-only">{{ t('More') }}</span>
   </span>
 </template>

@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\User;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
@@ -59,4 +60,31 @@ test('sessions last weeks', function () {
 
 test('the time zone is Europe/Madrid', function () {
     expect(config('app.timezone'))->toBe('Europe/Madrid');
+});
+
+test('sign-in errors are in Catalan', function () {
+    $this->post(route('login.store'), ['email' => '', 'password' => ''])
+        ->assertSessionHasErrors(['email' => 'El camp adreça electrònica és obligatori.']);
+});
+
+test('every user-facing string has a Catalan translation', function () {
+    $catalan = json_decode(file_get_contents(lang_path('ca.json')), true);
+
+    $files = collect(File::allFiles(resource_path('js')))
+        ->merge(File::allFiles(app_path()))
+        ->reject(fn ($file) => Str::contains($file->getPathname(), ['/routes/', '/actions/', '/wayfinder/']));
+
+    $missing = $files
+        ->flatMap(function ($file) {
+            preg_match_all("/(?<![\w.])(?:t|__)\(\s*'((?:[^'\\\\]|\\\\.)+)'/", $file->getContents(), $matches);
+
+            return $matches[1];
+        })
+        ->map(fn (string $key) => stripslashes($key))
+        ->unique()
+        ->reject(fn (string $key) => array_key_exists($key, $catalan))
+        ->values()
+        ->all();
+
+    expect($missing)->toBe([]);
 });
