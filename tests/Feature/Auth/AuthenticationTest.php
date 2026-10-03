@@ -12,7 +12,7 @@ test('users can sign in with their password', function () {
     ]);
 
     $this->assertAuthenticatedAs($user);
-    $response->assertRedirect(route('dashboard', absolute: false));
+    $response->assertRedirect(route('home', absolute: false));
 });
 
 test('users cannot sign in with a wrong password', function () {
@@ -22,6 +22,18 @@ test('users cannot sign in with a wrong password', function () {
         'email' => $user->email,
         'password' => 'wrong-password',
     ])->assertSessionHasErrors('email');
+
+    $this->assertGuest();
+});
+
+test('a wrong password does not reveal whether the email exists', function () {
+    $user = User::factory()->create();
+
+    $this->post(route('login.store'), ['email' => $user->email, 'password' => 'wrong-password'])
+        ->assertSessionHasErrors(['email' => __('auth.failed')]);
+
+    $this->post(route('login.store'), ['email' => 'nobody@example.com', 'password' => 'wrong-password'])
+        ->assertSessionHasErrors(['email' => __('auth.failed')]);
 
     $this->assertGuest();
 });

@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { Link } from '@inertiajs/vue3';
-import { LayoutGrid } from '@lucide/vue';
+import { Link, usePage } from '@inertiajs/vue3';
+import { LayoutGrid, ShieldCheck } from '@lucide/vue';
+import { computed } from 'vue';
 import AppLogo from '@/components/AppLogo.vue';
 import NavMain from '@/components/NavMain.vue';
 import NavUser from '@/components/NavUser.vue';
@@ -14,16 +15,29 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { t } from '@/lib/i18n';
-import { dashboard } from '@/routes';
+import { dashboard, home } from '@/routes';
+import { home as adminHome } from '@/routes/admin';
 import type { NavItem } from '@/types';
 
-const mainNavItems: NavItem[] = [
-    {
-        title: t('Dashboard'),
-        href: dashboard(),
-        icon: LayoutGrid,
-    },
-];
+const page = usePage();
+
+const mainNavItems = computed<NavItem[]>(() =>
+    page.props.auth.actingAs === 'administrator'
+        ? [
+              {
+                  title: t('Administration'),
+                  href: adminHome(),
+                  icon: ShieldCheck,
+              },
+          ]
+        : [
+              {
+                  title: t('Dashboard'),
+                  href: dashboard(),
+                  icon: LayoutGrid,
+              },
+          ],
+);
 </script>
 
 <template>
@@ -32,7 +46,7 @@ const mainNavItems: NavItem[] = [
             <SidebarMenu>
                 <SidebarMenuItem>
                     <SidebarMenuButton size="lg" as-child>
-                        <Link :href="dashboard()">
+                        <Link :href="home()">
                             <AppLogo />
                         </Link>
                     </SidebarMenuButton>

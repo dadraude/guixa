@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Auth\MagicLinkBroker;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
@@ -40,14 +41,23 @@ class FortifyServiceProvider extends ServiceProvider
     }
 
     /**
-     * Configure rate limiting.
+     * Configure rate limiting. Password attempts, magic-link requests and
+     * code attempts share one limit per email and one per IP address. The
+     * code form counts against the email the session asked a link for,
+     * whatever the request sends.
      */
     private function configureRateLimiting(): void
     {
         RateLimiter::for('login', function (Request $request) {
-            $throttleKey = Str::transliterate(Str::lower($request->input(Fortify::username())).'|'.$request->ip());
+            $email = $request->routeIs('magic-link.code.store')
+                ? $request->session()->get(MagicLinkBroker::EMAIL_SESSION_KEY)
+                : $request->input(Fortify::username());
+            $throttleKey = Str::transliterate(Str::lower(is_string($email) ? $email : '').'|'.$request->ip());
 
-            return Limit::perMinute(5)->by($throttleKey);
+            return [
+                Limit::perMinute(5)->by($throttleKey),
+                Limit::perMinute(20)->by('ip|'.$request->ip()),
+            ];
         });
     }
 }
