@@ -27,6 +27,19 @@ Domain vocabulary lives in `CONTEXT.md`; decisions in `docs/adr/NNNN-title.md`.
   next step, commit and push to `origin` (github.com:dadraude/guixa).
 - If the goal doesn't fit, split it and close the finished part.
 
+## Ticket flow (`/ship-ticket DRA-NN`)
+
+Standard way to implement a Linear ticket; defined in `.claude/skills/ship-ticket/SKILL.md`.
+
+- Branch `feature|bugfix|…/dra-NN-short-title`, from updated `main`, or from the blocking ticket's
+  branch while its PR is still open (stacked; the PR targets that branch until it merges).
+- `ticket-implementer` agent (Sonnet): test-first, linters, full suite, one single-line commit.
+- `ticket-reviewer` agent (Sonnet, read-only): independent review of Standards and Spec. One correction pass.
+- Linear: In Progress when starting, In Review when the PR is opened.
+- Agents never edit `STATUS.md` (parallel branches would conflict); the orchestrator writes the session
+  entry on `main` after the PRs merge.
+- Never push to `main`, never force-push, never merge PRs without being asked.
+
 ## Language
 
 - Conversation with the user: **Catalan**.
