@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
-import { Home, LayoutGrid, ShieldCheck, Users } from '@lucide/vue';
+import { Home, LayoutGrid, Mail, ShieldCheck, Users } from '@lucide/vue';
 import { computed } from 'vue';
 import AppLogo from '@/components/AppLogo.vue';
 import NavMain from '@/components/NavMain.vue';
@@ -19,6 +19,7 @@ import { dashboard, home } from '@/routes';
 import { home as adminHome } from '@/routes/admin';
 import { index as administratorsIndex } from '@/routes/admin/administrators';
 import { index as householdsIndex } from '@/routes/households';
+import { index as invitationsIndex } from '@/routes/households/invitations';
 import type { NavItem } from '@/types';
 
 const page = usePage();
@@ -35,6 +36,11 @@ const mainNavItems = computed<NavItem[]>(() =>
                   title: t('Households'),
                   href: householdsIndex(),
                   icon: Home,
+              },
+              {
+                  title: t('Invitations'),
+                  href: invitationsIndex(),
+                  icon: Mail,
               },
               ...(page.props.auth.isOwner
                   ? [

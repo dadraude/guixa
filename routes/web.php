@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\SetPasswordController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Households\HouseholdController;
 use App\Http\Controllers\Households\InvitationController;
+use App\Http\Controllers\Households\PendingInvitationController;
 use App\Http\Controllers\Invitations\AcceptInvitationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -44,6 +45,12 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/', [HouseholdController::class, 'store'])->name('store');
         Route::patch('{household}', [HouseholdController::class, 'update'])->name('update');
         Route::post('{household}/invitations', [InvitationController::class, 'store'])->name('invitations.store');
+
+        Route::prefix('invitations')->name('invitations.')->group(function () {
+            Route::get('/', [PendingInvitationController::class, 'index'])->name('index');
+            Route::post('{invitation}/resend', [PendingInvitationController::class, 'resend'])->name('resend');
+            Route::delete('{invitation}', [PendingInvitationController::class, 'cancel'])->name('cancel');
+        });
     });
 
     Route::middleware('can:administer')->prefix('admin')->name('admin.')->group(function () {

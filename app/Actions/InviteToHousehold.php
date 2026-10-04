@@ -3,11 +3,9 @@
 namespace App\Actions;
 
 use App\Auth\SecretHasher;
-use App\Mail\InvitationMail;
 use App\Models\Household;
 use App\Models\Invitation;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 /**
@@ -17,6 +15,8 @@ use Illuminate\Support\Str;
  */
 class InviteToHousehold
 {
+    public function __construct(private readonly QueueInvitationEmail $queueInvitationEmail) {}
+
     public function handle(Household $household, string $email, ?string $name): Invitation
     {
         $token = Str::random(64);
@@ -35,11 +35,7 @@ class InviteToHousehold
             ]);
         });
 
-        Mail::to($email)->queue(new InvitationMail(
-            url: route('invitations.show', ['token' => $token]),
-            householdName: $household->name,
-            name: $name,
-        ));
+        $this->queueInvitationEmail->handle($invitation, $token);
 
         return $invitation;
     }

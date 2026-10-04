@@ -25,4 +25,19 @@ class InvitationFactory extends Factory
             'expires_at' => now()->addDays(Invitation::DAYS_VALID),
         ];
     }
+
+    public function expired(): static
+    {
+        return $this->state(['expires_at' => now()->subDay()]);
+    }
+
+    public function cancelled(): static
+    {
+        return $this->state(['cancelled_at' => now()]);
+    }
+
+    public function accepted(): static
+    {
+        return $this->state(['accepted_at' => now()]);
+    }
 }

@@ -111,9 +111,20 @@
   hashing moved to `App\Auth\SecretHasher`, shared with magic links. Reviewed with
   `/code-review`, no findings to fix.
 
+- **Session 13 (2026-10-04):** DRA-16 implemented test-first (manage pending invitations),
+  stacked on the DRA-15 branch. `/households/invitations` lists open invitations (pending and
+  expired, expired ones badged; accepted and cancelled are not shown), soonest expiry first,
+  with an "Invitations" sidebar entry for administrators. Resend gives the invitation a new
+  token and a new 7-day expiry in place (the old link stops working, an expired one becomes
+  valid again) and queues the email; cancel sets `cancelled_at`, so the link shows the
+  existing "ask for a new one" message. Accepted or cancelled invitations answer 404 to resend
+  and cancel. Everything goes through `manage-membership`. Email queuing moved to
+  `QueueInvitationEmail`, shared by invite and resend. Added a test that re-inviting an email
+  kills the old link.
+
 ## Next step
 
-**Session 13:** open the DRA-15 PR, then `/implement` DRA-16, DRA-17, DRA-18 or DRA-19
-(all unblocked by DRA-15).
+**Session 14:** open the DRA-16 PR (stacked on DRA-15, PR #7), then `/implement` DRA-17, DRA-18
+or DRA-19 (unblocked by DRA-15).
 
 Still open (not blocking): backup strategy, data migration from the current software.

@@ -54,6 +54,11 @@ class Invitation extends Model
         };
     }
 
+    public function isOpen(): bool
+    {
+        return $this->accepted_at === null && $this->cancelled_at === null;
+    }
+
     /**
      * Only invitations that are still pending.
      *
@@ -62,6 +67,17 @@ class Invitation extends Model
     public function scopeUsable(Builder $query): void
     {
         $query->whereNull('accepted_at')->whereNull('cancelled_at')->where('expires_at', '>', now());
+    }
+
+    /**
+     * Invitations that can still be managed: pending or expired, not accepted
+     * or cancelled.
+     *
+     * @param  Builder<self>  $query
+     */
+    public function scopeOpen(Builder $query): void
+    {
+        $query->whereNull('accepted_at')->whereNull('cancelled_at');
     }
 
     /**
