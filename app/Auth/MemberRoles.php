@@ -9,13 +9,16 @@ use Illuminate\Support\Facades\DB;
 
 /**
  * The only place that knows how roles reach members: through the commissions
- * they are in. Always read from the database, so removing a member from a
- * commission or a role from a commission takes effect on the next request.
- * Inactive members have no roles.
+ * they are in. Inactive members have no roles.
  *
- * Registered as a scoped singleton: roles are remembered per member for the
- * life of one request (the gate and the shared props ask for the same member),
- * and the next request starts empty.
+ * Registered as a scoped singleton: roles are read from the database once per
+ * member and remembered for the life of one request (the gate and the shared
+ * props ask for the same member); the next request starts empty, so removing a
+ * member from a commission or a role from a commission takes effect then.
+ *
+ * Warning: writing roles or commission membership and then checking a gate in
+ * the same request would see the remembered, stale roles. Such code must
+ * invalidate the memo first (e.g. app()->forgetScopedInstances()).
  */
 class MemberRoles
 {
@@ -48,7 +51,7 @@ class MemberRoles
             return [];
         }
 
-        return $this->rolesByMember[$member->id] ??= $this->forCommissions($member->commissions()->pluck('commissions.id')->all());
+        return $this->rolesByMember[$member->id] ??= $this->rolesThroughCommissions($member);
     }
 
     /**
@@ -104,6 +107,16 @@ class MemberRoles
                 ),
             ])
             ->all());
+    }
+
+    /**
+     * @return list<Role>
+     */
+    private function rolesThroughCommissions(Member $member): array
+    {
+        $commissionIds = $member->commissions()->pluck('commissions.id')->all();
+
+        return $this->forCommissions($commissionIds);
     }
 
     /**

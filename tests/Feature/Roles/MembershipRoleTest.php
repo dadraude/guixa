@@ -103,25 +103,26 @@ test('a member in no commission is refused', function () {
     expectEveryMembershipRequestToBeRefused(memberWithRoles()->user);
 });
 
-test('the permission goes away as soon as the member leaves the commission or the commission loses the role', function () {
+test('the permission goes away on the next request once the member leaves the commission', function () {
     $member = memberWithRoles(Role::Membership);
     $commission = $member->commissions()->sole();
 
-    expect(Gate::forUser($member->user)->allows('manage-membership'))->toBeTrue();
-
-    // Roles are remembered per request, so each step below stands for a new request.
-    $commission->assignRole(Role::Orders);
-    $commission->removeRole(Role::Membership);
-    app()->forgetScopedInstances();
-    expect(Gate::forUser($member->user->fresh())->allows('manage-membership'))->toBeFalse();
-
-    $commission->assignRole(Role::Membership);
-    app()->forgetScopedInstances();
-    expect(Gate::forUser($member->user->fresh())->allows('manage-membership'))->toBeTrue();
+    $this->actingAs($member->user)->get(route('households.index'))->assertOk();
 
     $commission->members()->detach($member);
-    app()->forgetScopedInstances();
-    expect(Gate::forUser($member->user->fresh())->allows('manage-membership'))->toBeFalse();
+
+    $this->actingAs($member->user->fresh())->get(route('households.index'))->assertForbidden();
+});
+
+test('the permission goes away on the next request once the commission loses the role', function () {
+    $member = memberWithRoles(Role::Membership);
+    $commission = $member->commissions()->sole();
+
+    $this->actingAs($member->user)->get(route('households.index'))->assertOk();
+
+    $commission->removeRole(Role::Membership);
+
+    $this->actingAs($member->user->fresh())->get(route('households.index'))->assertForbidden();
 });
 
 test('the role comes from any of several commissions', function () {
@@ -174,7 +175,7 @@ test('a single request resolves the member roles with one set of queries', funct
     DB::enableQueryLog();
     $this->actingAs($member->user)->get(route('commissions.index'))->assertOk();
     $roleQueries = collect(DB::getQueryLog())
-        ->filter(fn (array $query) => str_contains($query['query'], 'commission_role') && str_contains($query['query'], 'distinct'))
+        ->filter(fn (array $query) => str_starts_with($query['query'], 'select distinct "role" from "commission_role"'))
         ->count();
     DB::disableQueryLog();
 

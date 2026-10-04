@@ -14,8 +14,8 @@ class DashboardController extends Controller
 {
     /**
      * The member's own household and its members, and their commissions with
-     * the roles those give them; no other household is
-     * exposed, and none at all while acting as administrator.
+     * the roles those give them; no other household is exposed, and none at
+     * all while acting as administrator.
      */
     public function __invoke(Request $request, ActiveProfile $activeProfile, MemberRoles $memberRoles): Response
     {
