@@ -143,10 +143,22 @@
   tests for the two-profile case, administrator without member profile, and inactive member.
   Locally PHPStan needs `--memory-limit=1G`, and tests need `vp build` after adding a page.
 
+- **Session 16 (2026-10-04):** DRA-20 implemented and merged (PR #17): fixed `Role` enum
+  (Comandes, Caixes, Tresoreria, Membres) assigned to commissions by administrators only
+  (`assign-roles`); `App\Auth\MemberRoles` is the single place that resolves a member's roles
+  from their commissions (a scoped singleton memoized per request; inactive members have none);
+  `manage-membership` now allows the membership role, so households, invitations and
+  commissions open to those members, and the sidebar follows the acting profile. A member sees
+  their commissions and roles on the commissions page and the home page. The base `TestCase`
+  flushes scoped instances before every test request, as production does per request. Pest
+  220/220. Workflow (PR #18): review follow-ups that are not trivial become Linear issues
+  labelled `needs-triage`, triaged with the user at the start of each session; the DRA-17 and
+  DRA-19 follow-ups were backfilled as DRA-24 to DRA-30. Merged local branches cleaned up.
+
 ## Next step
 
-**Session 16:** `/ship-ticket DRA-20` (roles on commissions and the membership role), which
-unblocks DRA-21, DRA-22 and DRA-23.
+**Session 17:** triage DRA-24 to DRA-30 (`needs-triage`) with the user, then `/ship-ticket`
+DRA-21, DRA-22 or DRA-23 (all unblocked by DRA-20) to finish spec 001.
 
 Before spec 002: define UX/UI principles with `/grill-with-docs` (mobile-first, accessibility
 target, visual identity, key flows for ordering and the offline box/payment screens) and record
