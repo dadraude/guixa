@@ -1,0 +1,46 @@
+<?php
+
+namespace App\Actions;
+
+use App\Auth\SecretHasher;
+use App\Mail\InvitationMail;
+use App\Models\Household;
+use App\Models\Invitation;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
+
+/**
+ * Invites an email to a household. A pending invitation for the same email is
+ * replaced, so only the newest link works. The email is queued once the
+ * transaction commits.
+ */
+class InviteToHousehold
+{
+    public function handle(Household $household, string $email, ?string $name): Invitation
+    {
+        $token = Str::random(64);
+
+        $invitation = DB::transaction(function () use ($household, $email, $name, $token) {
+            Invitation::query()
+                ->usable()
+                ->where('email', $email)
+                ->update(['cancelled_at' => now()]);
+
+            return $household->invitations()->create([
+                'email' => $email,
+                'name' => $name,
+                'token_hash' => SecretHasher::hash($token),
+                'expires_at' => now()->addDays(Invitation::DAYS_VALID),
+            ]);
+        });
+
+        Mail::to($email)->queue(new InvitationMail(
+            url: route('invitations.show', ['token' => $token]),
+            householdName: $household->name,
+            name: $name,
+        ));
+
+        return $invitation;
+    }
+}

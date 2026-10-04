@@ -3,7 +3,10 @@
 use App\Http\Controllers\Admin\AdministratorController;
 use App\Http\Controllers\Auth\MagicLinkController;
 use App\Http\Controllers\Auth\SetPasswordController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Households\HouseholdController;
+use App\Http\Controllers\Households\InvitationController;
+use App\Http\Controllers\Invitations\AcceptInvitationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -19,6 +22,11 @@ Route::middleware('guest')->group(function () {
     Route::post('magic-link/{token}', [MagicLinkController::class, 'consume'])->name('magic-link.consume');
 });
 
+Route::middleware('guest')->prefix('invitations')->name('invitations.')->group(function () {
+    Route::get('{token}', [AcceptInvitationController::class, 'show'])->name('show');
+    Route::post('{token}', [AcceptInvitationController::class, 'accept'])->name('accept');
+});
+
 Route::middleware(['auth'])->group(function () {
     Route::get('/', function (Request $request) {
         return $request->user()?->isActingAsAdministrator()
@@ -29,12 +37,13 @@ Route::middleware(['auth'])->group(function () {
     Route::get('set-password', [SetPasswordController::class, 'create'])->name('password.setup');
     Route::post('set-password', [SetPasswordController::class, 'store'])->name('password.setup.store');
 
-    Route::inertia('dashboard', 'Dashboard')->name('dashboard');
+    Route::get('dashboard', DashboardController::class)->name('dashboard');
 
     Route::middleware('can:manage-membership')->prefix('households')->name('households.')->group(function () {
         Route::get('/', [HouseholdController::class, 'index'])->name('index');
         Route::post('/', [HouseholdController::class, 'store'])->name('store');
         Route::patch('{household}', [HouseholdController::class, 'update'])->name('update');
+        Route::post('{household}/invitations', [InvitationController::class, 'store'])->name('invitations.store');
     });
 
     Route::middleware('can:administer')->prefix('admin')->name('admin.')->group(function () {

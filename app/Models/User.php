@@ -25,6 +25,7 @@ use Illuminate\Support\Str;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read Administrator|null $administrator
+ * @property-read Member|null $member
  */
 #[Fillable(['name', 'email', 'password'])]
 #[Hidden(['password', 'remember_token'])]
@@ -49,6 +50,14 @@ class User extends Authenticatable
     public function administrator(): HasOne
     {
         return $this->hasOne(Administrator::class);
+    }
+
+    /**
+     * @return HasOne<Member, $this>
+     */
+    public function member(): HasOne
+    {
+        return $this->hasOne(Member::class);
     }
 
     /**
