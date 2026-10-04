@@ -12,13 +12,14 @@ import { t } from '@/lib/i18n';
 defineOptions({
     layout: {
         title: t('Join your household'),
-        description: t('Confirm your name and choose a password'),
+        description: t('Confirm your details'),
     },
 });
 
 defineProps<{
     token: string;
     email: string;
+    existingUser: boolean;
     name: string | null;
     passwordRules: string;
 }>();
@@ -40,7 +41,7 @@ defineProps<{
                 <InputError :message="errors.email" />
             </div>
 
-            <div class="grid gap-2">
+            <div v-if="!existingUser" class="grid gap-2">
                 <Label for="name">{{ t('Full name') }}</Label>
                 <Input
                     id="name"
@@ -53,7 +54,19 @@ defineProps<{
                 <InputError :message="errors.name" />
             </div>
 
-            <div class="grid gap-2">
+            <p
+                v-if="existingUser"
+                class="text-sm text-muted-foreground"
+                data-test="existing-user-notice"
+            >
+                {{
+                    t(
+                        'You already have an account with this email, so your password stays the same.',
+                    )
+                }}
+            </p>
+
+            <div v-if="!existingUser" class="grid gap-2">
                 <Label for="password">{{ t('New password') }}</Label>
                 <PasswordInput
                     id="password"
@@ -66,7 +79,7 @@ defineProps<{
                 <InputError :message="errors.password" />
             </div>
 
-            <div class="grid gap-2">
+            <div v-if="!existingUser" class="grid gap-2">
                 <Label for="password_confirmation">{{
                     t('Confirm password')
                 }}</Label>

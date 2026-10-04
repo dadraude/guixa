@@ -44,6 +44,15 @@ class Invitation extends Model
         return $this->belongsTo(Household::class);
     }
 
+    /**
+     * The user who already signs in with the invitation's email, such as an
+     * administrator who is now also joining a household.
+     */
+    public function existingUser(): ?User
+    {
+        return User::query()->where('email', $this->email)->first();
+    }
+
     public function status(): InvitationStatus
     {
         return match (true) {

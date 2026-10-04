@@ -27,10 +27,13 @@ class AcceptInvitationController extends Controller
             return Inertia::render('invitations/Unavailable');
         }
 
+        $existingUser = $invitation->existingUser();
+
         return Inertia::render('invitations/Accept', [
             'token' => $token,
             'email' => $invitation->email,
-            'name' => $invitation->name,
+            'existingUser' => $existingUser !== null,
+            'name' => $existingUser === null ? $invitation->name : null,
             'passwordRules' => Password::defaults()->toPasswordRulesString(),
         ]);
     }
@@ -43,9 +46,25 @@ class AcceptInvitationController extends Controller
             return to_route('invitations.show', ['token' => $token]);
         }
 
-        Auth::login($user, remember: true);
-        $request->session()->regenerate();
+        if ($user->wasRecentlyCreated) {
+            // Nothing from a previously signed-in user may leak into the new session.
+            if (Auth::check()) {
+                Auth::logout();
+                $request->session()->invalidate();
+            }
 
-        return to_route('home');
+            Auth::login($user, remember: true);
+            $request->session()->regenerate();
+
+            return to_route('home');
+        }
+
+        // The link proves the email but is valid for days, so it must not
+        // sign in an existing account that already has its own way in.
+        if (Auth::id() === $user->id) {
+            return to_route('home');
+        }
+
+        return to_route('login')->with('status', __('Invitation accepted. Log in to join your household.'));
     }
 }

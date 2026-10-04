@@ -2,6 +2,8 @@
 
 namespace App\Http\Middleware;
 
+use App\Auth\ActiveProfile;
+use App\Auth\Profile;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -36,18 +38,16 @@ class HandleInertiaRequests extends Middleware
     public function share(Request $request): array
     {
         $user = $request->user();
+        $activeProfile = app(ActiveProfile::class);
 
         return [
             ...parent::share($request),
             'name' => config('app.name'),
             'auth' => [
                 'user' => $user,
-                'isOwner' => $user?->isOwner() === true,
-                'actingAs' => match (true) {
-                    $user === null => null,
-                    $user->isActingAsAdministrator() => 'administrator',
-                    default => 'member',
-                },
+                'isOwner' => $user !== null && $activeProfile->isActingAsOwner($user),
+                'actingAs' => $user === null ? null : $activeProfile->current($user)?->value,
+                'profiles' => $user === null ? [] : array_map(fn (Profile $profile) => $profile->value, $activeProfile->available($user)),
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
