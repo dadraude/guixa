@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Settings;
 
+use App\Auth\MagicLinkSignIn;
 use App\Concerns\PasswordValidationRules;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -17,8 +18,11 @@ class PasswordUpdateRequest extends FormRequest
      */
     public function rules(): array
     {
+        // Someone who signed in with a magic link has probably forgotten it.
+        $signedInWithMagicLink = MagicLinkSignIn::isRecent($this->session());
+
         return [
-            'current_password' => $this->currentPasswordRules(),
+            'current_password' => $signedInWithMagicLink ? ['nullable'] : $this->currentPasswordRules(),
             'password' => $this->passwordRules(),
         ];
     }

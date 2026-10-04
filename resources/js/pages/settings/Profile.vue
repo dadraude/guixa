@@ -21,6 +21,11 @@ defineOptions({
     },
 });
 
+defineProps<{
+    phone: string | null;
+    pendingEmail: string | null;
+}>();
+
 const page = usePage();
 const user = computed(() => page.props.auth.user);
 </script>
@@ -34,7 +39,7 @@ const user = computed(() => page.props.auth.user);
         <Heading
             variant="small"
             :title="t('Profile')"
-            :description="t('Update your name and email address')"
+            :description="t('Update your name, phone and email address')"
         />
 
         <Form
@@ -57,6 +62,20 @@ const user = computed(() => page.props.auth.user);
             </div>
 
             <div class="grid gap-2">
+                <Label for="phone">{{ t('Phone (optional)') }}</Label>
+                <Input
+                    id="phone"
+                    type="tel"
+                    class="mt-1 block w-full"
+                    name="phone"
+                    :default-value="phone ?? ''"
+                    autocomplete="tel"
+                    :placeholder="t('Phone (optional)')"
+                />
+                <InputError class="mt-2" :message="errors.phone" />
+            </div>
+
+            <div class="grid gap-2">
                 <Label for="email">{{ t('Email address') }}</Label>
                 <Input
                     id="email"
@@ -69,6 +88,18 @@ const user = computed(() => page.props.auth.user);
                     :placeholder="t('Email address')"
                 />
                 <InputError class="mt-2" :message="errors.email" />
+                <p
+                    v-if="pendingEmail"
+                    class="text-sm text-muted-foreground"
+                    data-test="pending-email"
+                >
+                    {{
+                        t(
+                            'We sent a link to :email. Your email will change when you open it.',
+                            { email: pendingEmail },
+                        )
+                    }}
+                </p>
             </div>
 
             <div class="flex items-center gap-4">

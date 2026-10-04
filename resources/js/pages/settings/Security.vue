@@ -11,6 +11,7 @@ import { edit } from '@/routes/security';
 
 type Props = {
     passwordRules: string;
+    requiresCurrentPassword: boolean;
 };
 
 const props = defineProps<Props>();
@@ -57,7 +58,7 @@ defineOptions({
             class="space-y-6"
             v-slot="{ errors, processing }"
         >
-            <div class="grid gap-2">
+            <div v-if="props.requiresCurrentPassword" class="grid gap-2">
                 <Label for="current_password">{{
                     t('Current password')
                 }}</Label>
