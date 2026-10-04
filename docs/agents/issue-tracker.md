@@ -17,7 +17,7 @@ Use the Linear MCP tools (`save_issue`, `get_issue`, `list_issues`, `save_commen
 
 - **Create**: `save_issue` with `team: "Draude"`, `project: "Guixa"`, a title,
   and a body that starts with `Spec: specs/NNN-<feature-slug>/spec.md` (plus a
-  `links` entry to the file on GitHub: `https://github.com/draude/guixa/blob/main/specs/…`).
+  `links` entry to the file on GitHub: `https://github.com/dadraude/guixa/blob/main/specs/…`).
 - **Blocking**: native Linear relations via `blockedBy` / `blocks`.
 - **Read**: `get_issue` with the identifier (e.g. `DRA-12`), plus `list_comments`.
 - **List**: `list_issues` filtered by `project: "Guixa"` and label/state.
