@@ -24,7 +24,7 @@ Domain vocabulary lives in `CONTEXT.md`; decisions in `docs/adr/NNNN-title.md`.
 - Each session has **one small goal** (e.g. "write spec 001", "tickets DRA-3 and DRA-4").
 - At the start: read `STATUS.md`.
 - At the end: leave nothing half-done, update `STATUS.md` with what was done and the concrete
-  next step, commit and push to `origin` (github.com:draude/guixa).
+  next step, commit and push to `origin` (github.com:dadraude/guixa).
 - If the goal doesn't fit, split it and close the finished part.
 
 ## Language
