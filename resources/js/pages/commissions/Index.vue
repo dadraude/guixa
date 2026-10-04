@@ -5,6 +5,7 @@ import CommissionMemberController from '@/actions/App/Http/Controllers/Commissio
 import CommissionRoleController from '@/actions/App/Http/Controllers/Commissions/CommissionRoleController';
 import Heading from '@/components/Heading.vue';
 import InputError from '@/components/InputError.vue';
+import MyCommissions from '@/components/MyCommissions.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -28,15 +29,9 @@ type CommissionRow = {
     roles: RoleOption[];
 };
 
-type OwnCommission = {
-    id: string;
-    name: string;
-    roles: RoleOption[];
-};
-
 defineProps<{
     commissions: CommissionRow[];
-    mine: OwnCommission[];
+    mine: { id: string; name: string; roles: RoleOption[] }[];
     canManage: boolean;
     canAssignRoles: boolean;
     availableRoles: RoleOption[];
@@ -61,28 +56,7 @@ defineOptions({
             "
         />
 
-        <section
-            v-if="mine.length > 0"
-            class="flex flex-col gap-2"
-            data-test="my-commissions"
-        >
-            <Heading variant="small" :title="t('Your commissions')" />
-            <ul class="flex flex-col gap-1 text-sm">
-                <li v-for="commission in mine" :key="commission.id">
-                    <span class="font-medium">{{ commission.name }}</span>
-                    <span class="text-muted-foreground">
-                        ·
-                        {{
-                            commission.roles.length === 0
-                                ? t('No roles')
-                                : commission.roles
-                                      .map((role) => role.label)
-                                      .join(', ')
-                        }}
-                    </span>
-                </li>
-            </ul>
-        </section>
+        <MyCommissions v-if="mine.length > 0" :commissions="mine" />
 
         <p v-if="commissions.length === 0" class="text-muted-foreground">
             {{ t('No commissions yet.') }}

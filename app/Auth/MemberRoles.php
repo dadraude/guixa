@@ -2,6 +2,7 @@
 
 namespace App\Auth;
 
+use App\Models\Commission;
 use App\Models\Member;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -65,6 +66,32 @@ class MemberRoles
             ->groupBy('commission_id')
             ->map(fn ($rows) => $this->inDeclaredOrder($rows->pluck('role')->all()))
             ->all();
+    }
+
+    /**
+     * The commissions the member is in, by name, each with the roles it holds,
+     * shaped for the pages. Inactive members are in none.
+     *
+     * @return list<array{id: string, name: string, roles: list<array{value: string, label: string}>}>
+     */
+    public function commissionsOf(Member $member): array
+    {
+        if (! $member->is_active) {
+            return [];
+        }
+
+        $rolesByCommission = $this->byCommission();
+
+        return array_values($member->commissions()->orderBy('name')->get()
+            ->map(fn (Commission $commission) => [
+                'id' => $commission->id,
+                'name' => $commission->name,
+                'roles' => array_map(
+                    fn (Role $role) => $role->toOption(),
+                    $rolesByCommission[$commission->id] ?? [],
+                ),
+            ])
+            ->all());
     }
 
     /**

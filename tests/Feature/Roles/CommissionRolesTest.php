@@ -141,3 +141,30 @@ test('role names are in Catalan', function () {
         expect(__($key))->not->toBe($key);
     }
 });
+
+test('the home page shows the member their commissions and the roles those give them', function () {
+    $member = activeMember();
+    commissionWithRoles('Caixes i comandes', Role::Orders, Role::Boxes)->members()->attach($member);
+    commissionWithRoles('Neteja')->members()->attach($member);
+    commissionWithRoles('Tresoreria', Role::Treasury);
+
+    $this->actingAs($member->user)
+        ->get(route('dashboard'))
+        ->assertInertia(fn (Assert $page) => $page
+            ->has('commissions', 2)
+            ->where('commissions.0.name', 'Caixes i comandes')
+            ->where('commissions.0.roles', [
+                ['value' => 'orders', 'label' => 'Comandes'],
+                ['value' => 'boxes', 'label' => 'Caixes'],
+            ])
+            ->where('commissions.1.name', 'Neteja')
+            ->where('commissions.1.roles', []));
+});
+
+test('the home page has no commissions for a member who is in none', function () {
+    commissionWithRoles('Tresoreria', Role::Treasury);
+
+    $this->actingAs(activeMember()->user)
+        ->get(route('dashboard'))
+        ->assertInertia(fn (Assert $page) => $page->where('commissions', []));
+});

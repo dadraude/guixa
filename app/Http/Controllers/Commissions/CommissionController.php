@@ -40,13 +40,7 @@ class CommissionController extends Controller
                     'members' => $this->namesOf($commission->members),
                     'roles' => $optionsOf($commission),
                 ]),
-            'mine' => $ownMember?->is_active === true
-                ? $ownMember->commissions()->orderBy('name')->get()->map(fn (Commission $commission) => [
-                    'id' => $commission->id,
-                    'name' => $commission->name,
-                    'roles' => $optionsOf($commission),
-                ])->all()
-                : [],
+            'mine' => $ownMember === null ? [] : $memberRoles->commissionsOf($ownMember),
             'availableRoles' => array_map(fn (Role $role) => $role->toOption(), Role::cases()),
             'canAssignRoles' => $request->user()?->can('assign-roles') === true,
             'canManage' => $canManage,
