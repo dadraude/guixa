@@ -11,20 +11,18 @@ class AcceptInvitationRequest extends FormRequest
     use PasswordValidationRules;
 
     /**
-     * Someone who already has a user keeps their password, so only a new
-     * person is asked for one.
+     * Someone who already has a user keeps their name and password, so only a
+     * new person is asked for them.
      *
      * @return array<string, array<int, mixed>>
      */
     public function rules(): array
     {
-        $rules = ['name' => ['required', 'string', 'max:255']];
-
         if ($this->invitationIsForExistingUser()) {
-            return $rules;
+            return [];
         }
 
-        return [...$rules, 'password' => $this->passwordRules()];
+        return ['name' => ['required', 'string', 'max:255'], 'password' => $this->passwordRules()];
     }
 
     private function invitationIsForExistingUser(): bool

@@ -33,7 +33,7 @@ class AcceptInvitationController extends Controller
             'token' => $token,
             'email' => $invitation->email,
             'existingUser' => $existingUser !== null,
-            'name' => $existingUser === null ? $invitation->name : $existingUser->name,
+            'name' => $existingUser === null ? $invitation->name : null,
             'passwordRules' => Password::defaults()->toPasswordRulesString(),
         ]);
     }
@@ -47,6 +47,12 @@ class AcceptInvitationController extends Controller
         }
 
         if ($user->wasRecentlyCreated) {
+            // Nothing from a previously signed-in user may leak into the new session.
+            if (Auth::check()) {
+                Auth::logout();
+                $request->session()->invalidate();
+            }
+
             Auth::login($user, remember: true);
             $request->session()->regenerate();
 
