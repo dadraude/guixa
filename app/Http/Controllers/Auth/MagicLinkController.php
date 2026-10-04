@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Auth\MagicLinkBroker;
+use App\Auth\MagicLinkSignIn;
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Settings\SecurityController;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -103,8 +103,8 @@ class MagicLinkController extends Controller
 
         $request->session()->forget(MagicLinkBroker::EMAIL_SESSION_KEY);
         $request->session()->regenerate();
-        // Lets the person set a new password without knowing the old one.
-        $request->session()->put(SecurityController::MAGIC_LINK_SESSION_KEY, true);
+        // Lets the person set a new password without knowing the old one, for a short while.
+        MagicLinkSignIn::mark($request->session());
 
         return redirect()->intended(route('home'));
     }

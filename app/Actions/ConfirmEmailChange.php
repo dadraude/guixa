@@ -13,6 +13,17 @@ use Illuminate\Support\Facades\DB;
 class ConfirmEmailChange
 {
     /**
+     * Whether the link could still be used, without using it up.
+     */
+    public function isPending(string $token): bool
+    {
+        return User::query()
+            ->where('pending_email_token_hash', SecretHasher::hash($token))
+            ->where('pending_email_expires_at', '>', now())
+            ->exists();
+    }
+
+    /**
      * @return bool Whether the email was changed.
      */
     public function handle(string $token): bool

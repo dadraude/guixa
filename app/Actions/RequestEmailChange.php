@@ -30,7 +30,7 @@ class RequestEmailChange
             ])->save();
 
             Mail::to($newEmail)->queue(new EmailChangeMail(
-                url: route('email-change.confirm', ['token' => $token]),
+                url: route('email-change.show', ['token' => $token]),
             ));
         });
     }

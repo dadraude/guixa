@@ -105,11 +105,26 @@ test('the old email keeps working for sign-in until the link is opened', functio
     $this->assertAuthenticatedAs($user);
 });
 
-test('opening the confirmation link changes the email', function () {
+test('opening the confirmation link only shows a page and changes nothing', function () {
     $user = User::factory()->create(['email' => 'old@example.com']);
     $url = requestEmailChange($user, 'new@example.com');
 
-    $this->actingAs($user)->get($url)->assertRedirect(route('profile.edit'));
+    $this->get($url)
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page->component('auth/EmailChangeConfirm'));
+
+    expect($user->refresh()->email)->toBe('old@example.com')
+        ->and($user->pending_email)->toBe('new@example.com');
+
+    $this->post($url)->assertRedirect(route('profile.edit'));
+    expect($user->refresh()->email)->toBe('new@example.com');
+});
+
+test('confirming the change updates the email', function () {
+    $user = User::factory()->create(['email' => 'old@example.com']);
+    $url = requestEmailChange($user, 'new@example.com');
+
+    $this->actingAs($user)->post($url)->assertRedirect(route('profile.edit'));
 
     $user->refresh();
     expect($user->email)->toBe('new@example.com')
@@ -117,36 +132,41 @@ test('opening the confirmation link changes the email', function () {
         ->and($user->email_verified_at)->not->toBeNull();
 });
 
-test('the confirmation link works from a browser that is not signed in', function () {
+test('the confirmation works from a browser that is not signed in', function () {
     $user = User::factory()->create(['email' => 'old@example.com']);
     $url = requestEmailChange($user, 'new@example.com');
     auth()->logout();
 
-    $this->get($url)->assertRedirect();
+    $this->post($url)->assertRedirect();
 
     expect($user->refresh()->email)->toBe('new@example.com');
 });
 
-test('the confirmation link cannot be used twice', function () {
+test('the confirmation cannot be used twice', function () {
     $user = User::factory()->create(['email' => 'old@example.com']);
     $url = requestEmailChange($user, 'new@example.com');
 
-    $this->get($url);
+    $this->post($url);
     $user->update(['email' => 'other@example.com']);
 
-    $this->get($url);
+    $this->post($url);
 
     expect($user->refresh()->email)->toBe('other@example.com');
 });
 
-test('the confirmation link expires', function () {
+test('the confirmation expires', function () {
     $user = User::factory()->create(['email' => 'old@example.com']);
     $url = requestEmailChange($user, 'new@example.com');
 
     $this->travel(RequestEmailChange::HOURS_VALID + 1)->hours();
-    $this->get($url);
+    $this->post($url);
 
     expect($user->refresh()->email)->toBe('old@example.com');
+});
+
+test('a used or expired link shows the error instead of the button', function () {
+    $this->get(route('email-change.show', ['token' => 'nope']))
+        ->assertRedirect(route('profile.edit'));
 });
 
 test('a new request replaces the previous link', function () {
@@ -155,10 +175,10 @@ test('a new request replaces the previous link', function () {
     Mail::fake();
     $second = requestEmailChange($user, 'second@example.com');
 
-    $this->get($first);
+    $this->post($first);
     expect($user->refresh()->email)->toBe('old@example.com');
 
-    $this->get($second);
+    $this->post($second);
     expect($user->refresh()->email)->toBe('second@example.com');
 });
 
@@ -166,7 +186,7 @@ test('an unknown token changes nothing', function () {
     $user = User::factory()->create(['email' => 'old@example.com']);
     requestEmailChange($user, 'new@example.com');
 
-    $this->get(route('email-change.confirm', ['token' => 'nope']));
+    $this->post(route('email-change.confirm', ['token' => 'nope']));
 
     expect($user->refresh()->email)->toBe('old@example.com');
 });
@@ -187,7 +207,7 @@ test('an email taken after the request cannot be confirmed', function () {
     $url = requestEmailChange($user, 'new@example.com');
     User::factory()->create(['email' => 'new@example.com']);
 
-    $this->get($url);
+    $this->post($url);
 
     expect($user->refresh()->email)->toBe('old@example.com');
 });

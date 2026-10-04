@@ -1,6 +1,7 @@
 <?php
 
 use App\Auth\MagicLinkBroker;
+use App\Auth\MagicLinkSignIn;
 use App\Mail\MagicLinkMail;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
@@ -48,12 +49,12 @@ test('the current password is not asked after signing in with a magic link', fun
     $user = User::factory()->create();
 
     $this->actingAs($user)
-        ->withSession(['signed_in_with_magic_link' => true])
+        ->withSession([MagicLinkSignIn::SESSION_KEY => now()->timestamp])
         ->get(route('security.edit'))
         ->assertInertia(fn (Assert $page) => $page->where('requiresCurrentPassword', false));
 
     $this->actingAs($user)
-        ->withSession(['signed_in_with_magic_link' => true])
+        ->withSession([MagicLinkSignIn::SESSION_KEY => now()->timestamp])
         ->from(route('security.edit'))
         ->put(route('user-password.update'), [
             'password' => 'new-password',
@@ -84,5 +85,33 @@ test('signing in with a magic link marks the session', function () {
 
     $this->post($url);
 
-    expect(session('signed_in_with_magic_link'))->toBeTrue();
+    expect(session(MagicLinkSignIn::SESSION_KEY))->toBe(now()->timestamp);
+});
+
+test('the current password is asked again once the magic-link window has passed', function () {
+    $user = User::factory()->create();
+    $this->actingAs($user)->withSession([MagicLinkSignIn::SESSION_KEY => now()->timestamp]);
+
+    $this->travel(MagicLinkSignIn::WINDOW_MINUTES + 1)->minutes();
+
+    $this->get(route('security.edit'))
+        ->assertInertia(fn (Assert $page) => $page->where('requiresCurrentPassword', true));
+
+    $this->from(route('security.edit'))
+        ->put(route('user-password.update'), ['password' => 'new-password', 'password_confirmation' => 'new-password'])
+        ->assertSessionHasErrors('current_password');
+
+    expect(Hash::check('new-password', $user->refresh()->password))->toBeFalse();
+});
+
+test('the current password is asked again after a password change', function () {
+    $user = User::factory()->create();
+    $this->actingAs($user)->withSession([MagicLinkSignIn::SESSION_KEY => now()->timestamp]);
+
+    $this->from(route('security.edit'))
+        ->put(route('user-password.update'), ['password' => 'new-password', 'password_confirmation' => 'new-password'])
+        ->assertSessionHasNoErrors();
+
+    $this->get(route('security.edit'))
+        ->assertInertia(fn (Assert $page) => $page->where('requiresCurrentPassword', true));
 });
