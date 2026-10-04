@@ -88,10 +88,16 @@
   administrators. `manage-administrators` is excluded from `Gate::before`, so only the owner
   passes it. Emails are unique ignoring case (`LOWER(email)` index).
 
+- **Session 11 (2026-10-04):** DRA-14 implemented test-first (households: create, rename, list).
+  The `households.number` column is a database identity column, so numbers are handed out in
+  order, never reused and not fillable; rename only accepts `name`. The list shows active and
+  inactive households. Every check goes through the single `manage-membership` Gate rule
+  (route middleware and form request); active administrators pass it through `Gate::before`,
+  others are refused until the roles ticket widens the rule. Reviewed with `/code-review`, no
+  findings to fix.
+
 ## Next step
 
-**Before session 11:** open the DRA-13 PR, merge it once CI is green and move DRA-13 to Done.
-
-**Session 11:** `/implement` DRA-14 (households).
+**Session 12:** `/implement` DRA-15 (invitations).
 
 Still open (not blocking): backup strategy, data migration from the current software.

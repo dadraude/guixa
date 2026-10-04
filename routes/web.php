@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AdministratorController;
 use App\Http\Controllers\Auth\MagicLinkController;
 use App\Http\Controllers\Auth\SetPasswordController;
+use App\Http\Controllers\Households\HouseholdController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -29,6 +30,12 @@ Route::middleware(['auth'])->group(function () {
     Route::post('set-password', [SetPasswordController::class, 'store'])->name('password.setup.store');
 
     Route::inertia('dashboard', 'Dashboard')->name('dashboard');
+
+    Route::middleware('can:manage-membership')->prefix('households')->name('households.')->group(function () {
+        Route::get('/', [HouseholdController::class, 'index'])->name('index');
+        Route::post('/', [HouseholdController::class, 'store'])->name('store');
+        Route::patch('{household}', [HouseholdController::class, 'update'])->name('update');
+    });
 
     Route::middleware('can:administer')->prefix('admin')->name('admin.')->group(function () {
         Route::inertia('/', 'admin/Home')->name('home');
