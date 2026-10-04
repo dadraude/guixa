@@ -32,52 +32,58 @@ import type { NavItem } from '@/types';
 
 const page = usePage();
 
-const mainNavItems = computed<NavItem[]>(() =>
-    page.props.auth.actingAs === 'administrator'
-        ? [
-              {
-                  title: t('Administration'),
-                  href: adminHome(),
-                  icon: ShieldCheck,
-              },
-              {
-                  title: t('Households'),
-                  href: householdsIndex(),
-                  icon: Home,
-              },
-              {
-                  title: t('Invitations'),
-                  href: invitationsIndex(),
-                  icon: Mail,
-              },
-              {
-                  title: t('Commissions'),
-                  href: commissionsIndex(),
-                  icon: UsersRound,
-              },
-              ...(page.props.auth.isOwner
-                  ? [
-                        {
-                            title: t('Administrators'),
-                            href: administratorsIndex(),
-                            icon: Users,
-                        },
-                    ]
-                  : []),
-          ]
-        : [
-              {
-                  title: t('Dashboard'),
-                  href: dashboard(),
-                  icon: LayoutGrid,
-              },
-              {
-                  title: t('Commissions'),
-                  href: commissionsIndex(),
-                  icon: UsersRound,
-              },
-          ],
-);
+const mainNavItems = computed<NavItem[]>(() => {
+    const isAdministrator = page.props.auth.actingAs === 'administrator';
+    // Administrators and members with the membership role manage the same things.
+    const managesMembership =
+        isAdministrator || page.props.auth.canManageMembership;
+
+    return [
+        ...(isAdministrator
+            ? [
+                  {
+                      title: t('Administration'),
+                      href: adminHome(),
+                      icon: ShieldCheck,
+                  },
+              ]
+            : [
+                  {
+                      title: t('Dashboard'),
+                      href: dashboard(),
+                      icon: LayoutGrid,
+                  },
+              ]),
+        ...(managesMembership
+            ? [
+                  {
+                      title: t('Households'),
+                      href: householdsIndex(),
+                      icon: Home,
+                  },
+                  {
+                      title: t('Invitations'),
+                      href: invitationsIndex(),
+                      icon: Mail,
+                  },
+              ]
+            : []),
+        {
+            title: t('Commissions'),
+            href: commissionsIndex(),
+            icon: UsersRound,
+        },
+        ...(isAdministrator && page.props.auth.isOwner
+            ? [
+                  {
+                      title: t('Administrators'),
+                      href: administratorsIndex(),
+                      icon: Users,
+                  },
+              ]
+            : []),
+    ];
+});
 </script>
 
 <template>

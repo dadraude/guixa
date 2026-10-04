@@ -2,6 +2,7 @@
 import { Form, Head } from '@inertiajs/vue3';
 import CommissionController from '@/actions/App/Http/Controllers/Commissions/CommissionController';
 import CommissionMemberController from '@/actions/App/Http/Controllers/Commissions/CommissionMemberController';
+import CommissionRoleController from '@/actions/App/Http/Controllers/Commissions/CommissionRoleController';
 import Heading from '@/components/Heading.vue';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
@@ -15,15 +16,30 @@ type Person = {
     name: string;
 };
 
+type RoleOption = {
+    value: string;
+    label: string;
+};
+
 type CommissionRow = {
     id: string;
     name: string;
     members: Person[];
+    roles: RoleOption[];
+};
+
+type OwnCommission = {
+    id: string;
+    name: string;
+    roles: RoleOption[];
 };
 
 defineProps<{
     commissions: CommissionRow[];
+    mine: OwnCommission[];
     canManage: boolean;
+    canAssignRoles: boolean;
+    availableRoles: RoleOption[];
     candidates: Person[];
 }>();
 
@@ -44,6 +60,29 @@ defineOptions({
                 t('Groups of members in charge of an area of the cooperative.')
             "
         />
+
+        <section
+            v-if="mine.length > 0"
+            class="flex flex-col gap-2"
+            data-test="my-commissions"
+        >
+            <Heading variant="small" :title="t('Your commissions')" />
+            <ul class="flex flex-col gap-1 text-sm">
+                <li v-for="commission in mine" :key="commission.id">
+                    <span class="font-medium">{{ commission.name }}</span>
+                    <span class="text-muted-foreground">
+                        ·
+                        {{
+                            commission.roles.length === 0
+                                ? t('No roles')
+                                : commission.roles
+                                      .map((role) => role.label)
+                                      .join(', ')
+                        }}
+                    </span>
+                </li>
+            </ul>
+        </section>
 
         <p v-if="commissions.length === 0" class="text-muted-foreground">
             {{ t('No commissions yet.') }}
@@ -98,6 +137,77 @@ defineOptions({
                     </Form>
                 </div>
                 <h2 v-else class="font-medium">{{ commission.name }}</h2>
+
+                <div class="flex flex-wrap items-center gap-2 text-sm">
+                    <span class="text-muted-foreground">{{ t('Roles') }}:</span>
+                    <span
+                        v-if="commission.roles.length === 0"
+                        class="text-muted-foreground"
+                        >{{ t('No roles') }}</span
+                    >
+                    <span
+                        v-for="role in commission.roles"
+                        :key="role.value"
+                        class="flex items-center gap-1 rounded-full border px-2 py-0.5"
+                        data-test="commission-role"
+                    >
+                        {{ role.label }}
+                        <Form
+                            v-if="canAssignRoles"
+                            v-bind="
+                                CommissionRoleController.destroy.form({
+                                    commission: commission.id,
+                                    role: role.value,
+                                })
+                            "
+                        >
+                            <button
+                                type="submit"
+                                class="text-muted-foreground hover:text-foreground"
+                                :aria-label="t('Remove role')"
+                            >
+                                ×
+                            </button>
+                        </Form>
+                    </span>
+                </div>
+
+                <Form
+                    v-if="canAssignRoles"
+                    v-bind="CommissionRoleController.store.form(commission.id)"
+                    class="flex flex-wrap items-start gap-2"
+                    reset-on-success
+                    v-slot="{ errors, processing }"
+                >
+                    <select
+                        name="role"
+                        required
+                        class="h-9 rounded-md border bg-background px-3 text-sm"
+                        :aria-label="t('Choose a role')"
+                    >
+                        <option value="">{{ t('Choose a role') }}</option>
+                        <option
+                            v-for="role in availableRoles.filter(
+                                (option) =>
+                                    !commission.roles.some(
+                                        (held) => held.value === option.value,
+                                    ),
+                            )"
+                            :key="role.value"
+                            :value="role.value"
+                        >
+                            {{ role.label }}
+                        </option>
+                    </select>
+                    <Button
+                        type="submit"
+                        variant="outline"
+                        size="sm"
+                        :disabled="processing"
+                        >{{ t('Add role') }}</Button
+                    >
+                    <InputError :message="errors.role" />
+                </Form>
 
                 <p
                     v-if="commission.members.length === 0"
