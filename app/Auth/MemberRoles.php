@@ -12,9 +12,21 @@ use Illuminate\Support\Facades\DB;
  * they are in. Always read from the database, so removing a member from a
  * commission or a role from a commission takes effect on the next request.
  * Inactive members have no roles.
+ *
+ * Registered as a scoped singleton: roles are remembered per member for the
+ * life of one request (the gate and the shared props ask for the same member),
+ * and the next request starts empty.
  */
 class MemberRoles
 {
+    /** @var array<string, list<Role>> */
+    private array $rolesByMember = [];
+
+    /**
+     * Deliberately ignores the acting profile: administrators acting as
+     * administrators are already let through by Gate::before, so reaching this
+     * point means the person acts as a member and only their commissions count.
+     */
     public function userHas(User $user, Role $role): bool
     {
         $member = $user->member;
@@ -36,7 +48,7 @@ class MemberRoles
             return [];
         }
 
-        return $this->forCommissions($member->commissions()->pluck('commissions.id')->all());
+        return $this->rolesByMember[$member->id] ??= $this->forCommissions($member->commissions()->pluck('commissions.id')->all());
     }
 
     /**
