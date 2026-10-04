@@ -1,5 +1,6 @@
 <?php
 
+use App\Mail\EmailChangeMail;
 use App\Mail\MagicLinkMail;
 use App\Models\Household;
 use App\Models\User;
@@ -226,8 +227,18 @@ test('the choice is forgotten when signing out', function () {
 test('changing the email changes it for both profiles', function () {
     $user = ownerAndMember();
 
+    Mail::fake();
+
     $this->actingAs($user)->post(route('active-profile.update'), ['profile' => 'member']);
     $this->patch(route('profile.update'), ['name' => $user->name, 'email' => 'nou@example.com']);
+
+    $confirmationUrl = null;
+    Mail::assertQueued(EmailChangeMail::class, function (EmailChangeMail $mail) use (&$confirmationUrl) {
+        $confirmationUrl = $mail->url;
+
+        return true;
+    });
+    $this->post($confirmationUrl);
 
     expect($user->administrator->fresh()->user->email)->toBe('nou@example.com')
         ->and($user->member->fresh()->user->email)->toBe('nou@example.com');
