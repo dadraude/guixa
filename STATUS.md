@@ -148,4 +148,9 @@
 **Session 16:** `/ship-ticket DRA-20` (roles on commissions and the membership role), which
 unblocks DRA-21, DRA-22 and DRA-23.
 
+Before spec 002: define UX/UI principles with `/grill-with-docs` (mobile-first, accessibility
+target, visual identity, key flows for ordering and the offline box/payment screens) and record
+them in `docs/principles.md`. Today only the starter kit's Tailwind + shadcn-vue base and
+"responsive, phones and desktops" are decided.
+
 Still open (not blocking): backup strategy, data migration from the current software.
