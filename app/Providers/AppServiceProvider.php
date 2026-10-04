@@ -43,6 +43,9 @@ class AppServiceProvider extends ServiceProvider
             : null);
 
         Gate::define('administer', fn (User $user) => false);
+        // The single rule behind every household and member management check;
+        // the roles ticket widens it to the membership role.
+        Gate::define('manage-membership', fn (User $user) => false);
         Gate::define('manage-administrators', fn (User $user) => $user->isOwner());
     }
 
