@@ -48,6 +48,8 @@ class AppServiceProvider extends ServiceProvider
         // The single rule behind every household and member management check;
         // the roles ticket widens it to the membership role.
         Gate::define('manage-membership', fn (User $user) => false);
+        // Every active member sees the commissions and who is in them.
+        Gate::define('view-commissions', fn (User $user) => $user->member?->is_active === true);
         Gate::define('manage-administrators', fn (User $user) => app(ActiveProfile::class)->isActingAsOwner($user));
     }
 

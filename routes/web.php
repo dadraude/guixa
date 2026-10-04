@@ -5,6 +5,8 @@ use App\Http\Controllers\Admin\AdministratorController;
 use App\Http\Controllers\Auth\ActiveProfileController;
 use App\Http\Controllers\Auth\MagicLinkController;
 use App\Http\Controllers\Auth\SetPasswordController;
+use App\Http\Controllers\Commissions\CommissionController;
+use App\Http\Controllers\Commissions\CommissionMemberController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Households\HouseholdController;
 use App\Http\Controllers\Households\InvitationController;
@@ -56,6 +58,16 @@ Route::middleware(['auth'])->group(function () {
             Route::post('{invitation}/resend', [PendingInvitationController::class, 'resend'])->name('resend');
             Route::delete('{invitation}', [PendingInvitationController::class, 'cancel'])->name('cancel');
         });
+    });
+
+    Route::middleware('can:view-commissions')->get('commissions', [CommissionController::class, 'index'])->name('commissions.index');
+
+    Route::middleware('can:manage-membership')->prefix('commissions')->name('commissions.')->group(function () {
+        Route::post('/', [CommissionController::class, 'store'])->name('store');
+        Route::patch('{commission}', [CommissionController::class, 'update'])->name('update');
+        Route::delete('{commission}', [CommissionController::class, 'destroy'])->name('destroy');
+        Route::post('{commission}/members', [CommissionMemberController::class, 'store'])->name('members.store');
+        Route::delete('{commission}/members/{member}', [CommissionMemberController::class, 'destroy'])->name('members.destroy');
     });
 
     Route::middleware('can:administer')->prefix('admin')->name('admin.')->group(function () {
