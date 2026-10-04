@@ -41,7 +41,7 @@ defineProps<{
                 <InputError :message="errors.email" />
             </div>
 
-            <div class="grid gap-2">
+            <div v-if="!existingUser" class="grid gap-2">
                 <Label for="name">{{ t('Full name') }}</Label>
                 <Input
                     id="name"

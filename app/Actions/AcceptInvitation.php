@@ -11,19 +11,21 @@ use LogicException;
 
 /**
  * Turns a pending invitation into a member of its household. A new person
- * gets a user with the chosen password; someone who already has a user (an
- * administrator) gets the member profile attached to it, keeping their
- * password.
+ * gets a user with the chosen name and password; someone who already has a
+ * user (an administrator) gets the member profile attached to it, keeping
+ * their name and password: the form is unauthenticated, so it must not
+ * rewrite an existing account.
  */
 class AcceptInvitation
 {
     /**
+     * @param  string|null  $name  required unless the email already has a user
      * @param  string|null  $password  required unless the email already has a user
      *
      * @throws InvitationUnavailable when the invitation cannot be used any more
      * @throws ValidationException when the email already belongs to a member
      */
-    public function handle(string $token, string $name, ?string $password): User
+    public function handle(string $token, ?string $name, ?string $password): User
     {
         try {
             return DB::transaction(fn () => $this->accept($token, $name, $password));
@@ -32,7 +34,7 @@ class AcceptInvitation
         }
     }
 
-    private function accept(string $token, string $name, ?string $password): User
+    private function accept(string $token, ?string $name, ?string $password): User
     {
         $invitation = Invitation::query()->withToken($token)->usable()->lockForUpdate()->first();
 
@@ -46,7 +48,6 @@ class AcceptInvitation
             throw $this->alreadyAMember();
         }
 
-        $user->update(['name' => $name]);
         $user->member()->create(['household_id' => $invitation->household_id]);
 
         $invitation->forceFill(['accepted_at' => now()])->save();
@@ -54,8 +55,9 @@ class AcceptInvitation
         return $user;
     }
 
-    private function createUser(Invitation $invitation, string $name, ?string $password): User
+    private function createUser(Invitation $invitation, ?string $name, ?string $password): User
     {
+        $name ?? throw new LogicException('A new user needs a name.');
         $password ?? throw new LogicException('A new user needs a password.');
 
         return User::create(['name' => $name, 'email' => $invitation->email, 'password' => $password]);
