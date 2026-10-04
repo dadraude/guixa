@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Head } from '@inertiajs/vue3';
 import Heading from '@/components/Heading.vue';
+import MyCommissions from '@/components/MyCommissions.vue';
 import { t } from '@/lib/i18n';
 import { dashboard } from '@/routes';
 
@@ -12,6 +13,11 @@ type Household = {
 
 defineProps<{
     household: Household | null;
+    commissions: {
+        id: string;
+        name: string;
+        roles: { value: string; label: string }[];
+    }[];
 }>();
 
 defineOptions({
@@ -51,6 +57,8 @@ defineOptions({
                     </li>
                 </ul>
             </div>
+
+            <MyCommissions :commissions="commissions" />
         </template>
     </div>
 </template>

@@ -46,6 +46,7 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $user,
                 'isOwner' => $user !== null && $activeProfile->isActingAsOwner($user),
+                'canManageMembership' => $user !== null && $user->can('manage-membership'),
                 'actingAs' => $user === null ? null : $activeProfile->current($user)?->value,
                 'profiles' => $user === null ? [] : array_map(fn (Profile $profile) => $profile->value, $activeProfile->available($user)),
             ],

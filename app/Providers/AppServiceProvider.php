@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use App\Auth\ActiveProfile;
+use App\Auth\MemberRoles;
+use App\Auth\Role;
 use App\Models\User;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
@@ -20,7 +22,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->scoped(MemberRoles::class);
     }
 
     /**
@@ -45,9 +47,11 @@ class AppServiceProvider extends ServiceProvider
             : null);
 
         Gate::define('administer', fn (User $user) => false);
-        // The single rule behind every household and member management check;
-        // the roles ticket widens it to the membership role.
-        Gate::define('manage-membership', fn (User $user) => false);
+        // The single rule behind every household and member management check.
+        Gate::define('manage-membership', fn (User $user) => app(MemberRoles::class)->userHas($user, Role::Membership));
+        // Only administrators assign roles (they pass Gate::before), so the
+        // membership role can never grant itself or others more permissions.
+        Gate::define('assign-roles', fn (User $user) => false);
         // Every active member sees the commissions and who is in them.
         Gate::define('view-commissions', fn (User $user) => $user->member?->is_active === true);
         Gate::define('manage-administrators', fn (User $user) => app(ActiveProfile::class)->isActingAsOwner($user));

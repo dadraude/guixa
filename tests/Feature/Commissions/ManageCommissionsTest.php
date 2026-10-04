@@ -183,6 +183,14 @@ test('a user without a member or administrator profile cannot see the list', fun
     $this->actingAs(User::factory()->create())->get(route('commissions.index'))->assertForbidden();
 });
 
+test('an administrator without a member profile can view the commissions', function () {
+    $this->actingAs(User::factory()->administrator()->create())->get(route('commissions.index'))->assertOk();
+});
+
+test('an inactive member cannot see the commissions', function () {
+    $this->actingAs(memberOf(active: false)->user)->get(route('commissions.index'))->assertRedirect(route('login'));
+});
+
 test('commission changes go through the manage-membership rule', function () {
     expect(Gate::forUser(User::factory()->create())->allows('manage-membership'))->toBeFalse();
 });

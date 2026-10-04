@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Auth\ActiveProfile;
+use App\Auth\MemberRoles;
 use App\Auth\Profile;
 use App\Models\Member;
 use Illuminate\Http\Request;
@@ -12,16 +13,18 @@ use Inertia\Response;
 class DashboardController extends Controller
 {
     /**
-     * The member's own household and its members; no other household is
-     * exposed, and none at all while acting as administrator.
+     * The member's own household and its members, and their commissions with
+     * the roles those give them; no other household is exposed, and none at
+     * all while acting as administrator.
      */
-    public function __invoke(Request $request, ActiveProfile $activeProfile): Response
+    public function __invoke(Request $request, ActiveProfile $activeProfile, MemberRoles $memberRoles): Response
     {
         $user = $request->user();
         $member = $activeProfile->current($user) === Profile::Member ? $user->member : null;
 
         return Inertia::render('Dashboard', [
             'household' => $member === null ? null : $this->householdOf($member),
+            'commissions' => $member === null ? [] : $memberRoles->commissionsOf($member),
         ]);
     }
 

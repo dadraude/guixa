@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Commissions;
 
+use App\Auth\MemberRoles;
+use App\Auth\Role;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Commissions\SaveCommissionRequest;
 use App\Models\Commission;
@@ -17,9 +19,15 @@ class CommissionController extends Controller
     /**
      * Everyone who is in the cooperative sees names only, never contact details.
      */
-    public function index(Request $request): Response
+    public function index(Request $request, MemberRoles $memberRoles): Response
     {
         $canManage = $request->user()?->can('manage-membership') === true;
+        $rolesByCommission = $memberRoles->byCommission();
+        $optionsOf = fn (Commission $commission) => array_map(
+            fn (Role $role) => $role->toOption(),
+            $rolesByCommission[$commission->id] ?? [],
+        );
+        $ownMember = $request->user()?->member;
 
         return Inertia::render('commissions/Index', [
             'commissions' => Commission::query()
@@ -30,7 +38,11 @@ class CommissionController extends Controller
                     'id' => $commission->id,
                     'name' => $commission->name,
                     'members' => $this->namesOf($commission->members),
+                    'roles' => $optionsOf($commission),
                 ]),
+            'mine' => $ownMember === null ? [] : $memberRoles->commissionsOf($ownMember),
+            'availableRoles' => array_map(fn (Role $role) => $role->toOption(), Role::cases()),
+            'canAssignRoles' => $request->user()?->can('assign-roles') === true,
             'canManage' => $canManage,
             'candidates' => $canManage ? $this->namesOf(Member::query()->with('user')->where('is_active', true)->get()) : [],
             'status' => $request->session()->get('status'),

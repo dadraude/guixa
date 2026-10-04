@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\MagicLinkController;
 use App\Http\Controllers\Auth\SetPasswordController;
 use App\Http\Controllers\Commissions\CommissionController;
 use App\Http\Controllers\Commissions\CommissionMemberController;
+use App\Http\Controllers\Commissions\CommissionRoleController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Households\HouseholdController;
 use App\Http\Controllers\Households\InvitationController;
@@ -68,6 +69,11 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('{commission}', [CommissionController::class, 'destroy'])->name('destroy');
         Route::post('{commission}/members', [CommissionMemberController::class, 'store'])->name('members.store');
         Route::delete('{commission}/members/{member}', [CommissionMemberController::class, 'destroy'])->name('members.destroy');
+    });
+
+    Route::middleware('can:assign-roles')->prefix('commissions')->name('commissions.')->group(function () {
+        Route::post('{commission}/roles', [CommissionRoleController::class, 'store'])->name('roles.store');
+        Route::delete('{commission}/roles/{role}', [CommissionRoleController::class, 'destroy'])->name('roles.destroy');
     });
 
     Route::middleware('can:administer')->prefix('admin')->name('admin.')->group(function () {
