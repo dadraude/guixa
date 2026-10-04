@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Form, Head } from '@inertiajs/vue3';
 import HouseholdController from '@/actions/App/Http/Controllers/Households/HouseholdController';
+import InvitationController from '@/actions/App/Http/Controllers/Households/InvitationController';
 import Heading from '@/components/Heading.vue';
 import InputError from '@/components/InputError.vue';
 import { Badge } from '@/components/ui/badge';
@@ -19,6 +20,7 @@ type HouseholdRow = {
 
 defineProps<{
     households: HouseholdRow[];
+    status?: string;
 }>();
 
 defineOptions({
@@ -38,6 +40,14 @@ defineOptions({
                 t('The number is assigned automatically and never changes.')
             "
         />
+
+        <p
+            v-if="status"
+            class="text-sm font-medium text-green-600"
+            data-test="status"
+        >
+            {{ status }}
+        </p>
 
         <p v-if="households.length === 0" class="text-muted-foreground">
             {{ t('No households yet.') }}
@@ -80,6 +90,37 @@ defineOptions({
                 <Badge :variant="household.is_active ? 'secondary' : 'outline'">
                     {{ household.is_active ? t('Active') : t('Inactive') }}
                 </Badge>
+
+                <Form
+                    v-bind="InvitationController.store.form(household.id)"
+                    class="flex w-full flex-wrap items-start gap-2"
+                    reset-on-success
+                    v-slot="{ errors, processing }"
+                >
+                    <Input
+                        name="email"
+                        type="email"
+                        required
+                        class="max-w-64"
+                        :aria-label="t('Email address')"
+                        :placeholder="t('Email address')"
+                    />
+                    <Input
+                        name="name"
+                        class="max-w-64"
+                        :aria-label="t('Full name')"
+                        :placeholder="t('Full name')"
+                    />
+                    <Button
+                        type="submit"
+                        variant="outline"
+                        size="sm"
+                        :disabled="processing"
+                        data-test="invite-button"
+                        >{{ t('Invite') }}</Button
+                    >
+                    <InputError :message="errors.email" />
+                </Form>
             </li>
         </ul>
 

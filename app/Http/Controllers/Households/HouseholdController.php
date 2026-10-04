@@ -7,12 +7,13 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Households\SaveHouseholdRequest;
 use App\Models\Household;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class HouseholdController extends Controller
 {
-    public function index(): Response
+    public function index(Request $request): Response
     {
         $households = Household::query()
             ->orderBy('number')
@@ -24,7 +25,10 @@ class HouseholdController extends Controller
                 'is_active' => $household->is_active,
             ]);
 
-        return Inertia::render('households/Index', ['households' => $households]);
+        return Inertia::render('households/Index', [
+            'households' => $households,
+            'status' => $request->session()->get('status'),
+        ]);
     }
 
     public function store(SaveHouseholdRequest $request, CreateHousehold $createHousehold): RedirectResponse

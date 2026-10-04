@@ -1,8 +1,18 @@
 <script setup lang="ts">
 import { Head } from '@inertiajs/vue3';
-import PlaceholderPattern from '@/components/PlaceholderPattern.vue';
+import Heading from '@/components/Heading.vue';
 import { t } from '@/lib/i18n';
 import { dashboard } from '@/routes';
+
+type Household = {
+    number: number;
+    name: string;
+    members: { id: string; name: string }[];
+};
+
+defineProps<{
+    household: Household | null;
+}>();
 
 defineOptions({
     layout: {
@@ -19,30 +29,28 @@ defineOptions({
 <template>
     <Head :title="t('Dashboard')" />
 
-    <div
-        class="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4"
-    >
-        <div class="grid auto-rows-min gap-4 md:grid-cols-3">
-            <div
-                class="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border"
-            >
-                <PlaceholderPattern />
+    <div class="flex h-full flex-1 flex-col gap-8 p-4">
+        <p v-if="household === null" class="text-muted-foreground">
+            {{ t('You do not belong to any household.') }}
+        </p>
+
+        <template v-else>
+            <Heading
+                :title="`${t('Your household')}: #${household.number} ${household.name}`"
+            />
+
+            <div class="flex flex-col gap-4">
+                <Heading variant="small" :title="t('Members')" />
+                <ul class="divide-y rounded-lg border" data-test="members">
+                    <li
+                        v-for="member in household.members"
+                        :key="member.id"
+                        class="p-4"
+                    >
+                        {{ member.name }}
+                    </li>
+                </ul>
             </div>
-            <div
-                class="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border"
-            >
-                <PlaceholderPattern />
-            </div>
-            <div
-                class="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border"
-            >
-                <PlaceholderPattern />
-            </div>
-        </div>
-        <div
-            class="relative min-h-[100vh] flex-1 rounded-xl border border-sidebar-border/70 md:min-h-min dark:border-sidebar-border"
-        >
-            <PlaceholderPattern />
-        </div>
+        </template>
     </div>
 </template>

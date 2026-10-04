@@ -96,8 +96,35 @@
   others are refused until the roles ticket widens the rule. Reviewed with `/code-review`, no
   findings to fix.
 
+- **Session 12 (2026-10-04):** DRA-15 implemented test-first (invite a person to a household
+  and accept the invitation). New `members` table (member profile: user, household, optional
+  phone, active; name and email stay on the `User`) and `invitations` table (household, email
+  in lower case, optional name, HMAC-hashed single-use token, expiry 7 days, accepted/cancelled
+  timestamps; status pending/accepted/cancelled/expired derived in `Invitation::status()`).
+  `InviteToHousehold` replaces any pending invitation for the same email and queues the email
+  after commit; an email that already belongs to a member is rejected ignoring case; everything
+  goes through `manage-membership`. Opening the link (GET) only shows the form; accepting (POST)
+  creates user and member, marks the invitation accepted and signs in. Expired, used, cancelled
+  or unknown invitations show "ask the membership commission for a new one". An email that
+  already has a user (an administrator) is refused for now, until the attach-to-existing-user
+  ticket. The member home (`/dashboard`) shows their own household and its members only. Token
+  hashing moved to `App\Auth\SecretHasher`, shared with magic links. Reviewed with
+  `/code-review`, no findings to fix.
+
+- **Session 13 (2026-10-04):** DRA-16 implemented test-first (manage pending invitations),
+  stacked on the DRA-15 branch. `/households/invitations` lists open invitations (pending and
+  expired, expired ones badged; accepted and cancelled are not shown), soonest expiry first,
+  with an "Invitations" sidebar entry for administrators. Resend gives the invitation a new
+  token and a new 7-day expiry in place (the old link stops working, an expired one becomes
+  valid again) and queues the email; cancel sets `cancelled_at`, so the link shows the
+  existing "ask for a new one" message. Accepted or cancelled invitations answer 404 to resend
+  and cancel. Everything goes through `manage-membership`. Email queuing moved to
+  `QueueInvitationEmail`, shared by invite and resend. Added a test that re-inviting an email
+  kills the old link.
+
 ## Next step
 
-**Session 12:** `/implement` DRA-15 (invitations).
+**Session 14:** open the DRA-16 PR (stacked on DRA-15, PR #7), then `/implement` DRA-17, DRA-18
+or DRA-19 (unblocked by DRA-15).
 
 Still open (not blocking): backup strategy, data migration from the current software.

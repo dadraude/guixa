@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Household;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
@@ -60,6 +61,16 @@ class UserFactory extends Factory
     {
         return $this->afterCreating(function (User $user) use ($active) {
             $user->administrator()->create(['is_active' => $active]);
+        });
+    }
+
+    /**
+     * Give the user a member profile in the given household.
+     */
+    public function member(Household $household): static
+    {
+        return $this->afterCreating(function (User $user) use ($household) {
+            $user->member()->create(['household_id' => $household->id]);
         });
     }
 

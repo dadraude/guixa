@@ -114,6 +114,6 @@ class MagicLinkBroker
 
     private static function hash(string $secret): string
     {
-        return hash_hmac('sha256', $secret, (string) config('app.key'));
+        return SecretHasher::hash($secret);
     }
 }
