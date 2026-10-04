@@ -122,9 +122,30 @@
   `QueueInvitationEmail`, shared by invite and resend. Added a test that re-inviting an email
   kills the old link.
 
+- **Session 14 (2026-10-04):** standard ticket flow added (PR #11): `/ship-ticket DRA-NN`
+  skill with a `ticket-implementer` agent (test-first, one single-line commit) and a read-only
+  `ticket-reviewer` agent; `.claude/settings.json` allows commit and push on feature branches and
+  denies force-push, pushing to `main` and merging PRs. DRA-19 implemented and merged (PR #12):
+  a member edits name, optional phone and email; an email change stays pending until a
+  single-use 24-hour link is confirmed by POST; the magic-link session may set a password
+  without the current one for 15 minutes. DRA-17 implemented (PR #10 landed on the DRA-15
+  branch after it had merged, so it was re-landed on `main` in PR #13): a user with both a
+  member and an administrator profile chooses which one to act as after signing in and
+  switches from the header; permissions follow the active profile (`ActiveProfile`,
+  `Gate::before`); accepting an invitation for an administrator's email attaches a member
+  profile without overwriting name or password. Follow-ups are listed in the PR bodies.
+
+- **Session 15 (2026-10-04):** DRA-18 rebased onto `main` (after DRA-17 and DRA-19) and merged
+  (PR #14): commissions with a unique name, rename, delete only when empty; add active members
+  and remove them (pivot with composite key); every active member sees all commissions and
+  their members' names without contact details (`view-commissions`); changes go through
+  `manage-membership`, which follows the active profile. Pest 193/193. Follow-ups in PR #14:
+  tests for the two-profile case, administrator without member profile, and inactive member.
+  Locally PHPStan needs `--memory-limit=1G`, and tests need `vp build` after adding a page.
+
 ## Next step
 
-**Session 14:** open the DRA-16 PR (stacked on DRA-15, PR #7), then `/implement` DRA-17, DRA-18
-or DRA-19 (unblocked by DRA-15).
+**Session 16:** `/ship-ticket DRA-20` (roles on commissions and the membership role), which
+unblocks DRA-21, DRA-22 and DRA-23.
 
 Still open (not blocking): backup strategy, data migration from the current software.
