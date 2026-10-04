@@ -111,9 +111,24 @@
   hashing moved to `App\Auth\SecretHasher`, shared with magic links. Reviewed with
   `/code-review`, no findings to fix.
 
+- **Session 13 (2026-10-04):** DRA-17 implemented test-first (choose and switch profile), on a
+  branch created from the DRA-15 branch (PR #7 still open). The active profile (member or
+  administrator) lives in the session (`App\Auth\ActiveProfile`, enum `Profile`); a person with
+  both profiles is sent to a choice screen after signing in by password, link or code
+  (`EnsureProfileIsChosen` middleware) and can switch from the header without signing in again;
+  the header always shows the active profile. Permissions follow the active profile only:
+  `Gate::before` and the owner rule use it, so acting as member never passes `administer`, and
+  the member home shows no household while acting as administrator. Single-profile people are
+  never asked. `User::canSignIn()` now means "has an active profile (or none at all)", so an
+  inactive administrator who is also an active member signs in as member only. Accepting an
+  invitation for an email that already has a user attaches the member profile to it, keeping the
+  password (the form only confirms the name); it does not sign that user in (they log in, or stay
+  signed in if already so), and invitation routes are no longer guest-only. Reviewed with
+  `/code-review`, no findings to fix.
+
 ## Next step
 
-**Session 13:** open the DRA-15 PR, then `/implement` DRA-16, DRA-17, DRA-18 or DRA-19
-(all unblocked by DRA-15).
+**Session 14:** open the DRA-15 and DRA-17 PRs (DRA-17 is stacked on DRA-15), then `/implement`
+DRA-16, DRA-18 or DRA-19 (all unblocked by DRA-15).
 
 Still open (not blocking): backup strategy, data migration from the current software.

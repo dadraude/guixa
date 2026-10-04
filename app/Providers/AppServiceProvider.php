@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Auth\ActiveProfile;
 use App\Models\User;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
@@ -32,13 +33,14 @@ class AppServiceProvider extends ServiceProvider
     }
 
     /**
-     * An active administrator passes every authorization check, except the
-     * owner-only abilities, which are decided by their own definition.
+     * Someone acting as an active administrator passes every authorization
+     * check, except the owner-only abilities, which are decided by their own
+     * definition. Acting as member never passes, even for an administrator.
      * Abilities reserved to administrators are defined as false for everyone else.
      */
     protected function configureAuthorization(): void
     {
-        Gate::before(fn (User $user, string $ability) => $user->isActingAsAdministrator() && ! in_array($ability, self::OWNER_ONLY_ABILITIES, true)
+        Gate::before(fn (User $user, string $ability) => app(ActiveProfile::class)->isActingAsAdministrator($user) && ! in_array($ability, self::OWNER_ONLY_ABILITIES, true)
             ? true
             : null);
 
@@ -46,7 +48,7 @@ class AppServiceProvider extends ServiceProvider
         // The single rule behind every household and member management check;
         // the roles ticket widens it to the membership role.
         Gate::define('manage-membership', fn (User $user) => false);
-        Gate::define('manage-administrators', fn (User $user) => $user->isOwner());
+        Gate::define('manage-administrators', fn (User $user) => app(ActiveProfile::class)->isActingAsOwner($user));
     }
 
     /**

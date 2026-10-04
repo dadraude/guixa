@@ -1,6 +1,8 @@
 <?php
 
+use App\Auth\ActiveProfile;
 use App\Http\Controllers\Admin\AdministratorController;
+use App\Http\Controllers\Auth\ActiveProfileController;
 use App\Http\Controllers\Auth\MagicLinkController;
 use App\Http\Controllers\Auth\SetPasswordController;
 use App\Http\Controllers\DashboardController;
@@ -22,20 +24,23 @@ Route::middleware('guest')->group(function () {
     Route::post('magic-link/{token}', [MagicLinkController::class, 'consume'])->name('magic-link.consume');
 });
 
-Route::middleware('guest')->prefix('invitations')->name('invitations.')->group(function () {
+Route::prefix('invitations')->name('invitations.')->group(function () {
     Route::get('{token}', [AcceptInvitationController::class, 'show'])->name('show');
     Route::post('{token}', [AcceptInvitationController::class, 'accept'])->name('accept');
 });
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('/', function (Request $request) {
-        return $request->user()?->isActingAsAdministrator()
+    Route::get('/', function (Request $request, ActiveProfile $activeProfile) {
+        return $activeProfile->isActingAsAdministrator($request->user())
             ? to_route('admin.home')
             : to_route('dashboard');
     })->name('home');
 
     Route::get('set-password', [SetPasswordController::class, 'create'])->name('password.setup');
     Route::post('set-password', [SetPasswordController::class, 'store'])->name('password.setup.store');
+
+    Route::get('active-profile', [ActiveProfileController::class, 'edit'])->name('active-profile.edit');
+    Route::post('active-profile', [ActiveProfileController::class, 'update'])->name('active-profile.update');
 
     Route::get('dashboard', DashboardController::class)->name('dashboard');
 

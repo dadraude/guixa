@@ -68,32 +68,31 @@ class User extends Authenticatable
         return $this->hasMany(MagicLink::class);
     }
 
-    /**
-     * Whether the user acts as an active administrator, who passes every
-     * authorization check.
-     */
-    public function isActingAsAdministrator(): bool
+    public function hasActiveAdministratorProfile(): bool
     {
         return $this->administrator?->is_active === true;
     }
 
-    /**
-     * Whether the user is the active owner, the only administrator who
-     * manages the other administrators.
-     */
-    public function isOwner(): bool
+    public function hasActiveMemberProfile(): bool
     {
-        return $this->administrator?->is_owner === true && $this->isActingAsAdministrator();
+        return $this->member?->is_active === true;
     }
 
     /**
-     * Whether the user may sign in. An inactive administrator may not; once
-     * members exist, one with an active member profile will be allowed to
-     * sign in as a member.
+     * Whether the user may sign in: they have an active profile, or no
+     * profile at all. Inactive profiles do not let anyone in, so an inactive
+     * administrator with an active member profile signs in as a member only.
      */
     public function canSignIn(): bool
     {
-        return ! $this->administrator()->where('is_active', false)->exists();
+        $administrator = $this->administrator()->first();
+        $member = $this->member()->first();
+
+        if ($administrator === null && $member === null) {
+            return true;
+        }
+
+        return $administrator?->is_active === true || $member?->is_active === true;
     }
 
     /**

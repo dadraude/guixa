@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\EnsurePasswordIsSet;
+use App\Http\Middleware\EnsureProfileIsChosen;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\SignOutUsersWhoMayNotSignIn;
@@ -25,6 +26,7 @@ return Application::configure(basePath: dirname(__DIR__))
             AddLinkHeadersForPreloadedAssets::class,
             SignOutUsersWhoMayNotSignIn::class,
             EnsurePasswordIsSet::class,
+            EnsureProfileIsChosen::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

@@ -3,6 +3,7 @@
 use App\Mail\InvitationMail;
 use App\Models\Household;
 use App\Models\Invitation;
+use App\Models\Member;
 use App\Models\User;
 use Illuminate\Support\Facades\Mail;
 use Inertia\Testing\AssertableInertia as Assert;
@@ -138,14 +139,85 @@ test('an unknown invitation shows the unavailable message', function () {
         ->assertInertia(fn (Assert $page) => $page->component('invitations/Unavailable'));
 });
 
-test('an invitation for an email that already has a user is refused and stays pending', function () {
+test('an invitation for an email that already belongs to a member is refused and stays pending', function () {
     [$invitation, $token] = sentInvitation();
-    User::factory()->administrator()->create(['email' => 'nou@example.com']);
+    User::factory()->member(Household::factory()->create())->create(['email' => 'nou@example.com']);
 
     $this->post(route('invitations.accept', $token), ['name' => 'Nou', 'password' => 'password', 'password_confirmation' => 'password'])
         ->assertSessionHasErrors('email');
 
     $this->assertGuest();
     expect($invitation->fresh()->status()->value)->toBe('pending')
-        ->and(User::where('email', 'nou@example.com')->count())->toBe(1);
+        ->and(Member::count())->toBe(1);
+});
+
+test('opening the invitation of an existing administrator asks only to confirm the name', function () {
+    [, $token] = sentInvitation();
+    User::factory()->administrator()->create(['email' => 'nou@example.com', 'name' => 'Nou Admin']);
+
+    $this->get(route('invitations.show', $token))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('invitations/Accept')
+            ->where('existingUser', true)
+            ->where('name', 'Nou Admin'));
+});
+
+test('a new person is not shown as an existing user', function () {
+    [, $token] = sentInvitation();
+
+    $this->get(route('invitations.show', $token))
+        ->assertInertia(fn (Assert $page) => $page->where('existingUser', false));
+});
+
+test('accepting as an existing administrator attaches a member profile to the same user and keeps the password', function () {
+    [$invitation, $token] = sentInvitation();
+    $administrator = User::factory()->administrator()->create(['email' => 'nou@example.com', 'password' => 'secret-password']);
+    $passwordHash = $administrator->password;
+
+    $this->post(route('invitations.accept', $token), ['name' => 'Nom Confirmat'])
+        ->assertRedirect(route('login'));
+
+    $user = User::where('email', 'nou@example.com')->sole();
+    expect(User::count())->toBe(2)
+        ->and($user->is($administrator))->toBeTrue()
+        ->and($user->name)->toBe('Nom Confirmat')
+        ->and($user->password)->toBe($passwordHash)
+        ->and($user->member->household_id)->toBe($invitation->household_id)
+        ->and($user->administrator)->not->toBeNull()
+        ->and($invitation->fresh()->status()->value)->toBe('accepted');
+    $this->assertGuest();
+});
+
+test('an existing administrator already signed in stays signed in after accepting', function () {
+    [, $token] = sentInvitation();
+    $administrator = User::factory()->administrator()->create(['email' => 'nou@example.com']);
+
+    $this->actingAs($administrator)
+        ->post(route('invitations.accept', $token), ['name' => 'Nou'])
+        ->assertRedirect(route('home'));
+
+    $this->assertAuthenticatedAs($administrator);
+    $this->actingAs($administrator->fresh())->get(route('home'))->assertRedirect(route('active-profile.edit'));
+});
+
+test('an existing administrator can then choose between both profiles after signing in', function () {
+    [, $token] = sentInvitation();
+    $administrator = User::factory()->administrator()->create(['email' => 'nou@example.com']);
+    $this->post(route('invitations.accept', $token), ['name' => 'Nou']);
+
+    $this->post(route('login.store'), ['email' => 'nou@example.com', 'password' => 'password']);
+
+    $this->get(route('home'))->assertRedirect(route('active-profile.edit'));
+    $this->assertAuthenticatedAs($administrator);
+});
+
+test('an existing user cannot be given a new password through an invitation', function () {
+    [, $token] = sentInvitation();
+    $administrator = User::factory()->administrator()->create(['email' => 'nou@example.com']);
+    $passwordHash = $administrator->password;
+
+    $this->post(route('invitations.accept', $token), ['name' => 'Nou', 'password' => 'hijacked1', 'password_confirmation' => 'hijacked1']);
+
+    expect($administrator->fresh()->password)->toBe($passwordHash);
 });
