@@ -1,10 +1,7 @@
 <script setup lang="ts">
-import { usePage } from '@inertiajs/vue3';
-import { ShieldCheck } from '@lucide/vue';
+import ActiveProfileIndicator from '@/components/ActiveProfileIndicator.vue';
 import Breadcrumbs from '@/components/Breadcrumbs.vue';
 import { SidebarTrigger } from '@/components/ui/sidebar';
-import { Badge } from '@/components/ui/badge';
-import { t } from '@/lib/i18n';
 import type { BreadcrumbItem } from '@/types';
 
 withDefaults(
@@ -15,8 +12,6 @@ withDefaults(
         breadcrumbs: () => [],
     },
 );
-
-const page = usePage();
 </script>
 
 <template>
@@ -29,14 +24,6 @@ const page = usePage();
                 <Breadcrumbs :breadcrumbs="breadcrumbs" />
             </template>
         </div>
-        <Badge
-            v-if="page.props.auth.actingAs === 'administrator'"
-            variant="secondary"
-            class="ml-auto"
-            data-test="acting-as-administrator"
-        >
-            <ShieldCheck />
-            {{ t('Acting as administrator') }}
-        </Badge>
+        <ActiveProfileIndicator />
     </header>
 </template>

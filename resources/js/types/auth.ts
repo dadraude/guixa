@@ -15,5 +15,7 @@ export type ActingAs = 'administrator' | 'member';
 export type Auth = {
     user: User;
     actingAs: ActingAs | null;
+    /** The profiles the person may act as; more than one means they can switch. */
+    profiles: ActingAs[];
     isOwner: boolean;
 };
