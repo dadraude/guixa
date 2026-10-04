@@ -22,7 +22,8 @@ Domain vocabulary lives in `CONTEXT.md`; decisions in `docs/adr/NNNN-title.md`.
 ## Session rules
 
 - Each session has **one small goal** (e.g. "write spec 001", "tickets DRA-3 and DRA-4").
-- At the start: read `STATUS.md`.
+- At the start: read `STATUS.md`, then triage the Guixa issues labelled `needs-triage` with the user:
+  each one becomes `ready-for-agent`, `ready-for-human` or `wontfix`.
 - At the end: leave nothing half-done, update `STATUS.md` with what was done and the concrete
   next step, commit and push to `origin` (github.com:dadraude/guixa).
 - If the goal doesn't fit, split it and close the finished part.
@@ -35,6 +36,8 @@ Standard way to implement a Linear ticket; defined in `.claude/skills/ship-ticke
   branch while its PR is still open (stacked; the PR targets that branch until it merges).
 - `ticket-implementer` agent (Sonnet): test-first, linters, full suite, one single-line commit.
 - `ticket-reviewer` agent (Sonnet, read-only): independent review of Standards and Spec. One correction pass.
+- Review follow-ups: trivial ones are fixed or dropped; every other one becomes a Linear issue
+  (`needs-triage`, related to the parent ticket) linked from the PR body.
 - Linear: In Progress when starting, In Review when the PR is opened.
 - Agents never edit `STATUS.md` (parallel branches would conflict); the orchestrator writes the session
   entry on `main` after the PRs merge.

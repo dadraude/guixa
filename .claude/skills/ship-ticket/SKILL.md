@@ -27,14 +27,21 @@ criteria) and the branch. Wait for its report. If it could not commit, stop and 
 
 Launch the `ticket-reviewer` agent with the ticket and the base ref (`main`, or the blocker's branch).
 If the verdict is `CHANGES REQUESTED`, relay the blockers to a new `ticket-implementer` pass (one
-correction pass only). Follow-ups are listed in the PR body, not fixed.
+correction pass only).
+
+Then sort every follow-up into one of two buckets, so none lives only in a PR body:
+- **Trivial** (wording, formatting, a comment): fix it in the correction pass, or drop it and say so.
+- **Worth doing**: one Linear issue each in project Guixa, label `needs-triage`, related to the
+  parent ticket, titled with the change to make; body: file:line, the reviewer's finding and the
+  suggested fix. Create them after the user approves the PR (step 4), before opening it.
 
 ## 4. Deliver
 
 Show the user a short summary: what was built, test/lint results (as reported, not re-verified unless
-asked), review verdict, open doubts. Then ask once whether to push and open the PR.
-On a yes: push with `-u`, `gh pr create --base <base>` with a conventional title
-`type(scope): description (DRA-NN)` and a short body ending with
+asked), review verdict, the follow-ups and their bucket, open doubts. Then ask once whether to push and
+open the PR.
+On a yes: create the follow-up issues, push with `-u`, `gh pr create --base <base>` with a conventional
+title `type(scope): description (DRA-NN)` and a short body that links each follow-up issue and ends with
 `🤖 Generated with [Claude Code](https://claude.com/claude-code)`, then move the issue to **In Review**.
 
 ## 5. Status file
