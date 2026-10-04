@@ -22,13 +22,16 @@ use Illuminate\Support\Str;
  * @property Carbon|null $email_verified_at
  * @property string|null $password
  * @property string|null $remember_token
+ * @property string|null $pending_email
+ * @property string|null $pending_email_token_hash
+ * @property Carbon|null $pending_email_expires_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read Administrator|null $administrator
  * @property-read Member|null $member
  */
 #[Fillable(['name', 'email', 'password'])]
-#[Hidden(['password', 'remember_token'])]
+#[Hidden(['password', 'remember_token', 'pending_email_token_hash'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
@@ -42,6 +45,14 @@ class User extends Authenticatable
     protected function email(): Attribute
     {
         return Attribute::make(set: fn (string $value) => Str::lower($value));
+    }
+
+    /**
+     * @return Attribute<string|null, string|null>
+     */
+    protected function pendingEmail(): Attribute
+    {
+        return Attribute::make(set: fn (?string $value) => $value === null ? null : Str::lower($value));
     }
 
     /**
@@ -105,6 +116,7 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
+            'pending_email_expires_at' => 'datetime',
             'password' => 'hashed',
         ];
     }

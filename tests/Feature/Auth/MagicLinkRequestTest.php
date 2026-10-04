@@ -219,12 +219,7 @@ test('an email sent along with the code does not dodge the throttle', function (
 });
 
 test('an email saved with capital letters can still ask for a link', function () {
-    $user = User::factory()->create(['email' => 'marta@example.com']);
-
-    $this->actingAs($user)
-        ->patch(route('profile.update'), ['name' => $user->name, 'email' => 'Marta.Puig@Example.com'])
-        ->assertSessionHasNoErrors();
-    auth()->logout();
+    $user = User::factory()->create(['email' => 'Marta.Puig@Example.com']);
 
     expect($user->fresh()->email)->toBe('marta.puig@example.com');
 

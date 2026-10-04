@@ -1,26 +1,217 @@
 <?php
 
+use App\Actions\RequestEmailChange;
+use App\Mail\EmailChangeMail;
+use App\Models\Household;
 use App\Models\User;
+use Illuminate\Support\Facades\Mail;
+use Inertia\Testing\AssertableInertia as Assert;
 
-test('the profile page is displayed', function () {
-    $this->actingAs(User::factory()->create())
+beforeEach(fn () => Mail::fake());
+
+/**
+ * Ask for an email change as the given user and return the link from the
+ * queued email.
+ */
+function requestEmailChange(User $user, string $email): string
+{
+    test()->actingAs($user)
+        ->patch(route('profile.update'), ['name' => $user->name, 'email' => $email])
+        ->assertSessionHasNoErrors();
+
+    $url = null;
+
+    Mail::assertQueued(EmailChangeMail::class, function (EmailChangeMail $mail) use (&$url) {
+        $url = $mail->url;
+
+        return true;
+    });
+
+    return $url;
+}
+
+test('the profile page shows the name, phone and pending email', function () {
+    $user = User::factory()->member(Household::factory()->create())->create();
+    $user->member->update(['phone' => '600 111 222']);
+
+    $this->actingAs($user)
         ->get(route('profile.edit'))
-        ->assertOk();
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('settings/Profile')
+            ->where('phone', '600 111 222')
+            ->where('pendingEmail', null));
 });
 
-test('profile information can be updated', function () {
-    $user = User::factory()->create();
+test('a member updates their name and phone', function () {
+    $user = User::factory()->member(Household::factory()->create())->create(['email' => 'anna@example.com']);
 
     $this->actingAs($user)
         ->patch(route('profile.update'), [
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+            'name' => 'Anna Puig',
+            'phone' => '600 111 222',
+            'email' => 'anna@example.com',
         ])
         ->assertSessionHasNoErrors()
         ->assertRedirect(route('profile.edit'));
 
-    $user->refresh();
+    expect($user->refresh()->name)->toBe('Anna Puig')
+        ->and($user->member->phone)->toBe('600 111 222');
+    Mail::assertNothingQueued();
+});
 
-    expect($user->name)->toBe('Test User')
-        ->and($user->email)->toBe('test@example.com');
+test('the phone is optional and can be cleared', function () {
+    $user = User::factory()->member(Household::factory()->create())->create();
+    $user->member->update(['phone' => '600 111 222']);
+
+    $this->actingAs($user)
+        ->patch(route('profile.update'), ['name' => $user->name, 'phone' => '', 'email' => $user->email])
+        ->assertSessionHasNoErrors();
+
+    expect($user->member->refresh()->phone)->toBeNull();
+});
+
+test('the name is required', function () {
+    $this->actingAs(User::factory()->create())
+        ->patch(route('profile.update'), ['name' => '', 'email' => 'x@example.com'])
+        ->assertSessionHasErrors('name');
+});
+
+test('requesting an email change queues a confirmation to the new address and keeps the current one', function () {
+    $user = User::factory()->create(['email' => 'old@example.com']);
+
+    $this->actingAs($user)
+        ->patch(route('profile.update'), ['name' => $user->name, 'email' => 'New@Example.com'])
+        ->assertSessionHasNoErrors()
+        ->assertRedirect(route('profile.edit'));
+
+    Mail::assertQueued(EmailChangeMail::class, fn (EmailChangeMail $mail) => $mail->hasTo('new@example.com'));
+    expect($user->refresh()->email)->toBe('old@example.com')
+        ->and($user->pending_email)->toBe('new@example.com');
+
+    $this->actingAs($user)
+        ->get(route('profile.edit'))
+        ->assertInertia(fn (Assert $page) => $page->where('pendingEmail', 'new@example.com'));
+});
+
+test('the old email keeps working for sign-in until the link is opened', function () {
+    $user = User::factory()->create(['email' => 'old@example.com']);
+    requestEmailChange($user, 'new@example.com');
+    auth()->logout();
+
+    $this->post(route('login.store'), ['email' => 'old@example.com', 'password' => 'password'])
+        ->assertSessionHasNoErrors();
+
+    $this->assertAuthenticatedAs($user);
+});
+
+test('opening the confirmation link changes the email', function () {
+    $user = User::factory()->create(['email' => 'old@example.com']);
+    $url = requestEmailChange($user, 'new@example.com');
+
+    $this->actingAs($user)->get($url)->assertRedirect(route('profile.edit'));
+
+    $user->refresh();
+    expect($user->email)->toBe('new@example.com')
+        ->and($user->pending_email)->toBeNull()
+        ->and($user->email_verified_at)->not->toBeNull();
+});
+
+test('the confirmation link works from a browser that is not signed in', function () {
+    $user = User::factory()->create(['email' => 'old@example.com']);
+    $url = requestEmailChange($user, 'new@example.com');
+    auth()->logout();
+
+    $this->get($url)->assertRedirect();
+
+    expect($user->refresh()->email)->toBe('new@example.com');
+});
+
+test('the confirmation link cannot be used twice', function () {
+    $user = User::factory()->create(['email' => 'old@example.com']);
+    $url = requestEmailChange($user, 'new@example.com');
+
+    $this->get($url);
+    $user->update(['email' => 'other@example.com']);
+
+    $this->get($url);
+
+    expect($user->refresh()->email)->toBe('other@example.com');
+});
+
+test('the confirmation link expires', function () {
+    $user = User::factory()->create(['email' => 'old@example.com']);
+    $url = requestEmailChange($user, 'new@example.com');
+
+    $this->travel(RequestEmailChange::HOURS_VALID + 1)->hours();
+    $this->get($url);
+
+    expect($user->refresh()->email)->toBe('old@example.com');
+});
+
+test('a new request replaces the previous link', function () {
+    $user = User::factory()->create(['email' => 'old@example.com']);
+    $first = requestEmailChange($user, 'first@example.com');
+    Mail::fake();
+    $second = requestEmailChange($user, 'second@example.com');
+
+    $this->get($first);
+    expect($user->refresh()->email)->toBe('old@example.com');
+
+    $this->get($second);
+    expect($user->refresh()->email)->toBe('second@example.com');
+});
+
+test('an unknown token changes nothing', function () {
+    $user = User::factory()->create(['email' => 'old@example.com']);
+    requestEmailChange($user, 'new@example.com');
+
+    $this->get(route('email-change.confirm', ['token' => 'nope']));
+
+    expect($user->refresh()->email)->toBe('old@example.com');
+});
+
+test('an email used by another user is rejected, ignoring case', function () {
+    User::factory()->create(['email' => 'taken@example.com']);
+    $user = User::factory()->create();
+
+    $this->actingAs($user)
+        ->patch(route('profile.update'), ['name' => $user->name, 'email' => 'TAKEN@example.com'])
+        ->assertSessionHasErrors('email');
+
+    Mail::assertNothingQueued();
+});
+
+test('an email taken after the request cannot be confirmed', function () {
+    $user = User::factory()->create(['email' => 'old@example.com']);
+    $url = requestEmailChange($user, 'new@example.com');
+    User::factory()->create(['email' => 'new@example.com']);
+
+    $this->get($url);
+
+    expect($user->refresh()->email)->toBe('old@example.com');
+});
+
+test('editing the profile never touches another member', function () {
+    $household = Household::factory()->create();
+    $anna = User::factory()->member($household)->create(['name' => 'Anna']);
+    $pere = User::factory()->member($household)->create(['name' => 'Pere', 'email' => 'pere@example.com']);
+
+    $this->actingAs($anna)
+        ->patch(route('profile.update'), [
+            'name' => 'Hacked',
+            'email' => 'anna@example.com',
+            'phone' => '999',
+            'user_id' => $pere->id,
+            'id' => $pere->id,
+        ]);
+
+    expect($pere->refresh()->name)->toBe('Pere')
+        ->and($pere->member->phone)->toBeNull()
+        ->and($anna->refresh()->name)->toBe('Hacked');
+});
+
+test('guests cannot edit a profile', function () {
+    $this->patch(route('profile.update'), ['name' => 'X', 'email' => 'x@example.com'])
+        ->assertRedirect(route('login'));
 });
