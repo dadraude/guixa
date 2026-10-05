@@ -185,9 +185,46 @@ test('the confirmation expires', function () {
     $url = requestEmailChange($user, 'new@example.com');
 
     $this->travel(RequestEmailChange::HOURS_VALID + 1)->hours();
-    $this->post($url);
+    $this->post($url)->assertRedirect(route('profile.edit'));
 
     expect($user->refresh()->email)->toBe('old@example.com');
+});
+
+test('the second of two users confirming the same new email gets the in-use message and the first keeps it', function () {
+    $first = User::factory()->create(['email' => 'first@example.com']);
+    $second = User::factory()->create(['email' => 'second@example.com']);
+    $firstUrl = requestEmailChange($first, 'new@example.com');
+    Mail::fake();
+    $secondUrl = requestEmailChange($second, 'New@example.com');
+
+    $this->post($firstUrl);
+    $this->post($secondUrl)
+        ->assertRedirect(route('profile.edit'))
+        ->assertInertiaFlash('toast.message', 'Aquesta adreça electrònica ja està en ús.');
+
+    expect($first->refresh()->email)->toBe('new@example.com')
+        ->and($second->refresh()->email)->toBe('second@example.com')
+        ->and($second->pending_email)->toBeNull()
+        ->and($second->pending_email_token_hash)->toBeNull();
+});
+
+test('losing the race for the new email at save time shows the in-use message instead of failing', function () {
+    $user = User::factory()->create(['email' => 'old@example.com']);
+    $url = requestEmailChange($user, 'new@example.com');
+
+    // The other user grabs the address between the availability check and the save.
+    User::updating(function () {
+        User::factory()->create(['email' => 'new@example.com']);
+    });
+
+    $response = $this->post($url);
+    // Removed before any assertion, so a failure cannot leak the listener into other tests.
+    User::flushEventListeners();
+
+    $response->assertRedirect(route('profile.edit'))
+        ->assertInertiaFlash('toast.message', 'Aquesta adreça electrònica ja està en ús.');
+    expect($user->refresh()->email)->toBe('old@example.com')
+        ->and($user->pending_email)->toBeNull();
 });
 
 test('a used or expired link shows the error instead of the button', function () {
