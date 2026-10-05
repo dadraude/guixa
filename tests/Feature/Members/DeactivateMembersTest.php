@@ -157,6 +157,9 @@ test('administrators deactivate and reactivate too', function () {
 
     $this->actingAs($administrator)->post(route('households.deactivate', $household))->assertRedirect();
     expect($household->fresh()->is_active)->toBeFalse();
+
+    $this->actingAs($administrator)->post(route('households.reactivate', $household))->assertRedirect();
+    expect($household->fresh()->is_active)->toBeTrue();
 });
 
 test('a member without the membership role is refused every action', function () {

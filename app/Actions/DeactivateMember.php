@@ -3,6 +3,7 @@
 namespace App\Actions;
 
 use App\Models\Member;
+use Illuminate\Support\Facades\DB;
 
 /**
  * A member leaves the cooperative while their household stays: they leave
@@ -13,7 +14,10 @@ class DeactivateMember
 {
     public function handle(Member $member): void
     {
-        $member->update(['is_active' => false]);
-        $member->commissions()->detach();
+        // Atomic on its own: the members.deactivate route calls this directly, outside DeactivateHousehold's transaction.
+        DB::transaction(function () use ($member): void {
+            $member->update(['is_active' => false]);
+            $member->commissions()->detach();
+        });
     }
 }
