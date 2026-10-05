@@ -42,6 +42,7 @@ function membershipRequests(): array
     $invitation = Invitation::factory()->for($household)->create();
     $commission = Commission::factory()->create(['name' => 'Neteja']);
     $target = Member::factory()->create(['is_active' => true]);
+    $other = Household::factory()->create();
 
     return [
         'list households' => [fn (User $user) => test()->actingAs($user)->get(route('households.index')), null],
@@ -55,6 +56,9 @@ function membershipRequests(): array
         'rename commission' => [fn (User $user) => test()->actingAs($user)->patch(route('commissions.update', $commission), ['name' => 'Neteja 2']), 'commissions.index'],
         'add commission member' => [fn (User $user) => test()->actingAs($user)->post(route('commissions.members.store', $commission), ['member_id' => $target->id]), 'commissions.index'],
         'remove commission member' => [fn (User $user) => test()->actingAs($user)->delete(route('commissions.members.destroy', [$commission, $target])), 'commissions.index'],
+        'list members' => [fn (User $user) => test()->actingAs($user)->get(route('members.index')), null],
+        'edit member' => [fn (User $user) => test()->actingAs($user)->patch(route('members.update', $target), ['name' => 'Nou', 'email' => fake()->unique()->safeEmail()]), 'members.index'],
+        'move member' => [fn (User $user) => test()->actingAs($user)->patch(route('members.household.update', $target), ['household_id' => $other->id]), 'members.index'],
         'delete commission' => [fn (User $user) => test()->actingAs($user)->delete(route('commissions.destroy', $commission)), 'commissions.index'],
     ];
 }

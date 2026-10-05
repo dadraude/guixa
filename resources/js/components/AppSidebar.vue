@@ -28,6 +28,7 @@ import { index as administratorsIndex } from '@/routes/admin/administrators';
 import { index as commissionsIndex } from '@/routes/commissions';
 import { index as householdsIndex } from '@/routes/households';
 import { index as invitationsIndex } from '@/routes/households/invitations';
+import { index as membersIndex } from '@/routes/members';
 import type { NavItem } from '@/types';
 
 const page = usePage();
@@ -60,6 +61,11 @@ const mainNavItems = computed<NavItem[]>(() => {
                       title: t('Households'),
                       href: householdsIndex(),
                       icon: Home,
+                  },
+                  {
+                      title: t('Members'),
+                      href: membersIndex(),
+                      icon: Users,
                   },
                   {
                       title: t('Invitations'),
