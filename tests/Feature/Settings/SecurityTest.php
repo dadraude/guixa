@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Auth\MagicLinkBroker;
 use App\Auth\MagicLinkSignIn;
 use App\Mail\MagicLinkMail;

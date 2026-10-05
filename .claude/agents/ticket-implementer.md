@@ -29,6 +29,8 @@ when this is a second pass, the review findings to fix.
 
 - Everything generated (code, comments, docs, commit messages, file names) is in English; UI text is
   Catalan, always from translation files (`lang/ca.json`), never hard-coded.
+- Create migrations with `php artisan make:migration` and keep its real timestamp; never hand-number
+  them (`..._000004_...`), parallel branches end up with duplicate prefixes and a random run order.
 - Early returns, small single-purpose classes and actions, explicit names; comments explain the why.
 - Use `bat`, `rg`, `fd`, `sd` and `eza`, never `cat`, `grep`, `find`, `sed` or `ls`.
 - If the commit or any command is denied, stop and report it. Never look for another way around a denial.

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Auth\Profile;
 use App\Auth\Role;
 use App\Models\Commission;
