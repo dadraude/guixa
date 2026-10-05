@@ -34,12 +34,13 @@ class ActiveProfileController extends Controller
 
     /**
      * Choose or switch profile. The home depends on the profile, so go there
-     * instead of back to a page the new profile may not be allowed to see.
+     * instead of back to a page the new profile may not be allowed to see,
+     * unless sign-in left a page the person asked for before choosing.
      */
     public function update(SwitchProfileRequest $request): RedirectResponse
     {
         $this->activeProfile->choose($request->profile());
 
-        return to_route('home');
+        return redirect()->intended(route('home'));
     }
 }
