@@ -17,7 +17,11 @@ class HouseholdController extends Controller
 {
     public function index(Request $request): Response
     {
+        // Informational only: an active household with nobody active in a
+        // commission is flagged so the membership role can encourage it to
+        // take part. Nothing is blocked.
         $households = Household::query()
+            ->withCommissionMemberFlag()
             ->orderBy('number')
             ->get()
             ->map(fn (Household $household) => [
@@ -25,6 +29,7 @@ class HouseholdController extends Controller
                 'number' => $household->number,
                 'name' => $household->name,
                 'is_active' => $household->is_active,
+                'without_commission' => $household->is_active && ! $household->has_commission_member,
             ]);
 
         return Inertia::render('households/Index', [

@@ -9,6 +9,7 @@ use App\Http\Controllers\Commissions\CommissionController;
 use App\Http\Controllers\Commissions\CommissionMemberController;
 use App\Http\Controllers\Commissions\CommissionRoleController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Directory\DirectoryController;
 use App\Http\Controllers\Households\HouseholdController;
 use App\Http\Controllers\Households\InvitationController;
 use App\Http\Controllers\Households\PendingInvitationController;
@@ -72,6 +73,8 @@ Route::middleware(['auth'])->group(function () {
         Route::post('{member}/deactivate', [MemberController::class, 'deactivate'])->name('deactivate');
         Route::post('{member}/reactivate', [MemberController::class, 'reactivate'])->name('reactivate');
     });
+
+    Route::middleware('can:view-directory')->get('directory', DirectoryController::class)->name('directory.index');
 
     Route::middleware('can:view-commissions')->get('commissions', [CommissionController::class, 'index'])->name('commissions.index');
 

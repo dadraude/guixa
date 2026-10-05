@@ -43,6 +43,15 @@ class MemberRoles
     }
 
     /**
+     * Whether the member takes part in at least one commission. Inactive
+     * members are in none.
+     */
+    public function isInAnyCommission(Member $member): bool
+    {
+        return Member::query()->whereKey($member->getKey())->activeInCommission()->exists();
+    }
+
+    /**
      * @return list<Role>
      */
     public function of(Member $member): array

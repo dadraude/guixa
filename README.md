@@ -48,6 +48,18 @@ npm run check                 # Oxlint and Oxfmt (Vite+)
 npm run types:check           # vue-tsc
 ```
 
+End-to-end tests (Playwright, `e2e/`) drive a real browser through the invitation and sign-in
+flow. They need [Mailpit](https://mailpit.axllent.org) (SMTP on 1025, web API on 8025, e.g.
+`docker run -d -p 1025:1025 -p 8025:8025 axllent/mailpit`) and the local `testing` database.
+The run wipes that database (`migrate:fresh`) and refuses any other name or a non-local host.
+
+```sh
+npm run build
+npm run e2e
+```
+
+Set `MAILPIT_URL` if Mailpit's API is not at `http://127.0.0.1:8025`.
+
 User-facing text lives in `lang/ca.json` and `lang/ca/*.php`. In Vue, wrap strings with
 `t('English text')` from `@/lib/i18n`; in PHP, with `__('English text')`. A test fails when a
 string has no Catalan translation.
