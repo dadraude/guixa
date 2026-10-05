@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\Settings;
 
+use App\Actions\CancelEmailChange;
 use App\Actions\ConfirmEmailChange;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -33,6 +35,15 @@ class EmailChangeController extends Controller
         }
 
         Inertia::flash('toast', ['type' => 'success', 'message' => __('Email address updated.')]);
+
+        return to_route('profile.edit');
+    }
+
+    public function cancel(Request $request, CancelEmailChange $cancelEmailChange): RedirectResponse
+    {
+        $cancelEmailChange->handle($request->user());
+
+        Inertia::flash('toast', ['type' => 'success', 'message' => __('Email change cancelled.')]);
 
         return to_route('profile.edit');
     }
