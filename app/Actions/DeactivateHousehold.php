@@ -19,8 +19,12 @@ class DeactivateHousehold
     public function handle(Household $household): void
     {
         DB::transaction(function () use ($household) {
-            $household->forceFill(['is_active' => false])->save();
-            $household->members->each(fn (Member $member) => $this->deactivateMember->handle($member));
+            // Same row lock as ReactivateMember, so both operations are serialized.
+            $locked = Household::query()->whereKey($household->getKey())->lockForUpdate()->firstOrFail();
+
+            $locked->forceFill(['is_active' => false])->save();
+            // Fresh query: a preloaded relation could miss members added meanwhile.
+            $locked->members()->get()->each(fn (Member $member) => $this->deactivateMember->handle($member));
         });
     }
 }
