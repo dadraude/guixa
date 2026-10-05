@@ -27,7 +27,9 @@ export default defineConfig({
     fullyParallel: false,
     workers: 1,
     forbidOnly: !!process.env.CI,
-    retries: process.env.CI ? 1 : 0,
+    // The test is not idempotent (the invitation is consumed, mail piles up), so a
+    // retry could only fail for the wrong reason.
+    retries: 0,
     reporter: process.env.CI ? 'github' : 'list',
     use: {
         baseURL: BASE_URL,
@@ -43,7 +45,8 @@ export default defineConfig({
         url: `${BASE_URL}/login`,
         reuseExistingServer: false,
         stdout: 'ignore',
-        stderr: 'ignore',
+        // PHP errors must be visible in CI logs; locally the built-in server's request log is noise.
+        stderr: process.env.CI ? 'pipe' : 'ignore',
         cwd: 'public',
         env: serverEnvironment,
     },

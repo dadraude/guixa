@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Database\Factories\HouseholdFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -18,6 +20,7 @@ use Illuminate\Support\Carbon;
  * @property int $number
  * @property string $name
  * @property bool $is_active
+ * @property-read bool|null $has_commission_member Only loaded by withCommissionMemberFlag()
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
@@ -43,12 +46,16 @@ class Household extends Model
         return $this->hasMany(Member::class);
     }
 
-    public function hasMemberInAnyCommission(): bool
+    /**
+     * Adds `has_commission_member` in the same query, so lists do not run one
+     * query per household.
+     *
+     * @param  Builder<Household>  $query
+     */
+    #[Scope]
+    protected function withCommissionMemberFlag(Builder $query): void
     {
-        return $this->members()
-            ->where('is_active', true)
-            ->whereHas('commissions')
-            ->exists();
+        $query->withExists(['members as has_commission_member' => fn ($members) => $members->activeInCommission()]);
     }
 
     /**

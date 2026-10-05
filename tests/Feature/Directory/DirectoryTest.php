@@ -5,6 +5,7 @@ use App\Models\Commission;
 use App\Models\Household;
 use App\Models\Member;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Inertia\Testing\AssertableInertia as Assert;
 
 function directoryMember(Household $household, string $name, bool $active = true, ?string $phone = null): Member
@@ -126,6 +127,24 @@ test('the households list flags active households with nobody in a commission', 
                 'Inactiva' => false,
             ]);
         });
+});
+
+test('the households list runs the same queries however many households there are', function () {
+    $administrator = User::factory()->administrator()->create();
+    $countQueries = function () use ($administrator): int {
+        DB::flushQueryLog();
+        DB::enableQueryLog();
+        $this->actingAs($administrator)->get(route('households.index'))->assertOk();
+
+        return count(DB::getQueryLog());
+    };
+    Household::factory()->create();
+    $countQueries(); // warm-up: the first request also boots the session and auth
+    $withOne = $countQueries();
+
+    Household::factory()->count(5)->create();
+
+    expect($countQueries())->toBe($withOne);
 });
 
 test('the membership role also sees the households warning', function () {

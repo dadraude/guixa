@@ -48,7 +48,7 @@ class MemberRoles
      */
     public function isInAnyCommission(Member $member): bool
     {
-        return $member->is_active && $member->commissions()->exists();
+        return Member::query()->whereKey($member->getKey())->activeInCommission()->exists();
     }
 
     /**

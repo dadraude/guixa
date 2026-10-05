@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Database\Factories\MemberFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -53,6 +55,18 @@ class Member extends Model
     public function commissions(): BelongsToMany
     {
         return $this->belongsToMany(Commission::class)->withTimestamps();
+    }
+
+    /**
+     * The single definition of "takes part in a commission": an active member
+     * in at least one commission. Inactive members are in none.
+     *
+     * @param  Builder<Member>  $query
+     */
+    #[Scope]
+    protected function activeInCommission(Builder $query): void
+    {
+        $query->where('is_active', true)->whereHas('commissions');
     }
 
     /**
