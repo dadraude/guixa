@@ -1,6 +1,7 @@
 <?php
 
 use App\Auth\Role;
+use App\Auth\SecretHasher;
 use App\Models\Commission;
 use App\Models\Household;
 use App\Models\Member;
@@ -143,4 +144,40 @@ test('the members page lists members with their household and the active househo
             ->component('members/Index')
             ->where('members', fn ($members) => collect($members)->contains(fn ($row) => $row['name'] === 'Pere' && $row['household_id'] === $household->id))
             ->has('households', 2));
+});
+
+test('an immediate email change drops a pending self-service change, so its old link cannot overwrite it', function () {
+    $member = memberIn(Household::factory()->create(), ['email' => 'old@example.com']);
+    $member->user->forceFill([
+        'pending_email' => 'requested@example.com',
+        'pending_email_token_hash' => SecretHasher::hash('old-link-token'),
+        'pending_email_expires_at' => now()->addHour(),
+    ])->save();
+
+    $this->actingAs(membershipUser())
+        ->patch(route('members.update', $member), ['name' => 'X', 'email' => 'set-by-team@example.com']);
+
+    $this->post(route('email-change.confirm', ['token' => 'old-link-token']));
+
+    $user = $member->user->fresh();
+    expect($user->email)->toBe('set-by-team@example.com')
+        ->and($user->pending_email)->toBeNull()
+        ->and($user->pending_email_token_hash)->toBeNull()
+        ->and($user->pending_email_expires_at)->toBeNull();
+});
+
+test('a failing member update rolls back the user update', function () {
+    $member = memberIn(Household::factory()->create(), ['name' => 'Abans', 'email' => 'old@example.com']);
+    Member::updating(fn () => throw new RuntimeException('boom'));
+
+    $this->withoutExceptionHandling();
+
+    try {
+        $this->actingAs(membershipUser())
+            ->patch(route('members.update', $member), ['name' => 'Despres', 'email' => 'new@example.com', 'phone' => '600123123']);
+    } catch (RuntimeException) {
+    }
+
+    expect($member->user->fresh()->name)->toBe('Abans')
+        ->and($member->user->fresh()->email)->toBe('old@example.com');
 });

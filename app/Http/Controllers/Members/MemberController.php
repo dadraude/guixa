@@ -7,6 +7,7 @@ use App\Http\Requests\Members\UpdateMemberRequest;
 use App\Models\Household;
 use App\Models\Member;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -48,8 +49,18 @@ class MemberController extends Controller
     {
         $validated = $request->validated();
 
-        $member->user->update(['name' => $validated['name'], 'email' => $validated['email']]);
-        $member->update(['phone' => $validated['phone'] ?? null]);
+        DB::transaction(function () use ($member, $validated) {
+            // A self-service change requested earlier must not overwrite this
+            // email later through its still-valid link.
+            $member->user->forceFill([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'pending_email' => null,
+                'pending_email_token_hash' => null,
+                'pending_email_expires_at' => null,
+            ])->save();
+            $member->update(['phone' => $validated['phone'] ?? null]);
+        });
 
         Inertia::flash('toast', ['type' => 'success', 'message' => __('Member updated.')]);
 
