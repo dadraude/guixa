@@ -1,8 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Requests\Settings;
 
 use App\Concerns\ProfileValidationRules;
+use App\Models\User;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
@@ -26,12 +30,12 @@ class ProfileUpdateRequest extends FormRequest
      *
      * @return array<string, ValidationRule|array<mixed>|string>
      */
-    public function rules(): array
+    public function rules(#[CurrentUser] User $user): array
     {
-        $rules = $this->profileRules($this->user()->id);
+        $rules = $this->profileRules($user->id);
 
         // Only a member profile can store a phone; reject it instead of dropping it silently.
-        if (! $this->user()->member) {
+        if (! $user->member) {
             $rules['phone'] = ['prohibited'];
         }
 

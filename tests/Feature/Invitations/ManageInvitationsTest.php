@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Auth\SecretHasher;
 use App\Mail\InvitationMail;
 use App\Models\Household;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Directory;
 
 use App\Auth\ActiveProfile;
@@ -7,7 +9,8 @@ use App\Auth\MemberRoles;
 use App\Http\Controllers\Controller;
 use App\Models\Household;
 use App\Models\Member;
-use Illuminate\Http\Request;
+use App\Models\User;
+use Illuminate\Container\Attributes\CurrentUser;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -18,9 +21,8 @@ use Inertia\Response;
  */
 class DirectoryController extends Controller
 {
-    public function __invoke(Request $request, ActiveProfile $activeProfile, MemberRoles $memberRoles): Response
+    public function __invoke(#[CurrentUser] User $user, ActiveProfile $activeProfile, MemberRoles $memberRoles): Response
     {
-        $user = $request->user();
         $ownMember = $user->member;
         $isFull = $activeProfile->isActingAsAdministrator($user)
             || ($ownMember !== null && $memberRoles->isInAnyCommission($ownMember));
