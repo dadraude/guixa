@@ -40,6 +40,10 @@ Standard way to implement a Linear ticket; defined in `.claude/skills/ship-ticke
 - Review follow-ups: trivial ones are fixed or dropped; every other one becomes a Linear issue
   (`needs-triage`, related to the parent ticket) linked from the PR body.
 - Linear: In Progress when starting, In Review when the PR is opened.
+- Before review and again before pushing, the branch merges `origin/<base>` so conflicts show up in the
+  session, not in the PR.
+- Cross-cutting tickets (sweeps over many files) ship alone: no other PRs open while theirs is open.
+- Migrations keep the real timestamp from `make:migration`; never hand-number them.
 - Agents never edit `STATUS.md` (parallel branches would conflict); the orchestrator writes the session
   entry on `main` after the PRs merge.
 - Never push to `main`, never force-push, never merge PRs without being asked.
