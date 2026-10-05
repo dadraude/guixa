@@ -203,12 +203,21 @@
   change); DRA-41 closed as superseded. Category labels (`Bug`/`Improvement`/`Feature`) are now
   set on triaged issues.
 
+- **Session 20 (2026-10-05):** DRA-43 implemented and merged (PR #39, shipped alone): Larastan
+  runs at level 9 with no ignores or baseline. Request data is read from validated data through
+  typed accessors (`$request->safe()->string(...)`), config through `config()->string(...)`, and
+  the active-profile session value is narrowed with `is_string`. The spec review caught that
+  raw `$request->string()` reads let `AcceptInvitationController` pass unvalidated
+  name/password for an invitation to an existing user; fixed in the correction pass with a
+  test. Pest 282/282. Review follow-up DRA-50 (architecture rule: no raw input reads in
+  controllers that take a FormRequest) is `needs-triage`.
+
 ## Next step
 
-**Session 20:** `/grill-with-docs` on DRA-46 (invitations without a household) to amend and
-re-approve spec 001, then `/to-tickets`. Meanwhile `/ship-ticket` the `ready-for-agent` issues,
-a few per session: DRA-37 then DRA-36, DRA-39, DRA-40, DRA-42 then DRA-31, DRA-45, DRA-47,
-DRA-48. DRA-43 ships alone, before DRA-46's implementation starts. DRA-49 needs a human
+**Session 21:** triage DRA-50. Then `/grill-with-docs` on DRA-46 (invitations without a
+household) to amend and re-approve spec 001, then `/to-tickets`. Meanwhile `/ship-ticket` the
+`ready-for-agent` issues, a few per session: DRA-37 then DRA-36, DRA-39, DRA-40, DRA-42 then
+DRA-31, DRA-45, DRA-47, DRA-48. DRA-49 needs a human
 decision on the review learning process. Check that `e2e` is a required status check in the
 `main` branch protection (the user does this by hand).
 
