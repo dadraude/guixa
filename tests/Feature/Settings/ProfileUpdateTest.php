@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Actions\RequestEmailChange;
 use App\Mail\EmailChangeMail;
 use App\Models\Household;

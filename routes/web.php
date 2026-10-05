@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Auth\ActiveProfile;
 use App\Http\Controllers\Admin\AdministratorController;
 use App\Http\Controllers\Auth\ActiveProfileController;
@@ -16,7 +18,8 @@ use App\Http\Controllers\Households\PendingInvitationController;
 use App\Http\Controllers\Invitations\AcceptInvitationController;
 use App\Http\Controllers\Members\MemberController;
 use App\Http\Controllers\Members\MemberHouseholdController;
-use Illuminate\Http\Request;
+use App\Models\User;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
@@ -37,8 +40,8 @@ Route::prefix('invitations')->name('invitations.')->group(function () {
 });
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('/', function (Request $request, ActiveProfile $activeProfile) {
-        return $activeProfile->isActingAsAdministrator($request->user())
+    Route::get('/', function (#[CurrentUser] User $user, ActiveProfile $activeProfile) {
+        return $activeProfile->isActingAsAdministrator($user)
             ? to_route('admin.home')
             : to_route('dashboard');
     })->name('home');
