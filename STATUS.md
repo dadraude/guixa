@@ -178,10 +178,20 @@
   `README.md`. Review follow-ups DRA-33, DRA-34 (DRA-22) and DRA-35 (DRA-23) are
   `needs-triage`.
 
+- **Session 18 (2026-10-05):** triage of the last `needs-triage` issues; none left. DRA-31 and
+  DRA-32 (already Done) relabelled `ready-for-agent`. Agent briefs posted and moved to
+  `ready-for-agent`: DRA-33 (reactivate a member under a lock on the household row), DRA-34
+  (a member acting with the membership role cannot deactivate themselves or their own
+  household; administrators can; rule added to spec 001) and DRA-35 (one Catalan-collator name
+  sort for the directory, members list and dashboard housemates, `ext-intl` required, plus a
+  directory test for an administrator acting as member; its households-access test was already
+  covered).
+
 ## Next step
 
-**Session 18:** triage DRA-24 to DRA-35 (`needs-triage`) with the user. Check that `e2e` is a
-required status check in the `main` branch protection (the user does this by hand).
+**Session 19:** `/ship-ticket` the open `ready-for-agent` follow-ups (DRA-24, DRA-26 to DRA-30,
+DRA-33 to DRA-35), a few per session. Check that `e2e` is a required status check in the `main`
+branch protection (the user does this by hand).
 
 Before spec 002: define UX/UI principles with `/grill-with-docs` (mobile-first, accessibility
 target, visual identity, key flows for ordering and the offline box/payment screens) and record
