@@ -147,6 +147,7 @@
     "The number is assigned automatically and never changes.": "El número s'assigna automàticament i no canvia mai.",
     "They receive an email with a link to log in and will choose a password.": "Rebran un correu amb un enllaç per iniciar la sessió i triaran una contrasenya.",
     "This email already belongs to a member.": "Aquesta adreça electrònica ja pertany a un membre.",
+    "This email is already in use.": "Aquesta adreça electrònica ja està en ús.",
     "This invitation is no longer valid": "Aquesta invitació ja no és vàlida",
     "This link has expired or has already been used.": "Aquest enllaç ha caducat o ja s'ha fet servir.",
     "Toggle sidebar": "Mostra o amaga la barra lateral",
