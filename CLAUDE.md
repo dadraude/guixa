@@ -35,7 +35,8 @@ Standard way to implement a Linear ticket; defined in `.claude/skills/ship-ticke
 - Branch `feature|bugfix|…/dra-NN-short-title`, from updated `main`, or from the blocking ticket's
   branch while its PR is still open (stacked; the PR targets that branch until it merges).
 - `ticket-implementer` agent (Sonnet): test-first, linters, full suite, one single-line commit.
-- `ticket-reviewer` agent (Sonnet, read-only): independent review of Standards and Spec. One correction pass.
+- `ticket-reviewer` (Spec and Standards) and `ticket-correctness-reviewer` (bugs and security) agents
+  (Opus, read-only), in parallel: independent review on a different model from the implementer. One correction pass.
 - Review follow-ups: trivial ones are fixed or dropped; every other one becomes a Linear issue
   (`needs-triage`, related to the parent ticket) linked from the PR body.
 - Linear: In Progress when starting, In Review when the PR is opened.

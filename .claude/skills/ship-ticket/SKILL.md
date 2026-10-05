@@ -25,9 +25,13 @@ criteria) and the branch. Wait for its report. If it could not commit, stop and 
 
 ## 3. Independent review
 
-Launch the `ticket-reviewer` agent with the ticket and the base ref (`main`, or the blocker's branch).
-If the verdict is `CHANGES REQUESTED`, relay the blockers to a new `ticket-implementer` pass (one
-correction pass only).
+Launch both reviewers in parallel (one message, two agents), each with the ticket and the base ref
+(`main`, or the blocker's branch):
+- `ticket-reviewer`: spec coverage and standards.
+- `ticket-correctness-reviewer`: bugs and security.
+
+If either verdict is `CHANGES REQUESTED`, relay the blockers of both to a new `ticket-implementer` pass
+(one correction pass only).
 
 Then sort every follow-up into one of two buckets, so none lives only in a PR body:
 - **Trivial** (wording, formatting, a comment): fix it in the correction pass, or drop it and say so.
@@ -38,7 +42,7 @@ Then sort every follow-up into one of two buckets, so none lives only in a PR bo
 ## 4. Deliver
 
 Show the user a short summary: what was built, test/lint results (as reported, not re-verified unless
-asked), review verdict, the follow-ups and their bucket, open doubts. Then ask once whether to push and
+asked), both review verdicts, the follow-ups and their bucket, open doubts. Then ask once whether to push and
 open the PR.
 On a yes: create the follow-up issues, push with `-u`, `gh pr create --base <base>` with a conventional
 title `type(scope): description (DRA-NN)` and a short body that links each follow-up issue and ends with
