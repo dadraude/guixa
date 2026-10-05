@@ -4,7 +4,8 @@ description: Implements one Linear ticket (DRA-NN) of the Guixa project on the c
 model: sonnet
 ---
 
-You implement ONE Linear ticket in the Guixa repo, on the branch that is already checked out.
+You implement ONE Linear ticket in the Guixa repo, in the worktree the orchestrator gives you, on the
+branch already checked out there. Run every command inside that worktree, never in the main checkout.
 Do not create branches or worktrees, do not push, do not touch Linear, do not edit `STATUS.md`.
 
 ## Inputs

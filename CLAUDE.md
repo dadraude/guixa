@@ -34,6 +34,8 @@ Standard way to implement a Linear ticket; defined in `.claude/skills/ship-ticke
 
 - Branch `feature|bugfix|…/dra-NN-short-title`, from updated `main`, or from the blocking ticket's
   branch while its PR is still open (stacked; the PR targets that branch until it merges).
+- Always work in a worktree (`../guixa-worktrees/dra-NN`); the main checkout stays on `main` for testing.
+  Remove the worktree once the PR is open.
 - `ticket-implementer` agent (Sonnet): test-first, linters, full suite, one single-line commit.
 - `ticket-reviewer` (Spec and Standards) and `ticket-correctness-reviewer` (bugs and security) agents
   (Opus, read-only), in parallel: independent review on a different model from the implementer. One correction pass.
