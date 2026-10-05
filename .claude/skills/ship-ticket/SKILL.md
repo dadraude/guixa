@@ -31,10 +31,13 @@ the agents do the heavy work and you keep a short thread. Talk to the user in Ca
 Launch the `ticket-implementer` agent with the full ticket (id, title, description, acceptance
 criteria), the branch and the worktree path. Wait for its report. If it could not commit, stop and tell the user.
 
+If it stopped on an undecided edge case, ask the user (one question at a time), record each answer in the
+ticket as an acceptance criterion, and launch it again with the updated ticket.
+
 Then sync with the base: `git fetch origin` and `git merge origin/<base>` (merge, never rebase: the
 branch may be pushed and force-push is forbidden). If it conflicts, resolve it with the
 `resolving-merge-conflicts` skill. If the base brought new commits, run a `ticket-implementer` pass that
-only runs the full checks (step 4 of its flow) and fixes what breaks.
+only runs the full checks (step 5 of its flow) and fixes what breaks.
 
 ## 3. Independent review
 

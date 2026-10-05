@@ -13,9 +13,13 @@ using Matt Pocock's skills (`mattpocock-skills` plugin). See `docs/adr/0001-sdd-
    1. `/grill-with-docs`: interview until the feature is clear; updates `CONTEXT.md` and `docs/adr/`.
    2. `/to-spec`: writes `specs/NNN-name/spec.md` (`Status: draft`) — problem, user stories,
       implementation and testing decisions.
-   3. **The user approves the spec** (`Status: approved`). No tickets and no code before that.
-   4. `/to-tickets`: splits the spec into vertical-slice tickets in Linear (project Guixa).
-   5. `/implement`: one or a few tickets per session, test-first (`/tdd`), then `/code-review`.
+   3. **Spec review**: the `spec-reviewer` agent (Opus, read-only) lists the edge cases the spec leaves
+      undecided (concurrency, lifecycle states, signed out, permissions, sibling screens, failure states).
+      Obvious answers go into the spec; the rest are asked one by one with `/grill-with-docs` and recorded.
+   4. **The user approves the spec** (`Status: approved`). No tickets and no code before that.
+   5. `/to-tickets`: splits the spec into vertical-slice tickets in Linear (project Guixa). Each ticket
+      carries the edge cases decided for its stories as acceptance criteria.
+   6. `/implement`: one or a few tickets per session, test-first (`/tdd`), then `/code-review`.
 
 Domain vocabulary lives in `CONTEXT.md`; decisions in `docs/adr/NNNN-title.md`.
 
