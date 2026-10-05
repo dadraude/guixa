@@ -1,5 +1,6 @@
 <?php
 
+use App\Actions\ReactivateMember;
 use App\Auth\Role;
 use App\Auth\SecretHasher;
 use App\Models\Commission;
@@ -8,6 +9,7 @@ use App\Models\MagicLink;
 use App\Models\Member;
 use App\Models\User;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\ValidationException;
 
 function membershipStaff(): User
 {
@@ -174,4 +176,18 @@ test('a member without the membership role is refused every action', function ()
 
     expect($member->fresh()->is_active)->toBeTrue()
         ->and($household->fresh()->is_active)->toBeTrue();
+});
+
+test('reactivating a member checks the stored household state, not a stale loaded model', function () {
+    $household = Household::factory()->create();
+    $member = activeMemberIn($household);
+    $member->update(['is_active' => false]);
+
+    // The household was loaded as active, then deactivated elsewhere before the check.
+    $member->load('household');
+    $household->forceFill(['is_active' => false])->save();
+    expect($member->household->is_active)->toBeTrue();
+
+    expect(fn () => app(ReactivateMember::class)->handle($member))->toThrow(ValidationException::class);
+    expect($member->fresh()->is_active)->toBeFalse();
 });
