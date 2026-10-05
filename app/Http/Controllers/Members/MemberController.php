@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Members;
 
+use App\Actions\DeactivateMember;
+use App\Actions\ReactivateMember;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Members\UpdateMemberRequest;
 use App\Models\Household;
@@ -63,6 +65,24 @@ class MemberController extends Controller
         });
 
         Inertia::flash('toast', ['type' => 'success', 'message' => __('Member updated.')]);
+
+        return to_route('members.index');
+    }
+
+    public function deactivate(Member $member, DeactivateMember $deactivateMember): RedirectResponse
+    {
+        $deactivateMember->handle($member);
+
+        Inertia::flash('toast', ['type' => 'success', 'message' => __('Member deactivated.')]);
+
+        return to_route('members.index');
+    }
+
+    public function reactivate(Member $member, ReactivateMember $reactivateMember): RedirectResponse
+    {
+        $reactivateMember->handle($member);
+
+        Inertia::flash('toast', ['type' => 'success', 'message' => __('Member reactivated.')]);
 
         return to_route('members.index');
     }
