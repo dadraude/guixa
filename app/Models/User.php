@@ -96,8 +96,10 @@ class User extends Authenticatable
      */
     public function canSignIn(): bool
     {
-        $administrator = $this->administrator()->first();
-        $member = $this->member()->first();
+        // Relations as properties: loaded once per request and shared with the gates and ActiveProfile.
+        // Each request authenticates a fresh User, so a cached relation cannot outlive a deactivation.
+        $administrator = $this->administrator;
+        $member = $this->member;
 
         if ($administrator === null && $member === null) {
             return true;

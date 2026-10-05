@@ -4,6 +4,7 @@ use App\Mail\EmailChangeMail;
 use App\Mail\MagicLinkMail;
 use App\Models\Household;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Mail;
 use Inertia\Testing\AssertableInertia as Assert;
@@ -264,4 +265,21 @@ test('changing the email changes it for both profiles', function () {
 
     expect($user->administrator->fresh()->user->email)->toBe('nou@example.com')
         ->and($user->member->fresh()->user->email)->toBe('nou@example.com');
+});
+
+test('a request loads the profiles of the signed-in user once, not again for the sign-in check', function () {
+    $user = User::factory()->member(Household::factory()->create())->create();
+    $this->actingAs($user);
+
+    $queries = collect();
+    DB::listen(fn ($query) => $queries->push($query->sql));
+
+    $this->get(route('dashboard'))->assertOk();
+
+    $profileQueries = fn (string $table) => $queries
+        ->filter(fn (string $sql) => str_contains($sql, "from \"{$table}\" where \"{$table}\".\"user_id\""))
+        ->count();
+
+    expect($profileQueries('administrators'))->toBe(1)
+        ->and($profileQueries('members'))->toBe(1);
 });
