@@ -20,8 +20,14 @@ class ProfileController extends Controller
      */
     public function edit(#[CurrentUser] User $user): Response
     {
+        // The phone lives on the member profile, so users without one (e.g. an
+        // administrator) get no phone field at all.
+        $memberProps = $user->member
+            ? ['hasMember' => true, 'phone' => $user->member->phone]
+            : ['hasMember' => false];
+
         return Inertia::render('settings/Profile', [
-            'phone' => $user->member?->phone,
+            ...$memberProps,
             'pendingEmail' => $user->pending_email,
         ]);
     }
@@ -35,7 +41,9 @@ class ProfileController extends Controller
         $validated = $request->validated();
 
         $user->update(['name' => $validated['name']]);
-        $user->member?->update(['phone' => $validated['phone'] ?? null]);
+        if ($user->member) {
+            $user->member->update(['phone' => $validated['phone'] ?? null]);
+        }
 
         if ($validated['email'] !== $user->email) {
             $requestEmailChange->handle($user, $validated['email']);

@@ -21,8 +21,9 @@ defineOptions({
     },
 });
 
-defineProps<{
-    phone: string | null;
+const props = defineProps<{
+    hasMember: boolean;
+    phone?: string | null;
     pendingEmail: string | null;
 }>();
 
@@ -39,7 +40,11 @@ const user = computed(() => page.props.auth.user);
         <Heading
             variant="small"
             :title="t('Profile')"
-            :description="t('Update your name, phone and email address')"
+            :description="
+                hasMember
+                    ? t('Update your name, phone and email address')
+                    : t('Update your name and email address')
+            "
         />
 
         <Form
@@ -61,14 +66,14 @@ const user = computed(() => page.props.auth.user);
                 <InputError class="mt-2" :message="errors.name" />
             </div>
 
-            <div class="grid gap-2">
+            <div v-if="props.hasMember" class="grid gap-2">
                 <Label for="phone">{{ t('Phone (optional)') }}</Label>
                 <Input
                     id="phone"
                     type="tel"
                     class="mt-1 block w-full"
                     name="phone"
-                    :default-value="phone ?? ''"
+                    :default-value="props.phone ?? ''"
                     autocomplete="tel"
                     :placeholder="t('Phone (optional)')"
                 />
@@ -96,7 +101,9 @@ const user = computed(() => page.props.auth.user);
                     {{
                         t(
                             'We sent a link to :email. Your email will change when you open it.',
-                            { email: pendingEmail },
+                            {
+                                email: pendingEmail,
+                            },
                         )
                     }}
                 </p>

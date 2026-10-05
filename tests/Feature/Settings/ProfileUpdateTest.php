@@ -73,6 +73,32 @@ test('the phone is optional and can be cleared', function () {
     expect($user->member->refresh()->phone)->toBeNull();
 });
 
+test('a user without a member profile gets no phone field', function () {
+    $this->actingAs(User::factory()->create())
+        ->get(route('profile.edit'))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('settings/Profile')
+            ->where('hasMember', false)
+            ->missing('phone'));
+});
+
+test('a user with a member profile gets the phone field', function () {
+    $this->actingAs(User::factory()->member(Household::factory()->create())->create())
+        ->get(route('profile.edit'))
+        ->assertInertia(fn (Assert $page) => $page->where('hasMember', true)->has('phone'));
+});
+
+test('a phone is rejected for a user without a member profile', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user)
+        ->patch(route('profile.update'), ['name' => 'Nou', 'phone' => '600 111 222', 'email' => $user->email])
+        ->assertSessionHasErrors('phone');
+
+    expect($user->refresh()->name)->not->toBe('Nou');
+});
+
 test('the name is required', function () {
     $this->actingAs(User::factory()->create())
         ->patch(route('profile.update'), ['name' => '', 'email' => 'x@example.com'])

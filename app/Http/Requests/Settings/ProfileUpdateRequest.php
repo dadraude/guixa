@@ -32,6 +32,13 @@ class ProfileUpdateRequest extends FormRequest
      */
     public function rules(#[CurrentUser] User $user): array
     {
-        return $this->profileRules($user->id);
+        $rules = $this->profileRules($user->id);
+
+        // Only a member profile can store a phone; reject it instead of dropping it silently.
+        if (! $user->member) {
+            $rules['phone'] = ['prohibited'];
+        }
+
+        return $rules;
     }
 }
