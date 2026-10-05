@@ -20,7 +20,7 @@ class EmailChangeMail extends Mailable implements ShouldQueueAfterCommit
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: __('Confirm your new email address for :app', ['app' => config('app.name')]),
+            subject: __('Confirm your new email address for :app', ['app' => config()->string('app.name')]),
         );
     }
 

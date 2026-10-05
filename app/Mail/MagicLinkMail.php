@@ -26,7 +26,7 @@ class MagicLinkMail extends Mailable implements ShouldQueueAfterCommit
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: __('Link to log in to :app', ['app' => config('app.name')]),
+            subject: __('Link to log in to :app', ['app' => config()->string('app.name')]),
         );
     }
 

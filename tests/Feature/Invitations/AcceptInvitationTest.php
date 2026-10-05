@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Actions\AcceptInvitation;
 use App\Mail\InvitationMail;
 use App\Models\Household;
 use App\Models\Invitation;
@@ -231,6 +232,18 @@ test('a name submitted for an existing user is not written to their account', fu
     $this->post(route('invitations.accept', $token), ['name' => 'Another Name']);
 
     expect($administrator->fresh()->name)->toBe('Nou Admin');
+});
+
+test('the name and password are not passed on for an invitation to an existing user', function () {
+    [, $token] = sentInvitation();
+    User::factory()->administrator()->create(['email' => 'nou@example.com']);
+    $this->mock(AcceptInvitation::class)
+        ->shouldReceive('handle')
+        ->once()
+        ->with($token, null, null)
+        ->andReturn(User::where('email', 'nou@example.com')->sole());
+
+    $this->post(route('invitations.accept', $token), ['name' => 'Another Name', 'password' => 'hijacked1', 'password_confirmation' => 'hijacked1']);
 });
 
 test('accepting while another user is signed in drops that user session data', function () {

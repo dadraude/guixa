@@ -46,8 +46,9 @@ class ProfileController extends Controller
             $user->member->update(['phone' => $validated['phone'] ?? null]);
         }
 
-        if ($validated['email'] !== $user->email) {
-            $requestEmailChange->handle($user, $validated['email']);
+        $email = $request->safe()->string('email')->toString();
+        if ($email !== $user->email) {
+            $requestEmailChange->handle($user, $email);
         }
 
         Inertia::flash('toast', ['type' => 'success', 'message' => __('Profile updated.')]);

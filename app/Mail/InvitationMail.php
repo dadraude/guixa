@@ -24,7 +24,7 @@ class InvitationMail extends Mailable implements ShouldQueueAfterCommit
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: __('Invitation to join :app', ['app' => config('app.name')]),
+            subject: __('Invitation to join :app', ['app' => config()->string('app.name')]),
         );
     }
 

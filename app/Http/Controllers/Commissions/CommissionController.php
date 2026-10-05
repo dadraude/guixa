@@ -77,7 +77,7 @@ class CommissionController extends Controller
     }
 
     /**
-     * @param  iterable<Member>  $members
+     * @param  iterable<int, Member>  $members
      * @return array<int, array{id: string, name: string}>
      */
     private function namesOf(iterable $members): array
