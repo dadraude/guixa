@@ -155,10 +155,19 @@
   labelled `needs-triage`, triaged with the user at the start of each session; the DRA-17 and
   DRA-19 follow-ups were backfilled as DRA-24 to DRA-30. Merged local branches cleaned up.
 
+- **Session 17 (2026-10-05):** DRA-21 implemented and merged (PR #20): new Members page under
+  `manage-membership` (membership role and administrators) to edit any member's name, email
+  and phone and move them to another active household. The email changes immediately, stays
+  unique across users (case-insensitive) and clears any pending self-service email change;
+  user and member updates run in one transaction. Inactive members are listed and editable.
+  Pest 232/232, Pint and Larastan pass. Review follow-ups DRA-31 (paginate the members list)
+  and DRA-32 (no "moved" toast for the current household) created as `needs-triage`.
+  The DRA-24 to DRA-30 triage was not done this session.
+
 ## Next step
 
-**Session 17:** triage DRA-24 to DRA-30 (`needs-triage`) with the user, then `/ship-ticket`
-DRA-21, DRA-22 or DRA-23 (all unblocked by DRA-20) to finish spec 001.
+**Session 18:** triage DRA-24 to DRA-32 (`needs-triage`) with the user, then `/ship-ticket`
+DRA-22 or DRA-23 to finish spec 001.
 
 Before spec 002: define UX/UI principles with `/grill-with-docs` (mobile-first, accessibility
 target, visual identity, key flows for ordering and the offline box/payment screens) and record
