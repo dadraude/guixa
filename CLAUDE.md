@@ -39,6 +39,8 @@ Standard way to implement a Linear ticket; defined in `.claude/skills/ship-ticke
   (Opus, read-only), in parallel: independent review on a different model from the implementer. One correction pass.
 - Review follow-ups: trivial ones are fixed or dropped; every other one becomes a Linear issue
   (`needs-triage`, related to the parent ticket) linked from the PR body.
+- No PR or ticket keeps follow-ups as plain text, also for work done outside `/ship-ticket`: each one is a
+  `DRA-NN` issue, created before the PR is opened.
 - Linear: In Progress when starting, In Review when the PR is opened.
 - Before review and again before pushing, the branch merges `origin/<base>` so conflicts show up in the
   session, not in the PR.
