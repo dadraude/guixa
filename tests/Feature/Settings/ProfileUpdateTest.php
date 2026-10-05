@@ -187,9 +187,46 @@ test('the confirmation expires', function () {
     $url = requestEmailChange($user, 'new@example.com');
 
     $this->travel(RequestEmailChange::HOURS_VALID + 1)->hours();
-    $this->post($url);
+    $this->post($url)->assertRedirect($url);
 
     expect($user->refresh()->email)->toBe('old@example.com');
+});
+
+test('the second of two users confirming the same new email gets the in-use message and the first keeps it', function () {
+    $first = User::factory()->create(['email' => 'first@example.com']);
+    $second = User::factory()->create(['email' => 'second@example.com']);
+    $firstUrl = requestEmailChange($first, 'new@example.com');
+    Mail::fake();
+    $secondUrl = requestEmailChange($second, 'New@example.com');
+
+    $this->post($firstUrl);
+    $this->post($secondUrl)
+        ->assertRedirect(route('profile.edit'))
+        ->assertInertiaFlash('toast.message', 'Aquesta adreça electrònica ja està en ús.');
+
+    expect($first->refresh()->email)->toBe('new@example.com')
+        ->and($second->refresh()->email)->toBe('second@example.com')
+        ->and($second->pending_email)->toBeNull()
+        ->and($second->pending_email_token_hash)->toBeNull();
+});
+
+test('losing the race for the new email at save time shows the in-use message instead of failing', function () {
+    $user = User::factory()->create(['email' => 'old@example.com']);
+    $url = requestEmailChange($user, 'new@example.com');
+
+    // The other user grabs the address between the availability check and the save.
+    User::updating(function () {
+        User::factory()->create(['email' => 'new@example.com']);
+    });
+
+    $response = $this->post($url);
+    // Removed before any assertion, so a failure cannot leak the listener into other tests.
+    User::flushEventListeners();
+
+    $response->assertRedirect(route('profile.edit'))
+        ->assertInertiaFlash('toast.message', 'Aquesta adreça electrònica ja està en ús.');
+    expect($user->refresh()->email)->toBe('old@example.com')
+        ->and($user->pending_email)->toBeNull();
 });
 
 test('a used or expired link shows the error instead of the button', function () {
@@ -278,4 +315,61 @@ test('editing the profile never touches another member', function () {
 test('guests cannot edit a profile', function () {
     $this->patch(route('profile.update'), ['name' => 'X', 'email' => 'x@example.com'])
         ->assertRedirect(route('login'));
+});
+
+test('cancelling the change clears the pending email and its link', function () {
+    $user = User::factory()->create(['email' => 'old@example.com']);
+    $url = requestEmailChange($user, 'new@example.com');
+
+    $this->actingAs($user)
+        ->delete(route('email-change.cancel'))
+        ->assertRedirect(route('profile.edit'));
+
+    $user->refresh();
+    expect($user->pending_email)->toBeNull()
+        ->and($user->pending_email_token_hash)->toBeNull()
+        ->and($user->pending_email_expires_at)->toBeNull();
+
+    $this->post($url);
+    expect($user->refresh()->email)->toBe('old@example.com');
+});
+
+test('saving the form with the current email keeps the pending change', function () {
+    $user = User::factory()->create(['email' => 'old@example.com', 'name' => 'Anna']);
+    requestEmailChange($user, 'new@example.com');
+
+    $this->actingAs($user)
+        ->patch(route('profile.update'), ['name' => 'Anna Puig', 'email' => 'old@example.com'])
+        ->assertSessionHasNoErrors();
+
+    expect($user->refresh()->name)->toBe('Anna Puig')
+        ->and($user->pending_email)->toBe('new@example.com')
+        ->and($user->pending_email_token_hash)->not->toBeNull();
+});
+
+test('cancelling with no pending change is harmless', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user)
+        ->delete(route('email-change.cancel'))
+        ->assertRedirect(route('profile.edit'));
+
+    expect($user->refresh()->pending_email)->toBeNull();
+});
+
+test('guests cannot cancel an email change', function () {
+    $this->delete(route('email-change.cancel'))->assertRedirect(route('login'));
+});
+
+test('the profile page shows the pending email only while its link is valid', function () {
+    $user = User::factory()->create(['email' => 'old@example.com']);
+    requestEmailChange($user, 'new@example.com');
+
+    $this->actingAs($user)->get(route('profile.edit'))
+        ->assertInertia(fn (Assert $page) => $page->where('pendingEmail', 'new@example.com'));
+
+    $this->travel(RequestEmailChange::HOURS_VALID + 1)->hours();
+
+    $this->actingAs($user)->get(route('profile.edit'))
+        ->assertInertia(fn (Assert $page) => $page->where('pendingEmail', null));
 });

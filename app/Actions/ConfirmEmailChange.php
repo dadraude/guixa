@@ -6,6 +6,7 @@ namespace App\Actions;
 
 use App\Auth\SecretHasher;
 use App\Models\User;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -25,38 +26,70 @@ class ConfirmEmailChange
             ->exists();
     }
 
-    /**
-     * @return bool Whether the email was changed.
-     */
-    public function handle(string $token): bool
+    public function handle(string $token): EmailChangeOutcome
     {
-        return DB::transaction(function () use ($token): bool {
-            $user = User::query()
-                ->where('pending_email_token_hash', SecretHasher::hash($token))
-                ->where('pending_email_expires_at', '>', now())
-                ->lockForUpdate()
-                ->first();
+        try {
+            return DB::transaction(fn () => $this->apply($token));
+        } catch (UniqueConstraintViolationException) {
+            // Lost the race for the address after the availability check. The
+            // transaction is rolled back, so the pending change is dropped here.
+            $this->discardPendingChange($token);
 
-            if ($user === null) {
-                return false;
-            }
+            return EmailChangeOutcome::EmailTaken;
+        }
+    }
 
-            // Someone else may have taken the address since it was requested.
-            $taken = User::query()->whereKeyNot($user->id)->where('email', $user->pending_email)->exists();
+    private function apply(string $token): EmailChangeOutcome
+    {
+        $user = User::query()
+            ->where('pending_email_token_hash', SecretHasher::hash($token))
+            ->where('pending_email_expires_at', '>', now())
+            ->lockForUpdate()
+            ->first();
 
-            if ($taken) {
-                return false;
-            }
+        if ($user === null) {
+            return EmailChangeOutcome::LinkUnusable;
+        }
 
-            $user->forceFill([
-                'email' => $user->pending_email,
-                'email_verified_at' => now(),
+        // Someone else may have taken the address since it was requested.
+        $taken = User::query()->whereKeyNot($user->id)->where('email', $user->pending_email)->exists();
+
+        if ($taken) {
+            $this->clearPendingChange($user);
+
+            return EmailChangeOutcome::EmailTaken;
+        }
+
+        $user->forceFill([
+            'email' => $user->pending_email,
+            'email_verified_at' => now(),
+        ]);
+        $this->clearPendingChange($user);
+
+        return EmailChangeOutcome::Applied;
+    }
+
+    private function discardPendingChange(string $token): void
+    {
+        User::query()
+            ->where('pending_email_token_hash', SecretHasher::hash($token))
+            ->update([
                 'pending_email' => null,
                 'pending_email_token_hash' => null,
                 'pending_email_expires_at' => null,
-            ])->save();
+            ]);
+    }
 
-            return true;
-        });
+    /**
+     * Saves the user together with the cleared pending change, so the dead link
+     * does not linger.
+     */
+    private function clearPendingChange(User $user): void
+    {
+        $user->forceFill([
+            'pending_email' => null,
+            'pending_email_token_hash' => null,
+            'pending_email_expires_at' => null,
+        ])->save();
     }
 }

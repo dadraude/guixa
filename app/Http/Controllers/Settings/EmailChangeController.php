@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Settings;
 
+use App\Actions\CancelEmailChange;
 use App\Actions\ConfirmEmailChange;
+use App\Actions\EmailChangeOutcome;
 use App\Http\Controllers\Controller;
+use App\Models\User;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -31,11 +35,28 @@ class EmailChangeController extends Controller
      */
     public function confirm(ConfirmEmailChange $confirmEmailChange, string $token): RedirectResponse
     {
-        if (! $confirmEmailChange->handle($token)) {
+        $outcome = $confirmEmailChange->handle($token);
+
+        if ($outcome === EmailChangeOutcome::LinkUnusable) {
             return to_route('email-change.show', ['token' => $token]);
         }
 
+        if ($outcome === EmailChangeOutcome::EmailTaken) {
+            Inertia::flash('toast', ['type' => 'error', 'message' => __('This email is already in use.')]);
+
+            return to_route('profile.edit');
+        }
+
         Inertia::flash('toast', ['type' => 'success', 'message' => __('Email address updated.')]);
+
+        return to_route('profile.edit');
+    }
+
+    public function cancel(#[CurrentUser] User $user, CancelEmailChange $cancelEmailChange): RedirectResponse
+    {
+        $cancelEmailChange->handle($user);
+
+        Inertia::flash('toast', ['type' => 'success', 'message' => __('Email change cancelled.')]);
 
         return to_route('profile.edit');
     }
