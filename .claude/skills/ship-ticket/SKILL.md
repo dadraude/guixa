@@ -16,6 +16,10 @@ the agents do the heavy work and you keep a short thread. Talk to the user in Ca
    - A blocker still has an open PR: create it from that blocker's branch (stacked). The PR will target
      that branch; mention it in the PR body and retarget to `main` once the blocker merges.
    - Never branch from a sibling that is not a blocker.
+   - Always work in a worktree, never switch branches in the main checkout: it stays on `main` so the
+     user can test there. `git worktree add ../guixa-worktrees/dra-NN -b <branch> <base>`, then in it
+     copy `.env` from the main checkout, `composer install` and `npm ci`. Every later step (agents,
+     merges, checks, push) runs inside that worktree.
 3. **Cross-cutting tickets ship alone.** If the ticket touches many files outside its own feature
    (formatter or linter sweeps, strict types, mass renames, moving folders), check `gh pr list`: with
    other PRs open, tell the user and ask whether to wait until they merge. Once its PR is open, do not
@@ -25,12 +29,15 @@ the agents do the heavy work and you keep a short thread. Talk to the user in Ca
 ## 2. Implement
 
 Launch the `ticket-implementer` agent with the full ticket (id, title, description, acceptance
-criteria) and the branch. Wait for its report. If it could not commit, stop and tell the user.
+criteria), the branch and the worktree path. Wait for its report. If it could not commit, stop and tell the user.
+
+If it stopped on an undecided edge case, ask the user (one question at a time), record each answer in the
+ticket as an acceptance criterion, and launch it again with the updated ticket.
 
 Then sync with the base: `git fetch origin` and `git merge origin/<base>` (merge, never rebase: the
 branch may be pushed and force-push is forbidden). If it conflicts, resolve it with the
 `resolving-merge-conflicts` skill. If the base brought new commits, run a `ticket-implementer` pass that
-only runs the full checks (step 4 of its flow) and fixes what breaks.
+only runs the full checks (step 5 of its flow) and fixes what breaks.
 
 ## 3. Independent review
 
@@ -56,7 +63,9 @@ open the PR.
 On a yes: create the follow-up issues, fetch again and, if the base moved since the sync, repeat the
 step 2 sync before pushing. Then push with `-u`, `gh pr create --base <base>` with a conventional
 title `type(scope): description (DRA-NN)` and a short body that links each follow-up issue and ends with
-`🤖 Generated with [Claude Code](https://claude.com/claude-code)`, then move the issue to **In Review**.
+`🤖 Generated with [Claude Code](https://claude.com/claude-code)`, then move the issue to **In Review**. Once the PR is open, remove the worktree
+(`git worktree remove ../guixa-worktrees/dra-NN`); the branch stays. If the PR needs more work later,
+add a new worktree for it.
 
 ## 5. Status file
 
@@ -64,5 +73,6 @@ Agents never edit `STATUS.md`. After the PRs merge, write one session entry on `
 
 ## Guardrails
 
+- Never open a PR whose body or ticket lists follow-ups as plain text: each one must be a linked `DRA-NN`.
 - Never push to `main` or force-push. Never merge PRs unless the user asks.
 - If a permission is denied, stop and tell the user; do not look for another route.
