@@ -187,11 +187,30 @@
   directory test for an administrator acting as member; its households-access test was already
   covered).
 
+- **Session 19 (2026-10-05):** triage of DRA-36 to DRA-45; none left in `needs-triage`.
+  `ready-for-agent` with agent briefs: DRA-36 (after choosing a profile, go to the intended URL
+  only if the route's `can:` gates pass, else home; blocked by DRA-37), DRA-37 (tests for the
+  intended URL), DRA-39 (`preserveState` when cancelling an email change, Playwright test),
+  DRA-40 (`MoveMember` action locking the target household), DRA-42 (one Catalan-collator name
+  sort for directory, members, dashboard and commission members; blocks DRA-31), DRA-43
+  (Larastan level 9, 21 errors; cross-cutting, ships alone) and DRA-45 (signed-out email change
+  confirmation shows the outcome on a public page; signed-in keeps the toast). DRA-31 reopened:
+  it was marked Done but never implemented. DRA-44 split into DRA-47 (on-demand mutation
+  testing, `ready-for-agent`), DRA-48 (Pint/Oxc hook on edit, `ready-for-agent`) and DRA-49
+  (review learning loop, `ready-for-human`). **Decision:** invitations will no longer carry a
+  household; accepting creates a user without one and the membership commission assigns
+  household, commissions and roles by hand. Recorded as DRA-46 (`ready-for-human`, spec 001
+  change); DRA-41 closed as superseded. Category labels (`Bug`/`Improvement`/`Feature`) are now
+  set on triaged issues.
+
 ## Next step
 
-**Session 19:** `/ship-ticket` the open `ready-for-agent` follow-ups (DRA-24, DRA-26 to DRA-30,
-DRA-33 to DRA-35), a few per session. Check that `e2e` is a required status check in the `main`
-branch protection (the user does this by hand).
+**Session 20:** `/grill-with-docs` on DRA-46 (invitations without a household) to amend and
+re-approve spec 001, then `/to-tickets`. Meanwhile `/ship-ticket` the `ready-for-agent` issues,
+a few per session: DRA-37 then DRA-36, DRA-39, DRA-40, DRA-42 then DRA-31, DRA-45, DRA-47,
+DRA-48. DRA-43 ships alone, before DRA-46's implementation starts. DRA-49 needs a human
+decision on the review learning process. Check that `e2e` is a required status check in the
+`main` branch protection (the user does this by hand).
 
 Before spec 002: define UX/UI principles with `/grill-with-docs` (mobile-first, accessibility
 target, visual identity, key flows for ordering and the offline box/payment screens) and record
