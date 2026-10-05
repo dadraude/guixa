@@ -164,10 +164,24 @@
   and DRA-32 (no "moved" toast for the current household) created as `needs-triage`.
   The DRA-24 to DRA-30 triage was not done this session.
 
+- **Session 17b (2026-10-05):** DRA-22 and DRA-23 implemented and merged; **spec 001 is
+  complete**. DRA-22 (PR #22): membership role and administrators deactivate/reactivate members
+  and households; deactivating a member removes them from every commission (one transaction)
+  and the existing sign-in checks refuse them (an active administrator profile still signs in as
+  administrator); reactivating a member needs an active household and does not restore
+  commissions; no balance warning yet. DRA-23 (PR #23): `/directory` (full for administrators
+  and members in any commission, own household otherwise; inactive households stay listed with
+  a badge, a product decision), households-without-commission warning on the households list
+  (one query; `Member::activeInCommission` is the single rule), and the Playwright e2e path
+  (invitation → password → magic link → code from Mailpit) with a CI job `e2e` that passed on
+  its first run. The e2e setup refuses a non-test or non-local database; local run documented in
+  `README.md`. Review follow-ups DRA-33, DRA-34 (DRA-22) and DRA-35 (DRA-23) are
+  `needs-triage`.
+
 ## Next step
 
-**Session 18:** triage DRA-24 to DRA-32 (`needs-triage`) with the user, then `/ship-ticket`
-DRA-22 or DRA-23 to finish spec 001.
+**Session 18:** triage DRA-24 to DRA-35 (`needs-triage`) with the user. Check that `e2e` is a
+required status check in the `main` branch protection (the user does this by hand).
 
 Before spec 002: define UX/UI principles with `/grill-with-docs` (mobile-first, accessibility
 target, visual identity, key flows for ordering and the offline box/payment screens) and record
