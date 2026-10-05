@@ -1,5 +1,6 @@
 <?php
 
+use App\Auth\Profile;
 use App\Auth\Role;
 use App\Models\Commission;
 use App\Models\Household;
@@ -158,4 +159,42 @@ test('the membership role also sees the households warning', function () {
         ->get(route('households.index'))
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page->where('households.0.without_commission', false));
+});
+
+test('an administrator acting as a member in no commission sees only their own household', function () {
+    $own = Household::factory()->create(['name' => 'Cal Pere']);
+    $other = Household::factory()->create(['name' => 'Cal Altre']);
+    $viewer = directoryMember($own, 'Anna Puig');
+    $viewer->user->administrator()->create(['is_active' => true]);
+    directoryMember($other, 'Joan Soler', phone: '600333444');
+
+    $this->actingAs($viewer->user->fresh())
+        ->withSession(['active_profile' => Profile::Member->value])
+        ->get(route('directory.index'))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('isFull', false)
+            ->has('households', 1)
+            ->where('households.0.name', 'Cal Pere'));
+});
+
+test('a member without the membership role cannot open the households list', function () {
+    $viewer = inACommission(directoryMember(Household::factory()->create(), 'Anna Puig'));
+
+    $this->actingAs($viewer->user)
+        ->get(route('households.index'))
+        ->assertForbidden();
+});
+
+test('members are sorted by name ignoring accents and case', function () {
+    $administrator = User::factory()->administrator()->create();
+    $household = Household::factory()->create();
+    foreach (['Zoe', 'Ferran', 'Èric', 'emma', 'Àlex'] as $name) {
+        directoryMember($household, $name);
+    }
+
+    $this->actingAs($administrator)
+        ->get(route('directory.index'))
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('households.0.members', fn ($members) => collect($members)->pluck('name')->all() === ['Àlex', 'emma', 'Èric', 'Ferran', 'Zoe']));
 });

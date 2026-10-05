@@ -7,6 +7,7 @@ use App\Auth\MemberRoles;
 use App\Http\Controllers\Controller;
 use App\Models\Household;
 use App\Models\Member;
+use Collator;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -25,6 +26,9 @@ class DirectoryController extends Controller
         $isFull = $activeProfile->isActingAsAdministrator($user)
             || ($ownMember !== null && $memberRoles->isInAnyCommission($ownMember));
 
+        // Locale-aware so that "Àlex" sorts before "Zoe"; a plain lowercase compare orders by code point.
+        $collator = new Collator('ca_ES');
+
         $households = Household::query()
             ->when(! $isFull, fn ($query) => $query->whereKey($ownMember?->household_id))
             ->with(['members' => fn ($query) => $query->where('is_active', true)->with('user')])
@@ -39,7 +43,7 @@ class DirectoryController extends Controller
                 'name' => $household->name,
                 'is_active' => $household->is_active,
                 'members' => $household->members
-                    ->sortBy(fn (Member $member) => mb_strtolower($member->user->name))
+                    ->sort(fn (Member $a, Member $b) => (int) $collator->compare($a->user->name, $b->user->name))
                     ->values()
                     ->map(fn (Member $member) => [
                         'id' => $member->id,
