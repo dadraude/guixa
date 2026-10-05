@@ -54,6 +54,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/', [HouseholdController::class, 'index'])->name('index');
         Route::post('/', [HouseholdController::class, 'store'])->name('store');
         Route::patch('{household}', [HouseholdController::class, 'update'])->name('update');
+        Route::post('{household}/deactivate', [HouseholdController::class, 'deactivate'])->name('deactivate');
+        Route::post('{household}/reactivate', [HouseholdController::class, 'reactivate'])->name('reactivate');
         Route::post('{household}/invitations', [InvitationController::class, 'store'])->name('invitations.store');
 
         Route::prefix('invitations')->name('invitations.')->group(function () {
@@ -67,6 +69,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/', [MemberController::class, 'index'])->name('index');
         Route::patch('{member}', [MemberController::class, 'update'])->name('update');
         Route::patch('{member}/household', [MemberHouseholdController::class, 'update'])->name('household.update');
+        Route::post('{member}/deactivate', [MemberController::class, 'deactivate'])->name('deactivate');
+        Route::post('{member}/reactivate', [MemberController::class, 'reactivate'])->name('reactivate');
     });
 
     Route::middleware('can:view-commissions')->get('commissions', [CommissionController::class, 'index'])->name('commissions.index');

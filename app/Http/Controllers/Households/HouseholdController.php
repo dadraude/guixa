@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Households;
 
 use App\Actions\CreateHousehold;
+use App\Actions\DeactivateHousehold;
+use App\Actions\ReactivateHousehold;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Households\SaveHouseholdRequest;
 use App\Models\Household;
@@ -41,6 +43,24 @@ class HouseholdController extends Controller
     public function update(SaveHouseholdRequest $request, Household $household): RedirectResponse
     {
         $household->update($request->validated());
+
+        return to_route('households.index');
+    }
+
+    public function deactivate(Household $household, DeactivateHousehold $deactivateHousehold): RedirectResponse
+    {
+        $deactivateHousehold->handle($household);
+
+        Inertia::flash('toast', ['type' => 'success', 'message' => __('Household deactivated.')]);
+
+        return to_route('households.index');
+    }
+
+    public function reactivate(Household $household, ReactivateHousehold $reactivateHousehold): RedirectResponse
+    {
+        $reactivateHousehold->handle($household);
+
+        Inertia::flash('toast', ['type' => 'success', 'message' => __('Household reactivated. Its members stay inactive until you reactivate them.')]);
 
         return to_route('households.index');
     }

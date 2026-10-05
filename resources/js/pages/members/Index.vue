@@ -129,6 +129,32 @@ defineOptions({
                     >
                     <InputError :message="errors.household_id" />
                 </Form>
+
+                <Form
+                    v-bind="
+                        member.is_active
+                            ? MemberController.deactivate.form(member.id)
+                            : MemberController.reactivate.form(member.id)
+                    "
+                    class="flex flex-wrap items-center gap-2"
+                    v-slot="{ errors, processing }"
+                >
+                    <Button
+                        type="submit"
+                        variant="outline"
+                        size="sm"
+                        :disabled="processing"
+                        :data-test="
+                            member.is_active
+                                ? 'deactivate-member'
+                                : 'reactivate-member'
+                        "
+                        >{{
+                            member.is_active ? t('Deactivate') : t('Reactivate')
+                        }}</Button
+                    >
+                    <InputError :message="errors.member" />
+                </Form>
             </li>
         </ul>
     </div>

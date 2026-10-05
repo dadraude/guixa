@@ -92,6 +92,32 @@ defineOptions({
                 </Badge>
 
                 <Form
+                    v-bind="
+                        household.is_active
+                            ? HouseholdController.deactivate.form(household.id)
+                            : HouseholdController.reactivate.form(household.id)
+                    "
+                    v-slot="{ processing }"
+                >
+                    <Button
+                        type="submit"
+                        variant="outline"
+                        size="sm"
+                        :disabled="processing"
+                        :data-test="
+                            household.is_active
+                                ? 'deactivate-household'
+                                : 'reactivate-household'
+                        "
+                        >{{
+                            household.is_active
+                                ? t('Deactivate')
+                                : t('Reactivate')
+                        }}</Button
+                    >
+                </Form>
+
+                <Form
                     v-bind="InvitationController.store.form(household.id)"
                     class="flex w-full flex-wrap items-start gap-2"
                     reset-on-success
