@@ -71,9 +71,13 @@ Technical decisions and rules for the whole project. Domain terms are defined in
     service container in CI).
   - **Vitest** for client-side logic, especially offline storage and sync.
   - **Playwright** for the offline flows and a few critical end-to-end paths.
-- **CI (GitHub Actions) blocks merging** unless all pass: tests, Pint, Larastan (level 7),
+- **CI (GitHub Actions) blocks merging** unless all pass: tests, Pint, Larastan (level 8),
   Oxlint and Oxfmt (through Vite+, the starter kit's own linter and formatter, used instead of
   ESLint and Prettier, see ADR 0007) and `vue-tsc`.
+- **Rules are enforced by tools, not by review.** Pint adds `declare(strict_types=1)` and strict
+  comparisons; Pest architecture tests (`tests/Unit/ArchitectureTest.php`) check project rules such
+  as UUIDv7 models and actions with `handle()`; a test fails when a translated string is missing
+  from `lang/ca.json`. When a review finding comes back more than once, turn it into one of these.
 
 ## Data
 

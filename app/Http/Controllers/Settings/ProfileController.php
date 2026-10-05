@@ -1,12 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Settings;
 
 use App\Actions\RequestEmailChange;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Settings\ProfileUpdateRequest;
+use App\Models\User;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -15,10 +18,8 @@ class ProfileController extends Controller
     /**
      * Show the user's profile settings page.
      */
-    public function edit(Request $request): Response
+    public function edit(#[CurrentUser] User $user): Response
     {
-        $user = $request->user();
-
         return Inertia::render('settings/Profile', [
             'phone' => $user->member?->phone,
             'pendingEmail' => $user->pending_email,
@@ -29,9 +30,8 @@ class ProfileController extends Controller
      * Update the signed-in user's own details. An email change is only
      * requested here; it applies when the link sent to the new address is opened.
      */
-    public function update(ProfileUpdateRequest $request, RequestEmailChange $requestEmailChange): RedirectResponse
+    public function update(ProfileUpdateRequest $request, #[CurrentUser] User $user, RequestEmailChange $requestEmailChange): RedirectResponse
     {
-        $user = $request->user();
         $validated = $request->validated();
 
         $user->update(['name' => $validated['name']]);

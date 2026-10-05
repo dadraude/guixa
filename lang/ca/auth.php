@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
 
     'failed' => 'Aquestes credencials no coincideixen amb les nostres dades.',
