@@ -64,5 +64,6 @@ Agents never edit `STATUS.md`. After the PRs merge, write one session entry on `
 
 ## Guardrails
 
+- Never open a PR whose body or ticket lists follow-ups as plain text: each one must be a linked `DRA-NN`.
 - Never push to `main` or force-push. Never merge PRs unless the user asks.
 - If a permission is denied, stop and tell the user; do not look for another route.
