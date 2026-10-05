@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Http\Middleware\EnsurePasswordIsSet;
 use App\Http\Middleware\EnsureProfileIsChosen;
 use App\Http\Middleware\HandleAppearance;
