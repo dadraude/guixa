@@ -125,7 +125,7 @@ class MemberRoles
      */
     private function rolesThroughCommissions(Member $member): array
     {
-        $commissionIds = $member->commissions()->get()->map(fn (Commission $commission) => $commission->id)->all();
+        $commissionIds = $member->commissions()->get(['commissions.id'])->map(fn (Commission $commission) => $commission->id)->all();
 
         return $this->forCommissions($commissionIds);
     }

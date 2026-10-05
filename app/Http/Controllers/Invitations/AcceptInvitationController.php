@@ -42,11 +42,13 @@ class AcceptInvitationController extends Controller
 
     public function accept(AcceptInvitationRequest $request, string $token, AcceptInvitation $acceptInvitation): RedirectResponse
     {
+        $validated = $request->safe();
+
         try {
             $user = $acceptInvitation->handle(
                 $token,
-                $request->filled('name') ? $request->string('name')->toString() : null,
-                $request->filled('password') ? $request->string('password')->toString() : null,
+                $validated->filled('name') ? $validated->string('name')->toString() : null,
+                $validated->filled('password') ? $validated->string('password')->toString() : null,
             );
         } catch (InvitationUnavailable) {
             return to_route('invitations.show', ['token' => $token]);

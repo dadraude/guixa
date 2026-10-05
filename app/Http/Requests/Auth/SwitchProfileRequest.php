@@ -29,6 +29,6 @@ class SwitchProfileRequest extends FormRequest
 
     public function profile(): Profile
     {
-        return Profile::from($this->string('profile')->toString());
+        return Profile::from($this->safe()->string('profile')->toString());
     }
 }
