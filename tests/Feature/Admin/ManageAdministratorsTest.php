@@ -151,6 +151,8 @@ test('an administrator who is deactivated while signed in is signed out on their
     $this->get(route('admin.home'))->assertOk();
 
     $user->administrator->update(['is_active' => false]);
+    // The test app outlives a request, so drop the guard's cached user as a real next request would.
+    $this->app['auth']->forgetGuards();
 
     $this->get(route('admin.home'))->assertRedirect(route('login'));
     $this->assertGuest();
