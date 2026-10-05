@@ -53,6 +53,28 @@ test('signing in with the code asks a person with both profiles to choose', func
     $this->get(route('home'))->assertRedirect(route('active-profile.edit'));
 });
 
+test('a protected page asked for before signing in is where the choice leads, whatever the sign-in method', function (string $method) {
+    $user = ownerAndMember();
+    $this->get(route('households.index'))->assertRedirect(route('login'));
+
+    match ($method) {
+        'password' => $this->post(route('login.store'), ['email' => $user->email, 'password' => 'password']),
+        'link' => $this->post(magicLinkFor($user)->url),
+        'code' => $this->post(route('magic-link.code.store'), ['code' => magicLinkFor($user)->code]),
+    };
+
+    $this->get(route('households.index'))->assertRedirect(route('active-profile.edit'));
+
+    $this->post(route('active-profile.update'), ['profile' => 'administrator'])
+        ->assertRedirect(route('households.index'));
+})->with(['password', 'link', 'code']);
+
+test('choosing a profile with no page asked for leads home', function () {
+    $this->actingAs(ownerAndMember())
+        ->post(route('active-profile.update'), ['profile' => 'member'])
+        ->assertRedirect(route('home'));
+});
+
 test('until they choose, a person with both profiles cannot reach any page', function () {
     $this->actingAs(ownerAndMember());
 

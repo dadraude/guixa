@@ -30,6 +30,12 @@ class EnsureProfileIsChosen
             return $next($request);
         }
 
+        // Sign-in already spent the intended URL on this very redirect, so keep it
+        // through the choice screen for the choice to go back to.
+        if ($request->isMethod('GET') && ! $request->expectsJson()) {
+            $request->session()->put('url.intended', $request->fullUrl());
+        }
+
         return to_route('active-profile.edit');
     }
 }
