@@ -9,6 +9,7 @@ use App\Http\Controllers\Commissions\CommissionController;
 use App\Http\Controllers\Commissions\CommissionMemberController;
 use App\Http\Controllers\Commissions\CommissionRoleController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Directory\DirectoryController;
 use App\Http\Controllers\Households\HouseholdController;
 use App\Http\Controllers\Households\InvitationController;
 use App\Http\Controllers\Households\PendingInvitationController;
@@ -68,6 +69,8 @@ Route::middleware(['auth'])->group(function () {
         Route::patch('{member}', [MemberController::class, 'update'])->name('update');
         Route::patch('{member}/household', [MemberHouseholdController::class, 'update'])->name('household.update');
     });
+
+    Route::middleware('can:view-directory')->get('directory', DirectoryController::class)->name('directory.index');
 
     Route::middleware('can:view-commissions')->get('commissions', [CommissionController::class, 'index'])->name('commissions.index');
 

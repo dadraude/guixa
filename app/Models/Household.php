@@ -43,6 +43,14 @@ class Household extends Model
         return $this->hasMany(Member::class);
     }
 
+    public function hasMemberInAnyCommission(): bool
+    {
+        return $this->members()
+            ->where('is_active', true)
+            ->whereHas('commissions')
+            ->exists();
+    }
+
     /**
      * Get the attributes that should be cast.
      *

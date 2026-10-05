@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
 import {
+    BookUser,
     Home,
     LayoutGrid,
     Mail,
@@ -26,6 +27,7 @@ import { dashboard, home } from '@/routes';
 import { home as adminHome } from '@/routes/admin';
 import { index as administratorsIndex } from '@/routes/admin/administrators';
 import { index as commissionsIndex } from '@/routes/commissions';
+import { index as directoryIndex } from '@/routes/directory';
 import { index as householdsIndex } from '@/routes/households';
 import { index as invitationsIndex } from '@/routes/households/invitations';
 import { index as membersIndex } from '@/routes/members';
@@ -78,6 +80,11 @@ const mainNavItems = computed<NavItem[]>(() => {
             title: t('Commissions'),
             href: commissionsIndex(),
             icon: UsersRound,
+        },
+        {
+            title: t('Directory'),
+            href: directoryIndex(),
+            icon: BookUser,
         },
         ...(isAdministrator && page.props.auth.isOwner
             ? [

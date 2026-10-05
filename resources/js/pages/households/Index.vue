@@ -16,6 +16,7 @@ type HouseholdRow = {
     number: number;
     name: string;
     is_active: boolean;
+    without_commission: boolean;
 };
 
 defineProps<{
@@ -87,9 +88,25 @@ defineOptions({
                     </Form>
                 </div>
 
-                <Badge :variant="household.is_active ? 'secondary' : 'outline'">
-                    {{ household.is_active ? t('Active') : t('Inactive') }}
-                </Badge>
+                <div class="flex items-center gap-2">
+                    <Badge
+                        v-if="household.without_commission"
+                        variant="outline"
+                        class="border-amber-500 text-amber-700"
+                        :title="
+                            t(
+                                'No active member of this household is in a commission.',
+                            )
+                        "
+                        data-test="without-commission"
+                        >{{ t('No members in any commission') }}</Badge
+                    >
+                    <Badge
+                        :variant="household.is_active ? 'secondary' : 'outline'"
+                    >
+                        {{ household.is_active ? t('Active') : t('Inactive') }}
+                    </Badge>
+                </div>
 
                 <Form
                     v-bind="InvitationController.store.form(household.id)"

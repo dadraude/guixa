@@ -54,6 +54,9 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('assign-roles', fn (User $user) => false);
         // Every active member sees the commissions and who is in them.
         Gate::define('view-commissions', fn (User $user) => $user->member?->is_active === true);
+        // Every active member opens the directory; what they see depends on
+        // whether they are in a commission (see DirectoryController).
+        Gate::define('view-directory', fn (User $user) => $user->member?->is_active === true);
         Gate::define('manage-administrators', fn (User $user) => app(ActiveProfile::class)->isActingAsOwner($user));
     }
 
