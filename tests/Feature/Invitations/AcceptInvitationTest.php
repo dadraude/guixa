@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Mail\InvitationMail;
 use App\Models\Household;
 use App\Models\Invitation;

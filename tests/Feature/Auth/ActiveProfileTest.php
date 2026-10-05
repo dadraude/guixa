@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Mail\EmailChangeMail;
 use App\Mail\MagicLinkMail;
 use App\Models\Household;
