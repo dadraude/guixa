@@ -15,6 +15,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('settings/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('settings/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('settings/email', [EmailChangeController::class, 'cancel'])->name('email-change.cancel');
 
     Route::get('settings/security', [SecurityController::class, 'edit'])
         ->name('security.edit');

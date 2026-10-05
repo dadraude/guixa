@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Form, Head, usePage } from '@inertiajs/vue3';
+import { Form, Head, router, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
 import Heading from '@/components/Heading.vue';
@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { t } from '@/lib/i18n';
+import { cancel } from '@/routes/email-change';
 import { edit } from '@/routes/profile';
 
 defineOptions({
@@ -93,20 +94,24 @@ const user = computed(() => page.props.auth.user);
                     :placeholder="t('Email address')"
                 />
                 <InputError class="mt-2" :message="errors.email" />
-                <p
-                    v-if="pendingEmail"
-                    class="text-sm text-muted-foreground"
-                    data-test="pending-email"
-                >
-                    {{
-                        t(
-                            'We sent a link to :email. Your email will change when you open it.',
-                            {
-                                email: pendingEmail,
-                            },
-                        )
-                    }}
-                </p>
+                <div v-if="pendingEmail" data-test="pending-email">
+                    <p class="text-sm text-muted-foreground">
+                        {{
+                            t(
+                                'We sent a link to :email. Your email will change when you open it.',
+                                { email: pendingEmail },
+                            )
+                        }}
+                    </p>
+                    <Button
+                        type="button"
+                        variant="link"
+                        class="h-auto p-0"
+                        data-test="cancel-email-change-button"
+                        @click="router.delete(cancel().url)"
+                        >{{ t('Cancel the change') }}</Button
+                    >
+                </div>
             </div>
 
             <div class="flex items-center gap-4">

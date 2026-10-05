@@ -263,3 +263,60 @@ test('guests cannot edit a profile', function () {
     $this->patch(route('profile.update'), ['name' => 'X', 'email' => 'x@example.com'])
         ->assertRedirect(route('login'));
 });
+
+test('cancelling the change clears the pending email and its link', function () {
+    $user = User::factory()->create(['email' => 'old@example.com']);
+    $url = requestEmailChange($user, 'new@example.com');
+
+    $this->actingAs($user)
+        ->delete(route('email-change.cancel'))
+        ->assertRedirect(route('profile.edit'));
+
+    $user->refresh();
+    expect($user->pending_email)->toBeNull()
+        ->and($user->pending_email_token_hash)->toBeNull()
+        ->and($user->pending_email_expires_at)->toBeNull();
+
+    $this->post($url);
+    expect($user->refresh()->email)->toBe('old@example.com');
+});
+
+test('saving the form with the current email keeps the pending change', function () {
+    $user = User::factory()->create(['email' => 'old@example.com', 'name' => 'Anna']);
+    requestEmailChange($user, 'new@example.com');
+
+    $this->actingAs($user)
+        ->patch(route('profile.update'), ['name' => 'Anna Puig', 'email' => 'old@example.com'])
+        ->assertSessionHasNoErrors();
+
+    expect($user->refresh()->name)->toBe('Anna Puig')
+        ->and($user->pending_email)->toBe('new@example.com')
+        ->and($user->pending_email_token_hash)->not->toBeNull();
+});
+
+test('cancelling with no pending change is harmless', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user)
+        ->delete(route('email-change.cancel'))
+        ->assertRedirect(route('profile.edit'));
+
+    expect($user->refresh()->pending_email)->toBeNull();
+});
+
+test('guests cannot cancel an email change', function () {
+    $this->delete(route('email-change.cancel'))->assertRedirect(route('login'));
+});
+
+test('the profile page shows the pending email only while its link is valid', function () {
+    $user = User::factory()->create(['email' => 'old@example.com']);
+    requestEmailChange($user, 'new@example.com');
+
+    $this->actingAs($user)->get(route('profile.edit'))
+        ->assertInertia(fn (Assert $page) => $page->where('pendingEmail', 'new@example.com'));
+
+    $this->travel(RequestEmailChange::HOURS_VALID + 1)->hours();
+
+    $this->actingAs($user)->get(route('profile.edit'))
+        ->assertInertia(fn (Assert $page) => $page->where('pendingEmail', null));
+});
