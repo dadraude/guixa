@@ -44,7 +44,8 @@ class ActiveProfile
             return $available[0] ?? Profile::Member;
         }
 
-        $chosen = Profile::tryFrom((string) $this->session->get(self::SESSION_KEY));
+        $stored = $this->session->get(self::SESSION_KEY);
+        $chosen = Profile::tryFrom(is_string($stored) ? $stored : '');
 
         return in_array($chosen, $available, true) ? $chosen : null;
     }

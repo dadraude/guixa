@@ -64,13 +64,13 @@ class FortifyServiceProvider extends ServiceProvider
 
     private function authenticate(Request $request, Timebox $timebox): ?User
     {
-        $user = User::where('email', Str::lower((string) $request->input(Fortify::username())))->first();
+        $user = User::where('email', Str::lower($request->string(Fortify::username())->toString()))->first();
 
         if ($user === null || $user->password === null || ! $user->canSignIn()) {
             return null;
         }
 
-        if (! Hash::check((string) $request->input('password'), $user->password)) {
+        if (! Hash::check($request->string('password')->toString(), $user->password)) {
             return null;
         }
 

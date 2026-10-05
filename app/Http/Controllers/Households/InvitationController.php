@@ -14,7 +14,9 @@ class InvitationController extends Controller
 {
     public function store(InviteToHouseholdRequest $request, Household $household, InviteToHousehold $inviteToHousehold): RedirectResponse
     {
-        $inviteToHousehold->handle($household, $request->validated('email'), $request->validated('name'));
+        $name = $request->filled('name') ? $request->string('name')->toString() : null;
+
+        $inviteToHousehold->handle($household, $request->string('email')->toString(), $name);
 
         return to_route('households.index')->with('status', __('Invitation sent.'));
     }

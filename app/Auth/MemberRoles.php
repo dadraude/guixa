@@ -125,13 +125,13 @@ class MemberRoles
      */
     private function rolesThroughCommissions(Member $member): array
     {
-        $commissionIds = $member->commissions()->pluck('commissions.id')->all();
+        $commissionIds = $member->commissions()->get()->map(fn (Commission $commission) => $commission->id)->all();
 
         return $this->forCommissions($commissionIds);
     }
 
     /**
-     * @param  array<int, string>  $values
+     * @param  array<mixed>  $values
      * @return list<Role>
      */
     private function inDeclaredOrder(array $values): array

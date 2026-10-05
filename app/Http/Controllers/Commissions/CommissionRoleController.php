@@ -14,7 +14,7 @@ class CommissionRoleController extends Controller
 {
     public function store(AssignCommissionRoleRequest $request, Commission $commission): RedirectResponse
     {
-        $commission->assignRole(Role::from($request->validated('role')));
+        $commission->assignRole(Role::from($request->string('role')->toString()));
 
         return to_route('commissions.index');
     }

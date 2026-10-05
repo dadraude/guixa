@@ -33,7 +33,7 @@ class AdministratorController extends Controller
 
     public function store(StoreAdministratorRequest $request, CreateAdministrator $createAdministrator): RedirectResponse
     {
-        $createAdministrator->handle($request->validated('name'), $request->validated('email'));
+        $createAdministrator->handle($request->string('name')->toString(), $request->string('email')->toString());
 
         return to_route('admin.administrators.index');
     }

@@ -42,7 +42,7 @@ class HouseholdController extends Controller
 
     public function store(SaveHouseholdRequest $request, CreateHousehold $createHousehold): RedirectResponse
     {
-        $createHousehold->handle($request->validated('name'));
+        $createHousehold->handle($request->string('name')->toString());
 
         return to_route('households.index');
     }
