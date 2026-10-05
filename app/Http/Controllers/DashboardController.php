@@ -1,12 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Auth\ActiveProfile;
 use App\Auth\MemberRoles;
 use App\Auth\Profile;
 use App\Models\Member;
-use Illuminate\Http\Request;
+use App\Models\User;
+use Illuminate\Container\Attributes\CurrentUser;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -17,9 +20,8 @@ class DashboardController extends Controller
      * the roles those give them; no other household is exposed, and none at
      * all while acting as administrator.
      */
-    public function __invoke(Request $request, ActiveProfile $activeProfile, MemberRoles $memberRoles): Response
+    public function __invoke(#[CurrentUser] User $user, ActiveProfile $activeProfile, MemberRoles $memberRoles): Response
     {
-        $user = $request->user();
         $member = $activeProfile->current($user) === Profile::Member ? $user->member : null;
 
         return Inertia::render('Dashboard', [
