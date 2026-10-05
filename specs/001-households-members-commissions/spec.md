@@ -267,6 +267,9 @@ Guixa gets the membership foundation every later feature builds on:
   warning and confirmation as stated in the principles; this spec only leaves room for that.
 - Reactivating a household keeps its number and data; its members stay inactive until
   reactivated one by one. A member can only be reactivated while their household is active.
+- A member with the membership role cannot deactivate themselves or their own household: the
+  app rejects it and hides the action, so they cannot lose the role by mistake. Administrators
+  are not restricted (DRA-34).
 - **Member:** name, email, optional phone, household, active flag. Belongs to exactly one
   household. Moving a member changes only their household; orders and balances (later specs)
   stay with the household they belong to.
