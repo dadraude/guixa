@@ -187,7 +187,7 @@ test('the confirmation expires', function () {
     $url = requestEmailChange($user, 'new@example.com');
 
     $this->travel(RequestEmailChange::HOURS_VALID + 1)->hours();
-    $this->post($url)->assertRedirect(route('profile.edit'));
+    $this->post($url)->assertRedirect($url);
 
     expect($user->refresh()->email)->toBe('old@example.com');
 });
@@ -231,7 +231,23 @@ test('losing the race for the new email at save time shows the in-use message in
 
 test('a used or expired link shows the error instead of the button', function () {
     $this->get(route('email-change.show', ['token' => 'nope']))
-        ->assertRedirect(route('profile.edit'));
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page->component('auth/EmailChangeUnavailable')->where('signedIn', false));
+});
+
+test('an invalid link confirmed while signed out ends on the public error page', function () {
+    $this->post(route('email-change.confirm', ['token' => 'nope']))
+        ->assertRedirect(route('email-change.show', ['token' => 'nope']));
+
+    $this->get(route('email-change.show', ['token' => 'nope']))
+        ->assertInertia(fn (Assert $page) => $page->component('auth/EmailChangeUnavailable')->where('signedIn', false));
+});
+
+test('a signed-in user opening an invalid link sees the same page', function () {
+    $this->actingAs(User::factory()->create())
+        ->get(route('email-change.show', ['token' => 'nope']))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page->component('auth/EmailChangeUnavailable')->where('signedIn', true));
 });
 
 test('a new request replaces the previous link', function () {
