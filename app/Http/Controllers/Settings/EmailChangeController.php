@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Settings;
 use App\Actions\ConfirmEmailChange;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -14,10 +15,10 @@ class EmailChangeController extends Controller
      * Ask for one click before applying the change, so that mail scanners and
      * link previews that open the link do not apply it. Nothing changes here.
      */
-    public function show(ConfirmEmailChange $confirmEmailChange, string $token): Response|RedirectResponse
+    public function show(Request $request, ConfirmEmailChange $confirmEmailChange, string $token): Response
     {
         if (! $confirmEmailChange->isPending($token)) {
-            return $this->rejectLink();
+            return $this->rejectLink($request);
         }
 
         return Inertia::render('auth/EmailChangeConfirm', ['token' => $token]);
@@ -29,7 +30,7 @@ class EmailChangeController extends Controller
     public function confirm(ConfirmEmailChange $confirmEmailChange, string $token): RedirectResponse
     {
         if (! $confirmEmailChange->handle($token)) {
-            return $this->rejectLink();
+            return to_route('email-change.show', ['token' => $token]);
         }
 
         Inertia::flash('toast', ['type' => 'success', 'message' => __('Email address updated.')]);
@@ -37,10 +38,12 @@ class EmailChangeController extends Controller
         return to_route('profile.edit');
     }
 
-    private function rejectLink(): RedirectResponse
+    /**
+     * Rendered on a public page, not as a toast on the profile: without a session
+     * the profile redirects to the login and the explanation would be lost.
+     */
+    private function rejectLink(Request $request): Response
     {
-        Inertia::flash('toast', ['type' => 'error', 'message' => __('This link has expired or has already been used.')]);
-
-        return to_route('profile.edit');
+        return Inertia::render('auth/EmailChangeUnavailable', ['signedIn' => $request->user() !== null]);
     }
 }
