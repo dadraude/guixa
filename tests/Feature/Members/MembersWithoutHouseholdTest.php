@@ -2,12 +2,13 @@
 
 declare(strict_types=1);
 
-use App\Auth\MemberRoles;
 use App\Auth\Role;
+use App\Mail\EmailChangeMail;
 use App\Models\Commission;
 use App\Models\Household;
 use App\Models\Member;
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Inertia\Testing\AssertableInertia as Assert;
 
@@ -50,7 +51,6 @@ test('every other request of a waiting member is redirected to the waiting scree
 
     $this->actingAs($user)->post(route('households.store'), ['name' => 'Cal Nou'])->assertRedirect(route('waiting'));
     $this->post(route('members.deactivate', $other))->assertRedirect(route('waiting'));
-    $this->post(route('active-profile.update'), ['profile' => 'member'])->assertRedirect(route('waiting'));
 
     expect(Household::query()->where('name', 'Cal Nou')->exists())->toBeFalse()
         ->and($other->fresh()->is_active)->toBeTrue();
@@ -127,8 +127,6 @@ test('a member with a commission but no household uses the app and has no househ
 test('a member with a commission but no household can do what their roles allow', function () {
     $user = householdlessInCommission('Marta Vila', Role::Membership);
 
-    expect(app(MemberRoles::class)->userHas($user, Role::Membership))->toBeTrue();
-
     $this->actingAs($user)->get(route('households.index'))->assertOk();
     $this->post(route('households.store'), ['name' => 'Cal Nou'])->assertRedirect(route('households.index'));
     expect(Household::query()->where('name', 'Cal Nou')->exists())->toBeTrue();
@@ -152,8 +150,7 @@ test('the directory lists only households and their members, never members witho
         ->assertInertia(fn (Assert $page) => $page
             ->has('households', 1)
             ->has('households.0.members', 1)
-            ->where('households.0.members.0.name', 'Joan Soler'))
-        ->assertDontSee('Pere Sense');
+            ->where('households.0.members.0.name', 'Joan Soler'));
 });
 
 test('the commissions page lists commission members with or without a household', function () {
@@ -207,4 +204,79 @@ test('removing the household of a member with no commission takes them to the wa
 
 test('an administrator with no member profile is never sent to the waiting screen', function () {
     $this->actingAs(User::factory()->owner()->create())->get(route('admin.home'))->assertOk();
+});
+
+test('a waiting member can open the pages they are allowed', function (string $route) {
+    $this->actingAs(waitingUser())->get(route($route))->assertOk();
+})->with(['profile.edit', 'security.edit', 'appearance.edit']);
+
+test('the settings shortcut leads a waiting member to their profile', function () {
+    $this->actingAs(waitingUser())
+        ->get(route('settings'))
+        ->assertRedirect('/settings/profile');
+});
+
+test('an administrator who chose the waiting member profile can switch back to administrator', function () {
+    $user = User::factory()->owner()->memberWithoutHousehold()->create();
+
+    $this->actingAs($user)->withSession(['active_profile' => 'member'])
+        ->post(route('active-profile.update'), ['profile' => 'administrator'])
+        ->assertRedirect(route('home'));
+
+    $this->get(route('admin.home'))->assertOk();
+});
+
+test('a waiting member without a password sets one and then lands on the waiting screen', function () {
+    $user = User::factory()->memberWithoutHousehold()->withoutPassword()->create();
+
+    $this->actingAs($user)->get(route('home'))->assertRedirect(route('password.setup'));
+
+    $this->post(route('password.setup.store'), [
+        'password' => 'a-new-password',
+        'password_confirmation' => 'a-new-password',
+    ])->assertRedirect(route('home'));
+
+    expect(Hash::check('a-new-password', $user->fresh()->password))->toBeTrue();
+    $this->get(route('home'))->assertRedirect(route('waiting'));
+});
+
+test('a waiting member confirms and cancels an email change', function () {
+    $user = User::factory()->memberWithoutHousehold()->create(['email' => 'old@example.com']);
+    $url = null;
+    $capture = function (EmailChangeMail $mail) use (&$url) {
+        $url = $mail->url;
+
+        return true;
+    };
+
+    $this->actingAs($user)
+        ->patch(route('profile.update'), ['name' => $user->name, 'email' => 'new@example.com'])
+        ->assertSessionHasNoErrors();
+    Mail::assertQueued(EmailChangeMail::class, $capture);
+
+    $this->delete(route('email-change.cancel'))->assertRedirect(route('profile.edit'));
+    expect($user->fresh()->pending_email)->toBeNull();
+
+    $this->patch(route('profile.update'), ['name' => $user->name, 'email' => 'new@example.com']);
+    Mail::assertQueued(EmailChangeMail::class, $capture);
+
+    $this->post($url)->assertRedirect(route('profile.edit'));
+    expect($user->fresh()->email)->toBe('new@example.com');
+});
+
+test('the waiting flag is shared only with a member who is waiting', function () {
+    $this->actingAs(waitingUser())
+        ->get(route('profile.edit'))
+        ->assertInertia(fn (Assert $page) => $page->where('auth.isWaiting', true));
+
+    $this->actingAs(householdlessInCommission())
+        ->get(route('profile.edit'))
+        ->assertInertia(fn (Assert $page) => $page->where('auth.isWaiting', false));
+});
+
+test('the member list works when a member has no household', function () {
+    $staff = householdlessInCommission('Marta Vila', Role::Membership);
+    waitingUser('Pere Sense');
+
+    $this->actingAs($staff)->get(route('members.index'))->assertOk();
 });

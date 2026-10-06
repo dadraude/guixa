@@ -33,9 +33,9 @@ Guixa gets the membership foundation every later feature builds on:
 - A new member gets a welcome email pointing to the sign-in screen. They sign in with a
   **magic link** (which also carries a 6-digit code) or with their password, and set a
   password on first access.
-- A member with no household and no commission only sees a waiting screen until the
-  membership commission assigns one. Roles apply with or without a household; a household is
-  needed to see "my household" and, later, to order.
+- A member with no household and no commission only sees a waiting screen (and can change the
+  light/dark theme) until the membership commission assigns one. Roles apply with or
+  without a household; a household is needed to see "my household" and, later, to order.
 - **Commissions** are created, renamed and deleted freely, and members are added to them.
   Permissions never come from a commission's name: only administrators assign one or more of
   four fixed **roles** (orders, boxes, treasury, membership) to commissions, and every member
@@ -117,7 +117,7 @@ Guixa gets the membership foundation every later feature builds on:
 28. As whoever creates a member, I want to be stopped from using an email that already
     belongs to a member, so that one person does not end up with two accounts.
 29. As a member with no household and no commission, I want a screen telling me the
-    membership commission will assign me a household, where I can only edit my name, phone, email and password and sign out, so
+    membership commission will assign me a household, where I can only edit my name, phone, email and password, change the theme and sign out, so
     that I know my account works while nothing else is open to me yet.
 30. As a member of a commission without a household (e.g. while moving house), I want to keep
     doing my commission's work, so that leaving a household never takes my roles away.
@@ -321,7 +321,8 @@ Guixa gets the membership foundation every later feature builds on:
   the DRA-46 amendment): they can do their commission's work and, being in a commission, see
   the directory. Without a household they have no "my household" page and, later, cannot
   order. A member with **no household and no commission** signs in to a waiting screen where
-  they can only edit their name, phone, email (with confirmation) and password and sign out.
+  they can only edit their name, phone, email (with confirmation) and password, change the
+  light/dark theme, and sign out.
   Members without a household can be deactivated and reactivated; the "household must be
   active" rule only applies when they have one.
 - A member with the membership role can change the household of, or remove from their

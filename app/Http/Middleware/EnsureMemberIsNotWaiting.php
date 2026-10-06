@@ -11,9 +11,9 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Keeps a member with no household and no commission on the waiting screen:
- * they may only edit their own details (name, phone, email, password) and
- * sign out. Checked on every request, so it takes effect as soon as the last
- * household or commission is taken away.
+ * they may only edit their own details (name, phone, email, password),
+ * pick the theme, switch profile and sign out. Checked on every request, so
+ * it takes effect as soon as the last household or commission is taken away.
  */
 class EnsureMemberIsNotWaiting
 {
@@ -27,6 +27,8 @@ class EnsureMemberIsNotWaiting
         'security.*',
         'user-password.update',
         'appearance.edit',
+        'active-profile.*',
+        'settings',
     ];
 
     public function __construct(private readonly WaitingForHousehold $waitingForHousehold) {}
