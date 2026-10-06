@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Members;
 use App\Actions\DeactivateMember;
 use App\Actions\ReactivateMember;
 use App\Auth\EmailChangeLevels;
+use App\Auth\MembershipRoleProtection;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Members\UpdateMemberRequest;
 use App\Models\Household;
@@ -19,7 +20,7 @@ use Inertia\Response;
 
 class MemberController extends Controller
 {
-    public function index(Request $request, EmailChangeLevels $emailChangeLevels): Response
+    public function index(Request $request, EmailChangeLevels $emailChangeLevels, MembershipRoleProtection $protection): Response
     {
         $actor = $request->user() ?? abort(403);
 
@@ -36,6 +37,7 @@ class MemberController extends Controller
                 'household_id' => $member->household_id,
                 'is_active' => $member->is_active,
                 'can_change_email' => $emailChangeLevels->canChange($actor, $member),
+                'can_deactivate' => $protection->mayDeactivateMember($actor, $member),
             ]);
 
         $households = Household::query()
@@ -81,8 +83,10 @@ class MemberController extends Controller
         return to_route('members.index');
     }
 
-    public function deactivate(Member $member, DeactivateMember $deactivateMember): RedirectResponse
+    public function deactivate(Request $request, Member $member, DeactivateMember $deactivateMember, MembershipRoleProtection $protection): RedirectResponse
     {
+        abort_unless($protection->mayDeactivateMember($request->user() ?? abort(403), $member), 403);
+
         $deactivateMember->handle($member);
 
         Inertia::flash('toast', ['type' => 'success', 'message' => __('Member deactivated.')]);

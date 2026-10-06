@@ -15,23 +15,25 @@ class UpdateMemberRequest extends FormRequest
 {
     use ProfileValidationRules;
 
+    private ?bool $mayChangeEmail = null;
+
     public function authorize(): bool
     {
         if ($this->user()?->can('manage-membership') !== true) {
             return false;
         }
 
-        // Submitting the unchanged email is harmless (the form always sends it),
-        // so only an actual change is refused to those below the required level.
+        // Clients may still send the unchanged email; only an actual change is
+        // refused to those below the required level.
         return ! $this->isChangingEmail() || $this->mayChangeEmail();
     }
 
-    public function mayChangeEmail(): bool
+    private function mayChangeEmail(): bool
     {
         /** @var Member $member */
         $member = $this->route('member');
 
-        return app(EmailChangeLevels::class)->canChange($this->user() ?? abort(403), $member);
+        return $this->mayChangeEmail ??= app(EmailChangeLevels::class)->canChange($this->user() ?? abort(403), $member);
     }
 
     /**

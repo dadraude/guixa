@@ -14,6 +14,9 @@ use App\Models\User;
  * administrators, and the membership role reaches members who neither hold the
  * membership role nor are administrators. Changing one's own email is never
  * decided here: it goes through the confirmation link.
+ *
+ * A class and not a Gate because Gate::before would let any administrator
+ * through, including against administrator targets.
  */
 class EmailChangeLevels
 {

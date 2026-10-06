@@ -18,6 +18,7 @@ type MemberRow = {
     household_id: string;
     is_active: boolean;
     can_change_email: boolean;
+    can_deactivate: boolean;
 };
 
 type HouseholdOption = {
@@ -150,7 +151,10 @@ defineOptions({
                         type="submit"
                         variant="outline"
                         size="sm"
-                        :disabled="processing"
+                        :disabled="
+                            processing ||
+                            (member.is_active && !member.can_deactivate)
+                        "
                         :data-test="
                             member.is_active
                                 ? 'deactivate-member'

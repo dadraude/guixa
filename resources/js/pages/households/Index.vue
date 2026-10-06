@@ -17,6 +17,7 @@ type HouseholdRow = {
     name: string;
     is_active: boolean;
     without_commission: boolean;
+    can_deactivate: boolean;
 };
 
 defineProps<{
@@ -120,7 +121,10 @@ defineOptions({
                         type="submit"
                         variant="outline"
                         size="sm"
-                        :disabled="processing"
+                        :disabled="
+                            processing ||
+                            (household.is_active && !household.can_deactivate)
+                        "
                         :data-test="
                             household.is_active
                                 ? 'deactivate-household'

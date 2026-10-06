@@ -6,6 +6,7 @@ namespace App\Providers;
 
 use App\Auth\ActiveProfile;
 use App\Auth\MemberRoles;
+use App\Auth\MembershipRoleProtection;
 use App\Auth\Role;
 use App\Models\User;
 use Carbon\CarbonImmutable;
@@ -54,6 +55,8 @@ class AppServiceProvider extends ServiceProvider
         // Only administrators assign roles (they pass Gate::before), so the
         // membership role can never grant itself or others more permissions.
         Gate::define('assign-roles', fn (User $user) => false);
+        // Only administrators take the membership role away from a member (see MembershipRoleProtection).
+        Gate::define(MembershipRoleProtection::ABILITY, fn (User $user) => false);
         // Every active member sees the commissions and who is in them.
         Gate::define('view-commissions', fn (User $user) => $user->member?->is_active === true);
         // Every active member opens the directory; what they see depends on
