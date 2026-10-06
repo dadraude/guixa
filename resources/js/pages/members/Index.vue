@@ -15,7 +15,7 @@ type MemberRow = {
     name: string;
     email: string;
     phone: string | null;
-    household_id: string;
+    household_id: string | null;
     is_active: boolean;
 };
 
@@ -112,6 +112,13 @@ defineOptions({
                         :aria-label="t('Household')"
                         :value="member.household_id"
                     >
+                        <option
+                            v-if="member.household_id === null"
+                            value=""
+                            disabled
+                        >
+                            {{ t('No household') }}
+                        </option>
                         <option
                             v-for="household in households"
                             :key="household.id"

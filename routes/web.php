@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\AdministratorController;
 use App\Http\Controllers\Auth\ActiveProfileController;
 use App\Http\Controllers\Auth\MagicLinkController;
 use App\Http\Controllers\Auth\SetPasswordController;
+use App\Http\Controllers\Auth\WaitingController;
 use App\Http\Controllers\Commissions\CommissionController;
 use App\Http\Controllers\Commissions\CommissionMemberController;
 use App\Http\Controllers\Commissions\CommissionRoleController;
@@ -51,6 +52,8 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('active-profile', [ActiveProfileController::class, 'edit'])->name('active-profile.edit');
     Route::post('active-profile', [ActiveProfileController::class, 'update'])->name('active-profile.update');
+
+    Route::get('waiting', WaitingController::class)->name('waiting');
 
     Route::get('dashboard', DashboardController::class)->name('dashboard');
 

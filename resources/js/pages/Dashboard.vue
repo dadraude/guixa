@@ -40,7 +40,7 @@ defineOptions({
             {{ t('You do not belong to any household.') }}
         </p>
 
-        <template v-else>
+        <template v-if="household !== null">
             <Heading
                 :title="`${t('Your household')}: #${household.number} ${household.name}`"
             />
@@ -57,8 +57,11 @@ defineOptions({
                     </li>
                 </ul>
             </div>
-
-            <MyCommissions :commissions="commissions" />
         </template>
+
+        <MyCommissions
+            v-if="household !== null || commissions.length > 0"
+            :commissions="commissions"
+        />
     </div>
 </template>

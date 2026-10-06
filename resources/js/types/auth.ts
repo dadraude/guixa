@@ -20,4 +20,6 @@ export type Auth = {
     isOwner: boolean;
     /** Whether the person manages households, invitations and commissions. */
     canManageMembership: boolean;
+    /** A member with no household and no commission, who can only wait. */
+    isWaiting: boolean;
 };

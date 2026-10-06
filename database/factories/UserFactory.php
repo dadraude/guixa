@@ -77,6 +77,16 @@ class UserFactory extends Factory
     }
 
     /**
+     * Give the user a member profile with no household yet.
+     */
+    public function memberWithoutHousehold(): static
+    {
+        return $this->afterCreating(function (User $user) {
+            $user->member()->create(['household_id' => null]);
+        });
+    }
+
+    /**
      * Make the user the owner: the administrator created from the command line.
      */
     public function owner(): static
