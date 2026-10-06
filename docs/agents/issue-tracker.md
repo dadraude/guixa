@@ -3,6 +3,13 @@
 Specs live in this repo. Implementation tickets live in Linear.
 Use the Linear MCP tools (`save_issue`, `get_issue`, `list_issues`, `save_comment`, …).
 
+## Workspace check (first Linear call of every session)
+
+Before any other Linear call, call `get_workspace` and check that the workspace **name** is
+`Draude` (URL `https://linear.app/draude`). If it is anything else, stop: do not read, create
+or change any issue, and tell the user which workspace is connected. Sub-agents that use
+Linear run the same check before their first Linear call.
+
 - Workspace team: **Draude** (key `DRA`) · Project: **Guixa** (every ticket belongs to it)
 - All content (titles, bodies, comments) is written in English.
 
