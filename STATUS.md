@@ -212,14 +212,28 @@
   test. Pest 282/282. Review follow-up DRA-50 (architecture rule: no raw input reads in
   controllers that take a FormRequest) is `needs-triage`.
 
+- **Session 21 (2026-10-06):** triage: DRA-50 `ready-for-agent` with an agent brief (a custom
+  Larastan rule forbids raw input reads on a FormRequest in controllers, magic properties
+  included). DRA-36 and DRA-45 reopened: marked Done but never implemented. `/grill-with-docs`
+  on DRA-46 plus a spec review amended and re-approved spec 001 (PR #41): **no invitations**,
+  members are created by hand (owner, administrators, membership role) with a token-free
+  welcome email and a password on first access (ADR 0008); members may have no household
+  (roles still apply; only members with no household and no commission see a waiting screen);
+  one "change household" action plus "remove from household"; active/inactive belongs to the
+  user; the owner promotes members to administrator; other people's emails change by levels.
+  Decisions D1–D9 in the spec's `decisions.md`. `/to-tickets` created DRA-51 to DRA-58;
+  DRA-40 closed as a duplicate of DRA-54. PR #42: every session checks with `get_workspace`
+  that Linear is the `Draude` workspace before any Linear call.
+
 ## Next step
 
-**Session 21:** triage DRA-50. Then `/grill-with-docs` on DRA-46 (invitations without a
-household) to amend and re-approve spec 001, then `/to-tickets`. Meanwhile `/ship-ticket` the
-`ready-for-agent` issues, a few per session: DRA-37 then DRA-36, DRA-39, DRA-40, DRA-42 then
-DRA-31, DRA-45, DRA-47, DRA-48. DRA-49 needs a human
-decision on the review learning process. Check that `e2e` is a required status check in the
-`main` branch protection (the user does this by hand).
+**Session 22:** `/ship-ticket` the spec 001 amendment, a few per session, starting with the
+unblocked DRA-51 (members without a household) and DRA-52 (emails by levels); then DRA-53 →
+DRA-56, DRA-55 → DRA-57, DRA-58, and DRA-54 after DRA-31. Other `ready-for-agent` issues:
+DRA-37 then DRA-36, DRA-39, DRA-42 then DRA-31, DRA-45, DRA-47, DRA-48, DRA-50. Invitation
+tickets in flight are obsolete: DRA-56 removes the feature. DRA-49 needs a human decision on
+the review learning process. Check that `e2e` is a required status check in the `main` branch
+protection (the user does this by hand).
 
 Before spec 002: define UX/UI principles with `/grill-with-docs` (mobile-first, accessibility
 target, visual identity, key flows for ordering and the offline box/payment screens) and record
