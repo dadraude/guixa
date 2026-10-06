@@ -12,7 +12,7 @@ _Catalan (UI)_: unitat familiar
 _Avoid_: Consumer unit, family, account, unitat de consum, caixa
 
 **Member**:
-A person who belongs to a household and uses the app with their own login.
+A person of the cooperative who uses the app with their own login. A member may have no household yet (right after being created) and may be in no commission; a member with no household and no commission can only wait; a household is needed to order. Members are created by hand by the owner, administrators or members with the membership role; there is no invitation and no open sign-up.
 _Catalan (UI)_: membre
 _Avoid_: Sòcia (ambiguous between person and household); "user" when the member is meant
 
@@ -21,28 +21,23 @@ The sign-in identity of a person (email and password), to which a member and/or 
 _Catalan (UI)_: (not shown; the UI says membre or administrador/a)
 _Avoid_: Account, login
 
-**Invitation**:
-The email a member with the membership role sends to a new member so they can join their household; there is no open sign-up.
-_Catalan (UI)_: invitació
-_Avoid_: Registration, sign-up
-
 **Inactive household**:
 A household that has left the cooperative; its data and balance are kept, and it can no longer place orders.
 _Catalan (UI)_: unitat familiar inactiva
 _Avoid_: Deleted household, former member
 
 **Administrator**:
-A person who can do everything in the app without belonging to any household; it is not a member and places no orders.
+A profile that can do everything in the app; acting as administrator is outside any household and places no orders. Apart from the owner, every administrator is a member to whom the owner has added the administrator profile.
 _Catalan (UI)_: administrador/a
 _Avoid_: Superadmin, root, admin member
 
 **Owner**:
-The one administrator created from the server when the app is installed; only the owner creates, deactivates and reactivates other administrators, and the owner cannot be deactivated from the app.
+The one administrator created from the server when the app is installed; only the owner adds and removes other administrators, and the owner cannot be deactivated from the app.
 _Catalan (UI)_: propietari/ària
 _Avoid_: Superadmin, main administrator, root
 
 **Inactive member**:
-A member who has left the cooperative while their household stays; they can no longer sign in and leave all commissions, but their history is kept. All members of an inactive household are inactive.
+A member who has left the cooperative (or never joined after being created) while their household, if any, stays; they can no longer sign in with any profile (also not as administrator) and leave all commissions, but their history is kept. All members of an inactive household are inactive.
 _Catalan (UI)_: membre inactiu
 _Avoid_: Deleted member, removed member
 

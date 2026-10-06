@@ -7,7 +7,7 @@ Outcome of the `/grill-with-docs` session on 2026-10-01. Input for `/to-spec`, w
 ## Scope
 
 Households, members, invitations, sign-in (magic link and password), commissions, roles and
-administrators.
+administrators. Invitations are superseded by the amendment at the end of this file.
 
 ## Access and bootstrap
 
@@ -70,3 +70,50 @@ administrators.
   editable.
 - Every member sees all commissions and the names of their members; contact details still
   follow the directory rule.
+
+## Amendment (2026-10-06, DRA-46)
+
+Outcome of the `/grill-with-docs` session on 2026-10-06; supersedes the invitation decisions
+above. See [ADR 0008](../../docs/adr/0008-members-created-by-hand.md).
+
+- **No invitations.** The owner, administrators and members with the membership role create
+  members by hand: name, email, optional phone, and optionally household and commissions.
+- **First access:** a welcome email with no token points to the sign-in screen; a password is
+  required on first access.
+- **Member without a household:** roles apply with or without a household; a household is
+  needed for "my household" and to order. With no household and no commission, only a waiting
+  screen (edit name, phone, email, password; sign out). Commissions can
+  be assigned before or after the household.
+- **One "change household" action** assigns the first household or moves the member (membership
+  role or administrator, active households only, target household locked). A member can be
+  removed from their household and waits again; they keep their commissions.
+- Members without a household can be deactivated and reactivated.
+- The members list shows everyone and the active members without a household; the directory
+  lists only households and their members.
+- **Administrators:** ADR 0004 stays (two profiles). Only the owner adds the administrator
+  profile to an active member; creating administrators by email is removed. A person whose
+  member profile has no household signs in straight as administrator.
+
+### Spec review of the amendment (2026-10-06)
+
+- **D1/D2 — Emails by levels.** Each person changes their own email with confirmation. For
+  someone else: the owner can change anyone's; an administrator, members who are not
+  administrators; the membership role, members who neither hold the membership role nor are
+  administrators. Such changes apply immediately (fixes typos at creation). Emails stay unique.
+- **D3 — Inactive member of an inactive household** can be moved with "change household" to
+  an active one and reactivated there. Only active members can be removed from a household.
+- **D4 — Profile changes mid-session:** a member profile with no household and no commission
+  is not an available profile while the person is an administrator; gaining one keeps them
+  acting as administrator with the switcher shown; losing both falls back to administrator.
+- **D5/D6 — Active or inactive belongs to the user,** not to a profile. An inactive person
+  cannot sign in with any profile. Being an administrator is a yes/no the owner adds or
+  removes; there is no inactive administrator. Deactivation keeps the administrator profile.
+- **D7 — The membership role** can change the household of, or remove from their household,
+  any member, including themselves and administrators.
+- **D8 — Roles apply with or without a household.** A household is needed for "my household"
+  and to order. Only a member with no household and no commission sees the waiting screen.
+- **D9 — DRA-34 stays:** the membership role cannot deactivate themselves or their own
+  household, and cannot deactivate a member who is an administrator.
+- **Model:** two profiles (member, administrator) on one user; the owner is an administrator,
+  not a third profile.
+

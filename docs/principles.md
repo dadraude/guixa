@@ -16,7 +16,7 @@ Technical decisions and rules for the whole project. Domain terms are defined in
   [ADR 0002](adr/0002-laravel-inertia-monolith-with-offline-islands.md).
 - **Base:** Laravel 13 from the official **Vue starter kit** (Inertia, Tailwind, shadcn-vue,
   Wayfinder). Sign-in uses **Fortify** for passwords and rate limits; the magic link and
-  invitations are our own code. See [ADR 0006](adr/0006-vue-starter-kit-with-fortify.md).
+  member creation are our own code. See [ADR 0006](adr/0006-vue-starter-kit-with-fortify.md).
 - **Versions:** PHP 8.5 and Node 22 LTS, the same locally, in CI and on the VPS.
 - **No real-time.** Orders have no shared stock limits, so plain request/response is enough.
 - **Offline only where needed:** packing **boxes** and recording **payments** must work
@@ -56,10 +56,10 @@ Technical decisions and rules for the whole project. Domain terms are defined in
 
 ## Access
 
-- No open sign-up: the membership commission creates **households** and invites **members**
-  by email.
+- No open sign-up and no invitations: the owner, administrators and the membership
+  commission create **households** and **members** by hand (ADR 0008).
 - Members sign in with a **magic link** by email or with a **password**. Setting the password
-  is required when accepting the **invitation**, so both ways always work.
+  is required on first access, so both ways always work.
   Sessions are long-lived (weeks), so offline screens keep working on a phone.
 - Permissions come from **commission** membership and are enforced with Laravel policies on
   the server.
