@@ -6,19 +6,23 @@ namespace App\Http\Controllers\Members;
 
 use App\Actions\DeactivateMember;
 use App\Actions\ReactivateMember;
+use App\Auth\EmailChangeLevels;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Members\UpdateMemberRequest;
 use App\Models\Household;
 use App\Models\Member;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class MemberController extends Controller
 {
-    public function index(): Response
+    public function index(Request $request, EmailChangeLevels $emailChangeLevels): Response
     {
+        $actor = $request->user() ?? abort(403);
+
         $members = Member::query()
             ->with('user')
             ->get()
@@ -31,6 +35,7 @@ class MemberController extends Controller
                 'phone' => $member->phone,
                 'household_id' => $member->household_id,
                 'is_active' => $member->is_active,
+                'can_change_email' => $emailChangeLevels->canChange($actor, $member),
             ]);
 
         $households = Household::query()
@@ -54,15 +59,20 @@ class MemberController extends Controller
         $validated = $request->validated();
 
         DB::transaction(function () use ($member, $validated) {
-            // A self-service change requested earlier must not overwrite this
-            // email later through its still-valid link.
-            $member->user->forceFill([
-                'name' => $validated['name'],
-                'email' => $validated['email'],
-                'pending_email' => null,
-                'pending_email_token_hash' => null,
-                'pending_email_expires_at' => null,
-            ])->save();
+            $member->user->forceFill(['name' => $validated['name']]);
+
+            if (isset($validated['email'])) {
+                // A self-service change requested earlier must not overwrite this
+                // email later through its still-valid link.
+                $member->user->forceFill([
+                    'email' => $validated['email'],
+                    'pending_email' => null,
+                    'pending_email_token_hash' => null,
+                    'pending_email_expires_at' => null,
+                ]);
+            }
+
+            $member->user->save();
             $member->update(['phone' => $validated['phone'] ?? null]);
         });
 

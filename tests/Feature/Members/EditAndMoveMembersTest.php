@@ -55,7 +55,7 @@ test('the email also changes for the administrator profile of the same user', fu
     $member = memberIn(Household::factory()->create(), ['email' => 'old@example.com']);
     $member->user->administrator()->create(['is_active' => true]);
 
-    $this->actingAs(membershipUser())
+    $this->actingAs(User::factory()->owner()->create())
         ->patch(route('members.update', $member), ['name' => 'X', 'email' => 'new@example.com']);
 
     expect($member->user->administrator->fresh()->user->email)->toBe('new@example.com');
