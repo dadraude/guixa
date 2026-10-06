@@ -9,7 +9,7 @@ the agents do the heavy work and you keep a short thread. Talk to the user in Ca
 
 ## 1. Prepare
 
-1. Read the ticket with Linear (`get_issue`, including relations). If a blocker is not Done, tell the user
+1. Check with `get_workspace` that the Linear workspace is `Draude` (stop otherwise). Read the ticket with Linear (`get_issue`, including relations). If a blocker is not Done, tell the user
    which one and which PR holds it.
 2. Branch name: `feature|bugfix|improvement|refactor|chore/dra-NN-short-kebab-title`.
    - Blockers merged, or none: create it from an updated `main`.

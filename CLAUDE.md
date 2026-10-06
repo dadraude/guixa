@@ -66,6 +66,8 @@ Standard way to implement a Linear ticket; defined in `.claude/skills/ship-ticke
 ### Issue tracker
 
 Specs in the repo (`specs/NNN-name/spec.md`); tickets in Linear (team Draude, project Guixa). See `docs/agents/issue-tracker.md`.
+Before the first Linear call of a session, check with `get_workspace` that the connected workspace is
+`Draude`; if not, stop and tell the user.
 
 ### Triage labels
 
