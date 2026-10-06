@@ -2,6 +2,8 @@
 
 - Status: accepted
 - Date: 2026-10-02
+- Amended by [ADR 0008](0008-members-created-by-hand.md): invitations are removed; members
+  are created by hand.
 
 Guixa starts from Laravel's official Vue starter kit (Inertia, Vue 3 + TypeScript, Tailwind,
 shadcn-vue, Wayfinder), which uses **Fortify** for authentication. We keep Fortify for

@@ -2,6 +2,8 @@
 
 - Status: accepted
 - Date: 2026-10-01
+- Amended by [ADR 0008](0008-members-created-by-hand.md): apart from the owner, every
+  administrator is also a member; the two profiles stay separate.
 
 Commissions are fully dynamic: the membership commission creates, renames and deletes them and
 decides who is in each one. Permissions do not belong to commissions directly; they come from
@@ -25,3 +27,5 @@ member and an administrator; the person chooses which one to act as when signing
 - Policies check roles, never commission names, so commissions can change freely.
 - The membership role cannot grant itself other roles: only administrators assign roles.
 - The first administrator is created with an Artisan command; later ones from the app.
+  Amended by [ADR 0008](0008-members-created-by-hand.md): later administrators are members
+  to whom the owner adds the administrator profile; none is created by email.
