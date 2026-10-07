@@ -216,14 +216,51 @@ test('the settings shortcut leads a waiting member to their profile', function (
         ->assertRedirect('/settings/profile');
 });
 
-test('an administrator who chose the waiting member profile can switch back to administrator', function () {
+test('an administrator whose member profile has no household and no commission signs in straight as administrator', function () {
     $user = User::factory()->owner()->memberWithoutHousehold()->create();
 
-    $this->actingAs($user)->withSession(['active_profile' => 'member'])
-        ->post(route('active-profile.update'), ['profile' => 'administrator'])
+    $this->post(route('login.store'), ['email' => $user->email, 'password' => 'password'])
         ->assertRedirect(route('home'));
 
+    $this->get(route('home'))->assertRedirect(route('admin.home'));
+    $this->get(route('admin.home'))->assertOk()
+        ->assertInertia(fn (Assert $page) => $page->where('auth.profiles', ['administrator']));
+});
+
+test('an administrator who gains a household mid-session keeps acting as administrator and gets the switcher', function () {
+    $user = User::factory()->owner()->memberWithoutHousehold()->create();
+    $this->actingAs($user)->get(route('admin.home'))->assertOk();
+
+    $user->member->update(['household_id' => Household::factory()->create()->id]);
+
+    $this->get(route('admin.home'))->assertOk()
+        ->assertInertia(fn (Assert $page) => $page->where('auth.profiles', ['member', 'administrator']));
+});
+
+test('an administrator who gains a commission mid-session keeps acting as administrator and gets the switcher', function () {
+    $user = User::factory()->owner()->memberWithoutHousehold()->create();
+    $this->actingAs($user)->get(route('admin.home'))->assertOk();
+
+    Commission::factory()->create()->members()->attach($user->member);
+
+    $this->get(route('admin.home'))->assertOk()
+        ->assertInertia(fn (Assert $page) => $page->where('auth.profiles', ['member', 'administrator']));
+});
+
+test('someone acting as member who loses household and commissions acts as administrator on the next request', function () {
+    $household = Household::factory()->create();
+    $user = User::factory()->owner()->member($household)->create();
+    $this->actingAs($user)->withSession(['active_profile' => 'member'])->get(route('dashboard'))->assertOk();
+
+    $user->member->update(['household_id' => null]);
+
     $this->get(route('admin.home'))->assertOk();
+});
+
+test('an administrator with a usable member profile still chooses after signing in', function () {
+    $user = User::factory()->owner()->member(Household::factory()->create())->create();
+
+    $this->actingAs($user)->get(route('home'))->assertRedirect(route('active-profile.edit'));
 });
 
 test('a waiting member without a password sets one and then lands on the waiting screen', function () {
