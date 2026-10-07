@@ -31,8 +31,11 @@ Domain vocabulary lives in `CONTEXT.md`; decisions in `docs/adr/NNNN-title.md`.
   There is no status file in the repo.
 - At the start: read the latest Guixa project status update, then triage the Guixa issues labelled
   `needs-triage` with the user: each one becomes `ready-for-agent`, `ready-for-human` or `wontfix`.
+  Then choose the session's issues with the user and move them to **Todo**: Todo is the session scope.
 - At the end: leave nothing half-done, commit and push to `origin` (github.com:dadraude/guixa), and
-  post a Guixa project status update with what was done and the concrete next step.
+  post a Guixa project status update with what was done and the concrete next step. Todo must be
+  empty: every session issue is In Review or Done, or goes back to Backlog and the status update says
+  why. In Review may carry over to the next session (it waits on a merge).
 - If the goal doesn't fit, split it and close the finished part.
 
 ## Ticket flow (`/ship-ticket DRA-NN`)
