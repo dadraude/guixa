@@ -6,6 +6,7 @@ namespace App\Http\Requests\Members;
 
 use App\Models\Commission;
 use App\Models\Household;
+use Closure;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -44,8 +45,37 @@ class StoreMemberRequest extends FormRequest
                 'uuid',
                 Rule::exists(Household::class, 'id')->where('is_active', true),
             ],
-            'commission_ids' => ['nullable', 'array'],
-            'commission_ids.*' => ['uuid', 'distinct', Rule::exists(Commission::class, 'id')],
+            'commission_ids' => ['nullable', 'array', $this->commissionsExist()],
+            'commission_ids.*' => ['uuid'],
         ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'household_id.exists' => __('Choose an active household.'),
+        ];
+    }
+
+    /**
+     * Checked on the array, not per item, so the error lands on `commission_ids`,
+     * the only key the form shows (and the one CreateMember uses too).
+     */
+    private function commissionsExist(): Closure
+    {
+        return function (string $attribute, mixed $value, Closure $fail): void {
+            if (! is_array($value)) {
+                return;
+            }
+
+            $ids = array_values(array_unique(array_filter($value, is_string(...))));
+
+            if (Commission::query()->whereKey($ids)->count() !== count($ids)) {
+                $fail(__('Choose existing commissions.'));
+            }
+        };
     }
 }

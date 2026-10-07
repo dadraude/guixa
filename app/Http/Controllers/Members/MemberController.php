@@ -62,7 +62,7 @@ class MemberController extends Controller
         $createMember->handle(
             $validated->string('name')->toString(),
             $validated->string('email')->toString(),
-            $validated->string('phone')->toString() ?: null,
+            $validated->filled('phone') ? $validated->string('phone')->toString() : null,
             $validated->string('household_id')->toString() ?: null,
             array_values(array_map(strval(...), $validated->array('commission_ids'))),
         );

@@ -46,6 +46,7 @@ class CreateMember
     private function create(string $name, string $email, ?string $phone, ?string $householdId, array $commissionIds): Member
     {
         $this->assertHouseholdIsActive($householdId);
+        $commissionIds = array_values(array_unique($commissionIds));
         $this->assertCommissionsExist($commissionIds);
 
         $user = User::query()->where('email', mb_strtolower($email))->lockForUpdate()->first();
@@ -53,7 +54,7 @@ class CreateMember
         if ($user?->member !== null) {
             throw $this->emailError($user->member->is_active
                 ? __('This email already belongs to a member.')
-                : __('This person is an inactive member: reactivate them instead.'));
+                : __('This member is inactive: reactivate them instead of creating a new one.'));
         }
 
         $isNewUser = $user === null;
@@ -86,13 +87,14 @@ class CreateMember
     }
 
     /**
-     * @param  list<string>  $commissionIds
+     * @param  list<string>  $commissionIds  without duplicates
      */
     private function assertCommissionsExist(array $commissionIds): void
     {
-        $unique = array_values(array_unique($commissionIds));
+        // Locked so a commission cannot be deleted between this check and the attach.
+        $existing = Commission::query()->whereKey($commissionIds)->lockForUpdate()->get(['id']);
 
-        if (Commission::query()->whereKey($unique)->count() === count($unique)) {
+        if (count($existing) === count($commissionIds)) {
             return;
         }
 

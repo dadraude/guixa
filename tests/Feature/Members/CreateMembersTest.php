@@ -8,8 +8,10 @@ use App\Mail\MagicLinkMail;
 use App\Mail\WelcomeMail;
 use App\Models\Commission;
 use App\Models\Household;
+use App\Models\Member;
 use App\Models\User;
 use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -103,7 +105,7 @@ test('a household or a commission that does not exist gives a validation error',
             'household_id' => (string) Str::uuid7(),
             'commission_ids' => [(string) Str::uuid7()],
         ]))
-        ->assertSessionHasErrors(['household_id', 'commission_ids.0']);
+        ->assertSessionHasErrors(['household_id', 'commission_ids']);
 });
 
 test('a household deactivated between validation and creation gives a validation error', function () {
@@ -139,7 +141,7 @@ test('an email that belongs to an inactive member points to reactivating them', 
 
     $this->actingAs(membershipRoleUser())
         ->post(route('members.store'), newMemberData())
-        ->assertSessionHasErrors(['email' => __('This person is an inactive member: reactivate them instead.')]);
+        ->assertSessionHasErrors(['email' => __('This member is inactive: reactivate them instead of creating a new one.')]);
 });
 
 test('an email that belongs to a user without a member profile attaches the profile and sends no email', function () {
@@ -182,6 +184,44 @@ test('a race on the same email ends as a validation error on the email', functio
     } catch (ValidationException $exception) {
         expect($exception->errors())->toHaveKey('email');
     }
+});
+
+test('losing the unique email race inside the transaction ends as a validation error', function () {
+    // The other submit commits its user between our lookup and our insert.
+    User::creating(function (User $user) {
+        DB::table('users')->insert(['id' => (string) Str::uuid7(), 'name' => 'Other', 'email' => $user->email, 'created_at' => now(), 'updated_at' => now()]);
+    });
+
+    try {
+        app(CreateMember::class)->handle('Maria', 'maria@example.com', null, null, []);
+        $this->fail('Expected a validation error');
+    } catch (ValidationException $exception) {
+        expect($exception->errors())->toHaveKey('email');
+    }
+
+    expect(Member::count())->toBe(0);
+    Mail::assertNothingQueued();
+});
+
+test('a commission deleted between validation and creation gives a validation error', function () {
+    $commission = Commission::factory()->create();
+    $creator = app(CreateMember::class);
+    $commission->delete();
+
+    try {
+        $creator->handle('Maria', 'maria@example.com', null, null, [$commission->id]);
+        $this->fail('Expected a validation error');
+    } catch (ValidationException $exception) {
+        expect($exception->errors())->toHaveKey('commission_ids');
+    }
+
+    expect(User::where('email', 'maria@example.com')->exists())->toBeFalse();
+});
+
+test('a phone of zero is kept', function () {
+    $this->actingAs(membershipRoleUser())->post(route('members.store'), newMemberData(['phone' => '0']));
+
+    expect(User::where('email', 'maria@example.com')->sole()->member->phone)->toBe('0');
 });
 
 test('a new member gets a welcome email with the sign-in link and no token', function () {
