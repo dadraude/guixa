@@ -2,8 +2,8 @@
 
 - Status: accepted
 - Date: 2026-10-01
-- Amended by [ADR 0008](0008-members-created-by-hand.md): apart from the owner, every
-  administrator is also a member; the two profiles stay separate.
+- Amended by [ADR 0008](0008-members-created-by-hand.md): every administrator, the owner
+  included (since 2026-10-07, DRA-75), is also a member; the two profiles stay separate.
 
 Commissions are fully dynamic: the membership commission creates, renames and deletes them and
 decides who is in each one. Permissions do not belong to commissions directly; they come from

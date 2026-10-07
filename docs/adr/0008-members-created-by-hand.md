@@ -2,6 +2,7 @@
 
 - Status: accepted
 - Date: 2026-10-06
+- Amended 2026-10-07 (DRA-75): the owner is also a member, so every user has a member profile.
 
 Members join the cooperative because someone creates them by hand: the owner, an
 administrator or a member with the membership role enters their name, email and optional
@@ -28,7 +29,9 @@ administrator profile to an existing active member.
 
 ## Consequences
 
-- One way in for everyone except the owner (created on the server): being created as a member.
+- One way in for everyone except the owner (created on the server, as an active member with no
+  household plus the administrator profile): being created as a member. Every user has a member
+  profile, so creating or updating a member with an email that already exists is always rejected.
 - No sign-in token is ever emailed on creation; the existing magic link and code are reused.
 - "Member" no longer implies a household: every rule that needs one (roles, directory, orders)
   must check for it.
