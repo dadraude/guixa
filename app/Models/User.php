@@ -83,8 +83,9 @@ class User extends Authenticatable
 
     /**
      * Active or inactive belongs to the person, not to a profile: it is the
-     * member profile's flag. A user with no member profile (the owner) cannot
-     * be deactivated.
+     * member profile's flag. A user with no member profile is always active.
+     * The owner may have a member profile, but nobody can deactivate it
+     * (see MembershipRoleProtection).
      */
     public function isActive(): bool
     {

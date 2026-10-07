@@ -26,6 +26,7 @@ class HouseholdController extends Controller
         // take part. Nothing is blocked.
         $households = Household::query()
             ->withCommissionMemberFlag()
+            ->with('members.user.administrator')
             ->orderBy('number')
             ->get()
             ->map(fn (Household $household) => [

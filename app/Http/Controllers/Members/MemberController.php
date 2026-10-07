@@ -25,7 +25,7 @@ class MemberController extends Controller
         $actor = $request->user() ?? abort(403);
 
         $members = Member::query()
-            ->with('user')
+            ->with('user.administrator')
             ->get()
             ->sortBy(fn (Member $member) => mb_strtolower($member->user->name))
             ->values()
