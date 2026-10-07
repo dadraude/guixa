@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use App\Actions\CreateMember;
-use App\Auth\Role;
 use App\Mail\MagicLinkMail;
 use App\Mail\WelcomeMail;
 use App\Models\Commission;
@@ -18,16 +17,6 @@ use Illuminate\Validation\ValidationException;
 use Inertia\Testing\AssertableInertia as Assert;
 
 beforeEach(fn () => Mail::fake());
-
-function membershipRoleUser(): User
-{
-    $user = User::factory()->member(Household::factory()->create())->create();
-    $commission = Commission::factory()->create();
-    $commission->assignRole(Role::Membership);
-    $commission->members()->attach($user->member->fresh());
-
-    return $user->fresh();
-}
 
 function newMemberData(array $overrides = []): array
 {
