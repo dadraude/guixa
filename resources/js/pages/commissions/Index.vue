@@ -27,6 +27,8 @@ type CommissionRow = {
     name: string;
     members: Person[];
     roles: RoleOption[];
+    can_remove_members: boolean;
+    can_delete: boolean;
 };
 
 defineProps<{
@@ -103,7 +105,7 @@ defineOptions({
                             type="submit"
                             variant="destructive"
                             size="sm"
-                            :disabled="processing"
+                            :disabled="processing || !commission.can_delete"
                             data-test="delete-commission"
                             >{{ t('Delete') }}</Button
                         >
@@ -205,9 +207,13 @@ defineOptions({
                                 })
                             "
                         >
-                            <Button type="submit" variant="ghost" size="sm">{{
-                                t('Remove')
-                            }}</Button>
+                            <Button
+                                type="submit"
+                                variant="ghost"
+                                size="sm"
+                                :disabled="!commission.can_remove_members"
+                                >{{ t('Remove') }}</Button
+                            >
                         </Form>
                     </li>
                 </ul>

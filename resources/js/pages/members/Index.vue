@@ -17,6 +17,8 @@ type MemberRow = {
     phone: string | null;
     household_id: string | null;
     is_active: boolean;
+    can_change_email: boolean;
+    can_deactivate: boolean;
 };
 
 type HouseholdOption = {
@@ -79,6 +81,12 @@ defineOptions({
                         class="max-w-64"
                         :aria-label="t('Email address')"
                         :default-value="member.email"
+                        :disabled="!member.can_change_email"
+                        :title="
+                            member.can_change_email
+                                ? undefined
+                                : t('You cannot change this email address.')
+                        "
                     />
                     <Input
                         name="phone"
@@ -150,7 +158,10 @@ defineOptions({
                         type="submit"
                         variant="outline"
                         size="sm"
-                        :disabled="processing"
+                        :disabled="
+                            processing ||
+                            (member.is_active && !member.can_deactivate)
+                        "
                         :data-test="
                             member.is_active
                                 ? 'deactivate-member'

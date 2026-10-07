@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Commissions;
 
 use App\Auth\MemberRoles;
+use App\Auth\MembershipRoleProtection;
 use App\Auth\Role;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Commissions\SaveCommissionRequest;
@@ -21,15 +22,16 @@ class CommissionController extends Controller
     /**
      * Everyone who is in the cooperative sees names only, never contact details.
      */
-    public function index(Request $request, MemberRoles $memberRoles): Response
+    public function index(Request $request, MemberRoles $memberRoles, MembershipRoleProtection $protection): Response
     {
-        $canManage = $request->user()?->can('manage-membership') === true;
+        $viewer = $request->user() ?? abort(403);
+        $canManage = $viewer->can('manage-membership') === true;
         $rolesByCommission = $memberRoles->byCommission();
         $optionsOf = fn (Commission $commission) => array_map(
             fn (Role $role) => $role->toOption(),
             $rolesByCommission[$commission->id] ?? [],
         );
-        $ownMember = $request->user()?->member;
+        $ownMember = $viewer->member;
 
         return Inertia::render('commissions/Index', [
             'commissions' => Commission::query()
@@ -41,10 +43,12 @@ class CommissionController extends Controller
                     'name' => $commission->name,
                     'members' => $this->namesOf($commission->members),
                     'roles' => $optionsOf($commission),
+                    'can_remove_members' => $protection->mayRemoveFromCommissionHolding($viewer, $rolesByCommission[$commission->id] ?? []),
+                    'can_delete' => $protection->mayRemoveFromCommissionHolding($viewer, $rolesByCommission[$commission->id] ?? []),
                 ]),
             'mine' => $ownMember === null ? [] : $memberRoles->commissionsOf($ownMember),
             'availableRoles' => array_map(fn (Role $role) => $role->toOption(), Role::cases()),
-            'canAssignRoles' => $request->user()?->can('assign-roles') === true,
+            'canAssignRoles' => $viewer->can('assign-roles') === true,
             'canManage' => $canManage,
             'candidates' => $canManage ? $this->namesOf(Member::query()->with('user')->where('is_active', true)->get()) : [],
             'status' => $request->session()->get('status'),
@@ -65,8 +69,10 @@ class CommissionController extends Controller
         return to_route('commissions.index');
     }
 
-    public function destroy(Commission $commission): RedirectResponse
+    public function destroy(Request $request, Commission $commission, MembershipRoleProtection $protection): RedirectResponse
     {
+        abort_unless($protection->mayDeleteCommission($request->user() ?? abort(403), $commission), 403);
+
         if ($commission->members()->exists()) {
             throw ValidationException::withMessages(['commission' => __('A commission with members cannot be deleted.')]);
         }
