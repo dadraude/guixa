@@ -234,7 +234,9 @@ test('an administrator who gains a household mid-session keeps acting as adminis
     $user->member->update(['household_id' => Household::factory()->create()->id]);
 
     $this->get(route('admin.home'))->assertOk()
-        ->assertInertia(fn (Assert $page) => $page->where('auth.profiles', ['member', 'administrator']));
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('auth.actingAs', 'administrator')
+            ->where('auth.profiles', ['member', 'administrator']));
 });
 
 test('an administrator who gains a commission mid-session keeps acting as administrator and gets the switcher', function () {
@@ -244,17 +246,35 @@ test('an administrator who gains a commission mid-session keeps acting as admini
     Commission::factory()->create()->members()->attach($user->member);
 
     $this->get(route('admin.home'))->assertOk()
-        ->assertInertia(fn (Assert $page) => $page->where('auth.profiles', ['member', 'administrator']));
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('auth.actingAs', 'administrator')
+            ->where('auth.profiles', ['member', 'administrator']));
 });
 
-test('someone acting as member who loses household and commissions acts as administrator on the next request', function () {
-    $household = Household::factory()->create();
-    $user = User::factory()->owner()->member($household)->create();
+test('someone acting as member who loses household and commissions acts as administrator on the next request', function (bool $hasHousehold, bool $hasCommission) {
+    $user = User::factory()->owner()->memberWithoutHousehold()->create();
+    $commission = Commission::factory()->create();
+    $hasHousehold && $user->member->update(['household_id' => Household::factory()->create()->id]);
+    $hasCommission && $commission->members()->attach($user->member);
     $this->actingAs($user)->withSession(['active_profile' => 'member'])->get(route('dashboard'))->assertOk();
 
     $user->member->update(['household_id' => null]);
+    $commission->members()->detach($user->member);
 
-    $this->get(route('admin.home'))->assertOk();
+    $this->get(route('admin.home'))->assertOk()
+        ->assertInertia(fn (Assert $page) => $page->where('auth.actingAs', 'administrator'));
+})->with([
+    'household only' => [true, false],
+    'commission only' => [false, true],
+    'household and commission' => [true, true],
+]);
+
+test('an administrator without a usable member profile cannot choose the member profile', function () {
+    $user = User::factory()->owner()->memberWithoutHousehold()->create();
+
+    $this->actingAs($user)
+        ->post(route('active-profile.update'), ['profile' => 'member'])
+        ->assertSessionHasErrors('profile');
 });
 
 test('an administrator with a usable member profile still chooses after signing in', function () {

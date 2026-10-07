@@ -16,14 +16,14 @@ class WaitingForHousehold
 {
     public function __construct(
         private readonly ActiveProfile $activeProfile,
-        private readonly MemberRoles $memberRoles,
+        private readonly UsableMember $usableMember,
     ) {}
 
     public function isWaiting(User $user): bool
     {
         $member = $user->member;
 
-        if ($member === null || ! $member->is_active || $member->household_id !== null) {
+        if ($member === null || ! $member->is_active) {
             return false;
         }
 
@@ -31,6 +31,6 @@ class WaitingForHousehold
             return false;
         }
 
-        return ! $this->memberRoles->isInAnyCommission($member);
+        return ! $this->usableMember->check($member);
     }
 }
