@@ -183,6 +183,9 @@ return [
         'password' => 'contrasenya',
         'current_password' => 'contrasenya actual',
         'password_confirmation' => 'confirmació de la contrasenya',
+        'phone' => 'telèfon',
+        'household_id' => 'unitat familiar',
+        'commission_ids' => 'comissions',
     ],
 
 ];

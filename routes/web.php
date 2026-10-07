@@ -74,6 +74,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::middleware('can:manage-membership')->prefix('members')->name('members.')->group(function () {
         Route::get('/', [MemberController::class, 'index'])->name('index');
+        Route::post('/', [MemberController::class, 'store'])->name('store');
         Route::patch('{member}', [MemberController::class, 'update'])->name('update');
         Route::patch('{member}/household', [MemberHouseholdController::class, 'update'])->name('household.update');
         Route::post('{member}/deactivate', [MemberController::class, 'deactivate'])->name('deactivate');
