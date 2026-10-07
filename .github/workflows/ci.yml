@@ -105,7 +105,7 @@ jobs:
           --health-interval 5s
           --health-timeout 5s
           --health-retries 10
-      # Catches the emails the browser test reads the invitation and the sign-in code from.
+      # Catches the emails the browser test reads the welcome email and the sign-in code from.
       mailpit:
         image: axllent/mailpit:v1.22
         ports:

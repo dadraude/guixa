@@ -24,8 +24,8 @@ function assertDisposableDatabase(): void {
 }
 
 /**
- * Starts every run from an empty database and mailbox, with one pending
- * invitation. The database is wiped, so it must be a throwaway one.
+ * Starts every run from an empty database and mailbox, with one member
+ * created in a household. The database is wiped, so it must be a throwaway one.
  */
 export default async function globalSetup(): Promise<void> {
     assertDisposableDatabase();
