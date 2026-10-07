@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
 #[Signature('guixa:create-owner {email : The owner\'s email address} {name : The owner\'s full name}')]
-#[Description('Create the owner, the first administrator, and email them a magic link')]
+#[Description('Create the owner (an active member and the first administrator) and email them a magic link')]
 class CreateOwner extends Command
 {
     public function handle(MagicLinkBroker $magicLinks): int
@@ -44,6 +44,8 @@ class CreateOwner extends Command
 
         DB::transaction(function () use ($email, $name, $magicLinks) {
             $owner = User::create(['email' => $email, 'name' => $name]);
+            // Every user is a member, the owner included; no household until they join one.
+            $owner->member()->create(['household_id' => null, 'is_active' => true]);
             $owner->administrator()->create(['is_owner' => true]);
 
             $magicLinks->send($owner);

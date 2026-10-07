@@ -18,7 +18,9 @@ test('the command creates the owner and emails them a magic link', function () {
     expect($owner->name)->toBe('Anna Puig')
         ->and($owner->password)->toBeNull()
         ->and($owner->administrator->is_owner)->toBeTrue()
-        ->and($owner->administrator->is_active)->toBeTrue();
+        ->and($owner->administrator->is_active)->toBeTrue()
+        ->and($owner->member->is_active)->toBeTrue()
+        ->and($owner->member->household_id)->toBeNull();
 
     Mail::assertQueued(MagicLinkMail::class, fn (MagicLinkMail $mail) => $mail->hasTo('anna@example.com'));
 });

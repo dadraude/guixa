@@ -133,20 +133,26 @@ test('an email that belongs to an inactive member points to reactivating them', 
         ->assertSessionHasErrors(['email' => __('This member is inactive: reactivate them instead of creating a new one.')]);
 });
 
-test('an email that belongs to a user without a member profile attaches the profile and sends no email', function () {
-    $owner = User::factory()->owner()->create(['email' => 'maria@example.com', 'name' => 'Maria Owner']);
-    $household = Household::factory()->create();
+test('the owner\'s email is rejected: no profile is attached and no email is sent', function () {
+    $owner = User::factory()->owner()->memberWithoutHousehold()->create(['email' => 'maria@example.com']);
 
-    $this->actingAs($owner)
-        ->post(route('members.store'), newMemberData(['name' => 'Other Name', 'household_id' => $household->id]))
-        ->assertRedirect(route('members.index'));
+    $this->actingAs(membershipRoleUser())
+        ->post(route('members.store'), newMemberData(['email' => 'MARIA@Example.com']))
+        ->assertSessionHasErrors(['email' => __('This email already belongs to a member.')]);
 
-    $owner->refresh();
+    expect(User::count())->toBe(2)->and($owner->fresh()->member()->count())->toBe(1);
 
-    expect(User::count())->toBe(1)
-        ->and($owner->name)->toBe('Maria Owner')
-        ->and($owner->member->household_id)->toBe($household->id)
-        ->and($owner->member->is_active)->toBeTrue();
+    Mail::assertNothingQueued();
+});
+
+test('an email that belongs to a user without a member profile is rejected', function () {
+    $admin = User::factory()->administrator()->create(['email' => 'maria@example.com']);
+
+    $this->actingAs($admin)
+        ->post(route('members.store'), newMemberData())
+        ->assertSessionHasErrors('email');
+
+    expect(User::count())->toBe(1)->and($admin->fresh()->member)->toBeNull();
 
     Mail::assertNothingQueued();
 });

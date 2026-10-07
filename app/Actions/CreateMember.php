@@ -15,9 +15,9 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
 
 /**
- * Creates a member by hand (ADR 0008). An email that already belongs to a user
- * without a member profile (the owner) gets the profile attached and no
- * welcome email, since that person already knows how to sign in.
+ * Creates a member by hand (ADR 0008). Every user has a member profile, the
+ * owner included, so any email that already belongs to a user is rejected and
+ * no profile is ever attached to an existing user.
  *
  * The household is locked like "change household" does, so it cannot be
  * deactivated between the check and the insert. Anything that can change
@@ -51,22 +51,19 @@ class CreateMember
 
         $user = User::query()->where('email', mb_strtolower($email))->lockForUpdate()->first();
 
-        if ($user?->member !== null) {
-            throw $this->emailError($user->member->is_active
-                ? __('This email already belongs to a member.')
-                : __('This member is inactive: reactivate them instead of creating a new one.'));
+        if ($user !== null) {
+            throw $this->emailError($user->member?->is_active === false
+                ? __('This member is inactive: reactivate them instead of creating a new one.')
+                : __('This email already belongs to a member.'));
         }
 
-        $isNewUser = $user === null;
-        $user ??= User::create(['name' => $name, 'email' => $email]);
+        $user = User::create(['name' => $name, 'email' => $email]);
 
         $member = $user->member()->create(['phone' => $phone, 'household_id' => $householdId, 'is_active' => true]);
         $member->commissions()->attach($commissionIds);
 
-        if ($isNewUser) {
-            // Queued after commit (ShouldQueueAfterCommit), so it is safe inside the transaction.
-            Mail::to($user)->queue(new WelcomeMail(route('login'), $name));
-        }
+        // Queued after commit (ShouldQueueAfterCommit), so it is safe inside the transaction.
+        Mail::to($user)->queue(new WelcomeMail(route('login'), $name));
 
         return $member;
     }
