@@ -4,23 +4,11 @@ declare(strict_types=1);
 
 use App\Actions\ReactivateMember;
 use App\Auth\Profile;
-use App\Auth\Role;
 use App\Auth\SecretHasher;
-use App\Models\Commission;
 use App\Models\Household;
 use App\Models\User;
 use Illuminate\Validation\ValidationException;
 use Inertia\Testing\AssertableInertia as Assert;
-
-function membershipRoleUser(): User
-{
-    $user = User::factory()->member(Household::factory()->create())->create();
-    $commission = Commission::factory()->create();
-    $commission->assignRole(Role::Membership);
-    $commission->members()->attach($user->member->fresh());
-
-    return $user->fresh();
-}
 
 function memberAdministrator(?Household $household = null): User
 {
