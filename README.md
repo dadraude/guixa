@@ -48,11 +48,12 @@ npm run check                 # Oxlint and Oxfmt (Vite+)
 npm run types:check           # vue-tsc
 ```
 
-End-to-end tests (Playwright, `e2e/`) drive a real browser through the critical path: a member is created with a household, the
-welcome email arrives, they sign in with the 6-digit code of a magic link, set a password,
-sign out and sign in with the password. They need [Mailpit](https://mailpit.axllent.org) (SMTP on 1025, web API on 8025, e.g.
-`docker run -d -p 1025:1025 -p 8025:8025 axllent/mailpit`) and the local `testing` database.
-The run wipes that database (`migrate:fresh`) and refuses any other name or a non-local host.
+End-to-end tests (Playwright, `e2e/`) drive a real browser through the critical path: a member is
+created with a household, the welcome email arrives, they sign in with the 6-digit code of a magic
+link, set a password, sign out and sign in with the password. They need
+[Mailpit](https://mailpit.axllent.org) (SMTP on 1025, web API on 8025, e.g.
+`docker run -d -p 1025:1025 -p 8025:8025 axllent/mailpit`) and the local `testing` database. The run
+wipes that database (`migrate:fresh`) and refuses any other name or a non-local host.
 
 ```sh
 npm run build

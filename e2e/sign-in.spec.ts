@@ -27,6 +27,7 @@ test('a new member signs in with a code from the email, sets a password and sign
     await page.getByTestId('set-password-button').click();
 
     await expect(page).toHaveURL(/\/dashboard$/);
+    await expect(page.getByText('Cal E2E')).toBeVisible();
 
     await page.getByTestId('sidebar-menu-button').click();
     await page.getByTestId('logout-button').click();
@@ -38,4 +39,5 @@ test('a new member signs in with a code from the email, sets a password and sign
     await page.getByTestId('login-button').click();
 
     await expect(page).toHaveURL(/\/dashboard$/);
+    await expect(page.getByText('Cal E2E')).toBeVisible();
 });
