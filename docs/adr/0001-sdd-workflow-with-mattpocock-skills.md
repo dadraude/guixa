@@ -20,6 +20,7 @@ and test-first implementation with review (`/implement`).
 - Domain docs: single `CONTEXT.md` + `docs/adr/` at the root (replaces `docs/decisions/`).
 - All generated artifacts are in English; conversation with the user is in Catalan.
 - Session rules (one goal, `STATUS.md`, commit and push) stay in `CLAUDE.md`.
+  (`STATUS.md` was replaced by Linear project status updates in ADR 0009.)
 
 ## Consequences
 

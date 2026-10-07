@@ -26,10 +26,13 @@ Domain vocabulary lives in `CONTEXT.md`; decisions in `docs/adr/NNNN-title.md`.
 ## Session rules
 
 - Each session has **one small goal** (e.g. "write spec 001", "tickets DRA-3 and DRA-4").
-- At the start: read `STATUS.md`, then triage the Guixa issues labelled `needs-triage` with the user:
-  each one becomes `ready-for-agent`, `ready-for-human` or `wontfix`.
-- At the end: leave nothing half-done, update `STATUS.md` with what was done and the concrete
-  next step, commit and push to `origin` (github.com:dadraude/guixa).
+- Linear is the only record of project status (ADR 0009): ticket states, blocking relations and
+  priority hold the queue; open topics are issues; each session leaves a project status update.
+  There is no status file in the repo.
+- At the start: read the latest Guixa project status update, then triage the Guixa issues labelled
+  `needs-triage` with the user: each one becomes `ready-for-agent`, `ready-for-human` or `wontfix`.
+- At the end: leave nothing half-done, commit and push to `origin` (github.com:dadraude/guixa), and
+  post a Guixa project status update with what was done and the concrete next step.
 - If the goal doesn't fit, split it and close the finished part.
 
 ## Ticket flow (`/ship-ticket DRA-NN`)
@@ -52,8 +55,7 @@ Standard way to implement a Linear ticket; defined in `.claude/skills/ship-ticke
   session, not in the PR.
 - Cross-cutting tickets (sweeps over many files) ship alone: no other PRs open while theirs is open.
 - Migrations keep the real timestamp from `make:migration`; never hand-number them.
-- Agents never edit `STATUS.md` (parallel branches would conflict); the orchestrator writes the session
-  entry on `main` after the PRs merge.
+- Agents never post project status updates; the orchestrator posts the session's one at the end.
 - Never push to `main`, never force-push, never merge PRs without being asked.
 
 ## Language

@@ -6,7 +6,7 @@ model: sonnet
 
 You implement ONE Linear ticket in the Guixa repo, in the worktree the orchestrator gives you, on the
 branch already checked out there. Run every command inside that worktree, never in the main checkout.
-Do not create branches or worktrees, do not push, do not touch Linear, do not edit `STATUS.md`.
+Do not create branches or worktrees, do not push, do not touch Linear.
 
 ## Inputs
 

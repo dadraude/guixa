@@ -20,6 +20,11 @@ the agents do the heavy work and you keep a short thread. Talk to the user in Ca
      user can test there. `git worktree add ../guixa-worktrees/dra-NN -b <branch> <base>`, then in it
      copy `.env` from the main checkout, `composer install` and `npm ci`. Every later step (agents,
      merges, checks, push) runs inside that worktree.
+   - In the worktree, `php` must be 8.5: Herd's isolation only covers the main checkout, and the global
+     `php` is 8.4. Put a `php` symlink to Herd's `php85` first on `PATH` before `composer install`
+     (the Vite Wayfinder plugin also calls `php`), and tell the agents to keep it there.
+   - With tickets running in parallel, give each worktree its own test database: tell the agents to run
+     the suite as `DB_DATABASE=testing_draNN php artisan test`.
 3. **Cross-cutting tickets ship alone.** If the ticket touches many files outside its own feature
    (formatter or linter sweeps, strict types, mass renames, moving folders), check `gh pr list`: with
    other PRs open, tell the user and ask whether to wait until they merge. Once its PR is open, do not
@@ -67,9 +72,10 @@ title `type(scope): description (DRA-NN)` and a short body that links each follo
 (`git worktree remove ../guixa-worktrees/dra-NN`); the branch stays. If the PR needs more work later,
 add a new worktree for it.
 
-## 5. Status file
+## 5. Session status
 
-Agents never edit `STATUS.md`. After the PRs merge, write one session entry on `main` yourself.
+Agents never post project status updates. At the end of the session, post one Guixa project status
+update yourself (see `docs/agents/issue-tracker.md`).
 
 ## Guardrails
 

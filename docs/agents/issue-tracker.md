@@ -32,6 +32,17 @@ Linear run the same check before their first Linear call.
 - **Close**: set `state: "Done"` (or `"Canceled"` for wontfix) with a closing comment.
 - Workflow states: Backlog → Todo → In Progress → Done.
 
+## Project status (ADR 0009)
+
+- Linear is the only record of project status; there is no status file in the repo.
+- **Session update**: at the end of each session, one Guixa project status update
+  (`save_status_update`, `type: "project"`, project Guixa) whose body starts with
+  `**Session NN (YYYY-MM-DD)**`: what was done
+  (tickets and PRs by identifier, decisions with their ADR or `decisions.md` entry) and the
+  concrete next step. Read the latest one with `get_status_updates` at the start of a session.
+- **Open topics** (questions, decisions to take, manual checks) are issues in project Guixa,
+  never only text in a status update.
+
 ## When a skill says "publish to the issue tracker"
 
 - `/to-spec` → write `specs/NNN-<feature-slug>/spec.md` in the repo (NOT Linear), with `Status: draft`.
