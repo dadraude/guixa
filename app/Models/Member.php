@@ -16,18 +16,19 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Carbon;
 
 /**
- * The member profile of a user: belongs to exactly one household. Name and
- * email live on the user, the sign-in identity.
+ * The member profile of a user: belongs to at most one household (none while
+ * they wait for one to be assigned). Name and email live on the user, the
+ * sign-in identity.
  *
  * @property string $id
  * @property string $user_id
- * @property string $household_id
+ * @property string|null $household_id
  * @property string|null $phone
  * @property bool $is_active
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read User $user
- * @property-read Household $household
+ * @property-read Household|null $household
  */
 #[Fillable(['household_id', 'phone', 'is_active'])]
 class Member extends Model

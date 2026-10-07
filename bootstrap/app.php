@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Middleware\EnsureMemberIsNotWaiting;
 use App\Http\Middleware\EnsurePasswordIsSet;
 use App\Http\Middleware\EnsureProfileIsChosen;
 use App\Http\Middleware\HandleAppearance;
@@ -29,6 +30,7 @@ return Application::configure(basePath: dirname(__DIR__))
             SignOutUsersWhoMayNotSignIn::class,
             EnsurePasswordIsSet::class,
             EnsureProfileIsChosen::class,
+            EnsureMemberIsNotWaiting::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

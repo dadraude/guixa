@@ -36,6 +36,11 @@ import type { NavItem } from '@/types';
 const page = usePage();
 
 const mainNavItems = computed<NavItem[]>(() => {
+    // Someone waiting for a household can reach none of the app's pages.
+    if (page.props.auth.isWaiting) {
+        return [];
+    }
+
     const isAdministrator = page.props.auth.actingAs === 'administrator';
     // Administrators and members with the membership role manage the same things.
     const managesMembership =

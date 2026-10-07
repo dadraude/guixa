@@ -6,6 +6,7 @@ namespace App\Http\Middleware;
 
 use App\Auth\ActiveProfile;
 use App\Auth\Profile;
+use App\Auth\WaitingForHousehold;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -49,6 +50,7 @@ class HandleInertiaRequests extends Middleware
                 'user' => $user,
                 'isOwner' => $user !== null && $activeProfile->isActingAsOwner($user),
                 'canManageMembership' => $user !== null && $user->can('manage-membership'),
+                'isWaiting' => $user !== null && app(WaitingForHousehold::class)->isWaiting($user),
                 'actingAs' => $user === null ? null : $activeProfile->current($user)?->value,
                 'profiles' => $user === null ? [] : array_map(fn (Profile $profile) => $profile->value, $activeProfile->available($user)),
             ],

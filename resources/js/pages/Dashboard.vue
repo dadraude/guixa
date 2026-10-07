@@ -57,8 +57,11 @@ defineOptions({
                     </li>
                 </ul>
             </div>
-
-            <MyCommissions :commissions="commissions" />
         </template>
+
+        <MyCommissions
+            v-if="household !== null || commissions.length > 0"
+            :commissions="commissions"
+        />
     </div>
 </template>
