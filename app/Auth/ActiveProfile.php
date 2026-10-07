@@ -18,7 +18,7 @@ class ActiveProfile
 
     public function __construct(
         private readonly Session $session,
-        private readonly MemberRoles $memberRoles,
+        private readonly UsableMember $usableMember,
     ) {}
 
     /**
@@ -51,7 +51,11 @@ class ActiveProfile
 
         $member = $user->member;
 
-        return $member?->household_id !== null || ($member !== null && $this->memberRoles->isInAnyCommission($member));
+        if ($member === null) {
+            return false;
+        }
+
+        return $this->usableMember->check($member);
     }
 
     /**
