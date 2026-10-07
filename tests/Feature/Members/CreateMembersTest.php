@@ -134,7 +134,7 @@ test('an email that belongs to an inactive member points to reactivating them', 
 });
 
 test('the owner\'s email is rejected: no profile is attached and no email is sent', function () {
-    $owner = User::factory()->owner()->memberWithoutHousehold()->create(['email' => 'maria@example.com']);
+    $owner = User::factory()->owner()->create(['email' => 'maria@example.com']);
 
     $this->actingAs(membershipRoleUser())
         ->post(route('members.store'), newMemberData(['email' => 'MARIA@Example.com']))
@@ -150,7 +150,7 @@ test('an email that belongs to a user without a member profile is rejected', fun
 
     $this->actingAs($admin)
         ->post(route('members.store'), newMemberData())
-        ->assertSessionHasErrors('email');
+        ->assertSessionHasErrors(['email' => __('This email already belongs to a member.')]);
 
     expect(User::count())->toBe(1)->and($admin->fresh()->member)->toBeNull();
 

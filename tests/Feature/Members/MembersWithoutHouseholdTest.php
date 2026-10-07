@@ -217,7 +217,7 @@ test('the settings shortcut leads a waiting member to their profile', function (
 });
 
 test('an administrator whose member profile has no household and no commission signs in straight as administrator', function () {
-    $user = User::factory()->owner()->memberWithoutHousehold()->create();
+    $user = User::factory()->owner()->create();
 
     $this->post(route('login.store'), ['email' => $user->email, 'password' => 'password'])
         ->assertRedirect(route('home'));
@@ -228,7 +228,7 @@ test('an administrator whose member profile has no household and no commission s
 });
 
 test('an administrator who gains a household mid-session keeps acting as administrator and gets the switcher', function () {
-    $user = User::factory()->owner()->memberWithoutHousehold()->create();
+    $user = User::factory()->owner()->create();
     $this->actingAs($user)->get(route('admin.home'))->assertOk();
 
     $user->member->update(['household_id' => Household::factory()->create()->id]);
@@ -240,7 +240,7 @@ test('an administrator who gains a household mid-session keeps acting as adminis
 });
 
 test('an administrator who gains a commission mid-session keeps acting as administrator and gets the switcher', function () {
-    $user = User::factory()->owner()->memberWithoutHousehold()->create();
+    $user = User::factory()->owner()->create();
     $this->actingAs($user)->get(route('admin.home'))->assertOk();
 
     Commission::factory()->create()->members()->attach($user->member);
@@ -252,7 +252,7 @@ test('an administrator who gains a commission mid-session keeps acting as admini
 });
 
 test('someone acting as member who loses household and commissions acts as administrator on the next request', function (bool $hasHousehold, bool $hasCommission) {
-    $user = User::factory()->owner()->memberWithoutHousehold()->create();
+    $user = User::factory()->owner()->create();
     $commission = Commission::factory()->create();
     $hasHousehold && $user->member->update(['household_id' => Household::factory()->create()->id]);
     $hasCommission && $commission->members()->attach($user->member);
@@ -270,7 +270,7 @@ test('someone acting as member who loses household and commissions acts as admin
 ]);
 
 test('an administrator without a usable member profile cannot choose the member profile', function () {
-    $user = User::factory()->owner()->memberWithoutHousehold()->create();
+    $user = User::factory()->owner()->create();
 
     $this->actingAs($user)
         ->post(route('active-profile.update'), ['profile' => 'member'])

@@ -145,6 +145,18 @@ test('nobody deactivates the owner member profile', function (User $actor) {
     'membership role' => fn () => membershipRoleUser(),
 ]);
 
+test('nobody deactivates the owner member profile when the owner has no household', function (User $actor) {
+    $owner = User::factory()->owner()->create();
+
+    $this->actingAs($actor)->post(route('members.deactivate', $owner->member))->assertForbidden();
+
+    expect($owner->fresh()->canSignIn())->toBeTrue()
+        ->and($owner->member->fresh()->is_active)->toBeTrue();
+})->with([
+    'administrator' => fn () => User::factory()->administrator()->create(),
+    'membership role' => fn () => membershipRoleUser(),
+]);
+
 test('nobody deactivates a household the owner belongs to', function (User $actor) {
     $household = Household::factory()->create();
     $owner = ownerWithMember($household);
