@@ -243,14 +243,15 @@ Guixa gets the membership foundation every later feature builds on:
   while acting as administrator and places no orders. A global authorization rule lets
   administrators pass every check.
 - The **owner** is the administrator created by a console command from an email and name;
-  the command sends them a magic link and refuses to run if an owner already exists. There is
-  exactly one owner.
+  the command creates them as an active member with no household and adds the administrator
+  profile, sends them a magic link and refuses to run if an owner already exists. There is
+  exactly one owner (amended 2026-10-07, DRA-75).
 - Only the owner adds and removes other administrators. The owner cannot be deactivated or
   removed from the app; changing the owner is done on the server.
 - Administrators are no longer created by email: the owner adds the administrator profile to
   an existing **active** member (ADR 0008). Removing it ends their open administrator sessions
-  and keeps the history of what they did. Apart from the owner, every user has a member
-  profile.
+  and keeps the history of what they did. Every user, the owner included, has a member
+  profile (amended 2026-10-07, DRA-75).
 - Any user with no password (the owner, a new member) is sent to a "set your password" screen
   after signing in and cannot continue until they set one; after it, a member with no
   household and no commission goes to the waiting screen.
@@ -282,10 +283,10 @@ Guixa gets the membership foundation every later feature builds on:
 - There are no invitations (ADR 0008). The owner, administrators and members with the
   membership role create members by hand: name, email, optional phone, and optionally a
   household (active households only) and commissions.
-- Creating a member with an email that already belongs to a member is rejected. If the email
-  belongs to a user without a member profile (only the owner can be one), the member profile
-  is attached to that user and no welcome email is sent. An email that belongs to an inactive
-  member is rejected with a message pointing to reactivating that member.
+- Creating a member with an email that already belongs to a member is rejected. Since every
+  user has a member profile, this covers every existing email: no member profile is ever
+  attached to an existing user (amended 2026-10-07, DRA-75). An email that belongs to an
+  inactive member is rejected with a message pointing to reactivating that member.
 - A double submit or a race on the same email ends as a validation error on the email field.
 - New members are created active. Creating a member with a household locks that household as
   "change household" does; a household that is no longer active, or a household or commission
@@ -432,3 +433,7 @@ Guixa gets the membership foundation every later feature builds on:
   hand (ADR 0008); members may have no household; administrators are added by promoting
   members. The app is not in production, so no data migration is needed; the invitation code
   and tests built in DRA-15/DRA-16 and the e2e path built in DRA-23 are replaced.
+- **Amendment of 2026-10-07 (DRA-75):** the owner is also a member. The console command creates
+  the owner as an active member with no household plus the administrator profile, so every user
+  has a member profile and creating a member with any existing email is rejected; nobody can
+  create or update a member with an email that already belongs to someone else.

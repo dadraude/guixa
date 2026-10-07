@@ -27,7 +27,7 @@ _Catalan (UI)_: unitat familiar inactiva
 _Avoid_: Deleted household, former member
 
 **Administrator**:
-A profile that can do everything in the app; acting as administrator is outside any household and places no orders. Apart from the owner, every administrator is a member to whom the owner has added the administrator profile.
+A profile that can do everything in the app; acting as administrator is outside any household and places no orders. Every administrator is a member: the owner is created as a member by the console command, and the others are members to whom the owner has added the administrator profile.
 _Catalan (UI)_: administrador/a
 _Avoid_: Superadmin, root, admin member
 
