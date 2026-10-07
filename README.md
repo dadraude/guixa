@@ -13,7 +13,7 @@ software.
 - [Principles](docs/principles.md): technical decisions and rules for the whole project.
 - [Architecture decisions](docs/adr/): ADRs, one per significant decision.
 - [Specs](specs/): one folder per feature (`NNN-name/spec.md`).
-- [Status](STATUS.md): what has been done and the next step.
+- Status: what has been done and the next step lives in Linear (project Guixa status updates).
 
 ## How we work
 

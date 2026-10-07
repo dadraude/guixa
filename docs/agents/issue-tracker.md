@@ -24,13 +24,37 @@ Linear run the same check before their first Linear call.
 
 - **Create**: `save_issue` with `team: "Draude"`, `project: "Guixa"`, a title,
   and a body that starts with `Spec: specs/NNN-<feature-slug>/spec.md` (plus a
-  `links` entry to the file on GitHub: `https://github.com/dadraude/guixa/blob/main/specs/…`).
+  `links` entry to the file on GitHub: `https://github.com/dadraude/guixa/blob/main/specs/…`),
+  and `milestone` set to the spec's milestone (see Milestones).
 - **Blocking**: native Linear relations via `blockedBy` / `blocks`.
 - **Read**: `get_issue` with the identifier (e.g. `DRA-12`), plus `list_comments`.
 - **List**: `list_issues` filtered by `project: "Guixa"` and label/state.
 - **Comment**: `save_comment`. **Labels**: `addLabels` / `removeLabels`.
 - **Close**: set `state: "Done"` (or `"Canceled"` for wontfix) with a closing comment.
 - Workflow states: Backlog → Todo → In Progress → Done.
+
+## Project status (ADR 0009)
+
+- Linear is the only record of project status; there is no status file in the repo.
+- **Session update**: at the end of each session, one Guixa project status update
+  (`save_status_update`, `type: "project"`, project Guixa) whose body starts with
+  `**Session NN (YYYY-MM-DD)**`: what was done
+  (tickets and PRs by identifier, decisions with their ADR or `decisions.md` entry) and the
+  concrete next step. Read the latest one with `get_status_updates` at the start of a session.
+- **Open topics** (questions, decisions to take, manual checks) are issues in project Guixa,
+  never only text in a status update.
+
+## Milestones
+
+Milestones group tickets and show progress; the order of work still comes from blocking relations.
+
+- **One per spec**, named `NNN Feature name` (e.g. `001 Households, members and commissions`),
+  created with `save_milestone` when the spec is approved. It holds the spec's tickets, its
+  amendments and their review follow-ups.
+- **`Ready to go live`**: what must be settled before production (backups, data migration, CI
+  protection), independent of any spec.
+- No milestone for tooling and process work (linters, agents, review flow).
+- A follow-up created during review takes its parent ticket's milestone.
 
 ## When a skill says "publish to the issue tracker"
 
