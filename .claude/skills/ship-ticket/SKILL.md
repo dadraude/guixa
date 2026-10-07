@@ -33,6 +33,9 @@ the agents do the heavy work and you keep a short thread. Talk to the user in Ca
 
 ## 2. Implement
 
+Every `ticket-implementer` launch in this flow passes `model: "sonnet"`; never implement inline in the
+main session or with the plugin's `/implement`.
+
 Launch the `ticket-implementer` agent with the full ticket (id, title, description, acceptance
 criteria), the branch and the worktree path. Wait for its report. If it could not commit, stop and tell the user.
 
@@ -46,8 +49,8 @@ only runs the full checks (step 5 of its flow) and fixes what breaks.
 
 ## 3. Independent review
 
-Launch both reviewers in parallel (one message, two agents), each with the ticket and the base ref
-(`main`, or the blocker's branch):
+Launch both reviewers in parallel (one message, two agents), each with `model: "opus"`, the ticket and
+the base ref (`main`, or the blocker's branch):
 - `ticket-reviewer`: spec coverage and standards.
 - `ticket-correctness-reviewer`: bugs and security.
 
