@@ -31,7 +31,9 @@ Linear run the same check before their first Linear call.
 - **List**: `list_issues` filtered by `project: "Guixa"` and label/state.
 - **Comment**: `save_comment`. **Labels**: `addLabels` / `removeLabels`.
 - **Close**: set `state: "Done"` (or `"Canceled"` for wontfix) with a closing comment.
-- Workflow states: Backlog → Todo → In Progress → Done.
+- Workflow states: Backlog → Todo → In Progress → In Review → Done.
+- **Todo is the current session's scope**: issues move there when the session picks them and leave it
+  before the session ends (In Review, Done, or back to Backlog). Outside a session, Todo is empty.
 
 ## Project status (ADR 0009)
 
