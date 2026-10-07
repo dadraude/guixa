@@ -45,7 +45,7 @@ class MembershipRoleProtection
 
     public function mayDeactivateMember(User $actor, Member $member): bool
     {
-        return $this->mayTakeAway($actor) || ! $this->memberRoles->memberHas($member, Role::Membership);
+        return $this->mayTakeAway($actor) || $this->mayBeDeactivatedByMembershipRole($member);
     }
 
     /**
@@ -57,7 +57,18 @@ class MembershipRoleProtection
             return true;
         }
 
-        return $household->members()->get()->every(fn (Member $member) => ! $this->memberRoles->memberHas($member, Role::Membership));
+        return $household->members()->with('user.administrator')->get()->every(fn (Member $member) => $this->mayBeDeactivatedByMembershipRole($member));
+    }
+
+    /**
+     * Whether the membership role may deactivate this member: not when they hold the
+     * membership role (DRA-34) nor when they are an administrator, since that would
+     * stop them acting as administrator.
+     */
+    private function mayBeDeactivatedByMembershipRole(Member $member): bool
+    {
+        return ! $this->memberRoles->memberHas($member, Role::Membership)
+            && $member->user->administrator === null;
     }
 
     private function mayTakeAway(User $actor): bool

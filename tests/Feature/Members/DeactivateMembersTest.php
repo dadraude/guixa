@@ -77,21 +77,6 @@ test('a deactivated member is refused at sign-in by password, code and link', fu
     $this->assertGuest();
 });
 
-test('a deactivated member who is an active administrator still signs in, only as administrator', function () {
-    $member = activeMemberIn(Household::factory()->create(), ['password' => 'secret-password-1']);
-    $member->user->administrator()->create(['is_active' => true]);
-
-    $this->actingAs(membershipStaff())->post(route('members.deactivate', $member));
-    auth()->logout();
-
-    $this->post(route('login.store'), ['email' => $member->user->email, 'password' => 'secret-password-1'])
-        ->assertSessionHasNoErrors();
-    $this->assertAuthenticatedAs($member->user);
-
-    $this->get(route('home'))->assertRedirect(route('admin.home'));
-    $this->get(route('admin.home'))->assertOk();
-});
-
 test('reactivating a member keeps their history and works while the household is active', function () {
     $member = activeMemberIn(Household::factory()->create());
     $member->update(['is_active' => false]);
