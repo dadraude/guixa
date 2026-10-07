@@ -90,8 +90,8 @@ test('an administrator can change the email of a member with the membership role
 test('an administrator cannot change the email of another administrator or of the owner', function () {
     $administrator = User::factory()->administrator()->create();
     $otherAdministrator = levelsAdministratorTarget();
-    $owner = User::factory()->owner()->create();
-    $ownerAsMember = Member::factory()->for($owner)->create(['household_id' => Household::factory()->create()->id, 'is_active' => true]);
+    $owner = User::factory()->member(Household::factory()->create())->owner()->create();
+    $ownerAsMember = $owner->member;
 
     $otherEmail = $otherAdministrator->user->email;
     $ownerEmail = $owner->email;
@@ -128,8 +128,8 @@ test('the membership role cannot change the email of a member with the role, an 
     $actor = levelsMembershipUser();
     $membership = levelsMembershipTarget();
     $administrator = levelsAdministratorTarget();
-    $owner = User::factory()->owner()->create();
-    $ownerAsMember = Member::factory()->for($owner)->create(['household_id' => Household::factory()->create()->id, 'is_active' => true]);
+    $owner = User::factory()->member(Household::factory()->create())->owner()->create();
+    $ownerAsMember = $owner->member;
 
     $emails = [$membership->user->email, $administrator->user->email, $owner->email];
 
