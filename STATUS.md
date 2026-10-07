@@ -224,12 +224,24 @@
   Decisions D1–D9 in the spec's `decisions.md`. `/to-tickets` created DRA-51 to DRA-58;
   DRA-40 closed as a duplicate of DRA-54. PR #42: every session checks with `get_workspace`
   that Linear is the `Draude` workspace before any Linear call.
+- **Session 22 (2026-10-07):** DRA-51 and DRA-52 shipped in parallel and merged (PRs #44, #45).
+  DRA-51: `members.household_id` nullable; a member with no household and no commission is held
+  on a waiting screen (profile, password, appearance, profile switch, sign out); spec amended so
+  the waiting screen also allows the light/dark theme. DRA-52: other people's emails change by
+  levels (owner > administrator > membership role), applied immediately. Review found a takeover
+  path (the membership role removes a colleague's role, then changes their email); the user
+  decided that only an administrator or the owner takes the membership role away (removing from
+  such a commission, deactivating a member or household holding it, deleting such a commission),
+  added to DRA-52 as a criterion. Follow-ups DRA-59 to DRA-62 (`needs-triage`). Worktrees need
+  PHP 8.5 on PATH (the global `php` is 8.4), `npm run build` before tests, and their own
+  `DB_DATABASE` when tickets run in parallel.
 
 ## Next step
 
-**Session 22:** `/ship-ticket` the spec 001 amendment, a few per session, starting with the
-unblocked DRA-51 (members without a household) and DRA-52 (emails by levels); then DRA-53 →
-DRA-56, DRA-55 → DRA-57, DRA-58, and DRA-54 after DRA-31. Other `ready-for-agent` issues:
+**Session 23:** triage DRA-59 to DRA-62. Then `/ship-ticket` the rest of the spec 001
+amendment, unblocked by DRA-51: DRA-53 → DRA-56, DRA-55 → DRA-57, DRA-58, and DRA-54 after
+DRA-31. Open question from DRA-52: the membership role cannot remove itself from a commission
+holding the membership role, even when it holds the role through another one. Other `ready-for-agent` issues:
 DRA-37 then DRA-36, DRA-39, DRA-42 then DRA-31, DRA-45, DRA-47, DRA-48, DRA-50. Invitation
 tickets in flight are obsolete: DRA-56 removes the feature. DRA-49 needs a human decision on
 the review learning process. Check that `e2e` is a required status check in the `main` branch
