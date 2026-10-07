@@ -14,6 +14,11 @@ Technical decisions and rules for the whole project. Domain terms are defined in
 - **Monolith: Laravel + Inertia + Vue 3 (TypeScript)** on **PostgreSQL**. One codebase,
   server-side routing, policies and validation; no separate API. See
   [ADR 0002](adr/0002-laravel-inertia-monolith-with-offline-islands.md).
+- **SOLID and DDD.** The domain (`Models`, `Auth`) and the use cases (`Actions`) do not depend on
+  delivery code (`Http`, `Console`, `Providers`, Inertia), and `Models` and `Mail` do not depend on
+  `Actions`. Classes stay small enough for one responsibility. Dependencies point inwards only.
+  Rules that can be checked statically are Pest architecture tests; see
+  [ADR 0010](adr/0010-solid-and-ddd-enforced-by-arch-tests.md).
 - **Base:** Laravel 13 from the official **Vue starter kit** (Inertia, Tailwind, shadcn-vue,
   Wayfinder). Sign-in uses **Fortify** for passwords and rate limits; the magic link and
   member creation are our own code. See [ADR 0006](adr/0006-vue-starter-kit-with-fortify.md).
