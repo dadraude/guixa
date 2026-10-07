@@ -12,6 +12,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Members\UpdateMemberRequest;
 use App\Models\Household;
 use App\Models\Member;
+use App\Support\CatalanCollation;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -24,10 +25,12 @@ class MemberController extends Controller
     {
         $actor = $request->user() ?? abort(403);
 
+        $collation = new CatalanCollation;
+
         $members = Member::query()
             ->with('user')
             ->get()
-            ->sortBy(fn (Member $member) => mb_strtolower($member->user->name))
+            ->sort(fn (Member $a, Member $b) => $collation->compare($a->user->name, $b->user->name))
             ->values()
             ->map(fn (Member $member) => [
                 'id' => $member->id,

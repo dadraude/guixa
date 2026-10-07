@@ -148,6 +148,18 @@ test('the members page lists members with their household and the active househo
             ->has('households', 2));
 });
 
+test('the members page sorts members by name ignoring accents and case', function () {
+    $household = Household::factory()->create();
+    foreach (['Zoe', 'Ferran', 'Èric', 'emma', 'Àlex'] as $name) {
+        memberIn($household, ['name' => $name]);
+    }
+    $names = ['Àlex', 'emma', 'Èric', 'Ferran', 'Zoe'];
+
+    $this->actingAs(membershipUser())->get(route('members.index'))
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('members', fn ($members) => collect($members)->pluck('name')->intersect($names)->values()->all() === $names));
+});
+
 test('an immediate email change drops a pending self-service change, so its old link cannot overwrite it', function () {
     $member = memberIn(Household::factory()->create(), ['email' => 'old@example.com']);
     $member->user->forceFill([
