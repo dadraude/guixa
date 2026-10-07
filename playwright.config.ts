@@ -27,7 +27,7 @@ export default defineConfig({
     fullyParallel: false,
     workers: 1,
     forbidOnly: !!process.env.CI,
-    // The test is not idempotent (the invitation is consumed, mail piles up), so a
+    // The test is not idempotent (the member already has a password, mail piles up), so a
     // retry could only fail for the wrong reason.
     retries: 0,
     reporter: process.env.CI ? 'github' : 'list',

@@ -18,7 +18,7 @@ export type Auth = {
     /** The profiles the person may act as; more than one means they can switch. */
     profiles: ActingAs[];
     isOwner: boolean;
-    /** Whether the person manages households, invitations and commissions. */
+    /** Whether the person manages households, members and commissions. */
     canManageMembership: boolean;
     /** A member with no household and no commission, who can only wait. */
     isWaiting: boolean;

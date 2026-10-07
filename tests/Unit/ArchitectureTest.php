@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use App\Actions\InvitationUnavailable;
 use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
@@ -29,8 +28,7 @@ arch('models use UUIDv7 primary keys (ADR 0005)')
 arch('actions expose a handle method')
     ->expect('App\Actions')
     ->classes()
-    ->toHaveMethod('handle')
-    ->ignoring(InvitationUnavailable::class);
+    ->toHaveMethod('handle');
 
 arch('domain code does not depend on the HTTP layer')
     ->expect(['App\Actions', 'App\Auth', 'App\Models', 'App\Mail'])

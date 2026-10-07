@@ -7,7 +7,6 @@ use App\Auth\Profile;
 use App\Auth\Role;
 use App\Models\Commission;
 use App\Models\Household;
-use App\Models\Invitation;
 use App\Models\Member;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -41,7 +40,6 @@ function memberWithRoles(Role ...$roles): Member
 function membershipRequests(): array
 {
     $household = Household::factory()->create(['name' => 'Cal Pere']);
-    $invitation = Invitation::factory()->for($household)->create();
     $commission = Commission::factory()->create(['name' => 'Neteja']);
     $target = Member::factory()->create(['is_active' => true]);
     $other = Household::factory()->create();
@@ -50,10 +48,6 @@ function membershipRequests(): array
         'list households' => [fn (User $user) => test()->actingAs($user)->get(route('households.index')), null],
         'create household' => [fn (User $user) => test()->actingAs($user)->post(route('households.store'), ['name' => 'Nova']), 'households.index'],
         'rename household' => [fn (User $user) => test()->actingAs($user)->patch(route('households.update', $household), ['name' => 'Cal Pere Nou']), 'households.index'],
-        'invite' => [fn (User $user) => test()->actingAs($user)->post(route('households.invitations.store', $household), ['email' => fake()->unique()->safeEmail()]), 'households.index'],
-        'list invitations' => [fn (User $user) => test()->actingAs($user)->get(route('households.invitations.index')), null],
-        'resend invitation' => [fn (User $user) => test()->actingAs($user)->post(route('households.invitations.resend', $invitation)), 'households.invitations.index'],
-        'cancel invitation' => [fn (User $user) => test()->actingAs($user)->delete(route('households.invitations.cancel', $invitation)), 'households.invitations.index'],
         'create commission' => [fn (User $user) => test()->actingAs($user)->post(route('commissions.store'), ['name' => 'Altra']), 'commissions.index'],
         'rename commission' => [fn (User $user) => test()->actingAs($user)->patch(route('commissions.update', $commission), ['name' => 'Neteja 2']), 'commissions.index'],
         'add commission member' => [fn (User $user) => test()->actingAs($user)->post(route('commissions.members.store', $commission), ['member_id' => $target->id]), 'commissions.index'],
@@ -97,7 +91,7 @@ function withAdministratorProfile(Member $member): User
     return $member->user->fresh();
 }
 
-test('a member in a commission with the membership role manages households, invitations and commissions', function () {
+test('a member in a commission with the membership role manages households and commissions', function () {
     expectEveryMembershipRequestToSucceed(memberWithRoles(Role::Membership)->user);
 });
 

@@ -33,14 +33,6 @@ class Household extends Model
     use HasFactory, HasUuids;
 
     /**
-     * @return HasMany<Invitation, $this>
-     */
-    public function invitations(): HasMany
-    {
-        return $this->hasMany(Invitation::class);
-    }
-
-    /**
      * @return HasMany<Member, $this>
      */
     public function members(): HasMany

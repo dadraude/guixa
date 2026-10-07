@@ -14,9 +14,6 @@ use App\Http\Controllers\Commissions\CommissionRoleController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Directory\DirectoryController;
 use App\Http\Controllers\Households\HouseholdController;
-use App\Http\Controllers\Households\InvitationController;
-use App\Http\Controllers\Households\PendingInvitationController;
-use App\Http\Controllers\Invitations\AcceptInvitationController;
 use App\Http\Controllers\Members\MemberController;
 use App\Http\Controllers\Members\MemberHouseholdController;
 use App\Models\User;
@@ -33,11 +30,6 @@ Route::middleware('guest')->group(function () {
         ->name('magic-link.code.store');
     Route::get('magic-link/{token}', [MagicLinkController::class, 'show'])->name('magic-link.show');
     Route::post('magic-link/{token}', [MagicLinkController::class, 'consume'])->name('magic-link.consume');
-});
-
-Route::prefix('invitations')->name('invitations.')->group(function () {
-    Route::get('{token}', [AcceptInvitationController::class, 'show'])->name('show');
-    Route::post('{token}', [AcceptInvitationController::class, 'accept'])->name('accept');
 });
 
 Route::middleware(['auth'])->group(function () {
@@ -63,13 +55,6 @@ Route::middleware(['auth'])->group(function () {
         Route::patch('{household}', [HouseholdController::class, 'update'])->name('update');
         Route::post('{household}/deactivate', [HouseholdController::class, 'deactivate'])->name('deactivate');
         Route::post('{household}/reactivate', [HouseholdController::class, 'reactivate'])->name('reactivate');
-        Route::post('{household}/invitations', [InvitationController::class, 'store'])->name('invitations.store');
-
-        Route::prefix('invitations')->name('invitations.')->group(function () {
-            Route::get('/', [PendingInvitationController::class, 'index'])->name('index');
-            Route::post('{invitation}/resend', [PendingInvitationController::class, 'resend'])->name('resend');
-            Route::delete('{invitation}', [PendingInvitationController::class, 'cancel'])->name('cancel');
-        });
     });
 
     Route::middleware('can:manage-membership')->prefix('members')->name('members.')->group(function () {
