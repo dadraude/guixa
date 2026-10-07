@@ -25,6 +25,9 @@ Domain vocabulary lives in `CONTEXT.md`; decisions in `docs/adr/NNNN-title.md`.
 
 ## Session rules
 
+`/run-session` runs a whole session in this order (open, work, close); defined in
+`.claude/skills/run-session/SKILL.md`.
+
 - Each session has **one small goal** (e.g. "write spec 001", "tickets DRA-3 and DRA-4").
 - Linear is the only record of project status (ADR 0009): ticket states, blocking relations and
   priority hold the queue; open topics are issues; each session leaves a project status update.
