@@ -33,6 +33,7 @@ class RequestEmailChange
 
             Mail::to($newEmail)->queue(new EmailChangeMail(
                 url: route('email-change.show', ['token' => $token]),
+                hours: self::HOURS_VALID,
             ));
         });
     }

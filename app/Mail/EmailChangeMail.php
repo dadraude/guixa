@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Mail;
 
-use App\Actions\RequestEmailChange;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
 use Illuminate\Mail\Mailable;
@@ -15,7 +14,10 @@ class EmailChangeMail extends Mailable implements ShouldQueueAfterCommit
 {
     use Queueable;
 
-    public function __construct(public readonly string $url) {}
+    public function __construct(
+        public readonly string $url,
+        public readonly int $hours,
+    ) {}
 
     public function envelope(): Envelope
     {
@@ -28,7 +30,7 @@ class EmailChangeMail extends Mailable implements ShouldQueueAfterCommit
     {
         return new Content(
             markdown: 'mail.email-change',
-            with: ['hours' => RequestEmailChange::HOURS_VALID],
+            with: ['hours' => $this->hours],
         );
     }
 }

@@ -32,7 +32,24 @@ arch('actions expose a handle method')
 
 arch('domain code does not depend on the HTTP layer')
     ->expect(['App\Actions', 'App\Auth', 'App\Models', 'App\Mail'])
-    ->not->toUse('App\Http');
+    ->not->toUse(['App\Http', 'Illuminate\Http']);
+
+arch('domain code does not depend on console, providers or Inertia (DDD)')
+    ->expect(['App\Actions', 'App\Auth', 'App\Models'])
+    ->not->toUse(['App\Console', 'App\Providers', 'Inertia']);
+
+arch('entities do not depend on use cases or mail (DDD)')
+    ->expect('App\Models')
+    ->not->toUse(['App\Actions', 'App\Mail']);
+
+arch('mail does not depend on use cases, so there are no layer cycles (DDD)')
+    ->expect('App\Mail')
+    ->not->toUse('App\Actions');
+
+arch('classes stay small enough to have one responsibility (SRP)')
+    ->expect(['App\Actions', 'App\Auth', 'App\Models', 'App\Mail'])
+    ->classes()
+    ->toHaveLineCountLessThan(150);
 
 arch('mails are queued after the transaction commits')
     ->expect('App\Mail')
