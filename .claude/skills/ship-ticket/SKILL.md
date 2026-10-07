@@ -57,7 +57,7 @@ If either verdict is `CHANGES REQUESTED`, relay the blockers of both to a new `t
 Then sort every follow-up into one of two buckets, so none lives only in a PR body:
 - **Trivial** (wording, formatting, a comment): fix it in the correction pass, or drop it and say so.
 - **Worth doing**: one Linear issue each in project Guixa, label `needs-triage`, related to the
-  parent ticket, titled with the change to make; body: file:line, the reviewer's finding and the
+  parent ticket and in its milestone, titled with the change to make; body: file:line, the reviewer's finding and the
   suggested fix. Create them after the user approves the PR (step 4), before opening it.
 
 ## 4. Deliver

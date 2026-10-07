@@ -24,7 +24,8 @@ Linear run the same check before their first Linear call.
 
 - **Create**: `save_issue` with `team: "Draude"`, `project: "Guixa"`, a title,
   and a body that starts with `Spec: specs/NNN-<feature-slug>/spec.md` (plus a
-  `links` entry to the file on GitHub: `https://github.com/dadraude/guixa/blob/main/specs/…`).
+  `links` entry to the file on GitHub: `https://github.com/dadraude/guixa/blob/main/specs/…`),
+  and `milestone` set to the spec's milestone (see Milestones).
 - **Blocking**: native Linear relations via `blockedBy` / `blocks`.
 - **Read**: `get_issue` with the identifier (e.g. `DRA-12`), plus `list_comments`.
 - **List**: `list_issues` filtered by `project: "Guixa"` and label/state.
@@ -42,6 +43,18 @@ Linear run the same check before their first Linear call.
   concrete next step. Read the latest one with `get_status_updates` at the start of a session.
 - **Open topics** (questions, decisions to take, manual checks) are issues in project Guixa,
   never only text in a status update.
+
+## Milestones
+
+Milestones group tickets and show progress; the order of work still comes from blocking relations.
+
+- **One per spec**, named `NNN Feature name` (e.g. `001 Households, members and commissions`),
+  created with `save_milestone` when the spec is approved. It holds the spec's tickets, its
+  amendments and their review follow-ups.
+- **`Ready to go live`**: what must be settled before production (backups, data migration, CI
+  protection), independent of any spec.
+- No milestone for tooling and process work (linters, agents, review flow).
+- A follow-up created during review takes its parent ticket's milestone.
 
 ## When a skill says "publish to the issue tracker"
 

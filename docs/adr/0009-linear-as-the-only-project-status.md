@@ -7,7 +7,8 @@ Project status lives only in Linear (team Draude, project Guixa). Ticket states,
 relations and priority hold the work queue. Open topics that are not tickets yet (questions,
 decisions still to take, manual checks) are issues too, usually `ready-for-human`. Each session
 ends with one Guixa project status update: what was done and the concrete next step. The repo
-no longer has a `STATUS.md`.
+no longer has a `STATUS.md`. Milestones group tickets by spec, plus one for going live, so
+progress per spec is visible without a separate summary.
 
 ## Considered options
 
