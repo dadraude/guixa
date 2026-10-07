@@ -27,9 +27,15 @@ type HouseholdOption = {
     name: string;
 };
 
+type CommissionOption = {
+    id: string;
+    name: string;
+};
+
 defineProps<{
     members: MemberRow[];
     households: HouseholdOption[];
+    commissions: CommissionOption[];
 }>();
 
 defineOptions({
@@ -51,6 +57,81 @@ defineOptions({
                 )
             "
         />
+
+        <Form
+            v-bind="MemberController.store.form()"
+            class="flex flex-col gap-3 rounded-lg border p-4"
+            data-test="create-member"
+            reset-on-success
+            v-slot="{ errors, processing }"
+        >
+            <h2 class="font-medium">{{ t('Create member') }}</h2>
+            <div class="flex flex-wrap items-start gap-2">
+                <Input
+                    name="name"
+                    required
+                    class="max-w-64"
+                    :aria-label="t('Full name')"
+                    :placeholder="t('Full name')"
+                />
+                <Input
+                    name="email"
+                    type="email"
+                    required
+                    class="max-w-64"
+                    :aria-label="t('Email address')"
+                    :placeholder="t('Email address')"
+                />
+                <Input
+                    name="phone"
+                    class="max-w-48"
+                    :aria-label="t('Phone (optional)')"
+                    :placeholder="t('Phone (optional)')"
+                />
+                <select
+                    name="household_id"
+                    class="h-9 rounded-md border bg-transparent px-3 text-sm"
+                    :aria-label="t('Household')"
+                >
+                    <option value="">{{ t('No household') }}</option>
+                    <option
+                        v-for="household in households"
+                        :key="household.id"
+                        :value="household.id"
+                    >
+                        #{{ household.number }} {{ household.name }}
+                    </option>
+                </select>
+            </div>
+            <fieldset
+                v-if="commissions.length > 0"
+                class="flex flex-wrap gap-4"
+            >
+                <legend class="sr-only">{{ t('Commissions') }}</legend>
+                <label
+                    v-for="commission in commissions"
+                    :key="commission.id"
+                    class="flex items-center gap-2 text-sm"
+                >
+                    <input
+                        type="checkbox"
+                        name="commission_ids[]"
+                        :value="commission.id"
+                    />
+                    {{ commission.name }}
+                </label>
+            </fieldset>
+            <div>
+                <Button type="submit" :disabled="processing">{{
+                    t('Create member')
+                }}</Button>
+            </div>
+            <InputError :message="errors.name" />
+            <InputError :message="errors.email" />
+            <InputError :message="errors.phone" />
+            <InputError :message="errors.household_id" />
+            <InputError :message="errors.commission_ids" />
+        </Form>
 
         <p v-if="members.length === 0" class="text-muted-foreground">
             {{ t('No members yet.') }}

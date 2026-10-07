@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Members;
 
+use App\Actions\CreateMember;
 use App\Actions\DeactivateMember;
 use App\Actions\ReactivateMember;
 use App\Auth\EmailChangeLevels;
 use App\Auth\MembershipRoleProtection;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Members\StoreMemberRequest;
 use App\Http\Requests\Members\UpdateMemberRequest;
+use App\Models\Commission;
 use App\Models\Household;
 use App\Models\Member;
 use Illuminate\Http\RedirectResponse;
@@ -48,7 +51,25 @@ class MemberController extends Controller
         return Inertia::render('members/Index', [
             'members' => $members,
             'households' => $households,
+            'commissions' => Commission::query()->orderBy('name')->get(['id', 'name']),
         ]);
+    }
+
+    public function store(StoreMemberRequest $request, CreateMember $createMember): RedirectResponse
+    {
+        $validated = $request->safe();
+
+        $createMember->handle(
+            $validated->string('name')->toString(),
+            $validated->string('email')->toString(),
+            $validated->string('phone')->toString() ?: null,
+            $validated->string('household_id')->toString() ?: null,
+            array_values(array_map(strval(...), $validated->array('commission_ids'))),
+        );
+
+        Inertia::flash('toast', ['type' => 'success', 'message' => __('Member created.')]);
+
+        return to_route('members.index');
     }
 
     /**
