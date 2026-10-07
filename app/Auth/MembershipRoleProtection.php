@@ -15,7 +15,8 @@ use Illuminate\Support\Facades\Gate;
  * a member with the role could strip it from a colleague, change their email
  * (see EmailChangeLevels) and sign in as them. The ability is defined as false
  * for everyone and administrators pass through Gate::before, as with the other
- * administrator-only abilities.
+ * administrator-only abilities. Nobody, administrators included, deactivates
+ * the owner or a household the owner belongs to.
  */
 class MembershipRoleProtection
 {
@@ -45,7 +46,11 @@ class MembershipRoleProtection
 
     public function mayDeactivateMember(User $actor, Member $member): bool
     {
-        return $this->mayTakeAway($actor) || ! $this->memberRoles->memberHas($member, Role::Membership);
+        if ($this->belongsToOwner($member)) {
+            return false;
+        }
+
+        return $this->mayTakeAway($actor) || $this->mayBeDeactivatedByMembershipRole($member);
     }
 
     /**
@@ -53,11 +58,37 @@ class MembershipRoleProtection
      */
     public function mayDeactivateHousehold(User $actor, Household $household): bool
     {
+        $members = $household->loadMissing('members.user.administrator')->members;
+
+        if ($members->contains(fn (Member $member) => $this->belongsToOwner($member))) {
+            return false;
+        }
+
         if ($this->mayTakeAway($actor)) {
             return true;
         }
 
-        return $household->members()->get()->every(fn (Member $member) => ! $this->memberRoles->memberHas($member, Role::Membership));
+        return $members->every(fn (Member $member) => $this->mayBeDeactivatedByMembershipRole($member));
+    }
+
+    /**
+     * The owner can never be deactivated, by anyone: it would lock them out.
+     * Checked here and not through the Gate so Gate::before cannot let administrators past it.
+     */
+    private function belongsToOwner(Member $member): bool
+    {
+        return $member->user->administrator?->is_owner === true;
+    }
+
+    /**
+     * Whether the membership role may deactivate this member: not when they hold the
+     * membership role (DRA-34) nor when they are an administrator, since that would
+     * stop them acting as administrator.
+     */
+    private function mayBeDeactivatedByMembershipRole(Member $member): bool
+    {
+        return ! $this->memberRoles->memberHas($member, Role::Membership)
+            && $member->user->administrator === null;
     }
 
     private function mayTakeAway(User $actor): bool

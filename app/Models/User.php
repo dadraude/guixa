@@ -81,9 +81,20 @@ class User extends Authenticatable
         return $this->hasMany(MagicLink::class);
     }
 
+    /**
+     * Active or inactive belongs to the person, not to a profile: it is the
+     * member profile's flag. A user with no member profile is always active.
+     * The owner may have a member profile, but nobody can deactivate it
+     * (see MembershipRoleProtection).
+     */
+    public function isActive(): bool
+    {
+        return $this->member === null || $this->member->is_active;
+    }
+
     public function hasActiveAdministratorProfile(): bool
     {
-        return $this->administrator?->is_active === true;
+        return $this->isActive() && $this->administrator?->is_active === true;
     }
 
     public function hasActiveMemberProfile(): bool
@@ -92,22 +103,20 @@ class User extends Authenticatable
     }
 
     /**
-     * Whether the user may sign in: they have an active profile, or no
-     * profile at all. Inactive profiles do not let anyone in, so an inactive
-     * administrator with an active member profile signs in as a member only.
+     * Whether the user may sign in: they are active and have an active
+     * profile, or no profile at all. An inactive person gets in with no
+     * profile, administrator included; reactivating them brings the
+     * administrator profile back untouched.
      */
     public function canSignIn(): bool
     {
         // Relations as properties: loaded once per request and shared with the gates and ActiveProfile.
         // Each request authenticates a fresh User, so a cached relation cannot outlive a deactivation.
-        $administrator = $this->administrator;
-        $member = $this->member;
-
-        if ($administrator === null && $member === null) {
+        if ($this->administrator === null && $this->member === null) {
             return true;
         }
 
-        return $administrator?->is_active === true || $member?->is_active === true;
+        return $this->hasActiveAdministratorProfile() || $this->hasActiveMemberProfile();
     }
 
     /**

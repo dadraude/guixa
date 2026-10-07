@@ -31,7 +31,7 @@ class MemberController extends Controller
         $collation = new CatalanCollation;
 
         $members = Member::query()
-            ->with('user')
+            ->with('user.administrator')
             ->get()
             ->sort(fn (Member $a, Member $b) => $collation->compare($a->user->name, $b->user->name))
             ->values()
