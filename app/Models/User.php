@@ -94,7 +94,7 @@ class User extends Authenticatable
 
     public function hasActiveAdministratorProfile(): bool
     {
-        return $this->isActive() && $this->administrator?->is_active === true;
+        return $this->isActive() && $this->administrator !== null;
     }
 
     public function hasActiveMemberProfile(): bool

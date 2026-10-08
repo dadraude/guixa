@@ -89,8 +89,7 @@ Route::middleware(['auth'])->group(function () {
         Route::middleware('can:manage-administrators')->prefix('administrators')->name('administrators.')->group(function () {
             Route::get('/', [AdministratorController::class, 'index'])->name('index');
             Route::post('/', [AdministratorController::class, 'store'])->name('store');
-            Route::post('{administrator}/deactivate', [AdministratorController::class, 'deactivate'])->name('deactivate');
-            Route::post('{administrator}/reactivate', [AdministratorController::class, 'reactivate'])->name('reactivate');
+            Route::delete('{administrator}', [AdministratorController::class, 'destroy'])->name('destroy');
         });
     });
 });

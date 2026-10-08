@@ -210,8 +210,9 @@ test('a member without an administrator profile goes straight to the member home
     $this->get(route('active-profile.edit'))->assertRedirect(route('home'));
 });
 
-test('an inactive administrator who is also a member signs in as member only', function () {
-    $user = User::factory()->administrator(active: false)->member(Household::factory()->create())->create();
+test('a person whose administrator profile was removed signs in as member only', function () {
+    $user = User::factory()->administrator()->member(Household::factory()->create())->create();
+    $user->administrator->delete();
 
     $this->post(route('login.store'), ['email' => $user->email, 'password' => 'password']);
 
@@ -221,12 +222,14 @@ test('an inactive administrator who is also a member signs in as member only', f
     $this->post(route('active-profile.update'), ['profile' => 'administrator'])->assertSessionHasErrors('profile');
 });
 
-test('deactivating the administrator profile ends the administrator session of someone acting as one', function () {
+test('removing the administrator profile ends the administrator session of someone acting as one', function () {
     $user = ownerAndMember();
     $this->actingAs($user)->post(route('active-profile.update'), ['profile' => 'administrator']);
     $this->get(route('admin.home'))->assertOk();
 
-    $user->administrator->update(['is_active' => false]);
+    $user->administrator->delete();
+    // The test reuses the signed-in user object; a real next request loads it afresh.
+    $user->unsetRelation('administrator');
 
     $this->get(route('admin.home'))->assertForbidden();
     $this->get(route('home'))->assertRedirect(route('dashboard'));

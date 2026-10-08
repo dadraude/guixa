@@ -45,6 +45,17 @@ class Member extends Model
     }
 
     /**
+     * Whether this is an active member who also holds the administrator
+     * profile. An inactive member who keeps the profile does not count: they
+     * cannot act as administrator until reactivated. The user must be loaded
+     * with its administrator relation to avoid a query per member.
+     */
+    public function isActiveAdministrator(): bool
+    {
+        return $this->is_active && $this->user->administrator !== null;
+    }
+
+    /**
      * @return BelongsTo<Household, $this>
      */
     public function household(): BelongsTo

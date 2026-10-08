@@ -19,7 +19,8 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        User::factory()->create([
+        // Every user but the owner has a member profile.
+        User::factory()->memberWithoutHousehold()->create([
             'name' => 'Test User',
             'email' => 'test@example.com',
         ]);

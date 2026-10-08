@@ -12,8 +12,9 @@ use App\Models\User;
  * with the administrator profile, so each level only reaches people below it:
  * the owner reaches everyone else, an administrator reaches members who are not
  * administrators, and the membership role reaches members who neither hold the
- * membership role nor are administrators. Changing one's own email is never
- * decided here: it goes through the confirmation link.
+ * membership role nor are administrators. Any member holding the administrator
+ * profile counts as an administrator, active or not (DRA-57). Changing one's
+ * own email is never decided here: it goes through the confirmation link.
  *
  * A class and not a Gate because Gate::before would let any administrator
  * through, including against administrator targets.

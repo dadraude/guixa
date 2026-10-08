@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
-use App\Actions\CreateAdministrator;
+use App\Actions\AddAdministratorProfile;
+use App\Actions\RemoveAdministratorProfile;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreAdministratorRequest;
 use App\Models\Administrator;
+use App\Models\Member;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -25,35 +27,40 @@ class AdministratorController extends Controller
                 'name' => $administrator->user->name,
                 'email' => $administrator->user->email,
                 'is_owner' => $administrator->is_owner,
-                'is_active' => $administrator->is_active,
             ]);
 
-        return Inertia::render('admin/Administrators', ['administrators' => $administrators]);
+        // The picker: active members who are not administrators yet.
+        $candidates = Member::query()
+            ->with('user')
+            ->where('is_active', true)
+            ->whereDoesntHave('user.administrator')
+            ->get()
+            ->sortBy(fn (Member $member) => mb_strtolower($member->user->name))
+            ->values()
+            ->map(fn (Member $member) => [
+                'id' => $member->id,
+                'name' => $member->user->name,
+                'email' => $member->user->email,
+            ]);
+
+        return Inertia::render('admin/Administrators', [
+            'administrators' => $administrators,
+            'candidates' => $candidates,
+        ]);
     }
 
-    public function store(StoreAdministratorRequest $request, CreateAdministrator $createAdministrator): RedirectResponse
+    public function store(StoreAdministratorRequest $request, AddAdministratorProfile $addAdministratorProfile): RedirectResponse
     {
-        $validated = $request->safe();
+        $member = Member::query()->findOrFail($request->safe()->string('member_id')->toString());
 
-        $createAdministrator->handle($validated->string('name')->toString(), $validated->string('email')->toString());
+        $addAdministratorProfile->handle($member);
 
         return to_route('admin.administrators.index');
     }
 
-    public function deactivate(Administrator $administrator): RedirectResponse
+    public function destroy(Administrator $administrator, RemoveAdministratorProfile $removeAdministratorProfile): RedirectResponse
     {
-        abort_if($administrator->is_owner, 403);
-
-        $administrator->update(['is_active' => false]);
-
-        return to_route('admin.administrators.index');
-    }
-
-    public function reactivate(Administrator $administrator): RedirectResponse
-    {
-        abort_if($administrator->is_owner, 403);
-
-        $administrator->update(['is_active' => true]);
+        $removeAdministratorProfile->handle($administrator);
 
         return to_route('admin.administrators.index');
     }

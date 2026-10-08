@@ -57,12 +57,15 @@ class UserFactory extends Factory
     }
 
     /**
-     * Give the user an administrator profile.
+     * Give the user an administrator profile. Every user but the owner who is
+     * an administrator is also a member, so a member profile with no
+     * household is created too unless member() gave one.
      */
-    public function administrator(bool $active = true): static
+    public function administrator(): static
     {
-        return $this->afterCreating(function (User $user) use ($active) {
-            $user->administrator()->create(['is_active' => $active]);
+        return $this->afterCreating(function (User $user) {
+            $user->member()->firstOrCreate([], ['household_id' => null]);
+            $user->administrator()->create();
         });
     }
 

@@ -5,7 +5,6 @@ import Heading from '@/components/Heading.vue';
 import InputError from '@/components/InputError.vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { t } from '@/lib/i18n';
 import { home } from '@/routes/admin';
@@ -16,11 +15,17 @@ type AdministratorRow = {
     name: string;
     email: string;
     is_owner: boolean;
-    is_active: boolean;
+};
+
+type Candidate = {
+    id: string;
+    name: string;
+    email: string;
 };
 
 defineProps<{
     administrators: AdministratorRow[];
+    candidates: Candidate[];
 }>();
 
 defineOptions({
@@ -41,7 +46,7 @@ defineOptions({
             :title="t('Administrators')"
             :description="
                 t(
-                    'Only the owner adds administrators and deactivates or reactivates them.',
+                    'Only the owner adds the administrator profile to active members and removes it.',
                 )
             "
         />
@@ -63,44 +68,19 @@ defineOptions({
                     <Badge v-if="administrator.is_owner">{{
                         t('Owner')
                     }}</Badge>
-                    <Badge
-                        :variant="
-                            administrator.is_active ? 'secondary' : 'outline'
+
+                    <Form
+                        v-else
+                        v-bind="
+                            AdministratorController.destroy.form(
+                                administrator.id,
+                            )
                         "
                     >
-                        {{
-                            administrator.is_active
-                                ? t('Active')
-                                : t('Inactive')
-                        }}
-                    </Badge>
-
-                    <template v-if="!administrator.is_owner">
-                        <Form
-                            v-if="administrator.is_active"
-                            v-bind="
-                                AdministratorController.deactivate.form(
-                                    administrator.id,
-                                )
-                            "
-                        >
-                            <Button type="submit" variant="outline" size="sm">{{
-                                t('Deactivate')
-                            }}</Button>
-                        </Form>
-                        <Form
-                            v-else
-                            v-bind="
-                                AdministratorController.reactivate.form(
-                                    administrator.id,
-                                )
-                            "
-                        >
-                            <Button type="submit" variant="outline" size="sm">{{
-                                t('Reactivate')
-                            }}</Button>
-                        </Form>
-                    </template>
+                        <Button type="submit" variant="outline" size="sm">{{
+                            t('Remove')
+                        }}</Button>
+                    </Form>
                 </div>
             </li>
         </ul>
@@ -111,40 +91,45 @@ defineOptions({
                 :title="t('Add administrator')"
                 :description="
                     t(
-                        'They receive an email with a link to log in and will choose a password.',
+                        'They are not sent any email: they act as administrator the next time they choose a profile or sign in.',
                     )
                 "
             />
 
+            <p
+                v-if="candidates.length === 0"
+                class="text-sm text-muted-foreground"
+            >
+                {{ t('There are no active members left to add.') }}
+            </p>
+
             <Form
+                v-else
                 v-bind="AdministratorController.store.form()"
                 class="space-y-6"
                 reset-on-success
                 v-slot="{ errors, processing }"
             >
                 <div class="grid gap-2">
-                    <Label for="name">{{ t('Name') }}</Label>
-                    <Input
-                        id="name"
-                        name="name"
+                    <Label for="member_id">{{ t('Choose a member') }}</Label>
+                    <select
+                        id="member_id"
+                        name="member_id"
                         required
-                        autocomplete="off"
-                        :placeholder="t('Full name')"
-                    />
-                    <InputError :message="errors.name" />
-                </div>
-
-                <div class="grid gap-2">
-                    <Label for="email">{{ t('Email address') }}</Label>
-                    <Input
-                        id="email"
-                        type="email"
-                        name="email"
-                        required
-                        autocomplete="off"
-                        :placeholder="t('Email address')"
-                    />
-                    <InputError :message="errors.email" />
+                        class="h-9 rounded-md border bg-transparent px-3 text-sm"
+                    >
+                        <option value="" disabled selected>
+                            {{ t('Choose a member') }}
+                        </option>
+                        <option
+                            v-for="candidate in candidates"
+                            :key="candidate.id"
+                            :value="candidate.id"
+                        >
+                            {{ candidate.name }} ({{ candidate.email }})
+                        </option>
+                    </select>
+                    <InputError :message="errors.member_id" />
                 </div>
 
                 <Button :disabled="processing" data-test="add-administrator">{{
