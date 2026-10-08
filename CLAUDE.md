@@ -29,13 +29,26 @@ Domain vocabulary lives in `CONTEXT.md`; decisions in `docs/adr/NNNN-title.md`.
 
 | Who | Model | Where it is set |
 | --- | --- | --- |
-| Main session: orchestration, `/grill-with-docs`, `/to-spec`, `/to-tickets`, triage | Opus | the user's `/model`; never pinned in `.claude/settings.json` |
+| Main session: `/grill-with-docs`, `/to-spec`, `/to-tickets`, triage | Opus | the user's `/model`; never pinned in `.claude/settings.json` |
+| Main session: `/ship-ticket`, `/run-session` work phase (git, Linear, launching agents) | Sonnet recommended | the user's `/model` |
 | `ticket-implementer` | Sonnet | agent frontmatter |
 | `ticket-reviewer`, `ticket-correctness-reviewer`, `spec-reviewer` | Opus | agent frontmatter |
 
 Every agent launch passes the `model` from this table explicitly: an Agent call's `model` overrides the
 agent's frontmatter, so a generic default (such as `sonnet` for every delegation) would silently downgrade
 the reviewers. Implementation and review must stay on different models.
+
+The main session never writes application code or tests, inside or outside `/ship-ticket`: every code
+change (features, fixes, review findings, merge conflicts, help on a `ready-for-human` issue) goes to a
+`ticket-implementer` launch with `model: "sonnet"`. The main session only writes docs, specs, ADRs and
+agent/skill files.
+
+### Keeping cost down
+
+- Context: one ticket per session when possible; otherwise `/compact` between tickets. Long contexts
+  cost more even when cached.
+- Linear: filter every list call (state, label, project) and set a `limit`; never re-read an issue that
+  is already in context.
 
 ## Session rules
 
