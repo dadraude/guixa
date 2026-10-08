@@ -167,7 +167,7 @@ test('an administrator acting as a member in no commission sees only their own h
     $own = Household::factory()->create(['name' => 'Cal Pere']);
     $other = Household::factory()->create(['name' => 'Cal Altre']);
     $viewer = directoryMember($own, 'Anna Puig');
-    $viewer->user->administrator()->create(['is_active' => true]);
+    $viewer->user->administrator()->create();
     directoryMember($other, 'Joan Soler', phone: '600333444');
 
     $this->actingAs($viewer->user->fresh())

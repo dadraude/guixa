@@ -114,7 +114,7 @@ test('the membership role still deactivates a member without the membership role
 
 test('an administrator acting as member is refused like the membership role', function () {
     $actor = protectionActor();
-    $actor->administrator()->create(['is_active' => true]);
+    $actor->administrator()->create();
     $colleague = protectionColleague();
 
     $this->withSession(['active_profile' => 'member'])
@@ -228,4 +228,44 @@ test('the pages tell which of these actions the viewer may do', function () {
         ->get(route('members.index'))
         ->assertInertia(fn (Assert $page) => $page
             ->where('members', fn ($members) => collect($members)->every(fn ($member) => $member['can_deactivate'] === true)));
+});
+
+test('the membership role is refused a deactivation only because of active members who are administrators', function () {
+    $actor = protectionActor();
+    $active = User::factory()->administrator()->member(Household::factory()->create())->create()->member;
+    $inactive = User::factory()->administrator()->member(Household::factory()->create())->create()->member;
+    $inactive->update(['is_active' => false]);
+    $removed = User::factory()->administrator()->member(Household::factory()->create())->create();
+    $removed->administrator->delete();
+
+    $this->actingAs($actor)->post(route('members.deactivate', $active))->assertForbidden();
+    $this->actingAs($actor)->post(route('members.deactivate', $removed->member))->assertRedirect();
+
+    expect($active->fresh()->is_active)->toBeTrue()
+        ->and($removed->member->fresh()->is_active)->toBeFalse();
+});
+
+test('an inactive member who keeps the administrator profile does not block deactivating their household', function () {
+    $actor = protectionActor();
+    $household = Household::factory()->create();
+    $kept = User::factory()->administrator()->member($household)->create();
+    $kept->member->update(['is_active' => false]);
+
+    $this->actingAs($actor)->post(route('households.deactivate', $household))->assertRedirect();
+
+    expect($household->fresh()->is_active)->toBeFalse();
+});
+
+test('an active administrator in the household still blocks the membership role from deactivating it, a removed profile never does', function () {
+    $actor = protectionActor();
+    $blocked = Household::factory()->create();
+    User::factory()->administrator()->member($blocked)->create();
+    $free = Household::factory()->create();
+    User::factory()->administrator()->member($free)->create()->administrator->delete();
+
+    $this->actingAs($actor)->post(route('households.deactivate', $blocked))->assertForbidden();
+    $this->actingAs($actor)->post(route('households.deactivate', $free))->assertRedirect();
+
+    expect($blocked->fresh()->is_active)->toBeTrue()
+        ->and($free->fresh()->is_active)->toBeFalse();
 });

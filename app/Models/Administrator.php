@@ -16,12 +16,11 @@ use Illuminate\Support\Carbon;
  * @property string $id
  * @property string $user_id
  * @property bool $is_owner
- * @property bool $is_active
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read User $user
  */
-#[Fillable(['is_owner', 'is_active'])]
+#[Fillable(['is_owner'])]
 class Administrator extends Model
 {
     use HasUuids;
@@ -43,7 +42,6 @@ class Administrator extends Model
     {
         return [
             'is_owner' => 'boolean',
-            'is_active' => 'boolean',
         ];
     }
 }

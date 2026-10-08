@@ -164,7 +164,8 @@ test('every member sees all commissions and their members names, but no contact 
 });
 
 test('an administrator gets the active members who can be added', function () {
-    $administrator = User::factory()->administrator()->create();
+    // An administrator is also an active member, so they are a candidate too.
+    $administrator = User::factory()->administrator()->create(['name' => 'Zoe Admin']);
     $in = memberOf('Anna Puig');
     memberOf('Pere Puig', active: false);
     memberOf('Berta Soler');
@@ -175,9 +176,10 @@ test('an administrator gets the active members who can be added', function () {
         ->get(route('commissions.index'))
         ->assertInertia(fn (Assert $page) => $page
             ->where('canManage', true)
-            ->has('candidates', 2)
+            ->has('candidates', 3)
             ->where('candidates.0.name', 'Anna Puig')
             ->where('candidates.1.name', 'Berta Soler')
+            ->where('candidates.2.name', 'Zoe Admin')
             ->missing('candidates.0.email'));
 });
 

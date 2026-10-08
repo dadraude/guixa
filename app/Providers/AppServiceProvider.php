@@ -8,6 +8,7 @@ use App\Auth\ActiveProfile;
 use App\Auth\MemberRoles;
 use App\Auth\MembershipRoleProtection;
 use App\Auth\Role;
+use App\Auth\UsableMember;
 use App\Models\User;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
@@ -26,6 +27,7 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->scoped(MemberRoles::class);
+        $this->app->scoped(UsableMember::class);
     }
 
     /**

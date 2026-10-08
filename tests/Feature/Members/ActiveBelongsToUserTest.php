@@ -206,10 +206,10 @@ test('a deactivated member who is an administrator cannot sign in with a magic l
     $this->assertGuest();
 });
 
-test('reactivating a person whose administrator profile was removed meanwhile keeps it inactive', function () {
+test('reactivating a person whose administrator profile was removed meanwhile does not bring it back', function () {
     $person = memberAdministrator();
     $person->member->update(['is_active' => false]);
-    $person->administrator->update(['is_active' => false]);
+    $person->administrator->delete();
 
     $this->actingAs(User::factory()->administrator()->create())
         ->post(route('members.reactivate', $person->member))

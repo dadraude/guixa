@@ -124,8 +124,9 @@ test('a signed-in user who is not an administrator is refused', function () {
         ->and($household->fresh()->name)->toBe('Cal Pere');
 });
 
-test('an inactive administrator is refused', function () {
-    $inactive = User::factory()->administrator(active: false)->create();
+test('an inactive member who keeps the administrator profile is refused', function () {
+    $inactive = User::factory()->administrator()->create();
+    $inactive->member->update(['is_active' => false]);
 
     $this->actingAs($inactive)->get(route('households.index'))->assertRedirect(route('login'));
 });

@@ -145,14 +145,15 @@ test('the owner\'s email is rejected: no profile is attached and no email is sen
     Mail::assertNothingQueued();
 });
 
-test('an email that belongs to a user without a member profile is rejected', function () {
+test('the email of an administrator is rejected because every administrator already has a member profile', function () {
     $admin = User::factory()->administrator()->create(['email' => 'maria@example.com']);
 
     $this->actingAs($admin)
         ->post(route('members.store'), newMemberData())
         ->assertSessionHasErrors(['email' => __('This email already belongs to a member.')]);
 
-    expect(User::count())->toBe(1)->and($admin->fresh()->member)->toBeNull();
+    expect(User::count())->toBe(1)
+        ->and($admin->fresh()->member()->count())->toBe(1);
 
     Mail::assertNothingQueued();
 });

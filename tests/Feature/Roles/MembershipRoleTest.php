@@ -86,7 +86,7 @@ function actingAsProfile(User $user, Profile $profile): User
 
 function withAdministratorProfile(Member $member): User
 {
-    $member->user->administrator()->create(['is_active' => true]);
+    $member->user->administrator()->create();
 
     return $member->user->fresh();
 }
@@ -143,9 +143,9 @@ test('an inactive member never gets role permissions', function () {
 
 test('someone with both profiles gets membership rights as member only through the role, and everything as administrator', function () {
     $withRole = memberWithRoles(Role::Membership)->user;
-    $withRole->administrator()->create(['is_active' => true]);
+    $withRole->administrator()->create();
     $withoutRole = memberWithRoles(Role::Orders)->user;
-    $withoutRole->administrator()->create(['is_active' => true]);
+    $withoutRole->administrator()->create();
 
     $actAs = fn (User $user, Profile $profile) => tap($user->fresh(), fn () => app(ActiveProfile::class)->choose($profile));
 

@@ -30,7 +30,7 @@ function levelsTarget(?string $email = null): Member
 function levelsAdministratorTarget(): Member
 {
     $member = levelsTarget();
-    $member->user->administrator()->create(['is_active' => true]);
+    $member->user->administrator()->create();
 
     return $member;
 }
@@ -163,7 +163,7 @@ test('the membership role cannot change its own email on the members screen', fu
 
 test('an administrator acting as member only has the membership role level', function () {
     $actor = levelsMembershipUser();
-    $actor->administrator()->create(['is_active' => true]);
+    $actor->administrator()->create();
     $target = levelsMembershipTarget();
 
     $this->actingAs($actor->fresh())->withSession(['active_profile' => 'member']);
@@ -216,14 +216,22 @@ test('the membership role still edits name and phone of an administrator, leavin
         ->and($target->user->fresh()->email)->toBe($originalEmail);
 });
 
-test('an inactive administrator target is still protected', function () {
+test('an inactive member who keeps the administrator profile no longer counts as an administrator for the membership role', function () {
     $target = levelsAdministratorTarget();
-    $target->user->administrator->update(['is_active' => false]);
-    $originalEmail = $target->user->email;
+    $target->update(['is_active' => false]);
 
-    changeEmail(levelsMembershipUser(), $target)->assertForbidden();
+    changeEmail(levelsMembershipUser(), $target)->assertSessionDoesntHaveErrors();
 
-    expect($target->user->fresh()->email)->toBe($originalEmail);
+    expect($target->user->fresh()->email)->toBe('new@example.com');
+});
+
+test('a removed administrator profile never protects the email', function () {
+    $target = levelsAdministratorTarget();
+    $target->user->administrator->delete();
+
+    changeEmail(levelsMembershipUser(), $target)->assertSessionDoesntHaveErrors();
+
+    expect($target->user->fresh()->email)->toBe('new@example.com');
 });
 
 test('the members page tells the membership role which emails it may change', function () {

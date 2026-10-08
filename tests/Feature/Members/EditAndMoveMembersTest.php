@@ -53,7 +53,7 @@ test('the new email works for sign-in at once, with no confirmation', function (
 
 test('the email also changes for the administrator profile of the same user', function () {
     $member = memberIn(Household::factory()->create(), ['email' => 'old@example.com']);
-    $member->user->administrator()->create(['is_active' => true]);
+    $member->user->administrator()->create();
 
     $this->actingAs(User::factory()->owner()->create())
         ->patch(route('members.update', $member), ['name' => 'X', 'email' => 'new@example.com']);
