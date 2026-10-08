@@ -262,3 +262,50 @@ test('a failing member update rolls back the user update', function () {
     expect($member->user->fresh()->name)->toBe('Abans')
         ->and($member->user->fresh()->email)->toBe('old@example.com');
 });
+
+dataset('member list actions', [
+    'update' => fn () => fn ($test, Member $member) => $test->patch(route('members.update', $member), ['name' => 'Maria Nova', 'email' => 'maria@example.com', 'phone' => null]),
+    'move' => fn () => fn ($test, Member $member) => $test->patch(route('members.household.update', $member), ['household_id' => Household::factory()->create()->id]),
+    'deactivate' => fn () => fn ($test, Member $member) => $test->post(route('members.deactivate', $member)),
+    'reactivate' => fn () => fn ($test, Member $member) => tap($test, fn () => $member->update(['is_active' => false]))->post(route('members.reactivate', $member)),
+    'create' => fn () => fn ($test, Member $member) => $test->post(route('members.store'), ['name' => 'Nou Soci', 'email' => 'nou@example.com']),
+]);
+
+test('member actions send the user back to the list page they were on', function (Closure $action) {
+    $member = memberIn(Household::factory()->create());
+    $test = $this->actingAs(membershipUser())->from(route('members.index', ['page' => 3, 'foo' => 'bar']));
+
+    $action()($test, $member)->assertRedirect(route('members.index', ['page' => 3, 'foo' => 'bar']));
+})->with('member list actions');
+
+test('member actions fall back to the plain list without a usable referer', function (Closure $action, string $referer) {
+    $member = memberIn(Household::factory()->create());
+    $test = $this->actingAs(membershipUser())->from($referer);
+
+    $action()($test, $member)->assertRedirect(route('members.index'));
+})->with('member list actions')->with([
+    'another host' => 'https://evil.example.com/members?page=3',
+    'another route' => 'http://localhost/commissions?page=3',
+    'a sibling path' => 'http://localhost/members/abc?page=3',
+]);
+
+test('a referer page that is not a positive integer is dropped but the rest of the query is kept', function (string $page) {
+    $member = memberIn(Household::factory()->create());
+
+    $this->actingAs(membershipUser())
+        ->from(route('members.index').'?page='.$page.'&foo=bar')
+        ->post(route('members.deactivate', $member))
+        ->assertRedirect(route('members.index', ['foo' => 'bar']));
+})->with(['zero' => '0', 'negative' => '-2', 'text' => 'abc', 'decimal' => '1.5']);
+
+test('a list page that no longer exists after an action ends on the last page', function () {
+    $user = membershipUser();
+    $member = memberIn(Household::factory()->create());
+
+    $response = $this->actingAs($user)->from(route('members.index', ['page' => 3]))
+        ->post(route('members.deactivate', $member));
+
+    $response->assertRedirect(route('members.index', ['page' => 3]));
+    $this->actingAs($user)->get(route('members.index', ['page' => 3]))
+        ->assertRedirect(route('members.index', ['page' => 1]));
+});

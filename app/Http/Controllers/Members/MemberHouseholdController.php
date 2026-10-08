@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Members;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Members\MoveMemberRequest;
 use App\Models\Member;
+use App\Support\MembersListRedirect;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 
@@ -22,6 +23,6 @@ class MemberHouseholdController extends Controller
 
         Inertia::flash('toast', ['type' => 'success', 'message' => __('Member moved.')]);
 
-        return to_route('members.index');
+        return MembersListRedirect::back($request);
     }
 }

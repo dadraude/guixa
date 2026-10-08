@@ -16,6 +16,7 @@ use App\Models\Commission;
 use App\Models\Household;
 use App\Models\Member;
 use App\Support\CatalanCollation;
+use App\Support\MembersListRedirect;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -94,7 +95,7 @@ class MemberController extends Controller
 
         Inertia::flash('toast', ['type' => 'success', 'message' => __('Member created.')]);
 
-        return to_route('members.index');
+        return MembersListRedirect::back($request);
     }
 
     /**
@@ -126,7 +127,7 @@ class MemberController extends Controller
 
         Inertia::flash('toast', ['type' => 'success', 'message' => __('Member updated.')]);
 
-        return to_route('members.index');
+        return MembersListRedirect::back($request);
     }
 
     public function deactivate(Request $request, Member $member, DeactivateMember $deactivateMember, MembershipRoleProtection $protection): RedirectResponse
@@ -137,15 +138,15 @@ class MemberController extends Controller
 
         Inertia::flash('toast', ['type' => 'success', 'message' => __('Member deactivated.')]);
 
-        return to_route('members.index');
+        return MembersListRedirect::back($request);
     }
 
-    public function reactivate(Member $member, ReactivateMember $reactivateMember): RedirectResponse
+    public function reactivate(Request $request, Member $member, ReactivateMember $reactivateMember): RedirectResponse
     {
         $reactivateMember->handle($member);
 
         Inertia::flash('toast', ['type' => 'success', 'message' => __('Member reactivated.')]);
 
-        return to_route('members.index');
+        return MembersListRedirect::back($request);
     }
 }
