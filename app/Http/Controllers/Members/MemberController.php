@@ -42,7 +42,14 @@ class MemberController extends Controller
             'users.name',
         )->orderBy('members.id');
 
-        $lastPage = max(1, (int) ceil(Member::query()->count() / self::PER_PAGE));
+        // Active members without a household: the ones the membership commission still has to place.
+        $filter = MembersListRedirect::filter($request->query('filter'));
+
+        if ($filter === MembersListRedirect::FILTER_NO_HOUSEHOLD) {
+            $query->whereNull('members.household_id')->where('members.is_active', true);
+        }
+
+        $lastPage = max(1, (int) ceil((clone $query)->toBase()->getCountForPagination() / self::PER_PAGE));
         $requestedPage = MembersListRedirect::page($request->query('page')) ?? 1;
 
         // Bounded before paginating: a huge page would overflow the offset.
@@ -80,6 +87,7 @@ class MemberController extends Controller
                 'prev_page_url' => $page->previousPageUrl(),
                 'next_page_url' => $page->nextPageUrl(),
             ],
+            'filter' => $filter,
             'households' => $households,
             'commissions' => Commission::query()->orderBy('name')->get(['id', 'name']),
         ]);

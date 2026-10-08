@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Members;
 
-use App\Models\Household;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class MoveMemberRequest extends FormRequest
 {
@@ -16,18 +14,15 @@ class MoveMemberRequest extends FormRequest
     }
 
     /**
-     * Members can only move to an active household.
+     * Only the format is checked here: whether the household is active is
+     * decided by ChangeMemberHousehold, under the lock on that household.
      *
      * @return array<string, array<int, mixed>>
      */
     public function rules(): array
     {
         return [
-            'household_id' => [
-                'required',
-                'uuid',
-                Rule::exists(Household::class, 'id')->where('is_active', true),
-            ],
+            'household_id' => ['required', 'uuid'],
         ];
     }
 }
