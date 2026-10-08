@@ -72,7 +72,8 @@ class UserFactory extends Factory
     public function member(Household $household): static
     {
         return $this->afterCreating(function (User $user) use ($household) {
-            $user->member()->create(['household_id' => $household->id]);
+            // updateOrCreate: owner() may already have given the user a profile without household.
+            $user->member()->updateOrCreate([], ['household_id' => $household->id]);
         });
     }
 
@@ -82,16 +83,18 @@ class UserFactory extends Factory
     public function memberWithoutHousehold(): static
     {
         return $this->afterCreating(function (User $user) {
-            $user->member()->create(['household_id' => null]);
+            $user->member()->firstOrCreate([], ['household_id' => null]);
         });
     }
 
     /**
-     * Make the user the owner: the administrator created from the command line.
+     * Make the user the owner: the administrator created from the command line,
+     * who is also an active member (no household unless member() adds one).
      */
     public function owner(): static
     {
         return $this->afterCreating(function (User $user) {
+            $user->member()->firstOrCreate([], ['household_id' => null]);
             $user->administrator()->create(['is_owner' => true]);
         });
     }
