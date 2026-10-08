@@ -16,19 +16,46 @@ class ActiveProfile
 {
     private const string SESSION_KEY = 'active_profile';
 
-    public function __construct(private readonly Session $session) {}
+    public function __construct(
+        private readonly Session $session,
+        private readonly UsableMember $usableMember,
+    ) {}
 
     /**
-     * The profiles the user may act as, member first.
+     * The profiles the user may act as, member first. A member profile with
+     * no household and no commission can do nothing, so it is not available
+     * to someone who is also an administrator; that is recomputed on every
+     * request, so gaining or losing a household or commission applies at once.
      *
      * @return list<Profile>
      */
     public function available(User $user): array
     {
         return array_values(array_filter([
-            $user->hasActiveMemberProfile() ? Profile::Member : null,
+            $this->isMemberProfileAvailable($user) ? Profile::Member : null,
             $user->hasActiveAdministratorProfile() ? Profile::Administrator : null,
         ]));
+    }
+
+    private function isMemberProfileAvailable(User $user): bool
+    {
+        if (! $user->hasActiveMemberProfile()) {
+            return false;
+        }
+
+        // Without an administrator profile the waiting member profile is all
+        // the person has, so it stays available.
+        if (! $user->hasActiveAdministratorProfile()) {
+            return true;
+        }
+
+        $member = $user->member;
+
+        if ($member === null) {
+            return false;
+        }
+
+        return $this->usableMember->check($member);
     }
 
     /**
@@ -41,13 +68,31 @@ class ActiveProfile
         $available = $this->available($user);
 
         if (count($available) < 2) {
-            return $available[0] ?? Profile::Member;
+            return $this->onlyAvailable($available);
         }
 
         $stored = $this->session->get(self::SESSION_KEY);
         $chosen = Profile::tryFrom(is_string($stored) ? $stored : '');
 
         return in_array($chosen, $available, true) ? $chosen : null;
+    }
+
+    /**
+     * Acting as administrator because it is the only usable profile is
+     * remembered, so a household or commission assigned later in the session
+     * adds the switcher without forcing the choice screen on the person.
+     *
+     * @param  list<Profile>  $available
+     */
+    private function onlyAvailable(array $available): Profile
+    {
+        $only = $available[0] ?? Profile::Member;
+
+        if ($only === Profile::Administrator) {
+            $this->choose($only);
+        }
+
+        return $only;
     }
 
     public function isChoicePending(User $user): bool
