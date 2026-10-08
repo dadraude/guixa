@@ -8,7 +8,7 @@ use App\Actions\CreateMember;
 use App\Actions\DeactivateMember;
 use App\Actions\ReactivateMember;
 use App\Auth\EmailChangeLevels;
-use App\Auth\MemberRolesPreloader;
+use App\Auth\MemberRoles;
 use App\Auth\MembershipRoleProtection;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Members\StoreMemberRequest;
@@ -28,7 +28,7 @@ class MemberController extends Controller
 {
     private const int PER_PAGE = 15;
 
-    public function index(Request $request, EmailChangeLevels $emailChangeLevels, MembershipRoleProtection $protection, MemberRolesPreloader $memberRolesPreloader): Response|RedirectResponse
+    public function index(Request $request, EmailChangeLevels $emailChangeLevels, MembershipRoleProtection $protection, MemberRoles $memberRoles): Response|RedirectResponse
     {
         $actor = $request->user() ?? abort(403);
 
@@ -53,7 +53,7 @@ class MemberController extends Controller
         $page = $query->paginate(self::PER_PAGE, page: $requestedPage)->withQueryString();
 
         // One lookup for the whole page: the per-row checks below read the remembered roles.
-        $memberRolesPreloader->preload($page->getCollection());
+        $memberRoles->preload($page->getCollection());
 
         $members = $page->getCollection()->map(fn (Member $member) => [
             'id' => $member->id,

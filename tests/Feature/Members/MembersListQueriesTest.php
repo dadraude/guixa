@@ -26,10 +26,15 @@ function addMembersWithCommissions(int $count): void
     $commission = Commission::factory()->create();
     $commission->assignRole(Role::Membership);
 
-    foreach (range(1, $count) as $ignored) {
+    foreach (range(1, $count) as $index) {
         $member = User::factory()->member(Household::factory()->create())->create()->member->fresh();
         $member->update(['is_active' => true]);
         Commission::factory()->create()->members()->attach($member);
+
+        // Half of them hold the membership role, so the page has members with roles.
+        if ($index % 2 === 0) {
+            $commission->members()->attach($member);
+        }
     }
 }
 
@@ -45,7 +50,7 @@ test('the members list runs the same number of queries for a viewer with the mem
     expect(membersListQueryCount($viewer))->toBe($fewMembers);
 });
 
-test('the members list runs the same number of queries for an administrator whatever the number of members', function () {
+test('regression guard: the members list keeps a constant query count for the owner, who never reaches MemberRoles for the checks', function () {
     $viewer = User::factory()->owner()->create();
 
     addMembersWithCommissions(4);

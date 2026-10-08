@@ -7,7 +7,6 @@ namespace App\Auth;
 use App\Models\Commission;
 use App\Models\Member;
 use App\Models\User;
-use Illuminate\Support\Facades\DB;
 
 /**
  * The only place that knows how roles reach members: through the commissions
@@ -26,6 +25,11 @@ class MemberRoles
 {
     /** @var array<string, list<Role>> */
     private array $rolesByMember = [];
+
+    public function __construct(
+        private readonly CommissionMemberships $memberships,
+        private readonly CommissionRoles $commissionRoles,
+    ) {}
 
     /**
      * Deliberately ignores the acting profile: administrators acting as
@@ -62,13 +66,36 @@ class MemberRoles
             return [];
         }
 
-        return $this->rolesByMember[$member->id] ??= $this->rolesThroughCommissions($member);
+        return $this->rolesByMember[$member->id] ??= $this->forCommissions($this->memberships->commissionIdsOf($member));
     }
 
-    /** @param array<string, list<Role>> $rolesByMember worked out in bulk by MemberRolesPreloader */
-    public function remember(array $rolesByMember): void
+    /**
+     * Works out the roles of a whole page of members with two queries instead
+     * of two per member, so later of() calls read the memo. Entries already
+     * remembered are kept, never overwritten; inactive members have no roles
+     * and need no query.
+     *
+     * @param  iterable<Member>  $members
+     */
+    public function preload(iterable $members): void
     {
-        $this->rolesByMember = $rolesByMember + $this->rolesByMember;
+        $pendingIds = [];
+
+        foreach ($members as $member) {
+            if ($member->is_active && ! isset($this->rolesByMember[$member->id])) {
+                $pendingIds[] = (string) $member->id;
+            }
+        }
+
+        if ($pendingIds === []) {
+            return;
+        }
+
+        $rolesByMember = $this->commissionRoles->forEachGroup($this->memberships->commissionIdsByMember($pendingIds));
+
+        foreach ($pendingIds as $memberId) {
+            $this->rolesByMember[$memberId] = $rolesByMember[$memberId] ?? [];
+        }
     }
 
     /**
@@ -79,25 +106,13 @@ class MemberRoles
      */
     public function forCommissions(array $commissionIds): array
     {
-        return $this->inDeclaredOrder(DB::table('commission_role')
-            ->whereIn('commission_id', $commissionIds)
-            ->distinct()
-            ->pluck('role')
-            ->all());
+        return $this->commissionRoles->forCommissions($commissionIds);
     }
 
-    /**
-     * The roles each commission holds, keyed by commission id, in one query.
-     *
-     * @return array<string, list<Role>>
-     */
+    /** @return array<string, list<Role>> the roles each commission holds, in one query */
     public function byCommission(): array
     {
-        return DB::table('commission_role')
-            ->get(['commission_id', 'role'])
-            ->groupBy('commission_id')
-            ->map(fn ($rows) => $this->inDeclaredOrder($rows->pluck('role')->all()))
-            ->all();
+        return $this->commissionRoles->byCommission();
     }
 
     /**
@@ -118,30 +133,11 @@ class MemberRoles
             ->map(fn (Commission $commission) => [
                 'id' => $commission->id,
                 'name' => $commission->name,
-                'roles' => array_map(fn (Role $role) => $role->toOption(), $rolesByCommission[$commission->id] ?? []),
+                'roles' => array_map(
+                    fn (Role $role) => $role->toOption(),
+                    $rolesByCommission[$commission->id] ?? [],
+                ),
             ])
             ->all());
-    }
-
-    /**
-     * @return list<Role>
-     */
-    private function rolesThroughCommissions(Member $member): array
-    {
-        $commissionIds = $member->commissions()->get(['commissions.id'])->map(fn (Commission $commission) => $commission->id)->all();
-
-        return $this->forCommissions($commissionIds);
-    }
-
-    /**
-     * @param  array<mixed>  $values
-     * @return list<Role>
-     */
-    private function inDeclaredOrder(array $values): array
-    {
-        return array_values(array_filter(
-            Role::cases(),
-            fn (Role $role) => in_array($role->value, $values, true),
-        ));
     }
 }
