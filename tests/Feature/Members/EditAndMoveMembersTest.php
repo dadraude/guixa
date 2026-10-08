@@ -201,14 +201,21 @@ test('members sharing the same name are paginated ordered by id, each exactly on
     expect(collect($firstPage)->merge($secondPage)->pluck('id')->all())->toBe($expectedIds);
 });
 
-test('a page past the end redirects to the last page keeping the rest of the query string', function () {
+test('a page past the end redirects to the last page dropping unknown query parameters', function () {
     $household = Household::factory()->create();
     $user = membershipUser();
     memberIn($household);
     memberIn($household);
 
     $this->actingAs($user)->get(route('members.index', ['page' => 2, 'foo' => 'bar']))
-        ->assertRedirect(route('members.index', ['page' => 1, 'foo' => 'bar']));
+        ->assertRedirect(route('members.index', ['page' => 1]));
+});
+
+test('a page past the end redirects to the last page even with array or numeric query keys', function () {
+    memberIn(Household::factory()->create());
+
+    $this->actingAs(membershipUser())->get('/members?0[]=x&page=999')
+        ->assertRedirect(route('members.index', ['page' => 1]));
 });
 
 test('a huge page number redirects to the last page instead of failing', function () {
@@ -275,7 +282,7 @@ test('member actions send the user back to the list page they were on', function
     $member = memberIn(Household::factory()->create());
     $test = $this->actingAs(membershipUser())->from(route('members.index', ['page' => 3, 'foo' => 'bar']));
 
-    $action()($test, $member)->assertRedirect(route('members.index', ['page' => 3, 'foo' => 'bar']));
+    $action()($test, $member)->assertRedirect(route('members.index', ['page' => 3]));
 })->with('member list actions');
 
 test('member actions fall back to the plain list without a usable referer', function (Closure $action, string $referer) {
@@ -289,23 +296,39 @@ test('member actions fall back to the plain list without a usable referer', func
     'a sibling path' => 'http://localhost/members/abc?page=3',
 ]);
 
-test('a referer page that is not a positive integer is dropped but the rest of the query is kept', function (string $page) {
+test('a referer page that is not a positive integer is dropped along with unknown parameters', function (string $page) {
     $member = memberIn(Household::factory()->create());
 
     $this->actingAs(membershipUser())
         ->from(route('members.index').'?page='.$page.'&foo=bar')
         ->post(route('members.deactivate', $member))
-        ->assertRedirect(route('members.index', ['foo' => 'bar']));
+        ->assertRedirect(route('members.index'));
 })->with(['zero' => '0', 'negative' => '-2', 'text' => 'abc', 'decimal' => '1.5']);
 
-test('a list page that no longer exists after an action ends on the last page', function () {
-    $user = membershipUser();
+test('a referer with numeric or array query keys never breaks the redirect', function (string $query) {
     $member = memberIn(Household::factory()->create());
 
-    $response = $this->actingAs($user)->from(route('members.index', ['page' => 3]))
-        ->post(route('members.deactivate', $member));
+    $this->actingAs(membershipUser())
+        ->from('http://localhost/members?'.$query)
+        ->post(route('members.deactivate', $member))
+        ->assertRedirect(route('members.index', ['page' => 2]));
+})->with(['array key' => '0[]=x&page=2', 'numeric key' => '0=foo&page=2']);
 
-    $response->assertRedirect(route('members.index', ['page' => 3]));
-    $this->actingAs($user)->get(route('members.index', ['page' => 3]))
-        ->assertRedirect(route('members.index', ['page' => 1]));
+test('a referer page with leading zeros is normalized to its integer value', function () {
+    $member = memberIn(Household::factory()->create());
+
+    $this->actingAs(membershipUser())
+        ->from('http://localhost/members?page=02')
+        ->post(route('members.deactivate', $member))
+        ->assertRedirect(route('members.index', ['page' => 2]));
+});
+
+test('a failed validation sends the user back to the list page they were on', function () {
+    $member = memberIn(Household::factory()->create());
+
+    $this->actingAs(membershipUser())
+        ->from(route('members.index', ['page' => 3]))
+        ->patch(route('members.update', $member), ['name' => '', 'email' => 'not-an-email'])
+        ->assertRedirect(route('members.index', ['page' => 3]))
+        ->assertSessionHasErrors(['name', 'email']);
 });

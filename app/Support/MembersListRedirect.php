@@ -21,7 +21,30 @@ final class MembersListRedirect
     }
 
     /**
-     * @return array<int|string, mixed>
+     * The single page-parsing rule of the members list: digits only, leading
+     * zeros ignored, at least 1. Anything else is not a page. A number too long
+     * to be a real page is capped so the list can still redirect to its last page.
+     */
+    public static function page(mixed $value): ?int
+    {
+        if (! is_string($value) || ! ctype_digit($value)) {
+            return null;
+        }
+
+        $digits = ltrim($value, '0');
+
+        if ($digits === '') {
+            return null;
+        }
+
+        return strlen($digits) > 9 ? 999_999_999 : (int) $digits;
+    }
+
+    /**
+     * Only the parameters the list understands are carried over (today only the
+     * page): arbitrary keys, numeric or array ones, must never reach the URL generator.
+     *
+     * @return array{page?: int}
      */
     private static function listQuery(Request $request): array
     {
@@ -37,16 +60,8 @@ final class MembersListRedirect
 
         parse_str($referer['query'] ?? '', $query);
 
-        if (! isset($query['page'])) {
-            return $query;
-        }
+        $page = self::page($query['page'] ?? null);
 
-        $page = is_string($query['page']) ? filter_var($query['page'], FILTER_VALIDATE_INT) : false;
-
-        if ($page === false || $page < 1) {
-            unset($query['page']);
-        }
-
-        return $query;
+        return $page === null ? [] : ['page' => $page];
     }
 }

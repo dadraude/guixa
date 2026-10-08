@@ -42,11 +42,11 @@ class MemberController extends Controller
         )->orderBy('members.id');
 
         $lastPage = max(1, (int) ceil(Member::query()->count() / self::PER_PAGE));
-        $requestedPage = max(1, $request->integer('page', 1));
+        $requestedPage = MembersListRedirect::page($request->query('page')) ?? 1;
 
         // Bounded before paginating: a huge page would overflow the offset.
         if ($requestedPage > $lastPage) {
-            return redirect()->route('members.index', [...$request->query(), 'page' => $lastPage]);
+            return redirect()->route('members.index', ['page' => $lastPage]);
         }
 
         $page = $query->paginate(self::PER_PAGE, page: $requestedPage)->withQueryString();
