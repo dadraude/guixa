@@ -43,9 +43,10 @@ If it stopped on an undecided edge case, ask the user (one question at a time), 
 ticket as an acceptance criterion, and launch it again with the updated ticket.
 
 Then sync with the base: `git fetch origin` and `git merge origin/<base>` (merge, never rebase: the
-branch may be pushed and force-push is forbidden). If it conflicts, resolve it with the
-`resolving-merge-conflicts` skill. If the base brought new commits, run a `ticket-implementer` pass that
-only runs the full checks (step 5 of its flow) and fixes what breaks.
+branch may be pushed and force-push is forbidden). If it conflicts, do not resolve it yourself: launch a
+`ticket-implementer` pass that resolves it with the `resolving-merge-conflicts` skill, runs the full
+checks and commits the merge. Otherwise, if the base brought new commits, run a `ticket-implementer` pass
+that only runs the full checks (step 5 of its flow) and fixes what breaks.
 
 ## 3. Independent review
 
@@ -59,6 +60,8 @@ If either verdict is `CHANGES REQUESTED`, relay the blockers of both to a new `t
 
 Then sort every follow-up into one of two buckets, so none lives only in a PR body:
 - **Trivial** (wording, formatting, a comment): fix it in the correction pass, or drop it and say so.
+  With no correction pass (both verdicts approve), drop it, or batch the ones worth keeping into one
+  short `ticket-implementer` pass; never fix them in the main session.
 - **Worth doing**: one Linear issue each in project Guixa, label `needs-triage`, related to the
   parent ticket and in its milestone, titled with the change to make; body: file:line, the reviewer's finding and the
   suggested fix. Create them after the user approves the PR (step 4), before opening it.

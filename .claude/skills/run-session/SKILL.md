@@ -13,7 +13,8 @@ live in `CLAUDE.md` and `docs/agents/issue-tracker.md`; this skill is their runn
 1. `get_workspace`: the workspace must be `Draude`, otherwise stop and tell the user.
 2. Read the latest Guixa project status update (`get_status_updates`). The session number is its
    number plus one; its next step is the default goal.
-3. **Leftovers**: list Guixa issues in Todo, In Progress and In Review.
+3. **Leftovers**: list Guixa issues in Todo, In Progress and In Review (one filtered `list_issues` call
+   per state, with a `limit`).
    - In Review: check each PR with `gh pr view`. Merged and still In Review → move it to Done.
      Still open → it carries over; mention it.
    - Todo or In Progress means the last session did not close cleanly: ask the user, issue by issue,
@@ -34,6 +35,9 @@ Take the Todo issues in blocking order:
 - **Ticket** (`ready-for-agent`): read `.claude/skills/ship-ticket/SKILL.md` and run its flow for the
   issue, skipping its step 5 (the status update belongs to this skill's close).
 - **`ready-for-human`**: the user does it; help as asked and move the issue when they say it is done.
+  Any code change that help needs goes to a `ticket-implementer` launch with `model: "sonnet"`.
+
+Between two tickets, suggest `/compact` to the user (or ending the session) when the context is long.
 - **Spec work** (vision, principles, a spec, its review, its tickets): run the matching step of the
   SDD workflow in `CLAUDE.md`, in a worktree on a `chore/` or `feature/` branch, and open a PR the same way.
 
