@@ -142,7 +142,7 @@ defineOptions({
             <InputError :message="errors.commission_ids" />
         </Form>
 
-        <p v-if="members.length === 0" class="text-muted-foreground">
+        <p v-if="pagination.total === 0" class="text-muted-foreground">
             {{ t('No members yet.') }}
         </p>
 

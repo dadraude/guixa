@@ -162,16 +162,18 @@ test('the members page sorts members by name ignoring accents and case', functio
 
 test('the members page paginates the list, sorted across pages', function () {
     $household = Household::factory()->create();
+    $user = membershipUser();
+    $user->update(['name' => 'Marta']);
     foreach (range(1, 20) as $number) {
         memberIn($household, ['name' => sprintf('Zzz%02d', $number)]);
     }
     memberIn($household, ['name' => 'Àlex']);
-    $user = membershipUser();
+    $expected = ['Àlex', 'Marta', ...array_map(fn ($number) => sprintf('Zzz%02d', $number), range(1, 20))];
 
     $this->actingAs($user)->get(route('members.index'))
         ->assertInertia(fn (Assert $page) => $page
             ->has('members', 15)
-            ->where('members.0.name', fn ($name) => $name === 'Àlex' || $name < 'Zzz')
+            ->where('members', fn ($members) => collect($members)->pluck('name')->all() === array_slice($expected, 0, 15))
             ->where('pagination.current_page', 1)
             ->where('pagination.last_page', 2)
             ->where('pagination.total', 22)
@@ -181,15 +183,48 @@ test('the members page paginates the list, sorted across pages', function () {
     $this->actingAs($user)->get(route('members.index', ['page' => 2]))
         ->assertInertia(fn (Assert $page) => $page
             ->has('members', 7)
-            ->where('members.6.name', 'Zzz20')
+            ->where('members', fn ($members) => collect($members)->pluck('name')->all() === array_slice($expected, 15))
             ->where('pagination.current_page', 2)
             ->where('pagination.next_page_url', null));
 });
 
-test('a page past the end is empty', function () {
-    $this->actingAs(membershipUser())->get(route('members.index', ['page' => 99]))
+test('members sharing the same name are paginated ordered by id, each exactly once', function () {
+    $household = Household::factory()->create();
+    $user = membershipUser();
+    $user->update(['name' => 'Aaa']);
+    $sameName = collect(range(1, 20))->map(fn () => memberIn($household, ['name' => 'Clon'])->id)->sort()->values();
+    $expectedIds = collect([$user->member->id])->merge($sameName)->all();
+
+    $firstPage = $this->actingAs($user)->get(route('members.index'))->viewData('page')['props']['members'];
+    $secondPage = $this->actingAs($user)->get(route('members.index', ['page' => 2]))->viewData('page')['props']['members'];
+
+    expect(collect($firstPage)->merge($secondPage)->pluck('id')->all())->toBe($expectedIds);
+});
+
+test('a page past the end redirects to the last page keeping the rest of the query string', function () {
+    $household = Household::factory()->create();
+    $user = membershipUser();
+    memberIn($household);
+    memberIn($household);
+
+    $this->actingAs($user)->get(route('members.index', ['page' => 2, 'foo' => 'bar']))
+        ->assertRedirect(route('members.index', ['page' => 1, 'foo' => 'bar']));
+});
+
+test('a huge page number redirects to the last page instead of failing', function () {
+    memberIn(Household::factory()->create());
+
+    $this->actingAs(membershipUser())->get(route('members.index', ['page' => PHP_INT_MAX]))
+        ->assertRedirect(route('members.index', ['page' => 1]));
+
+    $this->actingAs(membershipUser())->get(route('members.index', ['page' => '99999999999999999999999']))
+        ->assertRedirect(route('members.index', ['page' => 1]));
+});
+
+test('a non-positive page number shows the first page', function () {
+    $this->actingAs(membershipUser())->get(route('members.index', ['page' => -3]))
         ->assertOk()
-        ->assertInertia(fn (Assert $page) => $page->has('members', 0));
+        ->assertInertia(fn (Assert $page) => $page->where('pagination.current_page', 1));
 });
 
 test('an immediate email change drops a pending self-service change, so its old link cannot overwrite it', function () {

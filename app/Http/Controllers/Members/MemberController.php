@@ -15,6 +15,7 @@ use App\Http\Requests\Members\UpdateMemberRequest;
 use App\Models\Commission;
 use App\Models\Household;
 use App\Models\Member;
+use App\Support\CatalanCollation;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -25,21 +26,29 @@ class MemberController extends Controller
 {
     private const int PER_PAGE = 15;
 
-    public function index(Request $request, EmailChangeLevels $emailChangeLevels, MembershipRoleProtection $protection): Response
+    public function index(Request $request, EmailChangeLevels $emailChangeLevels, MembershipRoleProtection $protection): Response|RedirectResponse
     {
         $actor = $request->user() ?? abort(403);
 
-        // Sorted in the query so the list can be paginated. The ICU Catalan
-        // collation orders like the shared CatalanCollation helper does in PHP
-        // ("Àlex" before "Zoe"); the id breaks ties so pages stay stable.
-        $page = Member::query()
-            ->select('members.*')
-            ->join('users', 'users.id', '=', 'members.user_id')
-            ->with('user.administrator')
-            ->orderByRaw('users.name collate "ca-x-icu"')
-            ->orderBy('members.id')
-            ->paginate(self::PER_PAGE)
-            ->withQueryString();
+        // Sorted in the query so the list can be paginated, with the same
+        // collation the PHP sort uses; the id breaks ties so pages stay stable.
+        $query = CatalanCollation::orderByColumn(
+            Member::query()
+                ->select('members.*')
+                ->join('users', 'users.id', '=', 'members.user_id')
+                ->with('user.administrator'),
+            'users.name',
+        )->orderBy('members.id');
+
+        $lastPage = max(1, (int) ceil(Member::query()->count() / self::PER_PAGE));
+        $requestedPage = max(1, $request->integer('page', 1));
+
+        // Bounded before paginating: a huge page would overflow the offset.
+        if ($requestedPage > $lastPage) {
+            return redirect()->route('members.index', [...$request->query(), 'page' => $lastPage]);
+        }
+
+        $page = $query->paginate(self::PER_PAGE, page: $requestedPage)->withQueryString();
 
         $members = $page->getCollection()->map(fn (Member $member) => [
             'id' => $member->id,
