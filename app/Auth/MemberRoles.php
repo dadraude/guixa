@@ -65,6 +65,12 @@ class MemberRoles
         return $this->rolesByMember[$member->id] ??= $this->rolesThroughCommissions($member);
     }
 
+    /** @param array<string, list<Role>> $rolesByMember worked out in bulk by MemberRolesPreloader */
+    public function remember(array $rolesByMember): void
+    {
+        $this->rolesByMember = $rolesByMember + $this->rolesByMember;
+    }
+
     /**
      * The roles held by the given commissions together.
      *
@@ -112,10 +118,7 @@ class MemberRoles
             ->map(fn (Commission $commission) => [
                 'id' => $commission->id,
                 'name' => $commission->name,
-                'roles' => array_map(
-                    fn (Role $role) => $role->toOption(),
-                    $rolesByCommission[$commission->id] ?? [],
-                ),
+                'roles' => array_map(fn (Role $role) => $role->toOption(), $rolesByCommission[$commission->id] ?? []),
             ])
             ->all());
     }
