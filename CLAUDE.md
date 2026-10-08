@@ -13,15 +13,29 @@ using Matt Pocock's skills (`mattpocock-skills` plugin). See `docs/adr/0001-sdd-
    1. `/grill-with-docs`: interview until the feature is clear; updates `CONTEXT.md` and `docs/adr/`.
    2. `/to-spec`: writes `specs/NNN-name/spec.md` (`Status: draft`) — problem, user stories,
       implementation and testing decisions.
-   3. **Spec review**: the `spec-reviewer` agent (Opus, read-only) lists the edge cases the spec leaves
+   3. **Spec review**: the `spec-reviewer` agent (`model: "opus"`, read-only) lists the edge cases the spec leaves
       undecided (concurrency, lifecycle states, signed out, permissions, sibling screens, failure states).
       Obvious answers go into the spec; the rest are asked one by one with `/grill-with-docs` and recorded.
    4. **The user approves the spec** (`Status: approved`). No tickets and no code before that.
    5. `/to-tickets`: splits the spec into vertical-slice tickets in Linear (project Guixa). Each ticket
       carries the edge cases decided for its stories as acceptance criteria.
-   6. `/implement`: one or a few tickets per session, test-first (`/tdd`), then `/code-review`.
+   6. `/ship-ticket DRA-NN`: one or a few tickets per session; the `ticket-implementer` agent builds
+      test-first (`/tdd`) and two reviewer agents check it. Do not use the plugin's `/implement`: it
+      runs inline on the main session's model instead of the implementer's.
 
 Domain vocabulary lives in `CONTEXT.md`; decisions in `docs/adr/NNNN-title.md`.
+
+## Models
+
+| Who | Model | Where it is set |
+| --- | --- | --- |
+| Main session: orchestration, `/grill-with-docs`, `/to-spec`, `/to-tickets`, triage | Opus | the user's `/model`; never pinned in `.claude/settings.json` |
+| `ticket-implementer` | Sonnet | agent frontmatter |
+| `ticket-reviewer`, `ticket-correctness-reviewer`, `spec-reviewer` | Opus | agent frontmatter |
+
+Every agent launch passes the `model` from this table explicitly: an Agent call's `model` overrides the
+agent's frontmatter, so a generic default (such as `sonnet` for every delegation) would silently downgrade
+the reviewers. Implementation and review must stay on different models.
 
 ## Session rules
 
