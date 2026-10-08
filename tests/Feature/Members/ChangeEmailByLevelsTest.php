@@ -226,6 +226,16 @@ test('an inactive member who keeps the administrator profile is still protected 
     expect($target->user->fresh()->email)->toBe($originalEmail);
 });
 
+test('an administrator cannot change the email of an inactive member who keeps the administrator profile', function () {
+    $target = levelsAdministratorTarget();
+    $target->update(['is_active' => false]);
+    $originalEmail = $target->user->email;
+
+    changeEmail(User::factory()->administrator()->create(), $target)->assertForbidden();
+
+    expect($target->user->fresh()->email)->toBe($originalEmail);
+});
+
 test('a removed administrator profile never protects the email', function () {
     $target = levelsAdministratorTarget();
     $target->user->administrator->delete();

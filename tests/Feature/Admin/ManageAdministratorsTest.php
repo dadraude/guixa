@@ -200,6 +200,8 @@ test('the owner acting as a member cannot manage administrators', function () {
 
     $this->actingAs($owner)->withSession(['active_profile' => 'member']);
 
+    $this->get(route('admin.administrators.index'))->assertForbidden();
+    $this->post(route('admin.administrators.store'), ['member_id' => $other->member->id])->assertForbidden();
     $this->delete(route('admin.administrators.destroy', $other->administrator))->assertForbidden();
 });
 
@@ -223,6 +225,32 @@ test('removing the profile ends the administrator session and acting as member k
     $this->get(route('home'))->assertRedirect(route('dashboard'));
     $this->get(route('dashboard'))->assertOk();
     $this->assertAuthenticatedAs($berta);
+});
+
+test('re-adding the profile mid-session does not resume the old administrator choice', function () {
+    $owner = User::factory()->owner()->create();
+    $berta = User::factory()->administrator()->member(Household::factory()->create())->create(['email' => 'berta@example.com']);
+
+    $this->post(route('login.store'), ['email' => 'berta@example.com', 'password' => 'password']);
+    $this->post(route('active-profile.update'), ['profile' => 'administrator']);
+    $bertaSession = session()->all();
+
+    $this->flushSession();
+    auth()->forgetGuards();
+    $this->actingAs($owner)->delete(route('admin.administrators.destroy', $berta->administrator));
+
+    $this->flushSession();
+    auth()->forgetGuards();
+    $this->withSession($bertaSession)->get(route('dashboard'))->assertOk();
+    $bertaSession = session()->all();
+
+    $this->flushSession();
+    auth()->forgetGuards();
+    $this->actingAs($owner)->post(route('admin.administrators.store'), ['member_id' => $berta->member->id]);
+
+    $this->flushSession();
+    auth()->forgetGuards();
+    $this->withSession($bertaSession)->get(route('dashboard'))->assertRedirect(route('active-profile.edit'));
 });
 
 test('a member whose profile is removed while signed in as administrator without a household is sent to the waiting screen', function () {

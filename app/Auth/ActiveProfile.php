@@ -90,7 +90,13 @@ class ActiveProfile
 
         if ($only === Profile::Administrator) {
             $this->choose($only);
+
+            return $only;
         }
+
+        // Forget a stale administrator choice (e.g. the profile was removed), so
+        // adding it again later asks the person to choose instead of resuming it.
+        $this->session->forget(self::SESSION_KEY);
 
         return $only;
     }

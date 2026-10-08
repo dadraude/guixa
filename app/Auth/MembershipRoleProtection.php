@@ -84,7 +84,7 @@ class MembershipRoleProtection
      * Whether the membership role may deactivate this member: not when they hold the
      * membership role (DRA-34) nor when they are an active administrator, since that
      * would stop them acting as administrator. An inactive member who keeps the
-     * administrator profile does not block it (DRA-72).
+     * administrator profile does not block it (DRA-57, from DRA-72).
      */
     private function mayBeDeactivatedByMembershipRole(Member $member): bool
     {

@@ -240,8 +240,10 @@ test('the membership role is refused a deactivation only because of active membe
 
     $this->actingAs($actor)->post(route('members.deactivate', $active))->assertForbidden();
     $this->actingAs($actor)->post(route('members.deactivate', $removed->member))->assertRedirect();
+    $this->actingAs($actor)->post(route('members.deactivate', $inactive))->assertRedirect();
 
     expect($active->fresh()->is_active)->toBeTrue()
+        ->and($inactive->fresh()->is_active)->toBeFalse()
         ->and($removed->member->fresh()->is_active)->toBeFalse();
 });
 
