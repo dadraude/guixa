@@ -216,13 +216,14 @@ test('the membership role still edits name and phone of an administrator, leavin
         ->and($target->user->fresh()->email)->toBe($originalEmail);
 });
 
-test('an inactive member who keeps the administrator profile no longer counts as an administrator for the membership role', function () {
+test('an inactive member who keeps the administrator profile is still protected from the membership role', function () {
     $target = levelsAdministratorTarget();
     $target->update(['is_active' => false]);
+    $originalEmail = $target->user->email;
 
-    changeEmail(levelsMembershipUser(), $target)->assertSessionDoesntHaveErrors();
+    changeEmail(levelsMembershipUser(), $target)->assertForbidden();
 
-    expect($target->user->fresh()->email)->toBe('new@example.com');
+    expect($target->user->fresh()->email)->toBe($originalEmail);
 });
 
 test('a removed administrator profile never protects the email', function () {
