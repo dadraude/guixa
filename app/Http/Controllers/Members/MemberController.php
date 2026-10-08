@@ -8,6 +8,7 @@ use App\Actions\CreateMember;
 use App\Actions\DeactivateMember;
 use App\Actions\ReactivateMember;
 use App\Auth\EmailChangeLevels;
+use App\Auth\MemberRoles;
 use App\Auth\MembershipRoleProtection;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Members\StoreMemberRequest;
@@ -16,6 +17,7 @@ use App\Models\Commission;
 use App\Models\Household;
 use App\Models\Member;
 use App\Support\CatalanCollation;
+use App\Support\MembersListRedirect;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -24,27 +26,45 @@ use Inertia\Response;
 
 class MemberController extends Controller
 {
-    public function index(Request $request, EmailChangeLevels $emailChangeLevels, MembershipRoleProtection $protection): Response
+    private const int PER_PAGE = 15;
+
+    public function index(Request $request, EmailChangeLevels $emailChangeLevels, MembershipRoleProtection $protection, MemberRoles $memberRoles): Response|RedirectResponse
     {
         $actor = $request->user() ?? abort(403);
 
-        $collation = new CatalanCollation;
+        // Sorted in the query so the list can be paginated, with the same
+        // collation the PHP sort uses; the id breaks ties so pages stay stable.
+        $query = CatalanCollation::orderByColumn(
+            Member::query()
+                ->select('members.*')
+                ->join('users', 'users.id', '=', 'members.user_id')
+                ->with('user.administrator'),
+            'users.name',
+        )->orderBy('members.id');
 
-        $members = Member::query()
-            ->with('user.administrator')
-            ->get()
-            ->sort(fn (Member $a, Member $b) => $collation->compare($a->user->name, $b->user->name))
-            ->values()
-            ->map(fn (Member $member) => [
-                'id' => $member->id,
-                'name' => $member->user->name,
-                'email' => $member->user->email,
-                'phone' => $member->phone,
-                'household_id' => $member->household_id,
-                'is_active' => $member->is_active,
-                'can_change_email' => $emailChangeLevels->canChange($actor, $member),
-                'can_deactivate' => $protection->mayDeactivateMember($actor, $member),
-            ]);
+        $lastPage = max(1, (int) ceil(Member::query()->count() / self::PER_PAGE));
+        $requestedPage = MembersListRedirect::page($request->query('page')) ?? 1;
+
+        // Bounded before paginating: a huge page would overflow the offset.
+        if ($requestedPage > $lastPage) {
+            return redirect()->route('members.index', ['page' => $lastPage]);
+        }
+
+        $page = $query->paginate(self::PER_PAGE, page: $requestedPage)->withQueryString();
+
+        // One lookup for the whole page: the per-row checks below read the remembered roles.
+        $memberRoles->preload($page->getCollection());
+
+        $members = $page->getCollection()->map(fn (Member $member) => [
+            'id' => $member->id,
+            'name' => $member->user->name,
+            'email' => $member->user->email,
+            'phone' => $member->phone,
+            'household_id' => $member->household_id,
+            'is_active' => $member->is_active,
+            'can_change_email' => $emailChangeLevels->canChange($actor, $member),
+            'can_deactivate' => $protection->mayDeactivateMember($actor, $member),
+        ])->values();
 
         $households = Household::query()
             ->where('is_active', true)
@@ -53,6 +73,13 @@ class MemberController extends Controller
 
         return Inertia::render('members/Index', [
             'members' => $members,
+            'pagination' => [
+                'current_page' => $page->currentPage(),
+                'last_page' => $page->lastPage(),
+                'total' => $page->total(),
+                'prev_page_url' => $page->previousPageUrl(),
+                'next_page_url' => $page->nextPageUrl(),
+            ],
             'households' => $households,
             'commissions' => Commission::query()->orderBy('name')->get(['id', 'name']),
         ]);
@@ -72,7 +99,7 @@ class MemberController extends Controller
 
         Inertia::flash('toast', ['type' => 'success', 'message' => __('Member created.')]);
 
-        return to_route('members.index');
+        return MembersListRedirect::back($request);
     }
 
     /**
@@ -104,7 +131,7 @@ class MemberController extends Controller
 
         Inertia::flash('toast', ['type' => 'success', 'message' => __('Member updated.')]);
 
-        return to_route('members.index');
+        return MembersListRedirect::back($request);
     }
 
     public function deactivate(Request $request, Member $member, DeactivateMember $deactivateMember, MembershipRoleProtection $protection): RedirectResponse
@@ -115,15 +142,15 @@ class MemberController extends Controller
 
         Inertia::flash('toast', ['type' => 'success', 'message' => __('Member deactivated.')]);
 
-        return to_route('members.index');
+        return MembersListRedirect::back($request);
     }
 
-    public function reactivate(Member $member, ReactivateMember $reactivateMember): RedirectResponse
+    public function reactivate(Request $request, Member $member, ReactivateMember $reactivateMember): RedirectResponse
     {
         $reactivateMember->handle($member);
 
         Inertia::flash('toast', ['type' => 'success', 'message' => __('Member reactivated.')]);
 
-        return to_route('members.index');
+        return MembersListRedirect::back($request);
     }
 }

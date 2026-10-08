@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Form, Head } from '@inertiajs/vue3';
+import { Form, Head, Link } from '@inertiajs/vue3';
 import MemberController from '@/actions/App/Http/Controllers/Members/MemberController';
 import MemberHouseholdController from '@/actions/App/Http/Controllers/Members/MemberHouseholdController';
 import Heading from '@/components/Heading.vue';
@@ -32,8 +32,17 @@ type CommissionOption = {
     name: string;
 };
 
+type Pagination = {
+    current_page: number;
+    last_page: number;
+    total: number;
+    prev_page_url: string | null;
+    next_page_url: string | null;
+};
+
 defineProps<{
     members: MemberRow[];
+    pagination: Pagination;
     households: HouseholdOption[];
     commissions: CommissionOption[];
 }>();
@@ -133,7 +142,7 @@ defineOptions({
             <InputError :message="errors.commission_ids" />
         </Form>
 
-        <p v-if="members.length === 0" class="text-muted-foreground">
+        <p v-if="pagination.total === 0" class="text-muted-foreground">
             {{ t('No members yet.') }}
         </p>
 
@@ -256,5 +265,41 @@ defineOptions({
                 </Form>
             </li>
         </ul>
+
+        <nav
+            v-if="pagination.last_page > 1"
+            class="flex items-center justify-between gap-2"
+            data-test="members-pagination"
+            :aria-label="t('Pagination')"
+        >
+            <Button
+                v-if="pagination.prev_page_url"
+                as-child
+                variant="outline"
+                size="sm"
+            >
+                <Link :href="pagination.prev_page_url" preserve-scroll>{{
+                    t('Previous')
+                }}</Link>
+            </Button>
+            <span v-else />
+            <span class="text-sm text-muted-foreground">{{
+                t('Page :page of :last', {
+                    page: pagination.current_page,
+                    last: pagination.last_page,
+                })
+            }}</span>
+            <Button
+                v-if="pagination.next_page_url"
+                as-child
+                variant="outline"
+                size="sm"
+            >
+                <Link :href="pagination.next_page_url" preserve-scroll>{{
+                    t('Next')
+                }}</Link>
+            </Button>
+            <span v-else />
+        </nav>
     </div>
 </template>

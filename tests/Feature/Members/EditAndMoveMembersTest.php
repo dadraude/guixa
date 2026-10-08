@@ -160,6 +160,80 @@ test('the members page sorts members by name ignoring accents and case', functio
             ->where('members', fn ($members) => collect($members)->pluck('name')->intersect($names)->values()->all() === $names));
 });
 
+test('the members page paginates the list, sorted across pages', function () {
+    $household = Household::factory()->create();
+    $user = membershipUser();
+    $user->update(['name' => 'Marta']);
+    foreach (range(1, 20) as $number) {
+        memberIn($household, ['name' => sprintf('Zzz%02d', $number)]);
+    }
+    memberIn($household, ['name' => 'Àlex']);
+    $expected = ['Àlex', 'Marta', ...array_map(fn ($number) => sprintf('Zzz%02d', $number), range(1, 20))];
+
+    $this->actingAs($user)->get(route('members.index'))
+        ->assertInertia(fn (Assert $page) => $page
+            ->has('members', 15)
+            ->where('members', fn ($members) => collect($members)->pluck('name')->all() === array_slice($expected, 0, 15))
+            ->where('pagination.current_page', 1)
+            ->where('pagination.last_page', 2)
+            ->where('pagination.total', 22)
+            ->where('pagination.prev_page_url', null)
+            ->where('pagination.next_page_url', fn ($url) => str_contains($url, 'page=2')));
+
+    $this->actingAs($user)->get(route('members.index', ['page' => 2]))
+        ->assertInertia(fn (Assert $page) => $page
+            ->has('members', 7)
+            ->where('members', fn ($members) => collect($members)->pluck('name')->all() === array_slice($expected, 15))
+            ->where('pagination.current_page', 2)
+            ->where('pagination.next_page_url', null));
+});
+
+test('members sharing the same name are paginated ordered by id, each exactly once', function () {
+    $household = Household::factory()->create();
+    $user = membershipUser();
+    $user->update(['name' => 'Aaa']);
+    $sameName = collect(range(1, 20))->map(fn () => memberIn($household, ['name' => 'Clon'])->id)->sort()->values();
+    $expectedIds = collect([$user->member->id])->merge($sameName)->all();
+
+    $firstPage = $this->actingAs($user)->get(route('members.index'))->viewData('page')['props']['members'];
+    $secondPage = $this->actingAs($user)->get(route('members.index', ['page' => 2]))->viewData('page')['props']['members'];
+
+    expect(collect($firstPage)->merge($secondPage)->pluck('id')->all())->toBe($expectedIds);
+});
+
+test('a page past the end redirects to the last page dropping unknown query parameters', function () {
+    $household = Household::factory()->create();
+    $user = membershipUser();
+    memberIn($household);
+    memberIn($household);
+
+    $this->actingAs($user)->get(route('members.index', ['page' => 2, 'foo' => 'bar']))
+        ->assertRedirect(route('members.index', ['page' => 1]));
+});
+
+test('a page past the end redirects to the last page even with array or numeric query keys', function () {
+    memberIn(Household::factory()->create());
+
+    $this->actingAs(membershipUser())->get('/members?0[]=x&page=999')
+        ->assertRedirect(route('members.index', ['page' => 1]));
+});
+
+test('a huge page number redirects to the last page instead of failing', function () {
+    memberIn(Household::factory()->create());
+
+    $this->actingAs(membershipUser())->get(route('members.index', ['page' => PHP_INT_MAX]))
+        ->assertRedirect(route('members.index', ['page' => 1]));
+
+    $this->actingAs(membershipUser())->get(route('members.index', ['page' => '99999999999999999999999']))
+        ->assertRedirect(route('members.index', ['page' => 1]));
+});
+
+test('a non-positive page number shows the first page', function () {
+    $this->actingAs(membershipUser())->get(route('members.index', ['page' => -3]))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page->where('pagination.current_page', 1));
+});
+
 test('an immediate email change drops a pending self-service change, so its old link cannot overwrite it', function () {
     $member = memberIn(Household::factory()->create(), ['email' => 'old@example.com']);
     $member->user->forceFill([
@@ -194,4 +268,67 @@ test('a failing member update rolls back the user update', function () {
 
     expect($member->user->fresh()->name)->toBe('Abans')
         ->and($member->user->fresh()->email)->toBe('old@example.com');
+});
+
+dataset('member list actions', [
+    'update' => fn () => fn ($test, Member $member) => $test->patch(route('members.update', $member), ['name' => 'Maria Nova', 'email' => 'maria@example.com', 'phone' => null]),
+    'move' => fn () => fn ($test, Member $member) => $test->patch(route('members.household.update', $member), ['household_id' => Household::factory()->create()->id]),
+    'deactivate' => fn () => fn ($test, Member $member) => $test->post(route('members.deactivate', $member)),
+    'reactivate' => fn () => fn ($test, Member $member) => tap($test, fn () => $member->update(['is_active' => false]))->post(route('members.reactivate', $member)),
+    'create' => fn () => fn ($test, Member $member) => $test->post(route('members.store'), ['name' => 'Nou Soci', 'email' => 'nou@example.com']),
+]);
+
+test('member actions send the user back to the list page they were on', function (Closure $action) {
+    $member = memberIn(Household::factory()->create());
+    $test = $this->actingAs(membershipUser())->from(route('members.index', ['page' => 3, 'foo' => 'bar']));
+
+    $action()($test, $member)->assertRedirect(route('members.index', ['page' => 3]));
+})->with('member list actions');
+
+test('member actions fall back to the plain list without a usable referer', function (Closure $action, string $referer) {
+    $member = memberIn(Household::factory()->create());
+    $test = $this->actingAs(membershipUser())->from($referer);
+
+    $action()($test, $member)->assertRedirect(route('members.index'));
+})->with('member list actions')->with([
+    'another host' => 'https://evil.example.com/members?page=3',
+    'another route' => 'http://localhost/commissions?page=3',
+    'a sibling path' => 'http://localhost/members/abc?page=3',
+]);
+
+test('a referer page that is not a positive integer is dropped along with unknown parameters', function (string $page) {
+    $member = memberIn(Household::factory()->create());
+
+    $this->actingAs(membershipUser())
+        ->from(route('members.index').'?page='.$page.'&foo=bar')
+        ->post(route('members.deactivate', $member))
+        ->assertRedirect(route('members.index'));
+})->with(['zero' => '0', 'negative' => '-2', 'text' => 'abc', 'decimal' => '1.5']);
+
+test('a referer with numeric or array query keys never breaks the redirect', function (string $query) {
+    $member = memberIn(Household::factory()->create());
+
+    $this->actingAs(membershipUser())
+        ->from('http://localhost/members?'.$query)
+        ->post(route('members.deactivate', $member))
+        ->assertRedirect(route('members.index', ['page' => 2]));
+})->with(['array key' => '0[]=x&page=2', 'numeric key' => '0=foo&page=2']);
+
+test('a referer page with leading zeros is normalized to its integer value', function () {
+    $member = memberIn(Household::factory()->create());
+
+    $this->actingAs(membershipUser())
+        ->from('http://localhost/members?page=02')
+        ->post(route('members.deactivate', $member))
+        ->assertRedirect(route('members.index', ['page' => 2]));
+});
+
+test('a failed validation sends the user back to the list page they were on', function () {
+    $member = memberIn(Household::factory()->create());
+
+    $this->actingAs(membershipUser())
+        ->from(route('members.index', ['page' => 3]))
+        ->patch(route('members.update', $member), ['name' => '', 'email' => 'not-an-email'])
+        ->assertRedirect(route('members.index', ['page' => 3]))
+        ->assertSessionHasErrors(['name', 'email']);
 });

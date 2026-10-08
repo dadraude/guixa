@@ -51,6 +51,10 @@ arch('classes stay small enough to have one responsibility (SRP)')
     ->classes()
     ->toHaveLineCountLessThan(150);
 
+arch('the commission_member pivot is only read by CommissionMemberships')
+    ->expect('App\\Auth\\CommissionMemberships')
+    ->toOnlyBeUsedIn('App\\Auth\\MemberRoles');
+
 arch('mails are queued after the transaction commits')
     ->expect('App\Mail')
     ->toImplement(ShouldQueueAfterCommit::class);
