@@ -160,6 +160,38 @@ test('the members page sorts members by name ignoring accents and case', functio
             ->where('members', fn ($members) => collect($members)->pluck('name')->intersect($names)->values()->all() === $names));
 });
 
+test('the members page paginates the list, sorted across pages', function () {
+    $household = Household::factory()->create();
+    foreach (range(1, 20) as $number) {
+        memberIn($household, ['name' => sprintf('Zzz%02d', $number)]);
+    }
+    memberIn($household, ['name' => 'Àlex']);
+    $user = membershipUser();
+
+    $this->actingAs($user)->get(route('members.index'))
+        ->assertInertia(fn (Assert $page) => $page
+            ->has('members', 15)
+            ->where('members.0.name', fn ($name) => $name === 'Àlex' || $name < 'Zzz')
+            ->where('pagination.current_page', 1)
+            ->where('pagination.last_page', 2)
+            ->where('pagination.total', 22)
+            ->where('pagination.prev_page_url', null)
+            ->where('pagination.next_page_url', fn ($url) => str_contains($url, 'page=2')));
+
+    $this->actingAs($user)->get(route('members.index', ['page' => 2]))
+        ->assertInertia(fn (Assert $page) => $page
+            ->has('members', 7)
+            ->where('members.6.name', 'Zzz20')
+            ->where('pagination.current_page', 2)
+            ->where('pagination.next_page_url', null));
+});
+
+test('a page past the end is empty', function () {
+    $this->actingAs(membershipUser())->get(route('members.index', ['page' => 99]))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page->has('members', 0));
+});
+
 test('an immediate email change drops a pending self-service change, so its old link cannot overwrite it', function () {
     $member = memberIn(Household::factory()->create(), ['email' => 'old@example.com']);
     $member->user->forceFill([

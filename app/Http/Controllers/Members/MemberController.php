@@ -15,7 +15,6 @@ use App\Http\Requests\Members\UpdateMemberRequest;
 use App\Models\Commission;
 use App\Models\Household;
 use App\Models\Member;
-use App\Support\CatalanCollation;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -24,27 +23,34 @@ use Inertia\Response;
 
 class MemberController extends Controller
 {
+    private const int PER_PAGE = 15;
+
     public function index(Request $request, EmailChangeLevels $emailChangeLevels, MembershipRoleProtection $protection): Response
     {
         $actor = $request->user() ?? abort(403);
 
-        $collation = new CatalanCollation;
-
-        $members = Member::query()
+        // Sorted in the query so the list can be paginated. The ICU Catalan
+        // collation orders like the shared CatalanCollation helper does in PHP
+        // ("Àlex" before "Zoe"); the id breaks ties so pages stay stable.
+        $page = Member::query()
+            ->select('members.*')
+            ->join('users', 'users.id', '=', 'members.user_id')
             ->with('user.administrator')
-            ->get()
-            ->sort(fn (Member $a, Member $b) => $collation->compare($a->user->name, $b->user->name))
-            ->values()
-            ->map(fn (Member $member) => [
-                'id' => $member->id,
-                'name' => $member->user->name,
-                'email' => $member->user->email,
-                'phone' => $member->phone,
-                'household_id' => $member->household_id,
-                'is_active' => $member->is_active,
-                'can_change_email' => $emailChangeLevels->canChange($actor, $member),
-                'can_deactivate' => $protection->mayDeactivateMember($actor, $member),
-            ]);
+            ->orderByRaw('users.name collate "ca-x-icu"')
+            ->orderBy('members.id')
+            ->paginate(self::PER_PAGE)
+            ->withQueryString();
+
+        $members = $page->getCollection()->map(fn (Member $member) => [
+            'id' => $member->id,
+            'name' => $member->user->name,
+            'email' => $member->user->email,
+            'phone' => $member->phone,
+            'household_id' => $member->household_id,
+            'is_active' => $member->is_active,
+            'can_change_email' => $emailChangeLevels->canChange($actor, $member),
+            'can_deactivate' => $protection->mayDeactivateMember($actor, $member),
+        ])->values();
 
         $households = Household::query()
             ->where('is_active', true)
@@ -53,6 +59,13 @@ class MemberController extends Controller
 
         return Inertia::render('members/Index', [
             'members' => $members,
+            'pagination' => [
+                'current_page' => $page->currentPage(),
+                'last_page' => $page->lastPage(),
+                'total' => $page->total(),
+                'prev_page_url' => $page->previousPageUrl(),
+                'next_page_url' => $page->nextPageUrl(),
+            ],
             'households' => $households,
             'commissions' => Commission::query()->orderBy('name')->get(['id', 'name']),
         ]);
