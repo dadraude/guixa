@@ -4,7 +4,9 @@ Status: approved
 
 Decisions come from [`decisions.md`](decisions.md) (grilling session of 2026-10-01, amended
 on 2026-10-06 for DRA-46: members are created by hand, without invitations, and may have no
-household yet; see [ADR 0008](../../docs/adr/0008-members-created-by-hand.md)). Terms are
+household yet; see [ADR 0008](../../docs/adr/0008-members-created-by-hand.md); amended
+again on 2026-10-09 for DRA-87: deactivating only blocks sign-in, see
+[ADR 0011](../../docs/adr/0011-inactive-only-blocks-sign-in.md)). Terms are
 defined in [`CONTEXT.md`](../../CONTEXT.md); see also
 [ADR 0004](../../docs/adr/0004-fixed-roles-on-dynamic-commissions.md) and
 [`principles.md`](../../docs/principles.md).
@@ -33,14 +35,17 @@ Guixa gets the membership foundation every later feature builds on:
 - A new member gets a welcome email pointing to the sign-in screen. They sign in with a
   **magic link** (which also carries a 6-digit code) or with their password, and set a
   password on first access.
-- A member with no household and no commission only sees a waiting screen (and can change the
-  light/dark theme) until the membership commission assigns one. Roles apply with or
-  without a household; a household is needed to see "my household" and, later, to order.
+- A member with no active household and no commission only sees a waiting screen (and can
+  change the light/dark theme) until the membership commission assigns one. Roles apply with or
+  without a household; an active household is needed to see "my household" and, later, to
+  order.
 - **Commissions** are created, renamed and deleted freely, and members are added to them.
   Permissions never come from a commission's name: only administrators assign one or more of
   four fixed **roles** (orders, boxes, treasury, membership) to commissions, and every member
   of a commission gets its roles.
-- Households and members can be made inactive and reactivated without losing history.
+- Households and members can be made inactive and reactivated without losing history. An
+  inactive member only loses sign-in; an inactive household only loses its household access
+  (ADR 0011).
 - Members in any commission see a directory with the contact details of every household and
   its members; others see only
   their own household. Members with the membership role are warned about households that have
@@ -116,13 +121,13 @@ Guixa gets the membership foundation every later feature builds on:
     that both sign-in methods always work for me.
 28. As whoever creates a member, I want to be stopped from using an email that already
     belongs to a member, so that one person does not end up with two accounts.
-29. As a member with no household and no commission, I want a screen telling me the
+29. As a member with no active household and no commission, I want a screen telling me the
     membership commission will assign me a household, where I can only edit my name, phone, email and password, change the theme and sign out, so
     that I know my account works while nothing else is open to me yet.
 30. As a member of a commission without a household (e.g. while moving house), I want to keep
     doing my commission's work, so that leaving a household never takes my roles away.
 31. As a member with the membership role, I want to see the active members without a
-    household, so that I can assign them one.
+    household or with an inactive one, so that I can assign them one.
 
 ### Households
 
@@ -137,12 +142,14 @@ Guixa gets the membership foundation every later feature builds on:
     members, active and inactive, so that I can manage membership.
 36. As a member with the membership role, I want to deactivate a household that leaves the
     cooperative, so that it can no longer order while its history is kept.
-37. As a member with the membership role, I want deactivating a household to make all its
-    members inactive, so that nobody from it keeps access.
+37. As a member with the membership role, I want to choose, when deactivating a household,
+    whether its members are deactivated too, so that people who leave lose sign-in while people
+    who stay in the cooperative (e.g. in a commission) keep it.
 38. As a member with the membership role, I want to reactivate an inactive household with the
     same number, so that a family coming back keeps its history.
-39. As a member with the membership role, I want to reactivate the members of a reactivated
-    household one by one, so that only the people actually returning get access again.
+39. As a member with the membership role, I want to choose, when reactivating a household,
+    whether its inactive members are reactivated too, or reactivate them later one by one, so
+    that only the people actually returning get access again.
 40. As a member, I want to see my own household and its members, so that I know who shares
     our orders and balance.
 
@@ -162,14 +169,14 @@ Guixa gets the membership foundation every later feature builds on:
     household.
 45. As a member with the membership role, I want to deactivate a member who leaves, with or
     without a household (also someone who never joined), so that they can no longer sign in.
-46. As a member with the membership role, I want deactivating a member to remove them from
-    every commission and end their open sessions, so that they lose access at once.
+46. As a member with the membership role, I want deactivating a member to end their open
+    sessions and keep everything else (commissions included), so that they lose access at once
+    and nothing has to be rebuilt if they come back.
 47. As a member with the membership role, I want to reactivate an inactive member, so that a
     person who comes back keeps their history.
-48. As a member with the membership role, I want to be prevented from reactivating a member of
-    an inactive household, so that the household is reactivated first; a member without a
-    household can always be reactivated, and an inactive member can first be moved to an
-    active household and then reactivated there.
+48. As a member with the membership role, I want to reactivate a member whatever the state
+    of their household, so that someone returning on their own regains sign-in; while their
+    household is inactive they are treated as a member without a household.
 
 ### Commissions and roles
 
@@ -179,8 +186,9 @@ Guixa gets the membership foundation every later feature builds on:
     up to date when the cooperative reorganises.
 51. As a member with the membership role, I want to delete a commission only when it has no
     members, so that nobody loses permissions by surprise.
-52. As a member with the membership role, I want to add active members to a commission and
-    remove them, so that the app knows who does each job.
+52. As a member with the membership role, I want to add members, active or inactive, to a
+    commission and remove them, so that the app knows who does each job and a commission can
+    be prepared before someone is reactivated.
 53. As an administrator, I want to manage commissions and their members too, so that I can
     act when the membership commission cannot.
 54. As an administrator, I want to assign and remove the orders, boxes, treasury and
@@ -236,8 +244,8 @@ Guixa gets the membership foundation every later feature builds on:
   sessions. Being an administrator is a yes/no the owner adds or removes; there is no
   inactive administrator.
 - Consequences: one password per person, whichever profile they use; changing a member's
-  email changes it for the administrator profile too; deactivating a member (or their
-  household) also stops them acting as administrator. Deactivation does not remove the
+  email changes it for the administrator profile too; deactivating a member (also when their
+  household is deactivated together with its members) stops them acting as administrator. Deactivation does not remove the
   administrator profile: reactivating the person brings it back unless the owner removed it.
 - **Administrator** acts outside any household, cannot hold a member profile's permissions
   while acting as administrator and places no orders. A global authorization rule lets
@@ -303,36 +311,65 @@ Guixa gets the membership foundation every later feature builds on:
   database on creation, never chosen, edited or reused.
 - Every table in this spec uses UUIDv7 primary keys (ADR 0005); membership of commissions and
   role assignments are pivot tables with composite keys.
-- Deactivating a household deactivates all its members and removes them from commissions.
-  When balances exist (a later spec), deactivation with a non-zero balance will require a
+- **Inactive only blocks sign-in (ADR 0011, DRA-87).** Deactivating a member only stops them
+  signing in (and ends their sessions); they keep their household, commissions and roles.
+  Deactivating a household only removes its household access: its active members are treated
+  as members without a household (see below) and keep `household_id`, so reactivating the
+  household gives them their household back.
+- Deactivating a household asks whether to deactivate its active members too, and
+  reactivating one asks whether to reactivate its inactive members too: nothing is
+  preselected, the server rejects a request without an explicit choice, the dialog lists the
+  names of the members affected, and the question is skipped when there is nobody to affect.
+  Deactivating a household alone ends no session: its active members lose "my household" on
+  their next request, as when they are removed from a household.
+- With members, both actions lock the household and then select and lock (`FOR UPDATE`) the
+  members whose `household_id` is that household and whose active flag matches, inside the
+  same transaction; only those are changed. A member moved to another household at the same
+  time is never changed, whichever action runs first (tested for both orders). A single
+  member's deactivation or reactivation racing with them: the last one wins. When balances exist (a later spec), deactivation with a non-zero balance will require a
   warning and confirmation as stated in the principles; this spec only leaves room for that.
-- Reactivating a household keeps its number and data; its members stay inactive until
-  reactivated one by one. A member can only be reactivated while their household is active.
-- A member with the membership role cannot deactivate themselves or their own household: the
-  app rejects it and hides the action, so they cannot lose the role by mistake. Administrators
-  are not restricted (DRA-34).
+- Reactivating a household keeps its number and data and asks whether to reactivate its
+  inactive members too; otherwise they stay inactive until reactivated one by one. "Its
+  inactive members" means every inactive member in the household when the action runs, however
+  they became inactive; nothing records who was deactivated with the household. Members the
+  person acting may not reactivate on their own are skipped and named, as when deactivating. A member can
+  be reactivated whatever the state of their household.
+- A member with the membership role cannot deactivate themselves: the app rejects it and
+  hides the action, so they cannot lose the role by mistake. Administrators are not restricted
+  (DRA-34).
+- Deactivating a household alone is always allowed, also one's own household and the owner's
+  (DRA-87). With its members, the members the person acting may not deactivate on their own
+  (themselves, the owner, and, for a member with the membership role, members who hold that
+  role or the administrator profile) are skipped: the rest are deactivated and a message names
+  the ones that stayed active. The dialog already lists who will be skipped.
 - **Member:** name, email, optional phone, optional household, active flag. Belongs to at
   most one household. One "change household" action assigns the first household or moves the
   member; it needs the membership role (or administrator), accepts only active households and
   locks the target household. Removing a member from their household leaves them without
-  one and keeps their commissions; only active members can be removed. "Change household"
+  one and keeps their commissions; active and inactive members can be removed (DRA-87). "Change household"
   also works on an inactive member, who stays inactive until reactivated. Orders and balances (later specs) stay with the household
   they belong to.
-- **Member without a household:** their commissions and roles work as for any member (D8 of
+- **Member without a household** (also an active member of an inactive household, who is
+  treated the same way): their commissions and roles work as for any member (D8 of
   the DRA-46 amendment): they can do their commission's work and, being in a commission, see
   the directory. Without a household they have no "my household" page and, later, cannot
   order. A member with **no household and no commission** signs in to a waiting screen where
   they can only edit their name, phone, email (with confirmation) and password, change the
   light/dark theme, and sign out.
-  Members without a household can be deactivated and reactivated; the "household must be
-  active" rule only applies when they have one.
 - A member with the membership role can change the household of, or remove from their
   household, any member, including themselves and members who are administrators.
 - The DRA-34 rule stays for deactivation, and a member with the membership role cannot
   deactivate a member who is an administrator (that would stop them acting as administrator,
   story 7); only administrators and the owner can.
+- **Protections read the target's roles even when the target is inactive (DRA-87).** Being
+  inactive cancels only the permissions of whoever acts. Every protection that looks at the
+  person acted on (DRA-34, the email-change levels, removing someone from a membership
+  commission) counts the roles of their commissions whether they are active or not, so an
+  inactive member who keeps the membership role is protected as an active one. Reactivating a
+  member who holds the membership role or the administrator profile is reserved to
+  administrators and the owner, as deactivating them is.
 - Members of a commission are listed on the commissions page whether or not they have a
-  household.
+  household, and inactive ones are marked as inactive.
 - Removing a member from their household takes effect on their next request; if they are left
   with no household and no commission, it redirects to the waiting screen, and pages they
   already have open are refused or redirect there.
@@ -358,26 +395,29 @@ Guixa gets the membership foundation every later feature builds on:
   role (or administrator). Deleting is rejected while the commission has members; deleting
   removes its role assignments.
 - Only administrators assign or remove roles on commissions.
-- Only active members can be added to a commission; deactivating a member removes them from
-  all commissions.
+- Active and inactive members can be added to a commission (the candidates list marks the
+  inactive ones); deactivating a member keeps their commissions. An inactive member's roles do
+  nothing while they cannot sign in. An inactive member counts as a member of the commission,
+  so it still cannot be deleted while they are in it.
 - Every member can see the list of commissions and the names of who is in each one. Contact
   details still follow the directory rule below.
-- A single authorization module answers "does this member have role X?" from their active
-  commissions, with or without a household; it is the only place that knows how roles reach members, and every policy
+- A single authorization module answers "does this member have role X?" from the
+  commissions of an active member, with or without a household; it is the only place that knows how roles reach members, and every policy
   uses it.
 
 ### Directory and warnings
 
-- The directory (all households and their members, with contact details; members without a
-  household are not listed) is visible to administrators and
+- The directory (all active households and their active members, with contact details;
+  members without a household or of an inactive household are not listed) is visible to administrators and
   to members who belong to at least one commission. Other members only see their own
   household.
 - The households list for the membership role flags active households with no active member
-  in any commission, counting only the members currently in the household. It is
-  informational only.
+  in any commission, counting only the members currently in the household; an inactive
+  member who is still in a commission does not clear the flag. It is informational only.
 - The members list for the membership role shows every member and has a filter or section for
   the active members without a household, with the same sorting and inactive handling as the
-  rest of the list.
+  rest of the list. It also includes the active members of an inactive household, labelled
+  "(inactive household)", so the membership commission can move them or wait (DRA-87).
 
 ### General
 
@@ -437,3 +477,10 @@ Guixa gets the membership foundation every later feature builds on:
   the owner as an active member with no household plus the administrator profile, so every user
   has a member profile and creating a member with any existing email is rejected; nobody can
   create or update a member with an email that already belongs to someone else.
+- **Amendment of 2026-10-09 (DRA-87):** inactive only blocks sign-in (ADR 0011). Deactivating
+  a member keeps their commissions; deactivating a household no longer deactivates its members
+  unless asked, and its active members are treated as members without a household;
+  reactivating a household can reactivate its members in the same step; a member can be
+  reactivated whatever the state of their household; inactive members can be added to
+  commissions and removed from households. Protections read the target's roles even when they
+  are inactive; household actions with members skip the protected ones and name them.
