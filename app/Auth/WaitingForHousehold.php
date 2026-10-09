@@ -8,7 +8,7 @@ use App\Models\User;
 
 /**
  * The single definition of "waiting": an active member acting as a member who
- * has no household and no commission. They can do nothing until the
+ * has no active household and no commission. They can do nothing until the
  * membership commission assigns them a household, so the app only lets them
  * edit their own details and sign out.
  */

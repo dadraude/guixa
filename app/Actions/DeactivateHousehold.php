@@ -19,7 +19,7 @@ class DeactivateHousehold
     public function handle(Household $household): void
     {
         DB::transaction(function () use ($household) {
-            // Same row lock as ReactivateMember, so both operations are serialized.
+            // Locks the household row so concurrent household changes are serialized.
             $locked = Household::query()->whereKey($household->getKey())->lockForUpdate()->firstOrFail();
 
             $locked->forceFill(['is_active' => false])->save();

@@ -2,12 +2,10 @@
 
 declare(strict_types=1);
 
-use App\Actions\ReactivateMember;
 use App\Auth\Profile;
 use App\Auth\SecretHasher;
 use App\Models\Household;
 use App\Models\User;
-use Illuminate\Validation\ValidationException;
 use Inertia\Testing\AssertableInertia as Assert;
 
 function memberAdministrator(?Household $household = null): User
@@ -75,16 +73,6 @@ test('a member without a household can be deactivated and reactivated', function
 
     $this->actingAs(membershipRoleUser())->post(route('members.reactivate', $member))->assertRedirect(route('members.index'));
     expect($member->fresh()->is_active)->toBeTrue();
-});
-
-test('a member of an inactive household still cannot be reactivated', function () {
-    $household = Household::factory()->create();
-    $member = User::factory()->member($household)->create()->member->fresh();
-    $member->update(['is_active' => false]);
-    $household->forceFill(['is_active' => false])->save();
-
-    expect(fn () => app(ReactivateMember::class)->handle($member))->toThrow(ValidationException::class);
-    expect($member->fresh()->is_active)->toBeFalse();
 });
 
 test('the membership role is refused when deactivating a member who is an administrator', function () {

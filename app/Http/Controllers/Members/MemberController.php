@@ -38,15 +38,15 @@ class MemberController extends Controller
             Member::query()
                 ->select('members.*')
                 ->join('users', 'users.id', '=', 'members.user_id')
-                ->with('user.administrator'),
+                ->with(['user.administrator', 'household']),
             'users.name',
         )->orderBy('members.id');
 
-        // Active members without a household: the ones the membership commission still has to place.
+        // Active members without a household (none, or an inactive one): the ones the membership commission still has to place.
         $filter = MembersListRedirect::filter($request->query('filter'));
 
         if ($filter === MembersListRedirect::FILTER_NO_HOUSEHOLD) {
-            $query->whereNull('members.household_id')->where('members.is_active', true);
+            $query->withoutActiveHousehold()->where('members.is_active', true);
         }
 
         $lastPage = max(1, (int) ceil((clone $query)->toBase()->getCountForPagination() / self::PER_PAGE));
@@ -68,6 +68,7 @@ class MemberController extends Controller
             'email' => $member->user->email,
             'phone' => $member->phone,
             'household_id' => $member->household_id,
+            'household_is_active' => $member->household?->is_active,
             'is_active' => $member->is_active,
             'can_change_email' => $emailChangeLevels->canChange($actor, $member),
             'can_deactivate' => $protection->mayDeactivateMember($actor, $member),
