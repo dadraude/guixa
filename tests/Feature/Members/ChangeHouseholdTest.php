@@ -114,6 +114,17 @@ test('removing a member from their household keeps their commissions', function 
         ->and($member->fresh()->commissions()->count())->toBe(1);
 });
 
+test('administrators remove a member from their household too', function () {
+    $member = memberWith(Household::factory()->create());
+    $administrator = User::factory()->administrator()->create();
+
+    $this->actingAs($administrator)
+        ->delete(route('members.household.destroy', $member))
+        ->assertRedirect(route('members.index'));
+
+    expect($member->fresh()->household_id)->toBeNull();
+});
+
 test('only active members can be removed from their household', function () {
     $household = Household::factory()->create();
     $member = memberWith($household, false);
