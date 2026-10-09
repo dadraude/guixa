@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Auth\ActiveProfile;
-use App\Auth\MemberRoles;
+use App\Auth\MemberCommissionList;
 use App\Auth\Profile;
 use App\Models\Household;
 use App\Models\Member;
@@ -21,14 +21,14 @@ class DashboardController extends Controller
      * commissions with the roles those give them; no other household is
      * exposed, and none at all while acting as administrator.
      */
-    public function __invoke(#[CurrentUser] User $user, ActiveProfile $activeProfile, MemberRoles $memberRoles): Response
+    public function __invoke(#[CurrentUser] User $user, ActiveProfile $activeProfile, MemberCommissionList $commissionList): Response
     {
         $member = $activeProfile->current($user) === Profile::Member ? $user->member : null;
         $household = $member?->hasActiveHousehold() ? $member->household : null;
 
         return Inertia::render('Dashboard', [
             'household' => $household === null ? null : $this->householdOf($household),
-            'commissions' => $member === null ? [] : $memberRoles->commissionsOf($member),
+            'commissions' => $member === null ? [] : $commissionList->of($member),
         ]);
     }
 

@@ -20,6 +20,7 @@ type MemberRow = {
     is_active: boolean;
     can_change_email: boolean;
     can_deactivate: boolean;
+    can_reactivate: boolean;
 };
 
 type HouseholdOption = {
@@ -309,7 +310,8 @@ defineOptions({
                         size="sm"
                         :disabled="
                             processing ||
-                            (member.is_active && !member.can_deactivate)
+                            (member.is_active && !member.can_deactivate) ||
+                            (!member.is_active && !member.can_reactivate)
                         "
                         :data-test="
                             member.is_active

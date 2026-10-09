@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Households;
 use App\Actions\CreateHousehold;
 use App\Actions\DeactivateHousehold;
 use App\Actions\ReactivateHousehold;
+use App\Auth\MemberRoles;
 use App\Auth\MembershipRoleProtection;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Households\SaveHouseholdRequest;
@@ -18,7 +19,7 @@ use Inertia\Response;
 
 class HouseholdController extends Controller
 {
-    public function index(Request $request, MembershipRoleProtection $protection): Response
+    public function index(Request $request, MembershipRoleProtection $protection, MemberRoles $memberRoles): Response
     {
         $viewer = $request->user() ?? abort(403);
         // Informational only: an active household with nobody active in a
@@ -28,15 +29,19 @@ class HouseholdController extends Controller
             ->withCommissionMemberFlag()
             ->with('members.user.administrator')
             ->orderBy('number')
-            ->get()
-            ->map(fn (Household $household) => [
-                'can_deactivate' => $protection->mayDeactivateHousehold($viewer, $household),
-                'id' => $household->id,
-                'number' => $household->number,
-                'name' => $household->name,
-                'is_active' => $household->is_active,
-                'without_commission' => $household->is_active && ! $household->has_commission_member,
-            ]);
+            ->get();
+
+        // Two queries for all the members instead of two per member in the can_deactivate checks.
+        $memberRoles->preload($households->flatMap->members);
+
+        $households = $households->map(fn (Household $household) => [
+            'can_deactivate' => $protection->mayDeactivateHousehold($viewer, $household),
+            'id' => $household->id,
+            'number' => $household->number,
+            'name' => $household->name,
+            'is_active' => $household->is_active,
+            'without_commission' => $household->is_active && ! $household->has_commission_member,
+        ]);
 
         return Inertia::render('households/Index', [
             'households' => $households,

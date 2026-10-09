@@ -16,7 +16,7 @@ class AddCommissionMemberRequest extends FormRequest
     }
 
     /**
-     * Only active members can be added.
+     * Active and inactive members can be added.
      *
      * @return array<string, array<int, mixed>>
      */
@@ -26,7 +26,7 @@ class AddCommissionMemberRequest extends FormRequest
             'member_id' => [
                 'required',
                 'uuid',
-                Rule::exists(Member::class, 'id')->where('is_active', true),
+                Rule::exists(Member::class, 'id'),
             ],
         ];
     }

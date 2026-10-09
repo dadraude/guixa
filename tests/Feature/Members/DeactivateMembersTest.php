@@ -30,7 +30,7 @@ function activeMemberIn(Household $household, array $user = []): Member
     return $member;
 }
 
-test('deactivating a member removes them from every commission and keeps their data', function () {
+test('deactivating a member keeps their commissions and their data', function () {
     $household = Household::factory()->create();
     $member = activeMemberIn($household);
     $commissions = Commission::factory()->count(2)->create();
@@ -41,7 +41,7 @@ test('deactivating a member removes them from every commission and keeps their d
         ->assertRedirect(route('members.index'));
 
     expect($member->fresh()->is_active)->toBeFalse()
-        ->and($member->commissions()->count())->toBe(0)
+        ->and($member->commissions()->count())->toBe(2)
         ->and($member->fresh()->household_id)->toBe($household->id);
 });
 
@@ -104,7 +104,7 @@ test('deactivating a household deactivates all its members and keeps number and 
         ->and($household->name)->toBe('Cal Pere')
         ->and($first->fresh()->is_active)->toBeFalse()
         ->and($second->fresh()->is_active)->toBeFalse()
-        ->and($first->commissions()->count())->toBe(0)
+        ->and($first->commissions()->count())->toBe(1)
         ->and($other->fresh()->is_active)->toBeTrue();
 });
 

@@ -45,6 +45,6 @@ class EmailChangeLevels
         }
 
         return $this->memberRoles->userHas($actor, Role::Membership)
-            && ! $this->memberRoles->memberHas($target, Role::Membership);
+            && ! $this->memberRoles->memberHolds($target, Role::Membership);
     }
 }
