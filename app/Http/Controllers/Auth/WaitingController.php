@@ -15,7 +15,7 @@ use Inertia\Response;
 class WaitingController extends Controller
 {
     /**
-     * Only someone still waiting sees it; once they have a household or a
+     * Only someone still waiting sees it; once they have an active household or a
      * commission there is nothing to wait for.
      */
     public function __invoke(#[CurrentUser] User $user, WaitingForHousehold $waitingForHousehold): Response|RedirectResponse

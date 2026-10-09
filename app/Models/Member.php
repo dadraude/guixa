@@ -76,7 +76,7 @@ class Member extends Model
     {
         $query->where(fn (Builder $query) => $query
             ->whereNull('members.household_id')
-            ->orWhereHas('household', fn ($household) => $household->where('is_active', false)));
+            ->orWhereHas('household', fn (Builder $household) => $household->where('is_active', false)));
     }
 
     /**

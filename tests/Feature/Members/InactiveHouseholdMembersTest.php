@@ -36,9 +36,12 @@ test('they keep their household and get it back when it is reactivated', functio
 
     expect($user->member->fresh()->household_id)->toBe($household->id);
 
+    $this->actingAs($user->fresh())->get(route('dashboard'))->assertRedirect(route('waiting'));
+
     $household->forceFill(['is_active' => true])->save();
 
-    $this->actingAs($user->fresh())->get(route('dashboard'))
+    // A fresh user: the waiting check is memoized per request on the authenticated instance.
+    $this->actingAs(User::query()->findOrFail($user->id))->get(route('dashboard'))
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page->where('household.name', 'Cal Pere'));
 });
@@ -103,6 +106,20 @@ test('a member can be reactivated while their household is inactive and is then 
 
     expect($member->fresh()->is_active)->toBeTrue();
     $this->actingAs($member->user)->get(route('dashboard'))->assertRedirect(route('waiting'));
+});
+
+test('deactivating an already inactive household again leaves a reactivated member untouched', function () {
+    $household = Household::factory()->inactive()->create();
+    $member = inactiveHouseholdMemberIn($household, true, 'Pau');
+    $commission = Commission::factory()->create();
+    $commission->members()->attach($member);
+
+    $this->actingAs(User::factory()->administrator()->create())
+        ->post(route('households.deactivate', $household))
+        ->assertSessionHasNoErrors();
+
+    expect($member->fresh()->is_active)->toBeTrue()
+        ->and($commission->members()->whereKey($member->id)->exists())->toBeTrue();
 });
 
 test('inactive members can be removed from their household', function () {
