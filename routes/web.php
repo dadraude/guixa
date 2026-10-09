@@ -62,6 +62,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/', [MemberController::class, 'store'])->name('store');
         Route::patch('{member}', [MemberController::class, 'update'])->name('update');
         Route::patch('{member}/household', [MemberHouseholdController::class, 'update'])->name('household.update');
+        Route::delete('{member}/household', [MemberHouseholdController::class, 'destroy'])->name('household.destroy');
         Route::post('{member}/deactivate', [MemberController::class, 'deactivate'])->name('deactivate');
         Route::post('{member}/reactivate', [MemberController::class, 'reactivate'])->name('reactivate');
     });

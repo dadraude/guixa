@@ -43,6 +43,7 @@ type Pagination = {
 defineProps<{
     members: MemberRow[];
     pagination: Pagination;
+    filter: 'no-household' | null;
     households: HouseholdOption[];
     commissions: CommissionOption[];
 }>();
@@ -142,8 +143,35 @@ defineOptions({
             <InputError :message="errors.commission_ids" />
         </Form>
 
+        <nav
+            class="flex flex-wrap gap-2"
+            data-test="members-filter"
+            :aria-label="t('Filter members')"
+        >
+            <Button
+                as-child
+                size="sm"
+                :variant="filter === null ? 'default' : 'outline'"
+            >
+                <Link :href="index()">{{ t('All members') }}</Link>
+            </Button>
+            <Button
+                as-child
+                size="sm"
+                :variant="filter === 'no-household' ? 'default' : 'outline'"
+            >
+                <Link :href="index({ query: { filter: 'no-household' } })">{{
+                    t('Active members without a household')
+                }}</Link>
+            </Button>
+        </nav>
+
         <p v-if="pagination.total === 0" class="text-muted-foreground">
-            {{ t('No members yet.') }}
+            {{
+                filter === null
+                    ? t('No members yet.')
+                    : t('No active members without a household.')
+            }}
         </p>
 
         <ul v-else class="divide-y rounded-lg border" data-test="members">
@@ -230,9 +258,26 @@ defineOptions({
                         variant="outline"
                         size="sm"
                         :disabled="processing"
-                        >{{ t('Move') }}</Button
+                        >{{ t('Change household') }}</Button
                     >
                     <InputError :message="errors.household_id" />
+                </Form>
+
+                <Form
+                    v-if="member.is_active && member.household_id !== null"
+                    v-bind="MemberHouseholdController.destroy.form(member.id)"
+                    class="flex flex-wrap items-center gap-2"
+                    v-slot="{ errors, processing }"
+                >
+                    <Button
+                        type="submit"
+                        variant="outline"
+                        size="sm"
+                        :disabled="processing"
+                        data-test="remove-from-household"
+                        >{{ t('Remove from household') }}</Button
+                    >
+                    <InputError :message="errors.member" />
                 </Form>
 
                 <Form

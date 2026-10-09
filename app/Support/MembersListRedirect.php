@@ -15,6 +15,16 @@ use Illuminate\Http\Request;
  */
 final class MembersListRedirect
 {
+    public const string FILTER_NO_HOUSEHOLD = 'no-household';
+
+    /**
+     * The only filter value the list understands; anything else means no filter.
+     */
+    public static function filter(mixed $value): ?string
+    {
+        return $value === self::FILTER_NO_HOUSEHOLD ? self::FILTER_NO_HOUSEHOLD : null;
+    }
+
     public static function back(Request $request): RedirectResponse
     {
         return to_route('members.index', self::listQuery($request));
@@ -41,10 +51,10 @@ final class MembersListRedirect
     }
 
     /**
-     * Only the parameters the list understands are carried over (today only the
-     * page): arbitrary keys, numeric or array ones, must never reach the URL generator.
+     * Only the parameters the list understands are carried over (the page and the
+     * filter): arbitrary keys, numeric or array ones, must never reach the URL generator.
      *
-     * @return array{page?: int}
+     * @return array{page?: int, filter?: string}
      */
     private static function listQuery(Request $request): array
     {
@@ -61,7 +71,8 @@ final class MembersListRedirect
         parse_str($referer['query'] ?? '', $query);
 
         $page = self::page($query['page'] ?? null);
+        $filter = self::filter($query['filter'] ?? null);
 
-        return $page === null ? [] : ['page' => $page];
+        return array_filter(['filter' => $filter, 'page' => $page], fn ($value) => $value !== null);
     }
 }
