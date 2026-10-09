@@ -16,6 +16,7 @@ type MemberRow = {
     email: string;
     phone: string | null;
     household_id: string | null;
+    household_is_active: boolean | null;
     is_active: boolean;
     can_change_email: boolean;
     can_deactivate: boolean;
@@ -223,6 +224,12 @@ defineOptions({
                     <Badge v-if="!member.is_active" variant="outline">{{
                         t('Inactive')
                     }}</Badge>
+                    <Badge
+                        v-if="member.household_is_active === false"
+                        variant="outline"
+                        data-test="inactive-household"
+                        >{{ t('(inactive household)') }}</Badge
+                    >
                     <InputError :message="errors.name" />
                     <InputError :message="errors.email" />
                     <InputError :message="errors.phone" />
@@ -247,6 +254,13 @@ defineOptions({
                             {{ t('No household') }}
                         </option>
                         <option
+                            v-else-if="member.household_is_active === false"
+                            :value="member.household_id"
+                            disabled
+                        >
+                            {{ t('(inactive household)') }}
+                        </option>
+                        <option
                             v-for="household in households"
                             :key="household.id"
                             :value="household.id"
@@ -265,7 +279,7 @@ defineOptions({
                 </Form>
 
                 <Form
-                    v-if="member.is_active && member.household_id !== null"
+                    v-if="member.household_id !== null"
                     v-bind="MemberHouseholdController.destroy.form(member.id)"
                     class="flex flex-wrap items-center gap-2"
                     v-slot="{ errors, processing }"

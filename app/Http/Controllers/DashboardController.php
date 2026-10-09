@@ -24,7 +24,7 @@ class DashboardController extends Controller
     public function __invoke(#[CurrentUser] User $user, ActiveProfile $activeProfile, MemberCommissionList $commissionList): Response
     {
         $member = $activeProfile->current($user) === Profile::Member ? $user->member : null;
-        $household = $member?->household;
+        $household = $member?->hasActiveHousehold() ? $member->household : null;
 
         return Inertia::render('Dashboard', [
             'household' => $household === null ? null : $this->householdOf($household),

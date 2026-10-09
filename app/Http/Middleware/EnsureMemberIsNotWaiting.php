@@ -10,10 +10,10 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Keeps a member with no household and no commission on the waiting screen:
+ * Keeps a member with no active household and no commission on the waiting screen:
  * they may only edit their own details (name, phone, email, password),
  * pick the theme, switch profile and sign out. Checked on every request, so
- * it takes effect as soon as the last household or commission is taken away.
+ * it takes effect as soon as the last active household or commission is taken away.
  */
 class EnsureMemberIsNotWaiting
 {

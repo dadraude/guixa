@@ -7,8 +7,8 @@ namespace App\Auth;
 use App\Models\Member;
 
 /**
- * The single definition of a usable member profile: the member has a household
- * or is in a commission. Its negation is the "waiting" state, and it decides
+ * The single definition of a usable member profile: the member has an active
+ * household or is in a commission. Its negation is the "waiting" state, and it decides
  * whether an administrator is offered the member profile at all.
  *
  * Registered as a scoped singleton: every administrator is also a member, so
@@ -25,7 +25,7 @@ class UsableMember
 
     public function check(Member $member): bool
     {
-        if ($member->household_id !== null) {
+        if ($member->hasActiveHousehold()) {
             return true;
         }
 

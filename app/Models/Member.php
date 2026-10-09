@@ -56,6 +56,30 @@ class Member extends Model
     }
 
     /**
+     * The single definition of "has a household": an active one. An active
+     * member of an inactive household keeps household_id but is treated as a
+     * member without a household until it is reactivated (ADR 0011).
+     */
+    public function hasActiveHousehold(): bool
+    {
+        return $this->household_id !== null && $this->household?->is_active === true;
+    }
+
+    /**
+     * Members without a household in the sense of hasActiveHousehold(): none at
+     * all, or an inactive one.
+     *
+     * @param  Builder<Member>  $query
+     */
+    #[Scope]
+    protected function withoutActiveHousehold(Builder $query): void
+    {
+        $query->where(fn (Builder $query) => $query
+            ->whereNull('members.household_id')
+            ->orWhereHas('household', fn (Builder $household) => $household->where('is_active', false)));
+    }
+
+    /**
      * @return BelongsTo<Household, $this>
      */
     public function household(): BelongsTo

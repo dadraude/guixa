@@ -47,15 +47,13 @@ test('the same action assigns a first household and moves, with one success mess
     expect($member->fresh()->household_id)->toBe($second->id);
 });
 
-test('changing the household of an inactive member keeps them inactive and they can be reactivated there', function () {
+test('changing the household of an inactive member keeps them inactive until reactivated', function () {
     $old = Household::factory()->inactive()->create();
     $new = Household::factory()->create();
     $member = memberWith($old, false);
     $actor = membershipActor();
 
-    $this->actingAs($actor)->post(route('members.reactivate', $member))->assertSessionHasErrors('member');
-
-    $this->patch(route('members.household.update', $member), ['household_id' => $new->id])->assertSessionDoesntHaveErrors();
+    $this->actingAs($actor)->patch(route('members.household.update', $member), ['household_id' => $new->id])->assertSessionDoesntHaveErrors();
     expect($member->fresh()->is_active)->toBeFalse()
         ->and($member->fresh()->household_id)->toBe($new->id);
 
@@ -123,17 +121,6 @@ test('administrators remove a member from their household too', function () {
         ->assertRedirect(route('members.index'));
 
     expect($member->fresh()->household_id)->toBeNull();
-});
-
-test('only active members can be removed from their household', function () {
-    $household = Household::factory()->create();
-    $member = memberWith($household, false);
-
-    $this->actingAs(membershipActor())
-        ->delete(route('members.household.destroy', $member))
-        ->assertSessionHasErrors('member');
-
-    expect($member->fresh()->household_id)->toBe($household->id);
 });
 
 test('removal takes effect on the next request: no household and no commission lands on the waiting screen', function () {

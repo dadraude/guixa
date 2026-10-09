@@ -31,6 +31,7 @@ class DirectoryController extends Controller
         $collation = new CatalanCollation;
 
         $households = Household::query()
+            ->where('is_active', true)
             ->when(! $isFull, fn ($query) => $query->whereKey($ownMember?->household_id))
             ->with(['members' => fn ($query) => $query->where('is_active', true)->with('user')])
             ->orderBy('number')
