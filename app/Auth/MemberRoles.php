@@ -61,7 +61,7 @@ class MemberRoles
 
     /**
      * Whether the member takes part in at least one commission. Inactive
-     * members are in none.
+     * members count as in none.
      */
     public function isInAnyCommission(Member $member): bool
     {

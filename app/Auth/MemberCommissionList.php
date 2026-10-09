@@ -16,7 +16,7 @@ class MemberCommissionList
     public function __construct(private readonly CommissionRoles $commissionRoles) {}
 
     /**
-     * Inactive members are listed none: they cannot sign in to see them.
+     * Inactive members are listed with no commissions: they cannot sign in to see them.
      *
      * @return list<array{id: string, name: string, roles: list<array{value: string, label: string}>}>
      */

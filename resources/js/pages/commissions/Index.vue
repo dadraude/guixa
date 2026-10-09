@@ -244,11 +244,12 @@ defineOptions({
                             :key="candidate.id"
                             :value="candidate.id"
                         >
-                            {{ candidate.name
-                            }}{{
+                            {{
                                 candidate.is_active
-                                    ? ''
-                                    : ` (${t('Inactive').toLowerCase()})`
+                                    ? candidate.name
+                                    : t(':name (inactive)', {
+                                          name: candidate.name,
+                                      })
                             }}
                         </option>
                     </select>

@@ -11,7 +11,7 @@ use Illuminate\Validation\ValidationException;
 
 /**
  * A member with a household only comes back into one that is active; a member
- * without a household comes back without any check.  Their commissions were
+ * without a household comes back without any check. Their commissions were
  * never taken away.
  *
  * The household row is locked while the check and the update run, and

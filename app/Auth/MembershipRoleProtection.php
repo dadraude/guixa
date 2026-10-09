@@ -68,7 +68,8 @@ class MembershipRoleProtection
             return true;
         }
 
-        return $members->every(fn (Member $member) => $this->mayBeDeactivatedByMembershipRole($member));
+        // Deactivating a member who is already inactive changes nothing, so it cannot take a role away.
+        return $members->every(fn (Member $member) => ! $member->is_active || $this->mayBeDeactivatedByMembershipRole($member));
     }
 
     /**
