@@ -6,6 +6,7 @@ import CommissionRoleController from '@/actions/App/Http/Controllers/Commissions
 import Heading from '@/components/Heading.vue';
 import InputError from '@/components/InputError.vue';
 import MyCommissions from '@/components/MyCommissions.vue';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -15,6 +16,7 @@ import { index } from '@/routes/commissions';
 type Person = {
     id: string;
     name: string;
+    is_active: boolean;
 };
 
 type RoleOption = {
@@ -198,6 +200,9 @@ defineOptions({
                         class="flex items-center gap-2 text-sm"
                     >
                         <span>{{ member.name }}</span>
+                        <Badge v-if="!member.is_active" variant="outline">{{
+                            t('Inactive')
+                        }}</Badge>
                         <Form
                             v-if="canManage"
                             v-bind="
@@ -239,7 +244,12 @@ defineOptions({
                             :key="candidate.id"
                             :value="candidate.id"
                         >
-                            {{ candidate.name }}
+                            {{ candidate.name
+                            }}{{
+                                candidate.is_active
+                                    ? ''
+                                    : ` (${t('Inactive').toLowerCase()})`
+                            }}
                         </option>
                     </select>
                     <Button

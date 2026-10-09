@@ -71,6 +71,7 @@ class MemberController extends Controller
             'is_active' => $member->is_active,
             'can_change_email' => $emailChangeLevels->canChange($actor, $member),
             'can_deactivate' => $protection->mayDeactivateMember($actor, $member),
+            'can_reactivate' => $protection->mayReactivateMember($actor, $member),
         ])->values();
 
         $households = Household::query()
@@ -153,8 +154,10 @@ class MemberController extends Controller
         return MembersListRedirect::back($request);
     }
 
-    public function reactivate(Request $request, Member $member, ReactivateMember $reactivateMember): RedirectResponse
+    public function reactivate(Request $request, Member $member, ReactivateMember $reactivateMember, MembershipRoleProtection $protection): RedirectResponse
     {
+        abort_unless($protection->mayReactivateMember($request->user() ?? abort(403), $member), 403);
+
         $reactivateMember->handle($member);
 
         Inertia::flash('toast', ['type' => 'success', 'message' => __('Member reactivated.')]);

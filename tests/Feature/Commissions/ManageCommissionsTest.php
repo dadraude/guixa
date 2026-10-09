@@ -104,19 +104,21 @@ test('adding the same member twice keeps a single membership', function () {
     expect($commission->members()->count())->toBe(1);
 });
 
-test('an inactive or unknown member cannot be added', function () {
+test('active and inactive members can be added, an unknown one cannot', function () {
     $administrator = User::factory()->administrator()->create();
     $commission = Commission::factory()->create();
     $inactive = memberOf('Pere Puig', active: false);
 
     $this->actingAs($administrator)
         ->post(route('commissions.members.store', $commission), ['member_id' => $inactive->id])
-        ->assertSessionHasErrors('member_id');
+        ->assertSessionHasNoErrors();
+    expect($commission->members()->count())->toBe(1);
+
     $this->actingAs($administrator)
         ->post(route('commissions.members.store', $commission), ['member_id' => fake()->uuid()])
         ->assertSessionHasErrors('member_id');
 
-    expect($commission->members()->count())->toBe(0);
+    expect($commission->members()->count())->toBe(1);
 });
 
 test('a member without administrator rights is refused every change', function () {
@@ -163,7 +165,7 @@ test('every member sees all commissions and their members names, but no contact 
         ->assertDontSee('611111111');
 });
 
-test('an administrator gets the active members who can be added', function () {
+test('an administrator gets the members who can be added, inactive ones marked', function () {
     // An administrator is also an active member, so they are a candidate too.
     $administrator = User::factory()->administrator()->create(['name' => 'Zoe Admin']);
     $in = memberOf('Anna Puig');
@@ -176,10 +178,13 @@ test('an administrator gets the active members who can be added', function () {
         ->get(route('commissions.index'))
         ->assertInertia(fn (Assert $page) => $page
             ->where('canManage', true)
-            ->has('candidates', 3)
+            ->has('candidates', 4)
             ->where('candidates.0.name', 'Anna Puig')
+            ->where('candidates.0.is_active', true)
             ->where('candidates.1.name', 'Berta Soler')
-            ->where('candidates.2.name', 'Zoe Admin')
+            ->where('candidates.2.name', 'Pere Puig')
+            ->where('candidates.2.is_active', false)
+            ->where('candidates.3.name', 'Zoe Admin')
             ->missing('candidates.0.email'));
 });
 
@@ -203,4 +208,29 @@ test('the commission screen text is in Catalan', function () {
     foreach (['Commissions', 'Add commission', 'Add member', 'Remove', 'Delete', 'No commissions yet.'] as $key) {
         expect(__($key))->not->toBe($key);
     }
+});
+
+test('the commission lists its inactive members marked as inactive', function () {
+    $viewer = memberOf('Marta Vila');
+    $commission = Commission::factory()->create();
+    $commission->members()->attach([memberOf('Anna Puig')->id, memberOf('Pere Puig', active: false)->id]);
+
+    $this->actingAs($viewer->user)
+        ->get(route('commissions.index'))
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('commissions.0.members.0.name', 'Anna Puig')
+            ->where('commissions.0.members.0.is_active', true)
+            ->where('commissions.0.members.1.name', 'Pere Puig')
+            ->where('commissions.0.members.1.is_active', false));
+});
+
+test('an inactive member still prevents deleting the commission', function () {
+    $commission = Commission::factory()->create();
+    $commission->members()->attach(memberOf('Pere Puig', active: false));
+
+    $this->actingAs(User::factory()->administrator()->create())
+        ->delete(route('commissions.destroy', $commission))
+        ->assertSessionHasErrors('commission');
+
+    expect($commission->fresh())->not->toBeNull();
 });

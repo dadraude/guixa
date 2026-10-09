@@ -82,14 +82,29 @@ class MembershipRoleProtection
 
     /**
      * Whether the membership role may deactivate this member: not when they hold the
-     * membership role (DRA-34) nor when they are an active administrator, since that
+     * membership role, active or not (DRA-34) nor when they are an active administrator, since that
      * would stop them acting as administrator. An inactive member who keeps the
      * administrator profile does not block it (DRA-57, from DRA-72).
      */
     private function mayBeDeactivatedByMembershipRole(Member $member): bool
     {
-        return ! $this->memberRoles->memberHas($member, Role::Membership)
+        return ! $this->memberRoles->memberHolds($member, Role::Membership)
             && ! $member->isActiveAdministrator();
+    }
+
+    /**
+     * Reactivating someone who holds the membership role or the administrator
+     * profile is reserved to administrators, as deactivating them is. The
+     * target is inactive, so the profile counts whether or not it is active.
+     */
+    public function mayReactivateMember(User $actor, Member $member): bool
+    {
+        if ($this->mayTakeAway($actor)) {
+            return true;
+        }
+
+        return ! $this->memberRoles->memberHolds($member, Role::Membership)
+            && $member->user->administrator === null;
     }
 
     private function mayTakeAway(User $actor): bool

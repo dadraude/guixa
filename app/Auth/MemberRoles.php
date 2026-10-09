@@ -4,13 +4,15 @@ declare(strict_types=1);
 
 namespace App\Auth;
 
-use App\Models\Commission;
 use App\Models\Member;
 use App\Models\User;
 
 /**
  * The only place that knows how roles reach members: through the commissions
- * they are in. Inactive members have no roles.
+ * they are in. Inactive members keep their roles but they grant nothing:
+ * memberHas() and of() answer for whoever acts (none while inactive), while
+ * memberHolds() and heldBy() answer for the person acted on, active or not,
+ * so protections still see the roles of an inactive colleague.
  *
  * Registered as a scoped singleton: roles are read from the database once per
  * member and remembered for the life of one request (the gate and the shared
@@ -49,6 +51,15 @@ class MemberRoles
     }
 
     /**
+     * For protections on the person acted on: counts the roles of their
+     * commissions even when they are inactive.
+     */
+    public function memberHolds(Member $member, Role $role): bool
+    {
+        return in_array($role, $this->heldBy($member), true);
+    }
+
+    /**
      * Whether the member takes part in at least one commission. Inactive
      * members are in none.
      */
@@ -58,6 +69,8 @@ class MemberRoles
     }
 
     /**
+     * The roles that grant permissions to the member: none while inactive.
+     *
      * @return list<Role>
      */
     public function of(Member $member): array
@@ -66,6 +79,16 @@ class MemberRoles
             return [];
         }
 
+        return $this->heldBy($member);
+    }
+
+    /**
+     * The roles of the member's commissions, whether they are active or not.
+     *
+     * @return list<Role>
+     */
+    public function heldBy(Member $member): array
+    {
         return $this->rolesByMember[$member->id] ??= $this->forCommissions($this->memberships->commissionIdsOf($member));
     }
 
@@ -82,7 +105,7 @@ class MemberRoles
         $pendingIds = [];
 
         foreach ($members as $member) {
-            if ($member->is_active && ! isset($this->rolesByMember[$member->id])) {
+            if (! isset($this->rolesByMember[$member->id])) {
                 $pendingIds[] = (string) $member->id;
             }
         }
@@ -107,37 +130,5 @@ class MemberRoles
     public function forCommissions(array $commissionIds): array
     {
         return $this->commissionRoles->forCommissions($commissionIds);
-    }
-
-    /** @return array<string, list<Role>> the roles each commission holds, in one query */
-    public function byCommission(): array
-    {
-        return $this->commissionRoles->byCommission();
-    }
-
-    /**
-     * The commissions the member is in, by name, each with the roles it holds,
-     * shaped for the pages. Inactive members are in none.
-     *
-     * @return list<array{id: string, name: string, roles: list<array{value: string, label: string}>}>
-     */
-    public function commissionsOf(Member $member): array
-    {
-        if (! $member->is_active) {
-            return [];
-        }
-
-        $rolesByCommission = $this->byCommission();
-
-        return array_values($member->commissions()->orderBy('name')->get()
-            ->map(fn (Commission $commission) => [
-                'id' => $commission->id,
-                'name' => $commission->name,
-                'roles' => array_map(
-                    fn (Role $role) => $role->toOption(),
-                    $rolesByCommission[$commission->id] ?? [],
-                ),
-            ])
-            ->all());
     }
 }
