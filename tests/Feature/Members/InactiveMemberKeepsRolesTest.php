@@ -134,13 +134,13 @@ test('the membership role deactivates a household whose member is already inacti
     $target = inactiveMemberHolding(Role::Membership);
 
     $this->actingAs(membershipRoleUser())
-        ->post(route('households.deactivate', $target->household))
+        ->post(route('households.deactivate', $target->household), ['with_members' => true])
         ->assertRedirect(route('households.index'));
 
     expect($target->household->fresh()->is_active)->toBeFalse();
 });
 
-test('the membership role still cannot deactivate a household whose active member holds the membership role', function () {
+test('the membership role deactivating a household with members leaves the active member who holds the membership role', function () {
     $household = Household::factory()->create();
     $member = User::factory()->member($household)->create()->member->fresh();
     $commission = Commission::factory()->create();
@@ -148,10 +148,11 @@ test('the membership role still cannot deactivate a household whose active membe
     $commission->members()->attach($member);
 
     $this->actingAs(membershipRoleUser())
-        ->post(route('households.deactivate', $household))
-        ->assertForbidden();
+        ->post(route('households.deactivate', $household), ['with_members' => true])
+        ->assertRedirect(route('households.index'));
 
-    expect($household->fresh()->is_active)->toBeTrue();
+    expect($household->fresh()->is_active)->toBeFalse()
+        ->and($member->fresh()->is_active)->toBeTrue();
 });
 
 test('an inactive member in a commission does not clear the households warning', function () {

@@ -2,6 +2,7 @@
 import { Form, Head } from '@inertiajs/vue3';
 import HouseholdController from '@/actions/App/Http/Controllers/Households/HouseholdController';
 import Heading from '@/components/Heading.vue';
+import HouseholdStatusAction from '@/components/households/HouseholdStatusAction.vue';
 import InputError from '@/components/InputError.vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -16,7 +17,7 @@ type HouseholdRow = {
     name: string;
     is_active: boolean;
     without_commission: boolean;
-    can_deactivate: boolean;
+    affected_members: { name: string; left_out: boolean }[];
 };
 
 defineProps<{
@@ -108,34 +109,11 @@ defineOptions({
                     </Badge>
                 </div>
 
-                <Form
-                    v-bind="
-                        household.is_active
-                            ? HouseholdController.deactivate.form(household.id)
-                            : HouseholdController.reactivate.form(household.id)
-                    "
-                    v-slot="{ processing }"
-                >
-                    <Button
-                        type="submit"
-                        variant="outline"
-                        size="sm"
-                        :disabled="
-                            processing ||
-                            (household.is_active && !household.can_deactivate)
-                        "
-                        :data-test="
-                            household.is_active
-                                ? 'deactivate-household'
-                                : 'reactivate-household'
-                        "
-                        >{{
-                            household.is_active
-                                ? t('Deactivate')
-                                : t('Reactivate')
-                        }}</Button
-                    >
-                </Form>
+                <HouseholdStatusAction
+                    :household-id="household.id"
+                    :is-active="household.is_active"
+                    :affected-members="household.affected_members"
+                />
             </li>
         </ul>
 

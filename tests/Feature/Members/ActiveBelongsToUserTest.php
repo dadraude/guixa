@@ -46,7 +46,7 @@ test('deactivating a household stops its members who are administrators', functi
     $person = memberAdministrator($household);
 
     $this->actingAs(User::factory()->administrator()->create())
-        ->post(route('households.deactivate', $household))
+        ->post(route('households.deactivate', $household), ['with_members' => true])
         ->assertRedirect(route('households.index'));
 
     expect($person->fresh()->canSignIn())->toBeFalse();
@@ -83,13 +83,16 @@ test('the membership role is refused when deactivating a member who is an admini
     expect($person->member->fresh()->is_active)->toBeTrue();
 });
 
-test('the membership role is refused when deactivating a household with a member who is an administrator', function () {
+test('the membership role deactivating a household with members leaves a member who is an administrator active', function () {
     $household = Household::factory()->create();
-    memberAdministrator($household);
+    $person = memberAdministrator($household);
 
-    $this->actingAs(membershipRoleUser())->post(route('households.deactivate', $household))->assertForbidden();
+    $this->actingAs(membershipRoleUser())
+        ->post(route('households.deactivate', $household), ['with_members' => true])
+        ->assertRedirect(route('households.index'));
 
-    expect($household->fresh()->is_active)->toBeTrue();
+    expect($household->fresh()->is_active)->toBeFalse()
+        ->and($person->member->fresh()->is_active)->toBeTrue();
 });
 
 test('an administrator and the owner deactivate a member who is an administrator', function (User $actor) {
@@ -145,20 +148,20 @@ test('nobody deactivates the owner member profile when the owner has no househol
     'membership role' => fn () => membershipRoleUser(),
 ]);
 
-test('nobody deactivates a household the owner belongs to', function (User $actor) {
+test('nobody deactivates the owner along with their household', function (User $actor) {
     $household = Household::factory()->create();
     $owner = ownerWithMember($household);
 
-    $this->actingAs($actor)->post(route('households.deactivate', $household))->assertForbidden();
+    $this->actingAs($actor)->post(route('households.deactivate', $household), ['with_members' => true])->assertRedirect(route('households.index'));
 
     expect($owner->fresh()->canSignIn())->toBeTrue()
-        ->and($household->fresh()->is_active)->toBeTrue();
+        ->and($household->fresh()->is_active)->toBeFalse();
 })->with([
     'administrator' => fn () => User::factory()->administrator()->create(),
     'membership role' => fn () => membershipRoleUser(),
 ]);
 
-test('the lists hide the deactivate action for the owner and their household', function () {
+test('the member list hides the deactivate action for the owner', function () {
     $household = Household::factory()->create();
     $owner = ownerWithMember($household);
     $actor = User::factory()->administrator()->create();
@@ -166,19 +169,6 @@ test('the lists hide the deactivate action for the owner and their household', f
     $this->actingAs($actor)->get(route('members.index'))
         ->assertInertia(fn (Assert $page) => $page
             ->where('members', fn ($members) => collect($members)->firstWhere('id', $owner->member->id)['can_deactivate'] === false));
-
-    $this->actingAs($actor)->get(route('households.index'))
-        ->assertInertia(fn (Assert $page) => $page
-            ->where('households', fn ($rows) => collect($rows)->firstWhere('id', $household->id)['can_deactivate'] === false));
-});
-
-test('the households list hides the deactivate action from the membership role when an administrator belongs to it', function () {
-    $household = Household::factory()->create();
-    memberAdministrator($household);
-
-    $this->actingAs(membershipRoleUser())->get(route('households.index'))
-        ->assertInertia(fn (Assert $page) => $page
-            ->where('households', fn ($rows) => collect($rows)->firstWhere('id', $household->id)['can_deactivate'] === false));
 });
 
 test('a deactivated member who is an administrator cannot sign in with a magic link', function () {
@@ -207,7 +197,7 @@ test('reactivating a person whose administrator profile was removed meanwhile do
         ->and($person->fresh()->hasActiveMemberProfile())->toBeTrue();
 });
 
-test('the owner cannot deactivate themselves or their household', function () {
+test('the owner cannot deactivate themselves, but may deactivate their household alone', function () {
     $household = Household::factory()->create();
     $owner = ownerWithMember($household);
 
@@ -215,7 +205,8 @@ test('the owner cannot deactivate themselves or their household', function () {
     $this->withSession(['active_profile' => Profile::Administrator->value])->actingAs($owner);
 
     $this->post(route('members.deactivate', $owner->member))->assertForbidden();
-    $this->post(route('households.deactivate', $household))->assertForbidden();
+    $this->post(route('households.deactivate', $household), ['with_members' => true])->assertRedirect(route('households.index'));
 
-    expect($owner->fresh()->canSignIn())->toBeTrue();
+    expect($owner->fresh()->canSignIn())->toBeTrue()
+        ->and($household->fresh()->is_active)->toBeFalse();
 });

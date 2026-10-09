@@ -176,5 +176,18 @@
     "You have been added to the cooperative. Go to the sign-in screen and ask for a link or a code by email; you will choose a password the first time you get in.": "T'hem afegit a la cooperativa. Ves a la pantalla d'inici de sessió i demana un enllaç o un codi per correu; la primera vegada que entris triaràs una contrasenya.",
     "You only see your own household. Members of a commission see everyone.": "Només veus la teva unitat familiar. Els membres d'una comissió ho veuen tot.",
     "Your commissions": "Les teves comissions",
-    "Your household": "La teva unitat familiar"
+    "Your household": "La teva unitat familiar",
+    "Household deactivated. These members stay active: :names.": "Unitat familiar desactivada. Aquests membres continuen actius: :names.",
+    "Household reactivated. These members stay inactive: :names.": "Unitat familiar reactivada. Aquests membres continuen inactius: :names.",
+    "Household and its members reactivated.": "Unitat familiar i membres reactivats.",
+    "Deactivate only the household": "Desactiva només la unitat familiar",
+    "Deactivate the household and its members": "Desactiva la unitat familiar i els seus membres",
+    "Reactivate only the household": "Reactiva només la unitat familiar",
+    "Reactivate the household and its members": "Reactiva la unitat familiar i els seus membres",
+    "Deactivate household": "Desactiva la unitat familiar",
+    "Reactivate household": "Reactiva la unitat familiar",
+    "Members affected": "Membres afectats",
+    "These members will stay as they are because you may not change them on your own.": "Aquests membres no es canviaran perquè no pots fer-ho tu sol.",
+    "Choose what happens to the members": "Tria què passa amb els membres",
+    "Cancel": "Cancel·la"
 }
