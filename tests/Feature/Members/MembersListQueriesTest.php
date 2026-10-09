@@ -61,3 +61,38 @@ test('regression guard: the members list keeps a constant query count for the ow
 
     expect(membersListQueryCount($viewer))->toBe($fewMembers);
 });
+
+function addInactiveHouseholdsWithCommissionMembers(int $count): void
+{
+    foreach (range(1, $count) as $ignored) {
+        $household = Household::factory()->create();
+        $member = User::factory()->member($household)->create()->member->fresh();
+        $member->update(['is_active' => false]);
+        Commission::factory()->create()->members()->attach($member);
+    }
+}
+
+function householdsListQueryCount(User $viewer): int
+{
+    DB::flushQueryLog();
+    DB::enableQueryLog();
+
+    test()->actingAs($viewer)->get(route('households.index'))->assertOk();
+
+    $count = count(DB::getQueryLog());
+    DB::disableQueryLog();
+
+    return $count;
+}
+
+test('the households list runs the same number of queries for a viewer with the membership role whatever the number of inactive members', function () {
+    $viewer = membershipRoleUser();
+
+    addInactiveHouseholdsWithCommissionMembers(1);
+    householdsListQueryCount($viewer); // warm-up
+    $few = householdsListQueryCount($viewer);
+
+    addInactiveHouseholdsWithCommissionMembers(4);
+
+    expect(householdsListQueryCount($viewer))->toBe($few);
+});

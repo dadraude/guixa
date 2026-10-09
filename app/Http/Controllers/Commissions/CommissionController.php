@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Commissions;
 
-use App\Auth\MemberRoles;
+use App\Auth\CommissionRoles;
+use App\Auth\MemberCommissionList;
 use App\Auth\MembershipRoleProtection;
 use App\Auth\Role;
 use App\Http\Controllers\Controller;
@@ -22,11 +23,11 @@ class CommissionController extends Controller
     /**
      * Everyone who is in the cooperative sees names only, never contact details.
      */
-    public function index(Request $request, MemberRoles $memberRoles, MembershipRoleProtection $protection): Response
+    public function index(Request $request, CommissionRoles $commissionRoles, MemberCommissionList $commissionList, MembershipRoleProtection $protection): Response
     {
         $viewer = $request->user() ?? abort(403);
         $canManage = $viewer->can('manage-membership') === true;
-        $rolesByCommission = $memberRoles->byCommission();
+        $rolesByCommission = $commissionRoles->byCommission();
         $optionsOf = fn (Commission $commission) => array_map(
             fn (Role $role) => $role->toOption(),
             $rolesByCommission[$commission->id] ?? [],
@@ -46,11 +47,11 @@ class CommissionController extends Controller
                     'can_remove_members' => $protection->mayRemoveFromCommissionHolding($viewer, $rolesByCommission[$commission->id] ?? []),
                     'can_delete' => $protection->mayRemoveFromCommissionHolding($viewer, $rolesByCommission[$commission->id] ?? []),
                 ]),
-            'mine' => $ownMember === null ? [] : $memberRoles->commissionsOf($ownMember),
+            'mine' => $ownMember === null ? [] : $commissionList->of($ownMember),
             'availableRoles' => array_map(fn (Role $role) => $role->toOption(), Role::cases()),
             'canAssignRoles' => $viewer->can('assign-roles') === true,
             'canManage' => $canManage,
-            'candidates' => $canManage ? $this->namesOf(Member::query()->with('user')->where('is_active', true)->get()) : [],
+            'candidates' => $canManage ? $this->namesOf(Member::query()->with('user')->get()) : [],
             'status' => $request->session()->get('status'),
         ]);
     }
@@ -84,12 +85,12 @@ class CommissionController extends Controller
 
     /**
      * @param  iterable<int, Member>  $members
-     * @return array<int, array{id: string, name: string}>
+     * @return array<int, array{id: string, name: string, is_active: bool}>
      */
     private function namesOf(iterable $members): array
     {
         return collect($members)
-            ->map(fn (Member $member) => ['id' => $member->id, 'name' => $member->user->name])
+            ->map(fn (Member $member) => ['id' => $member->id, 'name' => $member->user->name, 'is_active' => $member->is_active])
             ->sortBy('name', SORT_NATURAL | SORT_FLAG_CASE)
             ->values()
             ->all();
