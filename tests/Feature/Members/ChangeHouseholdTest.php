@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Actions\ChangeMemberHousehold;
+use App\Actions\RemoveMemberFromHousehold;
 use App\Auth\Role;
 use App\Models\Commission;
 use App\Models\Household;
@@ -129,9 +130,11 @@ test('removal takes effect on the next request: no household and no commission l
     $actor = membershipActor();
 
     $this->actingAs($user)->get(route('dashboard'))->assertOk();
+    $this->actingAs($user)->get(route('directory.index'))->assertOk();
     $this->actingAs($actor)->delete(route('members.household.destroy', $user->member));
 
     $this->actingAs($user->fresh())->get(route('dashboard'))->assertRedirect(route('waiting'));
+    $this->actingAs($user->fresh())->get(route('directory.index'))->assertRedirect(route('waiting'));
 });
 
 test('the membership role changes and removes the household of anyone, including themselves and administrators', function () {
@@ -201,4 +204,67 @@ test('an unknown filter value shows the whole list', function () {
 
     $this->actingAs(membershipActor())->get(route('members.index', ['filter' => 'bogus']))
         ->assertInertia(fn (Assert $page) => $page->where('filter', null)->where('members', fn ($m) => collect($m)->pluck('name')->contains('Amb')));
+});
+
+test('the last change wins even when the action receives a stale member', function () {
+    $original = Household::factory()->create();
+    $other = Household::factory()->create();
+    $member = memberWith($original);
+    $stale = Member::query()->findOrFail($member->id);
+
+    app(ChangeMemberHousehold::class)->handle($member, $other->id);
+    app(ChangeMemberHousehold::class)->handle($stale, $original->id);
+
+    expect($member->fresh()->household_id)->toBe($original->id);
+});
+
+test('removing wins over a stale member that already had no household', function () {
+    $household = Household::factory()->create();
+    $member = memberWith(null);
+    $stale = Member::query()->findOrFail($member->id);
+
+    app(ChangeMemberHousehold::class)->handle($member, $household->id);
+    app(RemoveMemberFromHousehold::class)->handle($stale);
+
+    expect($member->fresh()->household_id)->toBeNull();
+});
+
+test('removing acts on the current state, not on a stale member that still had a household', function () {
+    $household = Household::factory()->create();
+    $other = Household::factory()->create();
+    $member = memberWith($household);
+    $stale = Member::query()->findOrFail($member->id);
+
+    app(RemoveMemberFromHousehold::class)->handle($member);
+    app(ChangeMemberHousehold::class)->handle($member, $other->id);
+    app(RemoveMemberFromHousehold::class)->handle($stale);
+
+    expect($member->fresh()->household_id)->toBeNull();
+});
+
+test('removing a member who already has no household is an error', function () {
+    $member = memberWith(null);
+
+    $this->actingAs(membershipActor())
+        ->delete(route('members.household.destroy', $member))
+        ->assertSessionHasErrors(['member' => __('This member has no household.')]);
+});
+
+test('the filter survives the redirect to the last page when the current page runs out', function () {
+    $household = Household::factory()->create();
+    foreach (range(1, 16) as $number) {
+        memberWith(null, true, ['name' => sprintf('Zzz%02d', $number)]);
+    }
+    $onSecondPage = Member::query()->whereNull('household_id')->where('is_active', true)
+        ->join('users', 'users.id', '=', 'members.user_id')->orderBy('users.name')->select('members.*')->get()->last();
+
+    $this->actingAs(membershipActor())
+        ->from(route('members.index', ['filter' => 'no-household', 'page' => 2]))
+        ->patch(route('members.household.update', $onSecondPage), ['household_id' => $household->id]);
+
+    $this->followingRedirects()->get(route('members.index', ['filter' => 'no-household', 'page' => 2]))
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('filter', 'no-household')
+            ->where('pagination.current_page', 1)
+            ->where('pagination.total', 15));
 });

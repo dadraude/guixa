@@ -54,7 +54,7 @@ class MemberController extends Controller
 
         // Bounded before paginating: a huge page would overflow the offset.
         if ($requestedPage > $lastPage) {
-            return redirect()->route('members.index', ['page' => $lastPage]);
+            return redirect()->route('members.index', array_filter(['filter' => $filter, 'page' => $lastPage]));
         }
 
         $page = $query->paginate(self::PER_PAGE, page: $requestedPage)->withQueryString();

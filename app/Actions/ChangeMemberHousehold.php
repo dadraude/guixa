@@ -33,7 +33,12 @@ class ChangeMemberHousehold
                 throw ValidationException::withMessages(['household_id' => __('Choose an active household.')]);
             }
 
-            $member->update(['household_id' => $household->id]);
+            // The household lock is taken first (as in ReactivateMember), then a fresh copy of
+            // the member: updating the possibly stale route-bound model would skip the UPDATE
+            // when its loaded value equals the new one but another change was committed meanwhile.
+            $current = Member::query()->whereKey($member->getKey())->lockForUpdate()->firstOrFail();
+            $current->update(['household_id' => $household->id]);
+            $member->setRawAttributes($current->getAttributes(), true);
         });
     }
 }

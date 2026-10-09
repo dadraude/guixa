@@ -28,7 +28,12 @@ class RemoveMemberFromHousehold
                 throw ValidationException::withMessages(['member' => __('Only active members can be removed from their household.')]);
             }
 
-            $member->update(['household_id' => null]);
+            if ($current->household_id === null) {
+                throw ValidationException::withMessages(['member' => __('This member has no household.')]);
+            }
+
+            // Update the locked row, never the possibly stale route-bound model.
+            $current->update(['household_id' => null]);
         });
     }
 }
