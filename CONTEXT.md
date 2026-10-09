@@ -22,7 +22,7 @@ _Catalan (UI)_: (not shown; the UI says membre or administrador/a)
 _Avoid_: Account, login
 
 **Inactive household**:
-A household that has left the cooperative; its data and balance are kept, and it can no longer place orders.
+A household that has left the cooperative; its data and balance are kept, and it can no longer place orders. Its members are not made inactive unless asked when deactivating it: an active member of an inactive household is treated as a member without a household.
 _Catalan (UI)_: unitat familiar inactiva
 _Avoid_: Deleted household, former member
 
@@ -37,7 +37,7 @@ _Catalan (UI)_: propietari/ària
 _Avoid_: Superadmin, main administrator, root
 
 **Inactive member**:
-A member who has left the cooperative (or never joined after being created) while their household, if any, stays; they can no longer sign in with any profile (also not as administrator) and leave all commissions, but their history is kept. All members of an inactive household are inactive.
+A member who has left the cooperative (or never joined after being created) while their household, if any, stays; they can no longer sign in with any profile (also not as administrator); nothing else changes: they keep their household, commissions and history (ADR 0011).
 _Catalan (UI)_: membre inactiu
 _Avoid_: Deleted member, removed member
 
