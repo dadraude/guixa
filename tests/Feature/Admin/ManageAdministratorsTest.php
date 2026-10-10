@@ -30,8 +30,24 @@ test('the owner lists the administrators, each with a member profile', function 
             ->where('administrators.0.name', 'Anna')
             ->where('administrators.0.is_owner', true)
             ->where('administrators.1.name', 'Berta')
-            ->where('administrators.1.is_owner', false)
-            ->missing('administrators.1.is_active'));
+            ->where('administrators.1.is_owner', false));
+});
+
+test('the list flags an administrator whose member is inactive, keeping order and the rest unflagged', function () {
+    $owner = User::factory()->owner()->create(['name' => 'Anna']);
+    User::factory()->administrator()->create(['name' => 'Berta'])->member->update(['is_active' => false]);
+    User::factory()->administrator()->create(['name' => 'Carla']);
+
+    $this->actingAs($owner)
+        ->get(route('admin.administrators.index'))
+        ->assertInertia(fn (Assert $page) => $page
+            ->has('administrators', 3)
+            ->where('administrators.0.name', 'Anna')
+            ->where('administrators.0.is_active', true)
+            ->where('administrators.1.name', 'Berta')
+            ->where('administrators.1.is_active', false)
+            ->where('administrators.2.name', 'Carla')
+            ->where('administrators.2.is_active', true));
 });
 
 test('the picker lists only active members who are not administrators', function () {

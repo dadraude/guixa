@@ -15,6 +15,7 @@ type AdministratorRow = {
     name: string;
     email: string;
     is_owner: boolean;
+    is_active: boolean;
 };
 
 type Candidate = {
@@ -65,6 +66,13 @@ defineOptions({
                 </div>
 
                 <div class="flex items-center gap-2">
+                    <Badge
+                        v-if="!administrator.is_active"
+                        variant="outline"
+                        data-test="inactive-administrator"
+                        >{{ t('Inactive') }}</Badge
+                    >
+
                     <Badge v-if="administrator.is_owner">{{
                         t('Owner')
                     }}</Badge>
