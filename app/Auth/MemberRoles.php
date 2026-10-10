@@ -93,6 +93,15 @@ class MemberRoles
     }
 
     /**
+     * Drops the remembered roles of a member so the next read goes to the database,
+     * for code that locks the member and must decide on current data.
+     */
+    public function forget(Member $member): void
+    {
+        unset($this->rolesByMember[$member->id]);
+    }
+
+    /**
      * Works out the roles of a whole page of members with two queries instead
      * of two per member, so later of() calls read the memo. Entries already
      * remembered are kept, never overwritten; inactive members have no roles

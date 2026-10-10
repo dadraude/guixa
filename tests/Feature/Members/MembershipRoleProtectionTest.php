@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use App\Actions\DeactivateMember;
+use App\Auth\MembershipRoleProtection;
 use App\Auth\Role;
 use App\Models\Commission;
 use App\Models\Household;
@@ -254,4 +256,41 @@ test('an active member who is an administrator stays active when the membership 
 
     expect($active->member->fresh()->is_active)->toBeTrue()
         ->and($removed->member->fresh()->is_active)->toBeFalse();
+});
+
+test('the deactivation re-evaluates the protection inside the transaction, with fresh data', function () {
+    $staff = protectionActor();
+    $member = protectionMember();
+    $protection = app(MembershipRoleProtection::class);
+
+    // What the controller sees: a member the membership role may still deactivate.
+    $stale = Member::query()->with('user.administrator')->findOrFail($member->id);
+    expect($protection->mayDeactivateMember($staff, $stale))->toBeTrue();
+
+    // The owner makes them an administrator after that check.
+    $member->user->administrator()->create();
+
+    expect(app(DeactivateMember::class)->handleAs($stale, $staff))->toBeFalse()
+        ->and($member->fresh()->is_active)->toBeTrue();
+});
+
+test('the deactivation re-reads the roles held through commissions inside the transaction', function () {
+    $staff = protectionActor();
+    $member = protectionMember();
+    $protection = app(MembershipRoleProtection::class);
+    expect($protection->mayDeactivateMember($staff, $member))->toBeTrue();
+
+    $commission = Commission::factory()->create();
+    $commission->assignRole(Role::Membership);
+    $commission->members()->attach($member);
+
+    expect(app(DeactivateMember::class)->handleAs($member, $staff))->toBeFalse()
+        ->and($member->fresh()->is_active)->toBeTrue();
+});
+
+test('the deactivation goes through when the protection still holds', function () {
+    $member = protectionMember();
+
+    expect(app(DeactivateMember::class)->handleAs($member, protectionActor()))->toBeTrue()
+        ->and($member->fresh()->is_active)->toBeFalse();
 });

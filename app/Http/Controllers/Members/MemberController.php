@@ -146,9 +146,10 @@ class MemberController extends Controller
 
     public function deactivate(Request $request, Member $member, DeactivateMember $deactivateMember, MembershipRoleProtection $protection): RedirectResponse
     {
-        abort_unless($protection->mayDeactivateMember($request->user() ?? abort(403), $member), 403);
+        $actor = $request->user() ?? abort(403);
+        abort_unless($protection->mayDeactivateMember($actor, $member), 403);
 
-        $deactivateMember->handle($member);
+        abort_unless($deactivateMember->handleAs($member, $actor), 403);
 
         Inertia::flash('toast', ['type' => 'success', 'message' => __('Member deactivated.')]);
 
