@@ -9,6 +9,7 @@ use App\Auth\MembershipRoleProtection;
 use App\Models\Household;
 use App\Models\Member;
 use App\Models\User;
+use App\Support\HouseholdStatusChange;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -26,22 +27,22 @@ class ReactivateHousehold
     ) {}
 
     /**
-     * @return list<string> Names of the members left inactive.
+     * @return HouseholdStatusChange The members left inactive are named in it.
      */
-    public function handle(Household $household, User $actor, bool $withMembers): array
+    public function handle(Household $household, User $actor, bool $withMembers): HouseholdStatusChange
     {
-        return DB::transaction(function () use ($household, $actor, $withMembers): array {
+        return DB::transaction(function () use ($household, $actor, $withMembers): HouseholdStatusChange {
             $locked = Household::query()->whereKey($household->getKey())->lockForUpdate()->firstOrFail();
 
             // A stale second request must not reactivate members deactivated since.
             if ($locked->is_active) {
-                return [];
+                return HouseholdStatusChange::alreadyInThatState();
             }
 
             $locked->forceFill(['is_active' => true])->save();
 
             if (! $withMembers) {
-                return [];
+                return HouseholdStatusChange::changed();
             }
 
             $members = Member::query()
@@ -64,7 +65,7 @@ class ReactivateHousehold
                 $this->reactivateMember->handle($member);
             }
 
-            return $skippedNames;
+            return HouseholdStatusChange::changed($skippedNames);
         });
     }
 }

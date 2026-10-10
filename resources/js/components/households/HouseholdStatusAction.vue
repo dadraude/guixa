@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Form } from '@inertiajs/vue3';
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import HouseholdController from '@/actions/App/Http/Controllers/Households/HouseholdController';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/dialog';
 import { t } from '@/lib/i18n';
 
-type AffectedMember = { name: string; left_out: boolean };
+type AffectedMember = { id: string; name: string; left_out: boolean };
 
 const props = defineProps<{
     householdId: string;
@@ -26,6 +26,26 @@ const props = defineProps<{
 // Nothing is preselected: the person has to choose before confirming.
 const withMembers = ref<'' | '0' | '1'>('');
 const open = ref(false);
+// Set when the server rejected a request sent without a choice: the members changed after the list loaded.
+const membersChanged = ref(false);
+
+// Inertia's <Form> keeps its state after a visit, so a previous choice would come back preselected.
+watch(open, (isOpen) => {
+    if (isOpen) {
+        withMembers.value = '';
+        return;
+    }
+    membersChanged.value = false;
+});
+
+// The redirect reloads the props with the members now affected: the dialog replaces this form, so open it.
+const askAgain = (errors: Record<string, string>) => {
+    if (!errors.with_members) {
+        return;
+    }
+    membersChanged.value = true;
+    open.value = true;
+};
 
 const action = computed(() =>
     props.isActive
@@ -45,8 +65,8 @@ const leftOut = computed(() =>
         v-bind="action"
         v-slot="{ processing }"
         data-test="household-status-form"
+        @error="askAgain"
     >
-        <input type="hidden" name="with_members" value="0" />
         <Button
             type="submit"
             variant="outline"
@@ -89,6 +109,18 @@ const leftOut = computed(() =>
                     }}</DialogDescription>
                 </DialogHeader>
 
+                <p
+                    v-if="membersChanged"
+                    class="text-sm text-destructive"
+                    data-test="members-changed-notice"
+                >
+                    {{
+                        t(
+                            'The members of this household changed. Review them and choose again.',
+                        )
+                    }}
+                </p>
+
                 <fieldset class="space-y-2">
                     <label class="flex items-center gap-2 text-sm">
                         <input
@@ -126,7 +158,7 @@ const leftOut = computed(() =>
                     <ul class="list-disc pl-5" data-test="affected-members">
                         <li
                             v-for="member in affectedMembers"
-                            :key="member.name"
+                            :key="member.id"
                             :class="member.left_out && 'text-muted-foreground'"
                         >
                             {{ member.name }}

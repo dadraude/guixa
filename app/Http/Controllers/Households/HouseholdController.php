@@ -34,7 +34,7 @@ class HouseholdController extends Controller
             ->orderBy('number')
             ->get();
 
-        // Two queries for all the members instead of two per member in the can_deactivate checks.
+        // Two queries for all the members instead of two per member in the affected_members checks.
         $memberRoles->preload($households->flatMap->members);
 
         $households = $households->map(fn (Household $household) => [
@@ -56,13 +56,14 @@ class HouseholdController extends Controller
      * The members the next action on the household would reach (the active ones to
      * deactivate, the inactive ones to reactivate), marking those the viewer may not change on their own.
      *
-     * @return list<array{name: string, left_out: bool}>
+     * @return list<array{id: string, name: string, left_out: bool}>
      */
     private function affectedMembers(Household $household, User $viewer, MembershipRoleProtection $protection): array
     {
         $affected = $household->members
             ->filter(fn (Member $member) => $member->is_active === $household->is_active)
             ->map(fn (Member $member) => [
+                'id' => $member->id,
                 'name' => $member->user->name,
                 'left_out' => $household->is_active
                     ? ! $protection->mayDeactivateAlongWithHousehold($viewer, $member)
@@ -90,21 +91,25 @@ class HouseholdController extends Controller
 
     public function deactivate(ChooseHouseholdMembersRequest $request, Household $household, DeactivateHousehold $deactivateHousehold): RedirectResponse
     {
-        $skippedNames = $deactivateHousehold->handle($household, $request->user() ?? abort(403), $request->withMembers());
+        $change = $deactivateHousehold->handle($household, $request->user() ?? abort(403), $request->withMembers());
 
-        Inertia::flash('toast', ['type' => 'success', 'message' => $skippedNames === []
-            ? __('Household deactivated.')
-            : __('Household deactivated. These members stay active: :names.', ['names' => implode(', ', $skippedNames)])]);
+        Inertia::flash('toast', ['type' => 'success', 'message' => match (true) {
+            ! $change->changed => __('The household was already inactive.'),
+            $change->skippedNames !== [] => __('Household deactivated. These members stay active: :names.', ['names' => implode(', ', $change->skippedNames)]),
+            $request->withMembers() => __('Household and its members deactivated.'),
+            default => __('Household deactivated.'),
+        }]);
 
         return to_route('households.index');
     }
 
     public function reactivate(ChooseHouseholdMembersRequest $request, Household $household, ReactivateHousehold $reactivateHousehold): RedirectResponse
     {
-        $skippedNames = $reactivateHousehold->handle($household, $request->user() ?? abort(403), $request->withMembers());
+        $change = $reactivateHousehold->handle($household, $request->user() ?? abort(403), $request->withMembers());
 
         Inertia::flash('toast', ['type' => 'success', 'message' => match (true) {
-            $skippedNames !== [] => __('Household reactivated. These members stay inactive: :names.', ['names' => implode(', ', $skippedNames)]),
+            ! $change->changed => __('The household was already active.'),
+            $change->skippedNames !== [] => __('Household reactivated. These members stay inactive: :names.', ['names' => implode(', ', $change->skippedNames)]),
             $request->withMembers() => __('Household and its members reactivated.'),
             default => __('Household reactivated. Its members stay inactive until you reactivate them.'),
         }]);

@@ -17,7 +17,7 @@ type HouseholdRow = {
     name: string;
     is_active: boolean;
     without_commission: boolean;
-    affected_members: { name: string; left_out: boolean }[];
+    affected_members: { id: string; name: string; left_out: boolean }[];
 };
 
 defineProps<{

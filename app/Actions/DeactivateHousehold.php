@@ -9,6 +9,7 @@ use App\Auth\MembershipRoleProtection;
 use App\Models\Household;
 use App\Models\Member;
 use App\Models\User;
+use App\Support\HouseholdStatusChange;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -26,23 +27,23 @@ class DeactivateHousehold
     ) {}
 
     /**
-     * @return list<string> Names of the members left active.
+     * @return HouseholdStatusChange The members left active are named in it.
      */
-    public function handle(Household $household, User $actor, bool $withMembers): array
+    public function handle(Household $household, User $actor, bool $withMembers): HouseholdStatusChange
     {
-        return DB::transaction(function () use ($household, $actor, $withMembers): array {
+        return DB::transaction(function () use ($household, $actor, $withMembers): HouseholdStatusChange {
             // Locks the household row so concurrent household changes are serialized.
             $locked = Household::query()->whereKey($household->getKey())->lockForUpdate()->firstOrFail();
 
             // A stale second request must not deactivate members reactivated since.
             if (! $locked->is_active) {
-                return [];
+                return HouseholdStatusChange::alreadyInThatState();
             }
 
             $locked->forceFill(['is_active' => false])->save();
 
             if (! $withMembers) {
-                return [];
+                return HouseholdStatusChange::changed();
             }
 
             // Locked after the household and selected by their current household, so one moved
@@ -67,7 +68,7 @@ class DeactivateHousehold
                 $this->deactivateMember->handle($member);
             }
 
-            return $skippedNames;
+            return HouseholdStatusChange::changed($skippedNames);
         });
     }
 }

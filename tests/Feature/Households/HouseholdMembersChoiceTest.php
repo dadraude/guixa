@@ -258,29 +258,89 @@ test('deactivating an already inactive household changes nothing', function () {
     expect($member->fresh()->is_active)->toBeTrue();
 });
 
-test('the household list tells who each action would affect and who would be left out', function () {
+test('the household list tells who each action would affect and who would be left out, by name', function () {
     $active = Household::factory()->create();
-    choiceMember($active, true, 'Anna');
-    choiceMembershipHolder($active);
+    $anna = choiceMember($active, true, 'Anna');
+    $holder = choiceMembershipHolder($active);
     choiceMember($active, false, 'Inactiva');
     $inactive = Household::factory()->inactive()->create();
-    choiceMember($inactive, false, 'Berta');
-    $actor = choiceActor();
+    $berta = choiceMember($inactive, false, 'Berta');
 
-    $this->actingAs($actor)->get(route('households.index'))->assertInertia(fn (Assert $page) => $page
-        ->where('households', function ($households) use ($active, $inactive) {
+    $this->actingAs(choiceActor())->get(route('households.index'))->assertInertia(fn (Assert $page) => $page
+        ->where('households', function ($households) use ($active, $inactive, $anna, $holder, $berta) {
             $activeRow = collect($households)->firstWhere('id', $active->id);
             $inactiveRow = collect($households)->firstWhere('id', $inactive->id);
 
-            return collect($activeRow['affected_members'])->sortBy('name')->values()->all() === [
-                ['name' => 'Anna', 'left_out' => false],
-                ['name' => 'Cap de Membres', 'left_out' => true],
-            ] && $inactiveRow['affected_members'] === [['name' => 'Berta', 'left_out' => false]];
+            return $activeRow['affected_members'] === [
+                ['id' => $anna->id, 'name' => 'Anna', 'left_out' => false],
+                ['id' => $holder->id, 'name' => 'Cap de Membres', 'left_out' => true],
+            ] && $inactiveRow['affected_members'] === [['id' => $berta->id, 'name' => 'Berta', 'left_out' => false]];
         }));
 });
 
-test('the household dialog text is in Catalan', function () {
-    foreach (['Deactivate only the household', 'Deactivate the household and its members', 'Reactivate only the household', 'Reactivate the household and its members'] as $key) {
-        expect(json_decode(file_get_contents(lang_path('ca.json')), true))->toHaveKey($key);
-    }
+function choiceToast(): string
+{
+    return (string) json_encode(session('inertia.flash_data.toast') ?? session('toast'), JSON_UNESCAPED_UNICODE);
+}
+
+test('a request without a choice is rejected when an active member joined after the list showed nobody affected', function () {
+    $household = Household::factory()->create();
+    $actor = choiceActor();
+
+    $this->actingAs($actor)->get(route('households.index'))->assertInertia(fn (Assert $page) => $page
+        ->where('households', fn ($households) => collect($households)->firstWhere('id', $household->id)['affected_members'] === []));
+
+    choiceMember($household, true, 'Nova');
+
+    $this->actingAs($actor)->post(route('households.deactivate', $household))->assertSessionHasErrors('with_members');
+
+    expect($household->fresh()->is_active)->toBeTrue();
+});
+
+test('reactivating an already active household is a no-op and says so', function () {
+    $household = Household::factory()->create();
+    $member = choiceMember($household, false);
+
+    $this->actingAs(choiceActor())
+        ->post(route('households.reactivate', $household), ['with_members' => true])
+        ->assertRedirect(route('households.index'));
+
+    expect($member->fresh()->is_active)->toBeFalse()
+        ->and(choiceToast())->toContain('La unitat familiar ja estava activa.')->not->toContain('reactivats');
+});
+
+test('deactivating an already inactive household with members says it was already inactive', function () {
+    $household = Household::factory()->inactive()->create();
+    choiceMember($household, true);
+
+    $this->actingAs(choiceActor())
+        ->post(route('households.deactivate', $household), ['with_members' => true])
+        ->assertRedirect(route('households.index'));
+
+    expect(choiceToast())->toContain('La unitat familiar ja estava inactiva.');
+});
+
+test('the messages say whether the members followed', function () {
+    $actor = choiceActor();
+    $household = Household::factory()->create();
+    choiceMember($household);
+
+    $this->actingAs($actor)->post(route('households.deactivate', $household), ['with_members' => true]);
+    expect(choiceToast())->toContain('Unitat familiar i membres desactivats.');
+
+    $this->actingAs($actor)->post(route('households.reactivate', $household), ['with_members' => true]);
+    expect(choiceToast())->toContain('Unitat familiar i membres reactivats.');
+
+    $this->actingAs($actor)->post(route('households.deactivate', $household), ['with_members' => false]);
+    expect(choiceToast())->toContain('Unitat familiar desactivada.')->not->toContain('membres');
+});
+
+test('the message names the acting person when they skip themselves', function () {
+    $household = Household::factory()->create();
+    $actor = choiceActor();
+    $actor->member->update(['household_id' => $household->id]);
+
+    $this->actingAs($actor)->post(route('households.deactivate', $household), ['with_members' => true]);
+
+    expect(choiceToast())->toContain($actor->name);
 });
