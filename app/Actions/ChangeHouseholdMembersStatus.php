@@ -8,6 +8,8 @@ use App\Auth\MemberRoles;
 use App\Models\Household;
 use App\Models\Member;
 use Closure;
+use Illuminate\Support\Facades\DB;
+use LogicException;
 
 /**
  * Applies a status change to the members a household has at this moment and
@@ -15,7 +17,7 @@ use Closure;
  * change on their own are skipped and named. Must run inside the transaction
  * that already locked the household, so the lock order is household first.
  */
-class ChangeHouseholdMembers
+class ChangeHouseholdMembersStatus
 {
     public function __construct(private readonly MemberRoles $memberRoles) {}
 
@@ -27,6 +29,10 @@ class ChangeHouseholdMembers
      */
     public function handle(Household $household, bool $currentlyActive, Closure $mayChange, Closure $change): array
     {
+        if (DB::transactionLevel() === 0) {
+            throw new LogicException('Household members must be changed inside the transaction that locked the household.');
+        }
+
         // Locked after the household and selected by their current household, so one moved
         // elsewhere meanwhile is never touched; a fresh query, as a preloaded relation could be stale.
         $members = Member::query()

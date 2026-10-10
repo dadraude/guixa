@@ -22,7 +22,7 @@ class DeactivateHousehold
     public function __construct(
         private readonly DeactivateMember $deactivateMember,
         private readonly MembershipRoleProtection $protection,
-        private readonly ChangeHouseholdMembers $householdMembers,
+        private readonly ChangeHouseholdMembersStatus $householdMembers,
     ) {}
 
     /**
