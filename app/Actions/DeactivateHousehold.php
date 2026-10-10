@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Actions;
 
-use App\Auth\MemberRoles;
 use App\Auth\MembershipRoleProtection;
 use App\Models\Household;
 use App\Models\Member;
@@ -23,7 +22,7 @@ class DeactivateHousehold
     public function __construct(
         private readonly DeactivateMember $deactivateMember,
         private readonly MembershipRoleProtection $protection,
-        private readonly MemberRoles $memberRoles,
+        private readonly ChangeHouseholdMembers $householdMembers,
     ) {}
 
     /**
@@ -46,27 +45,12 @@ class DeactivateHousehold
                 return HouseholdStatusChange::changed();
             }
 
-            // Locked after the household and selected by their current household, so one moved
-            // elsewhere meanwhile is never touched; a fresh query, as a preloaded relation could be stale.
-            $members = Member::query()
-                ->where('household_id', $locked->getKey())
-                ->where('is_active', true)
-                ->with('user.administrator')
-                ->lockForUpdate()
-                ->get();
-            $this->memberRoles->preload($members);
-
-            $skippedNames = [];
-
-            foreach ($members as $member) {
-                if (! $this->protection->mayDeactivateAlongWithHousehold($actor, $member)) {
-                    $skippedNames[] = $member->user->name;
-
-                    continue;
-                }
-
-                $this->deactivateMember->handle($member);
-            }
+            $skippedNames = $this->householdMembers->handle(
+                $locked,
+                currentlyActive: true,
+                mayChange: fn (Member $member): bool => $this->protection->mayDeactivateAlongWithHousehold($actor, $member),
+                change: fn (Member $member) => $this->deactivateMember->handle($member),
+            );
 
             return HouseholdStatusChange::changed($skippedNames);
         });
