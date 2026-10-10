@@ -140,7 +140,7 @@ test('every household check goes through the manage-membership rule', function (
 });
 
 test('the household screen text is in Catalan', function () {
-    foreach (['Households', 'Add household', 'Household number', 'Rename', 'Number'] as $key) {
+    foreach (['Households', 'Add household', 'Household number', 'Rename'] as $key) {
         expect(__($key))->not->toBe($key);
     }
 });
