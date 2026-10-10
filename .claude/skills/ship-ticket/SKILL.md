@@ -55,21 +55,26 @@ the base ref (`main`, or the blocker's branch):
 - `ticket-reviewer`: spec coverage and standards.
 - `ticket-correctness-reviewer`: bugs and security.
 
-If either verdict is `CHANGES REQUESTED`, relay the blockers of both to a new `ticket-implementer` pass
-(one correction pass only).
+Each reviewer marks every finding `fix now`, `question` or `follow-up` (see the agents). The default is
+to fix it now: a correction pass is cheaper than an issue, its triage and another session.
 
-Then sort every follow-up into one of two buckets, so none lives only in a PR body:
-- **Trivial** (wording, formatting, a comment): fix it in the correction pass, or drop it and say so.
-  With no correction pass (both verdicts approve), drop it, or batch the ones worth keeping into one
-  short `ticket-implementer` pass; never fix them in the main session.
-- **Worth doing**: one Linear issue each in project Guixa, label `needs-triage`, related to the
-  parent ticket and in its milestone, titled with the change to make; body: file:line, the reviewer's finding and the
-  suggested fix. Create them after the user approves the PR (step 4), before opening it.
+1. **Questions** (a product decision the ticket and spec leave open): ask the user, one at a time, and
+   record each answer in the ticket as an acceptance criterion. If the user rules it out of the
+   ticket's scope, it becomes a follow-up.
+2. **Correction pass**: if there is any `fix now` finding or answered question, relay all of them from
+   both reviewers to one new `ticket-implementer` pass (one correction pass only), whatever the
+   verdicts. A finding a tool could check is fixed by adding the check (arch test, Larastan or Pint
+   rule), not by a one-off edit. Drop anything not worth a line of code and say so.
+3. **Follow-ups**, only for (a) a problem that already existed before this ticket and sits outside the
+   code it changes, or (b) a question the user ruled out of scope. One Linear issue each in project
+   Guixa, label `needs-triage`, related to the parent ticket and in its milestone, titled with the
+   change to make; body: file:line, the finding and the suggested fix. Create them after the user
+   approves the PR (step 4), before opening it. Never fix anything in the main session.
 
 ## 4. Deliver
 
 Show the user a short summary: what was built, test/lint results (as reported, not re-verified unless
-asked), both review verdicts, the follow-ups and their bucket, open doubts. Then ask once whether to push and
+asked), both review verdicts, what the correction pass fixed, what was dropped, the follow-ups, open doubts. Then ask once whether to push and
 open the PR.
 On a yes: create the follow-up issues, fetch again and, if the base moved since the sync, repeat the
 step 2 sync before pushing. Then push with `-u`, `gh pr create --base <base>` with a conventional

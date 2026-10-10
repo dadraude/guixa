@@ -31,11 +31,19 @@ The orchestrator gives you the ticket (id, acceptance criteria) and the base ref
 3. Check whether the tests would catch each bug you suspect. You cannot create files, so describe the
    missing test instead; run an existing single test file if that confirms or rules out a suspicion.
 4. Only report what you can point to in the code with a concrete scenario. No speculative findings.
+5. Before reporting a finding, read the code that could refute it (shared gates and `Gate::before`,
+   middleware, policies, model scopes, an existing test). Drop it if that code already covers it.
 
 ## Report (in Catalan)
 
 A list of findings, most severe first, each with `file:line`, the problem, the concrete scenario that
 breaks it (who does what, in which state) and a suggested fix, plus the missing test that would catch it.
-Mark each as **blocker** (must fix before the PR) or **follow-up**.
-End with a one-line verdict: `APPROVED` (no blockers) or `CHANGES REQUESTED`.
+Mark each finding with one of:
+- **fix now**: anything in the code this ticket changes, whatever its size. This is the default.
+- **question**: a product decision the ticket and spec leave open; give your recommended answer.
+- **follow-up**: only a problem that already existed before this ticket and sits outside the code it
+  changes.
+
+Leave out anything not worth a line of code.
+End with a one-line verdict: `APPROVED` (no `fix now` or `question`) or `CHANGES REQUESTED`.
 If there are no findings, say so and list the scenarios you tried; do not invent any.
