@@ -41,6 +41,13 @@ class ChangeHouseholdMembersStatus
             ->with('user.administrator')
             ->lockForUpdate()
             ->get();
+
+        // The roles are remembered per request and preload keeps what is remembered: forget what
+        // was read before the lock so the predicate decides on roles read inside it.
+        foreach ($members as $member) {
+            $this->memberRoles->forget($member);
+        }
+
         $this->memberRoles->preload($members);
 
         $skippedNames = [];
