@@ -393,6 +393,10 @@ Guixa gets the membership foundation every later feature builds on:
   confirmation (so a mistyped email can be fixed); emails stay unique. Since every
   administrator is a member, an administrator's email is changed on the members screen; the
   administrators screen has no email edit (DRA-59).
+- **A change made for someone else ends their access through the old address (DRA-60):** in
+  the same transaction it invalidates their unused magic links, rotates their remember token
+  and ends all their existing sessions, as deactivation does, so whoever controls the old
+  address loses access at once. The person signs in again with the new email.
 - Emails are unique across sign-in identities, compared case-insensitively.
 
 ### Commissions and roles
@@ -404,6 +408,12 @@ Guixa gets the membership foundation every later feature builds on:
   role (or administrator). Deleting is rejected while the commission has members; deleting
   removes its role assignments.
 - Only administrators assign or remove roles on commissions.
+- Removing a member from a commission that holds the membership role takes the role away, so
+  it is reserved to administrators and the owner, unless the member keeps the membership role
+  through another commission they belong to: then a member with the membership role can
+  remove them, themselves included, since nobody loses the role (DRA-67). Whether they keep it
+  is re-checked under a lock in the removal's transaction, so two simultaneous removals cannot
+  leave them without it.
 - Active and inactive members can be added to a commission (the candidates list marks the
   inactive ones); deactivating a member keeps their commissions. An inactive member's roles do
   nothing while they cannot sign in. An inactive member counts as a member of the commission,
