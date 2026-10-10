@@ -265,6 +265,9 @@ Guixa gets the membership foundation every later feature builds on:
   household and no commission goes to the waiting screen.
 - Adding the administrator profile sends no email. The owner's picker lists only active
   members who are not already administrators.
+- The owner's administrators list marks an administrator whose member is inactive with the
+  same "Inactive" badge as the members list; it is informational only, and they can be removed
+  as any other (DRA-80).
 - A person with both profiles whose member profile has no household and no commission is not
   offered the choice: while they have an administrator profile, such a member profile is not
   an available profile, and they act as administrator. If a household or commission is
@@ -320,6 +323,10 @@ Guixa gets the membership foundation every later feature builds on:
   reactivating one asks whether to reactivate its inactive members too: nothing is
   preselected, the server rejects a request without an explicit choice, the dialog lists the
   names of the members affected, and the question is skipped when there is nobody to affect.
+  "Nobody to affect" means nobody who would actually change: when every member in the matching
+  state would be skipped (see below), the question is skipped, the dialog still names who stays
+  as they are, and the server accepts the action without a choice if, under the lock, nobody
+  would change; if somebody would, it asks again (DRA-94).
   Deactivating a household alone ends no session: its active members lose "my household" on
   their next request, as when they are removed from a household.
 - With members, both actions lock the household and then select and lock (`FOR UPDATE`) the
@@ -383,7 +390,9 @@ Guixa gets the membership foundation every later feature builds on:
   membership role can change the email of members who neither hold the membership role nor
   are administrators. Nobody else can change another person's email, and the owner's email is
   changed only by the owner. A change made for someone else applies immediately, without
-  confirmation (so a mistyped email can be fixed); emails stay unique.
+  confirmation (so a mistyped email can be fixed); emails stay unique. Since every
+  administrator is a member, an administrator's email is changed on the members screen; the
+  administrators screen has no email edit (DRA-59).
 - Emails are unique across sign-in identities, compared case-insensitively.
 
 ### Commissions and roles
@@ -417,7 +426,8 @@ Guixa gets the membership foundation every later feature builds on:
 - The members list for the membership role shows every member and has a filter or section for
   the active members without a household, with the same sorting and inactive handling as the
   rest of the list. It also includes the active members of an inactive household, labelled
-  "(inactive household)", so the membership commission can move them or wait (DRA-87).
+  "(inactive household)", so the membership commission can move them or wait (DRA-87). The
+  label and the household picker name that household as "#N Name (inactive household)" (DRA-92).
 
 ### General
 
