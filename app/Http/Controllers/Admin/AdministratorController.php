@@ -28,7 +28,7 @@ class AdministratorController extends Controller
                 'email' => $administrator->user->email,
                 'is_owner' => $administrator->is_owner,
                 // Informational only: an inactive member keeps the profile but cannot sign in.
-                'is_active' => $administrator->user->member?->is_active !== false,
+                'is_active' => $administrator->user->isActive(),
             ]);
 
         // The picker: active members who are not administrators yet.
