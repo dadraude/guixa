@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Actions;
 
-use App\Auth\MemberRoles;
 use App\Auth\MembershipRoleProtection;
 use App\Models\Household;
 use App\Models\Member;
@@ -23,7 +22,7 @@ class ReactivateHousehold
     public function __construct(
         private readonly ReactivateMember $reactivateMember,
         private readonly MembershipRoleProtection $protection,
-        private readonly MemberRoles $memberRoles,
+        private readonly ChangeHouseholdMembersStatus $householdMembers,
     ) {}
 
     /**
@@ -45,25 +44,12 @@ class ReactivateHousehold
                 return HouseholdStatusChange::changed();
             }
 
-            $members = Member::query()
-                ->where('household_id', $locked->getKey())
-                ->where('is_active', false)
-                ->with('user.administrator')
-                ->lockForUpdate()
-                ->get();
-            $this->memberRoles->preload($members);
-
-            $skippedNames = [];
-
-            foreach ($members as $member) {
-                if (! $this->protection->mayReactivateMember($actor, $member)) {
-                    $skippedNames[] = $member->user->name;
-
-                    continue;
-                }
-
-                $this->reactivateMember->handle($member);
-            }
+            $skippedNames = $this->householdMembers->handle(
+                $locked,
+                currentlyActive: false,
+                mayChange: fn (Member $member): bool => $this->protection->mayReactivateMember($actor, $member),
+                change: fn (Member $member) => $this->reactivateMember->handle($member),
+            );
 
             return HouseholdStatusChange::changed($skippedNames);
         });
