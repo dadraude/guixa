@@ -35,6 +35,12 @@ class DeactivateMember
      * the administrator profile or a membership-role commission may have been added since
      * the caller's own check.
      *
+     * Race safety: AddAdministratorProfile::add locks this same members row (lockForUpdate)
+     * and checks is_active under it, so both writes are serialized on the row; under
+     * Postgres READ COMMITTED the administrators row is visible to the load made after
+     * acquiring the lock. Commission writes need no lock because inactive members may
+     * join commissions, so any interleaving equals an allowed serial order.
+     *
      * @return bool False when the protection no longer allows it; nothing changed then.
      */
     public function handleAs(Member $member, User $actor): bool
@@ -54,7 +60,6 @@ class DeactivateMember
             }
 
             $this->handle($locked);
-            $member->refresh();
 
             return true;
         });

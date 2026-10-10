@@ -294,3 +294,17 @@ test('the deactivation goes through when the protection still holds', function (
     expect(app(DeactivateMember::class)->handleAs($member, protectionActor()))->toBeTrue()
         ->and($member->fresh()->is_active)->toBeFalse();
 });
+
+test('the deactivate route answers 403 when the protection fails inside the transaction', function () {
+    $member = protectionMember();
+
+    // The controller's own check passes; the locked re-check refuses.
+    $this->mock(DeactivateMember::class)->shouldReceive('handleAs')->once()->andReturnFalse();
+
+    $this->actingAs(protectionActor())
+        ->post(route('members.deactivate', $member))
+        ->assertForbidden()
+        ->assertSessionMissing('inertia.flash_data');
+
+    expect($member->fresh()->is_active)->toBeTrue();
+});
