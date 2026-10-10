@@ -19,7 +19,7 @@ class AdministratorController extends Controller
     public function index(): Response
     {
         $administrators = Administrator::query()
-            ->with('user')
+            ->with('user.member')
             ->oldest()
             ->get()
             ->map(fn (Administrator $administrator) => [
@@ -27,6 +27,8 @@ class AdministratorController extends Controller
                 'name' => $administrator->user->name,
                 'email' => $administrator->user->email,
                 'is_owner' => $administrator->is_owner,
+                // Informational only: an inactive member keeps the profile but cannot sign in.
+                'is_active' => $administrator->user->member?->is_active !== false,
             ]);
 
         // The picker: active members who are not administrators yet.
