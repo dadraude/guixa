@@ -17,6 +17,8 @@ type MemberRow = {
     phone: string | null;
     household_id: string | null;
     household_is_active: boolean | null;
+    household_number: number | null;
+    household_name: string | null;
     is_active: boolean;
     can_change_email: boolean;
     can_deactivate: boolean;
@@ -228,7 +230,12 @@ defineOptions({
                         v-if="member.household_is_active === false"
                         variant="outline"
                         data-test="inactive-household"
-                        >{{ t('(inactive household)') }}</Badge
+                        >{{
+                            t('#:number :name (inactive household)', {
+                                number: member.household_number ?? '',
+                                name: member.household_name ?? '',
+                            })
+                        }}</Badge
                     >
                     <InputError :message="errors.name" />
                     <InputError :message="errors.email" />
@@ -258,7 +265,12 @@ defineOptions({
                             :value="member.household_id"
                             disabled
                         >
-                            {{ t('(inactive household)') }}
+                            {{
+                                t('#:number :name (inactive household)', {
+                                    number: member.household_number ?? '',
+                                    name: member.household_name ?? '',
+                                })
+                            }}
                         </option>
                         <option
                             v-for="household in households"

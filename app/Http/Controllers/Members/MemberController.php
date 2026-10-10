@@ -69,6 +69,9 @@ class MemberController extends Controller
             'phone' => $member->phone,
             'household_id' => $member->household_id,
             'household_is_active' => $member->household?->is_active,
+            // Only an inactive household is named: the picker lists the active ones, so this is the only way to tell which one it is.
+            'household_number' => $member->household?->is_active === false ? $member->household->number : null,
+            'household_name' => $member->household?->is_active === false ? $member->household->name : null,
             'is_active' => $member->is_active,
             'can_change_email' => $emailChangeLevels->canChange($actor, $member),
             'can_deactivate' => $protection->mayDeactivateMember($actor, $member),

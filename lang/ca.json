@@ -1,5 +1,6 @@
 {
     "(inactive household)": "(unitat familiar inactiva)",
+    "#:number :name (inactive household)": "#:number :name (unitat familiar inactiva)",
     "6-digit code sent to :email": "Codi de 6 xifres enviat a :email",
     "A commission with members cannot be deleted.": "No es pot eliminar una comissió que té membres.",
     "Act as administrator": "Actua com a administrador/a",
