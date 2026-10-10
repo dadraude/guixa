@@ -86,7 +86,7 @@ test('reactivating a member keeps their history and works while the household is
     expect($member->fresh()->is_active)->toBeTrue();
 });
 
-test('deactivating a household deactivates all its members and keeps number and name', function () {
+test('deactivating a household with its members deactivates them all and keeps number and name', function () {
     $household = Household::factory()->create(['name' => 'Cal Pere']);
     $number = $household->fresh()->number;
     $first = activeMemberIn($household);
@@ -95,7 +95,7 @@ test('deactivating a household deactivates all its members and keeps number and 
     $other = activeMemberIn(Household::factory()->create());
 
     $this->actingAs(membershipStaff())
-        ->post(route('households.deactivate', $household))
+        ->post(route('households.deactivate', $household), ['with_members' => true])
         ->assertRedirect(route('households.index'));
 
     $household->refresh();
@@ -114,8 +114,8 @@ test('reactivating a household keeps its number and leaves its members inactive'
     $member = activeMemberIn($household);
     $staff = membershipStaff();
 
-    $this->actingAs($staff)->post(route('households.deactivate', $household));
-    $this->actingAs($staff)->post(route('households.reactivate', $household))
+    $this->actingAs($staff)->post(route('households.deactivate', $household), ['with_members' => true]);
+    $this->actingAs($staff)->post(route('households.reactivate', $household), ['with_members' => false])
         ->assertRedirect(route('households.index'));
 
     expect($household->fresh()->is_active)->toBeTrue()

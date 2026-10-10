@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Auth;
 
 use App\Models\Commission;
-use App\Models\Household;
 use App\Models\Member;
 use App\Models\User;
 use Illuminate\Support\Facades\Gate;
@@ -16,7 +15,7 @@ use Illuminate\Support\Facades\Gate;
  * (see EmailChangeLevels) and sign in as them. The ability is defined as false
  * for everyone and administrators pass through Gate::before, as with the other
  * administrator-only abilities. Nobody, administrators included, deactivates
- * the owner or a household the owner belongs to.
+ * the owner.
  */
 class MembershipRoleProtection
 {
@@ -54,22 +53,12 @@ class MembershipRoleProtection
     }
 
     /**
-     * Deactivating a household deactivates its members, so it is held to the same rule.
+     * Deactivating a household together with its members skips whoever the actor may not
+     * deactivate on their own, and the actor themselves, so they cannot lock themselves out.
      */
-    public function mayDeactivateHousehold(User $actor, Household $household): bool
+    public function mayDeactivateAlongWithHousehold(User $actor, Member $member): bool
     {
-        $members = $household->loadMissing('members.user.administrator')->members;
-
-        if ($members->contains(fn (Member $member) => $this->belongsToOwner($member))) {
-            return false;
-        }
-
-        if ($this->mayTakeAway($actor)) {
-            return true;
-        }
-
-        // Deactivating a member who is already inactive changes nothing, so it cannot take a role away.
-        return $members->every(fn (Member $member) => ! $member->is_active || $this->mayBeDeactivatedByMembershipRole($member));
+        return $member->user_id !== $actor->id && $this->mayDeactivateMember($actor, $member);
     }
 
     /**
