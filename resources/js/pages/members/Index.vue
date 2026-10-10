@@ -17,6 +17,8 @@ type MemberRow = {
     phone: string | null;
     household_id: string | null;
     household_is_active: boolean | null;
+    household_number: number | null;
+    household_name: string | null;
     is_active: boolean;
     can_change_email: boolean;
     can_deactivate: boolean;
@@ -49,6 +51,14 @@ defineProps<{
     households: HouseholdOption[];
     commissions: CommissionOption[];
 }>();
+
+// Shared by the badge and the picker's disabled option so the two cannot drift.
+function inactiveHouseholdLabel(member: MemberRow): string {
+    return t('#:number :name (inactive household)', {
+        number: member.household_number ?? '',
+        name: member.household_name ?? '',
+    });
+}
 
 defineOptions({
     layout: {
@@ -228,7 +238,7 @@ defineOptions({
                         v-if="member.household_is_active === false"
                         variant="outline"
                         data-test="inactive-household"
-                        >{{ t('(inactive household)') }}</Badge
+                        >{{ inactiveHouseholdLabel(member) }}</Badge
                     >
                     <InputError :message="errors.name" />
                     <InputError :message="errors.email" />
@@ -258,7 +268,7 @@ defineOptions({
                             :value="member.household_id"
                             disabled
                         >
-                            {{ t('(inactive household)') }}
+                            {{ inactiveHouseholdLabel(member) }}
                         </option>
                         <option
                             v-for="household in households"

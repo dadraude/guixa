@@ -54,3 +54,27 @@ test('every translated string has a Catalan translation', function () {
 
     expect($missing)->toBe([]);
 });
+
+test('every key in ca.json is used somewhere in the source', function () {
+    $root = dirname(__DIR__, 2);
+    $catalan = json_decode((string) file_get_contents($root.'/lang/ca.json'), true, flags: JSON_THROW_ON_ERROR);
+
+    $source = '';
+    foreach (['app', 'routes', 'resources', 'database', 'config'] as $directory) {
+        foreach (Finder::create()->files()->in($root.'/'.$directory)->name('/\.(php|vue|ts)$/') as $file) {
+            $source .= $file->getContents()."\n";
+        }
+    }
+
+    // Used by Laravel's own mail views, which live in vendor/.
+    $usedByFramework = ['All rights reserved.'];
+
+    $unused = array_values(array_filter(
+        array_keys($catalan),
+        fn (string $key) => ! in_array($key, $usedByFramework, true)
+            && ! str_contains($source, $key)
+            && ! str_contains($source, addcslashes($key, "'")),
+    ));
+
+    expect($unused)->toBe([]);
+});

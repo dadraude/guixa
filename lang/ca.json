@@ -1,5 +1,5 @@
 {
-    "(inactive household)": "(unitat familiar inactiva)",
+    "#:number :name (inactive household)": "#:number :name (unitat familiar inactiva)",
     "6-digit code sent to :email": "Codi de 6 xifres enviat a :email",
     "A commission with members cannot be deleted.": "No es pot eliminar una comissió que té membres.",
     "Act as administrator": "Actua com a administrador/a",
@@ -106,7 +106,6 @@
     "No members in any commission": "Cap membre en una comissió",
     "No members yet.": "Encara no hi ha cap membre.",
     "No roles": "Cap rol",
-    "Number": "Número",
     "Only active members can become administrators.": "Només els membres actius poden ser administradors/es.",
     "Only the owner adds the administrator profile to active members and removes it.": "Només el propietari/ària afegeix el perfil d'administrador/a a membres actius i el treu.",
     "Open the link in the email, on any device, or type its code here": "Obre l'enllaç del correu, des de qualsevol dispositiu, o escriu-ne el codi aquí",
@@ -169,7 +168,6 @@
     "We will email you a link and a code to log in": "T'enviarem per correu un enllaç i un codi per iniciar la sessió",
     "Welcome to :app": "Et donem la benvinguda a :app",
     "You are both a member and an administrator. You can switch whenever you want without logging in again.": "Ets alhora membre i administrador/a. Pots canviar quan vulguis sense tornar a iniciar la sessió.",
-    "You are not in any commission yet.": "Encara no formes part de cap comissió.",
     "You are not in any commission.": "No formes part de cap comissió.",
     "You cannot change this email address.": "No pots canviar aquesta adreça electrònica.",
     "You do not belong to any household.": "No pertanys a cap unitat familiar.",

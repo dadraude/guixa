@@ -140,3 +140,21 @@ function inactiveHouseholdMemberIn(?Household $household, bool $active, string $
 
     return $member->fresh();
 }
+
+test('the members list names the household of a member whose household is inactive', function () {
+    $active = Household::factory()->create(['name' => 'Cal Actiu']);
+    $inactive = Household::factory()->inactive()->create(['name' => 'Cal Inactiu'])->fresh();
+    inactiveHouseholdMemberIn($inactive, true, 'A Dins');
+    inactiveHouseholdMemberIn($inactive, false, 'B Dins inactiu');
+    inactiveHouseholdMemberIn($active, true, 'C Amb');
+    inactiveHouseholdMemberIn(null, true, 'D Sense');
+
+    $this->actingAs(inactiveHouseholdMembershipActor())->get(route('members.index'))
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('members', fn ($members) => collect($members)->whereIn('name', ['A Dins', 'B Dins inactiu', 'C Amb', 'D Sense'])->map(fn ($member) => [$member['name'], $member['household_number'], $member['household_name']])->values()->all() === [
+                ['A Dins', $inactive->number, 'Cal Inactiu'],
+                ['B Dins inactiu', $inactive->number, 'Cal Inactiu'],
+                ['C Amb', null, null],
+                ['D Sense', null, null],
+            ]));
+});
