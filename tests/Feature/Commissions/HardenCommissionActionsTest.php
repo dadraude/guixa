@@ -2,12 +2,17 @@
 
 declare(strict_types=1);
 
+use App\Actions\AddCommissionMember;
+use App\Actions\AssignCommissionRole;
+use App\Actions\SaveCommission;
 use App\Auth\Role;
 use App\Models\Commission;
 use App\Models\Household;
 use App\Models\Member;
 use App\Models\User;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use Inertia\Testing\AssertableInertia as Assert;
 
 function hardenMember(string $name = 'Anna Puig'): Member
@@ -207,4 +212,56 @@ test('the membership role cannot assign or remove roles', function () {
     $this->actingAs($user)->delete(route('commissions.roles.destroy', [$commission, 'orders']))->assertForbidden();
 
     expect(rolesOf($commission))->toBe([Role::Orders]);
+});
+
+// Direct action calls (bypassing the form requests)
+
+test('the add action finds no commission once the row was deleted', function () {
+    $commission = Commission::factory()->create();
+    $member = hardenMember();
+    $commission->delete();
+
+    expect(fn () => resolve(AddCommissionMember::class)->handle($commission, $member))->toThrow(ModelNotFoundException::class);
+    expect(DB::table('commission_member')->count())->toBe(0);
+});
+
+test('a name differing only in case loses to the unique index with a validation error', function () {
+    Commission::factory()->create(['name' => 'Tresoreria']);
+
+    expect(fn () => resolve(SaveCommission::class)->handle('TRESORERIA'))->toThrow(function (ValidationException $e) {
+        expect($e->errors())->toHaveKey('name');
+    });
+    expect(Commission::count())->toBe(1);
+});
+
+test('renaming to a name differing only in case loses to the unique index with a validation error', function () {
+    Commission::factory()->create(['name' => 'Tresoreria']);
+    $other = Commission::factory()->create(['name' => 'Caixes']);
+
+    expect(fn () => resolve(SaveCommission::class)->handle('tresoreria', $other))->toThrow(function (ValidationException $e) {
+        expect($e->errors())->toHaveKey('name');
+    });
+    expect($other->fresh()->name)->toBe('Caixes');
+});
+
+test('assigning a role locks the commission row', function () {
+    $commission = Commission::factory()->create();
+    $statements = [];
+    DB::listen(function ($query) use (&$statements) {
+        $statements[] = $query->sql;
+    });
+
+    $this->actingAs(hardenAdministrator())->post(route('commissions.roles.store', $commission), ['role' => 'orders']);
+
+    $locks = collect($statements)->filter(fn (string $sql) => str_contains($sql, 'from "commissions"') && str_contains($sql, 'for update'));
+
+    expect($locks)->toHaveCount(1);
+});
+
+test('assigning a role to a commission deleted meanwhile finds no commission and creates nothing', function () {
+    $commission = Commission::factory()->create();
+    $commission->delete();
+
+    expect(fn () => resolve(AssignCommissionRole::class)->handle($commission, Role::Orders))->toThrow(ModelNotFoundException::class);
+    expect(DB::table('commission_role')->count())->toBe(0);
 });

@@ -6,15 +6,15 @@ namespace App\Auth;
 
 use App\Models\Commission;
 use App\Models\User;
-use Illuminate\Support\Facades\Gate;
+use Illuminate\Contracts\Auth\Access\Gate;
 
 /**
- * Deleting a commission removes its role assignments, which only administrators do, so a
+ * Deleting a commission removes its role assignments, which only administrators do (the assign-roles gate), so a
  * commission holding any role is reserved to them; the membership role deletes the rest.
  */
 class CommissionDeletion
 {
-    public function __construct(private readonly MemberRoles $memberRoles) {}
+    public function __construct(private readonly MemberRoles $memberRoles, private readonly Gate $gate) {}
 
     public function mayDelete(User $actor, Commission $commission): bool
     {
@@ -28,6 +28,6 @@ class CommissionDeletion
      */
     public function mayDeleteHolding(User $actor, array $commissionRoles): bool
     {
-        return $commissionRoles === [] || Gate::forUser($actor)->allows(MembershipRoleProtection::ABILITY);
+        return $commissionRoles === [] || $this->gate->forUser($actor)->allows('assign-roles');
     }
 }

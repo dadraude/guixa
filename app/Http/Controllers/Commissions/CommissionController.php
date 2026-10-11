@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Commissions;
 
 use App\Actions\DeleteCommission;
+use App\Actions\SaveCommission;
 use App\Auth\CommissionDeletion;
 use App\Auth\CommissionRoles;
 use App\Auth\MemberCommissionList;
@@ -61,16 +62,16 @@ class CommissionController extends Controller
         ]);
     }
 
-    public function store(SaveCommissionRequest $request): RedirectResponse
+    public function store(SaveCommissionRequest $request, SaveCommission $saveCommission): RedirectResponse
     {
-        Commission::create($request->validated());
+        $saveCommission->handle($request->safe()->string('name')->toString());
 
         return to_route('commissions.index');
     }
 
-    public function update(SaveCommissionRequest $request, Commission $commission): RedirectResponse
+    public function update(SaveCommissionRequest $request, Commission $commission, SaveCommission $saveCommission): RedirectResponse
     {
-        $commission->update($request->validated());
+        $saveCommission->handle($request->safe()->string('name')->toString(), $commission);
 
         return to_route('commissions.index');
     }
