@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use App\Auth\MemberRoles;
 use App\Auth\Role;
 use App\Models\Commission;
 use App\Models\Household;
@@ -38,8 +37,8 @@ test('an administrator assigns several roles to a commission and a role to sever
     $this->actingAs($administrator)->post(route('commissions.roles.store', $orders), ['role' => 'boxes']);
     $this->actingAs($administrator)->post(route('commissions.roles.store', $boxes), ['role' => 'boxes']);
 
-    expect(app(MemberRoles::class)->forCommissions([$orders->id]))->toEqualCanonicalizing([Role::Orders, Role::Boxes])
-        ->and(app(MemberRoles::class)->forCommissions([$boxes->id]))->toBe([Role::Boxes]);
+    expect(rolesOf($orders))->toEqualCanonicalizing([Role::Orders, Role::Boxes])
+        ->and(rolesOf($boxes))->toBe([Role::Boxes]);
 });
 
 test('assigning the same role twice keeps a single assignment', function () {
@@ -59,7 +58,7 @@ test('only the fixed roles can be assigned', function () {
     $this->actingAs($administrator)->post(route('commissions.roles.store', $commission), ['role' => 'cleaning'])->assertSessionHasErrors('role');
     $this->actingAs($administrator)->post(route('commissions.roles.store', $commission), [])->assertSessionHasErrors('role');
 
-    expect(app(MemberRoles::class)->forCommissions([$commission->id]))->toBe([]);
+    expect(rolesOf($commission))->toBe([]);
 });
 
 test('an administrator removes a role from a commission and the others keep theirs', function () {
@@ -70,7 +69,7 @@ test('an administrator removes a role from a commission and the others keep thei
         ->delete(route('commissions.roles.destroy', [$commission, 'orders']))
         ->assertRedirect(route('commissions.index'));
 
-    expect(app(MemberRoles::class)->forCommissions([$commission->id]))->toBe([Role::Boxes]);
+    expect(rolesOf($commission))->toBe([Role::Boxes]);
 });
 
 test('a member with the membership role cannot assign or remove roles', function () {
@@ -83,8 +82,8 @@ test('a member with the membership role cannot assign or remove roles', function
     $this->actingAs($member->user)->delete(route('commissions.roles.destroy', [$other, 'orders']))->assertForbidden();
     $this->actingAs($member->user)->post(route('commissions.roles.store', $membership), ['role' => 'treasury'])->assertForbidden();
 
-    expect(app(MemberRoles::class)->forCommissions([$other->id]))->toBe([Role::Orders])
-        ->and(app(MemberRoles::class)->forCommissions([$membership->id]))->toBe([Role::Membership]);
+    expect(rolesOf($other))->toBe([Role::Orders])
+        ->and(rolesOf($membership))->toBe([Role::Membership]);
 });
 
 test('deleting an empty commission removes only its role assignments', function () {
@@ -95,7 +94,7 @@ test('deleting an empty commission removes only its role assignments', function 
     $this->actingAs($administrator)->delete(route('commissions.destroy', $doomed))->assertRedirect(route('commissions.index'));
 
     expect(DB::table('commission_role')->pluck('commission_id')->unique()->all())->toBe([$kept->id])
-        ->and(app(MemberRoles::class)->forCommissions([$kept->id]))->toBe([Role::Orders]);
+        ->and(rolesOf($kept))->toBe([Role::Orders]);
 });
 
 test('the commission list shows each commissions roles and who may assign them', function () {

@@ -67,5 +67,5 @@ arch('env() is only read from config files')
 // Fortify callbacks). Everywhere else dependencies are injected, not located (DRA-71 review).
 arch('app code injects its dependencies instead of locating them with app() or resolve()')
     ->expect('App')
-    ->not->toUse(['app', 'resolve'])
+    ->not->toUse(['app', 'resolve', 'Illuminate\Support\Facades\App', 'Illuminate\Container\Container'])
     ->ignoring('App\Providers');

@@ -21,7 +21,7 @@ use App\Models\User;
  *
  * Warning: writing roles or commission membership and then checking a gate in
  * the same request would see the remembered, stale roles. Such code must
- * invalidate the memo first (e.g. app()->forgetScopedInstances()).
+ * invalidate the memo first (call forget($member) on the injected MemberRoles).
  */
 class MemberRoles
 {
