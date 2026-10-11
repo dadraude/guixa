@@ -291,7 +291,11 @@ Guixa gets the membership foundation every later feature builds on:
   it works when opened again after signing out.
 - **Password:** standard email + password sign-in through Fortify (ADR 0006); any minimum length is enforced with
   Laravel's password rules.
-- The sign-in screen offers both ways; there is no separate "forgot password" flow.
+- The sign-in screen offers both ways; there is no separate "forgot password" flow. For 15
+  minutes after signing in with a magic link or its code, the password can be changed without
+  typing the current one; that is how a forgotten password is replaced.
+- Changing one's password ends all their other sessions and rotates their remember token; the
+  session where the change is made stays signed in (spec review of 2026-10-11).
 - Responses never reveal whether an email exists. Link requests, password attempts and code
   attempts share one rate limit: 5 per minute per email and IP together, and 20 per minute per
   IP. There is deliberately no limit per email alone, so nobody can lock someone else out by
