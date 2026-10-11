@@ -78,3 +78,21 @@ test('every key in ca.json is used somewhere in the source', function () {
 
     expect($unused)->toBe([]);
 });
+
+test('Catalan JSON translation keys stay alphabetically sorted', function () {
+    $path = dirname(__DIR__, 2).'/lang/ca.json';
+    $translations = json_decode((string) file_get_contents($path), true, flags: JSON_THROW_ON_ERROR);
+    $keys = array_keys($translations);
+    $sorted = $keys;
+    sort($sorted, SORT_STRING);
+
+    expect($keys)->toBe($sorted);
+});
+
+test('the translation order check recognizes a deliberate disorder', function () {
+    $keys = ['B', 'A'];
+    $sorted = $keys;
+    sort($sorted, SORT_STRING);
+
+    expect($keys)->not->toBe($sorted);
+});
