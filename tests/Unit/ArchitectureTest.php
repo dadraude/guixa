@@ -11,10 +11,12 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use PhpParser\Node\Expr\MethodCall;
+use PhpParser\Node\Expr\PropertyFetch;
 use PhpParser\Node\Expr\StaticCall;
 use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Identifier;
 use PhpParser\Node\Name;
+use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\NodeFinder;
 use PhpParser\NodeTraverser;
@@ -188,6 +190,40 @@ function controllerRequestViolations(string $source): array
         }
     }
 
+    // Constructor promotion and typed properties are the usual way an action
+    // becomes available to another controller method.
+    foreach ($finder->findInstanceOf($nodes, Class_::class) as $class) {
+        $deactivatorProperties = [];
+
+        foreach ($class->getProperties() as $property) {
+            if ($property->type instanceof Name && $property->type->toString() === DeactivateMember::class) {
+                foreach ($property->props as $prop) {
+                    $deactivatorProperties[] = $prop->name->toString();
+                }
+            }
+        }
+
+        foreach ($class->getMethod('__construct')?->params ?? [] as $param) {
+            if ($param->flags !== 0 && $param->type instanceof Name
+                && $param->type->toString() === DeactivateMember::class
+                && $param->var instanceof Variable && is_string($param->var->name)) {
+                $deactivatorProperties[] = $param->var->name;
+            }
+        }
+
+        foreach ($class->getMethods() as $method) {
+            foreach ($finder->findInstanceOf($method->stmts ?? [], MethodCall::class) as $call) {
+                if ($call->name instanceof Identifier && $call->name->toString() === 'handle'
+                    && $call->var instanceof PropertyFetch
+                    && $call->var->var instanceof Variable && $call->var->var->name === 'this'
+                    && $call->var->name instanceof Identifier
+                    && in_array($call->var->name->toString(), $deactivatorProperties, true)) {
+                    $violations[] = 'DeactivateMember::handle at line '.$call->getStartLine();
+                }
+            }
+        }
+    }
+
     return $violations;
 }
 
@@ -211,15 +247,27 @@ namespace App\Http\Controllers;
 use App\Actions\DeactivateMember as Deactivator;
 use App\Http\Requests\Settings\PasswordUpdateRequest as PasswordRequest;
 class ExampleController {
+    public function __construct(private Deactivator $deactivator) {}
     public function update(PasswordRequest $data, Deactivator $action): void {
         $data->string('password');
         $action->handle(null);
         Deactivator::handle(null);
+        $this->deactivator->handle(null);
     }
 }
 PHP;
-    $good = str_replace(['$'.'data->string', '$'.'action->handle(null);', 'Deactivator::handle(null);'], ['$'.'data->safe()->string', '$'.'action->handleAs(null);', ''], $bad);
+    $good = str_replace(['$'.'data->string', '$'.'action->handle(null);', 'Deactivator::handle(null);', '$'.'this->deactivator->handle(null);'], ['$'.'data->safe()->string', '$'.'action->handleAs(null);', '', '$'.'this->deactivator->handleAs(null);'], $bad);
+    $typedProperty = <<<'PHP'
+<?php
+namespace App\Http\Controllers;
+use App\Actions\DeactivateMember as Deactivator;
+class ExampleController {
+    private Deactivator $action;
+    public function update(): void { $this->action->handle(null); }
+}
+PHP;
 
-    expect(controllerRequestViolations($bad))->toHaveCount(3)
+    expect(controllerRequestViolations($bad))->toHaveCount(4)
+        ->and(controllerRequestViolations($typedProperty))->toHaveCount(1)
         ->and(controllerRequestViolations($good))->toBe([]);
 });
