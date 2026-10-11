@@ -42,14 +42,21 @@ class EmailChangeController extends Controller
         }
 
         if ($outcome === EmailChangeOutcome::EmailTaken) {
-            Inertia::flash('toast', ['type' => 'error', 'message' => __('This email is already in use.')]);
-
-            return to_route('profile.edit');
+            return to_route('email-change.taken');
         }
 
         Inertia::flash('toast', ['type' => 'success', 'message' => __('Email address updated.')]);
 
         return to_route('profile.edit');
+    }
+
+    /**
+     * Public, like the unavailable page: the link works from any browser, and
+     * without a session the profile would redirect to the login and lose the message.
+     */
+    public function taken(Request $request): Response
+    {
+        return Inertia::render('auth/EmailChangeTaken', ['signedIn' => $request->user() !== null]);
     }
 
     public function cancel(#[CurrentUser] User $user, CancelEmailChange $cancelEmailChange): RedirectResponse

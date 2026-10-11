@@ -7,6 +7,8 @@ use App\Http\Controllers\Settings\ProfileController;
 use App\Http\Controllers\Settings\SecurityController;
 use Illuminate\Support\Facades\Route;
 
+// Before the token route, so that "taken" is not read as a token.
+Route::get('settings/email/taken', [EmailChangeController::class, 'taken'])->name('email-change.taken');
 Route::get('settings/email/{token}', [EmailChangeController::class, 'show'])->name('email-change.show');
 Route::post('settings/email/{token}', [EmailChangeController::class, 'confirm'])->name('email-change.confirm');
 
