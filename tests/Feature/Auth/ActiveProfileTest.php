@@ -333,3 +333,21 @@ test('choosing a profile that can see the asked-for page leads to it', function 
         ->post(route('active-profile.update'), ['profile' => 'member'])
         ->assertRedirect(route('directory.index'));
 });
+
+test('an intended URL that matches no route is kept', function () {
+    $this->actingAs(ownerAndMember())
+        ->withSession(['url.intended' => url('/does-not-exist')])
+        ->post(route('active-profile.update'), ['profile' => 'member'])
+        ->assertRedirect(url('/does-not-exist'));
+});
+
+test('an administrator who is not the owner is sent home from an owner-only page', function () {
+    $user = User::factory()->administrator()->member(Household::factory()->create())->create();
+
+    $this->actingAs($user)
+        ->withSession(['url.intended' => route('admin.administrators.index')])
+        ->post(route('active-profile.update'), ['profile' => 'administrator'])
+        ->assertRedirect(route('home'));
+
+    expect(session()->has('url.intended'))->toBeFalse();
+});

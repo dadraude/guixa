@@ -18,6 +18,9 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class IntendedUrlAccess
 {
+    // The router resolves the `can:` alias to the Authorize class before we see it.
+    private const string CAN_PREFIX = Authorize::class.':';
+
     public function __construct(private readonly Router $router) {}
 
     public function allows(User $user, string $url): bool
@@ -32,16 +35,13 @@ class IntendedUrlAccess
         }
 
         foreach ($this->router->gatherRouteMiddleware($route) as $middleware) {
-            // The router resolves the `can:` alias to the Authorize class before we see it.
-            $prefix = Authorize::class.':';
-
-            if (! is_string($middleware) || ! str_starts_with($middleware, $prefix)) {
+            if (! is_string($middleware) || ! str_starts_with($middleware, self::CAN_PREFIX)) {
                 continue;
             }
 
             // Only ability-only gates are checked: those with model arguments
             // need route binding, and they still guard the page when it is visited.
-            $ability = substr($middleware, strlen($prefix));
+            $ability = substr($middleware, strlen(self::CAN_PREFIX));
 
             if (str_contains($ability, ',')) {
                 continue;
