@@ -26,13 +26,17 @@ class ChooseHouseholdMembersRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'with_members' => [Rule::requiredIf($this->hasMembersToAffect(...)), 'boolean'],
+            // Optional when nobody would change; the action confirms that under the lock.
+            'with_members' => [Rule::requiredIf($this->hasMembersToAffect(...)), 'nullable', 'boolean'],
         ];
     }
 
-    public function withMembers(): bool
+    /**
+     * @return bool|null Null when no choice was made.
+     */
+    public function withMembers(): ?bool
     {
-        return $this->boolean('with_members');
+        return $this->filled('with_members') ? $this->boolean('with_members') : null;
     }
 
     private function hasMembersToAffect(): bool

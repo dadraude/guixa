@@ -10,6 +10,7 @@ use App\Models\Member;
 use App\Models\User;
 use App\Support\HouseholdStatusChange;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 /**
  * A household leaves the cooperative; its number, data and history are kept.
@@ -28,7 +29,7 @@ class DeactivateHousehold
     /**
      * @return HouseholdStatusChange The members left active are named in it.
      */
-    public function handle(Household $household, User $actor, bool $withMembers): HouseholdStatusChange
+    public function handle(Household $household, User $actor, ?bool $withMembers = null): HouseholdStatusChange
     {
         return DB::transaction(function () use ($household, $actor, $withMembers): HouseholdStatusChange {
             // Locks the household row so concurrent household changes are serialized.
@@ -39,16 +40,24 @@ class DeactivateHousehold
                 return HouseholdStatusChange::alreadyInThatState();
             }
 
+            $mayChange = fn (Member $member): bool => $this->protection->mayChangeAlongWithHousehold($actor, $member, householdIsActive: true);
+
+            // No choice was made because the client saw nobody who would change: confirm it now, with the
+            // members locked, and roll back so the client asks again if somebody would (DRA-94).
+            if ($withMembers === null && $this->householdMembers->anyoneWouldChange($locked, currentlyActive: true, mayChange: $mayChange)) {
+                throw ValidationException::withMessages(['with_members' => __('The members of this household changed. Review them and choose again.')]);
+            }
+
             $locked->forceFill(['is_active' => false])->save();
 
-            if (! $withMembers) {
+            if ($withMembers !== true) {
                 return HouseholdStatusChange::changed();
             }
 
             $skippedNames = $this->householdMembers->handle(
                 $locked,
                 currentlyActive: true,
-                mayChange: fn (Member $member): bool => $this->protection->mayDeactivateAlongWithHousehold($actor, $member),
+                mayChange: $mayChange,
                 change: fn (Member $member) => $this->deactivateMember->handle($member),
             );
 

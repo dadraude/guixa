@@ -101,6 +101,7 @@ const leftOut = computed(() =>
                 class="space-y-4"
                 v-slot="{ errors, processing }"
                 @success="open = false"
+                @error="askAgain"
             >
                 <DialogHeader>
                     <DialogTitle>{{

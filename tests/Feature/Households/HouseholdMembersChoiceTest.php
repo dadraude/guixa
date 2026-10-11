@@ -2,11 +2,14 @@
 
 declare(strict_types=1);
 
+use App\Actions\DeactivateHousehold;
+use App\Actions\ReactivateHousehold;
 use App\Auth\Role;
 use App\Models\Commission;
 use App\Models\Household;
 use App\Models\Member;
 use App\Models\User;
+use Illuminate\Validation\ValidationException;
 use Inertia\Testing\AssertableInertia as Assert;
 
 function choiceActor(): User
@@ -390,14 +393,82 @@ test('an administrator is asked when a membership holder would change', function
         ->post(route('households.reactivate', $inactive))->assertSessionHasErrors('with_members');
 });
 
-test('the household list marks every affected member as left out when nobody would change', function () {
-    $household = Household::factory()->create();
-    $owner = User::factory()->owner()->member($household)->create(['name' => 'Propietaria']);
+test('the household list marks every affected member as left out when nobody would change, on both actions', function () {
+    $active = Household::factory()->create();
+    $owner = User::factory()->owner()->member($active)->create(['name' => 'Propietaria']);
     $actor = choiceActor();
-    $actor->member->update(['household_id' => $household->id]);
+    $actor->member->update(['household_id' => $active->id]);
+    $inactive = Household::factory()->inactive()->create();
+    $holder = choiceMembershipHolder($inactive);
+    $holder->update(['is_active' => false]);
 
     $this->actingAs($actor)->get(route('households.index'))->assertInertia(fn (Assert $page) => $page
-        ->where('households', fn ($households) => collect(collect($households)->firstWhere('id', $household->id)['affected_members'])
-            ->every(fn ($member) => $member['left_out'] === true)
-            && collect($households)->firstWhere('id', $household->id)['affected_members'] !== []));
+        ->where('households', function ($households) use ($active, $inactive, $owner, $actor, $holder) {
+            $activeMembers = collect(collect($households)->firstWhere('id', $active->id)['affected_members'])->sortBy('name')->values()->all();
+            $inactiveMembers = collect($households)->firstWhere('id', $inactive->id)['affected_members'];
+
+            $expectedActive = collect([
+                ['id' => $owner->member->id, 'name' => 'Propietaria', 'left_out' => true],
+                ['id' => $actor->member->id, 'name' => $actor->name, 'left_out' => true],
+            ])->sortBy('name')->values()->all();
+
+            return $activeMembers === $expectedActive
+                && $inactiveMembers === [['id' => $holder->id, 'name' => 'Cap de Membres', 'left_out' => true]];
+        }));
+});
+
+test('a membership holder deactivating or reactivating is not asked when only protected members would be skipped', function () {
+    $household = Household::factory()->create();
+    choiceMembershipHolder($household);
+    $administrator = User::factory()->administrator()->member($household)->create(['name' => 'Admin']);
+    $inactive = Household::factory()->inactive()->create();
+    $inactiveHolder = choiceMembershipHolder($inactive);
+    $inactiveHolder->update(['is_active' => false]);
+    $inactiveAdmin = User::factory()->administrator()->member($inactive)->create(['name' => 'Admin inactiu']);
+    $inactiveAdmin->member->update(['is_active' => false]);
+    $actor = choiceActor();
+
+    $this->actingAs($actor)->post(route('households.deactivate', $household))->assertSessionHasNoErrors();
+    $this->actingAs($actor)->post(route('households.reactivate', $inactive))->assertSessionHasNoErrors();
+
+    expect($household->fresh()->is_active)->toBeFalse()
+        ->and($administrator->member->fresh()->is_active)->toBeTrue()
+        ->and($inactive->fresh()->is_active)->toBeTrue()
+        ->and($inactiveHolder->fresh()->is_active)->toBeFalse()
+        ->and($inactiveAdmin->member->fresh()->is_active)->toBeFalse();
+});
+
+test('the actions refuse, under the lock, a missing choice when somebody would change, and change nothing', function () {
+    $household = Household::factory()->create();
+    $anna = choiceMember($household, true, 'Anna');
+    $inactive = Household::factory()->inactive()->create();
+    $berta = choiceMember($inactive, false, 'Berta');
+    $actor = choiceActor();
+
+    expect(fn () => app(DeactivateHousehold::class)->handle($household, $actor, null))->toThrow(ValidationException::class)
+        ->and(fn () => app(ReactivateHousehold::class)->handle($inactive, $actor, null))->toThrow(ValidationException::class);
+
+    expect($household->fresh()->is_active)->toBeTrue()
+        ->and($anna->fresh()->is_active)->toBeTrue()
+        ->and($inactive->fresh()->is_active)->toBeFalse()
+        ->and($berta->fresh()->is_active)->toBeFalse();
+});
+
+test('the actions accept a missing choice when nobody would change', function () {
+    $household = Household::factory()->create();
+    $owner = User::factory()->owner()->member($household)->create();
+    $inactive = Household::factory()->inactive()->create();
+    $holder = choiceMembershipHolder($inactive);
+    $holder->update(['is_active' => false]);
+    $actor = choiceActor();
+
+    $deactivated = app(DeactivateHousehold::class)->handle($household, $actor, null);
+    $reactivated = app(ReactivateHousehold::class)->handle($inactive, $actor, null);
+
+    expect($deactivated->changed)->toBeTrue()
+        ->and($reactivated->changed)->toBeTrue()
+        ->and($household->fresh()->is_active)->toBeFalse()
+        ->and($owner->member->fresh()->is_active)->toBeTrue()
+        ->and($inactive->fresh()->is_active)->toBeTrue()
+        ->and($holder->fresh()->is_active)->toBeFalse();
 });

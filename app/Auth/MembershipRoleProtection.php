@@ -55,6 +55,7 @@ class MembershipRoleProtection
     /**
      * Deactivating a household together with its members skips whoever the actor may not
      * deactivate on their own, and the actor themselves, so they cannot lock themselves out.
+     * Callers go through mayChangeAlongWithHousehold.
      */
     public function mayDeactivateAlongWithHousehold(User $actor, Member $member): bool
     {
