@@ -400,6 +400,11 @@ Guixa gets the membership foundation every later feature builds on:
   the same public page ("email updated, you can now sign in with the new address"), whoever is
   signed in there; if the signed-in user is the person whose email changed, they stay signed
   in with the new address (spec review of 2026-10-11).
+- **Own email change and the person's state (spec review of 2026-10-11):** deactivating a
+  member cancels their pending email change; a confirmation link of an inactive person is
+  treated as invalid, with the same message as an expired one. Confirming one's own change
+  invalidates the unused magic links sent to the old address, but ends no session and keeps
+  the remember token, since the person made the change themselves (unlike DRA-60).
 - **Changing someone else's email works by levels (DRA-46)**, because the email is shared with
   the administrator profile and controls sign-in: the owner can change anyone's; an
   administrator can change the email of members who are not administrators; a member with the
