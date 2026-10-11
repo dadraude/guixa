@@ -310,3 +310,44 @@ test('once the profile is chosen the intended URL is gone, so a later switch lea
     $this->post(route('active-profile.update'), ['profile' => 'member'])
         ->assertRedirect(route('home'));
 });
+
+test('choosing member after asking for an administrator page leads home, not to a 403', function () {
+    $this->actingAs(ownerAndMember())
+        ->withSession(['url.intended' => route('admin.administrators.index')])
+        ->post(route('active-profile.update'), ['profile' => 'member'])
+        ->assertRedirect(route('home'));
+
+    expect(session()->has('url.intended'))->toBeFalse();
+});
+
+test('choosing administrator after asking for an administrator page leads to that page', function () {
+    $this->actingAs(ownerAndMember())
+        ->withSession(['url.intended' => route('admin.administrators.index')])
+        ->post(route('active-profile.update'), ['profile' => 'administrator'])
+        ->assertRedirect(route('admin.administrators.index'));
+});
+
+test('choosing a profile that can see the asked-for page leads to it', function () {
+    $this->actingAs(ownerAndMember())
+        ->withSession(['url.intended' => route('directory.index')])
+        ->post(route('active-profile.update'), ['profile' => 'member'])
+        ->assertRedirect(route('directory.index'));
+});
+
+test('an intended URL that matches no route is kept', function () {
+    $this->actingAs(ownerAndMember())
+        ->withSession(['url.intended' => url('/does-not-exist')])
+        ->post(route('active-profile.update'), ['profile' => 'member'])
+        ->assertRedirect(url('/does-not-exist'));
+});
+
+test('an administrator who is not the owner is sent home from an owner-only page', function () {
+    $user = User::factory()->administrator()->member(Household::factory()->create())->create();
+
+    $this->actingAs($user)
+        ->withSession(['url.intended' => route('admin.administrators.index')])
+        ->post(route('active-profile.update'), ['profile' => 'administrator'])
+        ->assertRedirect(route('home'));
+
+    expect(session()->has('url.intended'))->toBeFalse();
+});

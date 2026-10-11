@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Auth;
 
 use App\Auth\ActiveProfile;
+use App\Auth\IntendedUrlAccess;
 use App\Auth\Profile;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\SwitchProfileRequest;
@@ -16,7 +17,10 @@ use Inertia\Response;
 
 class ActiveProfileController extends Controller
 {
-    public function __construct(private readonly ActiveProfile $activeProfile) {}
+    public function __construct(
+        private readonly ActiveProfile $activeProfile,
+        private readonly IntendedUrlAccess $intendedUrlAccess,
+    ) {}
 
     /**
      * Ask a person with both profiles which one to act as. Everyone else has
@@ -38,11 +42,18 @@ class ActiveProfileController extends Controller
     /**
      * Choose or switch profile. The home depends on the profile, so go there
      * instead of back to a page the new profile may not be allowed to see,
-     * unless sign-in left a page the person asked for before choosing.
+     * unless sign-in left a page the person asked for before choosing and the
+     * chosen profile may see it; otherwise that page is dropped and it is home.
      */
-    public function update(SwitchProfileRequest $request): RedirectResponse
+    public function update(SwitchProfileRequest $request, #[CurrentUser] User $user): RedirectResponse
     {
         $this->activeProfile->choose($request->profile());
+
+        $intended = $request->session()->get('url.intended');
+
+        if (is_string($intended) && ! $this->intendedUrlAccess->allows($user, $intended)) {
+            $request->session()->forget('url.intended');
+        }
 
         return redirect()->intended(route('home'));
     }
