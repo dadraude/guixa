@@ -28,7 +28,9 @@ the agents do the heavy work and you keep a short thread. Talk to the user in Ca
      (the first serial run also creates `testing_draNN`, which `--parallel` needs to exist); the full
      suite adds `--parallel`: `DB_DATABASE=testing_draNN php artisan test --parallel`. Parallel workers
      use their own databases, `testing_draNN_test_N`, so they collide neither with the main checkout
-     nor with other worktrees.
+     nor with other worktrees. Any other database the ticket needs (e.g. a reviewer running tests) is
+     named `testing_draNN_<suffix>`, so the cleanup in step 4 finds it. Tests never touch `guixa`
+     (the user's database) nor `testing` (the main checkout's): never pass either as `DB_DATABASE`.
 3. **Cross-cutting tickets ship alone.** If the ticket touches many files outside its own feature
    (formatter or linter sweeps, strict types, mass renames, moving folders), check `gh pr list`: with
    other PRs open, tell the user and ask whether to wait until they merge. Once its PR is open, do not
@@ -55,7 +57,8 @@ that only runs the full checks (step 5 of its flow) and fixes what breaks.
 ## 3. Independent review
 
 Launch both reviewers in parallel (one message, two agents), each with `model: "opus"`, the ticket and
-the base ref (`main`, or the blocker's branch):
+the base ref (`main`, or the blocker's branch). If they run tests, each prefixes them with its own
+`DB_DATABASE=testing_draNN_review` or `DB_DATABASE=testing_draNN_correctness`:
 - `ticket-reviewer`: spec coverage and standards.
 - `ticket-correctness-reviewer`: bugs and security.
 
@@ -91,8 +94,10 @@ To deliver: create the follow-up issues, fetch again and, if the base moved sinc
 step 2 sync before pushing. Then push with `-u`, `gh pr create --base <base>` with a conventional
 title `type(scope): description (DRA-NN)` and a short body that links each follow-up issue and ends with
 `🤖 Generated with [Claude Code](https://claude.com/claude-code)`, then move the issue to **In Review**. Once the PR is open, remove the worktree
-(`git worktree remove ../guixa-worktrees/dra-NN`); the branch stays. If the PR needs more work later,
-add a new worktree for it.
+(`git worktree remove ../guixa-worktrees/dra-NN`) and drop its test databases from the main checkout:
+`php .claude/skills/ship-ticket/drop-test-databases.php NN` (it only matches `testing_draNN` and
+`testing_draNN_*`). The branch stays. If the PR needs more work later, add a new worktree for it; its
+first serial test run recreates the database.
 
 Then show the user a short summary: the PR link, what was built, test/lint results (as reported, not
 re-verified unless asked), both review verdicts, what the correction pass fixed, what was dropped and the
