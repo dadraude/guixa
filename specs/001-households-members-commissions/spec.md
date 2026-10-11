@@ -284,6 +284,11 @@ Guixa gets the membership foundation every later feature builds on:
   After 5 wrong codes for the same token its code stops being accepted (the person asks for a
   new link); the link in the email keeps working until it expires or is used, since it cannot
   be guessed (spec review of 2026-10-11).
+- **A magic link opened in a browser that is already signed in (spec review of 2026-10-11):**
+  if the signed-in user is the link's owner, the link is consumed and they go home. If it is
+  someone else, nothing is signed out automatically: a page says "you are signed in as
+  <name>; sign out to use this link" with a sign-out button, and the link is not consumed, so
+  it works when opened again after signing out.
 - **Password:** standard email + password sign-in through Fortify (ADR 0006); any minimum length is enforced with
   Laravel's password rules.
 - The sign-in screen offers both ways; there is no separate "forgot password" flow.
@@ -390,7 +395,11 @@ Guixa gets the membership foundation every later feature builds on:
 - Two simultaneous "change household" actions on the same member: the last one wins; each one
   checks under the lock that its target household is active.
 - **Own email change:** stored as pending, a confirmation link (single use, time-limited) is
-  sent to the new address, and the email changes only when it is opened.
+  sent to the new address, and the email changes only when it is opened. The confirmation
+  route is public and ignores the browser's session: it applies the change and always shows
+  the same public page ("email updated, you can now sign in with the new address"), whoever is
+  signed in there; if the signed-in user is the person whose email changed, they stay signed
+  in with the new address (spec review of 2026-10-11).
 - **Changing someone else's email works by levels (DRA-46)**, because the email is shared with
   the administrator profile and controls sign-in: the owner can change anyone's; an
   administrator can change the email of members who are not administrators; a member with the
