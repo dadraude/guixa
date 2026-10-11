@@ -39,3 +39,4 @@ administrator profile to an existing active member.
 - Active or inactive belongs to the user, not to a profile: an inactive person cannot sign in
   at all, and being an administrator is a yes/no that only the owner adds or removes.
 - Amends the last consequence of [ADR 0004](0004-fixed-roles-on-dynamic-commissions.md).
+- Removing the administrator profile deletes the `administrators` row and adding it again creates a new id, so any future record of administrator actions references `user_id`, never `administrators.id`.

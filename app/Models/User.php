@@ -24,6 +24,7 @@ use Illuminate\Support\Str;
  * @property Carbon|null $email_verified_at
  * @property string|null $password
  * @property string|null $remember_token
+ * @property int $session_version
  * @property string|null $pending_email
  * @property string|null $pending_email_token_hash
  * @property Carbon|null $pending_email_expires_at
@@ -38,6 +39,13 @@ class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, HasUuids, Notifiable;
+
+    /**
+     * Mirrors the column default, so a user just created already carries it.
+     *
+     * @var array<string, mixed>
+     */
+    protected $attributes = ['session_version' => 0];
 
     /**
      * Emails are stored in lower case, so lookups and uniqueness ignore case.

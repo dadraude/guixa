@@ -234,3 +234,18 @@ test('an inactive member still prevents deleting the commission', function () {
 
     expect($commission->fresh())->not->toBeNull();
 });
+
+test('the members of a commission are ordered by name, accents and case ignored', function () {
+    $viewer = memberOf('Marta Vila');
+    $commission = Commission::factory()->create(['name' => 'Comandes']);
+    foreach (['Zoe Mas', 'emma Puig', 'Àlex Roca'] as $name) {
+        $commission->members()->attach(memberOf($name));
+    }
+
+    $this->actingAs($viewer->user)
+        ->get(route('commissions.index'))
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('commissions.0.members.0.name', 'Àlex Roca')
+            ->where('commissions.0.members.1.name', 'emma Puig')
+            ->where('commissions.0.members.2.name', 'Zoe Mas'));
+});

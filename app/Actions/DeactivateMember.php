@@ -6,20 +6,22 @@ namespace App\Actions;
 
 use App\Auth\MemberRoles;
 use App\Auth\MembershipRoleProtection;
+use App\Auth\UserSessions;
 use App\Models\Member;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
 /**
  * A member can no longer sign in with any profile; nothing else changes: they
- * keep their household, commissions and roles (ADR 0011). Open sessions end on
- * their next request (see SignOutUsersWhoMayNotSignIn).
+ * keep their household, commissions and roles (ADR 0011). Open sessions and
+ * remember cookies end for good, so reactivating the person does not revive them.
  */
 class DeactivateMember
 {
     public function __construct(
         private readonly MembershipRoleProtection $protection,
         private readonly MemberRoles $memberRoles,
+        private readonly UserSessions $userSessions,
     ) {}
 
     /**
@@ -28,6 +30,7 @@ class DeactivateMember
     public function handle(Member $member): void
     {
         $member->update(['is_active' => false]);
+        $this->userSessions->end($member->user);
     }
 
     /**
