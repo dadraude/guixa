@@ -3,8 +3,8 @@
 Mobile-first member management starts with a searchable, read-only list and opens each
 member on a dedicated page. This document records the decisions individually confirmed
 during the `/grill-with-docs` interview on 2026-10-11. The user confirmed the final shared
-understanding on 2026-10-11. This is ready as input for `/to-spec`; specification approval
-is a separate step.
+understanding on 2026-10-11. The resulting specification was independently reviewed and
+explicitly approved by the user on 2026-10-11, after the clarifications recorded below.
 
 ## Scope and existing contract
 
@@ -183,8 +183,8 @@ new contradiction in the changes. No runtime behavior was verified during either
 
 ## Next step
 
-The shared understanding is confirmed and the [draft specification](spec.md) has been
-synthesized and reviewed. Explicit user approval of the spec still precedes `/to-tickets`
-and implementation, following the project's SDD flow.
+The [specification](spec.md) was reviewed and explicitly approved by the user on 2026-10-11.
+It is ready for `/to-tickets` in a new milestone in the Draude workspace, followed by
+implementation through the project's SDD ticket workflow.
 
 No new domain term or architectural trade-off requiring an ADR was decided in this interview.

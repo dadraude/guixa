@@ -1,6 +1,8 @@
 # 002 — Member management UX
 
-Status: draft
+Status: approved
+
+Approved by the user on 2026-10-11 after independent review and resolution of its findings.
 
 Based on the confirmed [interview decisions](decisions.md). This specification complements
 [spec 001](../001-households-members-commissions/spec.md); its business rules and permissions
@@ -400,5 +402,6 @@ scroll restoration, and light/dark readability. HTTP tests alone cannot prove th
 - A bounded second review found the two decisions and five clarifications resolved, with
   no remaining material contradiction in the reviewed changes. This is documentary review;
   implementation must still prove the HTTP and browser criteria above.
-- This is a draft, not implementation authorization. Review and user approval precede
-  ticket creation through `/to-tickets`, following the repository's SDD workflow.
+- The user approved this specification on 2026-10-11 after review and clarification.
+  It is ready for ticket creation through `/to-tickets`; implementation follows the
+  repository's ticket workflow and the acceptance criteria above.
