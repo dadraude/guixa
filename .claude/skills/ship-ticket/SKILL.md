@@ -68,20 +68,31 @@ to fix it now: a correction pass is cheaper than an issue, its triage and anothe
 3. **Follow-ups**, only for (a) a problem that already existed before this ticket and sits outside the
    code it changes, or (b) a question the user ruled out of scope. One Linear issue each in project
    Guixa, label `needs-triage`, related to the parent ticket and in its milestone, titled with the
-   change to make; body: file:line, the finding and the suggested fix. Create them after the user
-   approves the PR (step 4), before opening it. Never fix anything in the main session.
+   change to make; body: file:line, the finding and the suggested fix. Create them in step 4, before
+   opening the PR. Never fix anything in the main session.
 
 ## 4. Deliver
 
-Show the user a short summary: what was built, test/lint results (as reported, not re-verified unless
-asked), both review verdicts, what the correction pass fixed, what was dropped, the follow-ups, open doubts. Then ask once whether to push and
-open the PR.
-On a yes: create the follow-up issues, fetch again and, if the base moved since the sync, repeat the
+The work is **validated** when all of these hold:
+- the last `ticket-implementer` pass committed and reports the full suite and linters green;
+- every reviewer `question` was answered by the user (or ruled out of scope into a follow-up);
+- the correction pass, if any, applied every `fix now` finding (dropped ones are only those not worth a
+  line of code);
+- no open doubt is left from the implementer or the reviewers.
+
+Validated: deliver without asking. Not validated: show the user what is missing and ask once whether to
+push and open the PR anyway.
+
+To deliver: create the follow-up issues, fetch again and, if the base moved since the sync, repeat the
 step 2 sync before pushing. Then push with `-u`, `gh pr create --base <base>` with a conventional
 title `type(scope): description (DRA-NN)` and a short body that links each follow-up issue and ends with
 `🤖 Generated with [Claude Code](https://claude.com/claude-code)`, then move the issue to **In Review**. Once the PR is open, remove the worktree
 (`git worktree remove ../guixa-worktrees/dra-NN`); the branch stays. If the PR needs more work later,
 add a new worktree for it.
+
+Then show the user a short summary: the PR link, what was built, test/lint results (as reported, not
+re-verified unless asked), both review verdicts, what the correction pass fixed, what was dropped and the
+follow-ups.
 
 ## 5. Session status
 
