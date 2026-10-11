@@ -9,6 +9,8 @@ use App\Models\Commission;
 use App\Models\Household;
 use App\Models\Member;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Inertia\Testing\AssertableInertia as Assert;
 
 function membershipUser(): User
@@ -347,4 +349,23 @@ test('the member update runs through the UpdateMember action', function () {
     $this->actingAs(membershipUser())
         ->patch(route('members.update', $member), ['name' => 'Maria Nova', 'email' => 'New@Example.com', 'phone' => '600123123'])
         ->assertRedirect(route('members.index'));
+});
+
+test('losing the unique email race while updating ends as a validation error and writes nothing', function () {
+    $member = memberIn(Household::factory()->create(), ['name' => 'Old Name', 'email' => 'old@example.com']);
+    $member->update(['phone' => '600000000']);
+    $actor = membershipUser();
+
+    // Another submit commits the same email between our validation and our write.
+    User::saving(function (User $user) {
+        DB::table('users')->insert(['id' => (string) Str::uuid7(), 'name' => 'Other', 'email' => $user->email, 'created_at' => now(), 'updated_at' => now()]);
+    });
+
+    $this->actingAs($actor)
+        ->patch(route('members.update', $member), ['name' => 'Maria Nova', 'email' => 'new@example.com', 'phone' => '611111111'])
+        ->assertSessionHasErrors(['email' => __('This email already belongs to a member.')]);
+
+    expect($member->user->fresh()->name)->toBe('Old Name')
+        ->and($member->user->fresh()->email)->toBe('old@example.com')
+        ->and($member->fresh()->phone)->toBe('600000000');
 });
