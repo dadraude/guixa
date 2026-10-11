@@ -347,7 +347,8 @@ test('cancelling the change clears the pending email and its link', function () 
 
     $this->actingAs($user)
         ->delete(route('email-change.cancel'))
-        ->assertRedirect(route('profile.edit'));
+        ->assertRedirect(route('profile.edit'))
+        ->assertSessionHas('inertia.flash_data.toast', ['type' => 'success', 'message' => __('Email change cancelled.')]);
 
     $user->refresh();
     expect($user->pending_email)->toBeNull()
@@ -371,12 +372,27 @@ test('saving the form with the current email keeps the pending change', function
         ->and($user->pending_email_token_hash)->not->toBeNull();
 });
 
-test('cancelling with no pending change is harmless', function () {
+test('cancelling with no pending change says there is none instead of cancelled', function () {
     $user = User::factory()->create();
 
     $this->actingAs($user)
         ->delete(route('email-change.cancel'))
-        ->assertRedirect(route('profile.edit'));
+        ->assertRedirect(route('profile.edit'))
+        ->assertSessionHas('inertia.flash_data.toast', ['type' => 'info', 'message' => __('There is no pending email change.')]);
+
+    expect($user->refresh()->pending_email)->toBeNull();
+});
+
+test('cancelling an expired change says there is none and clears it', function () {
+    $user = User::factory()->create(['email' => 'old@example.com']);
+    requestEmailChange($user, 'new@example.com');
+
+    $this->travel(RequestEmailChange::HOURS_VALID + 1)->hours();
+
+    $this->actingAs($user)
+        ->delete(route('email-change.cancel'))
+        ->assertRedirect(route('profile.edit'))
+        ->assertSessionHas('inertia.flash_data.toast', ['type' => 'info', 'message' => __('There is no pending email change.')]);
 
     expect($user->refresh()->pending_email)->toBeNull();
 });
