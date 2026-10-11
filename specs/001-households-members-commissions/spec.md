@@ -281,6 +281,9 @@ Guixa gets the membership foundation every later feature builds on:
   valid 15 minutes, bound to the browser session that asked for it. Opening the link on any
   device signs in that device; typing the code is only accepted in the requesting session.
   Using either consumes the token. Requesting a new link invalidates earlier unused ones.
+  After 5 wrong codes for the same token its code stops being accepted (the person asks for a
+  new link); the link in the email keeps working until it expires or is used, since it cannot
+  be guessed (spec review of 2026-10-11).
 - **Password:** standard email + password sign-in through Fortify (ADR 0006); any minimum length is enforced with
   Laravel's password rules.
 - The sign-in screen offers both ways; there is no separate "forgot password" flow.
