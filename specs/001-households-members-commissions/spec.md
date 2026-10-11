@@ -258,8 +258,9 @@ Guixa gets the membership foundation every later feature builds on:
 - Only the owner adds and removes other administrators. The owner cannot be deactivated or
   removed from the app; changing the owner is done on the server.
 - Administrators are no longer created by email: the owner adds the administrator profile to
-  an existing **active** member (ADR 0008). Removing it ends their open administrator sessions
-  and keeps the history of what they did. Every user, the owner included, has a member
+  an existing **active** member (ADR 0008). Removing it ends no session: from their next
+  request they can no longer act as administrator and fall back to their member profile (or
+  the waiting screen); the history of what they did is kept (spec review of 2026-10-11). Every user, the owner included, has a member
   profile (amended 2026-10-07, DRA-75).
 - Any user with no password (the owner, a new member) is sent to a "set your password" screen
   after signing in and cannot continue until they set one; after it, a member with no
@@ -455,7 +456,8 @@ Guixa gets the membership foundation every later feature builds on:
   Many-to-many with roles and with members.
 - Creating, renaming, deleting commissions and changing who is in them need the membership
   role (or administrator). Deleting is rejected while the commission has members; deleting
-  removes its role assignments.
+  removes its role assignments, so deleting a commission that holds any role is reserved to
+  administrators, as removing its roles is (spec review of 2026-10-11).
 - Only administrators assign or remove roles on commissions.
 - Deleting a commission locks its row and adding a member to it locks the same row, so a
   member added while it is being deleted makes the deletion fail with a validation error
@@ -492,6 +494,8 @@ Guixa gets the membership foundation every later feature builds on:
   household. The directory never lists inactive members, in either view.
 - "My household" lists every member of the household, the inactive ones marked "Inactive"
   (spec review of 2026-10-11).
+- The households list for the membership role shows each household's number, name, state and
+  the names of its members, the inactive ones marked "Inactive" (story 35).
 - The households list for the membership role flags active households with no active member
   in any commission, counting only the members currently in the household; an inactive
   member who is still in a commission does not clear the flag. It is informational only.
