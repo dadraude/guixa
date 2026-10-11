@@ -61,7 +61,11 @@ class EmailChangeController extends Controller
 
     public function cancel(#[CurrentUser] User $user, CancelEmailChange $cancelEmailChange): RedirectResponse
     {
-        $cancelEmailChange->handle($user);
+        if (! $cancelEmailChange->handle($user)) {
+            Inertia::flash('toast', ['type' => 'info', 'message' => __('There is no pending email change.')]);
+
+            return to_route('profile.edit');
+        }
 
         Inertia::flash('toast', ['type' => 'success', 'message' => __('Email change cancelled.')]);
 

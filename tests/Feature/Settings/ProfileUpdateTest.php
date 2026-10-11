@@ -2,7 +2,10 @@
 
 declare(strict_types=1);
 
+use App\Actions\CancelEmailChange;
+use App\Actions\ConfirmEmailChange;
 use App\Actions\RequestEmailChange;
+use App\Auth\SecretHasher;
 use App\Mail\EmailChangeMail;
 use App\Models\Household;
 use App\Models\User;
@@ -347,7 +350,8 @@ test('cancelling the change clears the pending email and its link', function () 
 
     $this->actingAs($user)
         ->delete(route('email-change.cancel'))
-        ->assertRedirect(route('profile.edit'));
+        ->assertRedirect(route('profile.edit'))
+        ->assertSessionHas('inertia.flash_data.toast', ['type' => 'success', 'message' => __('Email change cancelled.')]);
 
     $user->refresh();
     expect($user->pending_email)->toBeNull()
@@ -371,14 +375,45 @@ test('saving the form with the current email keeps the pending change', function
         ->and($user->pending_email_token_hash)->not->toBeNull();
 });
 
-test('cancelling with no pending change is harmless', function () {
+test('cancelling with no pending change says there is none instead of cancelled', function () {
     $user = User::factory()->create();
 
     $this->actingAs($user)
         ->delete(route('email-change.cancel'))
-        ->assertRedirect(route('profile.edit'));
+        ->assertRedirect(route('profile.edit'))
+        ->assertSessionHas('inertia.flash_data.toast', ['type' => 'info', 'message' => __('There is no pending email change.')]);
 
     expect($user->refresh()->pending_email)->toBeNull();
+});
+
+test('cancelling an expired change says there is none and clears it', function () {
+    $user = User::factory()->create(['email' => 'old@example.com']);
+    requestEmailChange($user, 'new@example.com');
+
+    $this->travel(RequestEmailChange::HOURS_VALID + 1)->hours();
+
+    $this->actingAs($user)
+        ->delete(route('email-change.cancel'))
+        ->assertRedirect(route('profile.edit'))
+        ->assertSessionHas('inertia.flash_data.toast', ['type' => 'info', 'message' => __('There is no pending email change.')]);
+
+    expect($user->refresh()->pending_email)->toBeNull();
+});
+
+test('cancelling reports nothing pending when the change was confirmed after the user was loaded', function () {
+    $user = User::factory()->create(['email' => 'old@example.com']);
+    $user->forceFill([
+        'pending_email' => 'new@example.com',
+        'pending_email_token_hash' => SecretHasher::hash('the-token'),
+        'pending_email_expires_at' => now()->addHours(RequestEmailChange::HOURS_VALID),
+    ])->save();
+
+    // The instance the request would hold still believes the change is pending.
+    $stale = User::query()->findOrFail($user->id);
+    app(ConfirmEmailChange::class)->handle('the-token');
+
+    expect(app(CancelEmailChange::class)->handle($stale))->toBeFalse()
+        ->and($user->refresh()->email)->toBe('new@example.com');
 });
 
 test('guests cannot cancel an email change', function () {
