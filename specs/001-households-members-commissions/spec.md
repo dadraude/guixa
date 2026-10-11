@@ -196,8 +196,9 @@ Guixa gets the membership foundation every later feature builds on:
 55. As an administrator, I want a commission to hold several roles and a role to be held by
     several commissions, so that merged or split commissions can be modelled without code
     changes.
-56. As a member with the membership role, I want to be unable to assign roles, so that the
-    membership role cannot grant itself or others more permissions.
+56. As a member with the membership role, I want to be unable to assign roles to commissions,
+    so that only administrators decide what each commission may do; deciding who is in each
+    commission (and so who gets its roles) stays with the membership role (ADR 0004).
 57. As a member, I want to get every role of every commission I belong to, so that I can do my
     commission's work.
 58. As a member, I want to see which commissions I belong to and which roles they give me, so
@@ -408,6 +409,11 @@ Guixa gets the membership foundation every later feature builds on:
   role (or administrator). Deleting is rejected while the commission has members; deleting
   removes its role assignments.
 - Only administrators assign or remove roles on commissions.
+- Adding a member to a commission is open to the membership role whatever roles the commission
+  holds, themselves included (treasury, membership…): the membership role decides who is in
+  each commission, administrators decide what each commission may do (spec review of
+  2026-10-11). Consequence accepted: once an inactive member is in a commission that holds the
+  membership role, reactivating them is reserved to administrators and the owner.
 - Removing a member from a commission that holds the membership role takes the role away, so
   it is reserved to administrators and the owner, unless the member keeps the membership role
   through another commission they belong to: then a member with the membership role can
