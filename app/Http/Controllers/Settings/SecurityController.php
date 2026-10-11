@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Settings;
 
+use App\Actions\ChangePassword;
 use App\Auth\MagicLinkSignIn;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Settings\PasswordUpdateRequest;
@@ -31,11 +32,9 @@ class SecurityController extends Controller
     /**
      * Update the user's password.
      */
-    public function update(PasswordUpdateRequest $request, #[CurrentUser] User $user): RedirectResponse
+    public function update(PasswordUpdateRequest $request, #[CurrentUser] User $user, ChangePassword $changePassword): RedirectResponse
     {
-        $user->update([
-            'password' => $request->password,
-        ]);
+        $changePassword->handle($user, (string) $request->password, $request->session());
 
         MagicLinkSignIn::clear($request->session());
 

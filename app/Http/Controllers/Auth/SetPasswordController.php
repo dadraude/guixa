@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Auth;
 
+use App\Actions\ChangePassword;
 use App\Concerns\PasswordValidationRules;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
@@ -30,7 +31,7 @@ class SetPasswordController extends Controller
         ]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request, ChangePassword $changePassword): RedirectResponse
     {
         $user = $request->user();
 
@@ -40,7 +41,7 @@ class SetPasswordController extends Controller
 
         $validated = $request->validate(['password' => $this->passwordRules()]);
 
-        $user->update(['password' => $validated['password']]);
+        $changePassword->handle($user, (string) $validated['password'], $request->session());
 
         return to_route('home');
     }
