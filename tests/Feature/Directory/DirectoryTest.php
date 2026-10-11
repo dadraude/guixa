@@ -102,6 +102,22 @@ test('inactive members are not listed in the directory', function () {
             ->where('households.0.members.0.name', 'Anna Puig'));
 });
 
+test('inactive members stay out of both full and own-household directory views', function () {
+    $household = Household::factory()->create();
+    $viewer = directoryMember($household, 'Zoe Mas');
+    directoryMember($household, 'Àlex Roca', active: false);
+    $administrator = User::factory()->administrator()->create();
+
+    foreach ([[$administrator, true], [$viewer->user, false]] as [$actor, $full]) {
+        $this->actingAs($actor)
+            ->get(route('directory.index'))
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('isFull', $full)
+                ->has('households.0.members', 1)
+                ->where('households.0.members.0.name', 'Zoe Mas'));
+    }
+});
+
 test('guests are sent to log in', function () {
     $this->get(route('directory.index'))->assertRedirect(route('login'));
 });

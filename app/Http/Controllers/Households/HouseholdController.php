@@ -15,6 +15,8 @@ use App\Http\Requests\Households\SaveHouseholdRequest;
 use App\Models\Household;
 use App\Models\Member;
 use App\Models\User;
+use App\Support\CatalanCollation;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -30,7 +32,15 @@ class HouseholdController extends Controller
         // take part. Nothing is blocked.
         $households = Household::query()
             ->withCommissionMemberFlag()
-            ->with('members.user.administrator')
+            ->with([
+                'members' => static function (Relation $query): void {
+                    CatalanCollation::orderByColumn(
+                        $query->getQuery()->select('members.*')->join('users', 'users.id', '=', 'members.user_id'),
+                        'users.name',
+                    )->orderBy('members.id');
+                },
+                'members.user.administrator',
+            ])
             ->orderBy('number')
             ->get();
 
@@ -43,6 +53,13 @@ class HouseholdController extends Controller
             'name' => $household->name,
             'is_active' => $household->is_active,
             'without_commission' => $household->is_active && ! $household->has_commission_member,
+            'members' => $household->members
+                ->map(fn (Member $member) => [
+                    'id' => $member->id,
+                    'name' => $member->user->name,
+                    'is_active' => $member->is_active,
+                ])
+                ->values(),
             'affected_members' => $this->affectedMembers($household, $viewer, $protection),
         ]);
 
@@ -67,7 +84,6 @@ class HouseholdController extends Controller
                 'name' => $member->user->name,
                 'left_out' => ! $protection->mayChangeAlongWithHousehold($viewer, $member, $household->is_active),
             ])
-            ->sortBy('name', SORT_NATURAL | SORT_FLAG_CASE)
             ->all();
 
         return array_values($affected);

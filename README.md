@@ -48,6 +48,9 @@ npm run check                 # Oxlint and Oxfmt (Vite+)
 npm run types:check           # vue-tsc
 ```
 
+Local full-suite runs use `--parallel` without `--processes` or any other explicit worker-count
+limit; let the runner use its default parallelism. Filtered test runs stay serial.
+
 Parallel runs need the base `testing` database to exist (a serial `vendor/bin/pest` creates it); the
 workers create `testing_test_N` from it.
 

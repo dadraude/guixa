@@ -19,6 +19,7 @@ use App\Models\Household;
 use App\Models\Member;
 use App\Support\CatalanCollation;
 use App\Support\MembersListRedirect;
+use App\Support\MemberStatusChange;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -94,7 +95,7 @@ class MemberController extends Controller
             ],
             'filter' => $filter,
             'households' => $households,
-            'commissions' => Commission::query()->orderBy('name')->get(['id', 'name']),
+            'commissions' => CatalanCollation::orderByColumn(Commission::query(), 'commissions.name')->get(['id', 'name']),
         ]);
     }
 
@@ -140,20 +141,27 @@ class MemberController extends Controller
         $actor = $request->user() ?? abort(403);
         abort_unless($protection->mayDeactivateMember($actor, $member), 403);
 
-        abort_unless($deactivateMember->handleAs($member, $actor), 403);
+        $result = $deactivateMember->changeAs($member, $actor);
+        abort_if($result === MemberStatusChange::Forbidden, 403);
 
-        Inertia::flash('toast', ['type' => 'success', 'message' => __('Member deactivated.')]);
+        Inertia::flash('toast', $result === MemberStatusChange::Changed
+            ? ['type' => 'success', 'message' => __('Member deactivated.')]
+            : ['type' => 'info', 'message' => __('The member was already inactive.')]);
 
         return MembersListRedirect::back($request);
     }
 
     public function reactivate(Request $request, Member $member, ReactivateMember $reactivateMember, MembershipRoleProtection $protection): RedirectResponse
     {
-        abort_unless($protection->mayReactivateMember($request->user() ?? abort(403), $member), 403);
+        $actor = $request->user() ?? abort(403);
+        abort_unless($protection->mayReactivateMember($actor, $member), 403);
 
-        $reactivateMember->handle($member);
+        $result = $reactivateMember->handleAs($member, $actor);
+        abort_if($result === MemberStatusChange::Forbidden, 403);
 
-        Inertia::flash('toast', ['type' => 'success', 'message' => __('Member reactivated.')]);
+        Inertia::flash('toast', $result === MemberStatusChange::Changed
+            ? ['type' => 'success', 'message' => __('Member reactivated.')]
+            : ['type' => 'info', 'message' => __('The member was already active.')]);
 
         return MembersListRedirect::back($request);
     }

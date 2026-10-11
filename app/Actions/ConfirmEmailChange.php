@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Actions;
 
+use App\Auth\MagicLinkBroker;
 use App\Auth\SecretHasher;
 use App\Models\User;
 use Illuminate\Database\UniqueConstraintViolationException;
@@ -15,6 +16,8 @@ use Illuminate\Support\Facades\DB;
  */
 class ConfirmEmailChange
 {
+    public function __construct(private readonly MagicLinkBroker $magicLinks) {}
+
     /**
      * Whether the link could still be used, without using it up.
      */
@@ -23,6 +26,7 @@ class ConfirmEmailChange
         return User::query()
             ->where('pending_email_token_hash', SecretHasher::hash($token))
             ->where('pending_email_expires_at', '>', now())
+            ->whereDoesntHave('member', fn ($query) => $query->where('is_active', false))
             ->exists();
     }
 
@@ -44,6 +48,7 @@ class ConfirmEmailChange
         $user = User::query()
             ->where('pending_email_token_hash', SecretHasher::hash($token))
             ->where('pending_email_expires_at', '>', now())
+            ->whereDoesntHave('member', fn ($query) => $query->where('is_active', false))
             ->lockForUpdate()
             ->first();
 
@@ -65,6 +70,7 @@ class ConfirmEmailChange
             'email_verified_at' => now(),
         ]);
         $this->clearPendingChange($user);
+        $this->magicLinks->revokeUnused($user);
 
         return EmailChangeOutcome::Applied;
     }

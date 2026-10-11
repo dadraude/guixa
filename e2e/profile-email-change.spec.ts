@@ -45,7 +45,7 @@ test('cancelling a pending email change keeps unsaved edits and shows the saved 
     const other = await otherDevice.newPage();
     await other.goto(`/settings/email/${token}`);
     await other.getByTestId('confirm-email-change-button').click();
-    await expect(other).toHaveURL(/\/login$|\/settings\/profile$/);
+    await expect(other).toHaveURL(/\/settings\/email\/updated$/);
     await otherDevice.close();
 
     // The field on the stale page still holds the old address; cancelling must reload the saved one.

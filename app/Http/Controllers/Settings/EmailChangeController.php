@@ -33,7 +33,7 @@ class EmailChangeController extends Controller
     /**
      * The token in the link is the proof, so it works from any browser.
      */
-    public function confirm(ConfirmEmailChange $confirmEmailChange, string $token): RedirectResponse
+    public function confirm(Request $request, ConfirmEmailChange $confirmEmailChange, string $token): RedirectResponse
     {
         $outcome = $confirmEmailChange->handle($token);
 
@@ -45,9 +45,9 @@ class EmailChangeController extends Controller
             return to_route('email-change.taken');
         }
 
-        Inertia::flash('toast', ['type' => 'success', 'message' => __('Email address updated.')]);
+        $request->user()?->refresh();
 
-        return to_route('profile.edit');
+        return to_route('email-change.updated');
     }
 
     /**

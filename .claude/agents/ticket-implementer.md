@@ -36,6 +36,8 @@ when this is a second pass, the review findings to fix.
    100 lines. If the full suite fails, do not read all of it: limit it (e.g. `| tail -n 40`) to see which
    tests failed, then rerun only those with `--filter` (still with the `DB_DATABASE=testing_draNN`
    prefix) and read one failure at a time.
+   Local full-suite runs use the runner's default parallelism: never add `--processes` or another
+   explicit worker-count limit. Filtered runs stay serial.
 6. Commit ONCE with a single-line conventional commit, no body, no `Co-Authored-By` or AI
    attribution: `type(scope): description (DRA-NN)`. Review-fix passes add a second commit
    `fix(scope): address review findings (DRA-NN)`.

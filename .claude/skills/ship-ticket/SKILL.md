@@ -26,7 +26,9 @@ the agents do the heavy work and you keep a short thread. Talk to the user in Ca
    - With tickets running in parallel, give each worktree its own test database: tell the agents that
      EVERY test command carries `DB_DATABASE=testing_draNN`. Filtered runs while doing TDD stay serial
      (the first serial run also creates `testing_draNN`, which `--parallel` needs to exist); the full
-     suite adds `--parallel`: `DB_DATABASE=testing_draNN php artisan test --parallel`. Parallel workers
+     suite adds `--parallel`: `DB_DATABASE=testing_draNN php artisan test --parallel`. In local runs,
+     never add `--processes` or another explicit worker-count limit: use the runner's default
+     parallelism. Parallel workers
      use their own databases, `testing_draNN_test_N`, so they collide neither with the main checkout
      nor with other worktrees. Any other database the ticket needs (e.g. a reviewer running tests) is
      named `testing_draNN_<suffix>`, so the cleanup in step 4 finds it. Tests never touch `guixa`

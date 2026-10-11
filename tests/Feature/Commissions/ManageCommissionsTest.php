@@ -248,3 +248,17 @@ test('the members of a commission are ordered by name, accents and case ignored'
             ->where('commissions.0.members.1.name', 'emma Puig')
             ->where('commissions.0.members.2.name', 'Zoe Mas'));
 });
+
+test('commissions and their member candidates use Catalan name order', function () {
+    $administrator = User::factory()->administrator()->create(['name' => 'Zoe Admin']);
+    foreach (['Óscar', 'alba', 'Àlex'] as $name) {
+        memberOf($name);
+        Commission::factory()->create(['name' => $name]);
+    }
+
+    $this->actingAs($administrator)
+        ->get(route('commissions.index'))
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('commissions', fn ($rows) => collect($rows)->pluck('name')->all() === ['alba', 'Àlex', 'Óscar'])
+            ->where('commissions.0.candidates', fn ($rows) => collect($rows)->pluck('name')->all() === ['alba', 'Àlex', 'Óscar', 'Zoe Admin']));
+});

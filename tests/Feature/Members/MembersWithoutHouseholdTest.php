@@ -317,7 +317,7 @@ test('a waiting member confirms and cancels an email change', function () {
     $this->patch(route('profile.update'), ['name' => $user->name, 'email' => 'new@example.com']);
     Mail::assertQueued(EmailChangeMail::class, $capture);
 
-    $this->post($url)->assertRedirect(route('profile.edit'));
+    $this->post($url)->assertRedirect(route('email-change.updated'));
     expect($user->fresh()->email)->toBe('new@example.com');
 });
 

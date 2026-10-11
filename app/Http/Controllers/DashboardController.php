@@ -38,16 +38,21 @@ class DashboardController extends Controller
      */
     private function householdOf(Household $household): array
     {
-        $collation = new CatalanCollation;
-
         return [
             'number' => $household->number,
             'name' => $household->name,
-            'members' => $household->members()
-                ->with('user')
-                ->get()
-                ->sort(fn (Member $a, Member $b) => $collation->compare($a->user->name, $b->user->name))
-                ->map(fn (Member $housemate) => ['id' => $housemate->id, 'name' => $housemate->user->name])
+            'members' => CatalanCollation::orderByColumn(
+                $household->members()->getQuery()
+                    ->select('members.*')
+                    ->join('users', 'users.id', '=', 'members.user_id')
+                    ->with('user'),
+                'users.name',
+            )->orderBy('members.id')->get()
+                ->map(fn (Member $housemate) => [
+                    'id' => $housemate->id,
+                    'name' => $housemate->user->name,
+                    'is_active' => $housemate->is_active,
+                ])
                 ->values(),
         ];
     }

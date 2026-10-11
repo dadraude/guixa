@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Auth\MemberRoles;
 use App\Auth\Role;
 use App\Auth\SecretHasher;
 use App\Models\Commission;
@@ -84,6 +85,39 @@ test('reactivating a member keeps their history and works while the household is
         ->assertRedirect(route('members.index'));
 
     expect($member->fresh()->is_active)->toBeTrue();
+});
+
+test('a stale deactivation of an inactive member leaves their sessions alone and says so', function () {
+    $member = activeMemberIn(Household::factory()->create());
+    $member->update(['is_active' => false]);
+    $version = $member->user->fresh()->session_version;
+
+    $this->actingAs(membershipStaff())->post(route('members.deactivate', $member))
+        ->assertSessionHas('inertia.flash_data.toast.message', __('The member was already inactive.'));
+
+    expect($member->user->fresh()->session_version)->toBe($version);
+});
+
+test('a stale reactivation of an active member says so', function () {
+    $member = activeMemberIn(Household::factory()->create());
+
+    $this->actingAs(membershipStaff())->post(route('members.reactivate', $member))
+        ->assertSessionHas('inertia.flash_data.toast.message', __('The member was already active.'));
+
+    expect($member->fresh()->is_active)->toBeTrue();
+});
+
+test('reactivation checks the target membership role again after it was remembered before submit', function () {
+    $member = activeMemberIn(Household::factory()->create());
+    $member->update(['is_active' => false]);
+    app(MemberRoles::class)->heldBy($member);
+    $commission = Commission::factory()->create();
+    $commission->assignRole(Role::Membership);
+    $commission->members()->attach($member);
+
+    $this->actingAs(membershipStaff())->post(route('members.reactivate', $member))->assertForbidden();
+
+    expect($member->fresh()->is_active)->toBeFalse();
 });
 
 test('deactivating a household with its members deactivates them all and keeps number and name', function () {

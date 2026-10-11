@@ -69,36 +69,29 @@ class MagicLinkBroker
         Mail::to($user)->queue(new MagicLinkMail(route('magic-link.show', ['token' => $token]), $code));
     }
 
-    /**
-     * Make every link the user has not used yet stop working.
-     */
     public function revokeUnused(User $user): void
     {
         $user->magicLinks()->whereNull('used_at')->delete();
     }
 
-    /**
-     * Forget any code the session was waiting for, so that a request for an
-     * unknown email leaves nothing usable behind.
-     */
     public function forget(Session $session): void
     {
         $session->forget(self::SESSION_KEY);
     }
 
     /**
-     * Use up the link with this token and return its user, or null when the
-     * link does not exist, has expired or has already been used.
+     * Look up a usable link without consuming it, to check the browser identity.
      */
+    public function owner(string $token): ?User
+    {
+        return MagicLink::query()->where('token_hash', self::hash($token))->usable()->first()?->user;
+    }
+
     public function consume(string $token): ?User
     {
         return $this->useUp(MagicLink::query()->where('token_hash', self::hash($token)));
     }
 
-    /**
-     * Use up the link this session asked for if the code matches, and return
-     * its user; null otherwise.
-     */
     public function consumeCode(Session $session, string $code): ?User
     {
         $id = $session->get(self::SESSION_KEY);
@@ -107,7 +100,7 @@ class MagicLinkBroker
             return null;
         }
 
-        $user = $this->useUp(MagicLink::query()->whereKey($id)->where('code_hash', self::hash($code)));
+        $user = $this->useUp(MagicLink::query()->whereKey($id), $code);
 
         if ($user !== null) {
             $this->forget($session);
@@ -119,13 +112,25 @@ class MagicLinkBroker
     /**
      * @param  Builder<MagicLink>  $query
      */
-    private function useUp(Builder $query): ?User
+    private function useUp(Builder $query, ?string $code = null): ?User
     {
-        return DB::transaction(function () use ($query) {
+        return DB::transaction(function () use ($query, $code) {
             $link = $query->usable()->lockForUpdate()->first();
 
             if ($link === null) {
                 return null;
+            }
+
+            if ($code !== null) {
+                if ($link->code_attempts >= 5) {
+                    return null;
+                }
+
+                if (! hash_equals((string) $link->code_hash, self::hash($code))) {
+                    $link->increment('code_attempts');
+
+                    return null;
+                }
             }
 
             $link->forceFill(['used_at' => now()])->save();

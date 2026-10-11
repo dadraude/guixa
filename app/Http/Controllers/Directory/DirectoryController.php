@@ -12,6 +12,7 @@ use App\Models\Member;
 use App\Models\User;
 use App\Support\CatalanCollation;
 use Illuminate\Container\Attributes\CurrentUser;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -28,12 +29,18 @@ class DirectoryController extends Controller
         $isFull = $activeProfile->isActingAsAdministrator($user)
             || ($ownMember !== null && $memberRoles->isInAnyCommission($ownMember));
 
-        $collation = new CatalanCollation;
-
         $households = Household::query()
             ->where('is_active', true)
             ->when(! $isFull, fn ($query) => $query->whereKey($ownMember?->household_id))
-            ->with(['members' => fn ($query) => $query->where('is_active', true)->with('user')])
+            ->with(['members' => static function (Relation $query): void {
+                CatalanCollation::orderByColumn(
+                    $query->getQuery()->select('members.*')
+                        ->join('users', 'users.id', '=', 'members.user_id')
+                        ->where('members.is_active', true)
+                        ->with('user'),
+                    'users.name',
+                )->orderBy('members.id');
+            }])
             ->orderBy('number')
             ->get();
 
@@ -45,8 +52,6 @@ class DirectoryController extends Controller
                 'name' => $household->name,
                 'is_active' => $household->is_active,
                 'members' => $household->members
-                    ->sort(fn (Member $a, Member $b) => $collation->compare($a->user->name, $b->user->name))
-                    ->values()
                     ->map(fn (Member $member) => [
                         'id' => $member->id,
                         'name' => $member->user->name,

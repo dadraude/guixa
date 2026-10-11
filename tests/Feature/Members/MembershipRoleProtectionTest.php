@@ -10,6 +10,7 @@ use App\Models\Commission;
 use App\Models\Household;
 use App\Models\Member;
 use App\Models\User;
+use App\Support\MemberStatusChange;
 use Inertia\Testing\AssertableInertia as Assert;
 
 function protectionMembershipCommission(): Commission
@@ -429,7 +430,7 @@ test('the deactivate route answers 403 when the protection fails inside the tran
     $member = protectionMember();
 
     // The controller's own check passes; the locked re-check refuses.
-    $this->mock(DeactivateMember::class)->shouldReceive('handleAs')->once()->andReturnFalse();
+    $this->mock(DeactivateMember::class)->shouldReceive('changeAs')->once()->andReturn(MemberStatusChange::Forbidden);
 
     $this->actingAs(protectionActor())
         ->post(route('members.deactivate', $member))

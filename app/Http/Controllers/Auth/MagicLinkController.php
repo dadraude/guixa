@@ -80,20 +80,34 @@ class MagicLinkController extends Controller
      * Ask for one click before using the link up, so that mail scanners and
      * link previews that open it do not spend it.
      */
-    public function show(string $token): Response
+    public function show(Request $request, string $token): Response|RedirectResponse
     {
+        if ($request->user() !== null) {
+            return $this->consume($request, $token);
+        }
+
         return Inertia::render('auth/MagicLinkConfirm', ['token' => $token]);
     }
 
     /**
      * Sign in the device that opened the link.
      */
-    public function consume(Request $request, string $token): RedirectResponse
+    public function consume(Request $request, string $token): Response|RedirectResponse
     {
+        $owner = $this->magicLinks->owner($token);
+
+        if ($owner !== null && $request->user() !== null && ! $owner->is($request->user())) {
+            return Inertia::render('auth/MagicLinkAccountMismatch', ['name' => $request->user()->name]);
+        }
+
         $user = $this->magicLinks->consume($token);
 
         if ($user === null || ! $user->canSignIn()) {
             return to_route('login')->with('status', __('This link has expired or has already been used.'));
+        }
+
+        if ($request->user() !== null) {
+            return to_route('home');
         }
 
         return $this->signIn($request, $user);

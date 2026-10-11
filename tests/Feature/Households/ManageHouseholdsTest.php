@@ -112,6 +112,35 @@ test('the list shows active and inactive households by number', function () {
             ->where('households.1.is_active', false));
 });
 
+test('the households list includes members by name and marks inactive members', function () {
+    $administrator = User::factory()->administrator()->create();
+    $household = Household::factory()->create();
+    User::factory()->member($household)->create(['name' => 'Zoe Mas']);
+    $inactive = User::factory()->member($household)->create(['name' => 'Àlex Roca']);
+    $inactive->member->update(['is_active' => false]);
+
+    $this->actingAs($administrator)
+        ->get(route('households.index'))
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('households.0.members.0.name', 'Àlex Roca')
+            ->where('households.0.members.0.is_active', false)
+            ->where('households.0.members.1.name', 'Zoe Mas')
+            ->where('households.0.members.1.is_active', true));
+});
+
+test('affected household members use Catalan name order', function () {
+    $administrator = User::factory()->administrator()->create();
+    $household = Household::factory()->create();
+    foreach (['Óscar', 'alba', 'Àlex', 'Zoe'] as $name) {
+        User::factory()->member($household)->create(['name' => $name]);
+    }
+
+    $this->actingAs($administrator)
+        ->get(route('households.index'))
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('households.0.affected_members', fn ($rows) => collect($rows)->pluck('name')->all() === ['alba', 'Àlex', 'Óscar', 'Zoe']));
+});
+
 test('a signed-in user who is not an administrator is refused', function () {
     $user = User::factory()->create();
     $household = Household::factory()->create(['name' => 'Cal Pere']);

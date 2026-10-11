@@ -93,3 +93,26 @@ test('an unknown magic link does not sign anyone in', function () {
 
     $this->assertGuest();
 });
+
+test('opening your own link while signed in consumes it and goes home', function (string $method) {
+    $url = ownerMagicLink();
+    $owner = User::where('email', 'anna@example.com')->sole();
+
+    $this->actingAs($owner)->{$method}($url)->assertRedirect(route('home'));
+    $this->assertAuthenticatedAs($owner);
+    auth()->logout();
+    $this->post($url)->assertRedirect(route('login'));
+})->with(['get', 'post']);
+
+test('someone else stays signed in and can sign out before using the unspent link', function (string $method) {
+    $url = ownerMagicLink();
+    $other = User::factory()->withoutPassword()->create(['name' => 'Marta']);
+
+    $this->actingAs($other)->{$method}($url)->assertOk()
+        ->assertInertia(fn (Assert $page) => $page->component('auth/MagicLinkAccountMismatch')->where('name', 'Marta'));
+    $this->assertAuthenticatedAs($other);
+
+    $this->post(route('logout'));
+    $this->post($url)->assertRedirect(route('home'));
+    $this->assertAuthenticatedAs(User::where('email', 'anna@example.com')->sole());
+})->with(['get', 'post']);
