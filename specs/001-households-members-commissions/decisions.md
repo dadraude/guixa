@@ -117,3 +117,50 @@ above. See [ADR 0008](../../docs/adr/0008-members-created-by-hand.md).
 - **Model:** two profiles (member, administrator) on one user; the owner is an administrator,
   not a third profile.
 
+## Amendment (2026-10-09, DRA-87)
+
+Inactive only blocks sign-in; see [ADR 0011](../../docs/adr/0011-inactive-only-blocks-sign-in.md).
+Supersedes these earlier decisions:
+
+- "Inactive member … leaves all commissions": an inactive member keeps their household,
+  commissions and roles; they only cannot sign in.
+- "Deactivating a household makes all its members inactive": it asks whether to deactivate its
+  active members too; those not deactivated are treated as members without a household.
+- "Its members are reactivated one by one": reactivating a household asks whether to
+  reactivate its inactive members too; otherwise they are reactivated one by one.
+- D3 "Only active members can be removed from a household": active and inactive members can be.
+- D9 "cannot deactivate … their own household": deactivating a household alone is always
+  allowed, also one's own and the owner's; with its members, the protected ones are skipped
+  and named.
+- Spec review of 2026-10-02 "Only the owner creates, deactivates and reactivates other
+  administrators": already replaced by DRA-46 (the owner adds and removes the administrator
+  profile; active or inactive belongs to the person).
+
+## Spec review (2026-10-11)
+
+Review of the approved spec against the code, to decide gaps before tickets reopen them.
+
+- **Commissions:** the membership role adds anyone, themselves included, to any commission
+  whatever its roles; only administrators decide what each commission may do (ADR 0004).
+  Accepted consequence: an inactive member in a commission holding the membership role can then
+  only be reactivated by an administrator or the owner.
+- **Magic link code:** after 5 wrong codes for the same token the code stops being accepted;
+  the emailed link keeps working.
+- **Rate limits:** 5 per minute per email and IP, 20 per minute per IP, shared by link
+  requests, codes and passwords; no limit per email alone, so nobody can lock someone else out.
+- **Links opened in a signed-in browser:** a magic link of someone other than the signed-in
+  user asks to sign out first (button), signs out nobody and is not consumed; of the same user,
+  it is consumed and goes home. The email-change confirmation is public, ignores the session
+  and always shows the same page.
+- **Own email change:** deactivating cancels the pending change; an inactive person's
+  confirmation link is invalid; confirming invalidates magic links sent to the old address but
+  ends no session.
+- **Password change:** ends the person's other sessions and rotates the remember token; the
+  15-minute window after a magic link sign-in (no current password needed) is recorded.
+- **"My household"** lists inactive members marked "Inactive"; the directory never lists them.
+- Obvious answers written straight into the spec: commission deletion vs. adding a member
+  (row lock), reactivation re-checked under lock, idempotent (de)activation and commission
+  membership/roles, administrator powers only while acting as administrator, session
+  lifetime and limits, field lengths, password rules, name uniqueness, pending email change
+  rules, Catalan-collation sorting of every list of people, editing inactive records, the
+  owner command's refusal and code-less magic link.
