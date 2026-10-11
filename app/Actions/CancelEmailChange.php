@@ -17,13 +17,19 @@ class CancelEmailChange
      */
     public function handle(User $user): bool
     {
-        $wasPending = $user->pending_email_expires_at?->isFuture() === true && $user->pending_email !== null;
-
-        $user->forceFill([
+        $clearedColumns = [
             'pending_email' => null,
             'pending_email_token_hash' => null,
             'pending_email_expires_at' => null,
-        ])->save();
+        ];
+
+        // One conditional UPDATE decides and clears atomically, so a confirmation
+        // committed meanwhile (e.g. from another device) is never reported as cancelled.
+        $wasPending = User::query()->whereKey($user->id)->withPendingEmailChange()->update($clearedColumns) > 0;
+
+        // Whatever is left is an expired leftover: drop it too.
+        User::query()->whereKey($user->id)->update($clearedColumns);
+        $user->forceFill($clearedColumns)->syncOriginal();
 
         return $wasPending;
     }

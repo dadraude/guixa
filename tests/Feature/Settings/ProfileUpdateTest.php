@@ -2,7 +2,10 @@
 
 declare(strict_types=1);
 
+use App\Actions\CancelEmailChange;
+use App\Actions\ConfirmEmailChange;
 use App\Actions\RequestEmailChange;
+use App\Auth\SecretHasher;
 use App\Mail\EmailChangeMail;
 use App\Models\Household;
 use App\Models\User;
@@ -395,6 +398,22 @@ test('cancelling an expired change says there is none and clears it', function (
         ->assertSessionHas('inertia.flash_data.toast', ['type' => 'info', 'message' => __('There is no pending email change.')]);
 
     expect($user->refresh()->pending_email)->toBeNull();
+});
+
+test('cancelling reports nothing pending when the change was confirmed after the user was loaded', function () {
+    $user = User::factory()->create(['email' => 'old@example.com']);
+    $user->forceFill([
+        'pending_email' => 'new@example.com',
+        'pending_email_token_hash' => SecretHasher::hash('the-token'),
+        'pending_email_expires_at' => now()->addHours(RequestEmailChange::HOURS_VALID),
+    ])->save();
+
+    // The instance the request would hold still believes the change is pending.
+    $stale = User::query()->findOrFail($user->id);
+    app(ConfirmEmailChange::class)->handle('the-token');
+
+    expect(app(CancelEmailChange::class)->handle($stale))->toBeFalse()
+        ->and($user->refresh()->email)->toBe('new@example.com');
 });
 
 test('guests cannot cancel an email change', function () {
