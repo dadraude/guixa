@@ -55,7 +55,9 @@ defineOptions({
                         class="flex items-center gap-2 p-4"
                     >
                         <span>{{ member.name }}</span>
-                        <Badge v-if="!member.is_active" variant="outline">{{ t('Inactive') }}</Badge>
+                        <Badge v-if="!member.is_active" variant="outline">{{
+                            t('Inactive')
+                        }}</Badge>
                     </li>
                 </ul>
             </div>

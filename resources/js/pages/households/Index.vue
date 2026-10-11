@@ -90,10 +90,20 @@ defineOptions({
                     </Form>
                 </div>
 
-                <ul v-if="household.members.length" class="flex flex-wrap gap-2 text-sm" data-test="household-members">
-                    <li v-for="member in household.members" :key="member.id" class="flex items-center gap-1">
+                <ul
+                    v-if="household.members.length"
+                    class="flex flex-wrap gap-2 text-sm"
+                    data-test="household-members"
+                >
+                    <li
+                        v-for="member in household.members"
+                        :key="member.id"
+                        class="flex items-center gap-1"
+                    >
                         <span>{{ member.name }}</span>
-                        <Badge v-if="!member.is_active" variant="outline">{{ t('Inactive') }}</Badge>
+                        <Badge v-if="!member.is_active" variant="outline">{{
+                            t('Inactive')
+                        }}</Badge>
                     </li>
                 </ul>
 
