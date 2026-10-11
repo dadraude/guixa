@@ -25,6 +25,7 @@ final class CatalanCollation
     public function __construct()
     {
         $this->collator = new Collator('ca_ES');
+        $this->collator->setStrength(Collator::SECONDARY);
     }
 
     public function compare(string $a, string $b): int
@@ -44,6 +45,6 @@ final class CatalanCollation
      */
     public static function orderByColumn(Builder $query, string $column): Builder
     {
-        return $query->orderByRaw($column.' collate "'.self::SQL_COLLATION.'"');
+        return $query->orderByRaw('lower('.$column.') collate "'.self::SQL_COLLATION.'"');
     }
 }

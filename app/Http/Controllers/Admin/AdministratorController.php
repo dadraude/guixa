@@ -10,6 +10,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreAdministratorRequest;
 use App\Models\Administrator;
 use App\Models\Member;
+use App\Support\CatalanCollation;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -18,10 +19,13 @@ class AdministratorController extends Controller
 {
     public function index(): Response
     {
-        $administrators = Administrator::query()
-            ->with('user.member')
-            ->oldest()
-            ->get()
+        $administrators = CatalanCollation::orderByColumn(
+            Administrator::query()
+                ->select('administrators.*')
+                ->join('users', 'users.id', '=', 'administrators.user_id')
+                ->with('user.member'),
+            'users.name',
+        )->orderBy('administrators.id')->get()
             ->map(fn (Administrator $administrator) => [
                 'id' => $administrator->id,
                 'name' => $administrator->user->name,
@@ -32,13 +36,15 @@ class AdministratorController extends Controller
             ]);
 
         // The picker: active members who are not administrators yet.
-        $candidates = Member::query()
-            ->with('user')
-            ->where('is_active', true)
-            ->whereDoesntHave('user.administrator')
-            ->get()
-            ->sortBy(fn (Member $member) => mb_strtolower($member->user->name))
-            ->values()
+        $candidates = CatalanCollation::orderByColumn(
+            Member::query()
+                ->select('members.*')
+                ->join('users', 'users.id', '=', 'members.user_id')
+                ->with('user')
+                ->where('members.is_active', true)
+                ->whereDoesntHave('user.administrator'),
+            'users.name',
+        )->orderBy('members.id')->get()
             ->map(fn (Member $member) => [
                 'id' => $member->id,
                 'name' => $member->user->name,

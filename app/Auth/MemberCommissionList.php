@@ -6,6 +6,7 @@ namespace App\Auth;
 
 use App\Models\Commission;
 use App\Models\Member;
+use App\Support\CatalanCollation;
 
 /**
  * The commissions a member is in, by name, each with the roles it holds,
@@ -28,7 +29,7 @@ class MemberCommissionList
 
         $rolesByCommission = $this->commissionRoles->byCommission();
 
-        return array_values($member->commissions()->orderBy('name')->get()
+        return array_values(CatalanCollation::orderByColumn($member->commissions()->getQuery(), 'commissions.name')->get()
             ->map(fn (Commission $commission) => [
                 'id' => $commission->id,
                 'name' => $commission->name,

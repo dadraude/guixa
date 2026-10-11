@@ -65,6 +65,22 @@ test('the picker lists only active members who are not administrators', function
             ->where('candidates.1.name', 'Carles'));
 });
 
+test('administrators and the owner picker use Catalan name order', function () {
+    $owner = User::factory()->owner()->create(['name' => 'Zoe']);
+    User::factory()->administrator()->create(['name' => 'Óscar']);
+    User::factory()->administrator()->create(['name' => 'alba']);
+    User::factory()->administrator()->create(['name' => 'Alba']);
+    foreach (['Zoe', 'Óscar', 'alba', 'Alba'] as $name) {
+        promotableMember($name);
+    }
+
+    $this->actingAs($owner)
+        ->get(route('admin.administrators.index'))
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('administrators', fn ($rows) => collect($rows)->pluck('name')->all() === ['alba', 'Alba', 'Óscar', 'Zoe'])
+            ->where('candidates', fn ($rows) => collect($rows)->pluck('name')->all() === ['alba', 'Alba', 'Óscar', 'Zoe']));
+});
+
 test('only the owner is shown the administrators menu entry', function () {
     $this->actingAs(User::factory()->owner()->create())
         ->get(route('admin.home'))

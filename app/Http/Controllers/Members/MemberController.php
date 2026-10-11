@@ -95,7 +95,7 @@ class MemberController extends Controller
             ],
             'filter' => $filter,
             'households' => $households,
-            'commissions' => Commission::query()->orderBy('name')->get(['id', 'name']),
+            'commissions' => CatalanCollation::orderByColumn(Commission::query(), 'commissions.name')->get(['id', 'name']),
         ]);
     }
 

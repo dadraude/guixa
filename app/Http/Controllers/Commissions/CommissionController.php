@@ -18,6 +18,7 @@ use App\Models\Commission;
 use App\Models\Member;
 use App\Models\User;
 use App\Support\CatalanCollation;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -39,13 +40,25 @@ class CommissionController extends Controller
         );
         $ownMember = $viewer->member;
         // Every member, inactive ones included, sorted once; each commission drops its own members.
-        $candidates = collect($canManage ? $this->namesOf(Member::query()->with('user')->get()) : []);
+        $candidates = collect($canManage ? $this->namesOf(CatalanCollation::orderByColumn(
+            Member::query()->select('members.*')->join('users', 'users.id', '=', 'members.user_id')->with('user'),
+            'users.name',
+        )->orderBy('members.id')->get()) : []);
 
         return Inertia::render('commissions/Index', [
-            'commissions' => Commission::query()
-                ->with(['members.user', 'members.commissions:id'])
-                ->orderBy('name')
-                ->get()
+            'commissions' => CatalanCollation::orderByColumn(
+                Commission::query()->with([
+                    'members' => static function (Relation $query): void {
+                        CatalanCollation::orderByColumn(
+                            $query->getQuery()->join('users', 'users.id', '=', 'members.user_id'),
+                            'users.name',
+                        )->orderBy('members.id');
+                    },
+                    'members.user',
+                    'members.commissions:id',
+                ]),
+                'commissions.name',
+            )->orderBy('commissions.id')->get()
                 ->map(fn (Commission $commission) => [
                     'id' => $commission->id,
                     'name' => $commission->name,
@@ -107,11 +120,8 @@ class CommissionController extends Controller
      */
     private function namesOf(iterable $members): array
     {
-        $collation = new CatalanCollation;
-
         return collect($members)
             ->map(fn (Member $member) => ['id' => $member->id, 'name' => $member->user->name, 'is_active' => $member->is_active])
-            ->sort(fn (array $a, array $b) => $collation->compare($a['name'], $b['name']))
             ->values()
             ->all();
     }

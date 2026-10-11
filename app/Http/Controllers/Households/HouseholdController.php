@@ -16,6 +16,7 @@ use App\Models\Household;
 use App\Models\Member;
 use App\Models\User;
 use App\Support\CatalanCollation;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -31,14 +32,20 @@ class HouseholdController extends Controller
         // take part. Nothing is blocked.
         $households = Household::query()
             ->withCommissionMemberFlag()
-            ->with('members.user.administrator')
+            ->with([
+                'members' => static function (Relation $query): void {
+                    CatalanCollation::orderByColumn(
+                        $query->getQuery()->select('members.*')->join('users', 'users.id', '=', 'members.user_id'),
+                        'users.name',
+                    )->orderBy('members.id');
+                },
+                'members.user.administrator',
+            ])
             ->orderBy('number')
             ->get();
 
         // Two queries for all the members instead of two per member in the affected_members checks.
         $memberRoles->preload($households->flatMap->members);
-
-        $collation = new CatalanCollation;
 
         $households = $households->map(fn (Household $household) => [
             'id' => $household->id,
@@ -47,7 +54,6 @@ class HouseholdController extends Controller
             'is_active' => $household->is_active,
             'without_commission' => $household->is_active && ! $household->has_commission_member,
             'members' => $household->members
-                ->sort(fn (Member $a, Member $b) => $collation->compare($a->user->name, $b->user->name))
                 ->map(fn (Member $member) => [
                     'id' => $member->id,
                     'name' => $member->user->name,
@@ -78,7 +84,6 @@ class HouseholdController extends Controller
                 'name' => $member->user->name,
                 'left_out' => ! $protection->mayChangeAlongWithHousehold($viewer, $member, $household->is_active),
             ])
-            ->sortBy('name', SORT_NATURAL | SORT_FLAG_CASE)
             ->all();
 
         return array_values($affected);
