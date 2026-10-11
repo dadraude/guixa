@@ -3,8 +3,12 @@
 declare(strict_types=1);
 
 use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
+use Illuminate\Database\ConnectionInterface;
+use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Symfony\Component\Finder\Finder;
 
 /*
  * Project rules that a reviewer would otherwise have to check by eye.
@@ -64,8 +68,31 @@ arch('env() is only read from config files')
     ->expect('env')
     ->not->toBeUsedIn(['App', 'Database']);
 
-// Pest cannot match method names, so lockForUpdate() is covered through the facade
-// that every transaction and lock in this project starts from.
-arch('transactions and locks live in actions, not in the HTTP layer')
+// Pest cannot match method names, so the HTTP layer is guarded by two checks:
+// 1. the arch rule rejects the classes a transaction starts from (DB facade and its
+//    global alias, the connection and the database manager);
+// 2. the source scan below rejects the calls that need no such class, such as
+//    Member::query()->lockForUpdate(), $model->getConnection()->transaction() or the
+//    global alias \DB::transaction().
+arch('transactions do not start from the HTTP layer')
     ->expect('App\Http')
-    ->not->toUse(DB::class);
+    ->not->toUse([
+        DB::class,
+        ConnectionInterface::class,
+        DatabaseManager::class,
+    ]);
+
+test('the HTTP layer holds no transactions or locks, they live in actions', function () {
+    $forbidden = ['lockForUpdate', 'sharedLock', '->transaction(', '::transaction('];
+
+    $files = (new Finder)->files()->in(dirname(__DIR__, 2).'/app/Http')->name('*.php');
+
+    $offenders = [];
+    foreach ($files as $file) {
+        if (Str::contains($file->getContents(), $forbidden)) {
+            $offenders[] = $file->getRelativePathname();
+        }
+    }
+
+    expect($offenders)->toBe([]);
+});
