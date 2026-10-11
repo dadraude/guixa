@@ -16,6 +16,9 @@ use App\Http\Controllers\Directory\DirectoryController;
 use App\Http\Controllers\Households\HouseholdController;
 use App\Http\Controllers\Members\MemberController;
 use App\Http\Controllers\Members\MemberHouseholdController;
+use App\Http\Middleware\EnsureMemberIsNotWaiting;
+use App\Http\Middleware\EnsurePasswordIsSet;
+use App\Http\Middleware\EnsureProfileIsChosen;
 use App\Models\User;
 use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Support\Facades\Route;
@@ -28,6 +31,9 @@ Route::middleware('guest')->group(function () {
     Route::post('magic-link/code', [MagicLinkController::class, 'storeCode'])
         ->middleware('throttle:login')
         ->name('magic-link.code.store');
+});
+
+Route::withoutMiddleware([EnsurePasswordIsSet::class, EnsureProfileIsChosen::class, EnsureMemberIsNotWaiting::class])->group(function () {
     Route::get('magic-link/{token}', [MagicLinkController::class, 'show'])->name('magic-link.show');
     Route::post('magic-link/{token}', [MagicLinkController::class, 'consume'])->name('magic-link.consume');
 });

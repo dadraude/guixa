@@ -87,9 +87,13 @@ class MagicLinkBroker
     }
 
     /**
-     * Use up the link with this token and return its user, or null when the
-     * link does not exist, has expired or has already been used.
+     * Look up a usable link without consuming it, to check the browser identity.
      */
+    public function owner(string $token): ?User
+    {
+        return MagicLink::query()->where('token_hash', self::hash($token))->usable()->first()?->user;
+    }
+
     public function consume(string $token): ?User
     {
         return $this->useUp(MagicLink::query()->where('token_hash', self::hash($token)));

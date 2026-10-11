@@ -147,7 +147,7 @@ test('opening the confirmation link only shows a page and changes nothing', func
     expect($user->refresh()->email)->toBe('old@example.com')
         ->and($user->pending_email)->toBe('new@example.com');
 
-    $this->post($url)->assertRedirect(route('profile.edit'));
+    $this->post($url)->assertRedirect(route('email-change.updated'));
     expect($user->refresh()->email)->toBe('new@example.com');
 });
 
@@ -155,7 +155,7 @@ test('confirming the change updates the email', function () {
     $user = User::factory()->create(['email' => 'old@example.com']);
     $url = requestEmailChange($user, 'new@example.com');
 
-    $this->actingAs($user)->post($url)->assertRedirect(route('profile.edit'));
+    $this->actingAs($user)->post($url)->assertRedirect(route('email-change.updated'));
 
     $user->refresh();
     expect($user->email)->toBe('new@example.com')
@@ -169,7 +169,7 @@ test('confirming your own email change keeps your session and remember token', f
     $version = $user->refresh()->session_version;
     $token = $user->remember_token;
 
-    $this->actingAs($user)->post($url)->assertRedirect(route('profile.edit'));
+    $this->actingAs($user)->post($url)->assertRedirect(route('email-change.updated'));
     $this->get(route('profile.edit'))->assertOk();
 
     $user->refresh();
