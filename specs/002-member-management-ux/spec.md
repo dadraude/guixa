@@ -109,8 +109,10 @@ the owner. This is shorthand for the audience, not a new role or a new UI term.
   for a member acting with the membership role; server rejection remains unchanged.
 - Reuse the existing Laravel, Inertia, Vue and shared UI infrastructure. There is no new
   public API, role, account type or offline capability. No new domain entity is needed.
-- Keep existing field limits, uniqueness rules, welcome email, first-access password setup,
-  transactions, locks, idempotency and status effects. UI confirmation never grants permission.
+- Keep spec 001's field limits, uniqueness rules, welcome email, first-access password setup,
+  transactions, locks, idempotency and status effects. Verify these guarantees rather than
+  assuming the current implementation already satisfies them. UI confirmation never grants
+  permission. The stale household-removal rule below explicitly tightens the current action.
 - All UI text is Catalan through the existing translation system. Reuse domain terms rather
   than introducing a new vocabulary for the redesign.
 
@@ -139,6 +141,9 @@ the owner. This is shorthand for the audience, not a new role or a new UI term.
   result page; changing filter preserves search. Clearing both returns to `Tots` on page one.
 - The result count, pagination links and rows must describe the same applied query. Show
   loading feedback during requests; a superseded response must not replace a newer result.
+- A failed search, filter or page request is not an empty result. Keep the last successful
+  applied query, URL, count and rows coherent, show an error and allow retrying the requested
+  query. Unapplied input must not be presented as the criteria for the retained rows.
 - Persist applied search, filter and page in the list URL. Preserve existing links using
   the active-without-household filter. Continue safely normalizing unknown filters and
   malformed page parameters; arbitrary query keys do not become return destinations.
@@ -163,6 +168,9 @@ the owner. This is shorthand for the audience, not a new role or a new UI term.
 - Detail contains personal details, household, status and commissions. Commissions are
   read-only here, with `No pertany a cap comissió` when empty and an ordinary link to their
   existing management screen. Active and inactive members retain their memberships.
+- Returning from Commissions to the detail page, including browser Back, revalidates
+  commissions and effective permissions. If the actor has lost management access, apply
+  the existing access flow instead of restoring an authorized-looking stale page.
 - Opening either page from the list retains the originating applied search, filter, page
   and scroll position. The page's return action and browser Back restore that context.
 - Returning revalidates list data; if an edit changes membership in the filtered results,
@@ -172,6 +180,10 @@ the owner. This is shorthand for the audience, not a new role or a new UI term.
   return context can identify only the application's member list, not an arbitrary URL.
 - Successful creation opens the created member with `Membre creat`, carrying the originating
   list context forward. It works even if the new member is outside that list's results.
+- After creation from the list, browser Back returns to that list instead of restoring a
+  filled creation form. Saving detail changes does not add repeated visits to the same
+  detail page that must be traversed to return. Direct-entry pages retain their ordinary
+  browser history; their explicit return action still uses the default-list fallback.
 - Successful detail mutations remain on the detail page, refresh the affected information
   and show confirmation, while retaining list context. Existing session/profile transitions
   take precedence if the actor's action removes their own access.
@@ -181,7 +193,9 @@ the owner. This is shorthand for the audience, not a new role or a new UI term.
 - Personal details initially appear in read mode. `Edita les dades` opens the permitted
   fields with `Desa` and `Cancel·la`. Keep restricted email readable and explain the reason.
   A person's own email is changed through the existing confirmed self-service process;
-  the management form never performs an immediate self-email change.
+  the management form never performs an immediate self-email change. Its explanation links
+  to the existing profile screen, including pending-change management. Following that link
+  obeys the same unsaved-change protection as other application navigation.
 - Only one block may be edited at a time. Entering another block or requesting a mutation
   while the current form is dirty first offers `Continua editant` or `Descarta els canvis`.
   Continuing keeps the form and cancels the attempted action. Discarding restores the saved
@@ -196,8 +210,17 @@ the owner. This is shorthand for the audience, not a new role or a new UI term.
   shows errors beside the fields. A request failure must not look like success or silently
   switch to read mode. If access expires or is revoked, the existing access flow wins;
   this spec does not promise draft recovery across sign-in or a closed tab.
-- Pending mutations show progress and prevent repeated submission. Do not submit a form
-  simply because an editable field changed or the person moved focus elsewhere.
+- While a mutation is pending, show progress and freeze the submitted form and its dialog.
+  Block editing, duplicate submission, cancellation/discard, block switching, other mutations
+  and application-controlled departure from the page until the request resolves. This also
+  applies to creation and confirmed household/status actions. On a definitive failure,
+  unlock the controls and preserve submitted values; success establishes the saved baseline.
+  Browser-controlled departure cannot be guaranteed to stop a submitted server operation:
+  keep the supported unload warning and never claim leaving cancels or rolls it back.
+- A connection failure can leave the write outcome unknown. Explain this uncertainty and
+  require refreshing current server state before retrying a mutation; retain entered values
+  for comparison while access remains available. Do not automatically replay the request.
+  Do not submit simply because an editable field changed or focus moved elsewhere.
 - Creation retains spec 001's name/email requirements and optional phone, active household
   and commissions. Existing duplicate-email and stale household/commission validation
   errors remain recoverable on the creation page.
@@ -216,8 +239,14 @@ the owner. This is shorthand for the audience, not a new role or a new UI term.
   `Vols treure [nom] de la unitat familiar #N [nom]? Mantindrà el seu estat i les seves
   comissions. Necessitarà una unitat familiar activa per fer comandes.`
 - Confirm with `Treu de la unitat familiar`. Cancelling makes no change; success shows
-  `Sense unitat familiar`. Existing stale-state behavior remains governed by spec 001 and
-  the domain action; a rejected removal leaves an understandable error, not a false success.
+  `Sense unitat familiar`. The request identifies the household named in the confirmation.
+  Under the member lock, compare that identifier with the current assignment before removal.
+  If it changed, remove nothing, explain that the assignment changed and refresh the block.
+  Removing a new assignment requires a new confirmation naming it. If there is no assignment
+  left, show `Sense unitat familiar` and explain that no removal was performed.
+- This is an explicit exception to preserving the current removal action, which removes
+  whichever assignment exists at submission. It does not change spec 001's last-write-wins
+  rule for competing assignment/move operations or add general conflict coordination.
 
 ### Status, permissions and stale pages
 
@@ -236,8 +265,12 @@ the owner. This is shorthand for the audience, not a new role or a new UI term.
 - Direct page requests and every mutation still enforce server authorization. A hidden or
   disabled client control is not the access check. Newly stale options fail safely through
   the existing validation/authorization behavior; they cannot bypass it.
-- An already-active/inactive outcome uses the existing idempotent behavior and message.
-  Do not pretend that the requested state transition happened again or repeat its effects.
+- Activation/deactivation checks current protection and state under the member lock.
+  An already-active/inactive outcome performs no transition, repeats no side effects and
+  explains that the member already had the requested state. This is required by spec 001;
+  source review found the current actions and success messages do not fully implement it.
+  Closing this gap with HTTP tests is a prerequisite of the status UX slice, not a follow-up
+  or a new product decision. Do not treat passing existing regression tests as proof of it.
 - An administrator allowed to deactivate themselves can lose the current session; the
   existing signed-out flow takes precedence over staying on the detail page.
 
@@ -282,6 +315,12 @@ effects. Avoid tests tied to the internal decomposition of controllers or Vue co
   validations and protections. Keep regression coverage for welcome mail, immediate changes
   to someone else's permitted email, self-email confirmation, retained commissions, status
   effects, stale destinations and session invalidation.
+- Change the stale-removal regression to reject a request naming a former household after
+  reassignment; also cover an assignment already removed, and successful reconfirmation of
+  the new assignment. Check unchanged commissions and member status in each outcome.
+- Prove status idempotency and protection revalidation under the lock, including a repeated
+  deactivation that must not repeat session/email effects, repeated reactivation and a
+  protection change before the locked write. Assert distinct already-in-state feedback.
 - Verify return context accepts only the member list's supported criteria and cannot redirect
   to an external destination. Keep the existing bounded list-query regression guard relevant.
 
@@ -299,17 +338,29 @@ Assert visible behavior, URLs and persisted outcomes, not component state or CSS
 - Search and filter, move to a later page, open a member and return through the page action
   and browser Back; verify criteria, page and scroll restoration. Also open a detail URL
   without originating list context and verify its default return path.
+- Fail a list request and verify error/retry behavior with coherent retained query, URL,
+  rows and counts. A late or failed old response must not replace a newer successful query.
 - Edit and save; cancel a clean form; make dirty changes and test both warning choices for
   cancellation, navigation, switching blocks and attempting another action. Reverting all
   changes removes the warning. Failed validation preserves values and exposes field errors.
 - Create a member, including optional selections, and verify the success message and detail
   destination even when the preceding list filter excludes that member. Test dirty creation
   cancellation and the existing duplicate-email validation path.
+- After creation and after detail saves, use browser Back and verify the originating list
+  is reached without a restored creation draft or duplicate detail-history entries.
+- Return from Commissions and verify refreshed commission memberships and permissions.
+  Follow the own-email link to the profile, testing the dirty-form warning on departure.
 - Search the household picker, compare current/new assignments, move an inactive member
   without reactivating them, and confirm/cancel household removal.
 - Confirm/cancel deactivate and reactivate, checking the named target, consequences,
   resulting state and feedback. Check visible explanations for representative forbidden
   actions rather than trying every authorization combination again in the browser.
+- Change the assigned household after opening the removal confirmation, then submit and
+  verify rejection, refreshed context and the need to confirm the new household explicitly.
+- Delay a mutation response and attempt editing, cancellation, another mutation, block
+  switching and application navigation; controls remain blocked with visible progress.
+  Resolve success or validation failure and check the correct baseline or retained values.
+  Simulate a lost response and verify uncertainty feedback and refresh before any retry.
 - Check keyboard focus and dialog return, visible labels, accessible error association and
   narrow-screen wrapping with long content. Check loading feedback and duplicate-submit
   prevention through observable behavior.
@@ -338,10 +389,16 @@ scroll restoration, and light/dark readability. HTTP tests alone cannot prove th
 
 - The 14 product decisions were confirmed together after the interview; the user separately
   confirmed the HTTP/browser testing boundaries while this draft was prepared.
+- An independent read-only subagent review checked all 45 stories against spec 001, the
+  domain documents and related source. On 2026-10-11 the user additionally confirmed
+  rejecting removal of a changed household assignment and blocking page actions during
+  pending mutations. The review clarifications and agreed decisions are recorded in
+  [the decision record](decisions.md#spec-review-clarifications).
 - Literal search, safe direct-link fallbacks, zero-result pagination and browser-controlled
   unload warnings make the agreed behavior explicit for implementation and review. They do
   not add a new domain model or require an ADR.
-- Spec review must check this draft against spec 001, especially hidden-versus-disabled
-  presentation, self-email handling, self-deactivation, lost access and stale return context.
+- A bounded second review found the two decisions and five clarifications resolved, with
+  no remaining material contradiction in the reviewed changes. This is documentary review;
+  implementation must still prove the HTTP and browser criteria above.
 - This is a draft, not implementation authorization. Review and user approval precede
   ticket creation through `/to-tickets`, following the repository's SDD workflow.

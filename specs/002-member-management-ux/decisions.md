@@ -146,10 +146,45 @@ The user confirmed retaining Pest through HTTP for search, filters, pagination a
 permissions, and extending Playwright on mobile and desktop for navigation, editing,
 confirmations and unsaved-change protection.
 
+## Spec review clarifications
+
+An independent read-only subagent reviewed the draft against spec 001, the domain documents
+and related source on 2026-10-11. The user confirmed two additional decisions:
+
+1. Household removal confirms a specific assignment. If another action has changed that
+   assignment before the locked write, reject removal, refresh the household information
+   and require a new confirmation. If already unassigned, explain that nothing was removed.
+   This deliberately tightens the existing removal behavior; competing moves retain
+   spec 001's last-write-wins rule.
+2. While a mutation is pending, freeze editing, cancellation/discard, block switching,
+   other mutations and application-controlled departure, with visible progress. Restore
+   editing and submitted values after failure. Browser departure does not cancel a write
+   already sent. An unknown result after connection loss requires refreshing server state
+   before retry, rather than assuming the operation failed or replaying it automatically.
+
+The following clarifications follow existing decisions and do not introduce new domain rules:
+
+- Verify spec 001's status idempotency and locked protection checks during the status UX
+  slice. Source review found these guarantees are not fully implemented yet; existing
+  regression tests alone are not sufficient evidence. This is required work in that slice.
+- Returning from Commissions refreshes detail memberships and effective permissions.
+- Creating from the list and saving detail changes preserve useful browser Back behavior,
+  without reviving a filled creation form or accumulating duplicate detail visits.
+- Own-email restrictions link to the existing profile flow and honor dirty-form protection.
+- Failed list requests show an error and retry action while preserving a coherent last
+  successful query; a network error is not an empty result.
+
+The review used targeted source reads because this worktree has no CodeGraph index and
+Codebase Memory tools were unavailable. It was a contract review, not a runtime verification
+or an exhaustive audit of the application. The configured Opus reviewer was unavailable;
+the subagent used the session's available model.
+A bounded second pass confirmed the seven findings were resolved and found no material
+new contradiction in the changes. No runtime behavior was verified during either pass.
+
 ## Next step
 
 The shared understanding is confirmed and the [draft specification](spec.md) has been
-synthesized. Spec review and explicit spec approval precede `/to-tickets` and
-implementation, following the project's SDD flow.
+synthesized and reviewed. Explicit user approval of the spec still precedes `/to-tickets`
+and implementation, following the project's SDD flow.
 
 No new domain term or architectural trade-off requiring an ADR was decided in this interview.
