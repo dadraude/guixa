@@ -2,11 +2,14 @@
 
 declare(strict_types=1);
 
+use App\Auth\MagicLinkBroker;
 use App\Auth\Role;
+use App\Mail\MagicLinkMail;
 use App\Models\Commission;
 use App\Models\Household;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 function sessionStaff(): User
 {
@@ -29,7 +32,7 @@ function sessionMember(): User
 
 function recallerFor(User $user): string
 {
-    return implode('|', [$user->id, $user->remember_token, hash_hmac('sha256', (string) $user->password, (string) $user->password)]);
+    return implode('|', [$user->id, $user->remember_token, Auth::guard()->hashPasswordForCookie($user->password)]);
 }
 
 test('a session opened before a deactivation stays refused after the reactivation', function () {
@@ -66,18 +69,87 @@ test('a session opened after the reactivation keeps working', function () {
     $this->assertAuthenticatedAs($user);
 });
 
+function deactivateAndReactivate(User $user): void
+{
+    test()->actingAs(sessionStaff())->post(route('members.deactivate', $user->member));
+    test()->actingAs(sessionStaff())->post(route('members.reactivate', $user->member));
+    Auth::forgetGuards();
+    test()->flushSession();
+}
+
+test('a valid remember cookie signs in a member who was not deactivated', function () {
+    $user = sessionMember();
+
+    $this->withCookie(Auth::guard()->getRecallerName(), recallerFor($user))->get(route('home'));
+
+    $this->assertAuthenticatedAs($user);
+});
+
 test('the remember cookie of a deactivated and reactivated member is refused', function () {
     $user = sessionMember();
     $cookie = recallerFor($user);
 
-    $this->actingAs(sessionStaff())->post(route('members.deactivate', $user->member));
-    $this->actingAs(sessionStaff())->post(route('members.reactivate', $user->member));
-    Auth::forgetGuards();
-    $this->flushSession();
+    deactivateAndReactivate($user);
 
-    $this->withUnencryptedCookie(Auth::guard()->getRecallerName(), $cookie)->get(route('home'));
+    $this->withCookie(Auth::guard()->getRecallerName(), $cookie)->get(route('home'));
 
     $this->assertGuest();
+});
+
+test('a stale session signs out only its own device, keeping the new remember cookie valid', function () {
+    $user = sessionMember();
+    $this->post(route('login.store'), ['email' => $user->email, 'password' => 'password']);
+    $oldSession = session()->all();
+    $this->flushSession();
+    Auth::forgetGuards();
+
+    deactivateAndReactivate($user);
+
+    $this->post(route('login.store'), ['email' => $user->email, 'password' => 'password', 'remember' => true]);
+    $newSession = session()->all();
+    $this->flushSession();
+    Auth::forgetGuards();
+    $tokenBefore = $user->fresh()->remember_token;
+    $cookie = recallerFor($user->fresh());
+
+    $this->withSession($oldSession)->get(route('home'));
+    Auth::forgetGuards();
+
+    expect($user->fresh()->remember_token)->toBe($tokenBefore);
+
+    $this->flushSession();
+    $this->withCookie(Auth::guard()->getRecallerName(), $cookie)->get(route('home'));
+
+    $this->assertAuthenticatedAs($user);
+});
+
+test('a magic link sign-in after a reactivation keeps working', function () {
+    Mail::fake();
+    $user = sessionMember();
+    deactivateAndReactivate($user);
+    app(MagicLinkBroker::class)->send($user);
+    $url = null;
+    Mail::assertQueued(MagicLinkMail::class, function (MagicLinkMail $mail) use (&$url) {
+        $url = $mail->url;
+
+        return true;
+    });
+
+    $this->post($url);
+    $this->get(route('home'));
+
+    $this->assertAuthenticatedAs($user);
+});
+
+test('a fresh remember cookie after a reactivation keeps working across requests', function () {
+    $user = sessionMember();
+    deactivateAndReactivate($user);
+    $cookie = recallerFor($user->fresh());
+
+    $this->withCookie(Auth::guard()->getRecallerName(), $cookie)->get(route('home'));
+    $this->get(route('home'));
+
+    $this->assertAuthenticatedAs($user);
 });
 
 test('deactivating a household with its members ends their old sessions too', function () {

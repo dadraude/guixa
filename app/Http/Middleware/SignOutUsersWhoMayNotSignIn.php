@@ -27,11 +27,22 @@ class SignOutUsersWhoMayNotSignIn
     {
         $user = $request->user();
 
-        if ($user === null || ($user->canSignIn() && $this->userSessions->isCurrent($request->session(), $user))) {
+        if ($user === null) {
             return $next($request);
         }
 
-        Auth::logout();
+        if ($user->canSignIn() && $this->userSessions->isCurrent($request->session(), $user)) {
+            return $next($request);
+        }
+
+        // A stale session only ends this device: logout() would rotate the
+        // remember token again and sign out the device opened after the reactivation.
+        if ($user->canSignIn()) {
+            Auth::guard('web')->logoutCurrentDevice();
+        } else {
+            Auth::logout();
+        }
+
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
