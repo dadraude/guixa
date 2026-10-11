@@ -288,7 +288,10 @@ Guixa gets the membership foundation every later feature builds on:
   Laravel's password rules.
 - The sign-in screen offers both ways; there is no separate "forgot password" flow.
 - Responses never reveal whether an email exists. Link requests, password attempts and code
-  attempts are rate-limited per email and per IP.
+  attempts share one rate limit: 5 per minute per email and IP together, and 20 per minute per
+  IP. There is deliberately no limit per email alone, so nobody can lock someone else out by
+  typing their email; the 5-wrong-codes rule and the password rules cover distributed guessing
+  (spec review of 2026-10-11).
 - Inactive users cannot sign in with any profile. Deactivation invalidates all their
   existing sessions.
 - Sessions are long-lived (weeks) as stated in the principles.
