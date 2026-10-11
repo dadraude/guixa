@@ -47,7 +47,11 @@ class DashboardController extends Controller
                 ->with('user')
                 ->get()
                 ->sort(fn (Member $a, Member $b) => $collation->compare($a->user->name, $b->user->name))
-                ->map(fn (Member $housemate) => ['id' => $housemate->id, 'name' => $housemate->user->name])
+                ->map(fn (Member $housemate) => [
+                    'id' => $housemate->id,
+                    'name' => $housemate->user->name,
+                    'is_active' => $housemate->is_active,
+                ])
                 ->values(),
         ];
     }

@@ -15,6 +15,7 @@ use App\Http\Requests\Households\SaveHouseholdRequest;
 use App\Models\Household;
 use App\Models\Member;
 use App\Models\User;
+use App\Support\CatalanCollation;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -37,12 +38,22 @@ class HouseholdController extends Controller
         // Two queries for all the members instead of two per member in the affected_members checks.
         $memberRoles->preload($households->flatMap->members);
 
+        $collation = new CatalanCollation;
+
         $households = $households->map(fn (Household $household) => [
             'id' => $household->id,
             'number' => $household->number,
             'name' => $household->name,
             'is_active' => $household->is_active,
             'without_commission' => $household->is_active && ! $household->has_commission_member,
+            'members' => $household->members
+                ->sort(fn (Member $a, Member $b) => $collation->compare($a->user->name, $b->user->name))
+                ->map(fn (Member $member) => [
+                    'id' => $member->id,
+                    'name' => $member->user->name,
+                    'is_active' => $member->is_active,
+                ])
+                ->values(),
             'affected_members' => $this->affectedMembers($household, $viewer, $protection),
         ]);
 

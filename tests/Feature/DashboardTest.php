@@ -57,6 +57,21 @@ test('the housemates are ordered by name, accents and case ignored', function ()
             ->where('household.members.2.name', 'Zoe Mas'));
 });
 
+test('my household includes inactive members and their state', function () {
+    $household = Household::factory()->create();
+    $viewer = User::factory()->member($household)->create(['name' => 'Zoe Mas']);
+    $inactive = User::factory()->member($household)->create(['name' => 'Àlex Roca']);
+    $inactive->member->update(['is_active' => false]);
+
+    $this->actingAs($viewer)
+        ->get(route('dashboard'))
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('household.members.0.name', 'Àlex Roca')
+            ->where('household.members.0.is_active', false)
+            ->where('household.members.1.name', 'Zoe Mas')
+            ->where('household.members.1.is_active', true));
+});
+
 test('the shared user props carry no member or administrator relation', function (User $user) {
     $this->actingAs($user)
         ->get(route('dashboard'))

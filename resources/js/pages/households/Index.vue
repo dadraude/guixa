@@ -17,6 +17,7 @@ type HouseholdRow = {
     name: string;
     is_active: boolean;
     without_commission: boolean;
+    members: { id: string; name: string; is_active: boolean }[];
     affected_members: { id: string; name: string; left_out: boolean }[];
 };
 
@@ -61,7 +62,7 @@ defineOptions({
                 :key="household.id"
                 class="flex flex-wrap items-center justify-between gap-3 p-4"
             >
-                <div class="flex items-center gap-3">
+                <div class="flex flex-wrap items-center gap-3">
                     <span
                         class="font-mono text-sm text-muted-foreground"
                         :title="t('Household number')"
@@ -88,6 +89,13 @@ defineOptions({
                         <InputError :message="errors.name" />
                     </Form>
                 </div>
+
+                <ul v-if="household.members.length" class="flex flex-wrap gap-2 text-sm" data-test="household-members">
+                    <li v-for="member in household.members" :key="member.id" class="flex items-center gap-1">
+                        <span>{{ member.name }}</span>
+                        <Badge v-if="!member.is_active" variant="outline">{{ t('Inactive') }}</Badge>
+                    </li>
+                </ul>
 
                 <div class="flex items-center gap-2">
                     <Badge

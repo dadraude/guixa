@@ -2,13 +2,14 @@
 import { Head } from '@inertiajs/vue3';
 import Heading from '@/components/Heading.vue';
 import MyCommissions from '@/components/MyCommissions.vue';
+import { Badge } from '@/components/ui/badge';
 import { t } from '@/lib/i18n';
 import { dashboard } from '@/routes';
 
 type Household = {
     number: number;
     name: string;
-    members: { id: string; name: string }[];
+    members: { id: string; name: string; is_active: boolean }[];
 };
 
 defineProps<{
@@ -51,9 +52,10 @@ defineOptions({
                     <li
                         v-for="member in household.members"
                         :key="member.id"
-                        class="p-4"
+                        class="flex items-center gap-2 p-4"
                     >
-                        {{ member.name }}
+                        <span>{{ member.name }}</span>
+                        <Badge v-if="!member.is_active" variant="outline">{{ t('Inactive') }}</Badge>
                     </li>
                 </ul>
             </div>
