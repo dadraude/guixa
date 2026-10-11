@@ -21,6 +21,11 @@ class HandleInertiaRequests extends Middleware
      */
     protected $rootView = 'app';
 
+    public function __construct(
+        private readonly ActiveProfile $activeProfile,
+        private readonly WaitingForHousehold $waitingForHousehold,
+    ) {}
+
     /**
      * Determines the current asset version.
      *
@@ -41,7 +46,6 @@ class HandleInertiaRequests extends Middleware
     public function share(Request $request): array
     {
         $user = $request->user();
-        $activeProfile = app(ActiveProfile::class);
 
         return [
             ...parent::share($request),
@@ -49,11 +53,11 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 // Without relations: the loaded member and household are not for the frontend.
                 'user' => $user?->withoutRelations(),
-                'isOwner' => $user !== null && $activeProfile->isActingAsOwner($user),
+                'isOwner' => $user !== null && $this->activeProfile->isActingAsOwner($user),
                 'canManageMembership' => $user !== null && $user->can('manage-membership'),
-                'isWaiting' => $user !== null && app(WaitingForHousehold::class)->isWaiting($user),
-                'actingAs' => $user === null ? null : $activeProfile->current($user)?->value,
-                'profiles' => $user === null ? [] : array_map(fn (Profile $profile) => $profile->value, $activeProfile->available($user)),
+                'isWaiting' => $user !== null && $this->waitingForHousehold->isWaiting($user),
+                'actingAs' => $user === null ? null : $this->activeProfile->current($user)?->value,
+                'profiles' => $user === null ? [] : array_map(fn (Profile $profile) => $profile->value, $this->activeProfile->available($user)),
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];

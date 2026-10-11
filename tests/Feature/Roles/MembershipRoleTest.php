@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Auth\ActiveProfile;
+use App\Auth\MemberRoles;
 use App\Auth\Profile;
 use App\Auth\Role;
 use App\Models\Commission;
@@ -208,5 +209,5 @@ test('acting as administrator, a two-profile user manages membership and assigns
 
     expectEveryMembershipRequestToSucceed($user);
     $this->actingAs($user)->post(route('commissions.roles.store', $commission), ['role' => 'orders'])->assertRedirect(route('commissions.index'));
-    expect($commission->roles())->toBe([Role::Orders]);
+    expect(app(MemberRoles::class)->forCommissions([$commission->id]))->toBe([Role::Orders]);
 });

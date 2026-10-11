@@ -62,3 +62,10 @@ arch('mails are queued after the transaction commits')
 arch('env() is only read from config files')
     ->expect('env')
     ->not->toBeUsedIn(['App', 'Database']);
+
+// Providers are the composition root and legitimately use the container (Gate definitions,
+// Fortify callbacks). Everywhere else dependencies are injected, not located (DRA-71 review).
+arch('app code injects its dependencies instead of locating them with app() or resolve()')
+    ->expect('App')
+    ->not->toUse(['app', 'resolve'])
+    ->ignoring('App\Providers');

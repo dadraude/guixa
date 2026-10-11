@@ -23,11 +23,11 @@ class ChooseHouseholdMembersRequest extends FormRequest
     /**
      * @return array<string, mixed>
      */
-    public function rules(): array
+    public function rules(MemberRoles $memberRoles, MembershipRoleProtection $protection): array
     {
         return [
             // Optional when nobody would change; the action confirms that under the lock.
-            'with_members' => [Rule::requiredIf($this->hasMembersToAffect(...)), 'nullable', 'boolean'],
+            'with_members' => [Rule::requiredIf(fn (): bool => $this->hasMembersToAffect($memberRoles, $protection)), 'nullable', 'boolean'],
         ];
     }
 
@@ -39,7 +39,7 @@ class ChooseHouseholdMembersRequest extends FormRequest
         return $this->filled('with_members') ? $this->boolean('with_members') : null;
     }
 
-    private function hasMembersToAffect(): bool
+    private function hasMembersToAffect(MemberRoles $memberRoles, MembershipRoleProtection $protection): bool
     {
         $household = $this->route('household');
         $actor = $this->user();
@@ -53,8 +53,7 @@ class ChooseHouseholdMembersRequest extends FormRequest
             ->with('user.administrator')
             ->get();
 
-        app(MemberRoles::class)->preload($members);
-        $protection = app(MembershipRoleProtection::class);
+        $memberRoles->preload($members);
 
         return $members->contains(fn (Member $member): bool => $protection->mayChangeAlongWithHousehold($actor, $member, $household->is_active));
     }
