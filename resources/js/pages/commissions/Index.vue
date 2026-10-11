@@ -27,9 +27,8 @@ type RoleOption = {
 type CommissionRow = {
     id: string;
     name: string;
-    members: Person[];
+    members: (Person & { can_remove: boolean })[];
     roles: RoleOption[];
-    can_remove_members: boolean;
     can_delete: boolean;
 };
 
@@ -216,7 +215,7 @@ defineOptions({
                                 type="submit"
                                 variant="ghost"
                                 size="sm"
-                                :disabled="!commission.can_remove_members"
+                                :disabled="!member.can_remove"
                                 >{{ t('Remove') }}</Button
                             >
                         </Form>

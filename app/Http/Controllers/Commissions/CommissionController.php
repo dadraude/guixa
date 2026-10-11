@@ -7,11 +7,13 @@ namespace App\Http\Controllers\Commissions;
 use App\Auth\CommissionRoles;
 use App\Auth\MemberCommissionList;
 use App\Auth\MembershipRoleProtection;
+use App\Auth\MembershipRoleRetention;
 use App\Auth\Role;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Commissions\SaveCommissionRequest;
 use App\Models\Commission;
 use App\Models\Member;
+use App\Models\User;
 use App\Support\CatalanCollation;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -24,7 +26,7 @@ class CommissionController extends Controller
     /**
      * Everyone who is in the cooperative sees names only, never contact details.
      */
-    public function index(Request $request, CommissionRoles $commissionRoles, MemberCommissionList $commissionList, MembershipRoleProtection $protection): Response
+    public function index(Request $request, CommissionRoles $commissionRoles, MemberCommissionList $commissionList, MembershipRoleProtection $protection, MembershipRoleRetention $retention): Response
     {
         $viewer = $request->user() ?? abort(403);
         $canManage = $viewer->can('manage-membership') === true;
@@ -37,15 +39,14 @@ class CommissionController extends Controller
 
         return Inertia::render('commissions/Index', [
             'commissions' => Commission::query()
-                ->with('members.user')
+                ->with(['members.user', 'members.commissions:id'])
                 ->orderBy('name')
                 ->get()
                 ->map(fn (Commission $commission) => [
                     'id' => $commission->id,
                     'name' => $commission->name,
-                    'members' => $this->namesOf($commission->members),
+                    'members' => $this->membersOf($commission, $viewer, $rolesByCommission, $protection, $retention),
                     'roles' => $optionsOf($commission),
-                    'can_remove_members' => $protection->mayRemoveFromCommissionHolding($viewer, $rolesByCommission[$commission->id] ?? []),
                     'can_delete' => $protection->mayRemoveFromCommissionHolding($viewer, $rolesByCommission[$commission->id] ?? []),
                 ]),
             'mine' => $ownMember === null ? [] : $commissionList->of($ownMember),
@@ -82,6 +83,24 @@ class CommissionController extends Controller
         $commission->delete();
 
         return to_route('commissions.index');
+    }
+
+    /**
+     * @param  array<string, list<Role>>  $rolesByCommission
+     * @return list<array{id: string, name: string, is_active: bool, can_remove: bool}>
+     */
+    private function membersOf(Commission $commission, User $viewer, array $rolesByCommission, MembershipRoleProtection $protection, MembershipRoleRetention $retention): array
+    {
+        $commissionsOf = $commission->members->mapWithKeys(fn (Member $member) => [$member->id => $member->commissions]);
+
+        return array_values(array_map(
+            fn (array $person) => $person + ['can_remove' => $protection->mayRemoveMemberHolding(
+                $viewer,
+                $rolesByCommission[$commission->id] ?? [],
+                $retention->keptOutsideOf((string) $commission->id, $commissionsOf[$person['id']] ?? [], $rolesByCommission),
+            )],
+            $this->namesOf($commission->members),
+        ));
     }
 
     /**

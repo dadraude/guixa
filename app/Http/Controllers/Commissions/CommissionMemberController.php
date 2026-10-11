@@ -11,6 +11,7 @@ use App\Models\Commission;
 use App\Models\Member;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CommissionMemberController extends Controller
 {
@@ -23,9 +24,23 @@ class CommissionMemberController extends Controller
 
     public function destroy(Request $request, Commission $commission, Member $member, MembershipRoleProtection $protection): RedirectResponse
     {
-        abort_unless($protection->mayRemoveFromCommission($request->user() ?? abort(403), $commission), 403);
+        $actor = $request->user() ?? abort(403);
 
-        $commission->members()->detach($member);
+        // Locking the member serializes two removals of the same person from two commissions:
+        // the second sees the first one's detach and cannot leave them without the role.
+        $removed = DB::transaction(function () use ($actor, $commission, $member, $protection): bool {
+            $locked = Member::query()->whereKey($member->getKey())->lockForUpdate()->firstOrFail();
+
+            if (! $protection->mayRemoveMemberFromCommission($actor, $commission, $locked)) {
+                return false;
+            }
+
+            $commission->members()->detach($locked);
+
+            return true;
+        });
+
+        abort_unless($removed, 403);
 
         return to_route('commissions.index');
     }

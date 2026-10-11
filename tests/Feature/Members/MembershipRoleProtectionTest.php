@@ -71,6 +71,64 @@ test('an administrator and the owner remove a member from a commission holding t
     'owner' => fn () => User::factory()->owner()->create(),
 ]);
 
+test('the membership role removes a member who keeps the role through another commission, themselves included', function (bool $themselves) {
+    $commission = protectionMembershipCommission();
+    $actor = protectionActor();
+    $target = $themselves ? $actor->member : protectionColleague();
+    $commission->members()->attach($target);
+
+    $this->actingAs($actor)
+        ->delete(route('commissions.members.destroy', [$commission, $target]))
+        ->assertRedirect(route('commissions.index'));
+
+    expect($commission->members()->whereKey($target->id)->exists())->toBeFalse();
+})->with([
+    'a colleague' => false,
+    'themselves' => true,
+]);
+
+test('the membership role cannot remove a member whose only other commission lacks the role', function () {
+    $commission = protectionMembershipCommission();
+    $target = protectionMember();
+    $commission->members()->attach($target);
+    Commission::factory()->create()->members()->attach($target);
+
+    $this->actingAs(protectionActor())
+        ->delete(route('commissions.members.destroy', [$commission, $target]))
+        ->assertForbidden();
+
+    expect($commission->members()->whereKey($target->id)->exists())->toBeTrue();
+});
+
+test('an inactive member keeps the role through another commission as an active one does', function () {
+    $commission = protectionMembershipCommission();
+    $target = protectionColleague();
+    $target->update(['is_active' => false]);
+    $commission->members()->attach($target);
+
+    $this->actingAs(protectionActor())
+        ->delete(route('commissions.members.destroy', [$commission, $target]))
+        ->assertRedirect(route('commissions.index'));
+
+    expect($commission->members()->whereKey($target->id)->exists())->toBeFalse();
+});
+
+test('the commissions page shows the remove action only where the member keeps the role', function () {
+    $commission = protectionMembershipCommission();
+    $keeper = protectionColleague();
+    $loser = protectionMember();
+    $commission->members()->attach([$keeper->id, $loser->id]);
+
+    $removable = fn (User $viewer) => $this->actingAs($viewer)->get(route('commissions.index'))->inertiaProps('commissions');
+
+    $members = collect($removable(protectionActor()))->firstWhere('id', $commission->id)['members'];
+    expect(collect($members)->firstWhere('id', $keeper->id)['can_remove'])->toBeTrue()
+        ->and(collect($members)->firstWhere('id', $loser->id)['can_remove'])->toBeFalse();
+
+    $members = collect($removable(User::factory()->administrator()->create()))->firstWhere('id', $commission->id)['members'];
+    expect(collect($members)->every(fn ($member) => $member['can_remove']))->toBeTrue();
+});
+
 test('the membership role still removes a member from a commission without the membership role', function () {
     $commission = Commission::factory()->create();
     $member = protectionMember();
@@ -217,8 +275,7 @@ test('the pages tell which of these actions the viewer may do', function () {
     $this->actingAs($viewer)
         ->get(route('commissions.index'))
         ->assertInertia(fn (Assert $page) => $page
-            ->where('commissions', fn ($commissions) => collect($commissions)->firstWhere('id', $commission->id)['can_delete'] === false
-                && collect($commissions)->firstWhere('id', $commission->id)['can_remove_members'] === false));
+            ->where('commissions', fn ($commissions) => collect($commissions)->firstWhere('id', $commission->id)['can_delete'] === false));
 
     $this->actingAs(User::factory()->administrator()->create())
         ->get(route('members.index'))
