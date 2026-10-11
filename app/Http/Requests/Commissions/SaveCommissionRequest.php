@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Http\Requests\Commissions;
 
 use App\Models\Commission;
+use Closure;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class SaveCommissionRequest extends FormRequest
 {
@@ -20,14 +20,25 @@ class SaveCommissionRequest extends FormRequest
      */
     public function rules(): array
     {
-        $commission = $this->route('commission');
+        $route = $this->route('commission');
+        $ignoredId = $route instanceof Commission ? $route->id : null;
 
         return [
             'name' => [
                 'required',
                 'string',
                 'max:255',
-                Rule::unique(Commission::class, 'name')->ignore($commission instanceof Commission ? $commission->id : null),
+                // Compared lowercase in the database; the TrimStrings middleware already trimmed the value.
+                function (string $attribute, mixed $value, Closure $fail) use ($ignoredId): void {
+                    $taken = Commission::query()
+                        ->whereRaw('lower(name) = lower(?)', [$value])
+                        ->when($ignoredId !== null, fn ($query) => $query->whereKeyNot($ignoredId))
+                        ->exists();
+
+                    if ($taken) {
+                        $fail('validation.unique')->translate();
+                    }
+                },
             ],
         ];
     }

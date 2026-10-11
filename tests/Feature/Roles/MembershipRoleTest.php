@@ -190,7 +190,7 @@ test('acting as member without the membership role, a two-profile user is refuse
     $this->actingAs($user)->post(route('commissions.roles.store', $commission), ['role' => 'orders'])->assertForbidden();
     $this->actingAs($user)->get(route('commissions.index'))
         ->assertOk()
-        ->assertInertia(fn (Assert $page) => $page->where('canManage', false)->where('candidates', []));
+        ->assertInertia(fn (Assert $page) => $page->where('canManage', false));
 });
 
 test('acting as member with the membership role, a two-profile user manages membership but cannot assign roles', function () {

@@ -66,11 +66,6 @@ class MembershipRoleProtection
         return $this->mayRemoveFromCommissionHolding($actor, $commissionRoles) || $memberKeepsMembershipRole;
     }
 
-    public function mayDeleteCommission(User $actor, Commission $commission): bool
-    {
-        return $this->mayRemoveFromCommission($actor, $commission);
-    }
-
     public function mayDeactivateMember(User $actor, Member $member): bool
     {
         if ($this->belongsToOwner($member)) {

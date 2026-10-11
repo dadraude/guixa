@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Commissions;
 
+use App\Actions\AddCommissionMember;
 use App\Actions\RemoveCommissionMember;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Commissions\AddCommissionMemberRequest;
@@ -14,9 +15,9 @@ use Illuminate\Http\Request;
 
 class CommissionMemberController extends Controller
 {
-    public function store(AddCommissionMemberRequest $request, Commission $commission): RedirectResponse
+    public function store(AddCommissionMemberRequest $request, Commission $commission, AddCommissionMember $addCommissionMember): RedirectResponse
     {
-        $commission->members()->syncWithoutDetaching([$request->validated('member_id')]);
+        $addCommissionMember->handle($commission, Member::query()->whereKey($request->validated('member_id'))->firstOrFail());
 
         return to_route('commissions.index');
     }

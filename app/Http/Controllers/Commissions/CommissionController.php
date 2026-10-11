@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Commissions;
 
+use App\Actions\DeleteCommission;
+use App\Actions\SaveCommission;
+use App\Auth\CommissionDeletion;
 use App\Auth\CommissionRoles;
 use App\Auth\MemberCommissionList;
 use App\Auth\MembershipRoleProtection;
@@ -17,7 +20,6 @@ use App\Models\User;
 use App\Support\CatalanCollation;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -26,7 +28,7 @@ class CommissionController extends Controller
     /**
      * Everyone who is in the cooperative sees names only, never contact details.
      */
-    public function index(Request $request, CommissionRoles $commissionRoles, MemberCommissionList $commissionList, MembershipRoleProtection $protection, MembershipRoleRetention $retention): Response
+    public function index(Request $request, CommissionRoles $commissionRoles, MemberCommissionList $commissionList, MembershipRoleProtection $protection, MembershipRoleRetention $retention, CommissionDeletion $deletion): Response
     {
         $viewer = $request->user() ?? abort(403);
         $canManage = $viewer->can('manage-membership') === true;
@@ -36,6 +38,8 @@ class CommissionController extends Controller
             $rolesByCommission[$commission->id] ?? [],
         );
         $ownMember = $viewer->member;
+        // Every member, inactive ones included, sorted once; each commission drops its own members.
+        $candidates = collect($canManage ? $this->namesOf(Member::query()->with('user')->get()) : []);
 
         return Inertia::render('commissions/Index', [
             'commissions' => Commission::query()
@@ -47,40 +51,34 @@ class CommissionController extends Controller
                     'name' => $commission->name,
                     'members' => $this->membersOf($commission, $viewer, $rolesByCommission, $protection, $retention),
                     'roles' => $optionsOf($commission),
-                    'can_delete' => $protection->mayRemoveFromCommissionHolding($viewer, $rolesByCommission[$commission->id] ?? []),
+                    'candidates' => $canManage ? $candidates->reject(fn (array $person) => $commission->members->contains('id', $person['id']))->values()->all() : [],
+                    'can_delete' => $deletion->mayDeleteHolding($viewer, $rolesByCommission[$commission->id] ?? []),
                 ]),
             'mine' => $ownMember === null ? [] : $commissionList->of($ownMember),
             'availableRoles' => array_map(fn (Role $role) => $role->toOption(), Role::cases()),
             'canAssignRoles' => $viewer->can('assign-roles') === true,
             'canManage' => $canManage,
-            'candidates' => $canManage ? $this->namesOf(Member::query()->with('user')->get()) : [],
             'status' => $request->session()->get('status'),
         ]);
     }
 
-    public function store(SaveCommissionRequest $request): RedirectResponse
+    public function store(SaveCommissionRequest $request, SaveCommission $saveCommission): RedirectResponse
     {
-        Commission::create($request->validated());
+        $saveCommission->handle($request->safe()->string('name')->toString());
 
         return to_route('commissions.index');
     }
 
-    public function update(SaveCommissionRequest $request, Commission $commission): RedirectResponse
+    public function update(SaveCommissionRequest $request, Commission $commission, SaveCommission $saveCommission): RedirectResponse
     {
-        $commission->update($request->validated());
+        $saveCommission->handle($request->safe()->string('name')->toString(), $commission);
 
         return to_route('commissions.index');
     }
 
-    public function destroy(Request $request, Commission $commission, MembershipRoleProtection $protection): RedirectResponse
+    public function destroy(Request $request, Commission $commission, DeleteCommission $deleteCommission): RedirectResponse
     {
-        abort_unless($protection->mayDeleteCommission($request->user() ?? abort(403), $commission), 403);
-
-        if ($commission->members()->exists()) {
-            throw ValidationException::withMessages(['commission' => __('A commission with members cannot be deleted.')]);
-        }
-
-        $commission->delete();
+        abort_unless($deleteCommission->handle($commission, $request->user() ?? abort(403)), 403);
 
         return to_route('commissions.index');
     }
