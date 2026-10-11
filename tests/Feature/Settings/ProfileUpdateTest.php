@@ -201,8 +201,7 @@ test('the second of two users confirming the same new email gets the in-use mess
 
     $this->post($firstUrl);
     $this->post($secondUrl)
-        ->assertRedirect(route('profile.edit'))
-        ->assertInertiaFlash('toast.message', 'Aquesta adreça electrònica ja està en ús.');
+        ->assertRedirect(route('email-change.taken'));
 
     expect($first->refresh()->email)->toBe('new@example.com')
         ->and($second->refresh()->email)->toBe('second@example.com')
@@ -223,8 +222,7 @@ test('losing the race for the new email at save time shows the in-use message in
     // Removed before any assertion, so a failure cannot leak the listener into other tests.
     User::flushEventListeners();
 
-    $response->assertRedirect(route('profile.edit'))
-        ->assertInertiaFlash('toast.message', 'Aquesta adreça electrònica ja està en ús.');
+    $response->assertRedirect(route('email-change.taken'));
     expect($user->refresh()->email)->toBe('old@example.com')
         ->and($user->pending_email)->toBeNull();
 });
@@ -288,9 +286,35 @@ test('an email taken after the request cannot be confirmed', function () {
     $url = requestEmailChange($user, 'new@example.com');
     User::factory()->create(['email' => 'new@example.com']);
 
-    $this->post($url);
+    $this->post($url)->assertRedirect(route('email-change.taken'));
 
     expect($user->refresh()->email)->toBe('old@example.com');
+});
+
+test('a signed-out user confirming a link whose address was taken ends on the public page', function () {
+    $user = User::factory()->create(['email' => 'old@example.com']);
+    $url = requestEmailChange($user, 'new@example.com');
+    User::factory()->create(['email' => 'new@example.com']);
+    // requestEmailChange() signed the user in; the link is confirmed from another browser.
+    $this->app['auth']->forgetGuards();
+
+    $this->post($url)->assertRedirect(route('email-change.taken'));
+
+    $this->get(route('email-change.taken'))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page->component('auth/EmailChangeTaken')->where('signedIn', false));
+});
+
+test('a signed-in user confirming a link whose address was taken sees the same page', function () {
+    $user = User::factory()->create(['email' => 'old@example.com']);
+    $url = requestEmailChange($user, 'new@example.com');
+    User::factory()->create(['email' => 'new@example.com']);
+
+    $this->actingAs($user)->post($url)->assertRedirect(route('email-change.taken'));
+
+    $this->actingAs($user)->get(route('email-change.taken'))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page->component('auth/EmailChangeTaken')->where('signedIn', true));
 });
 
 test('editing the profile never touches another member', function () {
