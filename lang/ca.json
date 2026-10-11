@@ -88,6 +88,8 @@
     "Member created.": "Membre creat.",
     "Member deactivated.": "Membre desactivat.",
     "Member reactivated.": "Membre reactivat.",
+    "The member was already active.": "El membre ja estava actiu.",
+    "The member was already inactive.": "El membre ja estava inactiu.",
     "Member removed from the household.": "Membre tret de la unitat familiar.",
     "Member updated.": "Membre actualitzat.",
     "Members": "Membres",

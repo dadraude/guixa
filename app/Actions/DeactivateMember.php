@@ -9,6 +9,7 @@ use App\Auth\MembershipRoleProtection;
 use App\Auth\UserSessions;
 use App\Models\Member;
 use App\Models\User;
+use App\Support\MemberStatusChange;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -48,7 +49,12 @@ class DeactivateMember
      */
     public function handleAs(Member $member, User $actor): bool
     {
-        return DB::transaction(function () use ($member, $actor): bool {
+        return $this->changeAs($member, $actor) !== MemberStatusChange::Forbidden;
+    }
+
+    public function changeAs(Member $member, User $actor): MemberStatusChange
+    {
+        return DB::transaction(function () use ($member, $actor): MemberStatusChange {
             $locked = Member::query()
                 ->with('user.administrator')
                 ->whereKey($member->getKey())
@@ -59,12 +65,16 @@ class DeactivateMember
             $this->memberRoles->forget($locked);
 
             if (! $this->protection->mayDeactivateMember($actor, $locked)) {
-                return false;
+                return MemberStatusChange::Forbidden;
+            }
+
+            if (! $locked->is_active) {
+                return MemberStatusChange::AlreadyInThatState;
             }
 
             $this->handle($locked);
 
-            return true;
+            return MemberStatusChange::Changed;
         });
     }
 }

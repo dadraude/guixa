@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Actions\DeactivateMember;
+use App\Support\MemberStatusChange;
 use App\Actions\RemoveCommissionMember;
 use App\Auth\MembershipRoleProtection;
 use App\Auth\Role;
@@ -429,7 +430,7 @@ test('the deactivate route answers 403 when the protection fails inside the tran
     $member = protectionMember();
 
     // The controller's own check passes; the locked re-check refuses.
-    $this->mock(DeactivateMember::class)->shouldReceive('handleAs')->once()->andReturnFalse();
+    $this->mock(DeactivateMember::class)->shouldReceive('changeAs')->once()->andReturn(MemberStatusChange::Forbidden);
 
     $this->actingAs(protectionActor())
         ->post(route('members.deactivate', $member))
