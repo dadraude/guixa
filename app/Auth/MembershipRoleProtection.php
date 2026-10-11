@@ -28,7 +28,7 @@ class MembershipRoleProtection
 
     public function mayRemoveFromCommission(User $actor, Commission $commission): bool
     {
-        return $this->mayRemoveFromCommissionHolding($actor, $commission->roles());
+        return $this->mayRemoveFromCommissionHolding($actor, $this->memberRoles->forCommissions([$commission->id]));
     }
 
     /**
@@ -50,7 +50,7 @@ class MembershipRoleProtection
     {
         return $this->mayRemoveMemberHolding(
             $actor,
-            $commission->roles(),
+            $this->memberRoles->forCommissions([$commission->id]),
             $this->retention->keptOutside($commission, $member),
         );
     }

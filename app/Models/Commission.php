@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Auth\MemberRoles;
 use App\Auth\Role;
 use Database\Factories\CommissionFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -35,16 +34,6 @@ class Commission extends Model
     public function members(): BelongsToMany
     {
         return $this->belongsToMany(Member::class)->withTimestamps();
-    }
-
-    /**
-     * The roles this commission holds, which all its members share.
-     *
-     * @return list<Role>
-     */
-    public function roles(): array
-    {
-        return app(MemberRoles::class)->forCommissions([$this->id]);
     }
 
     public function assignRole(Role $role): void

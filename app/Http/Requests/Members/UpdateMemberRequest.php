@@ -17,7 +17,7 @@ class UpdateMemberRequest extends FormRequest
 
     private ?bool $mayChangeEmail = null;
 
-    public function authorize(): bool
+    public function authorize(EmailChangeLevels $emailChangeLevels): bool
     {
         if ($this->user()?->can('manage-membership') !== true) {
             return false;
@@ -25,15 +25,15 @@ class UpdateMemberRequest extends FormRequest
 
         // Clients may still send the unchanged email; only an actual change is
         // refused to those below the required level.
-        return ! $this->isChangingEmail() || $this->mayChangeEmail();
+        return ! $this->isChangingEmail() || $this->mayChangeEmail($emailChangeLevels);
     }
 
-    private function mayChangeEmail(): bool
+    private function mayChangeEmail(EmailChangeLevels $emailChangeLevels): bool
     {
         /** @var Member $member */
         $member = $this->route('member');
 
-        return $this->mayChangeEmail ??= app(EmailChangeLevels::class)->canChange($this->user() ?? abort(403), $member);
+        return $this->mayChangeEmail ??= $emailChangeLevels->canChange($this->user() ?? abort(403), $member);
     }
 
     /**
@@ -49,14 +49,14 @@ class UpdateMemberRequest extends FormRequest
     /**
      * @return array<string, ValidationRule|array<mixed>|string>
      */
-    public function rules(): array
+    public function rules(EmailChangeLevels $emailChangeLevels): array
     {
         /** @var Member $member */
         $member = $this->route('member');
 
         $rules = $this->profileRules($member->user_id);
 
-        if (! $this->mayChangeEmail()) {
+        if (! $this->mayChangeEmail($emailChangeLevels)) {
             unset($rules['email']);
         }
 

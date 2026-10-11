@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Auth\MemberRoles;
 use App\Auth\Role;
 use App\Models\Commission;
 use App\Models\Household;
@@ -24,4 +25,14 @@ function membershipRoleUser(): User
     $commission->members()->attach($user->member->fresh());
 
     return $user->fresh();
+}
+
+/**
+ * The roles a commission holds, read through the application's MemberRoles.
+ *
+ * @return list<Role>
+ */
+function rolesOf(Commission $commission): array
+{
+    return resolve(MemberRoles::class)->forCommissions([$commission->id]);
 }

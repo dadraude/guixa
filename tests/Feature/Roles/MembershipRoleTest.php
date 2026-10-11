@@ -208,5 +208,5 @@ test('acting as administrator, a two-profile user manages membership and assigns
 
     expectEveryMembershipRequestToSucceed($user);
     $this->actingAs($user)->post(route('commissions.roles.store', $commission), ['role' => 'orders'])->assertRedirect(route('commissions.index'));
-    expect($commission->roles())->toBe([Role::Orders]);
+    expect(rolesOf($commission))->toBe([Role::Orders]);
 });

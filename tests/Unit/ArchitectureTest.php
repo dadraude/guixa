@@ -68,6 +68,13 @@ arch('env() is only read from config files')
     ->expect('env')
     ->not->toBeUsedIn(['App', 'Database']);
 
+// Providers are the composition root and legitimately use the container (Gate definitions,
+// Fortify callbacks). Everywhere else dependencies are injected, not located (DRA-71 review).
+arch('app code injects its dependencies instead of locating them with app() or resolve()')
+    ->expect('App')
+    ->not->toUse(['app', 'resolve', 'Illuminate\Support\Facades\App', 'Illuminate\Container\Container'])
+    ->ignoring('App\Providers');
+
 // Pest cannot match method names, so the HTTP layer is guarded by two checks:
 // 1. the arch rule rejects the classes a transaction starts from (DB facade and its
 //    global alias, the connection and the database manager);

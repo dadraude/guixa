@@ -18,9 +18,9 @@ class SwitchProfileRequest extends FormRequest
      *
      * @return array<string, array<int, mixed>>
      */
-    public function rules(#[CurrentUser] User $user): array
+    public function rules(#[CurrentUser] User $user, ActiveProfile $activeProfile): array
     {
-        $available = app(ActiveProfile::class)->available($user);
+        $available = $activeProfile->available($user);
 
         return [
             'profile' => ['required', Rule::in(array_map(fn (Profile $profile) => $profile->value, $available))],
