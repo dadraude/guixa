@@ -34,7 +34,7 @@ class SecurityController extends Controller
      */
     public function update(PasswordUpdateRequest $request, #[CurrentUser] User $user, ChangePassword $changePassword): RedirectResponse
     {
-        $changePassword->handle($user, (string) $request->password, $request->session());
+        $changePassword->handle($user, $request->string('password')->toString(), $request->session());
 
         MagicLinkSignIn::clear($request->session());
 

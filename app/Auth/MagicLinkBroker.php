@@ -69,18 +69,11 @@ class MagicLinkBroker
         Mail::to($user)->queue(new MagicLinkMail(route('magic-link.show', ['token' => $token]), $code));
     }
 
-    /**
-     * Make every link the user has not used yet stop working.
-     */
     public function revokeUnused(User $user): void
     {
         $user->magicLinks()->whereNull('used_at')->delete();
     }
 
-    /**
-     * Forget any code the session was waiting for, so that a request for an
-     * unknown email leaves nothing usable behind.
-     */
     public function forget(Session $session): void
     {
         $session->forget(self::SESSION_KEY);
@@ -99,10 +92,6 @@ class MagicLinkBroker
         return $this->useUp(MagicLink::query()->where('token_hash', self::hash($token)));
     }
 
-    /**
-     * Use up the link this session asked for if the code matches, and return
-     * its user; null otherwise.
-     */
     public function consumeCode(Session $session, string $code): ?User
     {
         $id = $session->get(self::SESSION_KEY);
