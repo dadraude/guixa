@@ -41,20 +41,40 @@ class MagicLinkBroker
         $link = DB::transaction(function () use ($user, $token, $code) {
             // Lock the user so that concurrent requests issue links one at a
             // time and only the newest stays usable.
-            User::query()->whereKey($user->id)->lockForUpdate()->first();
+            $locked = User::query()->whereKey($user->id)->lockForUpdate()->firstOrFail();
 
-            $user->magicLinks()->whereNull('used_at')->delete();
+            // The caller may have loaded the user before someone else changed
+            // the email or deactivated them; a link must not outlive that.
+            if ($locked->email !== $user->email || ! $locked->canSignIn()) {
+                return null;
+            }
 
-            return $user->magicLinks()->create([
+            $this->revokeUnused($locked);
+
+            return $locked->magicLinks()->create([
                 'token_hash' => self::hash($token),
                 'code_hash' => $code === null ? null : self::hash($code),
                 'expires_at' => now()->addMinutes(self::MINUTES_VALID),
             ]);
         });
 
+        if ($link === null) {
+            $session?->forget(self::SESSION_KEY);
+
+            return;
+        }
+
         $session?->put(self::SESSION_KEY, $link->id);
 
         Mail::to($user)->queue(new MagicLinkMail(route('magic-link.show', ['token' => $token]), $code));
+    }
+
+    /**
+     * Make every link the user has not used yet stop working.
+     */
+    public function revokeUnused(User $user): void
+    {
+        $user->magicLinks()->whereNull('used_at')->delete();
     }
 
     /**

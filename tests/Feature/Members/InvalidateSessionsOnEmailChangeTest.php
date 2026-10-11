@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Actions\UpdateMember;
 use App\Auth\MagicLinkBroker;
 use App\Auth\Role;
 use App\Mail\MagicLinkMail;
@@ -40,7 +41,7 @@ function editMember(Member $member, string $email): void
     test()->flushSession();
 }
 
-test('a magic link and code requested before someone else changes the email stop working', function () {
+test('a magic link requested before someone else changes the email stops working', function () {
     Mail::fake();
     $member = emailChangeTarget();
     $this->withSession([])->post(route('magic-link.store'), ['email' => $member->user->email]);
@@ -56,6 +57,39 @@ test('a magic link and code requested before someone else changes the email stop
     $this->post($url);
     $this->assertGuest();
     expect($member->user->magicLinks()->whereNull('used_at')->count())->toBe(0);
+});
+
+test('a magic link code requested before someone else changes the email stops working', function () {
+    Mail::fake();
+    $member = emailChangeTarget();
+    $this->withSession([])->post(route('magic-link.store'), ['email' => $member->user->email]);
+    $code = null;
+    Mail::assertQueued(MagicLinkMail::class, function (MagicLinkMail $mail) use (&$code) {
+        $code = $mail->code;
+
+        return true;
+    });
+    $requestSession = session()->all();
+
+    editMember($member, 'new@example.com');
+
+    $this->withSession($requestSession)->post(route('magic-link.code.store'), ['code' => $code]);
+    $this->assertGuest();
+});
+
+test('a link requested with a stale user is not issued after someone else changes the email', function () {
+    Mail::fake();
+    $member = emailChangeTarget();
+    $stale = User::query()->findOrFail($member->user->id);
+    $oldEmail = $stale->email;
+
+    app(UpdateMember::class)->handle($member, 'Same Name', 'new@example.com', '600000000');
+    app(MagicLinkBroker::class)->send($stale);
+
+    Mail::assertNothingQueued();
+    Mail::assertNothingSent();
+    expect($member->user->magicLinks()->count())->toBe(0)
+        ->and($oldEmail)->not->toBe($member->user->fresh()->email);
 });
 
 test('the old remember cookie no longer signs in after someone else changes the email', function () {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Actions;
 
+use App\Auth\MagicLinkBroker;
 use App\Auth\UserSessions;
 use App\Models\Member;
 use Illuminate\Database\UniqueConstraintViolationException;
@@ -18,7 +19,9 @@ use Illuminate\Validation\ValidationException;
  */
 class UpdateMember
 {
-    public function __construct(private readonly UserSessions $userSessions) {}
+    public function __construct(private readonly UserSessions $userSessions,
+        private readonly MagicLinkBroker $magicLinks,
+    ) {}
 
     /**
      * @throws ValidationException
@@ -54,7 +57,7 @@ class UpdateMember
             $member->user->save();
 
             if ($emailChanged) {
-                $member->user->magicLinks()->whereNull('used_at')->delete();
+                $this->magicLinks->revokeUnused($member->user);
                 $this->userSessions->end($member->user);
             }
 
