@@ -274,6 +274,11 @@ Guixa gets the membership foundation every later feature builds on:
   an available profile, and they act as administrator. If a household or commission is
   assigned mid-session they keep acting as administrator and the profile switcher appears; if
   they are acting as member and lose both, the next request falls back to administrator.
+- The owner's and administrators' powers (managing administrators, changing anyone's email,
+  passing every check) apply only while acting as administrator; acting as member, the same
+  person has only the roles of their commissions (spec review of 2026-10-11).
+- The console command refuses an email that already belongs to a user. The owner's magic link
+  carries no 6-digit code, since no browser session asked for it.
 
 ### Sign-in
 
@@ -303,7 +308,12 @@ Guixa gets the membership foundation every later feature builds on:
   (spec review of 2026-10-11).
 - Inactive users cannot sign in with any profile. Deactivation invalidates all their
   existing sessions.
-- Sessions are long-lived (weeks) as stated in the principles.
+- Sessions are long-lived as stated in the principles: 4 weeks since the last activity.
+  Signing in with a magic link or its code always remembers the device; with a password, only
+  when "remember me" is ticked.
+- Changing one's password is limited to 6 attempts per minute. In production a password needs
+  at least 12 characters, upper and lower case, numbers and symbols, and must not appear in
+  known breaches.
 
 ### Creating members
 
@@ -315,6 +325,8 @@ Guixa gets the membership foundation every later feature builds on:
   attached to an existing user (amended 2026-10-07, DRA-75). An email that belongs to an
   inactive member is rejected with a message pointing to reactivating that member.
 - A double submit or a race on the same email ends as a validation error on the email field.
+- Names (members, households, commissions) are required, at most 255 characters; the phone is
+  optional free text of at most 50 characters.
 - New members are created active. Creating a member with a household locks that household as
   "change household" does; a household that is no longer active, or a household or commission
   that no longer exists when the form is submitted, gives a validation error.
@@ -327,7 +339,10 @@ Guixa gets the membership foundation every later feature builds on:
 
 - **Household:** household number, editable name, active flag. The household number is an
   auto-increment column separate from the UUIDv7 primary key (ADR 0005): assigned by the
-  database on creation, never chosen, edited or reused.
+  database on creation, never chosen, edited or reused. Household names may repeat: the
+  number tells them apart.
+- Inactive households can be renamed and inactive members' name and phone edited, with the
+  same permissions as active ones.
 - Every table in this spec uses UUIDv7 primary keys (ADR 0005); membership of commissions and
   role assignments are pivot tables with composite keys.
 - **Inactive only blocks sign-in (ADR 0011, DRA-87).** Deactivating a member only stops them
@@ -357,6 +372,11 @@ Guixa gets the membership foundation every later feature builds on:
   they became inactive; nothing records who was deactivated with the household. Members the
   person acting may not reactivate on their own are skipped and named, as when deactivating. A member can
   be reactivated whatever the state of their household.
+- Deactivating or reactivating a single member locks the member and re-checks, under that
+  lock, both the protection (who may act on them) and their current state, as deactivation
+  already does (DRA-79). Deactivating a member who is already inactive, or reactivating one who
+  is already active (e.g. from a stale tab), changes nothing, ends no session and says "the
+  member was already inactive/active", as households do.
 - A member with the membership role cannot deactivate themselves: the app rejects it and
   hides the action, so they cannot lose the role by mistake. Administrators are not restricted
   (DRA-34).
@@ -399,7 +419,9 @@ Guixa gets the membership foundation every later feature builds on:
 - Two simultaneous "change household" actions on the same member: the last one wins; each one
   checks under the lock that its target household is active.
 - **Own email change:** stored as pending, a confirmation link (single use, time-limited) is
-  sent to the new address, and the email changes only when it is opened. The confirmation
+  sent to the new address, and the email changes only when it is opened. The link is valid 24
+  hours. Requesting a new change replaces the pending one; saving the form with the current
+  email keeps the pending change as it is. The confirmation
   route is public and ignores the browser's session: it applies the change and always shows
   the same public page ("email updated, you can now sign in with the new address"), whoever is
   signed in there; if the signed-in user is the person whose email changed, they stay signed
@@ -415,7 +437,8 @@ Guixa gets the membership foundation every later feature builds on:
   membership role can change the email of members who neither hold the membership role nor
   are administrators. Nobody else can change another person's email, and the owner's email is
   changed only by the owner. A change made for someone else applies immediately, without
-  confirmation (so a mistyped email can be fixed); emails stay unique. Since every
+  confirmation (so a mistyped email can be fixed); emails stay unique. Such a change cancels
+  the person's pending own email change. Since every
   administrator is a member, an administrator's email is changed on the members screen; the
   administrators screen has no email edit (DRA-59).
 - **A change made for someone else ends their access through the old address (DRA-60):** in
@@ -428,11 +451,18 @@ Guixa gets the membership foundation every later feature builds on:
 
 - **Role** is a fixed enumeration in code: orders, boxes, treasury, membership. Policies only
   ever check roles (or administrator), never commission names.
-- **Commission:** name (unique). Many-to-many with roles and with members.
+- **Commission:** name, unique compared case-insensitively after trimming spaces at both ends.
+  Many-to-many with roles and with members.
 - Creating, renaming, deleting commissions and changing who is in them need the membership
   role (or administrator). Deleting is rejected while the commission has members; deleting
   removes its role assignments.
 - Only administrators assign or remove roles on commissions.
+- Deleting a commission locks its row and adding a member to it locks the same row, so a
+  member added while it is being deleted makes the deletion fail with a validation error
+  ("the commission has members") instead of being removed silently.
+- A commission's candidates list leaves out its current members. Adding a member who is
+  already in it, removing one who is not, assigning a role it already holds or removing one it
+  does not hold changes nothing and is not an error.
 - Adding a member to a commission is open to the membership role whatever roles the commission
   holds, themselves included (treasury, membership…): the membership role decides who is in
   each commission, administrators decide what each commission may do (spec review of
@@ -459,7 +489,9 @@ Guixa gets the membership foundation every later feature builds on:
 - The directory (all active households and their active members, with contact details;
   members without a household or of an inactive household are not listed) is visible to administrators and
   to members who belong to at least one commission. Other members only see their own
-  household.
+  household. The directory never lists inactive members, in either view.
+- "My household" lists every member of the household, the inactive ones marked "Inactive"
+  (spec review of 2026-10-11).
 - The households list for the membership role flags active households with no active member
   in any commission, counting only the members currently in the household; an inactive
   member who is still in a commission does not clear the flag. It is informational only.
@@ -471,6 +503,10 @@ Guixa gets the membership foundation every later feature builds on:
 
 ### General
 
+- Every list of people (members, commission members and candidates, administrators and the
+  owner's picker, the affected members in household dialogs, the directory) is sorted by name
+  with the Catalan collation (accent-aware, case-insensitive); households by number;
+  commissions by name with the same collation.
 - All user-facing text lives in translation files, Catalan only, using the Catalan UI words
   from `CONTEXT.md`.
 - Server-side validation and policies on every action; pages are Inertia + Vue 3 (TS). None
