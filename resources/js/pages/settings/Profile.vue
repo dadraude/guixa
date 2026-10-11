@@ -85,6 +85,7 @@ const user = computed(() => page.props.auth.user);
                 <Label for="email">{{ t('Email address') }}</Label>
                 <Input
                     id="email"
+                    :key="user.email"
                     type="email"
                     class="mt-1 block w-full"
                     name="email"
@@ -108,7 +109,9 @@ const user = computed(() => page.props.auth.user);
                         variant="link"
                         class="h-auto p-0"
                         data-test="cancel-email-change-button"
-                        @click="router.delete(cancel().url)"
+                        @click="
+                            router.delete(cancel().url, { preserveState: true })
+                        "
                         >{{ t('Cancel the change') }}</Button
                     >
                 </div>

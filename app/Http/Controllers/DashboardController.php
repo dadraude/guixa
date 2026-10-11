@@ -10,6 +10,7 @@ use App\Auth\Profile;
 use App\Models\Household;
 use App\Models\Member;
 use App\Models\User;
+use App\Support\CatalanCollation;
 use Illuminate\Container\Attributes\CurrentUser;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -37,13 +38,15 @@ class DashboardController extends Controller
      */
     private function householdOf(Household $household): array
     {
+        $collation = new CatalanCollation;
+
         return [
             'number' => $household->number,
             'name' => $household->name,
             'members' => $household->members()
                 ->with('user')
                 ->get()
-                ->sortBy(fn (Member $housemate) => $housemate->user->name)
+                ->sort(fn (Member $a, Member $b) => $collation->compare($a->user->name, $b->user->name))
                 ->map(fn (Member $housemate) => ['id' => $housemate->id, 'name' => $housemate->user->name])
                 ->values(),
         ];

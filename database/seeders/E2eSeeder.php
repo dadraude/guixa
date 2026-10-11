@@ -21,6 +21,8 @@ class E2eSeeder extends Seeder
 
     public const string OWNER_EMAIL = 'e2e-owner@example.test';
 
+    public const string PROFILE_EMAIL = 'e2e-profile@example.test';
+
     public function run(CreateMember $createMember): void
     {
         $createMember->handle(
@@ -38,5 +40,10 @@ class E2eSeeder extends Seeder
         User::factory()->member($withMembers)->create(['name' => 'Carles E2E']);
 
         Household::create(['name' => 'Cal Buit E2E']);
+
+        // Created last so the household numbers above stay stable. Its own user: the email
+        // change test confirms a new address, which would break other sign-ins.
+        User::factory()->member(Household::create(['name' => 'Cal Perfil E2E']))
+            ->create(['name' => 'Perfil E2E', 'email' => self::PROFILE_EMAIL]);
     }
 }

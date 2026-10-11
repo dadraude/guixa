@@ -288,3 +288,25 @@ test('a request loads the profiles of the signed-in user once, not again for the
     expect($profileQueries('administrators'))->toBe(1)
         ->and($profileQueries('members'))->toBe(1);
 });
+
+test('a request that is not a plain page visit does not store the intended URL while the choice is pending', function () {
+    $this->actingAs(ownerAndMember());
+
+    $this->post(route('households.store'), [])->assertRedirect(route('active-profile.edit'));
+    $this->getJson(route('households.index'))->assertRedirect(route('active-profile.edit'));
+
+    expect(session()->has('url.intended'))->toBeFalse();
+});
+
+test('once the profile is chosen the intended URL is gone, so a later switch leads home', function () {
+    $this->actingAs(ownerAndMember());
+    $this->get(route('households.index'))->assertRedirect(route('active-profile.edit'));
+
+    $this->post(route('active-profile.update'), ['profile' => 'administrator'])
+        ->assertRedirect(route('households.index'));
+
+    expect(session()->has('url.intended'))->toBeFalse();
+
+    $this->post(route('active-profile.update'), ['profile' => 'member'])
+        ->assertRedirect(route('home'));
+});

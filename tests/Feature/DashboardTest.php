@@ -42,3 +42,32 @@ test('a user without a member profile has no household', function () {
         ->get(route('dashboard'))
         ->assertInertia(fn (Assert $page) => $page->where('household', null));
 });
+
+test('the housemates are ordered by name, accents and case ignored', function () {
+    $household = Household::factory()->create();
+    $zoe = User::factory()->member($household)->create(['name' => 'Zoe Mas']);
+    User::factory()->member($household)->create(['name' => 'emma Puig']);
+    User::factory()->member($household)->create(['name' => 'Àlex Roca']);
+
+    $this->actingAs($zoe)
+        ->get(route('dashboard'))
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('household.members.0.name', 'Àlex Roca')
+            ->where('household.members.1.name', 'emma Puig')
+            ->where('household.members.2.name', 'Zoe Mas'));
+});
+
+test('the shared user props carry no member or administrator relation', function (User $user) {
+    $this->actingAs($user)
+        ->get(route('dashboard'))
+        ->assertInertia(fn (Assert $page) => $page
+            ->missing('auth.user.member')
+            ->missing('auth.user.administrator')
+            ->has('auth.user', fn (Assert $shared) => $shared
+                ->hasAll(['id', 'name', 'email', 'email_verified_at', 'created_at', 'updated_at'])
+                ->etc()));
+})->with([
+    'member' => fn () => User::factory()->member(Household::factory()->create())->create(),
+    'owner who is also an administrator' => fn () => User::factory()->owner()->create(),
+    'administrator' => fn () => User::factory()->administrator()->create(),
+]);

@@ -47,7 +47,8 @@ class HandleInertiaRequests extends Middleware
             ...parent::share($request),
             'name' => config('app.name'),
             'auth' => [
-                'user' => $user,
+                // Without relations: the loaded member and household are not for the frontend.
+                'user' => $user?->withoutRelations(),
                 'isOwner' => $user !== null && $activeProfile->isActingAsOwner($user),
                 'canManageMembership' => $user !== null && $user->can('manage-membership'),
                 'isWaiting' => $user !== null && app(WaitingForHousehold::class)->isWaiting($user),

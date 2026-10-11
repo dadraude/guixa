@@ -12,6 +12,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Commissions\SaveCommissionRequest;
 use App\Models\Commission;
 use App\Models\Member;
+use App\Support\CatalanCollation;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -89,9 +90,11 @@ class CommissionController extends Controller
      */
     private function namesOf(iterable $members): array
     {
+        $collation = new CatalanCollation;
+
         return collect($members)
             ->map(fn (Member $member) => ['id' => $member->id, 'name' => $member->user->name, 'is_active' => $member->is_active])
-            ->sortBy('name', SORT_NATURAL | SORT_FLAG_CASE)
+            ->sort(fn (array $a, array $b) => $collation->compare($a['name'], $b['name']))
             ->values()
             ->all();
     }
