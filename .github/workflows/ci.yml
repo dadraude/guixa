@@ -85,7 +85,7 @@ jobs:
         run: npm run types:check
 
       - name: Pest
-        run: vendor/bin/pest
+        run: vendor/bin/pest --parallel
 
   e2e:
     runs-on: ubuntu-latest

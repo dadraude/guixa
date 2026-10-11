@@ -24,7 +24,7 @@ the agents do the heavy work and you keep a short thread. Talk to the user in Ca
      `php` is 8.4. Put a `php` symlink to Herd's `php85` first on `PATH` before `composer install`
      (the Vite Wayfinder plugin also calls `php`), and tell the agents to keep it there.
    - With tickets running in parallel, give each worktree its own test database: tell the agents to run
-     the suite as `DB_DATABASE=testing_draNN php artisan test`.
+     the full suite as `DB_DATABASE=testing_draNN php artisan test --parallel` (a filtered run while doing TDD stays serial). Parallel workers use their own databases, `testing_draNN_test_N`, so they collide neither with the main checkout nor with other worktrees. The base `testing_draNN` database must exist first: a parallel run does not create it, so the first run in a new worktree is a serial one.
 3. **Cross-cutting tickets ship alone.** If the ticket touches many files outside its own feature
    (formatter or linter sweeps, strict types, mass renames, moving folders), check `gh pr list`: with
    other PRs open, tell the user and ask whether to wait until they merge. Once its PR is open, do not
