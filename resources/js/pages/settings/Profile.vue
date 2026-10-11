@@ -108,7 +108,9 @@ const user = computed(() => page.props.auth.user);
                         variant="link"
                         class="h-auto p-0"
                         data-test="cancel-email-change-button"
-                        @click="router.delete(cancel().url)"
+                        @click="
+                            router.delete(cancel().url, { preserveState: true })
+                        "
                         >{{ t('Cancel the change') }}</Button
                     >
                 </div>
