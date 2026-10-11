@@ -29,7 +29,7 @@ class ProfileController extends Controller
         return Inertia::render('settings/Profile', [
             ...$memberProps,
             // An expired link can no longer confirm anything, so it is not shown.
-            'pendingEmail' => $user->pending_email_expires_at?->isFuture() ? $user->pending_email : null,
+            'pendingEmail' => $user->hasPendingEmailChange() ? $user->pending_email : null,
         ]);
     }
 
