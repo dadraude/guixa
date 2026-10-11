@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Actions;
 
+use App\Auth\UserSessions;
 use App\Models\Member;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
@@ -11,10 +12,14 @@ use Illuminate\Validation\ValidationException;
 
 /**
  * Name and email live on the user, so an administrator profile of the same
- * user follows. A null email means the email is left as it is.
+ * user follows. A null email means the email is left as it is. A different
+ * email ends everything the old address could still use: unused magic links,
+ * the remember cookie and every open session.
  */
 class UpdateMember
 {
+    public function __construct(private readonly UserSessions $userSessions) {}
+
     /**
      * @throws ValidationException
      */
@@ -44,7 +49,15 @@ class UpdateMember
                 ]);
             }
 
+            $emailChanged = $member->user->isDirty('email');
+
             $member->user->save();
+
+            if ($emailChanged) {
+                $member->user->magicLinks()->whereNull('used_at')->delete();
+                $this->userSessions->end($member->user);
+            }
+
             $member->update(['phone' => $phone]);
         });
     }
