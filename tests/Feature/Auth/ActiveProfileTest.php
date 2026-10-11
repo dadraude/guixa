@@ -310,3 +310,26 @@ test('once the profile is chosen the intended URL is gone, so a later switch lea
     $this->post(route('active-profile.update'), ['profile' => 'member'])
         ->assertRedirect(route('home'));
 });
+
+test('choosing member after asking for an administrator page leads home, not to a 403', function () {
+    $this->actingAs(ownerAndMember())
+        ->withSession(['url.intended' => route('admin.administrators.index')])
+        ->post(route('active-profile.update'), ['profile' => 'member'])
+        ->assertRedirect(route('home'));
+
+    expect(session()->has('url.intended'))->toBeFalse();
+});
+
+test('choosing administrator after asking for an administrator page leads to that page', function () {
+    $this->actingAs(ownerAndMember())
+        ->withSession(['url.intended' => route('admin.administrators.index')])
+        ->post(route('active-profile.update'), ['profile' => 'administrator'])
+        ->assertRedirect(route('admin.administrators.index'));
+});
+
+test('choosing a profile that can see the asked-for page leads to it', function () {
+    $this->actingAs(ownerAndMember())
+        ->withSession(['url.intended' => route('directory.index')])
+        ->post(route('active-profile.update'), ['profile' => 'member'])
+        ->assertRedirect(route('directory.index'));
+});
