@@ -163,6 +163,21 @@ test('confirming the change updates the email', function () {
         ->and($user->email_verified_at)->not->toBeNull();
 });
 
+test('confirming your own email change keeps your session and remember token', function () {
+    $user = User::factory()->create(['email' => 'old@example.com']);
+    $url = requestEmailChange($user, 'new@example.com');
+    $version = $user->refresh()->session_version;
+    $token = $user->remember_token;
+
+    $this->actingAs($user)->post($url)->assertRedirect(route('profile.edit'));
+    $this->get(route('profile.edit'))->assertOk();
+
+    $user->refresh();
+    expect($user->session_version)->toBe($version)
+        ->and($user->remember_token)->toBe($token);
+    $this->assertAuthenticatedAs($user);
+});
+
 test('the confirmation works from a browser that is not signed in', function () {
     $user = User::factory()->create(['email' => 'old@example.com']);
     $url = requestEmailChange($user, 'new@example.com');

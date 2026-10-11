@@ -68,6 +68,21 @@ arch('env() is only read from config files')
     ->expect('env')
     ->not->toBeUsedIn(['App', 'Database']);
 
+// Pest cannot match method names, so this scans the source: unused magic links are
+// revoked through MagicLinkBroker::revokeUnused, never by querying the relation (DRA-60 review).
+test('actions do not query magic links directly', function () {
+    $files = (new Finder)->files()->in(dirname(__DIR__, 2).'/app/Actions')->name('*.php');
+
+    $offenders = [];
+    foreach ($files as $file) {
+        if (Str::contains($file->getContents(), 'magicLinks(')) {
+            $offenders[] = $file->getRelativePathname();
+        }
+    }
+
+    expect($offenders)->toBe([]);
+});
+
 // Providers are the composition root and legitimately use the container (Gate definitions,
 // Fortify callbacks). Everywhere else dependencies are injected, not located (DRA-71 review).
 arch('app code injects its dependencies instead of locating them with app() or resolve()')
