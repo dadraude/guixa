@@ -21,7 +21,10 @@ class MembershipRoleProtection
 {
     public const string ABILITY = 'take-membership-role-away';
 
-    public function __construct(private readonly MemberRoles $memberRoles) {}
+    public function __construct(
+        private readonly MemberRoles $memberRoles,
+        private readonly MembershipRoleRetention $retention,
+    ) {}
 
     public function mayRemoveFromCommission(User $actor, Commission $commission): bool
     {
@@ -36,6 +39,31 @@ class MembershipRoleProtection
     public function mayRemoveFromCommissionHolding(User $actor, array $commissionRoles): bool
     {
         return $this->mayTakeAway($actor) || ! in_array(Role::Membership, $commissionRoles, true);
+    }
+
+    /**
+     * Removing a member from a commission holding the membership role is also allowed to the
+     * membership role when the member keeps the role through another commission (DRA-67).
+     * Reads the current data, so callers that lock the member get a decision on what is stored.
+     */
+    public function mayRemoveMemberFromCommission(User $actor, Commission $commission, Member $member): bool
+    {
+        return $this->mayRemoveMemberHolding(
+            $actor,
+            $commission->roles(),
+            $this->retention->keptOutside($commission, $member),
+        );
+    }
+
+    /**
+     * The one rule the server and the commissions page share, for pages that already know
+     * the roles of every commission and whether the member keeps the role elsewhere.
+     *
+     * @param  list<Role>  $commissionRoles
+     */
+    public function mayRemoveMemberHolding(User $actor, array $commissionRoles, bool $memberKeepsMembershipRole): bool
+    {
+        return $this->mayRemoveFromCommissionHolding($actor, $commissionRoles) || $memberKeepsMembershipRole;
     }
 
     public function mayDeleteCommission(User $actor, Commission $commission): bool

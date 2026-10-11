@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Commissions;
 
-use App\Auth\MembershipRoleProtection;
+use App\Actions\RemoveCommissionMember;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Commissions\AddCommissionMemberRequest;
 use App\Models\Commission;
@@ -21,11 +21,11 @@ class CommissionMemberController extends Controller
         return to_route('commissions.index');
     }
 
-    public function destroy(Request $request, Commission $commission, Member $member, MembershipRoleProtection $protection): RedirectResponse
+    public function destroy(Request $request, Commission $commission, Member $member, RemoveCommissionMember $removeCommissionMember): RedirectResponse
     {
-        abort_unless($protection->mayRemoveFromCommission($request->user() ?? abort(403), $commission), 403);
+        $actor = $request->user() ?? abort(403);
 
-        $commission->members()->detach($member);
+        abort_unless($removeCommissionMember->handleAs($commission, $member, $actor), 403);
 
         return to_route('commissions.index');
     }
