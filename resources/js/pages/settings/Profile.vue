@@ -85,6 +85,7 @@ const user = computed(() => page.props.auth.user);
                 <Label for="email">{{ t('Email address') }}</Label>
                 <Input
                     id="email"
+                    :key="user.email"
                     type="email"
                     class="mt-1 block w-full"
                     name="email"
