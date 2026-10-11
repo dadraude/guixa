@@ -19,4 +19,3 @@ test('every user seeded by E2eSeeder has a member profile', function () {
     expect(User::query()->doesntHave('member')->count())->toBe(0)
         ->and(User::count())->toBeGreaterThan(1);
 });
-
