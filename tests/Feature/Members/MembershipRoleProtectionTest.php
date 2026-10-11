@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use App\Actions\DeactivateMember;
-use App\Support\MemberStatusChange;
 use App\Actions\RemoveCommissionMember;
 use App\Auth\MembershipRoleProtection;
 use App\Auth\Role;
@@ -11,6 +10,7 @@ use App\Models\Commission;
 use App\Models\Household;
 use App\Models\Member;
 use App\Models\User;
+use App\Support\MemberStatusChange;
 use Inertia\Testing\AssertableInertia as Assert;
 
 function protectionMembershipCommission(): Commission

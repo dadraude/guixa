@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
+use App\Auth\MemberRoles;
 use App\Auth\Role;
 use App\Auth\SecretHasher;
-use App\Auth\MemberRoles;
 use App\Models\Commission;
 use App\Models\Household;
 use App\Models\MagicLink;
