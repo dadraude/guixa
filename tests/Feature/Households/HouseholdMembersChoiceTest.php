@@ -344,3 +344,60 @@ test('the message names the acting person when they skip themselves', function (
 
     expect(choiceToast())->toContain($actor->name);
 });
+
+test('the choice is not needed when every member in the matching state would be skipped', function () {
+    $household = Household::factory()->create();
+    $owner = User::factory()->owner()->member($household)->create();
+    $actor = choiceActor();
+    $actor->member->update(['household_id' => $household->id]);
+    $inactive = Household::factory()->inactive()->create();
+    $holder = choiceMembershipHolder($inactive);
+    $holder->update(['is_active' => false]);
+
+    $this->actingAs($actor)->post(route('households.deactivate', $household))->assertSessionHasNoErrors();
+    $this->actingAs($actor)->post(route('households.reactivate', $inactive))->assertSessionHasNoErrors();
+
+    expect($household->fresh()->is_active)->toBeFalse()
+        ->and($owner->member->fresh()->is_active)->toBeTrue()
+        ->and($actor->member->fresh()->is_active)->toBeTrue()
+        ->and($inactive->fresh()->is_active)->toBeTrue()
+        ->and($holder->fresh()->is_active)->toBeFalse();
+});
+
+test('the choice is still required when somebody besides the skipped ones would change', function () {
+    $household = Household::factory()->create();
+    User::factory()->owner()->member($household)->create();
+    choiceMember($household, true, 'Anna');
+    $inactive = Household::factory()->inactive()->create();
+    $holder = choiceMembershipHolder($inactive);
+    $holder->update(['is_active' => false]);
+    choiceMember($inactive, false, 'Berta');
+    $actor = choiceActor();
+
+    $this->actingAs($actor)->post(route('households.deactivate', $household))->assertSessionHasErrors('with_members');
+    $this->actingAs($actor)->post(route('households.reactivate', $inactive))->assertSessionHasErrors('with_members');
+
+    expect($household->fresh()->is_active)->toBeTrue()
+        ->and($inactive->fresh()->is_active)->toBeFalse();
+});
+
+test('an administrator is asked when a membership holder would change', function () {
+    $inactive = Household::factory()->inactive()->create();
+    $holder = choiceMembershipHolder($inactive);
+    $holder->update(['is_active' => false]);
+
+    $this->actingAs(User::factory()->administrator()->create())
+        ->post(route('households.reactivate', $inactive))->assertSessionHasErrors('with_members');
+});
+
+test('the household list marks every affected member as left out when nobody would change', function () {
+    $household = Household::factory()->create();
+    $owner = User::factory()->owner()->member($household)->create(['name' => 'Propietaria']);
+    $actor = choiceActor();
+    $actor->member->update(['household_id' => $household->id]);
+
+    $this->actingAs($actor)->get(route('households.index'))->assertInertia(fn (Assert $page) => $page
+        ->where('households', fn ($households) => collect(collect($households)->firstWhere('id', $household->id)['affected_members'])
+            ->every(fn ($member) => $member['left_out'] === true)
+            && collect($households)->firstWhere('id', $household->id)['affected_members'] !== []));
+});

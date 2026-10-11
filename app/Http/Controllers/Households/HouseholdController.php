@@ -65,9 +65,7 @@ class HouseholdController extends Controller
             ->map(fn (Member $member) => [
                 'id' => $member->id,
                 'name' => $member->user->name,
-                'left_out' => $household->is_active
-                    ? ! $protection->mayDeactivateAlongWithHousehold($viewer, $member)
-                    : ! $protection->mayReactivateMember($viewer, $member),
+                'left_out' => ! $protection->mayChangeAlongWithHousehold($viewer, $member, $household->is_active),
             ])
             ->sortBy('name', SORT_NATURAL | SORT_FLAG_CASE)
             ->all();

@@ -62,6 +62,18 @@ class MembershipRoleProtection
     }
 
     /**
+     * Whether a status change on a household reaches this member, who has the active flag the
+     * household has now: deactivating skips whoever the actor may not deactivate, reactivating
+     * whoever the actor may not reactivate. The one rule the actions and the dialog share.
+     */
+    public function mayChangeAlongWithHousehold(User $actor, Member $member, bool $householdIsActive): bool
+    {
+        return $householdIsActive
+            ? $this->mayDeactivateAlongWithHousehold($actor, $member)
+            : $this->mayReactivateMember($actor, $member);
+    }
+
+    /**
      * The owner can never be deactivated, by anyone: it would lock them out.
      * Checked here and not through the Gate so Gate::before cannot let administrators past it.
      */
