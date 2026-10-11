@@ -38,6 +38,11 @@ class RemoveCommissionMember
         return DB::transaction(function () use ($commission, $member, $actor): bool {
             $locked = Member::query()->whereKey($member->getKey())->lockForUpdate()->firstOrFail();
 
+            // Not in it: nothing to take away, so nothing to protect and nothing to report.
+            if (! $commission->members()->whereKey($locked->getKey())->exists()) {
+                return true;
+            }
+
             if (! $this->protection->mayRemoveMemberFromCommission($actor, $commission, $locked)) {
                 return false;
             }

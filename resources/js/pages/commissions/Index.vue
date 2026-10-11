@@ -30,6 +30,7 @@ type CommissionRow = {
     members: (Person & { can_remove: boolean })[];
     roles: RoleOption[];
     can_delete: boolean;
+    candidates: Person[];
 };
 
 defineProps<{
@@ -38,7 +39,6 @@ defineProps<{
     canManage: boolean;
     canAssignRoles: boolean;
     availableRoles: RoleOption[];
-    candidates: Person[];
 }>();
 
 defineOptions({
@@ -97,6 +97,7 @@ defineOptions({
                     </Form>
 
                     <Form
+                        v-if="commission.can_delete"
                         v-bind="
                             CommissionController.destroy.form(commission.id)
                         "
@@ -106,7 +107,7 @@ defineOptions({
                             type="submit"
                             variant="destructive"
                             size="sm"
-                            :disabled="processing || !commission.can_delete"
+                            :disabled="processing"
                             data-test="delete-commission"
                             >{{ t('Delete') }}</Button
                         >
@@ -239,7 +240,7 @@ defineOptions({
                     >
                         <option value="">{{ t('Choose a member') }}</option>
                         <option
-                            v-for="candidate in candidates"
+                            v-for="candidate in commission.candidates"
                             :key="candidate.id"
                             :value="candidate.id"
                         >

@@ -160,7 +160,7 @@ test('every member sees all commissions and their members names, but no contact 
             ->where('commissions.1.members.0.name', 'Anna Puig')
             ->missing('commissions.1.members.0.email')
             ->missing('commissions.1.members.0.phone')
-            ->where('candidates', []))
+            ->where('commissions.1.candidates', []))
         ->assertDontSee($anna->user->email)
         ->assertDontSee('611111111');
 });
@@ -168,24 +168,23 @@ test('every member sees all commissions and their members names, but no contact 
 test('an administrator gets the members who can be added, inactive ones marked', function () {
     // An administrator is also an active member, so they are a candidate too.
     $administrator = User::factory()->administrator()->create(['name' => 'Zoe Admin']);
-    $in = memberOf('Anna Puig');
+    memberOf('Anna Puig');
     memberOf('Pere Puig', active: false);
     memberOf('Berta Soler');
-    $commission = Commission::factory()->create();
-    $commission->members()->attach($in);
+    Commission::factory()->create();
 
     $this->actingAs($administrator)
         ->get(route('commissions.index'))
         ->assertInertia(fn (Assert $page) => $page
             ->where('canManage', true)
-            ->has('candidates', 4)
-            ->where('candidates.0.name', 'Anna Puig')
-            ->where('candidates.0.is_active', true)
-            ->where('candidates.1.name', 'Berta Soler')
-            ->where('candidates.2.name', 'Pere Puig')
-            ->where('candidates.2.is_active', false)
-            ->where('candidates.3.name', 'Zoe Admin')
-            ->missing('candidates.0.email'));
+            ->has('commissions.0.candidates', 4)
+            ->where('commissions.0.candidates.0.name', 'Anna Puig')
+            ->where('commissions.0.candidates.0.is_active', true)
+            ->where('commissions.0.candidates.1.name', 'Berta Soler')
+            ->where('commissions.0.candidates.2.name', 'Pere Puig')
+            ->where('commissions.0.candidates.2.is_active', false)
+            ->where('commissions.0.candidates.3.name', 'Zoe Admin')
+            ->missing('commissions.0.candidates.0.email'));
 });
 
 test('a user without a member or administrator profile cannot see the list', function () {
