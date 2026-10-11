@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Members;
 use App\Actions\CreateMember;
 use App\Actions\DeactivateMember;
 use App\Actions\ReactivateMember;
+use App\Actions\UpdateMember;
 use App\Auth\EmailChangeLevels;
 use App\Auth\MemberRoles;
 use App\Auth\MembershipRoleProtection;
@@ -20,7 +21,6 @@ use App\Support\CatalanCollation;
 use App\Support\MembersListRedirect;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -117,30 +117,18 @@ class MemberController extends Controller
 
     /**
      * The email applies at once, with no confirmation: the membership role
-     * fixes details for people who cannot do it themselves. Name and email
-     * live on the user, so an administrator profile of the same user follows.
+     * fixes details for people who cannot do it themselves.
      */
-    public function update(UpdateMemberRequest $request, Member $member): RedirectResponse
+    public function update(UpdateMemberRequest $request, Member $member, UpdateMember $updateMember): RedirectResponse
     {
-        $validated = $request->validated();
+        $validated = $request->safe();
 
-        DB::transaction(function () use ($member, $validated) {
-            $member->user->forceFill(['name' => $validated['name']]);
-
-            if (isset($validated['email'])) {
-                // A self-service change requested earlier must not overwrite this
-                // email later through its still-valid link.
-                $member->user->forceFill([
-                    'email' => $validated['email'],
-                    'pending_email' => null,
-                    'pending_email_token_hash' => null,
-                    'pending_email_expires_at' => null,
-                ]);
-            }
-
-            $member->user->save();
-            $member->update(['phone' => $validated['phone'] ?? null]);
-        });
+        $updateMember->handle(
+            $member,
+            $validated->string('name')->toString(),
+            $validated->filled('email') ? $validated->string('email')->toString() : null,
+            $validated->filled('phone') ? $validated->string('phone')->toString() : null,
+        );
 
         Inertia::flash('toast', ['type' => 'success', 'message' => __('Member updated.')]);
 

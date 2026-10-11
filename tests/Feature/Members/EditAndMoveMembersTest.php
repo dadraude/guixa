@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Actions\UpdateMember;
 use App\Auth\Role;
 use App\Auth\SecretHasher;
 use App\Models\Commission;
@@ -331,4 +332,19 @@ test('a failed validation sends the user back to the list page they were on', fu
         ->patch(route('members.update', $member), ['name' => '', 'email' => 'not-an-email'])
         ->assertRedirect(route('members.index', ['page' => 3]))
         ->assertSessionHasErrors(['name', 'email']);
+});
+
+test('the member update runs through the UpdateMember action', function () {
+    $member = memberIn(Household::factory()->create(), ['email' => 'old@example.com']);
+
+    $this->mock(UpdateMember::class)->shouldReceive('handle')
+        ->once()
+        ->withArgs(fn (Member $target, string $name, ?string $email, ?string $phone) => $target->is($member)
+            && $name === 'Maria Nova'
+            && $email === 'new@example.com'
+            && $phone === '600123123');
+
+    $this->actingAs(membershipUser())
+        ->patch(route('members.update', $member), ['name' => 'Maria Nova', 'email' => 'New@Example.com', 'phone' => '600123123'])
+        ->assertRedirect(route('members.index'));
 });

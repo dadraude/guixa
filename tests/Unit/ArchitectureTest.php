@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Support\Facades\DB;
 
 /*
  * Project rules that a reviewer would otherwise have to check by eye.
@@ -62,3 +63,9 @@ arch('mails are queued after the transaction commits')
 arch('env() is only read from config files')
     ->expect('env')
     ->not->toBeUsedIn(['App', 'Database']);
+
+// Pest cannot match method names, so lockForUpdate() is covered through the facade
+// that every transaction and lock in this project starts from.
+arch('transactions and locks live in actions, not in the HTTP layer')
+    ->expect('App\Http')
+    ->not->toUse(DB::class);
