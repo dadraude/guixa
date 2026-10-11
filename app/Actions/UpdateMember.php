@@ -23,12 +23,7 @@ class UpdateMember
         try {
             $this->update($member, $name, $email, $phone);
         } catch (UniqueConstraintViolationException $exception) {
-            // Lost the race for the address after the availability check; the
-            // transaction is rolled back. Any other unique violation is a real bug.
-            if ($email === null || ! str_contains($exception->getMessage(), 'email')) {
-                throw $exception;
-            }
-
+            // Lost the race for the address after the availability check; the transaction is rolled back.
             throw ValidationException::withMessages(['email' => __('This email already belongs to a member.')]);
         }
     }

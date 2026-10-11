@@ -363,7 +363,7 @@ test('losing the unique email race while updating ends as a validation error and
 
     $this->actingAs($actor)
         ->patch(route('members.update', $member), ['name' => 'Maria Nova', 'email' => 'new@example.com', 'phone' => '611111111'])
-        ->assertSessionHasErrors('email');
+        ->assertSessionHasErrors(['email' => __('This email already belongs to a member.')]);
 
     expect($member->user->fresh()->name)->toBe('Old Name')
         ->and($member->user->fresh()->email)->toBe('old@example.com')
