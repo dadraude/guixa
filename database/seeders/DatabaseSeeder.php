@@ -19,6 +19,12 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
+        User::factory()->owner()->create([
+            'name' => 'Owner User',
+            'email' => 'owner@draude.cat',
+            'password' => 'password',
+        ]);
+
         // Every user but the owner has a member profile.
         User::factory()->memberWithoutHousehold()->create([
             'name' => 'Test User',
