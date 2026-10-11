@@ -26,9 +26,16 @@ when this is a second pass, the review findings to fix.
    changes what a screen shows. Do not decide it yourself.
 3. Implement test-first with the `/tdd` skill. Seam: Pest feature tests at the HTTP level.
 4. Run `vue-tsc` and single test files while you work.
-5. At the end: `npm run build` (page tests need the Vite manifest), the full Pest suite once,
+5. At the end: `npm run build` (page tests need the Vite manifest), the full Pest suite once
+   (`DB_DATABASE=testing_draNN php artisan test --parallel`; filtered runs also carry
+   `DB_DATABASE=testing_draNN` and stay serial),
    Pint, Larastan (`composer types:check` needs `--memory-limit=1G`), and `npm run check`
    (Oxlint/Oxfmt). Ignore complaints about `.atl/` and never commit anything under `.atl/`.
+   When an agent runs Pest, `laravel/pao` already reduces its output to one JSON line on success, so
+   `--compact` adds nothing; on failure the output carries a stack trace per failure and can run past
+   100 lines. If the full suite fails, do not read all of it: limit it (e.g. `| tail -n 40`) to see which
+   tests failed, then rerun only those with `--filter` (still with the `DB_DATABASE=testing_draNN`
+   prefix) and read one failure at a time.
 6. Commit ONCE with a single-line conventional commit, no body, no `Co-Authored-By` or AI
    attribution: `type(scope): description (DRA-NN)`. Review-fix passes add a second commit
    `fix(scope): address review findings (DRA-NN)`.

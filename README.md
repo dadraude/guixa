@@ -41,12 +41,15 @@ Create the `guixa` and `testing` databases in DBngin's PostgreSQL first.
 Checks (the same ones CI runs; it blocks merging unless all pass):
 
 ```sh
-vendor/bin/pest                          # tests, against PostgreSQL
+vendor/bin/pest --parallel               # tests, against PostgreSQL
 vendor/bin/pint --test               # PHP style
 vendor/bin/phpstan analyse           # Larastan
 npm run check                 # Oxlint and Oxfmt (Vite+)
 npm run types:check           # vue-tsc
 ```
+
+Parallel runs need the base `testing` database to exist (a serial `vendor/bin/pest` creates it); the
+workers create `testing_test_N` from it.
 
 End-to-end tests (Playwright, `e2e/`) drive a real browser through the critical path: a member is
 created with a household, the welcome email arrives, they sign in with the 6-digit code of a magic
