@@ -8,6 +8,7 @@ use App\Auth\MemberRoles;
 use App\Models\Household;
 use App\Models\Member;
 use Closure;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use LogicException;
 
@@ -28,6 +29,37 @@ class ChangeHouseholdMembersStatus
      * @return list<string> The names of the members left untouched.
      */
     public function handle(Household $household, bool $currentlyActive, Closure $mayChange, Closure $change): array
+    {
+        $skippedNames = [];
+
+        foreach ($this->lockMembers($household, $currentlyActive) as $member) {
+            if (! $mayChange($member)) {
+                $skippedNames[] = $member->user->name;
+
+                continue;
+            }
+
+            $change($member);
+        }
+
+        return $skippedNames;
+    }
+
+    /**
+     * Whether, once locked, any member would change. Decides under the lock a choice the
+     * client did not make because the members it saw would all be skipped (DRA-94).
+     *
+     * @param  Closure(Member): bool  $mayChange
+     */
+    public function anyoneWouldChange(Household $household, bool $currentlyActive, Closure $mayChange): bool
+    {
+        return $this->lockMembers($household, $currentlyActive)->contains(fn (Member $member): bool => $mayChange($member));
+    }
+
+    /**
+     * @return Collection<int, Member>
+     */
+    private function lockMembers(Household $household, bool $currentlyActive): Collection
     {
         if (DB::transactionLevel() === 0) {
             throw new LogicException('Household members must be changed inside the transaction that locked the household.');
@@ -50,18 +82,6 @@ class ChangeHouseholdMembersStatus
 
         $this->memberRoles->preload($members);
 
-        $skippedNames = [];
-
-        foreach ($members as $member) {
-            if (! $mayChange($member)) {
-                $skippedNames[] = $member->user->name;
-
-                continue;
-            }
-
-            $change($member);
-        }
-
-        return $skippedNames;
+        return $members;
     }
 }

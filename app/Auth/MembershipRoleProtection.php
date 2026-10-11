@@ -55,10 +55,23 @@ class MembershipRoleProtection
     /**
      * Deactivating a household together with its members skips whoever the actor may not
      * deactivate on their own, and the actor themselves, so they cannot lock themselves out.
+     * Callers go through mayChangeAlongWithHousehold.
      */
     public function mayDeactivateAlongWithHousehold(User $actor, Member $member): bool
     {
         return $member->user_id !== $actor->id && $this->mayDeactivateMember($actor, $member);
+    }
+
+    /**
+     * Whether a status change on a household reaches this member, who has the active flag the
+     * household has now: deactivating skips whoever the actor may not deactivate, reactivating
+     * whoever the actor may not reactivate. The one rule the actions and the dialog share.
+     */
+    public function mayChangeAlongWithHousehold(User $actor, Member $member, bool $householdIsActive): bool
+    {
+        return $householdIsActive
+            ? $this->mayDeactivateAlongWithHousehold($actor, $member)
+            : $this->mayReactivateMember($actor, $member);
     }
 
     /**
