@@ -23,6 +23,7 @@ class DeactivateMember
         private readonly MembershipRoleProtection $protection,
         private readonly MemberRoles $memberRoles,
         private readonly UserSessions $userSessions,
+        private readonly CancelEmailChange $cancelEmailChange,
     ) {}
 
     /**
@@ -30,7 +31,12 @@ class DeactivateMember
      */
     public function handle(Member $member): void
     {
+        if (! $member->is_active) {
+            return;
+        }
+
         $member->update(['is_active' => false]);
+        $this->cancelEmailChange->handle($member->user);
         $this->userSessions->end($member->user);
     }
 
