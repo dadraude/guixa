@@ -283,3 +283,19 @@ test('requesting another link gives its code a fresh attempt allowance', functio
         ->assertRedirect(route('home'));
     $this->assertAuthenticatedAs($user);
 });
+
+test('the correct code still signs in after four wrong attempts', function () {
+    $user = User::factory()->create(['email' => 'marta@example.com']);
+    $mail = requestMagicLink();
+
+    foreach (range(1, 4) as $attempt) {
+        $this->travel(61)->seconds();
+        $this->post(route('magic-link.code.store'), ['code' => wrongCode($mail)])
+            ->assertSessionHasErrors('code');
+    }
+
+    $this->travel(61)->seconds();
+    $this->post(route('magic-link.code.store'), ['code' => $mail->code])
+        ->assertRedirect(route('home'));
+    $this->assertAuthenticatedAs($user);
+});

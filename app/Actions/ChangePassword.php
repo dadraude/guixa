@@ -15,13 +15,16 @@ class ChangePassword
 
     public function handle(User $user, string $password, Session $session): void
     {
-        DB::transaction(function () use ($user, $password): void {
+        $changed = DB::transaction(function () use ($user, $password): User {
             $locked = User::query()->whereKey($user->id)->lockForUpdate()->firstOrFail();
             $locked->update(['password' => $password]);
             $this->sessions->end($locked);
+
+            return $locked;
         });
 
-        $user->refresh();
+        // Keep the version this change generated: a later revocation must still end this session.
+        $user->setRawAttributes($changed->getAttributes(), sync: true);
         $this->sessions->stamp($session, $user);
     }
 }
