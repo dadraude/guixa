@@ -247,3 +247,39 @@ test('requests from many emails on one address are throttled', function () {
     $this->post(route('magic-link.store'), ['email' => 'one-more@example.com'])
         ->assertTooManyRequests();
 });
+
+test('five wrong codes lock the code but leave its email link usable', function () {
+    $user = User::factory()->create(['email' => 'marta@example.com']);
+    $mail = requestMagicLink();
+
+    foreach (range(1, 5) as $attempt) {
+        $this->travel(61)->seconds();
+        $this->post(route('magic-link.code.store'), ['code' => wrongCode($mail)])
+            ->assertSessionHasErrors(['code' => __('The code is not valid or has expired.')]);
+    }
+
+    $this->travel(61)->seconds();
+    $this->post(route('magic-link.code.store'), ['code' => $mail->code])
+        ->assertSessionHasErrors(['code' => __('The code is not valid or has expired.')]);
+    $this->assertGuest();
+
+    $this->post($mail->url)->assertRedirect(route('home'));
+    $this->assertAuthenticatedAs($user);
+});
+
+test('requesting another link gives its code a fresh attempt allowance', function () {
+    $user = User::factory()->create(['email' => 'marta@example.com']);
+    $first = requestMagicLink();
+
+    foreach (range(1, 5) as $attempt) {
+        $this->travel(61)->seconds();
+        $this->post(route('magic-link.code.store'), ['code' => wrongCode($first)])
+            ->assertSessionHasErrors('code');
+    }
+
+    $this->travel(61)->seconds();
+    $second = requestMagicLink();
+    $this->post(route('magic-link.code.store'), ['code' => $second->code])
+        ->assertRedirect(route('home'));
+    $this->assertAuthenticatedAs($user);
+});

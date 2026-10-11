@@ -107,7 +107,7 @@ class MagicLinkBroker
             return null;
         }
 
-        $user = $this->useUp(MagicLink::query()->whereKey($id)->where('code_hash', self::hash($code)));
+        $user = $this->useUp(MagicLink::query()->whereKey($id), $code);
 
         if ($user !== null) {
             $this->forget($session);
@@ -119,13 +119,25 @@ class MagicLinkBroker
     /**
      * @param  Builder<MagicLink>  $query
      */
-    private function useUp(Builder $query): ?User
+    private function useUp(Builder $query, ?string $code = null): ?User
     {
-        return DB::transaction(function () use ($query) {
+        return DB::transaction(function () use ($query, $code) {
             $link = $query->usable()->lockForUpdate()->first();
 
             if ($link === null) {
                 return null;
+            }
+
+            if ($code !== null) {
+                if ($link->code_attempts >= 5) {
+                    return null;
+                }
+
+                if (! hash_equals((string) $link->code_hash, self::hash($code))) {
+                    $link->increment('code_attempts');
+
+                    return null;
+                }
             }
 
             $link->forceFill(['used_at' => now()])->save();

@@ -19,6 +19,7 @@ use Illuminate\Support\Carbon;
  * @property string $user_id
  * @property string $token_hash
  * @property string|null $code_hash
+ * @property int $code_attempts
  * @property Carbon $expires_at
  * @property Carbon|null $used_at
  * @property Carbon|null $created_at
@@ -56,6 +57,7 @@ class MagicLink extends Model
     protected function casts(): array
     {
         return [
+            'code_attempts' => 'integer',
             'expires_at' => 'datetime',
             'used_at' => 'datetime',
         ];
