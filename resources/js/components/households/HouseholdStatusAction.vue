@@ -52,7 +52,11 @@ const action = computed(() =>
         ? HouseholdController.deactivate.form(props.householdId)
         : HouseholdController.reactivate.form(props.householdId),
 );
-const hasQuestion = computed(() => props.affectedMembers.length > 0);
+// Nobody would change when every member in the matching state is left out: there is nothing to choose.
+const hasQuestion = computed(() =>
+    props.affectedMembers.some((member) => !member.left_out),
+);
+const hasMembers = computed(() => props.affectedMembers.length > 0);
 const leftOut = computed(() =>
     props.affectedMembers.filter((member) => member.left_out),
 );
@@ -61,7 +65,7 @@ const leftOut = computed(() =>
 <template>
     <!-- Nobody to affect: the question is skipped and only the household changes. -->
     <Form
-        v-if="!hasQuestion"
+        v-if="!hasMembers"
         v-bind="action"
         v-slot="{ processing }"
         data-test="household-status-form"
@@ -97,6 +101,7 @@ const leftOut = computed(() =>
                 class="space-y-4"
                 v-slot="{ errors, processing }"
                 @success="open = false"
+                @error="askAgain"
             >
                 <DialogHeader>
                     <DialogTitle>{{
@@ -105,7 +110,9 @@ const leftOut = computed(() =>
                             : t('Reactivate household')
                     }}</DialogTitle>
                     <DialogDescription>{{
-                        t('Choose what happens to the members')
+                        hasQuestion
+                            ? t('Choose what happens to the members')
+                            : t('No member will change with the household')
                     }}</DialogDescription>
                 </DialogHeader>
 
@@ -121,7 +128,7 @@ const leftOut = computed(() =>
                     }}
                 </p>
 
-                <fieldset class="space-y-2">
+                <fieldset v-if="hasQuestion" class="space-y-2">
                     <label class="flex items-center gap-2 text-sm">
                         <input
                             v-model="withMembers"
@@ -154,8 +161,14 @@ const leftOut = computed(() =>
                 </fieldset>
 
                 <div class="space-y-1 text-sm">
-                    <p class="font-medium">{{ t('Members affected') }}</p>
-                    <ul class="list-disc pl-5" data-test="affected-members">
+                    <p v-if="hasQuestion" class="font-medium">
+                        {{ t('Members affected') }}
+                    </p>
+                    <ul
+                        v-if="hasQuestion"
+                        class="list-disc pl-5"
+                        data-test="affected-members"
+                    >
                         <li
                             v-for="member in affectedMembers"
                             :key="member.id"
@@ -187,7 +200,9 @@ const leftOut = computed(() =>
                     >
                     <Button
                         type="submit"
-                        :disabled="processing || withMembers === ''"
+                        :disabled="
+                            processing || (hasQuestion && withMembers === '')
+                        "
                         data-test="confirm-household-status"
                         >{{
                             isActive ? t('Deactivate') : t('Reactivate')
