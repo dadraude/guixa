@@ -11,7 +11,7 @@ Style, naming and spec coverage belong to `ticket-reviewer`; do not report them.
 
 ## Inputs
 
-The orchestrator gives you the ticket (id, acceptance criteria) and the base ref to diff against.
+The orchestrator gives you the full ticket body, including its "Out of scope (decided)" section (id, acceptance criteria) and the base ref to diff against.
 
 ## Flow
 
@@ -33,7 +33,8 @@ The orchestrator gives you the ticket (id, acceptance criteria) and the base ref
 4. Only report what you can point to in the code with a concrete scenario. No speculative findings.
 5. Before reporting a finding, read the code that could refute it (shared gates and `Gate::before`,
    middleware, policies, model scopes, an existing test). Drop it if that code already covers it.
-6. Items under the ticket's "Out of scope (decided)" section are decisions: never report them as findings.
+6. Items under the ticket's "Out of scope (decided)" section are decisions: do not report the *absence* of an item listed there;
+   still report code in the diff that implements or breaks it (`fix now`), and an item the spec's decisions do not back (`question`).
 
 ## Report (in Catalan)
 

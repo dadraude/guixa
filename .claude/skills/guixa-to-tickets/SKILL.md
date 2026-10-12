@@ -37,9 +37,9 @@ Break the work into **tracer bullet** tickets.
 
 <size-cap>
 
-- **Size cap:** a ticket should fit in roughly 300 diff lines (code, tests and docs together).
-- **Split rule:** a ticket that touches more than 2-3 areas (for example schema, an action, a screen, a mail, a policy) is split before it is created. Split along behaviour, keeping each piece a vertical slice, not along layers.
-- If a slice cannot get under the cap without becoming a horizontal slice, say so when quizzing the user instead of silently creating an oversized ticket.
+- **Size cap:** roughly 300 diff lines (code, tests and docs together) is the hard cap.
+- **Split rule:** the number of areas touched (for example schema, an action, a screen, a mail, a policy) is only a signal: more than 3 areas usually means more than one behaviour, so look for a split. Split along behaviour, keeping each piece a vertical slice, not along layers.
+- If a slice cannot get under the cap, or cannot be split by behaviour, without becoming a horizontal slice, say so when quizzing the user instead of silently creating an oversized ticket.
 
 </size-cap>
 
@@ -79,8 +79,8 @@ Do NOT close or modify any parent issue.
 ### Rules for every ticket
 
 - **Acceptance criteria include the edge cases decided for the ticket's stories** (roles, states, empty and boundary values, repeated requests, sibling screens), taken from the spec and its decisions.
-- **At least one acceptance criterion must be checkable by an automated test.** Write it so a test can fail without the change (observable behaviour, not "code is clean"). A ticket with no such criterion is not ready: rework it or, if it is docs-only, state what check covers it.
-- **"Out of scope (decided)" lists only things the spec's decisions deliberately exclude.** Do not invent exclusions and do not list undecided questions: those go back to the user. Anything listed there is a decision, not a follow-up: implementers and reviewers must not report it as a finding. Write "None" when nothing was excluded.
+- **At least one acceptance criterion must be checkable by an automated test.** Write it so a test can fail without the change (observable behaviour, not "code is clean"). A ticket with no such criterion is not ready: rework it or, if it is docs-only, name the check that covers it (e.g. `bash .claude/hooks/tests/run.sh`), or say there is none.
+- **"Out of scope (decided)" lists only things the spec's decisions deliberately exclude.** Do not invent exclusions and do not list undecided questions: those go back to the user. Anything listed there is a decision, not a follow-up: implementers and reviewers must not report it as a finding. It only holds exclusions decided in the spec before the tickets are created; what a user rules out of scope during `/ship-ticket` stays a follow-up. Write "None" when nothing was excluded.
 
 <local-ticket-template>
 

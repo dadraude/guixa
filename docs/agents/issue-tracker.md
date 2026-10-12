@@ -75,7 +75,7 @@ Milestones group tickets and show progress; the order of work still comes from b
 ## When a skill says "publish to the issue tracker"
 
 - `/to-spec` → write `specs/NNN-<feature-slug>/spec.md` in the repo (NOT Linear), with `Status: draft`.
-- `/to-tickets`, `/triage`, and anything else → create a Linear issue in project Guixa.
+- `/guixa-to-tickets`, `/triage`, and anything else → create a Linear issue in project Guixa.
 
 ## When a skill says "fetch the relevant ticket"
 

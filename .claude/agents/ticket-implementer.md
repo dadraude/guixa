@@ -76,7 +76,10 @@ first, and creates an issue only if the user leaves it open or rules it out of s
 ## Out of scope (decided)
 
 If the ticket has an "Out of scope (decided)" section, its items are decisions, not undecided edge cases and
-not follow-ups: do not implement them, do not ask about them and do not list them in your report.
+not follow-ups: do not implement them and do not list them in your report. Out of scope takes priority over
+the "fix it" rule above: do not fix an excluded item even if it looks needed. If an excluded item conflicts
+with an acceptance criterion, that is escalation condition 2: stop and report the conflict, do not implement
+either side silently.
 
 ## Rules
 

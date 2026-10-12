@@ -69,7 +69,7 @@ that only runs the full checks (step 5 of its flow) and fixes what breaks.
 
 ## 3. Independent review
 
-Launch both reviewers in parallel (one message, two agents), each with `model: "opus"`, the ticket and
+Launch both reviewers in parallel (one message, two agents), each with `model: "opus"`, the full ticket (as given to the implementer) and
 the base ref (`main`, or the blocker's branch). If they run tests, each prefixes them with its own
 `DB_DATABASE=testing_draNN_review` or `DB_DATABASE=testing_draNN_correctness`:
 - `ticket-reviewer`: spec coverage and standards.
@@ -94,7 +94,7 @@ to fix it now: a correction pass is cheaper than an issue, its triage and anothe
    still confirmed after the second pass is not deferred: create one Triage issue per finding as in
    section 2 (deduplicated, related to the ticket), tell the user, and the work is not validated (section 4).
 3. **Follow-ups**, only for (a) a problem that already existed before this ticket and sits outside the
-   files it changes (a reviewer `follow-up` inside a file the ticket changes is treated as `fix now`), (b) a question the user ruled out of scope, or (c) a follow-up the implementer
+   files it changes (a reviewer `follow-up` inside a file the ticket changes is treated as `fix now`), (b) a question the user ruled out of scope (the ticket's "Out of scope (decided)" section only holds exclusions decided in the spec before the tickets were created; what a user rules out during `/ship-ticket` stays a follow-up), or (c) a follow-up the implementer
    reported under the decision rule (Guardrails). One Linear issue each in project
    Guixa, state Triage, related to the parent ticket and in its milestone, titled with the
    change to make; body: file:line, the finding and the suggested fix. Add exactly one `cause` label
