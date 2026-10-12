@@ -57,6 +57,17 @@ shell sandbox does not scope their service operations. An authenticated Linear r
 that other projects or write tools are blocked. The [configuration reference](https://learn.chatgpt.com/docs/config-file/config-reference)
 provides server/tool enable controls, but a tool-name list does not constrain its project arguments.
 
+A read-only local inventory probe also established that `-c mcp_servers={}` preserves inherited
+servers on this CLI build. For the current configuration, explicit
+`-c mcp_servers.<server>.enabled=false` for each of the eight configured servers, together with
+`-c features.plugins=false` and `-c features.apps=false`, yielded zero enabled MCP servers in
+`codex mcp list --json`. The probe additionally disabled browser, computer-use, image-generation and
+multi-agent features for the proposed local worker scope. These are invocation-only overrides; no
+configuration file was edited. The exact argv and user-config hash are in
+`/private/tmp/dra135-tool-scope-review.json`. Any configuration change invalidates this snapshot.
+This verifies configuration inventory only, not actual `exec` tool exposure or service argument
+scoping. No MCP service was initialized and no mutation was attempted.
+
 Prepare the following complete boundary before requesting activation:
 
 | Surface | Required authority |
