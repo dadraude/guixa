@@ -43,6 +43,20 @@ Linear run the same check before their first Linear call.
   `**Session NN (YYYY-MM-DD)**`: what was done
   (tickets and PRs by identifier, decisions with their ADR or `decisions.md` entry) and the
   concrete next step. Read the latest one with `get_status_updates` at the start of a session.
+- **Autonomy metrics**: every session update also carries the block below, counted from Linear and
+  GitHub (never from memory), covering the period since the previous status update.
+  - **PRs merged** (`gh pr list --state merged`) and how many had **no human correction**: no changes
+    requested and no commits pushed by the repo owner after the PR was opened
+    (`gh pr view <PR> --json reviews,commits`; the owner's commits after the PR's creation time count
+    as corrections, the agents' CI-fix and correction commits do not). A PR is judged when merged: PRs
+    still In Review are not counted yet. Also the **streak**: consecutive merged PRs with no human
+    correction, counting back from the latest (input for the "5-10 consecutive PRs" threshold in
+    DRA-128 and DRA-139).
+  - **Follow-ups created**, grouped by their `cause` label (`list_issues` by label): `spec-gap`,
+    `ticket-too-big`, `pre-existing`, `product-question`, `review-finding`, `other`. Every follow-up
+    issue carries exactly one (Linear label group `cause`).
+  - **Reading**: one line. If most follow-ups share a cause, name the process fix (e.g. spec gaps →
+    fix the spec review).
 - **Open topics** (questions, decisions to take, manual checks) are issues in project Guixa,
   never only text in a status update.
 

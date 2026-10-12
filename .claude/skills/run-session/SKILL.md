@@ -57,7 +57,10 @@ Done when: every session issue is In Review, Done, or agreed with the user to go
    shows only worktrees of PRs that still need work. Everything made this session is committed and pushed.
 3. **Status update**: draft it as `issue-tracker.md` describes (`**Session NN (YYYY-MM-DD)**`, issues
    and PRs by identifier, decisions with their ADR, the concrete next step, why anything went back to
-   Backlog). Show it to the user and post it with `save_status_update` on their OK.
+   Backlog) plus the autonomy metrics block from `issue-tracker.md` (Project status). Count it from
+   Linear (issues by `cause` label) and GitHub (`gh pr list --state merged`,
+   `gh pr view --json reviews,commits`), never from memory. Show it to the user and post it with
+   `save_status_update` on their OK.
 
 Done when: the status update is posted. End with a short summary in Catalan: what shipped, what is in
 review, the next step.

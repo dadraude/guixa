@@ -97,9 +97,16 @@ to fix it now: a correction pass is cheaper than an issue, its triage and anothe
    files it changes (a reviewer `follow-up` inside a file the ticket changes is treated as `fix now`), (b) a question the user ruled out of scope, or (c) a follow-up the implementer
    reported under the decision rule (Guardrails). One Linear issue each in project
    Guixa, state Triage, related to the parent ticket and in its milestone, titled with the
-   change to make; body: file:line, the finding and the suggested fix. Skip any finding already filed as
+   change to make; body: file:line, the finding and the suggested fix. Add exactly one `cause` label
+   (see below) to every follow-up or escalation issue you create. Skip any finding already filed as
    an escalation or follow-up issue for this ticket (check the issues related to it first). Create them in
    step 4, before opening the PR. Never fix anything in the main session.
+
+**Cause labels** (Linear group `cause`, counted in the session status update): (a) →
+`pre-existing`; (b) and escalation condition 2 → `product-question`; (c) → `spec-gap` if the spec left
+the case undecided, `ticket-too-big` if the work did not fit the ticket, `other` otherwise; findings
+still confirmed after the second correction pass → `review-finding`; escalation conditions 1, 3 and 4 →
+`other`.
 
 ## 4. Deliver
 
