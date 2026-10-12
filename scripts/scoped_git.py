@@ -179,4 +179,3 @@ class HostGit:
             self._git('update-ref', 'refs/heads/' + approval.branch, commit, approval.head)
             self._git('-c', 'core.sparseCheckout=false', 'read-tree', commit)
             return commit
-
