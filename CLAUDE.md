@@ -83,7 +83,7 @@ Standard way to implement a Linear ticket; defined in `.claude/skills/ship-ticke
   orchestrator pushes and opens the PR without asking; otherwise it asks once.
 - Green CI is a convention gate (branch protection is unavailable on a private repo on the free plan): after
   the PR is opened the orchestrator waits for CI (`gh pr checks <PR> --watch`, after checks exist for the
-  pushed commit). The PR is **ready to merge** (validated and CI green) only when every check passes; it is
+  pushed commit). The PR is **ready to merge** (validated and CI green) only when every check passes ("validated" is evaluated once, before the push; after a CI-fix pass, green CI replaces the local full-suite requirement); it is
   never merged while any check is red or pending, and merging still needs the user to ask. Red CI goes to a
   `ticket-implementer` launch, at most 2 CI-fix passes for now (DRA-129 will define the escalation
   conditions). A PR that touches only paths the workflow ignores (the `paths-ignore` entries in

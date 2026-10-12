@@ -89,7 +89,7 @@ The work is **validated** when all of these hold:
   line of code);
 - no open doubt is left from the implementer or the reviewers.
 
-Validated (before the push; CI is checked after it): deliver without asking. Not validated: show the user what is missing and ask once whether to
+"Validated" is evaluated once, before the push; CI is checked after it. Validated: deliver without asking. Not validated: show the user what is missing and ask once whether to
 push and open the PR anyway.
 
 To deliver: create the follow-up issues, fetch again and, if the base moved since the sync, repeat the
@@ -99,7 +99,9 @@ title `type(scope): description (DRA-NN)` and a short body that links each follo
 
 **CI gate.** Green CI is a convention, not a GitHub rule (no branch protection on a private repo on the
 free plan, see `docs/principles.md`). The PR is **ready to merge** only when it is validated AND CI is
-green; never report it as ready, nor merge it, while any check is red or pending.
+green; never report it as ready, nor merge it, while any check is red or pending. After a CI-fix pass the
+local full-suite requirement no longer applies (that pass only runs the failing step's local equivalents):
+green CI replaces it, so the PR is ready to merge once CI is green again.
 1. Wait until checks exist for the pushed SHA: poll
    `gh run list --branch <branch> --commit <sha> --json databaseId --jq length` every ~10 s, up to ~2 min.
    `gh pr checks <PR> --watch` does not wait for checks that are not registered yet: it exits at once with
@@ -130,7 +132,7 @@ Once CI is green, remove the worktree
 do the same anyway and say so in the summary. If the PR needs more work later, add a new worktree for it;
 its first serial test run recreates the database.
 
-Then show the user a short summary: the PR link, what was built, CI result (ready to merge or not), the CI-fix commit(s) with their files or diff (they are not re-reviewed), test/lint results (as reported, not
+Then show the user a short summary: the PR link, what was built, CI result (ready to merge or not), the CI-fix commit(s) with their diff (nobody re-reviews them, and a file list would not reveal a weakened check), test/lint results (as reported, not
 re-verified unless asked), both review verdicts, what the correction pass fixed, what was dropped and the
 follow-ups.
 
