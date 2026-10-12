@@ -45,11 +45,16 @@ on_main() {
         return
     fi
     rel=${abs#"$top"/}
-    # A literal path that exists at the merge-base (also covers files already removed from the index).
-    git -C "$top" cat-file -e "$base:$rel" 2>/dev/null && return 0
-    while IFS= read -r match; do
-        git -C "$top" cat-file -e "$base:$match" 2>/dev/null && return 0
-    done < <(git -C "$top" ls-files -- "$abs" 2>/dev/null)
+    # A literal path that exists at the merge-base (also covers files already removed from the index),
+    # or at origin/main itself: a parent branch squashed into main shares no commit with a stacked branch,
+    # so its merge-base is still the old one.
+    local ref
+    for ref in "$base" origin/main; do
+        git -C "$top" cat-file -e "$ref:$rel" 2>/dev/null && return 0
+        while IFS= read -r match; do
+            git -C "$top" cat-file -e "$ref:$match" 2>/dev/null && return 0
+        done < <(git -C "$top" ls-files -- "$abs" 2>/dev/null)
+    done
     return 1
 }
 
@@ -77,6 +82,8 @@ command=$(jq -r '.tool_input.command // empty' <<<"$payload")
 command=$(join_continuations "$command")
 [[ $command = *migrations* ]] || exit 0
 
+redirect_only='^([0-9]*>>?|&>>?)$'
+redirect_attached='^([0-9]*>>?|&>>?)(.+)$'
 writers=" sd rm mv cp tee truncate install dd perl sed awk ex vim vi nano patch "
 wrappers=" xargs env sudo nohup time command "
 cur=$cwd
@@ -94,8 +101,10 @@ while IFS= read -r segment; do
     fi
 
     # Skip wrappers (xargs, env, sudo...), their flags and VAR=value assignments.
+    via_xargs=0
     while [ "$#" -gt 0 ]; do
         if [[ $wrappers = *" $1 "* ]]; then
+            [ "$1" = xargs ] && via_xargs=1
             shift
             while [ "$#" -gt 0 ] && [[ $1 = -* || $1 = *=* || $1 = '{}' ]]; do shift; done
         elif [[ $1 = *=* && $1 != -* ]]; then
@@ -113,7 +122,7 @@ while IFS= read -r segment; do
     if [[ $writers = *" $first "* ]]; then
         case "$first" in
             # sed/perl/awk only write with in-place flags.
-            sed | perl | awk) [[ $* =~ (^|[[:space:]])-[a-zA-Z]*i ]] && mode=all ;;
+            sed | perl | awk) [[ $* =~ (^|[[:space:]])(-[a-zA-Z]*i|--in-place) ]] && mode=all ;;
             cp | install) mode=last ;;
             *) mode=all ;;
         esac
@@ -131,6 +140,12 @@ while IFS= read -r segment; do
         done
     elif [ "$first" = git ]; then
         case "$second" in rm | mv | reset | apply | stash) mode=all ;; esac
+    fi
+
+    # xargs gets its paths from an earlier pipeline segment (`fd . database/migrations | xargs rm`), which
+    # this per-segment check cannot see: with a writer behind xargs, any mention of the directory blocks.
+    if [ "$via_xargs" -eq 1 ] && [ "$mode" != none ] && [[ $command = *database/migrations* ]]; then
+        reason "$segment"
     fi
 
     # Destination of cp/install/mv: last non-flag argument. When it is an existing directory the
@@ -153,11 +168,12 @@ while IFS= read -r segment; do
         [ "$mode" = all ] && target=1
         [ "$mode" = sources ] && [ "$token" != "$last" ] && target=1
         [ "$mode" = last ] && [ "$token" = "$last" ] && target=1
-        if [[ $previous = '>' || $previous = '>>' ]]; then target=1; fi
-        if [[ $token = '>'* && $token != '>' && $token != '>>' ]]; then
-            target=1
-            token=${token#>}
-            token=${token#>}
+        # Redirections, with an optional file descriptor: >f >>f 1>f 2>>f &>f, attached or separate.
+        if [[ $previous =~ $redirect_only ]]; then target=1; fi
+        if [[ $token =~ $redirect_attached ]]; then
+            token=${BASH_REMATCH[2]}
+            # `2>&1` duplicates a descriptor, it writes no file.
+            [[ $token = '&'* ]] || target=1
         fi
         previous=$token
         [ "$target" -eq 1 ] || continue

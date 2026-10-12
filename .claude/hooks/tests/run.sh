@@ -280,5 +280,61 @@ err=$(printf '%s' "$(via_transcript "$tmp/transcript-none.jsonl")" | env -u DB_D
 reason=$(printf '%s' "$(via_transcript "$tmp/transcript.jsonl")" | env -u DB_DATABASE GUIXA_STOP_CHECKS='echo boom; exit 1' bash "$hooks/implementer-stop-checks.sh" 2>/dev/null | jq -r '.reason')
 [[ $reason = *boom* && $reason = *'do not guess'* && $reason = *dra-55* ]] && pass=$((pass + 1)) || { fail=$((fail + 1)); echo "FAIL: block reason content ($reason)"; }
 
+# Second correction pass: squash-merged parent migration, background &, xargs, write forms, `@`, DB_DATABASE.
+make_repo "$tmp/sq" main
+git_quiet "$tmp/sq" checkout -b improvement/dra-20-parent
+echo '<?php' >"$tmp/sq/database/migrations/2026_06_06_000000_parent.php"
+git_quiet "$tmp/sq" add -A
+git_quiet "$tmp/sq" commit -m parent
+git_quiet "$tmp/sq" checkout -b improvement/dra-21-stacked
+echo '<?php' >"$tmp/sq/database/migrations/2026_07_07_000000_child.php"
+git_quiet "$tmp/sq" add -A
+git_quiet "$tmp/sq" commit -m child
+git_quiet "$tmp/sq" update-ref refs/remotes/origin/main main
+git_quiet "$tmp/sq" checkout -q main
+git_quiet "$tmp/sq" checkout improvement/dra-20-parent -- database/migrations/2026_06_06_000000_parent.php
+git_quiet "$tmp/sq" commit -m "squash of parent"
+git_quiet "$tmp/sq" update-ref refs/remotes/origin/main main
+git_quiet "$tmp/sq" checkout -q improvement/dra-21-stacked
+parent="database/migrations/2026_06_06_000000_parent.php"
+child="database/migrations/2026_07_07_000000_child.php"
+sp "Edit parent migration squashed into origin/main" 2 "$(file_payload Edit "$parent" "$tmp/sq")"
+sp2() { mp "squash: $1" "$2" "$(bash_payload "$1" "$tmp/sq")"; }
+sp2 "sd a b $parent" 2
+sp2 "rm database/migrations/*parent*" 2
+sp2 "sd a b $child" 0
+mp "squash: Edit branch-only migration" 0 "$(file_payload Edit "$child" "$tmp/sq")"
+
+# A lone & runs the next command in the background; it must be inspected too.
+push 'git status & git push origin main' 2
+push 'git fetch origin & git push' 2 "$tmp/checkout"
+push 'git push -u origin improvement/dra-134-demo 2>&1 | tail' 0
+push 'git push origin improvement/dra-134-demo &> /dev/null' 0
+push 'git fetch origin >& /dev/null' 0
+bm "sleep 0 & rm $mig" 2
+bm "php artisan migrate 2>&1 | tail" 0
+# xargs reads its paths from an earlier pipeline segment.
+bm "rg -l a database/migrations | xargs sed -i '' s/a/b/" 2
+bm "fd . database/migrations | xargs rm" 2
+bm "rg -l foo database/migrations | xargs bat" 0
+# Other write forms.
+bm "sed --in-place s/a/b/ $mig" 2
+bm "echo x 1> $mig" 2
+bm "echo x 2> $mig" 2
+bm "echo x 1>> $mig" 2
+bm "echo x 2>$mig" 2
+bm "echo x &> $mig" 2
+bm "echo x &>>$mig" 2
+bm "echo x > /dev/null 2>&1" 0
+# `@` is an alias of HEAD.
+push 'git push origin @' 2 "$tmp/checkout"
+push 'git push origin @' 0
+push 'git push origin @:main' 2
+# An inherited DB_DATABASE of another ticket never wins over the transcript worktree.
+printf '%s' "$(via_transcript "$tmp/transcript.jsonl")" | DB_DATABASE=testing_dra133 GUIXA_STOP_CHECKS="$probe" bash "$hooks/implementer-stop-checks.sh" >/dev/null 2>&1
+[ "$(cat "$tmp/db")" = testing_dra55 ] && pass=$((pass + 1)) || { fail=$((fail + 1)); echo "FAIL: foreign DB_DATABASE must not win over the worktree ($(cat "$tmp/db"))"; }
+printf '%s' "$(via_transcript "$tmp/transcript.jsonl")" | DB_DATABASE=testing_dra55_2 GUIXA_STOP_CHECKS="$probe" bash "$hooks/implementer-stop-checks.sh" >/dev/null 2>&1
+[ "$(cat "$tmp/db")" = testing_dra55_2 ] && pass=$((pass + 1)) || { fail=$((fail + 1)); echo "FAIL: suffixed DB of the same ticket is kept ($(cat "$tmp/db"))"; }
+
 echo "passed: $pass, failed: $fail"
 [ "$fail" -eq 0 ]

@@ -61,11 +61,17 @@ fi
 [ -n "$changed" ] || exit 0
 
 db=${DB_DATABASE:-}
-if [ -z "$db" ] || [ "$db" = guixa ] || [ "$db" = testing ]; then
-    ticket=$(basename "$PWD" | sed -nE 's#.*(dra-[0-9]+).*#\1#p')
-    [ -n "$ticket" ] || ticket=$(git branch --show-current | sed -nE 's#.*(dra-[0-9]+).*#\1#p')
+ticket=$(basename "$PWD" | sed -nE 's#.*(dra-[0-9]+).*#\1#p')
+[ -n "$ticket" ] || ticket=$(git branch --show-current | sed -nE 's#.*(dra-[0-9]+).*#\1#p')
+ticket_db="testing_${ticket//-/}"
+# An inherited value is kept unless it is guixa/testing or, for a worktree found in the transcript,
+# belongs to another ticket (the session's environment may be set up for a different one).
+use_inherited=1
+{ [ -z "$db" ] || [ "$db" = guixa ] || [ "$db" = testing ]; } && use_inherited=0
+if [ -n "$worktree" ] && [ "$db" != "$ticket_db" ] && [[ $db != "${ticket_db}_"* ]]; then use_inherited=0; fi
+if [ "$use_inherited" -eq 0 ]; then
     [ -n "$ticket" ] || skip "cannot derive DB_DATABASE (no dra-NN in the directory or branch)"
-    db="testing_${ticket//-/}"
+    db=$ticket_db
 fi
 export DB_DATABASE=$db
 

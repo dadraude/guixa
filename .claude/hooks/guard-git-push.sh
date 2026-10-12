@@ -128,7 +128,7 @@ check_segment() {
             block "pattern refspec '$refspec' could push every branch, main included."
         fi
         dest=${refspec#*:}
-        if [ "$dest" = HEAD ]; then
+        if [ "$dest" = HEAD ] || [ "$dest" = @ ]; then # `@` is an alias of HEAD
             [ "$known" -eq 1 ] || block "cannot tell which branch HEAD is (directory not resolvable) for '$refspec'."
             dest=$current
         fi

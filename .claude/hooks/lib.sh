@@ -17,9 +17,12 @@ join_continuations() {
 
 # Splits a shell command line into one simple command per line. Quotes are
 # kept out on purpose: nested forms such as `bash -c "git push ..."` must be
-# inspected too.
+# inspected too. A lone `&` (background execution) also splits; `&&` is already
+# gone by then and `>&`, `&>`, `<&` (redirections) are left alone.
 split_segments() {
-    { join_continuations "$1"; echo; } | sed -E 's/(&&|\|\||;|\||\(|\)|`)/\n/g'
+    { join_continuations "$1"; echo; } |
+        sed -E 's/(&&|\|\||;|\||\(|\)|`)/\n/g' |
+        sed -E 's/([^<>&]|^)&([^>&]|$)/\1\n\2/g'
 }
 
 # Strips quotes and brace characters from a token.
