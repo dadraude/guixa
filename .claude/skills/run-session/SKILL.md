@@ -19,14 +19,14 @@ live in `CLAUDE.md` and `docs/agents/issue-tracker.md`; this skill is their runn
      Still open → it carries over; mention it.
    - Todo or In Progress means the last session did not close cleanly: ask the user, issue by issue,
      whether to take it into this session or send it back to Backlog.
-4. **Triage**: every Guixa issue labelled `needs-triage`, one by one with the user. Each ends as
-   `ready-for-agent`, `ready-for-human` or `wontfix` (state Canceled with a closing comment), and
-   loses `needs-triage`.
+4. **Triage**: every Guixa issue in the Triage state, one by one with the user. Each ends as
+   `ready-for-agent`, `ready-for-human` (state Backlog, with that label) or `wontfix` (state Canceled
+   with a closing comment).
 5. **Scope**: propose one small goal, starting from the status update's next step: usually one to
    three unblocked Backlog issues, by blocking order and priority. Ask the user to confirm or change it,
    then move the chosen issues to **Todo**.
 
-Done when: Todo holds exactly the confirmed scope and nothing is left labelled `needs-triage`.
+Done when: Todo holds exactly the confirmed scope and nothing is left in the Triage state.
 
 ## 2. Work
 
@@ -42,7 +42,7 @@ Between two tickets, suggest `/compact` to the user (or ending the session) when
   SDD workflow in `CLAUDE.md`, in a worktree on a `chore/` or `feature/` branch, and open a PR the same way.
 
 Record every open topic that comes up (a question, a decision to take, a manual check) as a Guixa issue
-labelled `needs-triage` as soon as it appears.
+in the Triage state as soon as it appears.
 
 If the goal turns out not to fit, tell the user, split it, finish and close the part that fits, and
 send the rest back to Backlog.

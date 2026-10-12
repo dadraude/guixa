@@ -16,7 +16,7 @@ and test-first implementation with review (`/implement`).
 - Use the plugin's flow instead of writing custom skills.
 - Specs live in the repo (`specs/NNN-name/spec.md`); the spec includes implementation
   decisions, so there is no separate plan file. The user approves each spec before tickets.
-- Tickets live in Linear (team Draude, project Guixa), with the default triage labels.
+- Tickets live in Linear (team Draude, project Guixa), with the default triage labels (`needs-triage` is the Linear Triage state).
 - Domain docs: single `CONTEXT.md` + `docs/adr/` at the root (replaces `docs/decisions/`).
 - All generated artifacts are in English; conversation with the user is in Catalan.
 - Session rules (one goal, `STATUS.md`, commit and push) stay in `CLAUDE.md`.

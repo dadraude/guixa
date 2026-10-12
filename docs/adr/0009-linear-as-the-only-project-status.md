@@ -22,7 +22,7 @@ progress per spec is visible without a separate summary.
 
 ## Consequences
 
-- Sessions start by reading the latest Guixa status update and triaging `needs-triage` issues,
+- Sessions start by reading the latest Guixa status update and triaging issues in the Triage state,
   and end by posting a status update after pushing.
 - Decisions still go to ADRs and the specs' `decisions.md`; lessons about tooling go to
   `CLAUDE.md` or the skill that needs them, not to the status update.

@@ -59,8 +59,8 @@ agent/skill files.
 - Linear is the only record of project status (ADR 0009): ticket states, blocking relations and
   priority hold the queue; open topics are issues; each session leaves a project status update.
   There is no status file in the repo.
-- At the start: read the latest Guixa project status update, then triage the Guixa issues labelled
-  `needs-triage` with the user: each one becomes `ready-for-agent`, `ready-for-human` or `wontfix`.
+- At the start: read the latest Guixa project status update, then triage the Guixa issues in the
+  Triage state with the user: each one becomes `ready-for-agent`, `ready-for-human` (Backlog) or `wontfix` (Canceled).
   Then choose the session's issues with the user and move them to **Todo**: Todo is the session scope.
 - At the end: leave nothing half-done, commit and push to `origin` (github.com:dadraude/guixa), and
   post a Guixa project status update with what was done and the concrete next step. Todo must be
@@ -83,7 +83,7 @@ Standard way to implement a Linear ticket; defined in `.claude/skills/ship-ticke
   orchestrator pushes and opens the PR without asking; otherwise it asks once.
 - Review findings are fixed in the correction pass by default; open product questions are asked in the
   session. Only a pre-existing problem outside the ticket's code, or a question ruled out of scope,
-  becomes a follow-up: a Linear issue (`needs-triage`, related to the parent ticket) linked from the PR body.
+  becomes a follow-up: a Linear issue (state Triage, related to the parent ticket) linked from the PR body.
 - No PR or ticket keeps follow-ups as plain text, also for work done outside `/ship-ticket`: each one is a
   `DRA-NN` issue, created before the PR is opened.
 - Linear: In Progress when starting, In Review when the PR is opened.
@@ -109,7 +109,7 @@ Before the first Linear call of a session, check with `get_workspace` that the c
 
 ### Triage labels
 
-Default five labels (needs-triage, needs-info, ready-for-agent, ready-for-human, wontfix), created in Linear. See `docs/agents/triage-labels.md`.
+Labels needs-info, ready-for-agent, ready-for-human, wontfix, created in Linear. "Needs triage" is the Linear Triage state, not a label. See `docs/agents/triage-labels.md`.
 
 ### Domain docs
 
