@@ -45,3 +45,50 @@ establish the external facts. Live provider integration is a separate acceptance
 adapters prove the protocol and scheduler only.
 
 Run the contract tests with `python3 -m unittest scripts.tests.test_batch_contract -v`.
+
+## Isolated lifecycle and receipts
+
+The runtime checks the entire manifest's Git repository, base ref, branch availability and worktree
+paths before launching a wrapper. Each invocation creates a random run ID and a new worktree for each
+batch. It never switches the primary checkout, removes a worktree, drops a database or deletes a
+branch. The test database is `testing_dra<FIRST>`; adapters inherit `DB_DATABASE` and must carry it
+on **every** test command, including reviewer commands and parallel workers. They must provision
+tools/dependencies and a safe worktree `.env` before tests; the runner does not copy a user's database
+configuration. Every delivered ticket must identify a distinct new commit on the batch branch.
+
+All invocations of this runner share cooperative advisory locks under Git's common directory.
+Normal runs hold a shared repository lock; a sweep requires an exclusive lock. Database locks reject
+concurrent invocations using the same first ticket. Different checkouts of the same Git repository
+therefore share the lock domain. These locks do not control humans or external tools. A provider
+wrapper still needs reviewed permissions and equivalent Git/protected-file/check enforcement.
+Existing `.claude/settings.json` denies and hooks are preserved; a different provider must establish
+its own concrete enforcement before unattended execution. DRA-135 owns that integration gate.
+
+Both executables receive their configured argv followed by `--request <absolute JSON path>` and
+`--result <absolute JSON path>`. Output goes to an adjacent log. Results must be regular JSON files
+under 1 MiB; nonzero exit, missing/invalid results, timeouts or rejected receipts fail visibly.
+Adapters use `kind: execute_batch`; requests include the complete batch, model roles, base, parent
+refs, repository and worktree. A fresh adapter process is the batch orchestrator; freshness of its
+implementers/reviewers remains a wrapper obligation.
+
+The verifier runs first with `kind: repository_preflight`, `version`, `run_id`, `project`, `repository`
+and `cross_cutting`. It returns matching identity plus boolean `active_cross_cutting` and repository-
+wide `open_prs` URL list. It must inspect **all** open PRs across all projects, recognize sweep PRs
+from coordinator records/labels, and reject an unknown classification. Any open sweep blocks a run;
+a new sweep additionally requires no open PRs. A static/copied receipt is not a valid live verifier.
+
+After local branch/clean-tree/commit checks, `kind: verify_delivery` requests carry the run/project/
+batch/branch identity, delivered ticket IDs, worktree and claimed delivery. Receipts repeat these
+fields with `version: 1` and `ready: true`. The trusted verifier must read GitHub (or the configured
+host) and Git to check repository identity, PR openness, exact remote head SHA, expected base, current
+CI and ticket coverage. `not_required` is valid only when changed paths demonstrably match CI's ignore
+rules after checks have had time to appear. Missing/pending/red checks cannot pass. An exit-zero
+verifier that merely echoes a request is suitable only for local protocol tests, never delivery proof.
+The runner validates identities/equality, but cannot audit a verifier's implementation or permissions.
+
+`.batch-runs/<run-id>/` preserves manifests, requests, results, logs, receipts and `recovery.json`
+with each worktree/branch/database. Keep them private (they may contain ticket content). Cancellation
+terminates child process groups and reaps them. Failures and interruption leave recoverable work
+intact; the coordinator must inspect Git status, reconcile Linear/PR/CI, and perform authorized cleanup
+only after retaining any uncommitted work. Test with
+`python3 -m unittest scripts.tests.test_batch_runtime -v` using fake local services and Git fixtures.
