@@ -1,6 +1,6 @@
 ---
-name: guixa-to-tickets
-description: Break an approved spec, plan, or the current conversation into small tracer-bullet tickets with a size cap, an "Out of scope (decided)" section and at least one automated-test acceptance criterion, published to the project's issue tracker. Project-level variant of the global to-tickets skill.
+name: sdd-to-tickets
+description: "Use /sdd-to-tickets to split an approved spec or plan into small vertical slices with testable criteria, decided exclusions and native blocking relations."
 disable-model-invocation: true
 ---
 

@@ -11,7 +11,7 @@ using Matt Pocock's skills (`mattpocock-skills` plugin). See `docs/adr/0001-sdd-
    Worked out with `/grill-with-docs`; significant decisions become ADRs.
 3. For each feature:
    1. `/grill-with-docs`: interview until the feature is clear; updates `CONTEXT.md` and `docs/adr/`.
-   2. `/guixa-to-spec`: writes `specs/NNN-name/spec.md` (`Status: draft`) — problem, user stories,
+   2. `/sdd-to-spec`: writes `specs/NNN-name/spec.md` (`Status: draft`) — problem, user stories,
       implementation and testing decisions.
    3. **Spec review**: the `spec-reviewer` agent (`model: "opus"`, read-only) lists the edge cases the spec leaves
       undecided (concurrency, lifecycle states, signed out, permissions, sibling screens, failure states) and ends
@@ -22,7 +22,7 @@ using Matt Pocock's skills (`mattpocock-skills` plugin). See `docs/adr/0001-sdd-
    4. **The user approves the spec** (`Status: approved`). A spec cannot be offered for approval, nor approved,
       while any edge case the reviewer listed lacks a written decision in the spec, its `decisions.md` or an ADR (`Undecided: 0`).
       No tickets and no code before that.
-   5. `/guixa-to-tickets`: splits the spec into vertical-slice tickets in Linear (the selected project; see `docs/agents/issue-tracker.md`). Each ticket
+   5. `/sdd-to-tickets`: splits the spec into vertical-slice tickets in Linear (the selected project; see `docs/agents/issue-tracker.md`). Each ticket
       carries the edge cases decided for its stories as acceptance criteria.
    6. `/ship-ticket DRA-NN`: one or a few tickets per session; the `ticket-implementer` agent builds
       test-first (`/tdd`) and two reviewer agents check it. Do not use the plugin's `/implement`: it
@@ -34,7 +34,7 @@ Domain vocabulary lives in `CONTEXT.md`; decisions in `docs/adr/NNNN-title.md`.
 
 | Who | Model | Where it is set |
 | --- | --- | --- |
-| Main session: `/grill-with-docs`, `/guixa-to-spec`, `/guixa-to-tickets`, triage | Opus | the user's `/model`; never pinned in `.claude/settings.json` |
+| Main session: `/grill-with-docs`, `/sdd-to-spec`, `/sdd-to-tickets`, triage | Opus | the user's `/model`; never pinned in `.claude/settings.json` |
 | Main session: `/ship-ticket`, `/run-session` work phase (git, Linear, launching agents) | Sonnet recommended | the user's `/model` |
 | `ticket-implementer` | Sonnet | agent frontmatter |
 | `ticket-reviewer`, `ticket-correctness-reviewer`, `spec-reviewer` | Opus | agent frontmatter |
