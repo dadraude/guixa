@@ -76,9 +76,34 @@ Technical decisions and rules for the whole project. Domain terms are defined in
     service container in CI).
   - **Vitest** for client-side logic, especially offline storage and sync.
   - **Playwright** for the offline flows and a few critical end-to-end paths.
-- **CI (GitHub Actions) blocks merging** unless all pass: tests, Pint, Larastan (level 8),
-  Oxlint and Oxfmt (through Vite+, the starter kit's own linter and formatter, used instead of
-  ESLint and Prettier, see ADR 0007) and `vue-tsc`.
+- **CI (GitHub Actions) must be green to merge, by convention.** GitHub cannot enforce it: branch
+  protection and rulesets are unavailable on a private repository on the free plan. So `/ship-ticket`
+  waits for the checks (`gh pr checks <PR> --watch`) and a PR is only reported as ready to merge
+  (validated and CI green), and only merged, when they all pass ("validated" is evaluated once, before the push; after a CI-fix pass, green CI replaces the local full-suite requirement). The workflow ignores the paths listed under `paths-ignore` in
+  `.github/workflows/ci.yml`, so a PR touching only those paths reports no checks and, after the wait
+  for checks to appear, counts as passing. Any other PR with no checks is not ready to merge. CI runs tests, Pint, Larastan (level 9), Oxlint and
+  Oxfmt (through Vite+, the starter kit's own linter and formatter, used instead of ESLint and
+  Prettier, see ADR 0007), `vue-tsc` and Playwright.
+- **CI steps and local equivalents.** Run the same checks before pushing (the Pest and Playwright
+  runs use a test database; in a worktree set `DB_DATABASE=testing_draNN`):
+
+  | CI step | Local equivalent |
+  | --- | --- |
+  | Build assets (also generates Wayfinder routes) | `npm run build` |
+  | Pint | `vendor/bin/pint --test` (or `composer lint:check`; `composer lint` fixes) |
+  | Larastan | `vendor/bin/phpstan analyse --memory-limit=1G` (or `composer types:check -- --memory-limit=1G`) |
+  | Oxlint, Oxfmt | `npm run check` (`npm run check:fix` fixes) |
+  | `vue-tsc` | `npm run types:check` |
+  | Pest | `php artisan test --parallel` (or `vendor/bin/pest --parallel`) |
+  | Playwright (`e2e` job) | `npm run e2e` (see the note below) |
+
+  `composer ci:check` chains `npm run check`, `npm run types:check` and `composer test` (Pint, Larastan,
+  Pest); Larastan needs `--memory-limit=1G`, which the script does not pass, so run it separately.
+  `npm run e2e` shares resources: the fixed port 8000 (`reuseExistingServer: false`), the shared Mailpit
+  mailbox (SMTP 1025, UI 8025) that `e2e/global-setup.ts` clears at start, and `migrate:fresh` on
+  `DB_DATABASE` (default `testing`, the main checkout's database). Run it in one worktree at a time, with
+  Mailpit running, `npx playwright install chromium` done once, the built assets and its own
+  `DB_DATABASE=testing_draNN`.
 - **Rules are enforced by tools, not by review.** Pint adds `declare(strict_types=1)` and strict
   comparisons; Pest architecture tests (`tests/Unit/ArchitectureTest.php`) check project rules such
   as UUIDv7 models and actions with `handle()`; a test fails when a translated string is missing

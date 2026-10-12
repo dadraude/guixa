@@ -89,19 +89,50 @@ The work is **validated** when all of these hold:
   line of code);
 - no open doubt is left from the implementer or the reviewers.
 
-Validated: deliver without asking. Not validated: show the user what is missing and ask once whether to
+"Validated" is evaluated once, before the push; CI is checked after it. Validated: deliver without asking. Not validated: show the user what is missing and ask once whether to
 push and open the PR anyway.
 
 To deliver: create the follow-up issues, fetch again and, if the base moved since the sync, repeat the
 step 2 sync before pushing. Then push with `-u`, `gh pr create --base <base>` with a conventional
 title `type(scope): description (DRA-NN)` and a short body that links each follow-up issue and ends with
-`🤖 Generated with [Claude Code](https://claude.com/claude-code)`, then move the issue to **In Review**. Once the PR is open, remove the worktree
+`🤖 Generated with [Claude Code](https://claude.com/claude-code)`, then move the issue to **In Review**.
+
+**CI gate.** Green CI is a convention, not a GitHub rule (no branch protection on a private repo on the
+free plan, see `docs/principles.md`). The PR is **ready to merge** only when it is validated AND CI is
+green; never report it as ready, nor merge it, while any check is red or pending. After a CI-fix pass the
+local full-suite requirement no longer applies (that pass only runs the failing step's local equivalents):
+green CI replaces it, so the PR is ready to merge once CI is green again.
+1. Wait until checks exist for the pushed SHA: poll
+   `gh run list --branch <branch> --commit <sha> --json databaseId --jq length` every ~10 s, up to ~2 min.
+   `gh pr checks <PR> --watch` does not wait for checks that are not registered yet: it exits at once with
+   "no checks reported" and exit code 1, the same code as a red check.
+2. Then `gh pr checks <PR> --watch`. Exit 1 means either "no checks" or "red": read the output to tell which.
+3. A PR that touches only paths the workflow ignores (the `paths-ignore` entries in
+   `.github/workflows/ci.yml`) reports no checks: for such PRs only, and only after the wait in step 1,
+   "no checks reported" counts as passing. Any other PR with no checks reported is not ready: tell the user.
+
+Red CI: get the failing run and job with
+`gh pr checks <PR> --json name,bucket,link --jq '.[] | select(.bucket=="fail")'` (the link carries the run
+and job id), then read the log with `gh run view <run-id> --log-failed` (or `--job <job-id>`; without an id
+the command is interactive). Launch a `ticket-implementer` pass in the same worktree with the failing job
+and its log; it fixes, runs the local equivalents of the failing step (see "CI steps and local
+equivalents" in `docs/principles.md`) and makes one more commit `fix(scope): <description> (DRA-NN)`,
+without amending or rewriting anything already pushed. Push, repeat step 1 (the query may still show the
+previous commit's results, so match the new SHA) and step 2.
+- The CI-fix pass must never disable or weaken a check: no skipped or deleted tests, no PHPStan baseline
+  entries, no files excluded from Pint, no `test.skip` in Playwright, no looser linter config. If there is
+  no other way out, it escalates.
+- Provisional limit (DRA-129 will replace it): at most 2 CI-fix passes. On a third failure, or the same
+  job failing with the same error, stop and tell the user.
+
+Once CI is green, remove the worktree
 (`git worktree remove ../guixa-worktrees/dra-NN`) and drop its test databases from the main checkout:
 `php .claude/skills/ship-ticket/drop-test-databases.php NN` (it only matches `testing_draNN` and
-`testing_draNN_*`). The branch stays. If the PR needs more work later, add a new worktree for it; its
-first serial test run recreates the database.
+`testing_draNN_*`). The branch stays. If CI never gets green (escalated, red, or no checks when expected),
+do the same anyway and say so in the summary. If the PR needs more work later, add a new worktree for it;
+its first serial test run recreates the database.
 
-Then show the user a short summary: the PR link, what was built, test/lint results (as reported, not
+Then show the user a short summary: the PR link, what was built, CI result (ready to merge or not), the CI-fix commit(s) with their diff (nobody re-reviews them, and a file list would not reveal a weakened check), test/lint results (as reported, not
 re-verified unless asked), both review verdicts, what the correction pass fixed, what was dropped and the
 follow-ups.
 
