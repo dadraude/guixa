@@ -166,11 +166,13 @@ def validate_result(value, request, base):
         status = ticket["status"]
         require(status in ("delivered", "product_question", "blocked", "failed"), "invalid ticket outcome")
         if status == "delivered":
+            keys(ticket, ("id", "status", "commit"))
             require(sha(ticket.get("commit")), "delivered ticket needs a commit")
             local_parents = set(definition["depends_on"]) & {x["id"] for x in planned}
             require(local_parents <= delivered, "delivered ticket has an undelivered dependency")
             delivered.add(ticket["id"])
         elif status == "product_question":
+            keys(ticket, ("id", "status", "question", "triage_issue", "state"))
             require(text(ticket.get("question")) and ticket.get("state") == "Backlog",
                     "product question needs a question and Backlog state")
             triage = ticket.get("triage_issue")
@@ -178,6 +180,7 @@ def validate_result(value, request, base):
             require(text(triage["id"]) and triage["project"] == request["project"]
                     and triage["cause"] == "product-question", "invalid product-question triage receipt")
         else:
+            keys(ticket, ("id", "status", "reason"))
             require(text(ticket.get("reason")), "blocked/failed ticket needs a reason")
             failed |= status == "failed"
     expected = ("complete" if len(delivered) == len(planned) else "partial" if delivered
@@ -187,7 +190,10 @@ def validate_result(value, request, base):
         delivery = value.get("delivery")
         keys(delivery, ("pr", "state", "ci", "head", "base"))
         require(text(delivery["pr"]), "missing PR URL")
-        url = urlparse(delivery["pr"])
+        try:
+            url = urlparse(delivery["pr"])
+        except ValueError as error:
+            raise ContractError("invalid PR URL") from error
         require(url.scheme == "https" and url.hostname and url.path, "invalid PR URL")
         require(delivery["state"] == "open" and delivery["ci"] in ("green", "not_required")
                 and sha(delivery["head"]) and delivery["base"] == base, "delivery is not ready")
@@ -197,4 +203,6 @@ def validate_result(value, request, base):
         require(integer(value.get("correction_passes"), 0, 2), "at most two correction passes")
     else:
         require(value.get("delivery") is None, "undelivered batch cannot advertise a PR")
+        require(not any(key in value for key in ("checks", "reviews", "correction_passes")),
+                "undelivered batch cannot advertise delivery checks")
     return value

@@ -71,6 +71,25 @@ class ContractTests(unittest.TestCase):
                   "checks": "passed", "reviews": {"spec": "approved", "correctness": "approved"},
                   "correction_passes": 0}
         self.assertEqual(validate_result(result, request, "main")["status"], "partial")
+        complete = copy.deepcopy(result)
+        complete["status"] = "complete"
+        complete["tickets"][1] = {"id": "DRA-2", "status": "delivered", "commit": "b" * 40}
+        self.assertEqual(validate_result(complete, request, "main")["status"], "complete")
+        for status in ("blocked", "failed"):
+            stopped = {key: item for key, item in result.items() if key not in
+                       ("delivery", "checks", "reviews", "correction_passes")}
+            stopped["status"] = status
+            stopped["tickets"] = [{"id": ticket["id"], "status": status, "reason": "Cannot proceed"}
+                                  for ticket in result["tickets"]]
+            self.assertEqual(validate_result(stopped, request, "main")["status"], status)
+        contradictory = copy.deepcopy(result)
+        contradictory["tickets"][0].update(state="Backlog", question="Unexpected?", triage_issue=True)
+        with self.assertRaises(ContractError):
+            validate_result(contradictory, request, "main")
+        malformed = copy.deepcopy(result)
+        malformed["delivery"]["pr"] = "https://["
+        with self.assertRaises(ContractError):
+            validate_result(malformed, request, "main")
         for key, value in (("project", "other"), ("branch", "main"), ("status", "complete"),
                            ("correction_passes", 3), ("delivery", None)):
             with self.subTest(key=key), self.assertRaises(ContractError):
