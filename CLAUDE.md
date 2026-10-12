@@ -13,7 +13,7 @@ using Matt Pocock's skills (`mattpocock-skills` plugin). See `docs/adr/0001-sdd-
    1. `/grill-with-docs`: interview until the feature is clear; updates `CONTEXT.md` and `docs/adr/`.
    2. `/sdd-to-spec`: writes `specs/NNN-name/spec.md` (`Status: draft`) — problem, user stories,
       implementation and testing decisions.
-   3. **Spec review**: the `spec-reviewer` agent (`model: "opus"`, read-only) lists the edge cases the spec leaves
+   3. **Spec review**: the `spec-reviewer` agent (configured spec-reviewer model role, read-only) lists the edge cases the spec leaves
       undecided (concurrency, lifecycle states, signed out, permissions, sibling screens, failure states) and ends
       with an `Undecided: N` count. Obvious answers go into the spec; the rest are asked one by one (the skill
       invokes `grilling` and `domain-modeling` directly) and recorded. Re-run the reviewer until the count is 0; from the
@@ -32,21 +32,26 @@ Domain vocabulary lives in `CONTEXT.md`; decisions in `docs/adr/NNNN-title.md`.
 
 ## Models
 
-| Who | Model | Where it is set |
+Model selection is provider configuration. The user selects the service and explicit model IDs for
+these roles; never infer a provider, silently substitute a model or enable permission bypasses.
+User/session choices override legacy provider-specific frontmatter. Every launch passes the selected
+model explicitly; implementation and reviews use fresh independent contexts. Different model IDs
+may be selected for capability/cost, but the contract accepts any owner-selected service and roles.
+
+| Who | Configured role | Where it is set |
 | --- | --- | --- |
-| Main session: `/grill-with-docs`, `/sdd-to-spec`, `/sdd-to-tickets`, triage | Opus | the user's `/model`; never pinned in `.claude/settings.json` |
-| Main session: `/ship-ticket`, `/run-session` work phase (git, Linear, launching agents) | Sonnet recommended | the user's `/model` |
-| `ticket-implementer` | Sonnet | agent frontmatter |
-| `ticket-reviewer`, `ticket-correctness-reviewer`, `spec-reviewer` | Opus | agent frontmatter |
+| Main interactive session: SDD, triage, opening/closing sessions | orchestrator | user/session provider configuration |
+| Fresh batch orchestrator | orchestrator | batch manifest `models` |
+| `ticket-implementer` | implementer | user/session configuration or batch manifest |
+| `ticket-reviewer`, `spec-reviewer` | spec_reviewer | user/session configuration or batch manifest |
+| `ticket-correctness-reviewer` | correctness_reviewer | user/session configuration or batch manifest |
 
-Every agent launch passes the `model` from this table explicitly: an Agent call's `model` overrides the
-agent's frontmatter, so a generic default (such as `sonnet` for every delegation) would silently downgrade
-the reviewers. Implementation and review must stay on different models.
-
-The main session never writes application code or tests, inside or outside `/ship-ticket`: every code
-change (features, fixes, review findings, merge conflicts, help on a `ready-for-human` issue) goes to a
-`ticket-implementer` launch with `model: "sonnet"`. The main session only writes docs, specs, ADRs and
-agent/skill files.
+The main session never writes application code or tests: code changes, corrections, merge conflicts
+and help on `ready-for-human` issues go to fresh implementers with the configured role. The session
+writes docs/specs/ADRs/workflow files and coordinates delivery. In automatic work, `/ship-batch` runs
+up to four related tickets on one branch/PR with one implementation commit per ticket, followed by
+two independent reviewers on the combined diff. The batch runner's own code/tests are workflow
+infrastructure, covered by focused Python and hook checks instead of the application suite.
 
 ### Keeping cost down
 
@@ -79,6 +84,18 @@ projects also require clarification; it never defaults to Guixa. Defined in
   `.claude/skills/ship-ticket/SKILL.md`) instead of just carrying over.
 - If the goal doesn't fit, split it and close the finished part.
 
+## Automatic batches
+
+`/run-session` confirms related-ticket groups, invokes `scripts/run-batches.sh` with an explicit
+project/provider manifest, waits and reconciles the result. `/ship-batch` is the headless workflow:
+max four tickets, default three independent batches in parallel, verified dependencies stack,
+cross-cutting sweeps alone across the repository. Product questions create deduplicated Triage issues
+(`cause: product-question`) in the parent project; tickets return to Backlog and dependents stop.
+Only the interactive session publishes status updates, and human PR merge remains required.
+See ADR 0012 and `docs/agents/batch-execution.md` for the deterministic/runtime trust boundary.
+Provider-specific permissions and real external supervision require a reviewed adapter/verifier;
+existing hooks and denies remain intact (DRA-135 owns equivalent enforcement for each provider).
+
 ## Ticket flow (`/ship-ticket DRA-NN`)
 
 Standard way to implement a Linear ticket; defined in `.claude/skills/ship-ticket/SKILL.md`.
@@ -87,9 +104,9 @@ Standard way to implement a Linear ticket; defined in `.claude/skills/ship-ticke
   branch while its PR is still open (stacked; the PR targets that branch until it merges).
 - Always work in a worktree (`../guixa-worktrees/dra-NN`); the main checkout stays on `main` for testing.
   Remove the worktree once CI is green (or, if CI never gets green, once the work is escalated to the user).
-- `ticket-implementer` agent (Sonnet): test-first, linters, full suite, one single-line commit.
+- `ticket-implementer` agent (configured role): test-first, linters, full suite, one single-line commit.
 - `ticket-reviewer` (Spec and Standards) and `ticket-correctness-reviewer` (bugs and security) agents
-  (Opus, read-only), in parallel: independent review on a different model from the implementer. Up to two correction passes: the second only if the first leaves confirmed findings, and its re-review covers just those findings and the new diff; what is still open after it is escalated, not deferred.
+  (configured reviewer roles, read-only), in parallel: independent review in fresh contexts. Up to two correction passes: the second only if the first leaves confirmed findings, and its re-review covers just those findings and the new diff; what is still open after it is escalated, not deferred.
 - Once the work is validated (local checks green, review questions answered, correction passes applied), the
   orchestrator pushes and opens the PR without asking; otherwise it asks once.
 - Green CI is a convention gate (branch protection is unavailable on a private repo on the free plan): after

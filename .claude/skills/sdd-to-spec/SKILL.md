@@ -26,7 +26,7 @@ do not restart the design interview.
 2. Sketch the seams at which the feature will be tested. Prefer existing seams and the highest one
    possible; the ideal number is one. Check with the user that they match.
 3. Write the configured spec path with the template below, starting with `Status: draft`.
-4. Launch the `spec-reviewer` agent with `model: "opus"` and the spec path.
+4. Launch the `spec-reviewer` agent with the explicitly configured spec-reviewer model role (`CLAUDE.md`, Models) and the spec path.
 5. Resolve the reviewer's output: write the obvious answers into the spec as acceptance criteria, and
    ask the rest one by one, invoking the `grilling` and `domain-modeling` skills directly (one question at a
    time, as `/grill-with-docs` does; the model cannot invoke that command). Record each decision in the spec.

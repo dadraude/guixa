@@ -92,3 +92,56 @@ terminates child process groups and reaps them. Failures and interruption leave 
 intact; the coordinator must inspect Git status, reconcile Linear/PR/CI, and perform authorized cleanup
 only after retaining any uncommitted work. Test with
 `python3 -m unittest scripts.tests.test_batch_runtime -v` using fake local services and Git fixtures.
+
+## Invocation and scheduling
+
+Run `scripts/run-batches.sh <manifest.json>`; `--validate-only` validates schema and Git paths without
+creating state/locks/worktrees or invoking either configured executable. Relative manifest paths keep
+the caller's working-directory meaning. Exit 0 means every batch delivered; exit 1 means partial,
+blocked or failed outcomes; exit 2 means validation/preflight failure; exit 130 means interruption.
+The printed state location and `summary.json` make failures and manual reconciliation discoverable.
+
+Independent batches start up to `max_parallel` at a time. A child starts only after every dependency
+has finished and its required tickets delivered. Explicit batch dependencies require all parent
+tickets; ticket dependencies require only the named tickets, so delivered independent tickets in a
+partial parent may unblock their children. Parent delivery receipts are rechecked immediately before
+starting a child. Its base is the first parent branch in sorted batch-ID order, and additional parent
+branches are merged into its worktree before the adapter starts. Merge failure preserves that worktree
+for reconciliation. No independent sibling is used as a base. PRs remain open for human merge.
+
+Example manifest (replace every path, model ID and ticket context with reviewed configuration):
+
+```json
+{
+  "version": 1,
+  "project": "P-DRA-2",
+  "repository": "/home/user/code/guixa",
+  "worktree_root": "/home/user/code/guixa-worktrees",
+  "base": "main",
+  "adapter": ["/home/user/bin/approved-ai-wrapper"],
+  "verifier": ["/home/user/bin/approved-delivery-verifier"],
+  "models": {
+    "orchestrator": "selected-orchestrator-model",
+    "implementer": "selected-implementation-model",
+    "spec_reviewer": "selected-review-model",
+    "correctness_reviewer": "selected-correctness-model"
+  },
+  "batches": [{
+    "id": "related",
+    "branch": "feature/dra-12-related",
+    "tickets": [{"id": "DRA-12", "context": "Full approved ticket body"},
+                {"id": "DRA-13", "depends_on": ["DRA-12"], "context": "Full approved ticket body"}]
+  }]
+}
+```
+
+The runner supplies the protocol/request, not an implementation of every AI service. An owner must
+provide a usable adapter and verifier, credentials, equivalent permissions/check enforcement, and
+supervise a live run before unattended tickets. The session coordinator reconciles deduplicated
+product-question issues and final ticket states against the tracker, not just adapter claims. Neither
+headless adapter nor verifier publishes a project status update. New-batch execution does not take
+over an existing PR-fix branch; that remains the interactive `ship-ticket` flow.
+
+Run all focused tests with `python3 -m unittest discover -s scripts/tests -v`, and repository hooks
+with `bash .claude/hooks/tests/run.sh`. The dedicated `batch-runner` GitHub workflow runs these on
+relevant script, hook, contract or workflow changes; existing application CI remains intact.

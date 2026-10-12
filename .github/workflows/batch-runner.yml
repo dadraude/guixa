@@ -1,0 +1,36 @@
+name: batch-runner
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/**'
+      - '.claude/hooks/**'
+      - 'docs/agents/batch-execution.md'
+      - '.github/workflows/batch-runner.yml'
+  pull_request:
+    paths:
+      - 'scripts/**'
+      - '.claude/hooks/**'
+      - 'docs/agents/batch-execution.md'
+      - '.github/workflows/batch-runner.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  protocol-and-hooks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install hook test tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y jq ripgrep
+      - name: Batch runner protocol and Git fixtures
+        run: python3 -m unittest discover -s scripts/tests -v
+      - name: Existing repository guard hooks
+        run: bash .claude/hooks/tests/run.sh
