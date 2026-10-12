@@ -76,7 +76,7 @@ to fix it now: a correction pass is cheaper than an issue, its triage and anothe
    rule), not by a one-off edit. Drop anything not worth a line of code and say so.
 3. **Follow-ups**, only for (a) a problem that already existed before this ticket and sits outside the
    code it changes, or (b) a question the user ruled out of scope. One Linear issue each in project
-   Guixa, label `needs-triage`, related to the parent ticket and in its milestone, titled with the
+   Guixa, state Triage, related to the parent ticket and in its milestone, titled with the
    change to make; body: file:line, the finding and the suggested fix. Create them in step 4, before
    opening the PR. Never fix anything in the main session.
 
