@@ -124,6 +124,51 @@ class RuntimeTests(unittest.TestCase):
                 runtime.close()
                 self.manifest['batches'][0]['branch'] = f'feature/dra-1-after-{mode}'
 
+    def test_old_ancestor_cannot_be_reported_as_a_ticket_commit(self):
+        subprocess.run(['git', 'commit', '--allow-empty', '-m', 'new base'], cwd=self.repo,
+                       check=True, capture_output=True)
+        source = self.fake.read_text().replace("    result = {k: r[k] for k in ('run_id', 'project')}",
+            "    outcomes[0]['commit'] = subprocess.check_output(['git', 'rev-parse', 'main^'], text=True).strip()\n"
+            "    result = {k: r[k] for k in ('run_id', 'project')}")
+        self.fake.write_text(source)
+        runtime = self.runtime(); runtime.preflight()
+        with self.assertRaises(ContractError):
+            runtime.execute(runtime.manifest['batches'][0], 'main')
+
+    def test_close_cannot_release_locks_between_child_spawn_and_registration(self):
+        self.manifest['verifier'] += ['--mode', 'sleep']
+        runtime = self.runtime()
+        original = subprocess.Popen
+        created, release, closing = threading.Event(), threading.Event(), threading.Event()
+        children, errors = [], []
+
+        def paused_spawn(*args, **kwargs):
+            process = original(*args, **kwargs)
+            children.append(process); created.set()
+            release.wait(timeout=3)
+            return process
+
+        def invoke():
+            try: runtime.preflight()
+            except (ContractError, InterruptedError) as error: errors.append(error)
+
+        def close():
+            closing.set(); runtime.close()
+
+        with patch('scripts.batch_runtime.subprocess.Popen', side_effect=paused_spawn):
+            worker = threading.Thread(target=invoke); worker.start()
+            self.assertTrue(created.wait(timeout=3))
+            closer = threading.Thread(target=close); closer.start()
+            self.assertTrue(closing.wait(timeout=3))
+            closer.join(timeout=0.05)
+            was_waiting = closer.is_alive()
+            release.set(); closer.join(timeout=3); worker.join(timeout=3)
+        self.assertTrue(was_waiting, 'close must retain locks until spawned child is registered/reaped')
+        self.assertFalse(closer.is_alive() or worker.is_alive())
+        self.assertIsNotNone(children[0].poll())
+        self.assertTrue(errors)
+        with self.assertRaises(ContractError): runtime.preflight()
+
     def test_repository_and_database_locks_reject_overlapping_runs(self):
         runtime = self.runtime()
         with self.assertRaises(ContractError): self.runtime()

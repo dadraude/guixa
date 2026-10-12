@@ -114,10 +114,11 @@ class BatchRuntime:
         if database:
             environment["DB_DATABASE"] = database
         with (directory / (name + ".log")).open("w") as log:
-            process = subprocess.Popen([*argv, "--request", str(request_path), "--result", str(result_path)],
-                                       cwd=cwd, env=environment, stdout=log, stderr=subprocess.STDOUT,
-                                       start_new_session=True)
             with self.mutex:
+                require(not self.cancelled.is_set(), "run is cancelled")
+                process = subprocess.Popen([*argv, "--request", str(request_path), "--result", str(result_path)],
+                                           cwd=cwd, env=environment, stdout=log, stderr=subprocess.STDOUT,
+                                           start_new_session=True)
                 self.children.add(process)
             deadline = time.monotonic() + self.manifest["timeout_seconds"]
             try:
@@ -175,6 +176,7 @@ class BatchRuntime:
                     "each delivered ticket needs its own new commit")
             for ticket in result["tickets"]:
                 if ticket["status"] == "delivered":
+                    self.git("merge-base", "--is-ancestor", starting_head, ticket["commit"], cwd=worktree)
                     self.git("merge-base", "--is-ancestor", ticket["commit"], head, cwd=worktree)
             verification = {"version": 1, "kind": "verify_delivery", "run_id": self.run_id,
                             "project": request["project"], "batch_id": batch["id"], "branch": batch["branch"],
@@ -190,11 +192,10 @@ class BatchRuntime:
         return result
 
     def close(self):
-        self.cancelled.set()
         with self.mutex:
-            children = list(self.children)
-        for process in children:
-            self.terminate(process)
-        for handle in self.locks:
-            handle.close()
-        self.locks.clear()
+            self.cancelled.set()
+            for process in list(self.children):
+                self.terminate(process)
+            for handle in self.locks:
+                handle.close()
+            self.locks.clear()
