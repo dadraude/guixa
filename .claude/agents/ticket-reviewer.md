@@ -24,7 +24,7 @@ The orchestrator gives you the ticket (id, acceptance criteria) and the base ref
    that would fail without it. List what is missing or only weakly tested (e.g. the test asserts the
    status code but not the data, or only the happy path).
 4. **Standards axis:** `CLAUDE.md`, `docs/principles.md`, ADRs. CI already enforces formatting, strict
-   types, Larastan level 8, UUIDv7 models, actions with `handle()` and missing translations
+   types, Larastan level 9, UUIDv7 models, actions with `handle()` and missing translations
    (`tests/Unit/ArchitectureTest.php`, `tests/Unit/TranslationsTest.php`); do not report those.
    Focus on what tools cannot see: early returns, single responsibility, clear names, English code and
    comments, Catalan UI text from translation files only, authorization through the shared gates,
