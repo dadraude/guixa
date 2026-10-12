@@ -5,6 +5,7 @@
 of read prefixes if a command requests execution outside the sandbox. Owner approval is required
 before activation. It does not complete Codex permission parity or authorize unattended delivery.
 No active `.codex/` rule, global configuration, Claude setting or service permission was changed.
+Merging a PR containing these proposal files does not activate them.
 
 ## Proposed owner decision
 
