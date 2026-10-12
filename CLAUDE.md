@@ -93,9 +93,9 @@ Standard way to implement a Linear ticket; defined in `.claude/skills/ship-ticke
 - Migrations keep the real timestamp from `make:migration`; never hand-number them.
 - Agents never post project status updates; the orchestrator posts the session's one at the end.
 - Never push to `main`, never force-push, never merge PRs without being asked.
-- Hooks in `.claude/hooks/` enforce this deterministically (push to `main`/force push, edits to tracked
-  migrations, and lint + tests when `ticket-implementer` stops). Test them with
-  `bash .claude/hooks/tests/run.sh`.
+- Hooks in `.claude/hooks/` back these rules (push to `main` and force push, edits to migrations already on
+  `main`, lint + tests when `ticket-implementer` stops); the `deny` rules in `.claude/settings.json` remain a
+  second layer and are what stops `gh pr merge`. Test the hooks with `bash .claude/hooks/tests/run.sh`.
 
 ## Language
 

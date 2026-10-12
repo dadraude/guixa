@@ -40,6 +40,18 @@ expect() { # name expected-exit hook payload
     fi
 }
 
+expect_msg() { # name expected-substring hook payload (must exit 2 and print the substring on stderr)
+    local name=$1 want=$2 script=$3 payload=$4 err code
+    err=$(printf '%s' "$payload" | bash "$hooks/$script" 2>&1 >/dev/null)
+    code=$?
+    if [ "$code" -eq 2 ] && [[ $err = *"$want"* ]]; then
+        pass=$((pass + 1))
+    else
+        fail=$((fail + 1))
+        echo "FAIL: $name (exit $code, stderr: $err)"
+    fi
+}
+
 bash_payload() { jq -nc --arg c "$1" --arg d "$2" '{tool_name:"Bash",cwd:$d,tool_input:{command:$c}}'; }
 file_payload() { jq -nc --arg t "$1" --arg f "$2" --arg d "$3" '{tool_name:$t,cwd:$d,tool_input:{file_path:$f}}'; }
 
@@ -77,6 +89,48 @@ push 'git commit -m "mention git push origin main in the message"' 0
 push 'gh pr create --base main --title x' 0
 push 'ls' 0
 
+# F3: the branch follows `cd <dir>`; cwd is the main checkout while the work happens in a worktree.
+push "cd $tmp/on-feature && git push" 0 "$tmp/on-main"
+push "cd $tmp/on-feature && git push origin HEAD" 0 "$tmp/on-main"
+push "cd $tmp/on-main && git push" 2 "$tmp/on-feature"
+push "cd $tmp/on-main && git push origin HEAD" 2 "$tmp/on-feature"
+push "cd $tmp/does-not-exist && git push" 2 "$tmp/on-feature"
+push "cd $tmp/does-not-exist && git push -u origin improvement/x" 0 "$tmp/on-feature"
+push "git -C $tmp/on-feature push" 0 "$tmp/on-main"
+# F4: line continuation
+push $'git push origin \\\nmain' 2
+push $'git push \\\n--force origin improvement/x' 2
+push $'git push -u origin \\\nimprovement/dra-134-demo' 0
+# F5: abbreviated long options
+push 'git push --forc origin improvement/x' 2
+push 'git push --force-w origin improvement/x' 2
+push 'git push --force-with origin improvement/x' 2
+push 'git push --force-with-lease origin improvement/x' 2
+push 'git push --force-i origin improvement/x' 2
+push 'git push --force-if-includes origin improvement/x' 2
+push 'git push --mirror origin' 2
+push 'git push --mirr origin' 2
+push 'git push --mi origin' 2
+push 'git push --al origin' 2
+# F6: non-canonical destinations and patterns
+push 'git push origin HEAD:heads/main' 2
+push 'git push origin improvement/x:heads/main' 2
+push 'git push origin refs/heads/*:refs/heads/*' 2
+push "git push origin 'refs/heads/*:refs/heads/*'" 2
+push 'git push origin improvement/*' 2
+# F7: quoted text in gh/echo/printf segments
+push "gh pr create --body 'never run git push origin main'" 0
+push 'echo "git push origin main"' 0
+push "printf 'git push origin main'" 0
+push 'sh -c "git push origin main"' 2
+push 'env git push origin main' 2
+push 'gh pr create --title x && git push origin main' 2
+push 'git push -u origin maintenance/dra-9-cleanup' 0
+# F11: a block explains itself on stderr
+expect_msg "push: reason on stderr" 'pushing to main is not allowed' guard-git-push.sh "$(bash_payload 'git push origin main' "$tmp/on-feature")"
+expect_msg "push: force reason on stderr" 'forcing a push is not allowed' guard-git-push.sh "$(bash_payload 'git push --force origin x' "$tmp/on-feature")"
+expect_msg "push: mirror reason on stderr" 'also push main' guard-git-push.sh "$(bash_payload 'git push --mirror' "$tmp/on-feature")"
+
 # --- guard-migrations.sh ---
 mig="database/migrations/2026_01_01_000000_create_x.php"
 new="database/migrations/2026_02_02_000000_new.php"
@@ -99,7 +153,6 @@ bm "echo x > $mig" 2
 bm "echo x >> $mig" 2
 bm "echo x >$mig" 2
 bm "tee $mig" 2
-bm "git checkout -- $mig" 2
 bm "cd . && sd a b $mig" 2
 bm "sd a b $new" 0
 bm "echo x > $new" 0
@@ -108,6 +161,59 @@ bm "rg create database/migrations" 0
 bm "php artisan make:migration create_y_table" 0
 bm "php artisan migrate:fresh 2>&1 > /dev/null" 0
 bm "sed s/a/b/ $mig" 0
+
+# F2: "tracked" means present at the merge-base with origin/main.
+make_repo "$tmp/stacked" main
+git_quiet "$tmp/stacked" update-ref refs/remotes/origin/main main
+git_quiet "$tmp/stacked" checkout -b improvement/dra-8-own
+echo '<?php' >"$tmp/stacked/database/migrations/2026_03_03_000000_own.php"
+git_quiet "$tmp/stacked" add -A
+git_quiet "$tmp/stacked" commit -m own
+own="database/migrations/2026_03_03_000000_own.php"
+sp() { mp "stacked: $1" "$2" "$3"; }
+sp "Edit migration added on the branch" 0 "$(file_payload Edit "$tmp/stacked/$own" "$tmp/stacked")"
+sp "Write migration added on the branch" 0 "$(file_payload Write "$own" "$tmp/stacked")"
+sp "Edit migration that exists on main" 2 "$(file_payload Edit "$tmp/stacked/$mig" "$tmp/stacked")"
+sp "bash sd on branch-only migration" 0 "$(bash_payload "sd a b $own" "$tmp/stacked")"
+sp "bash sd on main migration" 2 "$(bash_payload "sd a b $mig" "$tmp/stacked")"
+sp "bash rm main migration even if deleted from index" 2 "$(git_quiet "$tmp/stacked" rm -q --cached "$mig"; bash_payload "rm $mig" "$tmp/stacked")"
+git_quiet "$tmp/stacked" reset -q -- "$mig"
+# F2b: absolute paths into another repo, and cd segments
+bm_other() { mp "other repo: $1" "$2" "$(bash_payload "$1" "$tmp/on-feature")"; }
+bm_other "rm $tmp/on-main/$mig" 2
+bm_other "sd a b $tmp/stacked/$mig" 2
+bm_other "sd a b $tmp/stacked/$own" 0
+bm_other "cd $tmp/on-main && rm $mig" 2
+bm_other "cd $tmp/on-main/database/migrations && rm 2026_01_01_000000_create_x.php" 2
+bm_other "cd $tmp/on-main && rm $new" 0
+bm_other "rm $tmp/on-main/$new" 0
+# F4: line continuation
+bm $'rm \\\ndatabase/migrations/2026_01_01_000000_create_x.php' 2
+bm $'rm \\\n'"$new" 0
+# F8: find, wrappers, destinations, git checkout/restore
+bm "find database/migrations -name '*.php' -delete" 2
+bm "find database/migrations -exec rm {} ;" 2
+bm "find database/migrations -exec sed -i s/a/b/ {} ;" 2
+bm "find database/migrations -name '*.php'" 0
+bm "find database/migrations -exec cat {} ;" 0
+bm "xargs rm $mig" 2
+bm "xargs -n1 rm $mig" 2
+bm "env FOO=1 rm $mig" 2
+bm "sudo rm $mig" 2
+bm "env sd a b $mig" 2
+bm "cp $mig database/migrations/2026_04_04_000000_copy.php" 0
+bm "cp $mig $new" 0
+bm "cp -r $mig database/migrations/2026_04_04_000000_copy.php" 0
+bm "cp /tmp/x.php $mig" 2
+bm "cp /tmp/x.php database/migrations/" 0
+bm "install -m 644 /tmp/x.php $mig" 2
+bm "mv $new database/migrations/2026_05_05_000000_renamed.php" 0
+bm "git checkout -- $mig" 0
+bm "git restore $mig" 0
+bm "git rm $mig" 2
+# F11: a block explains itself on stderr
+expect_msg "migrations: reason on stderr" 'make:migration' guard-migrations.sh "$(bash_payload "rm $mig" "$tmp/on-main")"
+expect_msg "migrations: Edit reason on stderr" 'already on main' guard-migrations.sh "$(file_payload Edit "$mig" "$tmp/on-main")"
 
 # --- implementer-stop-checks.sh ---
 stop_payload() { jq -nc --arg t "$1" --arg d "$2" --argjson a "${3:-false}" '{hook_event_name:"SubagentStop",agent_type:$t,cwd:$d,stop_hook_active:$a}'; }
@@ -149,6 +255,30 @@ git_quiet "$tmp/on-feature" checkout -q -b scratch
 rm -f "$tmp/db"
 printf '%s' "$changed" | env -u DB_DATABASE GUIXA_STOP_CHECKS="$probe" bash "$hooks/implementer-stop-checks.sh" >/dev/null 2>&1
 [ ! -e "$tmp/db" ] && pass=$((pass + 1)) || { fail=$((fail + 1)); echo "FAIL: no DB derivable must skip"; }
+
+# F1: payload cwd is the clean main checkout; the worktree comes from the agent transcript.
+make_repo "$tmp/checkout" main
+git_quiet "$tmp/checkout" update-ref refs/remotes/origin/main main
+mkdir -p "$tmp/guixa-worktrees"
+git_quiet "$tmp/checkout" worktree add "$tmp/guixa-worktrees/dra-55" -b improvement/dra-55-x
+echo '<?php // change' >"$tmp/guixa-worktrees/dra-55/app.php"
+git_quiet "$tmp/guixa-worktrees/dra-55" add -A
+git_quiet "$tmp/guixa-worktrees/dra-55" commit -m change
+jq -nc --arg p "Implement DRA-55 in the worktree $tmp/guixa-worktrees/dra-55 on its branch." '{type:"user",message:{role:"user",content:$p}}' >"$tmp/transcript.jsonl"
+jq -nc '{type:"user",message:{role:"user",content:"no path here"}}' >"$tmp/transcript-none.jsonl"
+jq -nc --arg p "Worktree ../guixa-worktrees/dra-55 please." '{message:{content:$p}}' >"$tmp/transcript-relative.jsonl"
+via_transcript() { jq -c --arg t "$1" '. + {agent_transcript_path: $t}' <<<"$(stop_payload ticket-implementer "$tmp/checkout")"; }
+check "worktree from transcript: red blocks" block 'false' "$(via_transcript "$tmp/transcript.jsonl")"
+check "worktree from transcript: green passes" allow 'true' "$(via_transcript "$tmp/transcript.jsonl")"
+check "relative worktree mention resolves next to the checkout" block 'false' "$(via_transcript "$tmp/transcript-relative.jsonl")"
+check "transcript_path is the fallback key" block 'false' "$(jq -c '. + {transcript_path: "'"$tmp/transcript.jsonl"'"}' <<<"$(stop_payload ticket-implementer "$tmp/checkout")")"
+check "no worktree anywhere: skipped, not blocked" allow 'false' "$(via_transcript "$tmp/transcript-none.jsonl")"
+printf '%s' "$(via_transcript "$tmp/transcript.jsonl")" | env -u DB_DATABASE GUIXA_STOP_CHECKS="$probe" bash "$hooks/implementer-stop-checks.sh" >/dev/null 2>&1
+[ "$(cat "$tmp/db")" = testing_dra55 ] && pass=$((pass + 1)) || { fail=$((fail + 1)); echo "FAIL: DB derived from transcript worktree"; }
+err=$(printf '%s' "$(via_transcript "$tmp/transcript-none.jsonl")" | env -u DB_DATABASE GUIXA_STOP_CHECKS=false bash "$hooks/implementer-stop-checks.sh" 2>&1 >/dev/null)
+[[ $err = *'checks skipped'* ]] && pass=$((pass + 1)) || { fail=$((fail + 1)); echo "FAIL: undeterminable worktree must say so on stderr ($err)"; }
+reason=$(printf '%s' "$(via_transcript "$tmp/transcript.jsonl")" | env -u DB_DATABASE GUIXA_STOP_CHECKS='echo boom; exit 1' bash "$hooks/implementer-stop-checks.sh" 2>/dev/null | jq -r '.reason')
+[[ $reason = *boom* && $reason = *'do not guess'* && $reason = *dra-55* ]] && pass=$((pass + 1)) || { fail=$((fail + 1)); echo "FAIL: block reason content ($reason)"; }
 
 echo "passed: $pass, failed: $fail"
 [ "$fail" -eq 0 ]
