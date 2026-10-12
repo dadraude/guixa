@@ -75,17 +75,19 @@ Standard way to implement a Linear ticket; defined in `.claude/skills/ship-ticke
 - Branch `feature|bugfix|…/dra-NN-short-title`, from updated `main`, or from the blocking ticket's
   branch while its PR is still open (stacked; the PR targets that branch until it merges).
 - Always work in a worktree (`../guixa-worktrees/dra-NN`); the main checkout stays on `main` for testing.
-  Remove the worktree once the PR is open.
+  Remove the worktree once CI is green (or, if CI never gets green, once the work is escalated to the user).
 - `ticket-implementer` agent (Sonnet): test-first, linters, full suite, one single-line commit.
 - `ticket-reviewer` (Spec and Standards) and `ticket-correctness-reviewer` (bugs and security) agents
   (Opus, read-only), in parallel: independent review on a different model from the implementer. One correction pass.
-- Once the work is validated (checks green, review questions answered, correction pass applied), the
+- Once the work is validated (local checks green, review questions answered, correction pass applied), the
   orchestrator pushes and opens the PR without asking; otherwise it asks once.
 - Green CI is a convention gate (branch protection is unavailable on a private repo on the free plan): after
-  the PR is opened the orchestrator waits for `gh pr checks <PR> --watch`, and the work counts as validated,
-  and may be merged, only when every check passes. Red CI goes to a `ticket-implementer` launch (escalation
-  conditions: DRA-129). A PR that touches only `.claude/**` reports no checks (the workflow ignores those
-  paths): for such PRs only, "no checks reported" counts as passing. Local equivalents of each CI step:
+  the PR is opened the orchestrator waits for CI (`gh pr checks <PR> --watch`, after checks exist for the
+  pushed commit). The PR is **ready to merge** (validated and CI green) only when every check passes; it is
+  never merged while any check is red or pending, and merging still needs the user to ask. Red CI goes to a
+  `ticket-implementer` launch, at most 2 CI-fix passes for now (DRA-129 will define the escalation
+  conditions). A PR that touches only `.claude/**` reports no checks (the workflow ignores those paths):
+  for such PRs only, "no checks reported" counts as passing. Local equivalents of each CI step:
   `docs/principles.md`.
 - Review findings are fixed in the correction pass by default; open product questions are asked in the
   session. Only a pre-existing problem outside the ticket's code, or a question ruled out of scope,
