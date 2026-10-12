@@ -10,6 +10,21 @@ ends with one Guixa project status update: what was done and the concrete next s
 no longer has a `STATUS.md`. Milestones group tickets by spec, plus one for going live, so
 progress per spec is visible without a separate summary.
 
+## Amendment — explicit project sessions (2026-10-12, DRA-145)
+
+The original single-project wording above describes the initial setup. Workflow autonomy is now a
+separate Linear project (`P-DRA-2`) in the same Draude workspace and repository. `/run-session` takes
+one explicit project name or ID; if it is missing, unknown or ambiguous, ask and wait before reading
+its queue or changing issues. No default to Guixa and no implicit combined session.
+
+Each project owns its queue, session numbering, status updates and autonomy metrics. A new project
+starts at session 1; its first reporting window begins at project creation. Follow-ups inherit the
+parent ticket's project and optional milestone. Shared repository safeguards still apply across
+projects. `docs/agents/issue-tracker.md` defines PR attribution and incomplete-evidence reporting.
+
+This amendment supersedes the Guixa-only session and status rules below; Linear remains the only
+record of project status.
+
 ## Considered options
 
 - **`STATUS.md` in the repo next to Linear (sessions 1–22):** it repeated ticket states and the
