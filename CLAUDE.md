@@ -78,8 +78,8 @@ Standard way to implement a Linear ticket; defined in `.claude/skills/ship-ticke
   Remove the worktree once CI is green (or, if CI never gets green, once the work is escalated to the user).
 - `ticket-implementer` agent (Sonnet): test-first, linters, full suite, one single-line commit.
 - `ticket-reviewer` (Spec and Standards) and `ticket-correctness-reviewer` (bugs and security) agents
-  (Opus, read-only), in parallel: independent review on a different model from the implementer. One correction pass.
-- Once the work is validated (local checks green, review questions answered, correction pass applied), the
+  (Opus, read-only), in parallel: independent review on a different model from the implementer. Up to two correction passes: the second only if the first leaves confirmed findings, and its re-review covers just those findings and the new diff; what is still open after it is escalated, not deferred.
+- Once the work is validated (local checks green, review questions answered, correction passes applied), the
   orchestrator pushes and opens the PR without asking; otherwise it asks once.
 - Green CI is a convention gate (branch protection is unavailable on a private repo on the free plan): after
   the PR is opened the orchestrator waits for CI (`gh pr checks <PR> --watch`, after checks exist for the

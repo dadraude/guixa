@@ -45,7 +45,10 @@ Every `ticket-implementer` launch in this flow passes `model: "sonnet"`; never i
 main session or with the plugin's `/implement`.
 
 Launch the `ticket-implementer` agent with the full ticket (id, title, description, acceptance
-criteria), the branch and the worktree path. Wait for its report.
+criteria), the branch and the worktree path. Tell it to read the two reviewer agents,
+`.claude/agents/ticket-reviewer.md` and `.claude/agents/ticket-correctness-reviewer.md`, before it starts
+and to self-check its work against their checklists (spec coverage and standards; bugs and security), so
+the reviewers do not find what it could have caught. Wait for its report.
 
 If it stopped on an undecided edge case or any product question, ask the user (one question at a time),
 record each answer in the ticket as an acceptance criterion, and launch it again with the updated ticket;
@@ -79,9 +82,17 @@ to fix it now: a correction pass is cheaper than an issue, its triage and anothe
    record each answer in the ticket as an acceptance criterion. If the user rules it out of the
    ticket's scope, it becomes a follow-up.
 2. **Correction pass**: if there is any `fix now` finding or answered question, relay all of them from
-   both reviewers to one new `ticket-implementer` pass (one correction pass only), whatever the
-   verdicts. A finding a tool could check is fixed by adding the check (arch test, Larastan or Pint
-   rule), not by a one-off edit. Drop anything not worth a line of code and say so.
+   both reviewers to one new `ticket-implementer` pass, whatever the verdicts. A finding a tool could
+   check is fixed by adding the check (arch test, Larastan or Pint rule), not by a one-off edit. Drop
+   anything not worth a line of code and say so.
+   **Second pass**: there are at most two correction passes. After the first, if any `fix now` finding was
+   dropped or fixed wrongly, or the diff may have introduced new problems, relaunch both reviewers
+   (`model: "opus"`) with only the first pass's findings and the diff of the correction commit
+   (`git diff <commit before the pass>..HEAD`), not the whole ticket again. If they confirm real
+   `fix now` findings, relay them to a second `ticket-implementer` pass, and do not review again after it
+   beyond checking that each of those findings is fixed (you may ask a reviewer for that). Whatever is
+   still confirmed after the second pass is not deferred: create one Triage issue per finding as in
+   section 2 (deduplicated, related to the ticket), tell the user, and the work is not validated (section 4).
 3. **Follow-ups**, only for (a) a problem that already existed before this ticket and sits outside the
    files it changes (a reviewer `follow-up` inside a file the ticket changes is treated as `fix now`), (b) a question the user ruled out of scope, or (c) a follow-up the implementer
    reported under the decision rule (Guardrails). One Linear issue each in project
@@ -95,8 +106,8 @@ to fix it now: a correction pass is cheaper than an issue, its triage and anothe
 The work is **validated** when all of these hold:
 - the last `ticket-implementer` pass committed and reports the full suite and linters green;
 - every reviewer `question` was answered by the user (or ruled out of scope into a follow-up);
-- the correction pass, if any, applied every `fix now` finding (dropped ones are only those not worth a
-  line of code);
+- the correction passes (at most two), if any, applied every `fix now` finding (dropped ones are only
+  those not worth a line of code);
 - no open doubt is left from the implementer or the reviewers, and no escalation is unresolved.
 
 "Validated" is evaluated once, before the push; CI is checked after it. Validated: deliver without asking. Not validated: show the user what is missing and ask once whether to
@@ -149,7 +160,7 @@ do the same anyway and say so in the summary. If the PR needs more work later, a
 its first serial test run recreates the database.
 
 Then show the user a short summary: the PR link, what was built, CI result (ready to merge or not), the CI-fix commit(s) with their diff (nobody re-reviews them, and a file list would not reveal a weakened check), test/lint results (as reported, not
-re-verified unless asked), both review verdicts, what the correction pass fixed, what was dropped and the
+re-verified unless asked), both review verdicts, what the correction pass(es) fixed, what was dropped and the
 follow-ups.
 
 ## 5. Session status

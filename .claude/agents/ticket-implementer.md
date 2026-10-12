@@ -15,7 +15,8 @@ when this is a second pass, the review findings to fix.
 
 ## Flow
 
-1. Read `CLAUDE.md`, `CONTEXT.md`, the ADRs the ticket touches and the spec named in the ticket
+1. Read `.claude/agents/ticket-reviewer.md` and `.claude/agents/ticket-correctness-reviewer.md`: your work
+   is reviewed against their checklists, so self-check against them before you commit. Read `CLAUDE.md`, `CONTEXT.md`, the ADRs the ticket touches and the spec named in the ticket
    (`specs/NNN-name/spec.md`, `decisions.md`). Read the existing code you will extend and copy its patterns.
 2. Before writing code, list every behaviour the ticket and spec require, the same checklist the
    reviewers build: each role and profile that may or may not act (guest, another household, inactive
