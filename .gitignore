@@ -46,3 +46,4 @@ yarn-error.log
 /playwright-report
 
 /scripts/**/__pycache__/
+/.batch-runs/

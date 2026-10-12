@@ -49,19 +49,33 @@ but is not automatically taken into this session.
 
 ## 2. Work
 
-Take only the selected project's Todo issues in blocking order:
+Take only the selected project's confirmed Todo scope:
 
-- **Ticket** (`ready-for-agent`): read `.claude/skills/ship-ticket/SKILL.md` and run its flow for the
-  issue, skipping its step 5 (the status update belongs to this skill's close).
-- **PR fix** (an In Review issue taken in Open): run the "PR fix" flow in
-  `.claude/skills/ship-ticket/SKILL.md`; when the PR is pushed and CI is green again, move the issue back
-  to In Review.
-- **`ready-for-human`**: the user does it; help as asked and move the issue when they say it is done.
-  Any code change that help needs goes to a `ticket-implementer` launch with `model: "sonnet"`.
+1. Propose and confirm the batch grouping: related/chained `ready-for-agent` tickets share one branch
+   and PR, at most four per batch, one implementation commit per ticket. Independent batches may run
+   in parallel (default three); cross-cutting sweeps run alone across the shared repository. Keep
+   project selection, ticket dependencies and grouping explicit rather than inferring a new scope.
+2. Read `.claude/skills/ship-batch/SKILL.md`. Prepare a version 1 manifest with the resolved project ID,
+   approved tickets/branches/DAG, isolated worktree root, provider adapter/verifier argv and all model
+   roles. Use `docs/agents/batch-execution.md`. Missing configuration or reviewed permissions stops
+   execution visibly; never switch providers or bypass permissions to keep the session moving.
+3. Invoke `scripts/run-batches.sh <manifest>` and wait for completion. Each batch gets a fresh external
+   orchestrator process. Parents must deliver verified open PRs with passing CI before dependents
+   stack on their branches. Unanswered headless product questions become deduplicated Triage issues
+   in the parent's project with `cause: product-question`; affected tickets return to Backlog and
+   their dependents stop while independent remainder may continue.
+4. Reconcile every result/receipt against Linear, Git, open PRs and exact-head CI. A zero exit and a
+   schema-valid result do not establish provider permissions or tracker writes. Preserve uncommitted
+   work before authorized cleanup; report failure/interruption and required recovery. Only this
+   interactive session drafts and posts the selected project's status update in Close.
 
-Between two tickets, suggest `/compact` to the user (or ending the session) when the context is long.
-- **Spec work** (vision, principles, a spec, its review, its tickets): run the matching step of the
-  SDD workflow in `CLAUDE.md`, in a worktree on a `chore/` or `feature/` branch, and open a PR the same way.
+- **PR fix** (an In Review issue taken in Open): retain the "PR fix" flow in
+  `.claude/skills/ship-ticket/SKILL.md`; when pushed and CI is green, move it back to In Review.
+  The new-batch runner does not reuse existing PR branches.
+- **`ready-for-human`**: the user does it; help as asked and move it when they say it is done.
+  Any code change goes to a fresh implementer with the configured model role.
+- **Spec work** (vision, principles, a spec, its review, its tickets): run the matching SDD step in
+  `CLAUDE.md`, in a worktree on a `chore/` or `feature/` branch, and open a PR the same way.
 
 Record every open topic that comes up (a question, a decision to take, a manual check) in the
 selected project's Triage as soon as it appears. Follow-ups and escalations inherit their parent
