@@ -4,6 +4,11 @@ description: Standard Guixa flow to take one Linear ticket (DRA-NN) from Backlog
 disable-model-invocation: true
 ---
 
+For headless automatic work, use `.claude/skills/ship-batch/SKILL.md` and the provider-neutral
+contract in `docs/agents/batch-execution.md`. An unanswered headless product question is immediately
+recorded as a deduplicated parent-project Triage issue (`cause: product-question`), and its ticket
+returns to Backlog; dependent tickets stop. Only the interactive session posts a status update.
+
 Orchestrate the ticket in the argument. Only the main session can launch agents, so you run this flow;
 the agents do the heavy work and you keep a short thread. Talk to the user in Catalan.
 
@@ -46,8 +51,8 @@ the agents do the heavy work and you keep a short thread. Talk to the user in Ca
 
 ## 2. Implement
 
-Every `ticket-implementer` launch in this flow passes `model: "sonnet"`; never implement inline in the
-main session or with the plugin's `/implement`.
+Every `ticket-implementer` launch explicitly selects the configured implementer model role from
+`CLAUDE.md`; never implement inline in the main session or with the plugin's `/implement`.
 
 Launch the `ticket-implementer` agent with the full ticket (id, title, description, acceptance
 criteria), the branch and the worktree path. Tell it to read the two reviewer agents,
@@ -74,7 +79,7 @@ that only runs the full checks (step 5 of its flow) and fixes what breaks.
 
 ## 3. Independent review
 
-Launch both reviewers in parallel (one message, two agents), each with `model: "opus"`, the full ticket (as given to the implementer) and
+Launch both reviewers in parallel (one message, two agents), each with its configured reviewer model role, the full ticket (as given to the implementer) and
 the base ref (`main`, or the blocker's branch). If they run tests, each prefixes them with its own
 `DB_DATABASE=testing_draNN_review` or `DB_DATABASE=testing_draNN_correctness`:
 - `ticket-reviewer`: spec coverage and standards.
@@ -92,7 +97,7 @@ to fix it now: a correction pass is cheaper than an issue, its triage and anothe
    anything not worth a line of code and say so.
    **Second pass**: there are at most two correction passes. After the first, if any `fix now` finding was
    dropped or fixed wrongly, or the diff may have introduced new problems, relaunch both reviewers
-   (`model: "opus"`) with only the first pass's findings and the diff of the correction commit
+   (configured reviewer model roles) with only the first pass's findings and the diff of the correction commit
    (`git diff <commit before the pass>..HEAD`), not the whole ticket again. If they confirm real
    `fix now` findings, relay them to a second `ticket-implementer` pass, and do not review again after it
    beyond checking that each of those findings is fixed (you may ask a reviewer for that). Whatever is
@@ -187,7 +192,7 @@ branch, not a new ticket; the PR stays the same.
    `git worktree add ../guixa-worktrees/dra-NN <branch>`, then the setup in section 1 step 2 (`.env`,
    `php` 8.5 on `PATH`, `composer install`, `npm ci`, its own `testing_draNN` database). Merge
    `origin/<base>` as in section 2.
-3. Launch a `ticket-implementer` (`model: "sonnet"`; the main session never writes code) with the
+3. Launch a `ticket-implementer` (configured implementer model role; the main session never writes code) with the
    ticket, the feedback to address and the branch. It follows the same decision rule and escalation
    conditions (Guardrails) and makes one more commit `fix(scope): <description> (DRA-NN)`, never
    amending or rewriting what is pushed. A review comment raising a product question the spec does not
