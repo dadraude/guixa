@@ -128,9 +128,10 @@ class BatchRuntime:
                     require(time.monotonic() < deadline, f"{name} timed out; see {log.name}")
                 require(process.returncode == 0, f"{name} exited {process.returncode}; see {log.name}")
             finally:
-                self.terminate(process)
                 with self.mutex:
-                    self.children.discard(process)
+                    if process in self.children:
+                        self.terminate(process)
+                        self.children.discard(process)
         return read_json(result_path)
 
     def preflight(self):
@@ -196,6 +197,7 @@ class BatchRuntime:
             self.cancelled.set()
             for process in list(self.children):
                 self.terminate(process)
+            self.children.clear()
             for handle in self.locks:
                 handle.close()
             self.locks.clear()
