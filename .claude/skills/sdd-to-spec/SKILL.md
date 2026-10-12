@@ -1,29 +1,31 @@
 ---
-name: guixa-to-spec
-description: Turn the current conversation into a Guixa spec at specs/NNN-name/spec.md (Status draft), then run spec-reviewer. Use when the user types /guixa-to-spec or asks to write a spec after /grill-with-docs.
+name: sdd-to-spec
+description: "Use /sdd-to-spec after design discussion to write a draft spec in the configured location and run the blocking spec review before approval."
 disable-model-invocation: true
 ---
 
-Based on the global `to-spec` skill, adapted to the Guixa SDD workflow (`CLAUDE.md`). Take the current
-conversation and codebase understanding and produce a spec. Do NOT interview the user; synthesize what
-you already know. Talk to the user in Catalan; the spec itself is in English.
+Based on the global `to-spec` skill, with a blocking review gate. Read `docs/agents/issue-tracker.md`
+for the spec location and approval rules, `docs/agents/domain.md` for vocabulary sources, and the
+repository instructions for language and reviewer configuration. If required configuration is missing,
+ask for it before writing. Synthesize the current conversation and codebase understanding into a spec;
+do not restart the design interview.
 
 ## Differences from the global `to-spec`
 
-1. The spec is written to `specs/NNN-name/spec.md` in the repo with `Status: draft`. It is not
+1. The spec is written to the configured spec path in the repo with `Status: draft`. It is not
    published to the issue tracker and gets no `ready-for-agent` label.
-2. Every user story has at least one acceptance criterion that can become an automated test (a Pest
-   feature test at the HTTP level by default; Vitest or Playwright where `docs/principles.md` says so). A story without one is not finished.
+2. Every user story has at least one acceptance criterion that can become an automated test using
+   the project's testing seams and tools from `docs/principles.md`. A story without one is not finished.
 3. The skill ends by launching `spec-reviewer`. The spec is not offered for approval until the
    reviewer's `Undecided` count is 0.
 
 ## Process
 
-1. Explore the repo if you have not already. Use the vocabulary of `CONTEXT.md` and respect the ADRs in
-   the area you touch. Pick the next free `NNN` in `specs/`.
+1. Explore the repo if you have not already. Use the configured domain vocabulary and respect the ADRs in
+   the area you touch. Pick the next free number in the configured spec directory.
 2. Sketch the seams at which the feature will be tested. Prefer existing seams and the highest one
    possible; the ideal number is one. Check with the user that they match.
-3. Write `specs/NNN-name/spec.md` with the template below, starting with `Status: draft`.
+3. Write the configured spec path with the template below, starting with `Status: draft`.
 4. Launch the `spec-reviewer` agent with `model: "opus"` and the spec path.
 5. Resolve the reviewer's output: write the obvious answers into the spec as acceptance criteria, and
    ask the rest one by one, invoking the `grilling` and `domain-modeling` skills directly (one question at a
