@@ -97,12 +97,23 @@ def prepare_launch(policy_path, policy_sha256, *, read_only=False):
         raise ValueError('unknown launch policy fields')
     fragment = prepare(policy['worktree'], policy['repository'], policy['writes'])
     tree, repo = Path(fragment['worktree']), Path(fragment['repository'])
-    for trusted in (Path(__file__).resolve(), Path(codex_profile.__file__).resolve()):
-        if str(trusted) in fragment['approved_writes']:
-            raise ValueError('worker may not modify host launcher code')
     executable = absolute_path(policy['executable'])
     home = absolute_path(policy['codex_home'])
     user_home = absolute_path(policy['user_home'])
+    trusted_paths = [policy_path, executable, home / 'config.toml',
+                     Path(__file__).resolve(), Path(codex_profile.__file__).resolve()]
+    trusted_paths += [Path(path) for path in policy['files']]
+    trusted_parts = {comparison_parts(path) for path in trusted_paths}
+    trusted_identities = {(path.stat().st_dev, path.stat().st_ino)
+                          for path in trusted_paths if path.exists()}
+    for name in fragment['approved_writes']:
+        grant = Path(name)
+        if comparison_parts(grant) in trusted_parts:
+            raise ValueError('worker may not modify host launcher or trust inputs')
+        if grant.exists():
+            stat = grant.stat()
+            if stat.st_nlink != 1 or (stat.st_dev, stat.st_ino) in trusted_identities:
+                raise ValueError('worker write grant aliases a file or host trust input')
     roots = [tree, repo, Path(fragment['git_common_dir'])]
     for path in (policy_path, executable, home):
         outside(path, roots)

@@ -1,10 +1,12 @@
 import hashlib
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import codex_worker as worker
@@ -131,6 +133,35 @@ class WorkerTest(unittest.TestCase):
         self.save()
         with self.assertRaises(ValueError):
             self.prepare()
+
+    def test_hardlinked_trust_inputs_are_refused_before_feature_probe(self):
+        (self.tree / 'scripts').mkdir()
+        grant = self.tree / 'scripts/new.py'
+        for trusted in (self.config, self.policy, self.exe):
+            os.link(trusted, grant)
+            for read_only in (False, True):
+                with self.subTest(trusted=trusted, read_only=read_only):
+                    with patch.object(worker.subprocess, 'run', wraps=subprocess.run) as probe:
+                        with self.assertRaises(ValueError):
+                            self.prepare(read_only=read_only)
+                        self.assertFalse(any(call.args[0][0] == str(self.exe) for call in probe.call_args_list))
+            grant.unlink()
+
+    def test_case_aliases_of_host_modules_are_refused(self):
+        (self.tree / 'scripts').mkdir()
+        for module, name in ((worker, 'launcher.py'), (worker.codex_profile, 'profile.py')):
+            trusted = self.tree / 'scripts' / name
+            trusted.write_text('trusted host code')
+            alias = trusted.with_name(name.upper())
+            # Exercise normalized spelling on every platform and inode aliases where supported.
+            self.data['writes'] = ['scripts/' + alias.name]
+            self.save()
+            with patch.object(module, '__file__', str(trusted)):
+                with self.assertRaisesRegex(ValueError, 'host launcher'):
+                    self.prepare()
+            if alias.exists():
+                self.assertTrue(alias.samefile(trusted))
+            trusted.unlink()
 
     def test_process_failure_and_timeout_are_reported(self):
         self.exe.write_text('#!/bin/sh\nif [ \"$2\" = features ]; then /bin/echo \"multi_agent stable true\"; else exit 3; fi\n')
