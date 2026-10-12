@@ -43,15 +43,30 @@ class CodexProfileTest(unittest.TestCase):
         self.assertEqual(config["web_search"], "disabled")
         self.assertNotIn("sandbox_mode", config)
         policy = config["permissions"]["guixa-batch"]
-        self.assertEqual(policy["filesystem"][str(self.worktree / "scripts/new.py")], "write")
+        self.assertEqual({path for path, mode in policy["filesystem"].items() if mode == "write"},
+                         {str(self.worktree / "scripts/new.py")})
+        self.assertIn("launch-time revalidation of exact write paths", artifact["required_gates"])
         self.assertEqual(policy["filesystem"][":root"], "read")
         self.assertFalse(policy["network"]["enabled"])
         self.assertFalse(artifact["activation_ready"])
         self.assertIn("sealed launch without inherited tools", artifact["required_gates"])
 
+    def test_preserves_non_bmp_path_in_valid_toml(self):
+        scope = "scripts/🧪-é.py"
+        result = self.run_cli(scope)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        artifact = json.loads(self.output.read_text())
+        config = tomllib.loads(artifact["toml"])
+        expected = str(self.worktree / scope)
+        self.assertEqual(artifact["approved_writes"], [expected])
+        self.assertEqual(config["permissions"]["guixa-batch"]["filesystem"][expected], "write")
+
     def test_refuses_protected_and_noncanonical_scopes(self):
-        for scope in ("docs", "docs/adr/new.md", "scripts/../docs/note.md", "scripts/.env",
+        for scope in ("docs", "docs/adr/new.md", "docs/ADR/new.md",
+                      "scripts/agents.MD", "scripts/AGENTS.md", "scripts/.CODEX/new.py",
+                      "scripts/.ENV.local", "scripts/../docs/note.md", "scripts/.env",
                       "scripts/.git/hooks/new", "scripts/package.json", "package.json", "app/new.php", "", "scripts//new.py"):
+            self.output.unlink(missing_ok=True)
             with self.subTest(scope=scope):
                 self.assertNotEqual(self.run_cli(scope).returncode, 0)
                 self.assertFalse(self.output.exists())
@@ -68,16 +83,33 @@ class CodexProfileTest(unittest.TestCase):
 
     def test_refuses_autoload_outputs_and_overwrite(self):
         for output in (self.root / "config.toml", self.root / "batch.config.toml",
-                       self.worktree / ".codex/review.json"):
-            self.assertNotEqual(self.run_cli("scripts/new.py", output=output).returncode, 0)
+                       self.worktree / ".codex/review.json", self.worktree / ".CODEX/review.json",
+                       self.root / "CONFIG.TOML", self.root / "batch.CONFIG.TOML"):
+            output.parent.mkdir(parents=True, exist_ok=True)
+            with self.subTest(output=output):
+                self.assertNotEqual(self.run_cli("scripts/new.py", output=output).returncode, 0)
+                self.assertFalse(output.exists())
+                output.unlink(missing_ok=True)
         self.output.write_text("keep")
         self.assertNotEqual(self.run_cli("scripts/new.py").returncode, 0)
         self.assertEqual(self.output.read_text(), "keep")
 
     def test_refuses_directory_grants(self):
-        (self.worktree / "scripts").mkdir()
-        self.assertNotEqual(self.run_cli("scripts").returncode, 0)
-        self.assertFalse(self.output.exists())
+        for scope in ("scripts", "scripts/subdir", "docs/subdir"):
+            (self.worktree / scope).mkdir(parents=True, exist_ok=True)
+            self.output.unlink(missing_ok=True)
+            with self.subTest(scope=scope):
+                self.assertNotEqual(self.run_cli(scope).returncode, 0)
+                self.assertFalse(self.output.exists())
+
+    def test_refuses_glob_and_control_syntax_in_grants(self):
+        for scope in ("scripts/*.py", "scripts/a?.py", "scripts/[ab].py",
+                      "scripts/{a,b}.py", "scripts/a\\b.py", "scripts/a\n.py",
+                      "scripts/a\t.py", "scripts/a\x7f.py"):
+            self.output.unlink(missing_ok=True)
+            with self.subTest(scope=scope):
+                self.assertNotEqual(self.run_cli(scope).returncode, 0)
+                self.assertFalse(self.output.exists())
 
     def test_refuses_main_checkout_empty_scope_and_output_symlinks(self):
         self.assertNotEqual(self.run_cli().returncode, 0)
