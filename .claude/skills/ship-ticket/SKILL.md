@@ -170,6 +170,32 @@ Then show the user a short summary: the PR link, what was built, CI result (read
 re-verified unless asked), both review verdicts, what the correction pass(es) fixed, what was dropped and the
 follow-ups.
 
+## PR fix (feedback on an open PR)
+
+For an In Review issue whose open PR has red checks, changes requested or unanswered review comments
+(found in the `run-session` open phase, or when the user asks). It is a correction on the existing
+branch, not a new ticket; the PR stays the same.
+
+1. Move the issue to **In Progress**. Read the feedback: `gh pr view <PR> --json reviews,comments` for
+   review text and `gh pr checks <PR>` for red checks (logs as in "Red CI" in section 4).
+2. New worktree on the existing branch (the previous one was removed): `git fetch origin`,
+   `git worktree add ../guixa-worktrees/dra-NN <branch>`, then the setup in section 1 step 2 (`.env`,
+   `php` 8.5 on `PATH`, `composer install`, `npm ci`, its own `testing_draNN` database). Merge
+   `origin/<base>` as in section 2.
+3. Launch a `ticket-implementer` (`model: "sonnet"`; the main session never writes code) with the
+   ticket, the feedback to address and the branch. It follows the same decision rule and escalation
+   conditions (Guardrails) and makes one more commit `fix(scope): <description> (DRA-NN)`, never
+   amending or rewriting what is pushed. A review comment raising a product question the spec does not
+   resolve is escalation condition 2: ask the user before changing behaviour.
+4. Re-review with the two Opus reviewers (section 3, only the diff of the fix commit) only when the fix
+   is non-trivial: it changes behaviour or logic, or touches more than the lines the feedback names. A
+   CI-only or wording fix does not need it; say so in the summary.
+5. Push (never force), answer each review comment on the PR with what changed, then follow the CI gate
+   of section 4 (including the CI-fix limits and the worktree and database cleanup). Move the issue back
+   to **In Review**.
+
+Never skip or disable a test to get green. Never merge; never push to `main`.
+
 ## 5. Session status
 
 Agents never post project status updates. At the end of the session, post one Guixa project status

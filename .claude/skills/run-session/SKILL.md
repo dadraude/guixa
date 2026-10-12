@@ -15,8 +15,13 @@ live in `CLAUDE.md` and `docs/agents/issue-tracker.md`; this skill is their runn
    number plus one; its next step is the default goal.
 3. **Leftovers**: list Guixa issues in Todo, In Progress and In Review (one filtered `list_issues` call
    per state, with a `limit`).
-   - In Review: check each PR with `gh pr view`. Merged and still In Review → move it to Done.
-     Still open → it carries over; mention it.
+   - In Review: check each PR with
+     `gh pr view <PR> --json state,reviewDecision,reviews,comments,statusCheckRollup`. Merged and still
+     In Review → move it to Done. Still open and clean (checks green or none expected, no changes
+     requested, no unanswered comments) → it carries over; mention it. Still open with red checks,
+     changes requested, or review comments not yet answered → offer it to the user as a **PR fix**; if
+     accepted, move the issue to **Todo** (session scope), otherwise it carries over and you say why it
+     needs work. Do not offer a PR whose checks are only pending.
    - Todo or In Progress means the last session did not close cleanly: ask the user, issue by issue,
      whether to take it into this session or send it back to Backlog.
 4. **Triage**: every Guixa issue in the Triage state, one by one with the user. Each ends as
@@ -34,6 +39,9 @@ Take the Todo issues in blocking order:
 
 - **Ticket** (`ready-for-agent`): read `.claude/skills/ship-ticket/SKILL.md` and run its flow for the
   issue, skipping its step 5 (the status update belongs to this skill's close).
+- **PR fix** (an In Review issue taken in Open): run the "PR fix" flow in
+  `.claude/skills/ship-ticket/SKILL.md`; when the PR is pushed and CI is green again, move the issue back
+  to In Review.
 - **`ready-for-human`**: the user does it; help as asked and move the issue when they say it is done.
   Any code change that help needs goes to a `ticket-implementer` launch with `model: "sonnet"`.
 
