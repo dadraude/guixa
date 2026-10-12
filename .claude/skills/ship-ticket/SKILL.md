@@ -9,7 +9,11 @@ the agents do the heavy work and you keep a short thread. Talk to the user in Ca
 
 ## 1. Prepare
 
-1. Check with `get_workspace` that the Linear workspace is `Draude` (stop otherwise). Read the ticket with Linear (`get_issue`, including relations). If a blocker is not Done, tell the user
+1. Check with `get_workspace` that the Linear workspace is `Draude` (stop otherwise). Read the ticket
+   with Linear (`get_issue`, including relations); keep its project ID and optional milestone for
+   follow-ups, escalations and the session update. If it has no project, ask before starting. Inside
+   `/run-session`, it must belong to the selected project; otherwise stop for a scope decision.
+   If a blocker is not Done, tell the user
    which one and which PR holds it.
 2. Branch name: `feature|bugfix|improvement|refactor|chore/dra-NN-short-kebab-title`.
    - Blockers merged, or none: create it from an updated `main`.
@@ -34,7 +38,8 @@ the agents do the heavy work and you keep a short thread. Talk to the user in Ca
      named `testing_draNN_<suffix>`, so the cleanup in step 4 finds it. Tests never touch `guixa`
      (the user's database) nor `testing` (the main checkout's): never pass either as `DB_DATABASE`.
 3. **Cross-cutting tickets ship alone.** If the ticket touches many files outside its own feature
-   (formatter or linter sweeps, strict types, mass renames, moving folders), check `gh pr list`: with
+   (formatter or linter sweeps, strict types, mass renames, moving folders), check `gh pr list` across
+   the whole repository, including PRs from other Linear projects: with
    other PRs open, tell the user and ask whether to wait until they merge. Once its PR is open, do not
    open new PRs until it merges.
 4. Move the issue to **In Progress**.
@@ -55,7 +60,7 @@ record each answer in the ticket as an acceptance criterion, and launch it again
 open a Triage issue only if the user leaves it open or rules it out of scope.
 
 If it stopped on any other escalation condition (see Guardrails), create ONE Triage issue per finding
-(project Guixa, related to the ticket, in its milestone), after checking the issues already related to
+(in the ticket's project, related to the ticket, with its milestone only when present), after checking the issues already related to
 this ticket to avoid duplicates, and tell the user. Then either relaunch it with the decision, or stop
 the ticket cleanly: issue back to Backlog, worktree removed, test databases dropped, nothing dangling.
 
@@ -95,8 +100,8 @@ to fix it now: a correction pass is cheaper than an issue, its triage and anothe
    section 2 (deduplicated, related to the ticket), tell the user, and the work is not validated (section 4).
 3. **Follow-ups**, only for (a) a problem that already existed before this ticket and sits outside the
    files it changes (a reviewer `follow-up` inside a file the ticket changes is treated as `fix now`), (b) a question the user ruled out of scope (the ticket's "Out of scope (decided)" section only holds exclusions decided in the spec before the tickets were created; what a user rules out during `/ship-ticket` stays a follow-up), or (c) a follow-up the implementer
-   reported under the decision rule (Guardrails). One Linear issue each in project
-   Guixa, state Triage, related to the parent ticket and in its milestone, titled with the
+   reported under the decision rule (Guardrails). One Linear issue each in the parent ticket's
+   project, state Triage, related to the parent ticket and with its milestone only when present, titled with the
    change to make; body: file:line, the finding and the suggested fix. Add exactly one `cause` label
    (see below) to every follow-up or escalation issue you create. Skip any finding already filed as
    an escalation or follow-up issue for this ticket (check the issues related to it first). Create them in
@@ -198,8 +203,9 @@ Never skip or disable a test to get green. Never merge; never push to `main`.
 
 ## 5. Session status
 
-Agents never post project status updates. At the end of the session, post one Guixa project status
-update yourself (see `docs/agents/issue-tracker.md`).
+Agents never post project status updates. At the end of a standalone ticket session, post one status
+update in the ticket's project yourself. Under `/run-session`, its Close phase posts the single update
+in the selected project (see `docs/agents/issue-tracker.md`).
 
 ## Guardrails
 

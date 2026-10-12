@@ -22,7 +22,7 @@ using Matt Pocock's skills (`mattpocock-skills` plugin). See `docs/adr/0001-sdd-
    4. **The user approves the spec** (`Status: approved`). A spec cannot be offered for approval, nor approved,
       while any edge case the reviewer listed lacks a written decision in the spec, its `decisions.md` or an ADR (`Undecided: 0`).
       No tickets and no code before that.
-   5. `/guixa-to-tickets`: splits the spec into vertical-slice tickets in Linear (project Guixa). Each ticket
+   5. `/guixa-to-tickets`: splits the spec into vertical-slice tickets in Linear (the selected project; see `docs/agents/issue-tracker.md`). Each ticket
       carries the edge cases decided for its stories as acceptance criteria.
    6. `/ship-ticket DRA-NN`: one or a few tickets per session; the `ticket-implementer` agent builds
       test-first (`/tdd`) and two reviewer agents check it. Do not use the plugin's `/implement`: it
@@ -57,21 +57,24 @@ agent/skill files.
 
 ## Session rules
 
-`/run-session` runs a whole session in this order (open, work, close); defined in
+`/run-session <project name or ID>` runs a whole session for that explicit project (open, work, close);
+if omitted, it asks which project before reading its queue or changing issues. Unknown or ambiguous
+projects also require clarification; it never defaults to Guixa. Defined in
 `.claude/skills/run-session/SKILL.md`.
 
 - Each session has **one small goal** (e.g. "write spec 001", "tickets DRA-3 and DRA-4").
 - Linear is the only record of project status (ADR 0009): ticket states, blocking relations and
-  priority hold the queue; open topics are issues; each session leaves a project status update.
+  priority hold the queue; open topics are issues; each session leaves a status update in its selected
+  project (Guixa for product work, Workflow autonomy for process work). Session numbering and metrics are per project.
   There is no status file in the repo.
-- At the start: read the latest Guixa project status update, then triage the Guixa issues in the
+- At the start: read the selected project's latest status update, then triage its issues in the
   Triage state with the user: each one becomes `ready-for-agent`, `ready-for-human` (Backlog) or `wontfix` (Canceled).
   Then choose the session's issues with the user and move them to **Todo**: Todo is the session scope.
 - At the end: leave nothing half-done, commit and push to `origin` (github.com:dadraude/guixa), and
-  post a Guixa project status update with what was done and the concrete next step. Todo must be
-  empty: every session issue is In Review or Done, or goes back to Backlog and the status update says
-  why. In Review may carry over to the next session (it waits on a merge).
-- At the start, every open In Review PR is also checked for red checks, changes requested and unanswered
+  post a status update in the selected project with what was done and the concrete next step. Its
+  Todo must be empty: every session issue is In Review or Done, or goes back to Backlog with the
+  reason in the update. Other projects' issues and active worktrees are left alone. In Review may carry over to the next session (it waits on a merge).
+- At the start, every open In Review PR linked to the selected project is also checked for red checks, changes requested and unanswered
   review comments; one that needs work is offered as session scope ("PR fix", run as in
   `.claude/skills/ship-ticket/SKILL.md`) instead of just carrying over.
 - If the goal doesn't fit, split it and close the finished part.
@@ -116,9 +119,13 @@ Standard way to implement a Linear ticket; defined in `.claude/skills/ship-ticke
 - Linear: In Progress when starting, In Review when the PR is opened.
 - Before review and again before pushing, the branch merges `origin/<base>` so conflicts show up in the
   session, not in the PR.
-- Cross-cutting tickets (sweeps over many files) ship alone: no other PRs open while theirs is open.
+- Cross-cutting tickets (sweeps over many files) ship alone across the shared repository: no other
+  PRs open while theirs is open, even from a different Linear project.
+- Follow-ups and escalations inherit the parent ticket's project and milestone when present; never
+  default to Guixa or invent a milestone for a ticket without one.
 - Migrations keep the real timestamp from `make:migration`; never hand-number them.
-- Agents never post project status updates; the orchestrator posts the session's one at the end.
+- Agents never post project status updates; the orchestrator posts the session's one in its selected
+  project at the end. A standalone `/ship-ticket` uses the ticket's project.
 - Never push to `main`, never force-push, never merge PRs without being asked.
 - Hooks in `.claude/hooks/` back these rules (push to `main` and force push, edits to migrations already on
   `main`, lint + tests when `ticket-implementer` stops); the `deny` rules in `.claude/settings.json` remain a
@@ -133,7 +140,8 @@ Standard way to implement a Linear ticket; defined in `.claude/skills/ship-ticke
 
 ### Issue tracker
 
-Specs in the repo (`specs/NNN-name/spec.md`); tickets in Linear (team Draude, project Guixa). See `docs/agents/issue-tracker.md`.
+Specs in the repo (`specs/NNN-name/spec.md`); tickets in Linear (team Draude; Guixa for product work,
+Workflow autonomy for process work). See `docs/agents/issue-tracker.md`.
 Before the first Linear call of a session, check with `get_workspace` that the connected workspace is
 `Draude`; if not, stop and tell the user.
 
