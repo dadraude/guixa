@@ -17,7 +17,7 @@ using Matt Pocock's skills (`mattpocock-skills` plugin). See `docs/adr/0001-sdd-
       undecided (concurrency, lifecycle states, signed out, permissions, sibling screens, failure states).
       Obvious answers go into the spec; the rest are asked one by one with `/grill-with-docs` and recorded.
    4. **The user approves the spec** (`Status: approved`). No tickets and no code before that.
-   5. `/to-tickets`: splits the spec into vertical-slice tickets in Linear (project Guixa). Each ticket
+   5. `/guixa-to-tickets`: splits the spec into vertical-slice tickets in Linear (project Guixa). Each ticket
       carries the edge cases decided for its stories as acceptance criteria.
    6. `/ship-ticket DRA-NN`: one or a few tickets per session; the `ticket-implementer` agent builds
       test-first (`/tdd`) and two reviewer agents check it. Do not use the plugin's `/implement`: it
@@ -29,7 +29,7 @@ Domain vocabulary lives in `CONTEXT.md`; decisions in `docs/adr/NNNN-title.md`.
 
 | Who | Model | Where it is set |
 | --- | --- | --- |
-| Main session: `/grill-with-docs`, `/to-spec`, `/to-tickets`, triage | Opus | the user's `/model`; never pinned in `.claude/settings.json` |
+| Main session: `/grill-with-docs`, `/to-spec`, `/guixa-to-tickets`, triage | Opus | the user's `/model`; never pinned in `.claude/settings.json` |
 | Main session: `/ship-ticket`, `/run-session` work phase (git, Linear, launching agents) | Sonnet recommended | the user's `/model` |
 | `ticket-implementer` | Sonnet | agent frontmatter |
 | `ticket-reviewer`, `ticket-correctness-reviewer`, `spec-reviewer` | Opus | agent frontmatter |

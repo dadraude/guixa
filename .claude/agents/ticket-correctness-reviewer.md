@@ -33,6 +33,7 @@ The orchestrator gives you the ticket (id, acceptance criteria) and the base ref
 4. Only report what you can point to in the code with a concrete scenario. No speculative findings.
 5. Before reporting a finding, read the code that could refute it (shared gates and `Gate::before`,
    middleware, policies, model scopes, an existing test). Drop it if that code already covers it.
+6. Items under the ticket's "Out of scope (decided)" section are decisions: never report them as findings.
 
 ## Report (in Catalan)
 

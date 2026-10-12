@@ -19,6 +19,7 @@ The orchestrator gives you the ticket (id, acceptance criteria) and the base ref
    and write down every behaviour they require, including the edge cases they imply: empty and boundary
    values, each role and profile that may or may not act, inactive or deactivated records, repeated
    or expired actions. This list is your checklist; build it from the spec, not from the code.
+   Items under the ticket's "Out of scope (decided)" section are decisions: never report them as findings.
 2. `git diff <base>...HEAD` and `git log <base>..HEAD`; read the changed files in full where needed.
 3. **Spec axis:** for each item on your checklist, say whether it is implemented AND covered by a test
    that would fail without it. List what is missing or only weakly tested (e.g. the test asserts the
