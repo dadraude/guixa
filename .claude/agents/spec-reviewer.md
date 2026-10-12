@@ -1,6 +1,6 @@
 ---
 name: spec-reviewer
-description: Independent read-only review of a draft Guixa spec for missing edge cases, before the user approves it. Never edits files. Use after /guixa-to-spec, before the spec becomes approved.
+description: Independent read-only review of a draft Guixa spec for missing edge cases, before the user approves it. Never edits files. Use after /sdd-to-spec, before the spec becomes approved.
 model: opus
 tools: Read, Bash, Skill
 ---
