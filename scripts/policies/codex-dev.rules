@@ -1,0 +1,78 @@
+# UNLOADED OWNER-REVIEW PROPOSAL. Keep outside every active Codex rules directory.
+# Prefix rules govern outside-sandbox commands, not MCP calls or sandboxed commands.
+# PATH/executable trust and repository/account scope require a reviewed provider profile.
+
+prefix_rule(
+    pattern = [["git", "/usr/bin/git"], "--no-optional-locks", "status"],
+    decision = "allow",
+    justification = "Read repository status without Git's optional index writes; use a trusted Git executable/config.",
+    match = ["git --no-optional-locks status --short", "/usr/bin/git --no-optional-locks status --porcelain"],
+    not_match = ["git status --short", "git -C /other/repo status", "git --no-optional-locks push"],
+)
+
+prefix_rule(
+    pattern = [["git", "/usr/bin/git"], "--no-optional-locks", "rev-parse", "--show-toplevel"],
+    decision = "allow",
+    justification = "Resolve the repository root using a trusted Git executable; no mutation prefix is approved.",
+    match = ["git --no-optional-locks rev-parse --show-toplevel"],
+    not_match = ["git rev-parse --show-toplevel", "git --no-optional-locks config --list"],
+)
+
+prefix_rule(
+    pattern = ["gh", "pr", ["view", "list", "checks"]],
+    decision = "allow",
+    justification = "Read PR metadata and CI status through the owner's reviewed GitHub account; no API or mutation command.",
+    match = ["gh pr view 1 --json headRefOid,baseRefName,state", "gh pr list --state open", "gh pr checks 1"],
+    not_match = ["gh pr merge 1", "gh pr create", "gh api repos/owner/repo/pulls -X POST"],
+)
+
+prefix_rule(
+    pattern = ["gh", "run", ["view", "list"]],
+    decision = "allow",
+    justification = "Read workflow results and logs through the owner's reviewed GitHub account.",
+    match = ["gh run view 1 --log-failed", "gh run list --branch feature/dra-135-proposal"],
+    not_match = ["gh run rerun 1", "gh run cancel 1"],
+)
+
+prefix_rule(
+    pattern = [["git", "/usr/bin/git"], "push"],
+    decision = "forbidden",
+    justification = "No outside-sandbox push is approved by this proposal. Use the owner-approved delivery gate.",
+    match = ["git push origin main", "git push --force origin feature/dra-135-proposal", "git push -u origin feature/dra-135-proposal"],
+    not_match = ["git --no-optional-locks status --short"],
+)
+
+prefix_rule(
+    pattern = [["git", "/usr/bin/git"], "--no-optional-locks", "push"],
+    decision = "forbidden",
+    justification = "Disabling optional Git locks does not approve an outside-sandbox push.",
+    match = ["git --no-optional-locks push origin main"],
+)
+
+prefix_rule(
+    pattern = ["gh", "pr", "merge"],
+    decision = "forbidden",
+    justification = "PR merge requires the user to ask and a separate reviewed execution boundary.",
+    match = ["gh pr merge 1 --merge", "gh pr merge 1 --auto", "gh pr merge 1 --admin"],
+)
+
+prefix_rule(
+    pattern = ["gh", "api"],
+    decision = "prompt",
+    justification = "The generic API command can mutate services; review the method, repository and payload each time.",
+    match = ["gh api repos/owner/repo -X GET", "gh api repos/owner/repo/pulls -X POST"],
+)
+
+prefix_rule(
+    pattern = ["supabase"],
+    decision = "forbidden",
+    justification = "No outside-sandbox Supabase operation is approved; keep local development in the sandbox and review remote access separately.",
+    match = ["supabase db push --linked", "supabase db reset --linked", "supabase projects list"],
+)
+
+prefix_rule(
+    pattern = ["psql"],
+    decision = "prompt",
+    justification = "Review the database target and SQL. This proposal grants no production or unrestricted SQL access.",
+    match = ["psql --dbname testing_dra135 -c SELECT", "psql --dbname production -c DELETE"],
+)
