@@ -86,8 +86,9 @@ Standard way to implement a Linear ticket; defined in `.claude/skills/ship-ticke
   pushed commit). The PR is **ready to merge** (validated and CI green) only when every check passes; it is
   never merged while any check is red or pending, and merging still needs the user to ask. Red CI goes to a
   `ticket-implementer` launch, at most 2 CI-fix passes for now (DRA-129 will define the escalation
-  conditions). A PR that touches only `.claude/**` reports no checks (the workflow ignores those paths):
-  for such PRs only, "no checks reported" counts as passing. Local equivalents of each CI step:
+  conditions). A PR that touches only paths the workflow ignores (the `paths-ignore` entries in
+  `.github/workflows/ci.yml`) reports no checks: for such PRs only, and after the wait for checks to
+  appear, "no checks reported" counts as passing. Any other PR with no checks is not ready to merge. Local equivalents of each CI step:
   `docs/principles.md`.
 - Review findings are fixed in the correction pass by default; open product questions are asked in the
   session. Only a pre-existing problem outside the ticket's code, or a question ruled out of scope,

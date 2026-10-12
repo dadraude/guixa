@@ -105,8 +105,8 @@ green; never report it as ready, nor merge it, while any check is red or pending
    `gh pr checks <PR> --watch` does not wait for checks that are not registered yet: it exits at once with
    "no checks reported" and exit code 1, the same code as a red check.
 2. Then `gh pr checks <PR> --watch`. Exit 1 means either "no checks" or "red": read the output to tell which.
-3. A PR that touches only `.claude/**` reports no checks, because the workflow ignores those paths
-   (`paths-ignore` in `.github/workflows/ci.yml`): for such PRs only, and only after the wait in step 1,
+3. A PR that touches only paths the workflow ignores (the `paths-ignore` entries in
+   `.github/workflows/ci.yml`) reports no checks: for such PRs only, and only after the wait in step 1,
    "no checks reported" counts as passing. Any other PR with no checks reported is not ready: tell the user.
 
 Red CI: get the failing run and job with

@@ -6,9 +6,15 @@ on:
       - main
     paths-ignore:
       - '.claude/**'
+      - 'docs/**'
+      - 'specs/**'
+      - '**/*.md'
   pull_request:
     paths-ignore:
       - '.claude/**'
+      - 'docs/**'
+      - 'specs/**'
+      - '**/*.md'
 
 permissions:
   contents: read

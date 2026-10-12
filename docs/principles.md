@@ -79,8 +79,9 @@ Technical decisions and rules for the whole project. Domain terms are defined in
 - **CI (GitHub Actions) must be green to merge, by convention.** GitHub cannot enforce it: branch
   protection and rulesets are unavailable on a private repository on the free plan. So `/ship-ticket`
   waits for the checks (`gh pr checks <PR> --watch`) and a PR is only reported as ready to merge
-  (validated and CI green), and only merged, when they all pass. The workflow ignores `.claude/**`, so a PR touching only those paths
-  reports no checks and counts as passing. CI runs tests, Pint, Larastan (level 8), Oxlint and
+  (validated and CI green), and only merged, when they all pass. The workflow ignores the paths listed under `paths-ignore` in
+  `.github/workflows/ci.yml`, so a PR touching only those paths reports no checks and, after the wait
+  for checks to appear, counts as passing. Any other PR with no checks is not ready to merge. CI runs tests, Pint, Larastan (level 8), Oxlint and
   Oxfmt (through Vite+, the starter kit's own linter and formatter, used instead of ESLint and
   Prettier, see ADR 0007), `vue-tsc` and Playwright.
 - **CI steps and local equivalents.** Run the same checks before pushing (the Pest and Playwright
