@@ -80,7 +80,7 @@ Do NOT close or modify any parent issue.
 
 - **Acceptance criteria include the edge cases decided for the ticket's stories** (roles, states, empty and boundary values, repeated requests, sibling screens), taken from the spec and its decisions.
 - **At least one acceptance criterion must be checkable by an automated test.** Write it so a test can fail without the change (observable behaviour, not "code is clean"). A ticket with no such criterion is not ready: rework it or, if it is docs-only, name the check that covers it (e.g. `bash .claude/hooks/tests/run.sh`), or say there is none.
-- **"Out of scope (decided)" lists only things the spec's decisions deliberately exclude.** Do not invent exclusions and do not list undecided questions: those go back to the user. Anything listed there is a decision, not a follow-up: implementers and reviewers must not report it as a finding. It only holds exclusions decided in the spec before the tickets are created; what a user rules out of scope during `/ship-ticket` stays a follow-up. Write "None" when nothing was excluded.
+- **"Out of scope (decided)" lists only things the spec's decisions deliberately exclude.** Do not invent exclusions and do not list undecided questions: those go back to the user. Anything listed there is a decision, not a follow-up: implementers do not implement it and reviewers do not report its absence (they still report code that implements or breaks it, or an item the spec does not back). It only holds exclusions decided in the spec before the tickets are created; what a user rules out of scope during `/ship-ticket` stays a follow-up. Write "None" when nothing was excluded.
 
 <local-ticket-template>
 
