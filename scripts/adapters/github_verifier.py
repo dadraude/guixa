@@ -2,7 +2,6 @@
 """Read-only GitHub receipts. Unknown repository/CI/classification facts fail closed."""
 
 import argparse
-import datetime
 import json
 import re
 import shutil
@@ -11,9 +10,9 @@ import sys
 from pathlib import Path
 
 if __package__:
-    from .github_ci import ProofError, assert_green, prove_skipped, required_configuration
+    from .github_ci import ProofError, assert_green
 else:
-    from github_ci import ProofError, assert_green, prove_skipped, required_configuration
+    from github_ci import ProofError, assert_green
 
 
 class VerificationError(ValueError):
@@ -89,36 +88,12 @@ class GithubVerifier:
         return {key: self.request[key] for key in ("version", "run_id", "project", "repository")} | {
             "active_cross_cutting": active, "open_prs": [pr["html_url"] for pr in prs]}
 
-    def no_checks(self, pr):
-        updated = datetime.datetime.fromisoformat(pr["updated_at"].replace("Z", "+00:00"))
-        age = (datetime.datetime.now(datetime.timezone.utc) - updated).total_seconds()
-        require(age >= 60, "checks have not had time to appear")
-        files = self.items(f"pulls/{pr['number']}/files?per_page=100")
-        require(len(files) == pr["changed_files"] and files, "incomplete PR files")
-        paths = {item["filename"] for item in files} | {
-            item["previous_filename"] for item in files if "previous_filename" in item}
-        base, head = pr["base"]["sha"], pr["head"]["sha"]
-        workflows = [path for path in self.git("ls-tree", "-r", "--name-only", base,
-                                               ".github/workflows").splitlines() if path.endswith((".yml", ".yaml"))]
-        head_workflows = [path for path in self.git("ls-tree", "-r", "--name-only", head,
-                                                    ".github/workflows").splitlines() if path.endswith((".yml", ".yaml"))]
-        require(workflows and workflows == head_workflows, "workflow set changed or missing")
-        for path in workflows:
-            require(self.git("rev-parse", base + ":" + path) == self.git("rev-parse", head + ":" + path),
-                    "workflow differs from trusted PR base")
-            prove_skipped(self.git("show", base + ":" + path), paths, pr["head"]["ref"])
-
     def checks(self, pr):
         head = pr["head"]["sha"]
         checks = self.items(f"commits/{head}/check-runs?filter=all&per_page=100", "check_runs")
         statuses = self.items(f"commits/{head}/statuses?per_page=100")
-        required_configuration(self.args.required_check, self.args.required_status)
-        if checks or statuses:
-            assert_green(checks, statuses, self.args.required_check, self.args.required_status, head)
-            require(self.request["delivery"]["ci"] == "green", "CI claim contradicts current checks")
-        else:
-            require(self.request["delivery"]["ci"] == "not_required", "missing checks")
-            self.no_checks(pr)
+        assert_green(checks, statuses, self.args.required_check, self.args.required_status, head)
+        require(self.request["delivery"]["ci"] == "green", "CI claim contradicts mandatory current checks")
 
     def delivery(self):
         delivery = self.request["delivery"]

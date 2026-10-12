@@ -107,7 +107,7 @@ class GithubVerifierTests(unittest.TestCase):
         self.responses[f'commits/{self.head}/check-runs?filter=all&per_page=100'] = [{'total_count': 0, 'check_runs': []}]
         self.assertNotEqual(self.call()[0].returncode, 0)
         delivery = {'pr': self.pr['html_url'], 'head': self.head, 'base': 'main', 'state': 'open', 'ci': 'not_required'}
-        self.assertEqual(self.call(delivery=delivery)[0].returncode, 0)
+        self.assertIn('required check has not appeared', self.call(delivery=delivery)[0].stderr)
         self.responses['pulls/1/files?per_page=100'][0][0]['previous_filename'] = 'app/old.php'
         self.assertNotEqual(self.call(delivery=delivery)[0].returncode, 0)
         self.responses['pulls/1/files?per_page=100'][0][0].pop('previous_filename')
@@ -132,9 +132,9 @@ class GithubVerifierTests(unittest.TestCase):
         self.responses[f'commits/{self.head}/check-runs?filter=all&per_page=100'] = [{'total_count': 0, 'check_runs': []}]
         self.responses[f'commits/{self.head}/statuses?per_page=100'] = [[]]
         self.responses['pulls/1/commits?per_page=100'][0].append({'sha': self.head, 'commit': {'message': 'change workflow'}})
-        self.assertIn('workflow differs from trusted PR base', self.call(delivery=delivery)[0].stderr)
+        self.assertIn('required check has not appeared', self.call(delivery=delivery)[0].stderr)
         self.pr['base']['sha'] = self.head
-        self.assertIn('unsupported workflow glob', self.call(delivery=delivery)[0].stderr)
+        self.assertIn('required check has not appeared', self.call(delivery=delivery)[0].stderr)
 
     def test_required_jobs_and_independent_suites_cannot_be_hidden(self):
         with self.subTest('missing configuration'):
@@ -166,4 +166,12 @@ class GithubVerifierTests(unittest.TestCase):
         self.responses[f'commits/{self.head}/check-runs?filter=all&per_page=100'] = [{'total_count': 0, 'check_runs': []}]
         self.responses[f'commits/{self.head}/statuses?per_page=100'] = [[]]
         delivery = {'pr': self.pr['html_url'], 'head': self.head, 'base': 'main', 'state': 'open', 'ci': 'not_required'}
-        self.assertIn('unrestricted push', self.call(delivery=delivery)[0].stderr)
+        self.assertIn('required check has not appeared', self.call(delivery=delivery)[0].stderr)
+
+    def test_ignored_paths_cannot_waive_external_or_unbound_required_contexts(self):
+        self.responses[f'commits/{self.head}/check-runs?filter=all&per_page=100'] = [{'total_count': 0, 'check_runs': []}]
+        delivery = {'pr': self.pr['html_url'], 'head': self.head, 'base': 'main', 'state': 'open', 'ci': 'not_required'}
+        for required, statuses in (([], ['external/security']), (['1/ci'], [])):
+            with self.subTest(checks=required, statuses=statuses):
+                self.assertNotEqual(self.call(delivery=delivery, required=required,
+                                             required_statuses=statuses)[0].returncode, 0)

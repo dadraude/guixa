@@ -46,26 +46,27 @@ count fails. Pagination establishes the pages GitHub exposes, not that every exp
 registered; the mandatory context configuration establishes that independent requirement.
 Retry identity is app ID/check-suite ID/check name, so success in one independent suite cannot hide
 failure in another. The latest retry within each identity and latest status per context must pass;
-pending, failed, neutral or skipped check runs are rejected. Status-only CI is supported. Claims must match observed CI: `green` needs
-checks/statuses, while `not_required` needs none plus the proof below. A final PR/head read rejects
+pending, failed, neutral or skipped check runs are rejected. Status-only CI is supported. Claims must match observed CI: `green` needs the complete mandatory current contexts.
+`not_required` is rejected by this verifier. A final PR/head read rejects
 changes observed during verification. Remote state can still change after a receipt; these reads are
 observations, not a transaction or an alternative to the human merge gate.
 
-No-check exceptions require at least 60 seconds since the PR's last update, complete changed-file
-pagination (including previous names on renames), and proof against **every** workflow from the
-trusted PR base. The complete workflow set and blob IDs must be unchanged at the head; an adapter
-cannot delete or modify CI to justify skipping it. The conservative parser supports the repository's
-plain two-space `on` mapping, `pull_request` `paths`/`paths-ignore` quoted lists, literal paths,
-literal directory `/**` and `**/*.md`. Every workflow must have a supported PR filter that skips
-all changed/renamed paths. Automatic push also needs proof of absence: a supported literal branch
-list must exclude the actual head branch (including the repository's `branches: [main]` form).
-Unrestricted push, a matching branch or path-only push restrictions reject absence proof; PR paths
-are not evidence of the actual push-event diff. Missing workflows, unfamiliar YAML/events/globs,
-or files that should trigger any workflow reject the exception. The required base/workflow objects must already exist
-locally; the verifier does not fetch them or approximate an unsupported filter.
+Missing mandatory contexts can never be waived by ignored workflow paths. External statuses need
+independent evidence; even required check names have no trusted binding to particular workflow
+files in the current protocol. This verifier therefore conservatively rejects `not_required` and
+all no-check deliveries, including docs-only PRs whose workflows appear skipped. A future explicit
+workflow/context binding can enable a narrowly proved exemption; until then the coordinator must
+report the blocked readiness gate rather than drop required contexts or infer success. The
+independent `github_ci.py` helper retains conservative push/PR skip proof for such diagnostic work,
+but that proof is not delivery authority and cannot waive missing mandatory contexts.
+
+Multiple workflows using the same app ID/check name are unsupported. Duplicate configured names
+fail; use distinct job names or a future workflow-aware identity contract instead of assuming one
+registered suite proves every same-named workflow ran. The owner-reviewed profile remains an
+explicit trust boundary; omission of an applicable workflow from that profile is not justified.
 
 Run `python3 -m unittest scripts.tests.test_github_verifier -v`. Tests use a fake gh executable and
 real temporary Git repositories to verify GET-only calls, pagination, pinned classifications,
-identity/ticket/CI failures and conservative skip proofs. They are not a live GitHub or AI-service
+identity/ticket/CI failures and mandatory-context waiver rejection. They are not a live GitHub or AI-service
 validation. This concrete verifier complements the Codex adapter; DRA-135 permission enforcement
 and a supervised real ticket batch remain separate unattended-execution acceptance gates.
