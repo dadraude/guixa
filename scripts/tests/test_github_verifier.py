@@ -31,8 +31,8 @@ class GithubVerifierTests(unittest.TestCase):
             'pulls?state=open&per_page=100': [[self.pr]], 'pulls/1': self.pr,
             'pulls/1/commits?per_page=100': [[{'sha': self.head, 'commit': {
                 'message': 'feat(test): deliver ticket (DRA-1)'}}]],
-            f'commits/{self.head}/check-runs?per_page=100': [{'check_runs': [
-                {'id': 1, 'name': 'ci', 'app': {'id': 1}, 'head_sha': self.head,
+            f'commits/{self.head}/check-runs?filter=all&per_page=100': [{'total_count': 1, 'check_runs': [
+                {'id': 1, 'name': 'ci', 'app': {'id': 1}, 'check_suite': {'id': 10}, 'head_sha': self.head,
                  'status': 'completed', 'conclusion': 'success'}]}],
             f'commits/{self.head}/statuses?per_page=100': [[]],
             'pulls/1/files?per_page=100': [[{'filename': 'docs/ticket.md'}]],
@@ -45,7 +45,7 @@ class GithubVerifierTests(unittest.TestCase):
         return subprocess.check_output(['git', *args], cwd=self.repo, text=True,
                                        stderr=subprocess.DEVNULL).strip()
 
-    def call(self, kind='verify_delivery', options=(), **changes):
+    def call(self, kind='verify_delivery', options=(), required=('1/ci',), required_statuses=(), **changes):
         self.config.write_text(json.dumps(self.responses))
         request = {'version': 1, 'kind': kind, 'run_id': 'run', 'project': 'P-DRA-2'}
         if kind == 'repository_preflight': request.update(repository=str(self.repo), cross_cutting=False)
@@ -55,6 +55,9 @@ class GithubVerifierTests(unittest.TestCase):
         request.update(changes)
         request_path, result_path = self.root / 'request.json', self.root / 'result.json'
         result_path.unlink(missing_ok=True); request_path.write_text(json.dumps(request))
+        options = list(options)
+        for check in required: options += ['--required-check', check]
+        for context in required_statuses: options += ['--required-status', context]
         run = subprocess.run([sys.executable, str(self.script), '--repository', 'example/repo',
             '--gh', str(self.gh), '--request', str(request_path), '--result', str(result_path), *options],
             capture_output=True, text=True)
@@ -89,18 +92,19 @@ class GithubVerifierTests(unittest.TestCase):
         self.assertNotEqual(self.call()[0].returncode, 0)
 
     def test_pending_failed_stale_and_mixed_checks_never_pass(self):
-        checks = self.responses[f'commits/{self.head}/check-runs?per_page=100'][0]['check_runs']
+        checks = self.responses[f'commits/{self.head}/check-runs?filter=all&per_page=100'][0]['check_runs']
         for change in ({'status': 'in_progress'}, {'conclusion': 'failure'}, {'head_sha': 'a' * 40}):
             original = dict(checks[0]); checks[0].update(change)
             self.assertNotEqual(self.call()[0].returncode, 0); checks[0] = original
         self.responses[f'commits/{self.head}/statuses?per_page=100'] = [[{'id': 1, 'context': 'other', 'state': 'pending'}]]
         self.assertNotEqual(self.call()[0].returncode, 0)
         checks.clear()
+        self.responses[f'commits/{self.head}/check-runs?filter=all&per_page=100'][0]['total_count'] = 0
         self.responses[f'commits/{self.head}/statuses?per_page=100'][0][0]['state'] = 'success'
-        self.assertEqual(self.call()[0].returncode, 0)
+        self.assertEqual(self.call(required=(), required_statuses=['other'])[0].returncode, 0)
 
     def test_no_checks_require_trusted_ignored_paths_including_renames(self):
-        self.responses[f'commits/{self.head}/check-runs?per_page=100'] = [{'check_runs': []}]
+        self.responses[f'commits/{self.head}/check-runs?filter=all&per_page=100'] = [{'total_count': 0, 'check_runs': []}]
         self.assertNotEqual(self.call()[0].returncode, 0)
         delivery = {'pr': self.pr['html_url'], 'head': self.head, 'base': 'main', 'state': 'open', 'ci': 'not_required'}
         self.assertEqual(self.call(delivery=delivery)[0].returncode, 0)
@@ -118,16 +122,48 @@ class GithubVerifierTests(unittest.TestCase):
         self.assertNotEqual(self.call()[0].returncode, 0)
 
     def test_no_checks_cannot_trust_modified_or_unfamiliar_workflows(self):
-        self.responses[f'commits/{self.head}/check-runs?per_page=100'] = [{'check_runs': []}]
+        self.responses[f'commits/{self.head}/check-runs?filter=all&per_page=100'] = [{'total_count': 0, 'check_runs': []}]
         delivery = {'pr': self.pr['html_url'], 'head': self.head, 'base': 'main', 'state': 'open', 'ci': 'not_required'}
         workflow = self.repo / '.github/workflows/ci.yml'
         workflow.write_text("on:\n  pull_request:\n    paths-ignore:\n      - '!docs/**'\njobs: {}\n")
         self.git('add', '.'); self.git('commit', '-m', 'change workflow')
         self.head = self.git('rev-parse', 'HEAD')
         self.pr['head']['sha'] = self.head; delivery['head'] = self.head; self.pr['commits'] = 2
-        self.responses[f'commits/{self.head}/check-runs?per_page=100'] = [{'check_runs': []}]
+        self.responses[f'commits/{self.head}/check-runs?filter=all&per_page=100'] = [{'total_count': 0, 'check_runs': []}]
         self.responses[f'commits/{self.head}/statuses?per_page=100'] = [[]]
         self.responses['pulls/1/commits?per_page=100'][0].append({'sha': self.head, 'commit': {'message': 'change workflow'}})
         self.assertIn('workflow differs from trusted PR base', self.call(delivery=delivery)[0].stderr)
         self.pr['base']['sha'] = self.head
         self.assertIn('unsupported workflow glob', self.call(delivery=delivery)[0].stderr)
+
+    def test_required_jobs_and_independent_suites_cannot_be_hidden(self):
+        with self.subTest('missing configuration'):
+            self.assertNotEqual(self.call(required=())[0].returncode, 0)
+        with self.subTest('missing e2e'):
+            self.assertNotEqual(self.call(required=['1/ci', '1/e2e'])[0].returncode, 0)
+        checks = self.responses[f'commits/{self.head}/check-runs?filter=all&per_page=100'][0]
+        failed = copy.deepcopy(checks['check_runs'][0]); failed['conclusion'] = 'failure'
+        other = copy.deepcopy(checks['check_runs'][0]); other.update(id=2, check_suite={'id': 20})
+        checks.update(total_count=2, check_runs=[failed, other])
+        with self.subTest('independent failed suite'):
+            self.assertNotEqual(self.call()[0].returncode, 0)
+        checks.update(total_count=2, check_runs=[other])
+        with self.subTest('truncated check runs'):
+            self.assertNotEqual(self.call()[0].returncode, 0)
+
+    def test_no_checks_cannot_ignore_unrestricted_push(self):
+        self.git('checkout', 'main')
+        workflow = self.repo / '.github/workflows/ci.yml'
+        workflow.write_text("on:\n  push:\n  pull_request:\n    paths-ignore:\n      - 'docs/**'\njobs: {}\n")
+        self.git('add', '.'); self.git('commit', '-m', 'base push workflow')
+        self.base = self.git('rev-parse', 'HEAD')
+        self.git('checkout', 'feature/dra-1-first'); self.git('merge', '--no-edit', 'main')
+        self.head = self.git('rev-parse', 'HEAD'); self.pr['head']['sha'] = self.head
+        self.pr['base']['sha'] = self.base
+        commits = [{'sha': sha, 'commit': {'message': self.git('show', '-s', '--format=%B', sha)}}
+                   for sha in self.git('rev-list', self.base + '..HEAD').splitlines()]
+        self.pr['commits'] = len(commits); self.responses['pulls/1/commits?per_page=100'] = [commits]
+        self.responses[f'commits/{self.head}/check-runs?filter=all&per_page=100'] = [{'total_count': 0, 'check_runs': []}]
+        self.responses[f'commits/{self.head}/statuses?per_page=100'] = [[]]
+        delivery = {'pr': self.pr['html_url'], 'head': self.head, 'base': 'main', 'state': 'open', 'ci': 'not_required'}
+        self.assertIn('unrestricted push', self.call(delivery=delivery)[0].stderr)

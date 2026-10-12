@@ -31,9 +31,22 @@ DRA identifier must occur as the conventional commit subject suffix `(DRA-NN)`. 
 commit data fails rather than silently accepting weak ticket coverage. This establishes commit
 coverage; it does not prove ticket acceptance criteria, reviews or tracker writes.
 
-Current-head check runs and commit statuses are fully paginated. The latest run for each app/name
-and latest status for each context must be completed/successful; pending, failed, neutral or skipped
-check runs are rejected. Status-only CI is supported. Claims must match observed CI: `green` needs
+Delivery requires explicit operator-reviewed mandatory contexts: repeated `--required-check
+APP_ID/NAME` and/or `--required-status CONTEXT` argv pairs. Missing configuration or any missing
+required job fails, even if unrelated visible checks are green. The owner reviews the complete
+applicable job list for this repository/batch, including independently triggered workflows; never
+infer requirements from only the checks currently visible. Repository job/filter changes require
+configuration review, and a conservative superset may block until an owner supplies the correct
+reviewed profile. The verifier cannot prove the operator selected that profile correctly. See
+`github-ci.md` for the independent proof boundary.
+
+Current-head check runs (`filter=all`) and commit statuses are fully paginated. Declared check-run
+`total_count` values, when present, must equal the complete collected count; a changed/truncated
+count fails. Pagination establishes the pages GitHub exposes, not that every expected job has
+registered; the mandatory context configuration establishes that independent requirement.
+Retry identity is app ID/check-suite ID/check name, so success in one independent suite cannot hide
+failure in another. The latest retry within each identity and latest status per context must pass;
+pending, failed, neutral or skipped check runs are rejected. Status-only CI is supported. Claims must match observed CI: `green` needs
 checks/statuses, while `not_required` needs none plus the proof below. A final PR/head read rejects
 changes observed during verification. Remote state can still change after a receipt; these reads are
 observations, not a transaction or an alternative to the human merge gate.
@@ -44,8 +57,11 @@ trusted PR base. The complete workflow set and blob IDs must be unchanged at the
 cannot delete or modify CI to justify skipping it. The conservative parser supports the repository's
 plain two-space `on` mapping, `pull_request` `paths`/`paths-ignore` quoted lists, literal paths,
 literal directory `/**` and `**/*.md`. Every workflow must have a supported PR filter that skips
-all changed/renamed paths. Missing workflows, unfamiliar YAML/events/globs, or files that should
-trigger any workflow reject the exception. The required base/workflow objects must already exist
+all changed/renamed paths. Automatic push also needs proof of absence: a supported literal branch
+list must exclude the actual head branch (including the repository's `branches: [main]` form).
+Unrestricted push, a matching branch or path-only push restrictions reject absence proof; PR paths
+are not evidence of the actual push-event diff. Missing workflows, unfamiliar YAML/events/globs,
+or files that should trigger any workflow reject the exception. The required base/workflow objects must already exist
 locally; the verifier does not fetch them or approximate an unsupported filter.
 
 Run `python3 -m unittest scripts.tests.test_github_verifier -v`. Tests use a fake gh executable and
