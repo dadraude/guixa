@@ -11,7 +11,7 @@ reviewer (`ticket-correctness-reviewer`); leave them to it.
 
 ## Inputs
 
-The orchestrator gives you the ticket (id, acceptance criteria) and the base ref to diff against.
+The orchestrator gives you the full ticket body, including its "Out of scope (decided)" section (id, acceptance criteria) and the base ref to diff against.
 
 ## Flow
 
@@ -19,6 +19,8 @@ The orchestrator gives you the ticket (id, acceptance criteria) and the base ref
    and write down every behaviour they require, including the edge cases they imply: empty and boundary
    values, each role and profile that may or may not act, inactive or deactivated records, repeated
    or expired actions. This list is your checklist; build it from the spec, not from the code.
+   Items under the ticket's "Out of scope (decided)" section are decisions: do not report the *absence* of an item listed there;
+   still report code in the diff that implements or breaks it (`fix now`), and an item the spec's decisions do not back (`question`).
 2. `git diff <base>...HEAD` and `git log <base>..HEAD`; read the changed files in full where needed.
 3. **Spec axis:** for each item on your checklist, say whether it is implemented AND covered by a test
    that would fail without it. List what is missing or only weakly tested (e.g. the test asserts the

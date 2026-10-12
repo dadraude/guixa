@@ -73,6 +73,14 @@ For conditions 1, 3 and 4 the orchestrator creates one Triage issue per finding 
 user, and either relaunches you with the decision or stops the ticket. For condition 2 it asks the user
 first, and creates an issue only if the user leaves it open or rules it out of scope.
 
+## Out of scope (decided)
+
+If the ticket has an "Out of scope (decided)" section, its items are decisions, not undecided edge cases and
+not follow-ups: do not implement them and do not list them in your report. Out of scope takes priority over
+the "fix it" rule above: do not fix an excluded item even if it looks needed. If an excluded item conflicts
+with an acceptance criterion, that is escalation condition 2: stop and report the conflict, do not implement
+either side silently.
+
 ## Rules
 
 - Everything generated (code, comments, docs, commit messages, file names) is in English; UI text is
