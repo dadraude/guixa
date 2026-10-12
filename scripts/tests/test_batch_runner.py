@@ -118,3 +118,32 @@ class RunnerTests(unittest.TestCase):
         self.assertEqual(summary['batches']['first']['status'], 'complete')
         self.assertEqual(summary['batches']['batch-3']['status'], 'failed')
         self.assertFalse(any((self.home / 'worktrees').glob('*-batch-3')))
+
+    def test_reverse_manifest_order_records_every_failed_parent_descendant(self):
+        self.add_batch(3, ['DRA-2']); self.add_batch(4, ['DRA-3'])
+        self.manifest['batches'].reverse()
+        self.manifest['adapter'] += ['--mode', 'exit']
+        code, summary, output = self.run_manifest()
+        self.assertEqual(code, 1, output)
+        self.assertEqual(summary['status'], 'incomplete')
+        self.assertEqual(set(summary['batches']), {'first', 'batch-3', 'batch-4'})
+        self.assertEqual(summary['batches']['first']['status'], 'failed')
+        self.assertEqual(summary['batches']['batch-3']['status'], 'blocked')
+        self.assertEqual(summary['batches']['batch-4']['status'], 'blocked')
+
+    def test_child_starts_from_verified_parent_sha_when_branch_moves_after_receipt(self):
+        self.add_batch(3, ['DRA-2'])
+        source = self.fake.read_text().replace("Path(a.result).write_text(json.dumps(result))", """if r['kind'] == 'verify_delivery' and Path(a.result).name.startswith('before-'):
+    Path('unverified-parent-change').write_text('must not enter child')
+    subprocess.run(['git', 'add', 'unverified-parent-change'], check=True)
+    subprocess.run(['git', 'commit', '-m', 'unverified parent advance'], check=True, capture_output=True)
+Path(a.result).write_text(json.dumps(result))""")
+        self.fake.write_text(source)
+        code, summary, output = self.run_manifest()
+        self.assertEqual(code, 0, output)
+        child = Path(summary['batches']['batch-3']['worktree'])
+        self.assertTrue((child / 'DRA-2').exists())
+        self.assertFalse((child / 'unverified-parent-change').exists())
+        request = json.loads(next((self.repo / '.batch-runs').glob('*/batch-3/request.json')).read_text())
+        self.assertEqual(request['base'], 'feature/dra-1-first')
+        self.assertEqual(request['start_ref'], summary['batches']['first']['delivery']['head'])

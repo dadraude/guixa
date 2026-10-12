@@ -37,6 +37,7 @@ def schedule(runtime):
                 for name in pending:
                     outcomes[name] = {"status": "blocked", "reason": "run interrupted"}
                 pending.clear()
+            pending_before = len(pending)
             for name, batch in list(pending.items()):
                 if runtime.cancelled.is_set():
                     break
@@ -55,11 +56,16 @@ def schedule(runtime):
                         reverify(runtime, batches[parent], batch)
                     refs = [batches[parent]["branch"] for parent in batch["depends_on"]]
                     base = refs[0] if refs else runtime.manifest["base"]
-                    running[pool.submit(runtime.execute, batch, base, refs[1:])] = name
+                    heads = [outcomes[parent]["delivery"]["head"] for parent in batch["depends_on"]]
+                    start_ref = heads[0] if heads else runtime.base_head
+                    running[pool.submit(runtime.execute, batch, base, heads[1:], start_ref)] = name
                 except (ContractError, OSError, InterruptedError) as error:
                     outcomes[name] = {"status": "failed", "reason": str(error)}
                 del pending[name]
             if not running:
+                # Failure propagation may unblock earlier entries on the next pass.
+                if pending and len(pending) < pending_before:
+                    continue
                 require(not pending, "scheduler has no ready batch")
                 break
             finished, _ = concurrent.futures.wait(running, timeout=0.1,

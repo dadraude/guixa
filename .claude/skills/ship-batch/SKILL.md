@@ -23,14 +23,16 @@ permission bypasses. Existing provider-specific denies/hooks remain intact.
    `guixa` or `testing`. Each worktree needs its own CodeGraph index if code discovery needs it.
 3. Resolve full tickets with relations/spec/acceptance criteria, validate their project, and move
    them to In Progress. Delivered parent batches need verified open PRs with passing CI before
-   stacking. The PR targets the request's base branch; other parent refs are merged into this base.
+   stacking. The PR targets the request's base branch; `start_ref` and additional `parents` are verified head
+   SHAs, not mutable branch refs.
 
 ## Implement and review
 
 1. For each ticket in dependency order launch a **fresh** implementer using the configured role.
    Give it the complete ticket and both reviewer checklists. Implement test-first at agreed seams,
    run meaningful project checks and commit once for that ticket. Never implement in the orchestrator.
-2. After all deliverable tickets, synchronize with the base. Launch two independent fresh reviewers
+2. After all deliverable tickets, verify any base update before synchronizing; never replace the
+   pinned parent heads with unchecked mutable refs. Launch two independent fresh reviewers
    once, in parallel, on the **combined batch diff** and all deliverable tickets: spec/standards and
    correctness/security. Use configured model roles and read-only review permissions.
 3. Apply confirmed findings in at most two correction passes. Re-review only previous findings and

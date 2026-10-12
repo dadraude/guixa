@@ -105,8 +105,10 @@ Independent batches start up to `max_parallel` at a time. A child starts only af
 has finished and its required tickets delivered. Explicit batch dependencies require all parent
 tickets; ticket dependencies require only the named tickets, so delivered independent tickets in a
 partial parent may unblock their children. Parent delivery receipts are rechecked immediately before
-starting a child. Its base is the first parent branch in sorted batch-ID order, and additional parent
-branches are merged into its worktree before the adapter starts. Merge failure preserves that worktree
+starting a child. Its PR base is the first parent branch in sorted batch-ID order. The worktree
+`start_ref` and additional `parents` merges use verified immutable parent head SHAs; a mutable branch
+advance cannot enter the child between verification and creation. Roots start at the manifest base
+SHA captured during Git validation. Merge failure preserves that worktree
 for reconciliation. No independent sibling is used as a base. PRs remain open for human merge.
 
 Example manifest (replace every path, model ID and ticket context with reviewed configuration):

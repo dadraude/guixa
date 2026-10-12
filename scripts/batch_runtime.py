@@ -59,7 +59,7 @@ class BatchRuntime:
         require(Path(self.git("rev-parse", "--show-toplevel")).resolve() == self.repo,
                 "repository must be a Git workspace root")
         self.common = Path(self.git("rev-parse", "--path-format=absolute", "--git-common-dir"))
-        self.git("rev-parse", "--verify", self.manifest["base"] + "^{commit}")
+        self.base_head = self.git("rev-parse", "--verify", self.manifest["base"] + "^{commit}")
         for batch in self.manifest["batches"]:
             self.git("check-ref-format", "--branch", batch["branch"])
             require(not self.git("branch", "--list", batch["branch"]), "batch branch already exists")
@@ -147,20 +147,20 @@ class BatchRuntime:
         require(not receipt["active_cross_cutting"], "repository has an open cross-cutting PR")
         require(not self.cross_cutting or not receipt["open_prs"], "cross-cutting batch needs no open PRs")
 
-    def execute(self, batch, base, parents=()):
+    def execute(self, batch, base, parents=(), start_ref=None):
         require(not self.cancelled.is_set(), "run is cancelled")
         directory, worktree = self.state / batch["id"], self.worktree_path(batch)
         directory.mkdir(mode=0o700)
         # Record the recovery location before a Git operation can partially create it.
         write_json(directory / "recovery.json", {"worktree": str(worktree), "branch": batch["branch"],
                                                  "database": batch["database"], "cleanup": "manual"})
-        self.git("worktree", "add", "-b", batch["branch"], str(worktree), base)
+        self.git("worktree", "add", "-b", batch["branch"], str(worktree), start_ref or base)
         for parent in parents:
             self.git("merge", "--no-edit", parent, cwd=worktree)
         starting_head = self.git("rev-parse", "HEAD", cwd=worktree)
         request = {"version": 1, "kind": "execute_batch", "run_id": self.run_id,
                    "project": self.manifest["project"], "repository": str(self.repo),
-                   "batch": batch, "base": base, "parents": list(parents),
+                   "batch": batch, "base": base, "start_ref": start_ref or base, "parents": list(parents),
                    "worktree": str(worktree), "models": self.manifest["models"],
                    "protocol": str(Path(__file__).resolve().parent.parent / "docs/agents/batch-execution.md")}
         write_json(directory / "request.json", request)
