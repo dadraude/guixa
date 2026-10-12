@@ -32,7 +32,8 @@ The orchestrator gives you the spec path.
    - **Testability:** acceptance criteria that cannot be checked by a test as written. A user story with
      no acceptance criterion that can become an automated test is always a blocking "Needs a decision"
      item, never an "Obvious answer".
-3. Drop cases the spec, `decisions.md` or an ADR already decides, and cases with a single sensible
+3. Drop cases with a written decision in the spec, its `decisions.md` or an ADR (including one explicitly
+   decided as out of scope, which is not Undecided), and cases with a single sensible
    answer that already follows from `docs/principles.md`.
 
 ## Report (in Catalan)
@@ -51,3 +52,7 @@ not yet written into the spec:
 
 The spec cannot be offered to the user for approval until the orchestrator re-runs you and gets
 `Undecided: 0`. Approval requires zero undecided edge cases.
+
+Re-review loop: from the 2nd pass on, check only the earlier items and the new or changed text. New cases
+about unchanged text go in a separate list for the orchestrator to bring to the user in one go; the user
+decides each one or moves it to the spec's Out of Scope.

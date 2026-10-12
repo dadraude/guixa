@@ -12,8 +12,8 @@ you already know. Talk to the user in Catalan; the spec itself is in English.
 
 1. The spec is written to `specs/NNN-name/spec.md` in the repo with `Status: draft`. It is not
    published to the issue tracker and gets no `ready-for-agent` label.
-2. Every user story has at least one acceptance criterion that can become an automated test (Pest
-   feature test at the HTTP level). A story without one is not finished.
+2. Every user story has at least one acceptance criterion that can become an automated test (a Pest
+   feature test at the HTTP level by default; Vitest or Playwright where `docs/principles.md` says so). A story without one is not finished.
 3. The skill ends by launching `spec-reviewer`. The spec is not offered for approval until the
    reviewer's `Undecided` count is 0.
 
@@ -26,8 +26,13 @@ you already know. Talk to the user in Catalan; the spec itself is in English.
 3. Write `specs/NNN-name/spec.md` with the template below, starting with `Status: draft`.
 4. Launch the `spec-reviewer` agent with `model: "opus"` and the spec path.
 5. Resolve the reviewer's output: write the obvious answers into the spec as acceptance criteria, and
-   ask the rest one by one with `/grill-with-docs`, recording each decision in the spec.
-6. Re-run `spec-reviewer` until it ends with `Undecided: 0`. Only then tell the user the spec is ready
+   ask the rest one by one, invoking the `grilling` and `domain-modeling` skills directly (one question at a
+   time, as `/grill-with-docs` does; the model cannot invoke that command). Record each decision in the spec.
+   An edge case is decided when there is a written decision in the spec, its `decisions.md` or an ADR; one
+   explicitly decided as out of scope (listed in the spec's Out of Scope) counts as decided.
+6. Re-run `spec-reviewer` until it ends with `Undecided: 0`. From the 2nd pass on, tell it to check the
+   earlier items and the new or changed text only; new cases about unchanged text are brought to the user in
+   a single list, who decides each one or moves it to Out of Scope. Only then tell the user the spec is ready
    for approval. Never set `Status: approved` yourself.
 
 <spec-template>
