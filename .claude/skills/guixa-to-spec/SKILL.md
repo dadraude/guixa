@@ -30,8 +30,9 @@ you already know. Talk to the user in Catalan; the spec itself is in English.
    time, as `/grill-with-docs` does; the model cannot invoke that command). Record each decision in the spec.
    An edge case is decided when there is a written decision in the spec, its `decisions.md` or an ADR; one
    explicitly decided as out of scope (listed in the spec's Out of Scope) counts as decided.
-6. Re-run `spec-reviewer` until it ends with `Undecided: 0`. From the 2nd pass on, tell it to check the
-   earlier items and the new or changed text only; new cases about unchanged text are brought to the user in
+6. Re-run `spec-reviewer` until it ends with `Undecided: 0`. From the 2nd pass on, pass it the previous
+   report and the changed text (or a diff of the spec) and tell it to check the earlier items and the new or
+   changed text only; new cases about unchanged text are brought to the user in
    a single list, who decides each one or moves it to Out of Scope. Only then tell the user the spec is ready
    for approval. Never set `Status: approved` yourself.
 

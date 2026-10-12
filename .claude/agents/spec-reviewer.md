@@ -11,7 +11,8 @@ You never edit, stage, commit or push anything.
 
 ## Inputs
 
-The orchestrator gives you the spec path.
+The orchestrator gives you the spec path. From the 2nd pass on it also gives you the previous report and the
+changed text (or a diff of the spec), so you can review the earlier items and the new or changed text.
 
 ## Flow
 
@@ -45,8 +46,9 @@ Two lists, most important first:
 
 If the spec covers everything, say so; do not invent gaps.
 
-End the report with this line, counting only the "Needs a decision" items plus any "Obvious answers"
-not yet written into the spec:
+End the report with this line, counting the "Needs a decision" items, any "Obvious answers" not yet
+written into the spec, and every item of the separate list of new cases about unchanged text (see the
+re-review loop) that has no written decision yet and is not moved to Out of Scope:
 
 `Undecided: N`
 
