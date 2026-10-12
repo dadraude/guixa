@@ -95,13 +95,27 @@ push and open the PR anyway.
 To deliver: create the follow-up issues, fetch again and, if the base moved since the sync, repeat the
 step 2 sync before pushing. Then push with `-u`, `gh pr create --base <base>` with a conventional
 title `type(scope): description (DRA-NN)` and a short body that links each follow-up issue and ends with
-`🤖 Generated with [Claude Code](https://claude.com/claude-code)`, then move the issue to **In Review**. Once the PR is open, remove the worktree
+`🤖 Generated with [Claude Code](https://claude.com/claude-code)`, then move the issue to **In Review**.
+
+**CI gate.** Green CI is a convention, not a GitHub rule (no branch protection on a private repo on the
+free plan, see `docs/principles.md`). After opening the PR, wait for it: `gh pr checks <PR> --watch`.
+Do not report the PR as validated, nor merge it, while any check is red or pending.
+- Red: launch a `ticket-implementer` pass in the same worktree with the failing job and its log
+  (`gh run view --log-failed`); it fixes, runs the local equivalents of the failing step (see "CI steps
+  and local equivalents" in `docs/principles.md`) and adds a second commit
+  `fix(scope): <description> (DRA-NN)`. Push and watch again. When it escalates (conditions defined in
+  DRA-129, not merged yet: align this wording once it is), tell the user instead of looping.
+- A PR that touches only `.claude/**` reports no checks, because the workflow ignores those paths
+  (`paths-ignore` in `.github/workflows/ci.yml`): for such PRs only, "no checks reported" counts as passing.
+  Any other PR with no checks reported is not validated: tell the user.
+
+Once CI is green, remove the worktree
 (`git worktree remove ../guixa-worktrees/dra-NN`) and drop its test databases from the main checkout:
 `php .claude/skills/ship-ticket/drop-test-databases.php NN` (it only matches `testing_draNN` and
 `testing_draNN_*`). The branch stays. If the PR needs more work later, add a new worktree for it; its
 first serial test run recreates the database.
 
-Then show the user a short summary: the PR link, what was built, test/lint results (as reported, not
+Then show the user a short summary: the PR link, what was built, CI result, test/lint results (as reported, not
 re-verified unless asked), both review verdicts, what the correction pass fixed, what was dropped and the
 follow-ups.
 

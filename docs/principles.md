@@ -76,9 +76,27 @@ Technical decisions and rules for the whole project. Domain terms are defined in
     service container in CI).
   - **Vitest** for client-side logic, especially offline storage and sync.
   - **Playwright** for the offline flows and a few critical end-to-end paths.
-- **CI (GitHub Actions) blocks merging** unless all pass: tests, Pint, Larastan (level 8),
-  Oxlint and Oxfmt (through Vite+, the starter kit's own linter and formatter, used instead of
-  ESLint and Prettier, see ADR 0007) and `vue-tsc`.
+- **CI (GitHub Actions) must be green to merge, by convention.** GitHub cannot enforce it: branch
+  protection and rulesets are unavailable on a private repository on the free plan. So `/ship-ticket`
+  waits for the checks (`gh pr checks <PR> --watch`) and a PR is only reported as validated, and only
+  merged, when they all pass. The workflow ignores `.claude/**`, so a PR touching only those paths
+  reports no checks and counts as passing. CI runs tests, Pint, Larastan (level 8), Oxlint and
+  Oxfmt (through Vite+, the starter kit's own linter and formatter, used instead of ESLint and
+  Prettier, see ADR 0007), `vue-tsc` and Playwright.
+- **CI steps and local equivalents.** Run the same checks before pushing (the Pest and Playwright
+  runs use a test database; in a worktree set `DB_DATABASE=testing_draNN`):
+
+  | CI step | Local equivalent |
+  | --- | --- |
+  | Build assets (also generates Wayfinder routes) | `npm run build` |
+  | Pint | `vendor/bin/pint --test` (or `composer lint:check`; `composer lint` fixes) |
+  | Larastan | `vendor/bin/phpstan analyse --memory-limit=1G` (or `composer types:check`) |
+  | Oxlint, Oxfmt | `npm run check` (`npm run check:fix` fixes) |
+  | `vue-tsc` | `npm run types:check` |
+  | Pest | `php artisan test --parallel` (or `vendor/bin/pest --parallel`) |
+  | Playwright (`e2e` job) | `npm run e2e` (needs the built assets and a mail catcher, see CI) |
+
+  `composer ci:check` chains `npm run check`, `npm run types:check` and `composer test` (Pint, Larastan, Pest).
 - **Rules are enforced by tools, not by review.** Pint adds `declare(strict_types=1)` and strict
   comparisons; Pest architecture tests (`tests/Unit/ArchitectureTest.php`) check project rules such
   as UUIDv7 models and actions with `handle()`; a test fails when a translated string is missing

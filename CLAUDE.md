@@ -81,6 +81,12 @@ Standard way to implement a Linear ticket; defined in `.claude/skills/ship-ticke
   (Opus, read-only), in parallel: independent review on a different model from the implementer. One correction pass.
 - Once the work is validated (checks green, review questions answered, correction pass applied), the
   orchestrator pushes and opens the PR without asking; otherwise it asks once.
+- Green CI is a convention gate (branch protection is unavailable on a private repo on the free plan): after
+  the PR is opened the orchestrator waits for `gh pr checks <PR> --watch`, and the work counts as validated,
+  and may be merged, only when every check passes. Red CI goes to a `ticket-implementer` launch (escalation
+  conditions: DRA-129). A PR that touches only `.claude/**` reports no checks (the workflow ignores those
+  paths): for such PRs only, "no checks reported" counts as passing. Local equivalents of each CI step:
+  `docs/principles.md`.
 - Review findings are fixed in the correction pass by default; open product questions are asked in the
   session. Only a pre-existing problem outside the ticket's code, or a question ruled out of scope,
   becomes a follow-up: a Linear issue (state Triage, related to the parent ticket) linked from the PR body.
