@@ -42,6 +42,21 @@ when this is a second pass, the review findings to fix.
    attribution: `type(scope): description (DRA-NN)`. Review-fix passes add a second commit
    `fix(scope): address review findings (DRA-NN)`.
 
+## Findings outside the ticket text
+
+Decision rule, for anything you find that the ticket text does not name:
+- Inside code the ticket touches or breaks: **fix it**.
+- A dependency the ticket needs to work, even in another file: **fix it**.
+- **Follow-up only if** it is pre-existing, does not affect the ticket's behaviour, and fixing it would
+  noticeably widen the diff. You cannot create it: list it in your report (file:line, finding, suggested
+  fix) and the orchestrator creates the `DRA-NN` issue before the PR (follow-ups are never plain text).
+
+Escalation conditions: instead of deciding silently, stop and report (you have no Linear access; the
+orchestrator raises an issue in the Triage state, related to the ticket) when there are:
+- two consecutive CI failures that you cannot root-cause (the same job failing with the same error counts);
+- a product question the spec does not resolve (the undecided edge cases of step 2 are this case);
+- a change that would go outside the ticket's scope.
+
 ## Rules
 
 - Everything generated (code, comments, docs, commit messages, file names) is in English; UI text is
@@ -54,4 +69,4 @@ when this is a second pass, the review findings to fix.
 
 ## Report (in Catalan, short)
 
-What you built, test and lint results, decisions or doubts, commit hash. If you could not commit, say so. If you stopped on an undecided edge case, list the questions instead.
+What you built, test and lint results, decisions or doubts, commit hash. If you could not commit, say so. If you stopped on an undecided edge case or an escalation condition, list the questions or findings instead. List follow-ups too.

@@ -122,8 +122,9 @@ previous commit's results, so match the new SHA) and step 2.
 - The CI-fix pass must never disable or weaken a check: no skipped or deleted tests, no PHPStan baseline
   entries, no files excluded from Pint, no `test.skip` in Playwright, no looser linter config. If there is
   no other way out, it escalates.
-- Provisional limit (DRA-129 will replace it): at most 2 CI-fix passes. On a third failure, or the same
-  job failing with the same error, stop and tell the user.
+- Escalation: after two consecutive CI failures the implementer cannot root-cause (the same job failing
+  with the same error counts), do not launch another pass: raise the Triage issue (see "Escalation
+  conditions" in Guardrails) and tell the user instead of looping.
 
 Once CI is green, remove the worktree
 (`git worktree remove ../guixa-worktrees/dra-NN`) and drop its test databases from the main checkout:
@@ -143,6 +144,14 @@ update yourself (see `docs/agents/issue-tracker.md`).
 
 ## Guardrails
 
+- Findings outside the ticket text: inside code the ticket touches or breaks, **fix it**; a dependency the
+  ticket needs to work, even in another file, **fix it**; **follow-up only if** it is pre-existing, does not
+  affect the ticket's behaviour, and fixing it would noticeably widen the diff. Escalation conditions:
+  instead of deciding silently, the implementer stops and reports (no Linear access) and the orchestrator
+  raises an issue in the Triage state, related to the ticket, when there are two consecutive CI failures it
+  cannot root-cause, a product question the spec does not resolve, or a change that would go outside the
+  ticket's scope. Full rule: `.claude/agents/ticket-implementer.md`. Reviewer follow-ups (section 3) are
+  the same kind of issue and obey the guardrail below.
 - Never open a PR whose body or ticket lists follow-ups as plain text: each one must be a linked `DRA-NN`.
 - Never push to `main` or force-push. Never merge PRs unless the user asks.
 - If a permission is denied, stop and tell the user; do not look for another route.

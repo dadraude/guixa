@@ -85,11 +85,18 @@ Standard way to implement a Linear ticket; defined in `.claude/skills/ship-ticke
   the PR is opened the orchestrator waits for CI (`gh pr checks <PR> --watch`, after checks exist for the
   pushed commit). The PR is **ready to merge** (validated and CI green) only when every check passes ("validated" is evaluated once, before the push; after a CI-fix pass, green CI replaces the local full-suite requirement); it is
   never merged while any check is red or pending, and merging still needs the user to ask. Red CI goes to a
-  `ticket-implementer` launch, at most 2 CI-fix passes for now (DRA-129 will define the escalation
-  conditions). A PR that touches only paths the workflow ignores (the `paths-ignore` entries in
+  `ticket-implementer` launch; two consecutive failures it cannot root-cause (the same job failing with
+  the same error counts) are an escalation condition (below). A PR that touches only paths the workflow ignores (the `paths-ignore` entries in
   `.github/workflows/ci.yml`) reports no checks: for such PRs only, and after the wait for checks to
   appear, "no checks reported" counts as passing. Any other PR with no checks is not ready to merge. Local equivalents of each CI step:
   `docs/principles.md`.
+- Findings outside the ticket text: inside code the ticket touches or breaks, **fix it**; a dependency the
+  ticket needs to work, even in another file, **fix it**; **follow-up only if** it is pre-existing, does not
+  affect the ticket's behaviour, and fixing it would noticeably widen the diff. Escalation conditions: instead
+  of deciding silently, the implementer stops and reports (no Linear access) and the orchestrator raises an
+  issue in the Triage state, related to the ticket, when there are two consecutive CI failures it cannot
+  root-cause, a product question the spec does not resolve, or a change that would go outside the ticket's
+  scope. Full rule: `.claude/agents/ticket-implementer.md`.
 - Review findings are fixed in the correction pass by default; open product questions are asked in the
   session. Only a pre-existing problem outside the ticket's code, or a question ruled out of scope,
   becomes a follow-up: a Linear issue (state Triage, related to the parent ticket) linked from the PR body.
