@@ -94,7 +94,7 @@ class HostGit:
         if Path(self._git("rev-parse", "--path-format=absolute", "--git-common-dir").strip()) != self.common:
             raise Refused("Repository identity changed")
         config = self._git('config', '--local', '--list').lower()
-        if any(x in config for x in ('insteadof=', 'pushurl=', 'include.', 'includeif.', 'filter.', 'textconv=', 'attributesfile=')):
+        if any(x in config for x in ('insteadof=', 'pushurl=', 'include.', 'includeif.', 'filter.', 'textconv=', 'attributesfile=', 'extensions.worktreeconfig=')):
             raise Refused('Executable filters or config rewriting are forbidden')
         self._branch(approval.branch)
         self._sha(approval.head)

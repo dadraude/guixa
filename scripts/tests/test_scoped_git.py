@@ -1,4 +1,5 @@
 import hashlib
+from dataclasses import replace
 import pathlib
 import subprocess
 import tempfile
@@ -55,6 +56,32 @@ class ScopedGitTests(GitFixture, unittest.TestCase):
         with self.assertRaises(Refused):
             self.host.commit(self.approval)
         self.assertFalse(marker.exists())
+
+    def test_worktree_filter_rejected_without_execution(self):
+        marker = pathlib.Path(self.tmp.name) / 'executed'
+        self.git('config', 'extensions.worktreeConfig', 'true')
+        self.git('config', '--worktree', 'filter.hostile.clean', 'touch ' + str(marker) + '; cat')
+        (self.root / 'scripts/.gitattributes').write_text('*.txt filter=hostile')
+        with self.assertRaises(Refused):
+            self.host.commit(self.approval)
+        self.assertFalse(marker.exists())
+
+    def test_repository_branch_and_baseline_refusals(self):
+        with self.assertRaises(Refused):
+            HostGit(self.repository, self.repository, pathlib.Path('/usr/bin/git'))
+        unrelated = pathlib.Path(self.tmp.name) / 'unrelated'
+        unrelated.mkdir()
+        subprocess.run(['/usr/bin/git', 'init', str(unrelated)], check=True, capture_output=True)
+        with self.assertRaises(Refused):
+            HostGit(self.root, unrelated, pathlib.Path('/usr/bin/git'))
+        other = '0' * 40
+        for changed in (replace(self.approval, worktree=self.repository),
+                        replace(self.approval, branch='main'),
+                        replace(self.approval, branch='feature/other'),
+                        replace(self.approval, base=other)):
+            with self.subTest(approval=changed), self.assertRaises(Refused):
+                self.host.commit(changed)
+        self.assertEqual(self.git('rev-parse', 'HEAD'), self.head)
 
     def test_changed_mode_rejected(self):
         (self.root / 'scripts/file.txt').chmod(0o755)
