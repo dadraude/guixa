@@ -38,7 +38,7 @@ out.write_text("oops" if mode == "malformed" else "x"*(1024*1024+1) if mode == "
         self.protocol.write_text("The provider-neutral protocol is mandatory.")
         self.request = {
             "version": 1, "kind": "execute_batch", "run_id": "run-123", "project": "workflow",
-            "repository": str(self.root), "worktree": str(self.root), "base": "main", "parents": [],
+            "repository": str(self.root), "worktree": str(self.root), "base": "main", "start_ref": "b"*40, "parents": [],
             "batch": {"id": "codex", "branch": "feature/dra-144-adapter", "database": "testing_dra144",
                       "tickets": [{"id": "DRA-144", "depends_on": [], "context": "Implement adapter."}]},
             "models": {"orchestrator": "gpt-6.1-sol", "implementer": "gpt-6.1-sol",
@@ -97,6 +97,34 @@ out.write_text("oops" if mode == "malformed" else "x"*(1024*1024+1) if mode == "
         self.reply["tickets"] = [{"id": "DRA-144", "status": "delivered", "commit": "a"*40}]
         self.assertEqual(self.invoke().returncode, 0)
         self.assertEqual(json.loads(self.output.read_text()), self.reply)
+
+    def test_runtime_pinned_request_is_accepted(self):
+        self.request.update(base="feature/dra-12-parent", start_ref="b"*40, parents=["c"*40])
+        self.request["batch"].update(depends_on=["parent"], cross_cutting=False, required_tickets=["DRA-12"])
+        result = self.invoke()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        prompt = json.loads(self.capture.read_text())["prompt"]
+        self.assertIn('"start_ref": "' + "b"*40 + '"', prompt)
+        self.assertIn("pinned merged baseline", prompt)
+        self.assertIn("never merge unchecked mutable", prompt)
+
+    def test_missing_or_mutable_starting_refs_prevent_cli_launch(self):
+        for value in (None, "main", "b"*39, "B"*40):
+            with self.subTest(start_ref=value):
+                self.output.unlink(missing_ok=True)
+                self.capture.unlink(missing_ok=True)
+                if value is None:
+                    self.request.pop("start_ref", None)
+                else:
+                    self.request["start_ref"] = value
+                self.assertNotEqual(self.invoke().returncode, 0)
+                self.assertFalse(self.capture.exists())
+        self.output.unlink(missing_ok=True)
+        self.capture.unlink(missing_ok=True)
+        self.request["start_ref"] = "b"*40
+        self.request["parents"] = ["feature/dra-12-parent"]
+        self.assertNotEqual(self.invoke().returncode, 0)
+        self.assertFalse(self.capture.exists())
 
     def test_invalid_input_prevents_cli_launch(self):
         for field, value in (("version", True), ("kind", "verify_delivery"), ("models", {}),

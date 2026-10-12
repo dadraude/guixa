@@ -49,7 +49,10 @@ The implementation uses the installed CLI's `exec`, `--model`, `--sandbox`, `--e
 ## Invocation and evidence
 
 The runner appends `--request FILE --result FILE` and invokes the adapter inside the requested
-worktree. It receives the full protocol and request, including all four model roles. The orchestrator
+worktree. It receives the full protocol and request, including all four model roles. `start_ref` and
+additional `parents` must be full immutable SHAs; `base` names the PR target. The orchestrator records
+the already merged starting HEAD as the review baseline and stops for coordinator reverification
+before incorporating any base advance. It never substitutes unchecked mutable branch refs. The orchestrator
 gets fresh child-exec argv arrays with the selected implementer model and read-only reviewer models.
 Its instructions require a fresh implementer per ticket/correction, two independent parallel reviews
 on the combined diff, at most two correction passes, exact database isolation, headless questions,
@@ -83,6 +86,7 @@ selects another manifest adapter, without changing the provider-neutral runner o
 The parent session's live CLI probe used Codex `0.162.0-alpha.17.2`, `gpt-6.1-sol` and a read-only
 sandbox and returned `CODEX_BATCH_SMOKE_OK`. That proves basic CLI reachability only. This adapter's
 complete real ticket workflow, fresh model-role children, permission parity and delivery have not
-been live-validated. CLI Linear MCP OAuth initialization currently fails; native app connector access
-does not establish CLI credentials. Do not change authentication or claim DRA-135/DRA-144 live
-acceptance from fake tests or the CLI probe.
+been live-validated. After user-authorized reconnection, a read-only Codex CLI query listed the Draude
+Linear teams successfully and returned `CONNECTED_DRAUDE` with exit 0. This establishes CLI tracker
+read access, rather than full batch delivery or permission acceptance. Do not change authentication
+or claim DRA-135/DRA-144 live acceptance from fake tests or these CLI probes.
