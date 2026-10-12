@@ -45,10 +45,18 @@ Every `ticket-implementer` launch in this flow passes `model: "sonnet"`; never i
 main session or with the plugin's `/implement`.
 
 Launch the `ticket-implementer` agent with the full ticket (id, title, description, acceptance
-criteria), the branch and the worktree path. Wait for its report. If it could not commit, stop and tell the user.
+criteria), the branch and the worktree path. Wait for its report.
 
-If it stopped on an undecided edge case, ask the user (one question at a time), record each answer in the
-ticket as an acceptance criterion, and launch it again with the updated ticket.
+If it stopped on an undecided edge case or any product question, ask the user (one question at a time),
+record each answer in the ticket as an acceptance criterion, and launch it again with the updated ticket;
+open a Triage issue only if the user leaves it open or rules it out of scope.
+
+If it stopped on any other escalation condition (see Guardrails), create ONE Triage issue per finding
+(project Guixa, related to the ticket, in its milestone), after checking the issues already related to
+this ticket to avoid duplicates, and tell the user. Then either relaunch it with the decision, or stop
+the ticket cleanly: issue back to Backlog, worktree removed, test databases dropped, nothing dangling.
+
+If it could not commit for any other reason, stop and tell the user.
 
 Then sync with the base: `git fetch origin` and `git merge origin/<base>` (merge, never rebase: the
 branch may be pushed and force-push is forbidden). If it conflicts, do not resolve it yourself: launch a
@@ -75,10 +83,12 @@ to fix it now: a correction pass is cheaper than an issue, its triage and anothe
    verdicts. A finding a tool could check is fixed by adding the check (arch test, Larastan or Pint
    rule), not by a one-off edit. Drop anything not worth a line of code and say so.
 3. **Follow-ups**, only for (a) a problem that already existed before this ticket and sits outside the
-   code it changes, or (b) a question the user ruled out of scope. One Linear issue each in project
+   files it changes (a reviewer `follow-up` inside a file the ticket changes is treated as `fix now`), (b) a question the user ruled out of scope, or (c) a follow-up the implementer
+   reported under the decision rule (Guardrails). One Linear issue each in project
    Guixa, state Triage, related to the parent ticket and in its milestone, titled with the
-   change to make; body: file:line, the finding and the suggested fix. Create them in step 4, before
-   opening the PR. Never fix anything in the main session.
+   change to make; body: file:line, the finding and the suggested fix. Skip any finding already filed as
+   an escalation or follow-up issue for this ticket (check the issues related to it first). Create them in
+   step 4, before opening the PR. Never fix anything in the main session.
 
 ## 4. Deliver
 
@@ -87,7 +97,7 @@ The work is **validated** when all of these hold:
 - every reviewer `question` was answered by the user (or ruled out of scope into a follow-up);
 - the correction pass, if any, applied every `fix now` finding (dropped ones are only those not worth a
   line of code);
-- no open doubt is left from the implementer or the reviewers.
+- no open doubt is left from the implementer or the reviewers, and no escalation is unresolved.
 
 "Validated" is evaluated once, before the push; CI is checked after it. Validated: deliver without asking. Not validated: show the user what is missing and ask once whether to
 push and open the PR anyway.
@@ -120,10 +130,16 @@ equivalents" in `docs/principles.md`) and makes one more commit `fix(scope): <de
 without amending or rewriting anything already pushed. Push, repeat step 1 (the query may still show the
 previous commit's results, so match the new SHA) and step 2.
 - The CI-fix pass must never disable or weaken a check: no skipped or deleted tests, no PHPStan baseline
-  entries, no files excluded from Pint, no `test.skip` in Playwright, no looser linter config. If there is
-  no other way out, it escalates.
-- Provisional limit (DRA-129 will replace it): at most 2 CI-fix passes. On a third failure, or the same
-  job failing with the same error, stop and tell the user.
+  entries, no files excluded from Pint, no `test.skip` in Playwright, no looser linter config. If the fix
+  would need that, it is escalation condition (4) in Guardrails.
+- Escalation (condition 1 in Guardrails): you count, not the implementer. The initial red CI is not a
+  failure after a fix. Pass the previous failure's log to each next CI-fix pass. Do not launch another
+  pass, escalate (below) and tell the user instead of looping, when the CI run after a CI-fix
+  pass fails again in the same job with the same error, or the implementer reports it could not find the
+  cause, or 2 CI-fix passes have already run even if every failure was diagnosable. Escalating with the
+  PR open: create the Triage issue as in section 2, leave the PR open (convert it to draft if needed)
+  with a comment linking that issue, keep the ticket In Review and blocked by that issue (blocking
+  relation), and still remove the worktree and drop the test databases as below.
 
 Once CI is green, remove the worktree
 (`git worktree remove ../guixa-worktrees/dra-NN`) and drop its test databases from the main checkout:
@@ -143,6 +159,21 @@ update yourself (see `docs/agents/issue-tracker.md`).
 
 ## Guardrails
 
+- Findings outside the ticket text. Protected areas: already merged migrations, `specs/`, ADRs, `CLAUDE.md`,
+  linter or CI config, and changes to the behaviour of other features' shared code (extending shared code
+  compatibly, with tests, is not protected); a file the ticket already changes is never protected. In order:
+  needed for the ticket (it touches or breaks it, or it needs it to work, even in another file) and not in
+  a protected area: **fix it**; needed but in a protected area: **escalate**; not needed: **fix it** if it
+  is in a file the ticket already changes, otherwise **follow-up**, however small (it never meets the
+  protected-area escalation). Escalation conditions: (1) CI keeps failing after a CI-fix pass (the
+  orchestrator counts: same job with the same error again, the implementer could not find the cause, or 2
+  CI-fix passes in total; the initial red CI does not count); (2) a product question the spec does not
+  resolve; (3) a needed change in a protected area; (4) a fix that would need disabling or weakening a
+  check. The implementer stops and reports (no Linear access). For 1, 3 and 4 the orchestrator creates one
+  Triage issue per finding (deduplicated), related to the ticket, and either relaunches it with the
+  decision or stops the ticket; for 2 it asks the user first and creates an issue only if the user leaves
+  it open or rules it out of scope. Full rule: `.claude/agents/ticket-implementer.md`.
+  Reviewer follow-ups (section 3) are the same kind of issue and obey the guardrail below.
 - Never open a PR whose body or ticket lists follow-ups as plain text: each one must be a linked `DRA-NN`.
 - Never push to `main` or force-push. Never merge PRs unless the user asks.
 - If a permission is denied, stop and tell the user; do not look for another route.

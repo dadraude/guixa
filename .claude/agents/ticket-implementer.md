@@ -42,6 +42,36 @@ when this is a second pass, the review findings to fix.
    attribution: `type(scope): description (DRA-NN)`. Review-fix passes add a second commit
    `fix(scope): address review findings (DRA-NN)`.
 
+## Findings outside the ticket text
+
+Decision rule, for anything you find that the ticket text does not name. Protected areas are: already
+merged migrations, `specs/`, ADRs, `CLAUDE.md`, linter or CI config, and changes to the behaviour of other
+features' shared code (extending shared code compatibly, with tests, is not protected). A file the ticket
+already changes is never protected. In order:
+- Needed for the ticket (it touches or breaks it, or the ticket needs it to work, even in another file)
+  and not in a protected area: **fix it**.
+- Needed but in a protected area: **escalate** (below), do not edit it.
+- Not needed: **fix it** if it is in a file the ticket already changes; otherwise it is a **follow-up**,
+  however small. You cannot create it: list it in your report (file:line, finding, suggested fix) and the
+  orchestrator creates the `DRA-NN` issue before the PR (follow-ups are never plain text). A follow-up is
+  not needed for the ticket, so it never meets the protected-area escalation.
+
+Escalation conditions: instead of deciding silently, stop and report your findings (you have no Linear
+access) when:
+1. CI keeps failing after a CI-fix pass. The orchestrator counts, not you: you only receive one failing
+   job and its log. It escalates when the CI run after a CI-fix pass fails again in the same job with the
+   same error, when you report you could not find the cause, or after 2 CI-fix passes in total even if
+   every failure was diagnosable. The initial red CI is not a failure after a fix.
+2. A product question the spec does not resolve (the undecided edge cases of step 2 are this case). The
+   orchestrator asks the user first; a Triage issue only if the user leaves it open or rules it out of
+   scope.
+3. A change that is needed but in a protected area.
+4. A fix that would need disabling or weakening a check.
+
+For conditions 1, 3 and 4 the orchestrator creates one Triage issue per finding (deduplicated), tells the
+user, and either relaunches you with the decision or stops the ticket. For condition 2 it asks the user
+first, and creates an issue only if the user leaves it open or rules it out of scope.
+
 ## Rules
 
 - Everything generated (code, comments, docs, commit messages, file names) is in English; UI text is
@@ -54,4 +84,4 @@ when this is a second pass, the review findings to fix.
 
 ## Report (in Catalan, short)
 
-What you built, test and lint results, decisions or doubts, commit hash. If you could not commit, say so. If you stopped on an undecided edge case, list the questions instead.
+What you built, test and lint results, decisions or doubts, commit hash. If you could not commit, say so. If you stopped on an undecided edge case or an escalation condition, list the questions or findings instead. List follow-ups too.

@@ -89,7 +89,7 @@ while IFS= read -r check; do
     if ! output=$(bash -c "$check" 2>&1); then
         reason="Check failed in $PWD (DB_DATABASE=$DB_DATABASE): $check
 $(tail -n 40 <<<"$output")
-Fix it and finish again. If you stopped on an undecided edge case or could not commit, finish again with your questions; do not guess."
+Fix it and finish again. If you stopped on an undecided edge case, could not commit, or hit an escalation condition, finish again with your questions or findings; do not guess."
         jq -n --arg reason "$reason" '{decision: "block", reason: $reason}'
         exit 0
     fi

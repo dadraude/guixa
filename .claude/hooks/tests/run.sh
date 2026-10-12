@@ -278,7 +278,7 @@ printf '%s' "$(via_transcript "$tmp/transcript.jsonl")" | env -u DB_DATABASE GUI
 err=$(printf '%s' "$(via_transcript "$tmp/transcript-none.jsonl")" | env -u DB_DATABASE GUIXA_STOP_CHECKS=false bash "$hooks/implementer-stop-checks.sh" 2>&1 >/dev/null)
 [[ $err = *'checks skipped'* ]] && pass=$((pass + 1)) || { fail=$((fail + 1)); echo "FAIL: undeterminable worktree must say so on stderr ($err)"; }
 reason=$(printf '%s' "$(via_transcript "$tmp/transcript.jsonl")" | env -u DB_DATABASE GUIXA_STOP_CHECKS='echo boom; exit 1' bash "$hooks/implementer-stop-checks.sh" 2>/dev/null | jq -r '.reason')
-[[ $reason = *boom* && $reason = *'do not guess'* && $reason = *dra-55* ]] && pass=$((pass + 1)) || { fail=$((fail + 1)); echo "FAIL: block reason content ($reason)"; }
+[[ $reason = *boom* && $reason = *'do not guess'* && $reason = *'hit an escalation condition'* && $reason = *dra-55* ]] && pass=$((pass + 1)) || { fail=$((fail + 1)); echo "FAIL: block reason content ($reason)"; }
 
 # Second correction pass: squash-merged parent migration, background &, xargs, write forms, `@`, DB_DATABASE.
 make_repo "$tmp/sq" main

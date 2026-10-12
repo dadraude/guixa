@@ -85,16 +85,26 @@ Standard way to implement a Linear ticket; defined in `.claude/skills/ship-ticke
   the PR is opened the orchestrator waits for CI (`gh pr checks <PR> --watch`, after checks exist for the
   pushed commit). The PR is **ready to merge** (validated and CI green) only when every check passes ("validated" is evaluated once, before the push; after a CI-fix pass, green CI replaces the local full-suite requirement); it is
   never merged while any check is red or pending, and merging still needs the user to ask. Red CI goes to a
-  `ticket-implementer` launch, at most 2 CI-fix passes for now (DRA-129 will define the escalation
-  conditions). A PR that touches only paths the workflow ignores (the `paths-ignore` entries in
+  `ticket-implementer` launch; repeated failures are an escalation condition (below). A PR that touches only paths the workflow ignores (the `paths-ignore` entries in
   `.github/workflows/ci.yml`) reports no checks: for such PRs only, and after the wait for checks to
   appear, "no checks reported" counts as passing. Any other PR with no checks is not ready to merge. Local equivalents of each CI step:
   `docs/principles.md`.
+- Findings outside the ticket text. Protected areas: already merged migrations, `specs/`, ADRs, `CLAUDE.md`,
+  linter or CI config, and changes to the behaviour of other features' shared code (compatible extensions
+  with tests are not protected); a file the ticket already changes is never protected. Needed for the
+  ticket and not protected: **fix it**; needed but protected: **escalate**; not needed: **fix it** if in a
+  file the ticket already changes, else **follow-up**, however small. Escalation conditions: (1) CI keeps
+  failing after a CI-fix pass (the orchestrator counts: same job and error again, cause not found, or 2
+  CI-fix passes; the initial red CI does not count); (2) a product question the spec does not resolve;
+  (3) a needed change in a protected area; (4) a fix that would need weakening a check. For 1, 3 and 4 the
+  orchestrator creates one Triage issue per finding (deduplicated); for 2 it asks the user first and
+  creates an issue only if the user leaves it open or rules it out of scope. Full rule:
+  `.claude/agents/ticket-implementer.md`.
 - Review findings are fixed in the correction pass by default; open product questions are asked in the
-  session. Only a pre-existing problem outside the ticket's code, or a question ruled out of scope,
-  becomes a follow-up: a Linear issue (state Triage, related to the parent ticket) linked from the PR body.
+  session. Only a pre-existing problem outside the files the ticket changes, a question ruled out of scope, or an
+  implementer-reported follow-up (findings rule above) becomes a follow-up: a Linear issue (state Triage, related to the parent ticket) linked from the PR body.
 - No PR or ticket keeps follow-ups as plain text, also for work done outside `/ship-ticket`: each one is a
-  `DRA-NN` issue, created before the PR is opened.
+  `DRA-NN` issue, created before the PR is opened (this includes follow-ups under the findings rule above).
 - Linear: In Progress when starting, In Review when the PR is opened.
 - Before review and again before pushing, the branch merges `origin/<base>` so conflicts show up in the
   session, not in the PR.
