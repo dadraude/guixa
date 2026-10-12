@@ -18,7 +18,9 @@ def required_configuration(checks, statuses):
     for value in checks:
         match = re.fullmatch(r"([1-9][0-9]*)/(.+)", value)
         require(match and match[2].strip(), "required checks must be APP_ID/NAME")
-        identities.add((int(match[1]), match[2]))
+        identity = (int(match[1]), match[2])
+        require(identity not in identities, "duplicate required check identities are unsupported")
+        identities.add(identity)
     require(all(isinstance(context, str) and context.strip() for context in statuses), "invalid required status context")
     return identities, set(statuses)
 

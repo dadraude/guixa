@@ -49,3 +49,7 @@ class GithubCIProofTests(unittest.TestCase):
         ):
             with self.subTest(source=bad_source, paths=paths, branch=branch), self.assertRaises(ProofError):
                 prove_skipped(bad_source, paths, branch)
+
+    def test_duplicate_required_names_cannot_represent_independent_workflows(self):
+        with self.assertRaises(ProofError):
+            assert_green([self.check], [], ['1/ci', '1/ci'], [], self.head)

@@ -11,7 +11,10 @@ The owner must inspect the repository's actual required/applicable jobs and revi
 including independently triggered workflows such as batch-runner CI. Do not discover the required
 list from the currently visible checks: that would treat a job that has not appeared as optional.
 The caller cannot substitute a favorable subset when required jobs are absent. Repository changes
-that add/rename jobs require configuration review. The configuration is an explicit operator trust
+that add/rename jobs require configuration review. Multiple workflows exposing the same app ID/check name are unsupported: duplicate mandatory
+identities are rejected rather than deduplicated. Use distinct job names or a future workflow-aware
+identity contract; do not configure one name and assume it proves multiple workflows ran.
+The configuration is an explicit operator trust
 boundary; this helper cannot establish that the operator selected every applicable job correctly.
 
 All observed check runs must pass. Retry grouping uses **app ID, check-suite ID and check name**,
