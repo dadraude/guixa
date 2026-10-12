@@ -11,12 +11,15 @@ using Matt Pocock's skills (`mattpocock-skills` plugin). See `docs/adr/0001-sdd-
    Worked out with `/grill-with-docs`; significant decisions become ADRs.
 3. For each feature:
    1. `/grill-with-docs`: interview until the feature is clear; updates `CONTEXT.md` and `docs/adr/`.
-   2. `/to-spec`: writes `specs/NNN-name/spec.md` (`Status: draft`) — problem, user stories,
+   2. `/guixa-to-spec`: writes `specs/NNN-name/spec.md` (`Status: draft`) — problem, user stories,
       implementation and testing decisions.
    3. **Spec review**: the `spec-reviewer` agent (`model: "opus"`, read-only) lists the edge cases the spec leaves
-      undecided (concurrency, lifecycle states, signed out, permissions, sibling screens, failure states).
-      Obvious answers go into the spec; the rest are asked one by one with `/grill-with-docs` and recorded.
-   4. **The user approves the spec** (`Status: approved`). No tickets and no code before that.
+      undecided (concurrency, lifecycle states, signed out, permissions, sibling screens, failure states) and ends
+      with an `Undecided: N` count. Obvious answers go into the spec; the rest are asked one by one with
+      `/grill-with-docs` and recorded. Re-run the reviewer until the count is 0.
+   4. **The user approves the spec** (`Status: approved`). A spec cannot be offered for approval, nor approved,
+      while any edge case the reviewer listed lacks a written decision in the spec (`Undecided: 0`).
+      No tickets and no code before that.
    5. `/to-tickets`: splits the spec into vertical-slice tickets in Linear (project Guixa). Each ticket
       carries the edge cases decided for its stories as acceptance criteria.
    6. `/ship-ticket DRA-NN`: one or a few tickets per session; the `ticket-implementer` agent builds
