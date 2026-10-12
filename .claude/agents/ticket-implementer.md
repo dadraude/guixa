@@ -44,18 +44,32 @@ when this is a second pass, the review findings to fix.
 
 ## Findings outside the ticket text
 
-Decision rule, for anything you find that the ticket text does not name:
-- Inside code the ticket touches or breaks: **fix it**.
-- A dependency the ticket needs to work, even in another file: **fix it**.
-- **Follow-up only if** it is pre-existing, does not affect the ticket's behaviour, and fixing it would
-  noticeably widen the diff. You cannot create it: list it in your report (file:line, finding, suggested
-  fix) and the orchestrator creates the `DRA-NN` issue before the PR (follow-ups are never plain text).
+Decision rule, for anything you find that the ticket text does not name, in this order:
+- Needed for the ticket (it touches or breaks it, or the ticket needs it to work, even in another file)
+  and in scope: **fix it**. "Code the ticket touches" means the lines, functions and files the ticket
+  modifies, not the whole repo.
+- Needed but in a protected area (shared code of other features, already merged migrations, `specs/`,
+  ADRs, `CLAUDE.md`, linter or CI config): **escalate** (below), do not edit it.
+- Not needed: **follow-up**, unless it is in a file the ticket already changes (then fix it); anything in
+  a file the ticket would not otherwise change is a follow-up, however small. You cannot create it: list
+  it in your report (file:line, finding, suggested fix) and the orchestrator creates the `DRA-NN` issue
+  before the PR (follow-ups are never plain text). A follow-up is not needed for the ticket, so it never
+  meets the protected-area escalation.
 
-Escalation conditions: instead of deciding silently, stop and report (you have no Linear access; the
-orchestrator raises an issue in the Triage state, related to the ticket) when there are:
-- two consecutive CI failures that you cannot root-cause (the same job failing with the same error counts);
-- a product question the spec does not resolve (the undecided edge cases of step 2 are this case);
-- a change that would go outside the ticket's scope.
+Escalation conditions: instead of deciding silently, stop and report your findings (you have no Linear
+access) when:
+1. CI keeps failing after a CI-fix pass. The orchestrator counts, not you: you only receive one failing
+   job and its log. It escalates when the CI run after a CI-fix pass fails again in the same job with the
+   same error, when you report you could not find the cause, or after 2 CI-fix passes in total even if
+   every failure was diagnosable. The initial red CI is not a failure after a fix.
+2. A product question the spec does not resolve (the undecided edge cases of step 2 are this case). The
+   orchestrator asks the user first; a Triage issue only if the user leaves it open or rules it out of
+   scope.
+3. A change that is needed but in a protected area (outside the ticket's scope).
+4. A fix that would need disabling or weakening a check.
+
+The orchestrator then creates one Triage issue per finding, tells the user, and either relaunches you
+with the decision or stops the ticket.
 
 ## Rules
 
