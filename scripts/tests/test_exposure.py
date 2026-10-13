@@ -1,15 +1,13 @@
+import ast
 import copy
 import json
-import subprocess
 import sys
+import tempfile
 import unittest
 from pathlib import Path
-from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from scripts.batch_contract import ContractError, verify_exposure
-from scripts.tests import test_codex_worker as codex_tests
-import codex_worker as worker
 
 CONTRACT = {"version": 1, "tools": ["read"], "mcp_servers": [],
             "writable_paths": ["/work/tree/scripts"], "network": False, "inherited_config": []}
@@ -55,42 +53,52 @@ class NeutralVerifierTest(unittest.TestCase):
                                         {**CONTRACT, "network": True})["network"])
 
 
-class CodexExposureTest(unittest.TestCase):
-    def setUp(self):
-        # Reuse the Codex fixture by composition so its own tests are not re-run here.
-        self.base = codex_tests.WorkerTest("test_fixed_native_argv_and_clean_environment")
-        self.base.setUp()
-        self.addCleanup(self.base.temp.cleanup)
-        self.tree, self.config, self.prepare = self.base.tree, self.base.config, self.base.prepare
+class StrictReportTest(unittest.TestCase):
+    def test_duplicate_keys_and_non_finite_numbers_are_refused(self):
+        body = json.dumps({**CONTRACT, "writable_paths": []})
+        duplicate = body.replace('"mcp_servers": []', '"mcp_servers": ["x"], "mcp_servers": []')
+        self.assertNotEqual(body, duplicate)
+        for raw in (duplicate, body.replace('"version": 1', '"version": NaN'),
+                    body.replace('"version": 1', '"version": Infinity')):
+            with self.subTest(raw), self.assertRaises(ContractError):
+                verify_exposure(raw, CONTRACT)
 
-    def measure(self, servers, features):
-        def run(argv, **kwargs):
-            out = json.dumps(servers) if "mcp" in argv else features
-            return subprocess.CompletedProcess(argv, 0, out, "")
-        plan = self.prepare()  # before patching: Git helpers also go through subprocess.run
-        with patch.object(worker.subprocess, "run", side_effect=run):
-            return worker.exposure_report(plan)
-
-    def contract(self):
-        return {"version": 1, "tools": [], "mcp_servers": [], "network": False,
-                "writable_paths": [str(self.tree / "scripts/new.py")], "inherited_config": [str(self.config)]}
-
-    def test_supported_configuration_passes(self):
-        report = self.measure([{"name": "test", "enabled": False}], "multi_agent stable false")
-        self.assertEqual(report["mcp_servers"], [])
-        verify_exposure(json.dumps(report), self.contract())
-
-    def test_report_comes_from_inventory_not_from_flags(self):
-        report = self.measure([{"name": "test", "enabled": True}], "multi_agent stable true")
-        self.assertEqual((report["mcp_servers"], report["tools"]), (["test"], ["multi_agent"]))
+    def test_boolean_contract_version_is_refused(self):
         with self.assertRaises(ContractError):
-            verify_exposure(json.dumps(report), self.contract())
+            verify_exposure(FakeAdapter().exposure(), {**CONTRACT, "version": True})
 
-    def test_unparseable_inventory_is_refused(self):
-        with self.assertRaises(ValueError):
-            self.measure({"not": "a list"}, "multi_agent stable false")
-        with self.assertRaises(ValueError):
-            self.measure([], "garbage")
+    def test_inherited_config_must_be_canonical_absolute_paths(self):
+        for bad in ("config.toml", "/a/../b/config.toml"):
+            with self.subTest(bad), self.assertRaises(ContractError):
+                verify_exposure(FakeAdapter(inherited_config=[bad]).exposure(),
+                                {**CONTRACT, "inherited_config": [bad]})
+
+    def test_symlink_inside_a_root_is_refused(self):
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw).resolve()
+            (root / "outside").mkdir()
+            (root / "scope").mkdir()
+            (root / "scope" / "link").symlink_to(root / "outside")
+            contract = {**CONTRACT, "writable_paths": [str(root / "scope")]}
+            ok = FakeAdapter(writable_paths=[str(root / "scope" / "a.py")])
+            verify_exposure(ok.exposure(), contract)
+            escaped = FakeAdapter(writable_paths=[str(root / "scope" / "link" / "a.py")])
+            with self.assertRaises(ContractError):
+                verify_exposure(escaped.exposure(), contract)
+            with self.assertRaises(ContractError):
+                verify_exposure(ok.exposure(), {**contract, "writable_paths": [str(root / "scope" / "link")]})
+
+    def test_inherited_config_is_compared_as_a_path_set(self):
+        contract = {**CONTRACT, "inherited_config": ["/a/config.toml"]}
+        verify_exposure(FakeAdapter(inherited_config=["/a/config.toml"]).exposure(), contract)
+
+
+class NeutralImportsTest(unittest.TestCase):
+    def test_this_module_imports_no_codex_module(self):
+        tree = ast.parse(Path(__file__).read_text())
+        imported = [node.module or "" for node in ast.walk(tree) if isinstance(node, ast.ImportFrom)]
+        imported += [alias.name for node in ast.walk(tree) if isinstance(node, ast.Import) for alias in node.names]
+        self.assertFalse([name for name in imported if "codex" in name.lower()], imported)
 
 
 if __name__ == "__main__":

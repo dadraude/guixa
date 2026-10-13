@@ -71,12 +71,31 @@ The report proves configuration inventory, not service-argument scoping.
 
 ### First adapter
 
-The Codex adapter
-(`codex_worker.exposure_report`) replays the launch overrides against `mcp list --json` and
-`features list`; its probes are described in `docs/agents/codex-provider-profile.md`. This defines
-the measurement only: nothing here activates a permission, profile or global configuration.
-Test with `python3 -m unittest scripts.tests.test_exposure -v`; the fake adapter there has no
-provider import.
+The Codex adapter (`codex_worker.measured_inventory`, `codex_worker.exposure_report`) runs the CLI's
+inventory subcommands in the worker's context (same environment, working directory and `-c`
+overrides); the probes are described in `docs/agents/codex-provider-profile.md`.
+
+Measured, and from what:
+
+- `tools`: the features reported enabled by `features list`.
+- `mcp_servers`: the servers reported enabled by `mcp list --json`; an inventory missing any server
+  of the audited configuration is refused as incomplete.
+- `inherited_config`: the configuration, instruction, rule and hook files rediscovered on disk at
+  report time, not a constant.
+
+Not measured yet: `network` and `writable_paths`. No measured source for them exists in the
+adapter, so `exposure_report` refuses instead of copying the launch plan; this is an open decision
+(DRA-146). Also not covered: `web_search` as a network path, and `-C` / `--strict-config` on the
+inventory subcommands (not confirmed for them). Nothing here activates a permission, profile or
+global configuration.
+
+The neutral verifier (`batch_contract.verify_exposure`) accepts only what a contract lists. The
+report is JSON with exactly the contract fields; duplicate keys, non-finite numbers, unknown fields
+and non-boolean `network` are refused. `inherited_config` and `writable_paths` are absolute,
+canonical paths (no `..`, no symlinks); `inherited_config` is compared as a set of paths and every
+written path must lie under a declared root. Test with
+`python3 -m unittest scripts.tests.test_exposure scripts.tests.test_codex_exposure -v`; the neutral
+tests import no provider module.
 
 ## Isolated lifecycle and receipts
 

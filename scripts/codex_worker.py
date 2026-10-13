@@ -85,6 +85,26 @@ def audited_config(home, tree):
     return servers
 
 
+FEATURE_STATUSES = ('stable', 'experimental', 'under development', 'deprecated', 'removed')
+
+
+def parse_features(stdout):
+    """Parse `features list` into {name: (status, enabled)}; any unknown shape is a refusal."""
+    features = {}
+    for line in stdout.splitlines():
+        fields = line.split()
+        if len(fields) < 3 or fields[-1] not in ('true', 'false') \
+                or not re.fullmatch(r'[A-Za-z0-9_.]+', fields[0]):
+            raise ValueError('unknown feature inventory format')
+        status = ' '.join(fields[1:-1])
+        if status not in FEATURE_STATUSES:
+            raise ValueError('unknown feature status')
+        features[fields[0]] = (status, fields[-1] == 'true')
+    if not features:
+        raise ValueError('empty feature inventory')
+    return features
+
+
 def prepare_launch(policy_path, policy_sha256, *, read_only=False):
     """Validate host policy and build argv without executing any worker."""
     policy_path = absolute_path(policy_path)
@@ -127,16 +147,9 @@ def prepare_launch(policy_path, policy_sha256, *, read_only=False):
     feature_result = subprocess.run([str(executable), '--no-daemon', 'features', 'list'],
                                     env={'HOME': str(user_home), 'CODEX_HOME': str(home)},
                                     input='', capture_output=True, text=True, check=True, timeout=10)
-    features = {}
-    for line in feature_result.stdout.splitlines():
-        fields = line.split()
-        if len(fields) < 3 or fields[-1] not in ('true', 'false') or not re.fullmatch(r'[A-Za-z0-9_.]+', fields[0]):
-            raise ValueError('unknown feature inventory format')
-        status = ' '.join(fields[1:-1])
-        if status not in ('stable', 'experimental', 'under development', 'deprecated', 'removed'):
-            raise ValueError('unknown feature status')
-        features[fields[0]] = status
-    if not features or features != policy['features']:
+    features = parse_features(feature_result.stdout)
+    features = {name: status for name, (status, _) in features.items()}
+    if features != policy['features']:
         raise ValueError('registered feature inventory changed')
     config = tomllib.loads(fragment['toml'])
     filesystem = config['permissions'][fragment['profile']]['filesystem']
@@ -163,6 +176,8 @@ def prepare_launch(policy_path, policy_sha256, *, read_only=False):
         argv.extend(['-c', override])
     argv.append('-')
     return {'argv': argv, 'env': {'HOME': str(user_home), 'CODEX_HOME': str(home)},
+            'repository': str(repo), 'worktree': str(tree), 'executable': str(executable),
+            'user_home': str(user_home),
             'filesystem': filesystem, 'activation_ready': False,
             'owner_authorized': policy.get('activation') is True,
             'acceptance_recorded': policy.get('owner_tool_audit_authorized') is True,
@@ -193,32 +208,53 @@ def launch(policy_path, policy_sha256, prompt, *, read_only=False, timeout=300):
     return subprocess.CompletedProcess(plan['argv'], process.returncode, stdout, stderr)
 
 
-def exposure_report(plan):
-    """Measure what this launch plan exposes from the CLI's own inventory, not from the plan's flags.
+def probe(plan, *command):
+    """Run an inventory subcommand in the worker's context: same env, tree and `-c` overrides.
 
-    The plan's override flags are only replayed so the CLI reports its effective state under them.
+    --strict-config and -C are not documented for these subcommands, so the tree is matched by
+    working directory; the installed CLI was not available to confirm broader flag support.
     """
-    argv, env = plan['argv'], plan['env']
-    overrides = [item for flag, item in zip(argv, argv[1:]) if flag == '-c']
-    flags = [item for override in overrides for item in ('-c', override)]
-    def inventory_output(*command):
-        return subprocess.run([argv[0], '--no-daemon', *command, *flags], env=env, input='',
-                              capture_output=True, text=True, check=True, timeout=10).stdout
-    servers = json.loads(inventory_output('mcp', 'list', '--json'))
+    argv = plan['argv']
+    flags = [item for flag, value in zip(argv, argv[1:]) if flag == '-c' for item in (flag, value)]
+    return subprocess.run([argv[0], '--no-daemon', *command, *flags], env=plan['env'], cwd=plan['worktree'],
+                          input='', capture_output=True, text=True, check=True, timeout=10).stdout
+
+
+def measured_mcp_servers(plan, configured):
+    try:
+        servers = json.loads(probe(plan, 'mcp', 'list', '--json'))
+    except json.JSONDecodeError as error:
+        raise ValueError('unparseable MCP inventory') from error
     if not isinstance(servers, list) or not all(
             isinstance(item, dict) and isinstance(item.get('name'), str)
             and isinstance(item.get('enabled'), bool) for item in servers):
         raise ValueError('unknown MCP inventory format')
-    tools = []
-    for line in inventory_output('features', 'list').splitlines():
-        fields = line.split()
-        if len(fields) < 3 or fields[-1] not in ('true', 'false'):
-            raise ValueError('unknown feature inventory format')
-        if fields[-1] == 'true':
-            tools.append(fields[0])
-    writable = [path for path, mode in plan['filesystem'].items() if mode == 'write']
-    return {'version': 1, 'tools': sorted(tools),
-            'mcp_servers': sorted(item['name'] for item in servers if item['enabled']),
-            'writable_paths': sorted(writable),
-            'network': not any(item.endswith('network.enabled=false') for item in overrides),
-            'inherited_config': [str(Path(env['CODEX_HOME']) / 'config.toml')]}
+    if set(configured) - {item['name'] for item in servers}:
+        raise ValueError('incomplete MCP inventory: configured servers are missing')
+    return sorted(item['name'] for item in servers if item['enabled'])
+
+
+def inherited_layers(plan):
+    """Every config layer the CLI would read, rediscovered now (not a constant)."""
+    audited = {Path(plan['executable']), Path(__file__).resolve(), Path(codex_profile.__file__).resolve()}
+    found = inventory(Path(plan['repository']), Path(plan['worktree']), Path(plan['env']['CODEX_HOME']),
+                      Path(plan['executable']), Path(plan['user_home']))
+    return sorted(path for path in found if Path(path) not in audited)
+
+
+def measured_inventory(plan):
+    """Measured fields: tools (`features list`), mcp_servers (`mcp list --json`), inherited_config."""
+    home, tree = Path(plan['env']['CODEX_HOME']), Path(plan['worktree'])
+    features = parse_features(probe(plan, 'features', 'list'))
+    return {'tools': sorted(name for name, (_, enabled) in features.items() if enabled),
+            'mcp_servers': measured_mcp_servers(plan, audited_config(home, tree)),
+            'inherited_config': inherited_layers(plan)}
+
+
+def exposure_report(plan):
+    """Refuse until `network` and `writable_paths` have a measured source (DRA-146 escalation).
+
+    Echoing the plan's filesystem or override strings would be a claim, not a measurement.
+    """
+    measured_inventory(plan)
+    raise ValueError('network and writable_paths have no measured source yet')

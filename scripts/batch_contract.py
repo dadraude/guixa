@@ -217,11 +217,26 @@ def names(value, label):
     return set(value)
 
 
+def canonical(item):
+    path = Path(item)
+    # A symlink inside a root must not widen it, so only already-resolved paths are accepted.
+    return path.is_absolute() and ".." not in path.parts and path == path.resolve()
+
+
 def paths(value, label):
-    require(isinstance(value, list) and all(text(item) and Path(item).is_absolute()
-                                            and ".." not in Path(item).parts for item in value),
-            f"{label} must be absolute paths without parent segments")
-    return [Path(item) for item in value]
+    require(isinstance(value, list) and all(text(item) and canonical(item) for item in value),
+            f"{label} must be canonical absolute paths without parent segments")
+    return {Path(item) for item in value}
+
+
+def unique_object(pairs):
+    keys_seen = [key for key, _ in pairs]
+    require(len(keys_seen) == len(set(keys_seen)), "duplicate key in exposure report")
+    return dict(pairs)
+
+
+def refuse_constant(name):
+    raise ContractError(f"non-finite number in exposure report: {name}")
 
 
 def verify_exposure(raw_report, contract):
@@ -231,18 +246,23 @@ def verify_exposure(raw_report, contract):
     measured. Anything missing, unparseable, unknown or not covered is a refusal.
     """
     keys(contract, EXPOSURE_FIELDS)
-    require(contract["version"] == 1 and type(contract["network"]) is bool, "invalid exposure contract")
+    require(type(contract["version"]) is int and contract["version"] == 1
+            and type(contract["network"]) is bool, "invalid exposure contract")
     try:
-        report = json.loads(raw_report) if isinstance(raw_report, (str, bytes)) else None
+        report = (json.loads(raw_report, object_pairs_hook=unique_object, parse_constant=refuse_constant)
+                  if isinstance(raw_report, (str, bytes)) else None)
     except ValueError as error:
         raise ContractError("unparseable exposure report") from error
     keys(report, EXPOSURE_FIELDS)
     require(type(report["version"]) is int and report["version"] == 1, "unsupported exposure version")
     require(type(report["network"]) is bool, "network must be boolean")
     require(not report["network"] or contract["network"], "network access was not declared")
-    for field in ("tools", "mcp_servers", "inherited_config"):
+    for field in ("tools", "mcp_servers"):
         extra = names(report[field], field) - names(contract[field], field)
         require(not extra, f"undeclared {field}: {sorted(extra)}")
+    extra = paths(report["inherited_config"], "inherited_config") - paths(contract["inherited_config"],
+                                                                         "contract inherited_config")
+    require(not extra, f"undeclared inherited_config: {sorted(map(str, extra))}")
     allowed = paths(contract["writable_paths"], "contract writable_paths")
     for path in paths(report["writable_paths"], "writable_paths"):
         require(any(path.is_relative_to(root) for root in allowed), f"writable path outside scope: {path}")
