@@ -48,26 +48,36 @@ Run the contract tests with `python3 -m unittest scripts.tests.test_batch_contra
 
 ## Effective-exposure contract
 
-A launched worker may only see and do what the host declared. The host declares a **contract** and
-the adapter reports its **measured** exposure; both are JSON objects with exactly these fields
-(`scripts/batch_contract.py`, `verify_exposure`):
+A launched worker may only see and do what the host declared. The host declares a **contract** with
+exactly these fields (`scripts/batch_contract.py`, `verify_exposure`):
 
 - `version`: `1`;
 - `tools`: names of every tool the worker can call, including built-in features;
 - `mcp_servers`: names of every enabled MCP server;
-- `writable_paths`: absolute paths (no `..`) the worker can write; in a contract they are scope roots,
-  in a report each must lie inside one of them;
-- `network`: boolean; a report may say `true` only if the contract does;
-- `inherited_config`: configuration layers the worker inherits (absolute paths).
+- `inherited_config`: configuration layers the worker inherits (absolute paths);
+- `writable_paths`: absolute paths (no `..`) the worker can write; in a contract they are scope roots;
+- `network`: boolean; it may be `true` in an exposure only if the contract says so.
 
-For list fields the contract is an allowlist: the report must be a subset. A missing, unparseable or
-non-object report, an unknown or missing field, a wrong type or any undeclared item is a refusal
-(`ContractError`); there are no defaults. An unsupported setup (for example a full desktop
-configuration with inherited MCP servers) is refused simply because it exceeds the contract.
+The exposure has two halves that are never mixed:
 
-An adapter must build its report from the provider's own inventory of the effective configuration
-and tools, not by echoing the flags it passed, and must run the verifier before any worker starts.
-The report proves configuration inventory, not service-argument scoping.
+- **Measured** (`version`, `tools`, `mcp_servers`, `inherited_config`): the worker report, built from
+  the provider's own inventory of the effective configuration.
+- **Host-attested** (`network`, `writable_paths`): no measured source exists. The host declares them
+  from its own sealed launch plan / profile hash and passes them to the verifier separately; they are
+  never read from the worker report, and a report that carries them is refused. They are claims
+  about what the host sealed, not proof of what the worker could do. A real native probe is the open
+  gap (DRA-147).
+
+For list fields the contract is an allowlist: the measured or attested value must be a subset. A
+missing, unparseable or non-object report, a missing attestation, an unknown or missing field, a wrong
+type or any undeclared item is a refusal (`ContractError`); there are no defaults. An unsupported setup
+(for example a full desktop configuration with inherited MCP servers) is refused simply because it
+exceeds the contract.
+
+An adapter must build the measured half from the provider's inventory, not by echoing the flags it
+passed, and must run the verifier before any worker starts. The result is configuration inventory,
+not service-argument scoping. `verify_exposure(report, contract, attestation)` returns
+`{"measured": ..., "attested": ...}` so callers can tell the halves apart.
 
 ### First adapter
 
@@ -83,17 +93,21 @@ Measured, and from what:
 - `inherited_config`: the configuration, instruction, rule and hook files rediscovered on disk at
   report time, not a constant.
 
-Not measured yet: `network` and `writable_paths`. No measured source for them exists in the
-adapter, so `exposure_report` refuses instead of copying the launch plan; this is an open decision
-(DRA-146). Also not covered: `web_search` as a network path, and `-C` / `--strict-config` on the
-inventory subcommands (not confirmed for them). Nothing here activates a permission, profile or
-global configuration.
+Host-attested, not measured (DRA-147 tracks a native probe):
+
+- `writable_paths`: the plan's filesystem scope, entries with mode `write`.
+- `network`: the permission profile's network setting, read from the parsed profile that also feeds the
+  `-c` override (never by matching override text). Enabled web search (a `web_search*` feature on, or
+  the plan's `web_search` not `disabled`) counts as network, so a contract without network refuses it.
+
+Also not covered: `-C` / `--strict-config` on the inventory subcommands (not confirmed for them).
+Nothing here activates a permission, profile or global configuration.
 
 The neutral verifier (`batch_contract.verify_exposure`) accepts only what a contract lists. The
-report is JSON with exactly the contract fields; duplicate keys, non-finite numbers, unknown fields
-and non-boolean `network` are refused. `inherited_config` and `writable_paths` are absolute,
-canonical paths (no `..`, no symlinks); `inherited_config` is compared as a set of paths and every
-written path must lie under a declared root. Test with
+report is JSON with exactly the measured fields; duplicate keys, non-finite numbers and unknown fields
+are refused, and so is a non-boolean attested `network`. `inherited_config` and `writable_paths` are
+absolute, canonical paths (no `..`, no symlinks); `inherited_config` is compared as a set of paths and
+every attested writable path must lie under a declared root. Test with
 `python3 -m unittest scripts.tests.test_exposure scripts.tests.test_codex_exposure -v`; the neutral
 tests import no provider module.
 

@@ -159,10 +159,15 @@ def prepare_launch(policy_path, policy_sha256, *, read_only=False):
     # JSON object syntax is not TOML; inline-table keys must be individually quoted.
     table = '{' + ','.join(f'{json.dumps(path, ensure_ascii=False)}={json.dumps(mode)}'
                           for path, mode in filesystem.items()) + '}'
+    # Read from the parsed profile itself (not from override strings) so the plan and the override agree.
+    network_enabled = config['permissions'][fragment['profile']]['network']['enabled']
+    if type(network_enabled) is not bool:
+        raise ValueError('profile network setting must be boolean')
+    web_search = 'disabled'
     overrides = [f'default_permissions="{fragment["profile"]}"',
                  f'permissions.{fragment["profile"]}.filesystem={table}',
-                 f'permissions.{fragment["profile"]}.network.enabled=false',
-                 'approval_policy="never"', 'web_search="disabled"',
+                 f'permissions.{fragment["profile"]}.network.enabled={json.dumps(network_enabled)}',
+                 'approval_policy="never"', f'web_search="{web_search}"',
                  'shell_environment_policy.inherit="none"',
                  'shell_environment_policy.ignore_default_excludes=false',
                  'shell_environment_policy.set={}']
@@ -178,7 +183,8 @@ def prepare_launch(policy_path, policy_sha256, *, read_only=False):
     return {'argv': argv, 'env': {'HOME': str(user_home), 'CODEX_HOME': str(home)},
             'repository': str(repo), 'worktree': str(tree), 'executable': str(executable),
             'user_home': str(user_home),
-            'filesystem': filesystem, 'activation_ready': False,
+            'filesystem': filesystem, 'network': network_enabled, 'web_search': web_search,
+            'activation_ready': False,
             'owner_authorized': policy.get('activation') is True,
             'acceptance_recorded': policy.get('owner_tool_audit_authorized') is True,
             'layers_recorded': policy.get('owner_config_audit_authorized') is True,
@@ -252,9 +258,16 @@ def measured_inventory(plan):
 
 
 def exposure_report(plan):
-    """Refuse until `network` and `writable_paths` have a measured source (DRA-146 escalation).
+    """Return {'measured': ..., 'attested': ...} for `batch_contract.verify_exposure`.
 
-    Echoing the plan's filesystem or override strings would be a claim, not a measurement.
+    `measured` comes from the inventory. `network` and `writable_paths` have no measured source
+    (DRA-147): they are host attestations read from the sealed plan, which was built from the exact
+    permission profile, never from the override strings. Enabled web search is a network path, so it
+    attests network even when the profile says none, and a no-network contract then refuses it.
     """
-    measured_inventory(plan)
-    raise ValueError('network and writable_paths have no measured source yet')
+    measured = {'version': 1, **measured_inventory(plan)}
+    web_search = plan['web_search'] != 'disabled' or any(
+        name.startswith('web_search') for name in measured['tools'])
+    attested = {'network': plan['network'] is not False or web_search,
+                'writable_paths': sorted(path for path, mode in plan['filesystem'].items() if mode == 'write')}
+    return {'measured': measured, 'attested': attested}

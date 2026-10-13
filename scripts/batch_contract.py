@@ -209,6 +209,8 @@ def validate_result(value, request, base):
     return value
 
 
+MEASURED_FIELDS = ("version", "tools", "mcp_servers", "inherited_config")
+ATTESTED_FIELDS = ("network", "writable_paths")
 EXPOSURE_FIELDS = ("version", "tools", "mcp_servers", "writable_paths", "network", "inherited_config")
 
 
@@ -239,11 +241,24 @@ def refuse_constant(name):
     raise ContractError(f"non-finite number in exposure report: {name}")
 
 
-def verify_exposure(raw_report, contract):
-    """Fail closed unless a worker's measured exposure fits the declared contract.
+def verify_attestation(attestation, contract):
+    """Check the host's attestation (not a worker report) against the contract."""
+    keys(attestation, ATTESTED_FIELDS)
+    require(type(attestation["network"]) is bool, "network must be boolean")
+    require(not attestation["network"] or contract["network"], "network access was not declared")
+    allowed = paths(contract["writable_paths"], "contract writable_paths")
+    for path in paths(attestation["writable_paths"], "writable_paths"):
+        require(any(path.is_relative_to(root) for root in allowed), f"writable path outside scope: {path}")
+    return attestation
 
-    Both sides use EXPOSURE_FIELDS; the contract lists what is allowed, the report what was
-    measured. Anything missing, unparseable, unknown or not covered is a refusal.
+
+def verify_exposure(raw_report, contract, attestation):
+    """Fail closed unless the declared contract covers both halves of the exposure.
+
+    MEASURED_FIELDS come from the worker's report (the provider's own inventory). ATTESTED_FIELDS
+    (`network`, `writable_paths`) have no measured source: they are host attestations, derived from
+    the host's sealed launch plan, and are never read from the report. Anything missing,
+    unparseable, unknown or not covered is a refusal. Returns {"measured": ..., "attested": ...}.
     """
     keys(contract, EXPOSURE_FIELDS)
     require(type(contract["version"]) is int and contract["version"] == 1
@@ -253,17 +268,12 @@ def verify_exposure(raw_report, contract):
                   if isinstance(raw_report, (str, bytes)) else None)
     except ValueError as error:
         raise ContractError("unparseable exposure report") from error
-    keys(report, EXPOSURE_FIELDS)
+    keys(report, MEASURED_FIELDS)
     require(type(report["version"]) is int and report["version"] == 1, "unsupported exposure version")
-    require(type(report["network"]) is bool, "network must be boolean")
-    require(not report["network"] or contract["network"], "network access was not declared")
     for field in ("tools", "mcp_servers"):
         extra = names(report[field], field) - names(contract[field], field)
         require(not extra, f"undeclared {field}: {sorted(extra)}")
     extra = paths(report["inherited_config"], "inherited_config") - paths(contract["inherited_config"],
                                                                          "contract inherited_config")
     require(not extra, f"undeclared inherited_config: {sorted(map(str, extra))}")
-    allowed = paths(contract["writable_paths"], "contract writable_paths")
-    for path in paths(report["writable_paths"], "writable_paths"):
-        require(any(path.is_relative_to(root) for root in allowed), f"writable path outside scope: {path}")
-    return report
+    return {"measured": report, "attested": verify_attestation(attestation, contract)}
