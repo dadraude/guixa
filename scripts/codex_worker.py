@@ -191,3 +191,34 @@ def launch(policy_path, policy_sha256, prompt, *, read_only=False, timeout=300):
     if process.returncode:
         raise subprocess.CalledProcessError(process.returncode, plan['argv'], stdout, stderr)
     return subprocess.CompletedProcess(plan['argv'], process.returncode, stdout, stderr)
+
+
+def exposure_report(plan):
+    """Measure what this launch plan exposes from the CLI's own inventory, not from the plan's flags.
+
+    The plan's override flags are only replayed so the CLI reports its effective state under them.
+    """
+    argv, env = plan['argv'], plan['env']
+    overrides = [item for flag, item in zip(argv, argv[1:]) if flag == '-c']
+    flags = [item for override in overrides for item in ('-c', override)]
+    def inventory_output(*command):
+        return subprocess.run([argv[0], '--no-daemon', *command, *flags], env=env, input='',
+                              capture_output=True, text=True, check=True, timeout=10).stdout
+    servers = json.loads(inventory_output('mcp', 'list', '--json'))
+    if not isinstance(servers, list) or not all(
+            isinstance(item, dict) and isinstance(item.get('name'), str)
+            and isinstance(item.get('enabled'), bool) for item in servers):
+        raise ValueError('unknown MCP inventory format')
+    tools = []
+    for line in inventory_output('features', 'list').splitlines():
+        fields = line.split()
+        if len(fields) < 3 or fields[-1] not in ('true', 'false'):
+            raise ValueError('unknown feature inventory format')
+        if fields[-1] == 'true':
+            tools.append(fields[0])
+    writable = [path for path, mode in plan['filesystem'].items() if mode == 'write']
+    return {'version': 1, 'tools': sorted(tools),
+            'mcp_servers': sorted(item['name'] for item in servers if item['enabled']),
+            'writable_paths': sorted(writable),
+            'network': not any(item.endswith('network.enabled=false') for item in overrides),
+            'inherited_config': [str(Path(env['CODEX_HOME']) / 'config.toml')]}

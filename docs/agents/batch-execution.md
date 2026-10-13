@@ -46,6 +46,38 @@ adapters prove the protocol and scheduler only.
 
 Run the contract tests with `python3 -m unittest scripts.tests.test_batch_contract -v`.
 
+## Effective-exposure contract
+
+A launched worker may only see and do what the host declared. The host declares a **contract** and
+the adapter reports its **measured** exposure; both are JSON objects with exactly these fields
+(`scripts/batch_contract.py`, `verify_exposure`):
+
+- `version`: `1`;
+- `tools`: names of every tool the worker can call, including built-in features;
+- `mcp_servers`: names of every enabled MCP server;
+- `writable_paths`: absolute paths (no `..`) the worker can write; in a contract they are scope roots,
+  in a report each must lie inside one of them;
+- `network`: boolean; a report may say `true` only if the contract does;
+- `inherited_config`: configuration layers the worker inherits (absolute paths).
+
+For list fields the contract is an allowlist: the report must be a subset. A missing, unparseable or
+non-object report, an unknown or missing field, a wrong type or any undeclared item is a refusal
+(`ContractError`); there are no defaults. An unsupported setup (for example a full desktop
+configuration with inherited MCP servers) is refused simply because it exceeds the contract.
+
+An adapter must build its report from the provider's own inventory of the effective configuration
+and tools, not by echoing the flags it passed, and must run the verifier before any worker starts.
+The report proves configuration inventory, not service-argument scoping.
+
+### First adapter
+
+The Codex adapter
+(`codex_worker.exposure_report`) replays the launch overrides against `mcp list --json` and
+`features list`; its probes are described in `docs/agents/codex-provider-profile.md`. This defines
+the measurement only: nothing here activates a permission, profile or global configuration.
+Test with `python3 -m unittest scripts.tests.test_exposure -v`; the fake adapter there has no
+provider import.
+
 ## Isolated lifecycle and receipts
 
 The runtime checks the entire manifest's Git repository, base ref, branch availability and worktree

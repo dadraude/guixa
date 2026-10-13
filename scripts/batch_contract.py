@@ -1,6 +1,7 @@
 """Versioned, provider-neutral input and output boundary for automatic batches."""
 
 import copy
+import json
 import os
 import re
 from pathlib import Path
@@ -206,3 +207,43 @@ def validate_result(value, request, base):
         require(not any(key in value for key in ("checks", "reviews", "correction_passes")),
                 "undelivered batch cannot advertise delivery checks")
     return value
+
+
+EXPOSURE_FIELDS = ("version", "tools", "mcp_servers", "writable_paths", "network", "inherited_config")
+
+
+def names(value, label):
+    require(isinstance(value, list) and all(text(item) for item in value), f"{label} must be a list of names")
+    return set(value)
+
+
+def paths(value, label):
+    require(isinstance(value, list) and all(text(item) and Path(item).is_absolute()
+                                            and ".." not in Path(item).parts for item in value),
+            f"{label} must be absolute paths without parent segments")
+    return [Path(item) for item in value]
+
+
+def verify_exposure(raw_report, contract):
+    """Fail closed unless a worker's measured exposure fits the declared contract.
+
+    Both sides use EXPOSURE_FIELDS; the contract lists what is allowed, the report what was
+    measured. Anything missing, unparseable, unknown or not covered is a refusal.
+    """
+    keys(contract, EXPOSURE_FIELDS)
+    require(contract["version"] == 1 and type(contract["network"]) is bool, "invalid exposure contract")
+    try:
+        report = json.loads(raw_report) if isinstance(raw_report, (str, bytes)) else None
+    except ValueError as error:
+        raise ContractError("unparseable exposure report") from error
+    keys(report, EXPOSURE_FIELDS)
+    require(type(report["version"]) is int and report["version"] == 1, "unsupported exposure version")
+    require(type(report["network"]) is bool, "network must be boolean")
+    require(not report["network"] or contract["network"], "network access was not declared")
+    for field in ("tools", "mcp_servers", "inherited_config"):
+        extra = names(report[field], field) - names(contract[field], field)
+        require(not extra, f"undeclared {field}: {sorted(extra)}")
+    allowed = paths(contract["writable_paths"], "contract writable_paths")
+    for path in paths(report["writable_paths"], "writable_paths"):
+        require(any(path.is_relative_to(root) for root in allowed), f"writable path outside scope: {path}")
+    return report
