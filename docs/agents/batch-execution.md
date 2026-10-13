@@ -46,6 +46,71 @@ adapters prove the protocol and scheduler only.
 
 Run the contract tests with `python3 -m unittest scripts.tests.test_batch_contract -v`.
 
+## Effective-exposure contract
+
+A launched worker may only see and do what the host declared. The host declares a **contract** with
+exactly these fields (`scripts/batch_contract.py`, `verify_exposure`):
+
+- `version`: `1`;
+- `tools`: names of every tool the worker can call, including built-in features;
+- `mcp_servers`: names of every enabled MCP server;
+- `inherited_config`: configuration layers the worker inherits (absolute paths);
+- `writable_paths`: absolute paths (no `..`) the worker can write; in a contract they are scope roots;
+- `network`: boolean; it may be `true` in an exposure only if the contract says so.
+
+The exposure has two halves that are never mixed:
+
+- **Measured** (`version`, `tools`, `mcp_servers`, `inherited_config`): the worker report, built from
+  the provider's own inventory of the effective configuration.
+- **Host-attested** (`network`, `writable_paths`): no measured source exists. The host declares them
+  from its own sealed launch plan / profile hash and passes them to the verifier separately; they are
+  never read from the worker report, and a report that carries them is refused. They are claims
+  about what the host sealed, not proof of what the worker could do. A real native probe is the open
+  gap (DRA-147).
+
+For list fields the contract is an allowlist: the measured or attested value must be a subset. A
+missing, unparseable or non-object report, a missing attestation, an unknown or missing field, a wrong
+type or any undeclared item is a refusal (`ContractError`); there are no defaults. An unsupported setup
+(for example a full desktop configuration with inherited MCP servers) is refused simply because it
+exceeds the contract.
+
+An adapter must build the measured half from the provider's inventory, not by echoing the flags it
+passed, and must run the verifier before any worker starts. The result is configuration inventory,
+not service-argument scoping. `verify_exposure(report, contract, attestation)` returns
+`{"measured": ..., "attested": ...}` so callers can tell the halves apart.
+
+### First adapter
+
+The Codex adapter (`codex_worker.measured_inventory`, `codex_worker.exposure_report`) runs the CLI's
+inventory subcommands in the worker's context (same environment, working directory and `-c`
+overrides); the probes are described in `docs/agents/codex-provider-profile.md`.
+
+Measured, and from what:
+
+- `tools`: the features reported enabled by `features list`.
+- `mcp_servers`: the servers reported enabled by `mcp list --json`; an inventory missing any server
+  of the audited configuration is refused as incomplete.
+- `inherited_config`: the configuration, instruction, rule and hook files rediscovered on disk at
+  report time, not a constant.
+
+Host-attested, not measured (DRA-147 tracks a native probe):
+
+- `writable_paths`: the plan's filesystem scope, entries with mode `write`.
+- `network`: the permission profile's network setting, read from the parsed profile that also feeds the
+  `-c` override (never by matching override text). Enabled web search (a `web_search*` feature on, or
+  the plan's `web_search` not `disabled`) counts as network, so a contract without network refuses it.
+
+Also not covered: `-C` / `--strict-config` on the inventory subcommands (not confirmed for them).
+Nothing here activates a permission, profile or global configuration.
+
+The neutral verifier (`batch_contract.verify_exposure`) accepts only what a contract lists. The
+report is JSON with exactly the measured fields; duplicate keys, non-finite numbers and unknown fields
+are refused, and so is a non-boolean attested `network`. `inherited_config` and `writable_paths` are
+absolute, canonical paths (no `..`, no symlinks); `inherited_config` is compared as a set of paths and
+every attested writable path must lie under a declared root. Test with
+`python3 -m unittest scripts.tests.test_exposure scripts.tests.test_codex_exposure -v`; the neutral
+tests import no provider module.
+
 ## Isolated lifecycle and receipts
 
 The runtime checks the entire manifest's Git repository, base ref, branch availability and worktree

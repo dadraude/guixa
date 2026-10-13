@@ -1,6 +1,7 @@
 """Versioned, provider-neutral input and output boundary for automatic batches."""
 
 import copy
+import json
 import os
 import re
 from pathlib import Path
@@ -206,3 +207,73 @@ def validate_result(value, request, base):
         require(not any(key in value for key in ("checks", "reviews", "correction_passes")),
                 "undelivered batch cannot advertise delivery checks")
     return value
+
+
+MEASURED_FIELDS = ("version", "tools", "mcp_servers", "inherited_config")
+ATTESTED_FIELDS = ("network", "writable_paths")
+EXPOSURE_FIELDS = ("version", "tools", "mcp_servers", "writable_paths", "network", "inherited_config")
+
+
+def names(value, label):
+    require(isinstance(value, list) and all(text(item) for item in value), f"{label} must be a list of names")
+    return set(value)
+
+
+def canonical(item):
+    path = Path(item)
+    # A symlink inside a root must not widen it, so only already-resolved paths are accepted.
+    return path.is_absolute() and ".." not in path.parts and path == path.resolve()
+
+
+def paths(value, label):
+    require(isinstance(value, list) and all(text(item) and canonical(item) for item in value),
+            f"{label} must be canonical absolute paths without parent segments")
+    return {Path(item) for item in value}
+
+
+def unique_object(pairs):
+    keys_seen = [key for key, _ in pairs]
+    require(len(keys_seen) == len(set(keys_seen)), "duplicate key in exposure report")
+    return dict(pairs)
+
+
+def refuse_constant(name):
+    raise ContractError(f"non-finite number in exposure report: {name}")
+
+
+def verify_attestation(attestation, contract):
+    """Check the host's attestation (not a worker report) against the contract."""
+    keys(attestation, ATTESTED_FIELDS)
+    require(type(attestation["network"]) is bool, "network must be boolean")
+    require(not attestation["network"] or contract["network"], "network access was not declared")
+    allowed = paths(contract["writable_paths"], "contract writable_paths")
+    for path in paths(attestation["writable_paths"], "writable_paths"):
+        require(any(path.is_relative_to(root) for root in allowed), f"writable path outside scope: {path}")
+    return attestation
+
+
+def verify_exposure(raw_report, contract, attestation):
+    """Fail closed unless the declared contract covers both halves of the exposure.
+
+    MEASURED_FIELDS come from the worker's report (the provider's own inventory). ATTESTED_FIELDS
+    (`network`, `writable_paths`) have no measured source: they are host attestations, derived from
+    the host's sealed launch plan, and are never read from the report. Anything missing,
+    unparseable, unknown or not covered is a refusal. Returns {"measured": ..., "attested": ...}.
+    """
+    keys(contract, EXPOSURE_FIELDS)
+    require(type(contract["version"]) is int and contract["version"] == 1
+            and type(contract["network"]) is bool, "invalid exposure contract")
+    try:
+        report = (json.loads(raw_report, object_pairs_hook=unique_object, parse_constant=refuse_constant)
+                  if isinstance(raw_report, (str, bytes)) else None)
+    except ValueError as error:
+        raise ContractError("unparseable exposure report") from error
+    keys(report, MEASURED_FIELDS)
+    require(type(report["version"]) is int and report["version"] == 1, "unsupported exposure version")
+    for field in ("tools", "mcp_servers"):
+        extra = names(report[field], field) - names(contract[field], field)
+        require(not extra, f"undeclared {field}: {sorted(extra)}")
+    extra = paths(report["inherited_config"], "inherited_config") - paths(contract["inherited_config"],
+                                                                         "contract inherited_config")
+    require(not extra, f"undeclared inherited_config: {sorted(map(str, extra))}")
+    return {"measured": report, "attested": verify_attestation(attestation, contract)}
