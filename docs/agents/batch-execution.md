@@ -81,9 +81,11 @@ not service-argument scoping. `verify_exposure(report, contract, attestation)` r
 
 ### First adapter
 
-The Codex adapter (`codex_worker.measured_inventory`, `codex_worker.exposure_report`) runs the CLI's
-inventory subcommands in the worker's context (same environment, working directory and `-c`
-overrides); the probes are described in `docs/agents/codex-provider-profile.md`.
+The opt-in Codex launcher (`scripts/codex_worker.py`: `measured_inventory`, `exposure_report`) runs the
+CLI's inventory subcommands in the worker's context (same environment, working directory and `-c`
+overrides); the probes are described in `docs/agents/codex-provider-profile.md`. The batch adapter
+(`scripts/adapters/codex_adapter.py`) does not yet produce this report or run the verifier; the launcher
+is not connected to it (see that document).
 
 Measured, and from what:
 
