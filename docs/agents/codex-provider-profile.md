@@ -41,10 +41,15 @@ Selected roles remain `gpt-6.1-sol` for implementation/orchestration and `gpt-6-
 reviews. Reviewer executions need a separate fully read-only profile.
 
 The [native permissions documentation](https://learn.chatgpt.com/docs/permissions) states that
-legacy `--sandbox` / `sandbox_mode` settings override native profile selection. The existing batch
-adapter always passes `--sandbox` and `sandbox_workspace_write.network_access=false`, so this
-artifact cannot be attached to that adapter and treated as effective enforcement. A reviewed
-launcher must reject conflicting configuration and verify the effective profile for every child.
+legacy `--sandbox` / `sandbox_mode` settings override native profile selection. Two launch paths
+exist. The batch adapter (`scripts/adapters/codex_adapter.py`, `cli_argv`) still always passes
+`--sandbox` and `sandbox_workspace_write.network_access=false`, so this artifact cannot be attached
+to that adapter and treated as effective enforcement. The opt-in isolated launcher
+(`scripts/codex_worker.py`, `prepare_launch` / `launch`) applies the native profile through
+`default_permissions` and `permissions.<profile>` overrides, never adds `--sandbox`, and refuses
+legacy sandbox keys in user configuration; it is not connected to the batch adapter, and its
+`activation_ready` stays false. A reviewed launcher must reject conflicting configuration and verify
+the effective profile for every child.
 Do not remove an existing restriction silently to make a new profile load.
 
 The CLI's `--profile NAME` loads `NAME.config.toml` from its configuration home. This JSON output
