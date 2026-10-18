@@ -2,6 +2,9 @@
 
 Guixa is a management app for a food consumer cooperative.
 
+One installation serves exactly one cooperative (single-tenant). Cooperative-wide settings, such as
+its timezone, are configuration, not data; there is no tenant id anywhere.
+
 ## Stack
 
 - Laravel 12, PHP 8.5.
@@ -65,7 +68,8 @@ iterating over every context. A rule change edits this list first.
 
 - Money is an integer number of cents (`Money` value object). Never floats.
 - Quantities are decimals with 3 places (`Quantity` value object), so 1.125 kg is exact.
-- Timezone: `Europe/Madrid`. Stored in UTC.
+- Time: every local date and time (cutoffs, pickup dates, "today") is interpreted in the cooperative's
+  timezone, a setting (`COOP_TIMEZONE`, e.g. `Europe/Madrid`), never hard-coded. Stored in UTC.
 - Every acceptance scenario in a spec has a test at the Application layer (use case level).
   HTTP tests only cover authorization, wiring and Inertia props (`assertInertia`).
 - Early returns, small classes with one responsibility, explicit names. Comments only for *why*.

@@ -19,4 +19,4 @@ Rules:
 
 | ID  | Feature                         | Status |
 | --- | ------------------------------- | ------ |
-| 001 | [Weekly orders](001-weekly-orders/spec.md) | Spec accepted, plan draft |
+| 001 | [Weekly orders](001-weekly-orders/spec.md) | Spec accepted · plan + tasks in review |
