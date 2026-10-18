@@ -19,4 +19,4 @@ Rules:
 
 | ID  | Feature                         | Status |
 | --- | ------------------------------- | ------ |
-| 001 | [Weekly orders](001-weekly-orders/spec.md) | Spec accepted · plan + tasks in review |
+| 001 | [Weekly orders](001-weekly-orders/spec.md) | Spec reopened (OQ1–OQ18) · plan + tasks in review |
