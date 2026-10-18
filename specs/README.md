@@ -14,6 +14,7 @@ Rules:
 - Each acceptance scenario becomes at least one test. A task is done when its scenarios pass.
 - A requirement change edits the spec first, then the plan and tasks it affects.
 - Open questions block only the requirements that depend on them.
+- Before a spec is accepted, walk the gap families in `.claude/skills/spec-gaps/SKILL.md`.
 
 ## Features
 
