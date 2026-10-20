@@ -46,7 +46,7 @@ Agents follow these rules through `.claude/skills/spec-flow/SKILL.md`.
 
 | ID  | Feature                         | Status |
 | --- | ------------------------------- | ------ |
-| 001 | [Weekly orders](001-weekly-orders/spec.md) | Spec revised (OQ1–OQ19 resolved) · plan + tasks updated, drafts pending review |
+| 001 | [Weekly orders](001-weekly-orders/spec.md) | Spec revised (OQ1–OQ19 resolved) · plan + tasks accepted (2026-10-21) · in progress, status in Linear (Coop) |
 
 ## Roadmap
 
