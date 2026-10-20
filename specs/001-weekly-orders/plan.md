@@ -1,6 +1,6 @@
 # 001 — Weekly orders · Plan
 
-Status: Draft · Spec: [spec.md](spec.md) + areas (R1–R36b, S1–S60) · Rules: [constitution](../constitution.md)
+Status: Draft · Spec: [spec.md](spec.md) + areas (R1–R36b, S1–S61) · Rules: [constitution](../constitution.md)
 
 ## Bootstrap
 
@@ -13,6 +13,7 @@ Status: Draft · Spec: [spec.md](spec.md) + areas (R1–R36b, S1–S60) · Rules
   Postgres service, Vitest.
 - `MAIL_MAILER=log` in `phpunit.xml`; Mailpit for local mail (invitations, D15).
 - Laravel scheduler running every minute (`schedule:work` in dev, cron in production) for D10.
+- `php artisan guixa:create-manager {name} {email}` creates the first manager at installation (R36a, D17).
 
 ## Bounded contexts
 
@@ -33,6 +34,7 @@ Ordering ──port ReturnItemCatalog───▶ Stock\Application      (return
 Ordering ──port StockSeller─────────▶ Stock\Application      (record a sale when a pickup is completed)
 Ordering ──port WalletLedger────────▶ Wallet\Application     (charge or credit, top-up at pickup)
 Ordering ──port ProducerNotifier────▶ Membership\Application (producer account email, for sending)
+Ordering ──port Households──────────▶ Membership\Application (household name and active, for allocations and pickups)
 Catalog  ──port ProducerCycles──────▶ Ordering\Application   (lines in unsettled cycles, stop participating)
 Catalog  ──port ProducerAccess──────▶ Membership\Application (suspend or restore the producer role)
 Membership ─port HouseholdBalances──▶ Wallet\Application     (to-settle list)
@@ -56,8 +58,10 @@ only call the other context's use cases (rule A4). Every write that spans contex
 - **`Actor`** `final readonly`: `accountId`, `roles` (set of `Manager|Member|Producer`), `?householdId`,
   `?producerId`. Built by an HTTP middleware from the authenticated account and passed to every use case.
   Authorization is checked inside use cases (`assertManager()`, `assertMemberOf($householdId)`…),
-  so scenarios test it without HTTP (R36a).
-- **`TransactionRunner`** port (`Shared\Application`): `run(callable)`. DB adapter wraps `DB::transaction`.
+  so scenarios test it without HTTP (R36a). A failed check throws `Shared\Domain\Error\NotAllowed`.
+- **`TransactionRunner`** port (`Shared\Application`): `run(callable)` and `afterCommit(callable)`. DB adapter
+  wraps `DB::transaction` and `DB::afterCommit`. Emails (sent orders, invitations) go out after commit, so a
+  rolled-back write sends nothing.
 
 ## Membership
 
@@ -78,10 +82,10 @@ Use cases
 | Use case | Actor | Covers |
 | --- | --- | --- |
 | `CreateHousehold`, `RenameHousehold` | manager | R33, S56 |
-| `AddMember` → sends invitation | manager | R33, R34, S25 |
+| `AddMember` → sends invitation (an inactive household is reactivated) | manager | R33, R34, R35a, S25 |
 | `ResendInvitation`, `ChangeInvitationEmail` | manager | R34, S25 |
 | `AcceptInvitation` (sets password, activates) | invitee | R34, S25 |
-| `MoveMember`, `UnlinkMember` (an inactive target household is reactivated) | manager | R35, R35a, S43 |
+| `MoveMember` (an inactive target household is reactivated), `UnlinkMember` | manager | R35, R35a, S43 |
 | `DeactivateHousehold` (returns the warning first), `ReactivateHousehold` | manager | R35a, S58 |
 | `ListHouseholdsToSettle` | manager | R35a, S43, S58 |
 | `InviteProducerAccount` (one per producer) | manager | R36, S57 |
@@ -89,6 +93,8 @@ Use cases
 | `DeactivateAccount`, `ReactivateAccount` | manager | R36b, S59 |
 | `SuspendProducerRole`, `RestoreProducerRole` | — (called by Catalog) | R3a |
 | `GetProducerAccountEmail` | — (called by Ordering) | R12a |
+| `GetHouseholds` (name, active) | — (called by Ordering) | R13, R16, R19 |
+| `CreateFirstManager` (rejected once any manager exists) | — (installation command) | R36a |
 
 A household is deactivated automatically when `MoveMember`, `UnlinkMember` or `DeactivateAccount` leaves it
 without members (R35a). Deactivating it unlinks its members; its orders and pickups stay in Ordering.
@@ -154,7 +160,9 @@ role only; participation is not restored.
   (stock-only pickup, R19).
   - `orderLines`, keyed by productId. **`OrderLine`**: id, productId, producerId, name, unit, unitPrice,
     variable, `?containersPerUnit`, `ordered` (0 for an allocation-only line), `allocated`, `allocatedByHand`,
-    `createdAt`, `addedBy`, `notDelivered`, `dropped`.
+    `?delivered` (set only by a pickup adjustment; `delivered()` = `delivered ?? allocated`, D16),
+    `createdAt`, `addedBy`, `notDelivered`, `dropped`. Lines marked `notDelivered` or `dropped` count in no
+    total, claim, reception or container count.
   - `stockLines`, keyed by stockProductId. **`StockLine`**: name, unit, unitPrice, variable,
     `?containersPerUnit`, quantity.
   - `returnLines`, keyed by returnItemId. **`ReturnLine`**: name, amount, whole quantity (R20a).
@@ -165,13 +173,15 @@ role only; participation is not restored.
     check (R11). `removeMarkedLine` is allowed after the cutoff (R8).
   - Reception: `allocate(productId, Quantity)` marks `allocatedByHand` (R16); `allocateNew(product snapshot,
     Quantity)` adds an allocation-only line (R16, S39); `reallocate(productId, Quantity)` clears the mark (R15).
+    All three clear `delivered`: a new allocation replaces a pending pickup's adjustment (R18).
   - Settlement: `drop(producerIds not participating)` drops those lines and the `notDelivered` ones, then the
     pickup becomes `pending`, or `nothingToCollect` if every allocation is 0 (R18, R24).
     `reopenIfAllocated()` turns `nothingToCollect` back into `pending` (R24).
-  - Pickup: `adjustDelivered(productId, Quantity)` = `allocate` at pickup time (R19);
+  - Pickup: `adjustDelivered(productId, Quantity)` sets `delivered`, in the product's step; `allocated`
+    stays as the reception left it (R19, D16);
     `addStock(StockOffer, Quantity)` checks `quantity ≤ available` (R20); `addReturn(ReturnItem, int)`;
     their removals.
-  - `total(): Money` = Σ round(allocated × unitPrice) + Σ round(quantity × unitPrice) − Σ quantity × amount,
+  - `total(): Money` = Σ round(delivered() × unitPrice) + Σ round(quantity × unitPrice) − Σ quantity × amount,
     each line half up (R22). Negative is a credit.
   - `complete(now)` and `markNotCollected(now)` (drops stock and return lines, R24a) throw
     `PickupNotPending` unless pending (R23); every mutator throws once the pickup is done.
@@ -195,10 +205,12 @@ role only; participation is not restored.
   largest remainders, ties by `createdAt`, then by line id (UUID v7, the record order). Exact on thousandths.
 
 - **`Reception`** read model (not an aggregate): per product of a producer in a cycle, `ordered total`,
-  `received total`, every household's `allocated` and `allocatedByHand`, `difference = received − Σ allocated`
-  and `balanced` (R14, R17), plus the producer order's validated and distributed flags (R17a, R18).
+  `received total`, every household's `allocated`, `delivered()` and `allocatedByHand`,
+  `difference = received − Σ delivered()` and `balanced` (shown and flagged, R17, R19), and
+  `balancedForDistribution`: `received − Σ allocated` is 0, so pickup adjustments do not count (R18, S61);
+  plus the producer order's validated and distributed flags (R17a, R18).
 
-- **`ContainerCount`** read model: per household, Σ ceil(allocated × containersPerUnit) over order lines plus
+- **`ContainerCount`** read model: per household, Σ ceil(delivered() × containersPerUnit) over order lines plus
   Σ ceil(quantity × containersPerUnit) over stock lines; and the cycle total (R18a, S60).
 
 - Errors (`Ordering\Domain\Error`): `NotOnPickupWeekday`, `PickupDateNotInFuture`, `CycleAlreadyExists`,
@@ -206,11 +218,11 @@ role only; participation is not restored.
   `ProducerOrderSent`, `ProducerOrderNotSent`, `ProducerStillOpen`, `CutoffOutOfRange`, `ProductNotOrderable`,
   `FractionalQuantityNotAllowed`, `NoHousehold`, `ReceptionNotValidated`, `ReceptionUnbalanced`,
   `ManualAllocationsWouldBeLost`, `NobodyOrderedProduct`, `CycleNotSettled`, `NotEnoughStock`,
-  `PickupNotPending`.
+  `PickupNotPending`, `HouseholdInactive`.
 
 - Ports: `CooperativeSettings`, `CycleRepository`, `OrderRepository`, `ProductAvailabilityRepository`,
   `ReceivedTotalRepository`, `ProductCatalog`, `ProducerCutoffRules`, `StockCatalog`, `ReturnItemCatalog`,
-  `StockSeller`, `WalletLedger`, `ProducerNotifier`.
+  `StockSeller`, `WalletLedger`, `ProducerNotifier`, `Households`.
 
 ### Use cases
 
@@ -237,7 +249,7 @@ role only; participation is not restored.
 | `SetReceivedTotal(overwriteManual?)` → runs `ProportionalAllocator` | manager | R15, R17a, S10–S12, S31 |
 | `SetAllocation` | manager | R16, R17, S13, S39, S40 |
 | `ValidateReception` | manager | R17a, S47 |
-| `MarkProducerDistributed` (settles the cycle when it is the last) | manager | R18, R24, S13, S20, S27–S29, S47 |
+| `MarkProducerDistributed` (settles the cycle when it is the last) | manager | R18, R24, S13, S20, S27–S29, S47, S61 |
 | `ReopenProducerOrder` | manager | R18, S29, S30, S46 |
 | `GetContainerCount` | manager | R18a, S60 |
 | `OpenPickup` (household without an order) | manager | R19, S18 |
@@ -254,13 +266,18 @@ role only; participation is not restored.
    `ManualAllocationsWouldBeLost` listing those households; nothing is stored. The page shows the
    warning and resubmits with `overwriteManual=true` on confirm, or does nothing on cancel (R15, S31).
 3. Claims = every household that ordered the product and whose pickup is not done, with its `ordered`
-   quantity; `target = received − Σ allocated of done pickups` (D12). Before settlement no pickup is done.
+   quantity; `target = received − Σ allocated of done pickups` (D12), so the reception stays balanced for
+   distribution whatever done pickups delivered (D16). Before settlement no pickup is done.
 4. `reallocate` each line with the result, store the `ReceivedTotal` and clear the validation (R17a).
 
-`SetAllocation` also requires a sent, not distributed producer order, and rejects a done pickup.
+`SetAllocation` also requires a sent, not distributed producer order and an active household (`Households`,
+`HouseholdInactive`), and rejects a done pickup.
+
+`OpenPickup` requires a settled, not closed cycle (`CycleNotSettled`, `CycleClosed`) and an active household
+with no order in it (R19, R24b).
 
 `MarkProducerDistributed(cycle, producer)`, in one transaction with the cycle `FOR UPDATE`:
-1. Build the `Reception`; `cycle.markDistributed(producerId, reception.balanced, now)`.
+1. Build the `Reception`; `cycle.markDistributed(producerId, reception.balancedForDistribution, now)`.
 2. `CycleSettlement::afterDistributed(cycle, settledNow)`, an Application service:
    - if this settled the cycle: every order `drop(nonParticipating)` (R18, R24);
    - if the cycle was already settled (a reopen): every `nothingToCollect` order `reopenIfAllocated()` (R24, S30);
@@ -336,7 +353,7 @@ All ids are UUID v7 generated by repositories (`nextId()`); timestamps are `time
 | `cycle_producers` | cycle_id, producer_id, participating, closes_at?, sent_at?, validated_at?, distributed_at? | `PK (cycle_id, producer_id)` |
 | `product_unavailabilities` | cycle_id, product_id | `PK (cycle_id, product_id)` |
 | `orders` | id, cycle_id, household_id, pickup_status, pickup_done_at?, charged_cents? | `UNIQUE (cycle_id, household_id)` |
-| `order_lines` | id, order_id, product_id, producer_id, product_name, unit, unit_price_cents, variable, containers_per_unit?, ordered_quantity, allocated_quantity, allocated_by_hand, created_at, added_by, not_delivered, dropped | `UNIQUE (order_id, product_id)`; `CHECK (ordered_quantity >= 0)`; `CHECK (allocated_quantity >= 0)` |
+| `order_lines` | id, order_id, product_id, producer_id, product_name, unit, unit_price_cents, variable, containers_per_unit?, ordered_quantity, allocated_quantity, allocated_by_hand, delivered_quantity?, created_at, added_by, not_delivered, dropped | `UNIQUE (order_id, product_id)`; `CHECK (ordered_quantity >= 0)`; `CHECK (allocated_quantity >= 0)`; `CHECK (delivered_quantity >= 0)` |
 | `received_totals` | cycle_id, producer_id, product_id, received_quantity | `PK (cycle_id, product_id)`; `CHECK (received_quantity >= 0)` |
 | `order_stock_lines` | id, order_id, stock_product_id, name, unit, unit_price_cents, variable, containers_per_unit?, quantity | `UNIQUE (order_id, stock_product_id)`; `CHECK (quantity > 0)` |
 | `order_return_lines` | id, order_id, return_item_id, name, amount_cents, quantity | `UNIQUE (order_id, return_item_id)`; `CHECK (quantity > 0)` |
@@ -351,6 +368,8 @@ Concurrency:
 - `SetReceivedTotal` and settlement lock every affected order of the cycle, in id order (no deadlocks).
 - `ReopenProducerOrder` locks the cycle `FOR UPDATE` and `CompletePickup` `FOR SHARE`, so a cycle cannot
   close and reopen at once (R18, R24b).
+- An order is created with `INSERT … ON CONFLICT (cycle_id, household_id) DO NOTHING` and then loaded
+  `FOR UPDATE`, so two members adding a household's first lines at once share one order.
 - `SellStock` and stock adjustments lock the `stock_products` row, so availability is checked under the lock.
   `CompletePickup` sells its stock lines in stock product id order, so two pickups selling the same
   products cannot deadlock.
@@ -401,7 +420,8 @@ reception), adjust what is needed, add stock and returns, enter a top-up if they
 not collected. Each step before completion is saved on the server, so a pickup can be left and resumed.
 
 Controllers map domain errors in one place: an exception handler turns `Guixa\*\Domain\Error\*`
-into a 422 with a translated message, so Vue shows it as a form error.
+into a 422 with a translated message, so Vue shows it as a form error. `Shared\Domain\Error\NotAllowed`
+becomes a 403 instead.
 
 Client-side logic (Vitest): order running total, pickup resulting balance, both display-only.
 
@@ -410,9 +430,9 @@ Client-side logic (Vitest): order running total, pickup resulting balance, both 
 | Level | What | Where |
 | --- | --- | --- |
 | Domain | Value objects, `LocalTime`, `CutoffRule`, `ProportionalAllocator` (property: Σ result == target), `Cycle`, `Order` | `tests/Unit/<Context>` |
-| Application | **Every scenario S1–S60**, with in-memory repositories and `FrozenClock` | `tests/Application/<Context>` |
+| Application | **Every scenario S1–S61**, with in-memory repositories and `FrozenClock` | `tests/Application/<Context>` |
 | Infrastructure | Each Eloquent repository against `guixa_test` (constraints, locks, numeric mapping) | `tests/Integration` |
-| HTTP | Role gates, wiring, `assertInertia` props, error → 422 mapping | `tests/Feature` |
+| HTTP | Role gates, wiring, `assertInertia` props, error → 422 and `NotAllowed` → 403 mapping | `tests/Feature` |
 | Architecture | A1–A8 | `tests/Architecture` |
 | Frontend | Display totals, A9 via ESLint | `resources/js/**/*.spec.ts` |
 
@@ -440,6 +460,12 @@ as the Eloquent ones, so the Application tests stay trustworthy.
   still see it as cancelled (R4b).
 - **D15** Invitations use Laravel's password broker with a 7-day expiry; a new token replaces the previous
   one, so resending or changing the email invalidates the old link (R34).
+- **D16** An order line keeps the reception's `allocated` and, apart, the `delivered` quantity a pickup
+  adjustment sets. The charge, what members see and the container count use `delivered()`; the reception
+  shows and flags the difference it makes, but distributing checks `allocated` only (R18, R19, S61).
+  A new allocation (way A or B, after a reopen) clears a pending pickup's adjustment.
+- **D17** The first manager is created by an Artisan command calling `CreateFirstManager`, which sends the
+  usual invitation and is rejected once any manager exists (R36a: "outside the app").
 
 Dropped: D1 (pickup is a sequence of saved steps, R19–R22). D2 and D3 became spec rules (R4a, R6). D4 was
 replaced by R35 and R36b (unlinking keeps the account; deactivation is separate). D5, D6 and D8 became spec

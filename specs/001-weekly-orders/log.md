@@ -30,3 +30,46 @@ scheduler would skip dropping lines and closing; stock locks taken in line order
 orders moved to T23 with `CycleSettlement`. T30 adds closing and reopening to `CycleSettlement`. T29's
 *Done when* adds a test that two pickups selling the same stock products in opposite order both complete.
 Why: follows the `plan.md` change above; `CycleSettlement` does not exist before T23.
+
+## 2026-10-21 · Q&A
+
+Q: "How do you want to settle #1? Should a pickup adjustment also block re-distributing, or should that
+balance check leave it out?" (R19 says a pickup adjustment "blocks nothing", R18 requires every product
+balanced to distribute, so a reopened producer with an adjusted pickup could not be distributed again.)
+A: "leave pickup adjustments out of the balance check"
+
+## 2026-10-21 · Change
+
+R18 (`reception.md`): the balance required to distribute does not count adjustments made at pickup.
+R19 (`pickup.md`): states that redistributing after a reopen ignores the adjustment. New S61 (`pickup.md`).
+Why: the Q&A above, found while reviewing `plan.md`.
+
+## 2026-10-21 · Change
+
+`plan.md`, after the R18/R19 change and a plan review:
+- Order lines keep `delivered` apart from `allocated`; the reception's `balancedForDistribution` ignores pickup
+  adjustments (D16, S61).
+- New `Households` port from Ordering to Membership (`GetHouseholds`): household name and active status.
+- First manager: `guixa:create-manager` command and `CreateFirstManager` (D17).
+- Lines marked `notDelivered` or `dropped` count in no total, claim, reception or container count.
+- Authorization failures throw `Shared\Domain\Error\NotAllowed`, mapped to 403.
+- Orders are created with `INSERT … ON CONFLICT` and then locked.
+- `OpenPickup` and `SetAllocation` check for an active household (`HouseholdInactive`); `OpenPickup` also
+  checks that the cycle is settled and not closed.
+- The note that an inactive household is reactivated moved from `UnlinkMember` to `AddMember` and
+  `MoveMember`.
+- `TransactionRunner::afterCommit`: emails go out after commit.
+Why: Ordering had no way to read households (R13, R16, R19); nothing created the first manager (R36a);
+`total()` and claims did not exclude dropped lines (R3b, R18); a 422 for a permission failure; two first lines
+at once broke the unique order constraint; a closed cycle could get a new pickup (R24b); the reactivation note
+was on a use case with no target household; an email could go out for a rolled-back write.
+
+## 2026-10-21 · Change
+
+`tasks.md`, following the `plan.md` change above: new T34 (first manager, after T06). T03 adds
+`TransactionRunner::afterCommit`; T04 maps `NotAllowed` to 403. T13's *Done when* races two first lines of a
+household with no order. T20 adds `GetHouseholds` and the `Households` port, so T22 now also runs after T20;
+T22 checks for an active household and leaves not-delivered lines out of claims. T27: `OpenPickup` checks and
+`delivered`. T29 and T31 use `delivered()` and skip dropped lines. T30 covers S61. T32 adds reactivation on
+`AddMember` and `MoveMember`. T33 covers S1–S61 and runs after T34.
+Why: the plan review above.

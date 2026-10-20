@@ -37,7 +37,8 @@ Checking each producer's delivery against the orders, allocating it to household
 - **R17a** **Validating.** After checking what arrived, a manager marks a producer's reception as
   *validated*. Changing a received total afterwards clears the validation.
 - **R18** **Distributing.** A manager marks a producer order as *distributed* only when its reception is
-  validated and every product of it is balanced. Its reception is then read-only. A manager can reopen a distributed producer
+  validated and every product of it is balanced, not counting adjustments made at pickup (R19). Its
+  reception is then read-only. A manager can reopen a distributed producer
   order until the cycle is closed (R24b), e.g. when goods arrive late after being received as 0.
   The cycle becomes *settled* the first time every participating producer is distributed; at that moment
   lines of producers that do not participate, and lines marked *will not be delivered*, are dropped: never
