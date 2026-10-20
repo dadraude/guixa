@@ -36,8 +36,8 @@ Done when every document edit in the diff has its entry.
 
 ## 3. Close a task
 
-Before checking off an item in `tasks.md`, compare the code against `plan.md` and every `R#` and
-scenario the task links. Write each mismatch back to the document it contradicts and log it as a
+Before opening a task's PR (its Linear issue tracks the status), compare the code against `plan.md`
+and every `R#` and scenario the task links. Write each mismatch back to the document it contradicts and log it as a
 **Deviation**.
 
 Done when every linked `R#` and scenario matches the code and its tests pass.
