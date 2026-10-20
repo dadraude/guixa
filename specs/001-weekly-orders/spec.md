@@ -73,6 +73,7 @@ Requirements (`R#`) and acceptance scenarios (`S#`) live in one file per area; n
 
 ## Out of scope (for now)
 
-Online payments, membership fees, work shifts, selling stock outside a pickup, notifications other than
-sending an order to a producer (R12a), producer confirmation of an order (v2), minimum order per producer,
-invoicing and payments to producers, tracking returned containers as stock.
+A cooperative fee on product prices, work shifts, selling stock outside a pickup, notifications other than
+sending an order to a producer (R12a), producer confirmation of an order, minimum order per producer,
+invoicing and payments to producers, returning containers to their producers. Each is a future slice in
+the [roadmap](../README.md#roadmap).
