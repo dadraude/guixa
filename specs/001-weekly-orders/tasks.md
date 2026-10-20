@@ -18,8 +18,8 @@ How to work a task:
 | --- | --- | --- | --- |
 | T01 | Bootstrap: Laravel 13 Vue starter kit, Postgres (`guixa`, `guixa_test`), `Guixa\` → `src/`, public registration off, scheduler, Pest + Vitest running, Pint + Larastan + Prettier, GitHub Actions CI, mail (`log` in tests, Mailpit in dev) | Constitution | — |
 | T02 | Architecture tests A1–A8 in `tests/Architecture` (loop over contexts) and ESLint rules for A9 | A1–A9 | T01 |
-| T03 | `Shared`: `Money` (half-up `multiply`), `Quantity` (thousandths, `ceilToWhole`), `Clock` with the cooperative's timezone (`SystemClock` from `COOP_TIMEZONE`, `FrozenClock`), `LocalTime`, `TransactionRunner` | R22 rounding, Time | T01 |
-| T04 | `Actor` with several roles from the authenticated account, `role:<role>` middleware, domain error → 422 handler, shared Inertia layout with a switch between role areas | Roles, R36a | T01 |
+| T03 | `Shared`: `Money` (half-up `multiply`), `Quantity` (thousandths, `ceilToWhole`), `Clock` with the cooperative's timezone (`SystemClock` from `COOP_TIMEZONE`, `FrozenClock`), `LocalTime`, `TransactionRunner` (with `afterCommit`) | R22 rounding, Time | T01 |
+| T04 | `Actor` with several roles from the authenticated account, `role:<role>` middleware, domain error → 422 and `NotAllowed` → 403 handler, shared Inertia layout with a switch between role areas | Roles, R36a | T01 |
 | T05 | Test support: in-memory repository base and contract-test pattern shared with Eloquent repositories | Plan · Testing | T03 |
 
 **Done when** T01: app boots on Postgres, the starter tests pass, lint and Larastan are clean, and the
@@ -32,6 +32,7 @@ negative quantity rejected, string ↔ thousandths mapping, and `LocalTime` on b
 | ID | Task | Covers | After |
 | --- | --- | --- | --- |
 | T06 | `CreateHousehold`, `RenameHousehold`, `AddMember` + invitation email, `AcceptInvitation`, `ResendInvitation`, `ChangeInvitationEmail`; login refused until accepted; 7-day expiry; households admin pages | R33, R34, S25, S56 | T04, T05 |
+| T34 | `CreateFirstManager` (rejected once any manager exists) and the `guixa:create-manager` Artisan command, sending the usual invitation (D17) | R36a (first manager) | T06 |
 | T07 | `MoveMember`, `UnlinkMember`, `GrantManagerRole`, `RemoveManagerRole`, `DeactivateAccount`, `ReactivateAccount`, accounts admin pages | R35, R36a, R36b, S43 (move), S44, S59 | T06 |
 
 **Done when** T07: two concurrent `RemoveManagerRole` calls on the last two managers (integration test)
@@ -61,9 +62,10 @@ including the weeks when daylight saving time changes (S38).
 | T17 | `CancelCycle` (orders deleted, cycle shown as cancelled) | R4b, S37 | T13 |
 | T18 | `SendProducerOrder` + producer email, cutoff frozen once sent, marked lines stored as not delivered, `SendEmptyProducerOrders` scheduled command (sends only) | R6b, R12a (sending), S34 (frozen), S36 | T16 |
 | T19 | `GetProducerCycleSummary`, `Producer/CycleSummary` page with availability per product | R12, S7, S8 | T18 |
-| T20 | `GetCycleSummary` (totals per producer and product, per household), `Manage/Cycles/Show` page | R13, S52 | T13 |
+| T20 | `GetHouseholds` (Membership) behind Ordering's `Households` port, `GetCycleSummary` (totals per producer and product, per household), `Manage/Cycles/Show` page | R13, S52 | T13 |
 
-**Done when** T13: two concurrent `SetOrderLine` calls on the same order (integration test) leave both lines.
+**Done when** T13: two concurrent `SetOrderLine` calls for a household with no order yet (integration test)
+create one order with both lines.
 T18: a `SetOrderLine` racing a `SendProducerOrder` either lands before the send or is rejected.
 
 ## Phase 4 — Reception and distribution
@@ -71,7 +73,7 @@ T18: a `SetOrderLine` racing a `SendProducerOrder` either lands before the send 
 | ID | Task | Covers | After |
 | --- | --- | --- | --- |
 | T21 | `ProportionalAllocator` domain service (tie by creation, then line id) | R15, S10–S12 (math), S31 (math) | T03 |
-| T22 | `ReceivedTotal`, `GetReception`, `AddUnorderedProduct`, `SetReceivedTotal(overwriteManual?)`, `SetAllocation` (allocation-only lines), `Manage/Reception` page with the overwrite/cancel warning | R14–R17, S10–S12, S13 (balance), S31, S39, S40 (allocation) | T18, T21 |
+| T22 | `ReceivedTotal`, `GetReception`, `AddUnorderedProduct`, `SetReceivedTotal(overwriteManual?)`, `SetAllocation` (allocation-only lines, active household only), `Manage/Reception` page with the overwrite/cancel warning; lines marked not delivered are left out of claims and the reception | R14–R17, S10–S12, S13 (balance), S31, S39, S40 (allocation) | T18, T20, T21 |
 | T23 | `ValidateReception`, `MarkProducerDistributed`, `ReopenProducerOrder` before settlement, `CycleSettlement` (drop lines, pending or nothing-to-collect pickups); `SendEmptyProducerOrders` also validates and distributes, settling through `CycleSettlement` (D10); receptions read-only when distributed | R12a (empty orders), R17a, R18 (before settlement), R24, S13, S20, S27 (settlement), S28, S29, S40, S47 | T22 |
 
 **Done when** T21: property test — for random claims and targets, Σ allocations == target, every allocation
@@ -96,11 +98,11 @@ is a multiple of the step, and no household gets more than one step above its ex
 
 | ID | Task | Covers | After |
 | --- | --- | --- | --- |
-| T27 | `GetPickup`, `OpenPickup` (stock-only pickup creates an empty order), `AdjustDeliveredQuantity`, pickups only once settled, `Manage/Pickups/Index` and `Manage/Pickups/Show`; member sees the pickup once settled | R19, R21, R23a, S27 | T23, T26 |
+| T27 | `GetPickup`, `OpenPickup` (stock-only pickup creates an empty order; active household, settled and not closed cycle), `AdjustDeliveredQuantity` (sets `delivered`, shown and flagged in the reception, D16), pickups only once settled, `Manage/Pickups/Index` and `Manage/Pickups/Show`; member sees the pickup once settled | R19, R21, R23a, S27 | T23, T26 |
 | T28 | `AddStockToPickup`, `RemoveStockFromPickup`, `AddReturnToPickup`, `RemoveReturnFromPickup` | R20, R20a, S17 | T27, T25 |
-| T29 | `CompletePickup(topUp?)`: freeze, sell stock, top-up, charge or credit, all in one transaction | R21–R23, S9, S14–S16, S18, S19, S21, S22, S26, S41, S45, S53, S55 | T28 |
-| T30 | `MarkPickupNotCollected`, closing the cycle, `ReopenProducerOrder` after settlement (done pickups kept, nothing-to-collect pickups reopened; both added to `CycleSettlement`), no reopen once closed | R18 (after settlement), R24a, R24b, S30, S42, S46, S54 | T29 |
-| T31 | `GetContainerCount` on `Manage/Cycles/Show` | R18a, S60 | T29, T20 |
+| T29 | `CompletePickup(topUp?)`: freeze, sell stock, top-up, charge or credit, all in one transaction; the total uses `delivered()` and skips dropped and not-delivered lines | R21–R23, S9, S14–S16, S18, S19, S21, S22, S26, S41, S45, S53, S55 | T28 |
+| T30 | `MarkPickupNotCollected`, closing the cycle, `ReopenProducerOrder` after settlement (done pickups kept, nothing-to-collect pickups reopened; both added to `CycleSettlement`), distributing again ignores pickup adjustments (`balancedForDistribution`), a new allocation clears a pending pickup's adjustment (D16), no reopen once closed | R18 (after settlement), R24a, R24b, S30, S42, S46, S54, S61 | T29 |
+| T31 | `GetContainerCount` on `Manage/Cycles/Show` (`delivered()`, dropped and not-delivered lines skipped) | R18a, S60 | T29, T20 |
 
 **Done when** T29: integration tests show that a failure while selling stock rolls back the charge and
 the top-up, that two concurrent completions charge once, and that two pickups selling the same stock
@@ -110,13 +112,13 @@ products, added in opposite order, both complete.
 
 | ID | Task | Covers | After |
 | --- | --- | --- | --- |
-| T32 | `DeactivateHousehold` (warning first), `ReactivateHousehold`, automatic deactivation when the last member leaves, `ListHouseholdsToSettle` (balances from Wallet, pending pickups from Ordering) | R35a, S43, S58 | T07, T30 |
+| T32 | `DeactivateHousehold` (warning first), `ReactivateHousehold`, automatic deactivation when the last member leaves, reactivation when `AddMember` or `MoveMember` links someone to an inactive household, `ListHouseholdsToSettle` (balances from Wallet, pending pickups from Ordering) | R35a, S43, S58 | T07, T30 |
 
 ## Closure
 
 | ID | Task | Covers | After |
 | --- | --- | --- | --- |
-| T33 | Traceability check: every `R#` and `S#` is named in at least one test (`->group('S14')` or test name); fill the gaps; set feature 001 to *Done* in `specs/README.md` | R1–R36b, S1–S60 | T14, T17, T19, T31, T32 |
+| T33 | Traceability check: every `R#` and `S#` is named in at least one test (`->group('S14')` or test name); fill the gaps; set feature 001 to *Done* in `specs/README.md` | R1–R36b, S1–S61 | T14, T17, T19, T31, T32, T34 |
 
 ## Coverage
 
@@ -140,3 +142,4 @@ products, added in opposite order, both complete.
 | | | S39 | T22 | S58 | T32 |
 | | | S40 | T22, T23 | S59 | T07 |
 | | | S41, S42 | T29, T30 | S60 | T31 |
+| | | | | S61 | T30 |

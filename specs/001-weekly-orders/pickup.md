@@ -13,7 +13,8 @@ A household collects its allocation and stock products and is charged; optional 
   Each order line shows its allocation as the delivered quantity, which the manager can still adjust
   (≥ 0, in the same step as R16),
   e.g. the real weight of a package or a damaged item. The adjustment updates the allocation, so it is
-  reflected in the reception balance (R17), where it is flagged but blocks nothing.
+  reflected in the reception balance (R17), where it is flagged but blocks nothing: distributing the
+  producer again after a reopen ignores it (R18).
   A pickup stays pending until it is completed or marked not collected: it is not charged in the meantime,
   and it can be picked up after the pickup date, even once later cycles are open.
 - **R20** The manager can add stock products to the pickup, each with a quantity. A stock line takes a
@@ -57,6 +58,11 @@ Given H was allocated 1 kg of beef at €20.00/kg and its wallet is at €50.00
 When the manager records 1.120 kg at H's pickup and completes it
 Then H is charged €22.40, the balance is €27.60
 And the beef reception now shows an unbalanced difference of −0.120 kg, which blocks nothing.
+
+**S61 — Redistributing after a pickup adjustment** (R18, R19)
+Given the beef reception of S14 shows −0.120 kg because of H's adjustment at pickup
+When the manager reopens the beef producer and marks it distributed again without other changes
+Then it is accepted, and the −0.120 kg difference stays flagged.
 
 **S15 — Allocation drives the charge** (R15, R22)
 Given A ordered 4 loaves at €3.00 and was allocated 3 in S10
