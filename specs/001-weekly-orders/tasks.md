@@ -1,6 +1,6 @@
 # 001 — Weekly orders · Tasks
 
-Status: Draft · Spec: [spec.md](spec.md) · Plan: [plan.md](plan.md)
+Status: Draft · Spec: [spec.md](spec.md) + areas · Plan: [plan.md](plan.md)
 
 How to work a task:
 

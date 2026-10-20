@@ -1,6 +1,6 @@
 # 001 — Weekly orders · Plan
 
-Status: Draft · Spec: [spec.md](spec.md) (R1–R36, S1–S31) · Rules: [constitution](../constitution.md)
+Status: Draft · Spec: [spec.md](spec.md) + areas (R1–R36, S1–S31) · Rules: [constitution](../constitution.md)
 
 ## Bootstrap
 

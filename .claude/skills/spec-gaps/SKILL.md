@@ -1,6 +1,6 @@
 ---
 name: spec-gaps
-description: Hunt the gaps in a Guixa feature spec (`specs/NNN-*/spec.md`). Use when writing or editing a spec's requirements, or when reviewing a spec before accepting it.
+description: Hunt the gaps in a Guixa feature spec (`specs/NNN-*/spec.md` and its area files). Use when writing or editing a spec's requirements, or when reviewing a spec before accepting it.
 ---
 
 A **gap** is a case the spec does not decide: a state with no way out, a rule that contradicts another,
@@ -75,7 +75,7 @@ the account, the unique email, the balance and the in-flight records. Invitation
 
 ## Open question format
 
-Append under `## Open questions` in the spec, numbered after the last `OQ#`, and mark the spec status as
+Append to the spec's `open-questions.md` (or under `## Open questions` in a single-file spec), numbered after the last `OQ#`, and mark the spec status as
 reopened for them (see spec 001 for a worked example):
 
 ```markdown

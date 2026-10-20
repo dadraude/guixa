@@ -6,6 +6,8 @@ no code is written before its spec is accepted.
 1. `constitution.md` — project-wide principles, stack and architecture. Changes rarely.
 2. `NNN-feature/spec.md` — what and why: glossary, requirements (`R#`), acceptance scenarios
    (Given/When/Then), open questions. No technology.
+   A long spec is split into one file per area (`ordering.md`, `pickup.md`…) plus `open-questions.md`;
+   `spec.md` keeps the glossary, roles and an index of the areas. `R#` and `S#` stay global.
 3. `NNN-feature/plan.md` — how: domain model, use cases, ports/adapters, persistence, UI routes.
 4. `NNN-feature/tasks.md` — ordered, small tasks, each linked to the `R#` and scenarios it covers.
 
