@@ -16,7 +16,7 @@ How to work a task:
 
 | ID | Task | Covers | After |
 | --- | --- | --- | --- |
-| T01 | Bootstrap: Laravel 12 Vue starter kit, Postgres (`guixa`, `guixa_test`), `Guixa\` → `src/`, public registration off, scheduler, Pest + Vitest running, Pint + Larastan + Prettier, GitHub Actions CI, mail (`log` in tests, Mailpit in dev) | Constitution | — |
+| T01 | Bootstrap: Laravel 13 Vue starter kit, Postgres (`guixa`, `guixa_test`), `Guixa\` → `src/`, public registration off, scheduler, Pest + Vitest running, Pint + Larastan + Prettier, GitHub Actions CI, mail (`log` in tests, Mailpit in dev) | Constitution | — |
 | T02 | Architecture tests A1–A8 in `tests/Architecture` (loop over contexts) and ESLint rules for A9 | A1–A9 | T01 |
 | T03 | `Shared`: `Money` (half-up `multiply`), `Quantity` (thousandths, `ceilToWhole`), `Clock` with the cooperative's timezone (`SystemClock` from `COOP_TIMEZONE`, `FrozenClock`), `LocalTime`, `TransactionRunner` | R22 rounding, Time | T01 |
 | T04 | `Actor` with several roles from the authenticated account, `role:<role>` middleware, domain error → 422 handler, shared Inertia layout with a switch between role areas | Roles, R36a | T01 |

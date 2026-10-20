@@ -8,8 +8,10 @@ in the app (e.g. the pickup weekday): those live in a single-row settings table.
 
 ## Stack
 
-- Laravel 12, PHP 8.5.
-- Inertia + Vue 3 (Composition API, `<script setup lang="ts">`), built with Vite. No Livewire, no separate SPA/API.
+- Laravel 13, PHP 8.5.
+- Inertia 3 + Vue 3 (Composition API, `<script setup lang="ts">`), built with Vite. No Livewire, no separate SPA/API.
+- UI: Tailwind 4 and shadcn-vue (on Reka UI), copied into `resources/js/components/ui` as the starter kit
+  ships them. No other component library.
 - PostgreSQL in every environment except fast unit tests.
 - Pest for backend tests, Vitest for Vue components with client-side logic.
 - PHP DTOs passed as Inertia props generate their TypeScript types (`spatie/laravel-typescript-transformer`);
@@ -31,8 +33,8 @@ src/
     Infrastructure/     # Eloquent/DB repositories, mail, clock. Implements domain ports.
 app/Http/               # controllers: thin adapters that call use cases and render Inertia pages.
 resources/js/
-  Pages/                # one Vue page per Inertia route. Receives props, emits form submits.
-  Components/           # presentational components, no data fetching.
+  pages/                # one Vue page per Inertia route. Receives props, emits form submits.
+  components/           # presentational components, no data fetching.
 ```
 
 - Controllers only translate HTTP ↔ use case DTOs and call `Inertia::render`. No business rules in
@@ -65,7 +67,7 @@ iterating over every context. A rule change edits this list first.
   named `<Verb><Noun>` (e.g. `ConfirmPickup`), expose a single public `__invoke`, and live in `Application`.
   Repository ports are interfaces in `Domain`, named `<Noun>Repository`.
 - **A8 — Hygiene.** Pest presets `php()` and `security()` pass. No `dd`, `dump`, `ray`, `var_dump` anywhere.
-- **A9 — Frontend boundaries.** Vue files in `resources/js/Components` never import from `Pages`,
+- **A9 — Frontend boundaries.** Vue files in `resources/js/components` never import from `pages`,
   never call `router`, `axios` or `fetch`, and never import `@inertiajs/*`. Enforced with ESLint
   `no-restricted-imports` / `no-restricted-syntax`.
 

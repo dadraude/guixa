@@ -4,7 +4,7 @@ Status: Draft · Spec: [spec.md](spec.md) + areas (R1–R36b, S1–S60) · Rules
 
 ## Bootstrap
 
-- Laravel 12 **Vue starter kit** (Inertia + Vue 3 + TS + Vite, auth scaffolding). Public registration disabled.
+- Laravel 13 **Vue starter kit** (Inertia 3 + Vue 3 + TS + Vite, Tailwind 4 + shadcn-vue, Fortify auth). Public registration disabled.
 - Postgres via `DB_CONNECTION=pgsql`; a separate `guixa_test` database for integration tests.
 - `composer.json` autoloads `Guixa\` → `src/`.
 - Dev tooling: `spatie/laravel-typescript-transformer`, Pest arch tests (A1–A8), ESLint rules (A9), Vitest,
