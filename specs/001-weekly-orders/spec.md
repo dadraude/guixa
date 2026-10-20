@@ -2,8 +2,9 @@
 
 Status: Accepted (2026-10-19) — includes the amendment for producer reception, stock and top-up at pickup.
 Revised (2026-10-20): OQ1–OQ18 resolved and the gap review of the revision applied (fixed pickup weekday,
-late deliveries, per-cycle product availability, account deactivation, validated receptions). Reopened for
-[OQ19](open-questions.md): the requirements it blocks are not final.
+late deliveries, per-cycle product availability, account deactivation, validated receptions). OQ19 resolved
+(2026-10-20): containers per unit on products and stock products, counted per household and cycle (R1, R10, R18a,
+R20, R25).
 
 Households order products from local producers every week and collect them on a fixed
 pickup date. After each producer closes, a manager sends it the order. When the producer delivers,
@@ -35,7 +36,8 @@ wallet, and it can top up the wallet on the spot.
 | Distributed | Distribuïda | A producer order whose reception is finished and balanced. |
 | Settled | Liquidat | A cycle whose every participating producer is distributed. Pickups start. |
 | Stock product | Producte d'estoc | Product kept at the cooperative's premises, with tracked quantity, sold at pickup. |
-| Return item | Retorn | Something a household brings back at pickup (e.g. a glass jar), credited at a fixed amount. |
+| Container | Envàs | Reusable packaging a product comes in (e.g. a glass jar, a bottle). Its cost is part of the product's price. |
+| Return item | Retorn | A container the cooperative takes back at pickup, credited at a fixed amount. |
 | Pickup | Recollida | A household collects its allocation and stock products, and is charged. |
 | Wallet | Moneder | Household balance: top-ups plus credits minus charges ± corrections. May be negative. |
 | Top-up | Recàrrega | Money added to a wallet, recorded by a manager. |
@@ -65,10 +67,9 @@ Requirements (`R#`) and acceptance scenarios (`S#`) live in one file per area; n
 | File | Requirements |
 | --- | --- |
 | [ordering.md](ordering.md) | R1–R13 |
-| [reception.md](reception.md) | R14–R18 |
+| [reception.md](reception.md) | R14–R18a |
 | [pickup.md](pickup.md) | R19–R24 |
 | [stock-wallet.md](stock-wallet.md) | R25–R36 |
-| [open-questions.md](open-questions.md) | OQ19 |
 
 ## Out of scope (for now)
 

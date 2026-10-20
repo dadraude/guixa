@@ -44,6 +44,10 @@ Checking each producer's delivery against the orders, allocating it to household
   received and never charged. Reopening a producer afterwards does not stop pickups. Its new
   allocations apply to pending pickups; completed and not collected pickups keep theirs (R23), and any
   difference is fixed with a wallet correction and a stock adjustment.
+- **R18a** **Containers distributed.** A manager sees, per cycle, how many containers each household takes
+  and the cycle total. Each allocation (R10) and each stock line of the household's pickup (R20) counts its
+  quantity × the containers per unit of its snapshot, rounded up to a whole number; a product without
+  containers counts 0. The cycle total is the sum over households.
 
 ## Acceptance scenarios
 
@@ -123,3 +127,10 @@ Then they are warned that C's manual allocation will be lost;
 if they cancel, the received total stays 15 and C stays 6;
 if they confirm, the allocations become A 3, B 4, C 7 (2.8 + 4.2 + 7 → 2 + 4 + 7 = 13, the leftover unit
 goes to A, largest remainder 0.8).
+
+**S60 — Counting containers** (R1, R10, R18a, R20, R25)
+Given yoghurt is variable, comes with 2 containers per kg, and honey comes with 1 container per unit
+And H is allocated 1.300 kg of yoghurt and 3 jars of honey, and K 0.500 kg of yoghurt
+And K's pickup has a stock line of 2 jars of stock honey, with 1 container per unit
+When the producer changes yoghurt to 4 containers per kg and the manager opens the cycle
+Then they see H 6 containers (1.300 × 2 = 2.6 → 3, plus 3), K 3 (1 + 2), and 9 for the cycle.

@@ -17,7 +17,7 @@ A household collects its allocation and stock products and is charged; optional 
   A pickup stays pending until it is completed or marked not collected: it is not charged in the meantime,
   and it can be picked up after the pickup date, even once later cycles are open.
 - **R20** The manager can add stock products to the pickup, each with a quantity. A stock line takes a
-  snapshot of the stock product's price when the line is added. Non-variable stock products are sold in
+  snapshot of the stock product's price and containers per unit when the line is added. Non-variable stock products are sold in
   whole units; variable ones in multiples of 0.001. The quantity cannot exceed the available stock,
   checked when the line is added and again when the pickup is completed (R22).
   A stock line stays even if its stock product is deactivated afterwards.

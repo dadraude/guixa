@@ -9,8 +9,10 @@ Catalog, cycles and cutoffs, ordering, sending orders to producers and what prod
 ### Catalog
 
 - **R1** A producer creates, edits and deactivates their own products: name, unit, unit price (≥ 0),
-  variable flag. While a product has lines in a cycle that is not settled, its unit and variable flag
-  cannot change; its name and price can.
+  variable flag, and whether it comes with containers. When it does, the producer sets how many containers
+  go with one unit (> 0, in multiples of 0.001; e.g. 2 per kg for 0.500 kg jars). While a product has lines
+  in a cycle that is not settled, its unit and variable flag cannot change; its name, price and containers
+  can.
 - **R2** A producer cannot see or edit another producer's products.
 - **R3** Only products that are active and available in the cycle (R3c), of producers participating in
   it, can be ordered.
@@ -72,7 +74,7 @@ Catalog, cycles and cutoffs, ordering, sending orders to producers and what prod
   Non-variable products are ordered in whole units; variable products in multiples of 0.001, with no other
   minimum or step.
 - **R10** A line keeps a snapshot of the product as it was when the line was last changed: name, unit,
-  variable flag and unit price. Later changes to the product do not affect it.
+  variable flag, unit price and containers per unit. Later changes to the product do not affect it.
 - **R11** Ordering is allowed regardless of wallet balance.
 
 ### Sending and aggregation
