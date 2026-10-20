@@ -59,7 +59,7 @@ including the weeks when daylight saving time changes (S38).
 | T15 | `SetProductAvailability`, *will not be delivered* derived on read, `RemoveMarkedLine`, product deactivation; unit and variable flag locked while the product has unsettled lines (`HasUnsettledLines`) | R1 (lock), R3, R3b, R3c, S5 (lock), S32, S48 | T13 |
 | T16 | `StopParticipating`, `ParticipateAgain`, `DeactivateProducer`, `ReactivateProducer` (producer role, participation where not sent) | R3a, R6c, S50 | T15 |
 | T17 | `CancelCycle` (orders deleted, cycle shown as cancelled) | R4b, S37 | T13 |
-| T18 | `SendProducerOrder` + producer email, cutoff frozen once sent, marked lines stored as not delivered, `SendEmptyProducerOrders` scheduled command | R6b, R12a, S34 (frozen), S36 | T16 |
+| T18 | `SendProducerOrder` + producer email, cutoff frozen once sent, marked lines stored as not delivered, `SendEmptyProducerOrders` scheduled command (sends only) | R6b, R12a (sending), S34 (frozen), S36 | T16 |
 | T19 | `GetProducerCycleSummary`, `Producer/CycleSummary` page with availability per product | R12, S7, S8 | T18 |
 | T20 | `GetCycleSummary` (totals per producer and product, per household), `Manage/Cycles/Show` page | R13, S52 | T13 |
 
@@ -72,7 +72,7 @@ T18: a `SetOrderLine` racing a `SendProducerOrder` either lands before the send 
 | --- | --- | --- | --- |
 | T21 | `ProportionalAllocator` domain service (tie by creation, then line id) | R15, S10–S12 (math), S31 (math) | T03 |
 | T22 | `ReceivedTotal`, `GetReception`, `AddUnorderedProduct`, `SetReceivedTotal(overwriteManual?)`, `SetAllocation` (allocation-only lines), `Manage/Reception` page with the overwrite/cancel warning | R14–R17, S10–S12, S13 (balance), S31, S39, S40 (allocation) | T18, T21 |
-| T23 | `ValidateReception`, `MarkProducerDistributed`, `ReopenProducerOrder` before settlement, settlement (drop lines, pending or nothing-to-collect pickups); receptions read-only when distributed | R17a, R18 (before settlement), R24, S13, S20, S27 (settlement), S28, S29, S40, S47 | T22 |
+| T23 | `ValidateReception`, `MarkProducerDistributed`, `ReopenProducerOrder` before settlement, `CycleSettlement` (drop lines, pending or nothing-to-collect pickups); `SendEmptyProducerOrders` also validates and distributes, settling through `CycleSettlement` (D10); receptions read-only when distributed | R12a (empty orders), R17a, R18 (before settlement), R24, S13, S20, S27 (settlement), S28, S29, S40, S47 | T22 |
 
 **Done when** T21: property test — for random claims and targets, Σ allocations == target, every allocation
 is a multiple of the step, and no household gets more than one step above its exact share.
@@ -99,11 +99,12 @@ is a multiple of the step, and no household gets more than one step above its ex
 | T27 | `GetPickup`, `OpenPickup` (stock-only pickup creates an empty order), `AdjustDeliveredQuantity`, pickups only once settled, `Manage/Pickups/Index` and `Manage/Pickups/Show`; member sees the pickup once settled | R19, R21, R23a, S27 | T23, T26 |
 | T28 | `AddStockToPickup`, `RemoveStockFromPickup`, `AddReturnToPickup`, `RemoveReturnFromPickup` | R20, R20a, S17 | T27, T25 |
 | T29 | `CompletePickup(topUp?)`: freeze, sell stock, top-up, charge or credit, all in one transaction | R21–R23, S9, S14–S16, S18, S19, S21, S22, S26, S41, S45, S53, S55 | T28 |
-| T30 | `MarkPickupNotCollected`, closing the cycle, `ReopenProducerOrder` after settlement (done pickups kept, nothing-to-collect pickups reopened), no reopen once closed | R18 (after settlement), R24a, R24b, S30, S42, S46, S54 | T29 |
+| T30 | `MarkPickupNotCollected`, closing the cycle, `ReopenProducerOrder` after settlement (done pickups kept, nothing-to-collect pickups reopened; both added to `CycleSettlement`), no reopen once closed | R18 (after settlement), R24a, R24b, S30, S42, S46, S54 | T29 |
 | T31 | `GetContainerCount` on `Manage/Cycles/Show` | R18a, S60 | T29, T20 |
 
 **Done when** T29: integration tests show that a failure while selling stock rolls back the charge and
-the top-up, and that two concurrent completions charge once.
+the top-up, that two concurrent completions charge once, and that two pickups selling the same stock
+products, added in opposite order, both complete.
 
 ## Phase 8 — Households
 

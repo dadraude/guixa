@@ -1,0 +1,2 @@
+# log.md is append-only: keep both sides when branches add entries.
+specs/*/log.md merge=union
