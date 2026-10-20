@@ -73,3 +73,9 @@ T22 checks for an active household and leaves not-delivered lines out of claims.
 `delivered`. T29 and T31 use `delivered()` and skip dropped lines. T30 covers S61. T32 adds reactivation on
 `AddMember` and `MoveMember`. T33 covers S1–S61 and runs after T34.
 Why: the plan review above.
+
+## 2026-10-21 · Change
+
+`plan.md` and `tasks.md`: status Draft → Accepted. `specs/README.md`: feature 001 in progress, task status in
+Linear (Coop, DRA-150–DRA-183).
+Why: the user approved `tasks.md` after PR #141 (plan review) was merged; coding can start with T01.
