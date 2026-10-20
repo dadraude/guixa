@@ -8,7 +8,8 @@ Stock products and movements, household wallets, households, members and invitat
 
 ### Stock
 
-- **R25** A manager creates, edits and deactivates stock products: name, unit, price (≥ 0), variable flag.
+- **R25** A manager creates, edits and deactivates stock products: name, unit, price (≥ 0), variable flag,
+  and containers per unit as for products (R1).
   A manager creates, edits and deactivates return items: name and amount (> 0).
 - **R26** A manager records stock entries (quantity > 0, optional note, e.g. "bought from X").
 - **R27** A manager records stock adjustments (positive or negative, mandatory note, e.g. "broken jar",

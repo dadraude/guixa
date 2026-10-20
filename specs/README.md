@@ -22,4 +22,4 @@ Rules:
 
 | ID  | Feature                         | Status |
 | --- | ------------------------------- | ------ |
-| 001 | [Weekly orders](001-weekly-orders/spec.md) | Spec revised (OQ1–OQ18 resolved), reopened for OQ19 · plan + tasks pending update |
+| 001 | [Weekly orders](001-weekly-orders/spec.md) | Spec revised (OQ1–OQ19 resolved) · plan + tasks pending update |
