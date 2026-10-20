@@ -15,3 +15,18 @@ membership fees became a cooperative fee on product prices, tracking returned co
 returning containers to their producers, producer confirmation lost its "(v2)" tag. No `R#` or `S#` changed.
 Why: each row was reviewed one by one when the roadmap was written (PR #137). Online payments are not
 planned because top-ups stay manual (R29). Merged in PR #138.
+
+## 2026-10-20 · Change
+
+`plan.md`: settlement after a producer is distributed became one Application service,
+`CycleSettlement::afterDistributed`, shared by `MarkProducerDistributed` and `SendEmptyProducerOrders` (D10).
+`CompletePickup` sells its stock lines in stock product id order. No `R#` or `S#` changed.
+Why: plan review. Settlement was written only inside `MarkProducerDistributed`, so a cycle settled by the
+scheduler would skip dropping lines and closing; stock locks taken in line order let two pickups deadlock.
+
+## 2026-10-20 · Change
+
+`tasks.md`: T18's `SendEmptyProducerOrders` only sends; validating, distributing and settling empty producer
+orders moved to T23 with `CycleSettlement`. T30 adds closing and reopening to `CycleSettlement`. T29's
+*Done when* adds a test that two pickups selling the same stock products in opposite order both complete.
+Why: follows the `plan.md` change above; `CycleSettlement` does not exist before T23.

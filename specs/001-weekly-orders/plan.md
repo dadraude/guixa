@@ -261,14 +261,19 @@ role only; participation is not restored.
 
 `MarkProducerDistributed(cycle, producer)`, in one transaction with the cycle `FOR UPDATE`:
 1. Build the `Reception`; `cycle.markDistributed(producerId, reception.balanced, now)`.
-2. If this settled the cycle: every order `drop(nonParticipating)` (R18, R24).
-3. If the cycle was already settled (a reopen): every `nothingToCollect` order `reopenIfAllocated()` (R24, S30).
-4. `cycle.close(...)` if every pickup is done (R24b).
+2. `CycleSettlement::afterDistributed(cycle, settledNow)`, an Application service:
+   - if this settled the cycle: every order `drop(nonParticipating)` (R18, R24);
+   - if the cycle was already settled (a reopen): every `nothingToCollect` order `reopenIfAllocated()` (R24, S30);
+   - `cycle.close(...)` if every pickup is done (R24b).
+
+`SendEmptyProducerOrders` (D10), per producer order whose cutoff passed with no line, in one transaction
+with the cycle `FOR UPDATE`: `send`, `validate`, `markDistributed(producerId, true, now)`, then the same
+`CycleSettlement::afterDistributed`, so a cycle settled by the scheduler drops lines and closes like any other.
 
 `CompletePickup(cycle, household, topUp?)`, in one transaction:
 1. Load the cycle `FOR SHARE` and assert it is settled and not closed; load the order `FOR UPDATE`;
    `order.complete(now)`.
-2. For each stock line, `StockSeller::sell(stockProductId, quantity, orderId)` — locks the stock product
+2. For each stock line, in stock product id order, `StockSeller::sell(stockProductId, quantity, orderId)` — locks the stock product
    and fails with `NotEnoughStock` if it went below the quantity since it was added (R22, R27, S45).
 3. `WalletLedger::topUp(...)` if any, then `WalletLedger::charge(household, cycle, total)`: a negative total
    is a credit, 0 records nothing (R21, R22).
@@ -347,6 +352,8 @@ Concurrency:
 - `ReopenProducerOrder` locks the cycle `FOR UPDATE` and `CompletePickup` `FOR SHARE`, so a cycle cannot
   close and reopen at once (R18, R24b).
 - `SellStock` and stock adjustments lock the `stock_products` row, so availability is checked under the lock.
+  `CompletePickup` sells its stock lines in stock product id order, so two pickups selling the same
+  products cannot deadlock.
 - `RemoveManagerRole` and `DeactivateAccount` lock the manager accounts, so two of them cannot remove the
   last manager together (R36a, R36b).
 
@@ -419,7 +426,8 @@ as the Eloquent ones, so the Application tests stay trustworthy.
 - **D9** *Will not be delivered* is derived on read until the producer order is sent, then stored on the
   line by `send`. Nothing has to react to catalog or participation changes before that (R3b, R6c).
 - **D10** Producer orders that close with no line to send are sent, validated and distributed by a command
-  the scheduler runs every minute (`SendEmptyProducerOrders`), which can settle the cycle. A cutoff passes
+  the scheduler runs every minute (`SendEmptyProducerOrders`), which can settle the cycle through the same
+  `CycleSettlement` step as `MarkProducerDistributed`. A cutoff passes
   without any request, so nothing else would notice it (R12a).
 - **D11** The pickup weekday is a single-row `cooperative_settings` table, not configuration: R4c lets a
   manager change it. It is still one value per installation, as the constitution allows for settings a
