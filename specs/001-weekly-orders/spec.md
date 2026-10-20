@@ -1,58 +1,77 @@
 # 001 — Weekly orders
 
 Status: Accepted (2026-10-19) — includes the amendment for producer reception, stock and top-up at pickup.
-Reopened (2026-10-19) for [OQ1–OQ18](open-questions.md): the requirements they block are not final.
+Revised (2026-10-20): OQ1–OQ18 resolved and the gap review of the revision applied (fixed pickup weekday,
+late deliveries, per-cycle product availability, account deactivation, validated receptions). Reopened for
+[OQ19](open-questions.md): the requirements it blocks are not final.
 
 Households order products from local producers every week and collect them on a fixed
-pickup date. When each producer delivers, a manager checks what arrived against what was ordered
-and allocates it to households. At pickup, each household takes its allocation plus any stock
-products, everything is charged to its prepaid wallet, and it can top up the wallet on the spot.
+pickup date. After each producer closes, a manager sends it the order. When the producer delivers,
+a manager checks what arrived and allocates it to households. Once every producer is distributed,
+each household picks up its allocation plus any stock products, everything is charged to its prepaid
+wallet, and it can top up the wallet on the spot.
 
 ## Glossary
 
 | Term | Català | Meaning |
 | --- | --- | --- |
-| Household | Unitat de convivència | Ordering and paying unit. Has one or more members. |
-| Member | Soci/sòcia | Person who belongs to exactly one household. |
-| Manager | Gestor/a | Runs the cooperative: cycles, reception, pickup, stock, wallets. |
-| Producer | Productor/a | Supplies products and manages its own catalog. |
-| Product | Producte | Sold by a producer, with a unit (kg, unit, bunch…) and a unit price. |
+| Household | Unitat de convivència | Ordering and paying unit. Has members; inactive once it leaves or loses its last member. |
+| Member | Soci/sòcia | Person who belongs to at most one household; only with a household can they order. |
+| Manager | Gestor/a | Runs the cooperative: cycles, reception, pickup, stock, wallets, accounts. |
+| Producer | Productor/a | Supplies products and manages its own catalog. Has exactly one account. |
+| Account | Compte | One login (unique email) with one or more roles: member, manager, producer. |
+| Product | Producte | Sold by a producer, with a unit (kg, unit, bunch…) and a unit price (≥ 0). |
 | Variable product | Producte de pes variable | Quantity can be fractional (weight); delivered quantity may differ from ordered. |
-| Cycle | Cicle | One week of ordering, identified by its fixed pickup date. |
-| Cutoff | Tancament | Moment after which a producer's products can no longer be ordered in a cycle. |
+| Cycle | Cicle | One week of ordering, identified by its pickup date. *Closed* once every pickup is done (R24b). |
+| Participating producer | Productor/a actiu al cicle | A producer a manager has made active in a cycle. Only they can be ordered from in it. |
+| Cutoff | Tancament | Moment after which a producer's products can no longer be ordered in a cycle. Optional. |
+| Producer order | Comanda al productor | Everything households ordered from one producer in one cycle. |
+| Sent | Enviada | A producer order a manager has sent to the producer. It can no longer change. |
 | Order | Comanda | A household's order in one cycle. One per household per cycle. |
-| Order line | Línia de comanda | Product + ordered quantity + unit price at the time of ordering. |
+| Order line | Línia de comanda | Product + ordered quantity + snapshot of the product (name, unit, variable flag, price). |
 | Reception | Recepció | Check of one producer's delivery in one cycle: received vs ordered, and allocation to households. |
 | Allocation | Assignació | Quantity of a product a household will take in a cycle. Starts equal to the ordered quantity. |
+| Validated | Validada | A reception whose received totals a manager has checked against what arrived. |
+| Distributed | Distribuïda | A producer order whose reception is finished and balanced. |
+| Settled | Liquidat | A cycle whose every participating producer is distributed. Pickups start. |
 | Stock product | Producte d'estoc | Product kept at the cooperative's premises, with tracked quantity, sold at pickup. |
+| Return item | Retorn | Something a household brings back at pickup (e.g. a glass jar), credited at a fixed amount. |
 | Pickup | Recollida | A household collects its allocation and stock products, and is charged. |
-| Wallet | Moneder | Household balance: top-ups minus charges. May be negative. |
+| Wallet | Moneder | Household balance: top-ups plus credits minus charges ± corrections. May be negative. |
 | Top-up | Recàrrega | Money added to a wallet, recorded by a manager. |
 
 ## Time
 
 Every date and time in this spec (pickup dates, cutoffs, "Wednesday 20:00") is local time in the
-cooperative's timezone.
+cooperative's timezone. On daylight-saving days, a local time that does not exist moves forward by the
+gap (02:30 becomes 03:30), and a local time that happens twice means its first occurrence.
+
+Every recorded movement (wallet, stock) is dated at the moment it is recorded; that moment orders history
+and defines a balance on a given day.
 
 ## Roles
 
-- **Member**: orders for their household, sees their household's orders, balance and movements.
-- **Producer**: manages their own products and default cutoff, sees aggregated quantities of their products.
-- **Manager**: everything else — cycles, cutoff overrides, reception, pickup, stock, top-ups, households and members.
+An account has one or more roles.
+
+- **Member**: orders for their household, sees their household's orders, pickups, balance and movements.
+- **Producer**: manages their own products and default cutoff, sees the sent totals of their products.
+- **Manager**: everything else — cycles, participation, cutoffs, sending, reception, pickup, stock,
+  top-ups, households and accounts. A manager never edits a household's order lines.
 
 ## Areas
 
 Requirements (`R#`) and acceptance scenarios (`S#`) live in one file per area; numbers are global.
 
-| File | Requirements | Scenarios |
-| --- | --- | --- |
-| [ordering.md](ordering.md) | R1–R13 | S1–S9 |
-| [reception.md](reception.md) | R14–R18 | S10–S13, S27–S31 |
-| [pickup.md](pickup.md) | R19–R24 | S14–S22, S26 |
-| [stock-wallet.md](stock-wallet.md) | R25–R36 | S23–S25 |
-| [open-questions.md](open-questions.md) | — | — |
+| File | Requirements |
+| --- | --- |
+| [ordering.md](ordering.md) | R1–R13 |
+| [reception.md](reception.md) | R14–R18 |
+| [pickup.md](pickup.md) | R19–R24 |
+| [stock-wallet.md](stock-wallet.md) | R25–R36 |
+| [open-questions.md](open-questions.md) | OQ19 |
 
 ## Out of scope (for now)
 
-Online payments, membership fees, work shifts, selling stock outside a pickup, notifications,
-minimum order per producer, invoicing and payments to producers.
+Online payments, membership fees, work shifts, selling stock outside a pickup, notifications other than
+sending an order to a producer (R12a), producer confirmation of an order (v2), minimum order per producer,
+invoicing and payments to producers, tracking returned containers as stock.
