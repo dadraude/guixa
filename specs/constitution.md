@@ -2,8 +2,9 @@
 
 Guixa is a management app for a food consumer cooperative.
 
-One installation serves exactly one cooperative (single-tenant). Cooperative-wide settings, such as
-its timezone, are configuration, not data; there is no tenant id anywhere.
+One installation serves exactly one cooperative (single-tenant); there is no tenant id anywhere.
+Cooperative-wide settings are configuration (e.g. its timezone), unless a spec lets a manager change them
+in the app (e.g. the pickup weekday): those live in a single-row settings table.
 
 ## Stack
 
