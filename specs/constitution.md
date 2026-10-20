@@ -14,6 +14,10 @@ in the app (e.g. the pickup weekday): those live in a single-row settings table.
 - Pest for backend tests, Vitest for Vue components with client-side logic.
 - PHP DTOs passed as Inertia props generate their TypeScript types (`spatie/laravel-typescript-transformer`);
   never hand-written duplicates.
+- Code quality: Pint and Larastan (PHPStan) for PHP, ESLint and Prettier for TypeScript and Vue.
+- CI on GitHub Actions runs lint, static analysis, Pest (architecture tests included) against Postgres
+  and Vitest on every pull request; a red build blocks the merge.
+- Mail: the `log` driver in tests, Mailpit in development.
 
 ## Architecture
 
