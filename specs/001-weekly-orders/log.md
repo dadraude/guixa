@@ -92,6 +92,13 @@ Prettier (asked during T01).
 
 ## 2026-10-21 · Deviation
 
+T03: `plan.md` (Shared) now states details it left open: `Clock` lives in `Shared\Domain` (A1 lets Domain use
+only Shared Domain, and `LocalTime` consumers need it there); `FrozenClock` lives in `tests/Support`;
+`Money::multiply` rounds a negative amount by magnitude (the spec only says "half up"), so a credit mirrors
+the charge; `Quantity` is built with `fromString` / `ofThousandths` and throws `InvalidQuantity`; `LocalTime`
+needs its own first-occurrence step because PHP picks the second occurrence of a repeated local time.
+Why: implementing T03 test-first showed these gaps and one wrong assumption (PHP's native resolution).
+
 T02: the Pest architecture tests need to tell value objects, DTOs and use cases apart, which `constitution.md`
 A7 did not say; A7 now states it (value objects in `Domain\ValueObject`, use case = `Application` class with
 `__invoke`, any other `Application` class = DTO). T03 must put `Money`, `Quantity` and `LocalTime` in

@@ -3,6 +3,10 @@
 namespace App\Providers;
 
 use Carbon\CarbonImmutable;
+use Guixa\Shared\Application\TransactionRunner;
+use Guixa\Shared\Domain\Clock;
+use Guixa\Shared\Infrastructure\DatabaseTransactionRunner;
+use Guixa\Shared\Infrastructure\SystemClock;
 use Illuminate\Foundation\DevCommands;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -16,7 +20,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(Clock::class, fn (): Clock => new SystemClock(config('guixa.timezone')));
+        $this->app->bind(TransactionRunner::class, DatabaseTransactionRunner::class);
     }
 
     /**
