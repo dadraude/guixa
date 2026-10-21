@@ -7,10 +7,10 @@ Status: Accepted (2026-10-21) · Spec: [spec.md](spec.md) + areas (R1–R36b, S1
 - Laravel 13 **Vue starter kit** (Inertia 3 + Vue 3 + TS + Vite, Tailwind 4 + shadcn-vue, Fortify auth). Public registration disabled.
 - Postgres via `DB_CONNECTION=pgsql`; a separate `guixa_test` database for integration tests.
 - `composer.json` autoloads `Guixa\` → `src/`.
-- Dev tooling: `spatie/laravel-typescript-transformer`, Pest arch tests (A1–A8), ESLint rules (A9), Vitest,
-  Pint, Larastan, Prettier.
-- GitHub Actions workflow on pull requests: Pint `--test`, Larastan, ESLint + Prettier check, Pest against a
-  Postgres service, Vitest.
+- Dev tooling: `spatie/laravel-typescript-transformer`, Pest arch tests (A1–A8), Oxlint rules (A9), Vitest,
+  Pint, Larastan, Oxfmt. Vite+ (`vp`) runs Oxlint, Oxfmt and Vitest.
+- GitHub Actions workflow on pull requests: Pint `--test`, Larastan, `vp check` (Oxlint + Oxfmt), vue-tsc,
+  Pest against a Postgres service, Vitest.
 - `MAIL_MAILER=log` in `phpunit.xml`; Mailpit for local mail (invitations, D15).
 - Laravel scheduler running every minute (`schedule:work` in dev, cron in production) for D10.
 - `php artisan guixa:create-manager {name} {email}` creates the first manager at installation (R36a, D17).
@@ -434,7 +434,7 @@ Client-side logic (Vitest): order running total, pickup resulting balance, both 
 | Infrastructure | Each Eloquent repository against `guixa_test` (constraints, locks, numeric mapping) | `tests/Integration` |
 | HTTP | Role gates, wiring, `assertInertia` props, error → 422 and `NotAllowed` → 403 mapping | `tests/Feature` |
 | Architecture | A1–A8 | `tests/Architecture` |
-| Frontend | Display totals, A9 via ESLint | `resources/js/**/*.spec.ts` |
+| Frontend | Display totals, A9 via Oxlint | `resources/js/**/*.spec.ts` |
 
 In-memory repositories live in `tests/Support/InMemory` and must pass the same contract tests
 as the Eloquent ones, so the Application tests stay trustworthy.
