@@ -79,3 +79,13 @@ Why: the plan review above.
 `plan.md` and `tasks.md`: status Draft → Accepted. `specs/README.md`: feature 001 in progress, task status in
 Linear (Coop, DRA-150–DRA-183).
 Why: the user approved `tasks.md` after PR #141 (plan review) was merged; coding can start with T01.
+
+## 2026-10-21 · Deviation
+
+T01: the Laravel 13 Vue starter kit ships Vite+ (`vp`): Oxlint and Oxfmt instead of ESLint and Prettier,
+with Vitest bundled. `constitution.md` (Stack, A9), `plan.md` (Bootstrap, Testing) and `tasks.md` (T01, T02)
+now name Oxlint and Oxfmt; A9 is enforced with `no-restricted-imports` and `no-restricted-globals` (for
+`fetch`), since Oxlint has no `no-restricted-syntax`. Oxfmt ignores `specs/**`, so it never rewrites
+`log.md`.
+Why: the user chose to keep the starter kit's toolchain as it ships rather than swap it back to ESLint and
+Prettier (asked during T01).

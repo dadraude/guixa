@@ -16,7 +16,8 @@ in the app (e.g. the pickup weekday): those live in a single-row settings table.
 - Pest for backend tests, Vitest for Vue components with client-side logic.
 - PHP DTOs passed as Inertia props generate their TypeScript types (`spatie/laravel-typescript-transformer`);
   never hand-written duplicates.
-- Code quality: Pint and Larastan (PHPStan) for PHP, ESLint and Prettier for TypeScript and Vue.
+- Code quality: Pint and Larastan (PHPStan) for PHP; Oxlint and Oxfmt for TypeScript and Vue, through Vite+
+  (`vp check`) as the starter kit ships them.
 - CI on GitHub Actions runs lint, static analysis, Pest (architecture tests included) against Postgres
   and Vitest on every pull request; a red build blocks the merge.
 - Mail: the `log` driver in tests, Mailpit in development.
@@ -68,8 +69,8 @@ iterating over every context. A rule change edits this list first.
   Repository ports are interfaces in `Domain`, named `<Noun>Repository`.
 - **A8 — Hygiene.** Pest presets `php()` and `security()` pass. No `dd`, `dump`, `ray`, `var_dump` anywhere.
 - **A9 — Frontend boundaries.** Vue files in `resources/js/components` never import from `pages`,
-  never call `router`, `axios` or `fetch`, and never import `@inertiajs/*`. Enforced with ESLint
-  `no-restricted-imports` / `no-restricted-syntax`.
+  never call `router`, `axios` or `fetch`, and never import `@inertiajs/*`. Enforced with Oxlint
+  `no-restricted-imports` / `no-restricted-globals`.
 
 ## Principles
 
