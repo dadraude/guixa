@@ -67,10 +67,13 @@ iterating over every context. A rule change edits this list first.
 - **A7 — Shape of building blocks.** Value objects and DTOs are `final readonly`. Use cases are `final`,
   named `<Verb><Noun>` (e.g. `ConfirmPickup`), expose a single public `__invoke`, and live in `Application`.
   Repository ports are interfaces in `Domain`, named `<Noun>Repository`.
+  The test finds them by shape: value objects live in `Domain\ValueObject`; an `Application` class
+  with `__invoke` is a use case and any other `Application` class is a DTO.
 - **A8 — Hygiene.** Pest presets `php()` and `security()` pass. No `dd`, `dump`, `ray`, `var_dump` anywhere.
 - **A9 — Frontend boundaries.** Vue files in `resources/js/components` never import from `pages`,
   never call `router`, `axios` or `fetch`, and never import `@inertiajs/*`. Enforced with Oxlint
   `no-restricted-imports` / `no-restricted-globals`.
+  The starter-kit components that predate this rule are listed as exceptions in `vite.config.ts`.
 
 ## Principles
 

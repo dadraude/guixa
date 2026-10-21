@@ -69,6 +69,78 @@ export default defineConfig({
             denyWarnings: true,
             typeAware: true,
         },
+        overrides: [
+            {
+                // A9: presentational components never fetch, navigate or reach into pages.
+                files: ['resources/js/components/**/*.{vue,ts}'],
+                rules: {
+                    'no-restricted-imports': [
+                        'error',
+                        {
+                            paths: [
+                                {
+                                    name: 'axios',
+                                    message:
+                                        'A9: components do not fetch data.',
+                                },
+                            ],
+                            patterns: [
+                                {
+                                    group: ['@inertiajs/*'],
+                                    message:
+                                        'A9: components do not import Inertia; the page passes props and handles events.',
+                                },
+                                {
+                                    group: ['@/pages/**', '**/pages/**'],
+                                    message:
+                                        'A9: components never import from pages.',
+                                },
+                            ],
+                        },
+                    ],
+                    'no-restricted-globals': [
+                        'error',
+                        {
+                            name: 'fetch',
+                            message: 'A9: components do not fetch data.',
+                        },
+                        {
+                            name: 'axios',
+                            message: 'A9: components do not fetch data.',
+                        },
+                        {
+                            name: 'router',
+                            message: 'A9: components do not navigate.',
+                        },
+                    ],
+                },
+            },
+            {
+                // Starter-kit components that predate A9; move them out of components/ or
+                // refactor them, then delete their line here.
+                files: [
+                    'resources/js/components/AppHeader.vue',
+                    'resources/js/components/AppLogo.vue',
+                    'resources/js/components/AppShell.vue',
+                    'resources/js/components/AppSidebar.vue',
+                    'resources/js/components/Breadcrumbs.vue',
+                    'resources/js/components/DeleteUser.vue',
+                    'resources/js/components/ManagePasskeys.vue',
+                    'resources/js/components/ManageTwoFactor.vue',
+                    'resources/js/components/NavMain.vue',
+                    'resources/js/components/NavUser.vue',
+                    'resources/js/components/PasskeyVerify.vue',
+                    'resources/js/components/TextLink.vue',
+                    'resources/js/components/TwoFactorRecoveryCodes.vue',
+                    'resources/js/components/TwoFactorSetupModal.vue',
+                    'resources/js/components/UserMenuContent.vue',
+                ],
+                rules: {
+                    'no-restricted-imports': 'off',
+                    'no-restricted-globals': 'off',
+                },
+            },
+        ],
     },
     fmt: {
         printWidth: 80,

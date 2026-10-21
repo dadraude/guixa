@@ -44,7 +44,53 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+/**
+ * Bounded contexts under src/ (directory names). `Shared` is a kernel, not a context, so it is
+ * left out unless the rule applies to it too.
+ *
+ * @return list<string>
+ */
+function architectureContexts(bool $includeShared = false): array
 {
-    // ..
+    $contexts = array_map('basename', glob(dirname(__DIR__).'/src/*', GLOB_ONLYDIR) ?: []);
+
+    return array_values(array_filter(
+        $contexts,
+        fn (string $context) => $includeShared || $context !== 'Shared',
+    ));
+}
+
+/**
+ * Classes declared (concrete ones only unless told otherwise) under a Guixa namespace.
+ *
+ * @return list<class-string>
+ */
+function architectureClasses(string $namespace, bool $concreteOnly = true): array
+{
+    $directory = dirname(__DIR__).'/src/'.str_replace('\\', '/', substr($namespace, strlen('Guixa\\')));
+
+    if (! is_dir($directory)) {
+        return [];
+    }
+
+    $classes = [];
+    $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($directory, FilesystemIterator::SKIP_DOTS));
+
+    foreach ($files as $file) {
+        if ($file->getExtension() !== 'php') {
+            continue;
+        }
+
+        $relative = substr($file->getPathname(), strlen(dirname(__DIR__).'/src/'), -strlen('.php'));
+        $class = 'Guixa\\'.str_replace('/', '\\', $relative);
+        $reflection = new ReflectionClass($class);
+
+        if ($concreteOnly && ($reflection->isInterface() || $reflection->isTrait() || $reflection->isEnum())) {
+            continue;
+        }
+
+        $classes[] = $class;
+    }
+
+    return $classes;
 }

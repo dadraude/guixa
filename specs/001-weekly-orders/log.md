@@ -98,3 +98,13 @@ only Shared Domain, and `LocalTime` consumers need it there); `FrozenClock` live
 the charge; `Quantity` is built with `fromString` / `ofThousandths` and throws `InvalidQuantity`; `LocalTime`
 needs its own first-occurrence step because PHP picks the second occurrence of a repeated local time.
 Why: implementing T03 test-first showed these gaps and one wrong assumption (PHP's native resolution).
+
+T02: the Pest architecture tests need to tell value objects, DTOs and use cases apart, which `constitution.md`
+A7 did not say; A7 now states it (value objects in `Domain\ValueObject`, use case = `Application` class with
+`__invoke`, any other `Application` class = DTO). T03 must put `Money`, `Quantity` and `LocalTime` in
+`Shared\Domain\ValueObject`. The 15 starter-kit components in `resources/js/components` import `@inertiajs/*`,
+so A9 lists them as exceptions in `vite.config.ts` (A9 note in the constitution) instead of refactoring them
+here; new components are bound by the rule. The architecture tests also add a `tests/Architecture` suite to
+`phpunit.xml`, and with no contexts in `src/` yet the loops run empty (Pest reports them as risky) until T03
+adds `Shared`.
+Why: the rules had to be checkable by shape alone, and fixing the starter kit's components is outside T02.
