@@ -89,3 +89,15 @@ now name Oxlint and Oxfmt; A9 is enforced with `no-restricted-imports` and `no-r
 `log.md`.
 Why: the user chose to keep the starter kit's toolchain as it ships rather than swap it back to ESLint and
 Prettier (asked during T01).
+
+## 2026-10-21 · Deviation
+
+T02: the Pest architecture tests need to tell value objects, DTOs and use cases apart, which `constitution.md`
+A7 did not say; A7 now states it (value objects in `Domain\ValueObject`, use case = `Application` class with
+`__invoke`, any other `Application` class = DTO). T03 must put `Money`, `Quantity` and `LocalTime` in
+`Shared\Domain\ValueObject`. The 15 starter-kit components in `resources/js/components` import `@inertiajs/*`,
+so A9 lists them as exceptions in `vite.config.ts` (A9 note in the constitution) instead of refactoring them
+here; new components are bound by the rule. The architecture tests also add a `tests/Architecture` suite to
+`phpunit.xml`, and with no contexts in `src/` yet the loops run empty (Pest reports them as risky) until T03
+adds `Shared`.
+Why: the rules had to be checkable by shape alone, and fixing the starter kit's components is outside T02.
