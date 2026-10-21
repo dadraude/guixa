@@ -15,7 +15,7 @@ class TypeScriptTransformerServiceProvider extends TypeScriptTransformerApplicat
         $config
             ->transformer(AttributedClassTransformer::class)
             ->transformer(EnumTransformer::class)
-            ->transformDirectories(base_path('src'))
+            ->transformDirectories(base_path('src'), app_path('Http'))
             ->writer(new GlobalNamespaceWriter('generated.d.ts'));
     }
 }

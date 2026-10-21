@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { Link } from '@inertiajs/vue3';
+import { Link, usePage } from '@inertiajs/vue3';
 import { BookOpen, FolderGit2, LayoutGrid } from '@lucide/vue';
+import { computed } from 'vue';
 import AppLogo from '@/components/AppLogo.vue';
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
+import NavRoleAreas from '@/components/NavRoleAreas.vue';
 import NavUser from '@/components/NavUser.vue';
 import {
     Sidebar,
@@ -16,6 +18,9 @@ import {
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import type { NavItem } from '@/types';
+
+const page = usePage();
+const roleAreas = computed(() => page.props.roleAreas);
 
 const mainNavItems: NavItem[] = [
     {
@@ -54,6 +59,7 @@ const footerNavItems: NavItem[] = [
         </SidebarHeader>
 
         <SidebarContent>
+            <NavRoleAreas :areas="roleAreas" />
             <NavMain :items="mainNavItems" />
         </SidebarContent>
 

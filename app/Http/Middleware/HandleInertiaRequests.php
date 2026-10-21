@@ -2,6 +2,8 @@
 
 namespace App\Http\Middleware;
 
+use App\Http\RoleAreas;
+use Guixa\Shared\Application\Actor;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -35,12 +37,16 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $actor = app()->bound(Actor::class) ? app(Actor::class) : null;
+
         return [
             ...parent::share($request),
             'name' => config('app.name'),
             'auth' => [
                 'user' => $request->user(),
+                'roles' => $actor === null ? [] : $actor->roleNames(),
             ],
+            'roleAreas' => $actor === null ? [] : RoleAreas::for($actor),
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
     }

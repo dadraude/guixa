@@ -58,7 +58,7 @@ only call the other context's use cases (rule A4). Every write that spans contex
   `SystemClock` (Infrastructure, reads `config('guixa.timezone')` ← `COOP_TIMEZONE`) and `FrozenClock` (`tests/Support`,
   any timezone). `LocalTime::at(date, HH:MM, timezone)` resolves a local time to one instant: a time that does
   not exist moves forward by the gap, a repeated one takes its first occurrence (Time, S38).
-- **`Actor`** `final readonly`: `accountId`, `roles` (set of `Manager|Member|Producer`), `?householdId`,
+- **`Actor`** (`Shared\Application`; `Role` and `NotAllowed` live in `Shared\Domain`) `final readonly`: `accountId` (UUID v7 string), `roles` (set of `Manager|Member|Producer`), `?householdId`,
   `?producerId`. Built by an HTTP middleware from the authenticated account and passed to every use case.
   Authorization is checked inside use cases (`assertManager()`, `assertMemberOf($householdId)`…),
   so scenarios test it without HTTP (R36a). A failed check throws `Shared\Domain\Error\NotAllowed`.
@@ -381,7 +381,7 @@ Concurrency:
 
 ## HTTP & pages
 
-Middleware `role:<role>` gates route groups; use cases still check the `Actor`. One login can reach several
+Middleware `role:<role>` (any of several: `role:manager,producer`) gates route groups; use cases still check the `Actor`. One login can reach several
 role areas (R36a); the layout shows a switch between them.
 
 | Route | Page / action | Use case |
@@ -423,7 +423,8 @@ reception), adjust what is needed, add stock and returns, enter a top-up if they
 not collected. Each step before completion is saved on the server, so a pickup can be left and resumed.
 
 Controllers map domain errors in one place: an exception handler turns `Guixa\*\Domain\Error\*`
-into a 422 with a translated message, so Vue shows it as a form error. `Shared\Domain\Error\NotAllowed`
+into a 422 with a translated message (`errors.<ClassName>` in `lang/`, else the exception message), so Vue
+shows it as a form error: JSON requests get the 422, Inertia requests a redirect back with a `domain` error. `Shared\Domain\Error\NotAllowed`
 becomes a 403 instead.
 
 Client-side logic (Vitest): order running total, pickup resulting balance, both display-only.
