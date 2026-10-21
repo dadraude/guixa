@@ -48,11 +48,14 @@ only call the other context's use cases (rule A4). Every write that spans contex
 ## Shared
 
 - **`Money`** `final readonly`: `int $cents`. `add`, `subtract`, `negate`, `multiply(Quantity): Money` rounding
-  **half up** to the cent (R22). Formatting is a UI concern.
+  **half up** to the cent (R22); a negative amount (a credit) rounds by magnitude, so
+  `negate()` before or after `multiply` gives the same cents. Built with `Money::ofCents()`. Formatting is a UI concern.
 - **`Quantity`** `final readonly`: integer thousandths (`1.120 kg` → `1120`). Rejects negatives; `isZero()`,
-  `isWhole()`, `ceilToWhole()` (R18a). Stored as `numeric(10,3)`; mapped through strings, never floats.
-- **`Clock`** port: `now(): DateTimeImmutable` and `timezone(): DateTimeZone` (the cooperative's timezone).
-  `SystemClock` (Infrastructure, reads `config('guixa.timezone')` ← `COOP_TIMEZONE`) and `FrozenClock` (tests,
+  `isWhole()`, `ceilToWhole()` (R18a). Built with `Quantity::fromString('1.120')` (at most 3 decimals) or
+  `Quantity::ofThousandths(1120)`; a negative or malformed value throws `Shared\Domain\Error\InvalidQuantity`.
+  Stored as `numeric(10,3)`; mapped through strings, never floats.
+- **`Clock`** port (`Shared\Domain`, so Domain code can use it under A1): `now(): DateTimeImmutable` and `timezone(): DateTimeZone` (the cooperative's timezone).
+  `SystemClock` (Infrastructure, reads `config('guixa.timezone')` ← `COOP_TIMEZONE`) and `FrozenClock` (`tests/Support`,
   any timezone). `LocalTime::at(date, HH:MM, timezone)` resolves a local time to one instant: a time that does
   not exist moves forward by the gap, a repeated one takes its first occurrence (Time, S38).
 - **`Actor`** `final readonly`: `accountId`, `roles` (set of `Manager|Member|Producer`), `?householdId`,
