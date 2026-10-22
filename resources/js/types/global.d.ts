@@ -19,6 +19,7 @@ declare module '@inertiajs/core' {
         sharedPageProps: {
             name: string;
             auth: Auth;
+            roleAreas: App.Http.RoleArea[];
             sidebarOpen: boolean;
             [key: string]: unknown;
         };

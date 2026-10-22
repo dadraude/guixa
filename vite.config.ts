@@ -128,6 +128,7 @@ export default defineConfig({
                     'resources/js/components/ManagePasskeys.vue',
                     'resources/js/components/ManageTwoFactor.vue',
                     'resources/js/components/NavMain.vue',
+                    'resources/js/components/NavRoleAreas.vue',
                     'resources/js/components/NavUser.vue',
                     'resources/js/components/PasskeyVerify.vue',
                     'resources/js/components/TextLink.vue',

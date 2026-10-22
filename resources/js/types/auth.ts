@@ -1,5 +1,5 @@
 export type User = {
-    id: number;
+    id: string;
     name: string;
     email: string;
     avatar?: string;
@@ -12,6 +12,7 @@ export type User = {
 
 export type Auth = {
     user: User;
+    roles: Guixa.Shared.Domain.Role[];
 };
 
 export type Passkey = {

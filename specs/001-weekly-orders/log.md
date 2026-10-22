@@ -108,3 +108,21 @@ here; new components are bound by the rule. The architecture tests also add a `t
 `phpunit.xml`, and with no contexts in `src/` yet the loops run empty (Pest reports them as risky) until T03
 adds `Shared`.
 Why: the rules had to be checkable by shape alone, and fixing the starter kit's components is outside T02.
+T04: `Actor` is in `Guixa\Shared\Application` (with `ActorResolver`; `DatabaseActorResolver` in
+`Shared\Infrastructure`) and is the class other contexts depend on; `Role` and `NotAllowed` are in
+`Shared\Domain`. `app/Http` never imports `Role` (A5): it asks the `Actor` by role name (`hasAnyRole`,
+`roleNames`). The `role:` middleware accepts several roles (any of). A domain error answers 422 to JSON requests
+and, for Inertia requests, a redirect back with a `domain` error (the Inertia form error convention).
+Account ids are UUID v7 (Laravel's `HasUuids`), decided by the user: `users.id`, `sessions.user_id`,
+`passkeys.user_id` and `account_roles.user_id` are uuids (original migrations edited in place, no data existed),
+and `users.household_id` / `producer_id` are nullable uuids, so `Actor` ids are strings. T04 adds the
+`account_roles` table and those two columns, with no foreign keys until their tables exist (T06 and the Catalog
+task); `activated_at` / `deactivated_at` stay with T06. The role-area switch links to `/`, `/producer/products`
+and `/manage/cycles`, which later tasks create. Its TypeScript types are generated from `Role` and `RoleArea`
+(`resources/js/generated/generated.d.ts`, by `php artisan typescript:transform`), not written by hand.
+`plan.md` (Shared, HTTP & pages) now says so.
+`NavRoleAreas.vue` (new) and `AppSidebar.vue` use `@inertiajs/vue3`; the user kept the starter-kit nav
+components exempt from A9, so `NavRoleAreas.vue` is added to the exception list in `vite.config.ts`
+(`AppSidebar.vue` was already there).
+Why: the plan did not say which layer holds `Actor`, how the 422 reaches Inertia, the type of account ids, or
+where roles are stored before Membership exists.
