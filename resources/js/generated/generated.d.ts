@@ -1,5 +1,25 @@
 declare namespace App {
 namespace Http {
+export type HouseholdRow = {
+readonly id: string,
+readonly name: string,
+readonly active: boolean,
+readonly members: App.Http.MemberRow[],
+};
+export type HouseholdSummaryRow = {
+readonly id: string,
+readonly name: string,
+readonly active: boolean,
+readonly memberCount: number,
+};
+export type MemberRow = {
+readonly accountId: string,
+readonly name: string,
+readonly email: string,
+readonly invitationPending: boolean,
+readonly invitationExpiresAt: string | null,
+readonly invitationExpired: boolean,
+};
 export type ReturnItemRow = {
 readonly id: string,
 readonly name: string,

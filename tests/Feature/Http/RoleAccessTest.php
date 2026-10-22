@@ -110,6 +110,7 @@ it('shares a single role area for an account with one role', function () {
 
 it('resolves the actor with UUID account, household and producer ids', function () {
     $householdId = (string) Str::uuid7();
+    DB::table('households')->insert(['id' => $householdId, 'name' => 'Household H', 'created_at' => now(), 'updated_at' => now()]);
     $producerId = (string) Str::uuid7();
     $user = userWithRoles(Role::Member, Role::Producer);
     DB::table('users')->where('id', $user->id)->update(['household_id' => $householdId, 'producer_id' => $producerId]);

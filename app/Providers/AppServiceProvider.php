@@ -3,6 +3,16 @@
 namespace App\Providers;
 
 use Carbon\CarbonImmutable;
+use Guixa\Membership\Domain\AccountPasswords;
+use Guixa\Membership\Domain\AccountRepository;
+use Guixa\Membership\Domain\HouseholdRepository;
+use Guixa\Membership\Domain\InvitationRepository;
+use Guixa\Membership\Domain\InvitationSender;
+use Guixa\Membership\Infrastructure\Mail\MailInvitationSender;
+use Guixa\Membership\Infrastructure\Persistence\DatabaseAccountPasswords;
+use Guixa\Membership\Infrastructure\Persistence\DatabaseAccountRepository;
+use Guixa\Membership\Infrastructure\Persistence\DatabaseHouseholdRepository;
+use Guixa\Membership\Infrastructure\Persistence\DatabaseInvitationRepository;
 use Guixa\Shared\Application\ActorResolver;
 use Guixa\Shared\Application\TransactionRunner;
 use Guixa\Shared\Domain\Clock;
@@ -31,6 +41,12 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(ActorResolver::class, DatabaseActorResolver::class);
         $this->app->bind(StockProductRepository::class, EloquentStockProductRepository::class);
         $this->app->bind(ReturnItemRepository::class, EloquentReturnItemRepository::class);
+
+        $this->app->bind(HouseholdRepository::class, DatabaseHouseholdRepository::class);
+        $this->app->bind(AccountRepository::class, DatabaseAccountRepository::class);
+        $this->app->bind(InvitationRepository::class, DatabaseInvitationRepository::class);
+        $this->app->bind(InvitationSender::class, MailInvitationSender::class);
+        $this->app->bind(AccountPasswords::class, DatabaseAccountPasswords::class);
     }
 
     /**

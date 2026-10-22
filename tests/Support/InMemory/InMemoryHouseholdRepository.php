@@ -1,0 +1,31 @@
+<?php
+
+namespace Tests\Support\InMemory;
+
+use Guixa\Membership\Domain\Household;
+use Guixa\Membership\Domain\HouseholdRepository;
+
+/** @extends InMemoryRepository<Household> */
+final class InMemoryHouseholdRepository extends InMemoryRepository implements HouseholdRepository
+{
+    /** @param Household $item */
+    public function save(object $item): void
+    {
+        parent::save($item);
+    }
+
+    public function get(string $id): ?Household
+    {
+        return $this->find($id);
+    }
+
+    public function list(): array
+    {
+        return $this->all();
+    }
+
+    protected function idOf(object $item): string
+    {
+        return $item->id;
+    }
+}
