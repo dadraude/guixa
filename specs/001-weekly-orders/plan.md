@@ -206,6 +206,10 @@ role only; participation is not restored.
   ```
   `share_i = target × ordered_i / Σ ordered`, floored to `step`; leftover steps go one by one to the
   largest remainders, ties by `createdAt`, then by line id (UUID v7, the record order). Exact on thousandths.
+  `claims` are `ProportionalClaim` value objects (`Ordering\Domain\ValueObject`) (`householdId`, `ordered`, `createdAt`, `lineId`) and `step` is a
+  `Quantity` (1.000 or 0.001). It works in steps, as `floor(T/S)·o + floor((T mod S)·o/S)` with S = Σ ordered, so no
+  intermediate product exceeds (Σ ordered)². No claims or a zero ordered total throws `NobodyOrderedProduct`; a target or
+  claim that is not a multiple of the step throws `InvalidArgumentException` (a caller bug).
 
 - **`Reception`** read model (not an aggregate): per product of a producer in a cycle, `ordered total`,
   `received total`, every household's `allocated`, `delivered()` and `allocatedByHand`,

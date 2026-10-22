@@ -126,3 +126,14 @@ components exempt from A9, so `NavRoleAreas.vue` is added to the exception list 
 (`AppSidebar.vue` was already there).
 Why: the plan did not say which layer holds `Actor`, how the 422 reaches Inertia, the type of account ids, or
 where roles are stored before Membership exists.
+
+## 2026-10-22 · Deviation
+
+T21: `plan.md` did not say the allocator's input type, how `step` is passed, or what it does with an empty claim list or
+off-step quantities. `ProportionalAllocator` takes `ProportionalClaim` value objects (`Ordering\Domain\ValueObject`) (household id, ordered, createdAt,
+line id) and `step` as a `Quantity` (1.000 or 0.001); it throws `NobodyOrderedProduct` for no claims or a zero ordered
+total, and `InvalidArgumentException` for a target or claim that is not a multiple of the step (a caller bug, since
+non-variable products carry whole units). It works in steps and splits `target × ordered / Σ ordered` as
+`floor(T/S)·o + floor((T mod S)·o/S)` (S = Σ ordered), so no intermediate product exceeds (Σ ordered)².
+`plan.md` (Ordering · Domain) now says so.
+Why: the plan left these gaps for the code to fill.
