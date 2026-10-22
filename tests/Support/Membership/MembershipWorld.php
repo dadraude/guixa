@@ -6,6 +6,7 @@ use Guixa\Membership\Application\AcceptInvitation;
 use Guixa\Membership\Application\AddMember;
 use Guixa\Membership\Application\CanLogIn;
 use Guixa\Membership\Application\ChangeInvitationEmail;
+use Guixa\Membership\Application\CreateFirstManager;
 use Guixa\Membership\Application\CreateHousehold;
 use Guixa\Membership\Application\GetHousehold;
 use Guixa\Membership\Application\ListHouseholds;
@@ -41,6 +42,8 @@ final class MembershipWorld
 
     public readonly CreateHousehold $createHousehold;
 
+    public readonly CreateFirstManager $createFirstManager;
+
     public readonly RenameHousehold $renameHousehold;
 
     public readonly AddMember $addMember;
@@ -74,6 +77,7 @@ final class MembershipWorld
         $sendInvitation = new SendInvitation($this->invitations, $this->sender, $this->transactions, $this->clock);
 
         $this->createHousehold = new CreateHousehold($this->households);
+        $this->createFirstManager = new CreateFirstManager($this->accounts, $sendInvitation, $this->transactions);
         $this->renameHousehold = new RenameHousehold($this->households);
         $this->addMember = new AddMember($this->households, $this->accounts, $sendInvitation, $this->transactions);
         $this->resendInvitation = new ResendInvitation($this->accounts, $sendInvitation, $this->transactions);

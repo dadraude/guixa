@@ -14,6 +14,8 @@ interface AccountRepository
 
     public function emailIsTaken(Email $email): bool;
 
+    public function hasManager(): bool;
+
     /** @return list<Account> */
     public function membersOf(string $householdId): array;
 }

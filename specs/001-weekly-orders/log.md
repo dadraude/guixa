@@ -185,3 +185,11 @@ Why: found in the T06 review; no code changed in T06 because nothing can deactiv
 T06: Inertia prop DTOs are named `App\Http\<Noun>Row` (`HouseholdRow`, `HouseholdSummaryRow`, `MemberRow`), like T24's `StockProductRow`,
 not `App\Http\Props\*Prop`. `plan.md` (HTTP & pages) now says so.
 Why: two naming schemes for the same kind of class.
+
+## 2026-10-22 · Deviation
+
+T34: the plan did not name how `CreateFirstManager` knows a manager exists or builds the account. Added `Account::inviteManager` and
+`AccountRepository::hasManager()` (in-memory, database and contract test); `plan.md` (Membership, Domain) now says so. The
+check and the write run in one transaction. `guixa:create-manager` is `App\Console\Commands\CreateManager` and prints the
+domain error and fails when a manager already exists or the email is taken.
+Why: the use case needs both to enforce "rejected once any manager exists" (R36a, D17).
