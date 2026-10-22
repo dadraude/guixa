@@ -9,12 +9,15 @@ use Guixa\Membership\Domain\ValueObject\Email;
 use Guixa\Shared\Domain\Role;
 use PHPUnit\Framework\Attributes\Test;
 
-/** Integration tests also need a household row for members to point at: they implement `householdId()`. */
+/** Integration tests also need household and producer rows to point at: they implement `householdId()` and `producerId()`. */
 trait AccountRepositoryContract
 {
     abstract protected function repository(): AccountRepository;
 
     abstract protected function householdId(): string;
+
+    /** An existing producer for producer accounts to point at. */
+    abstract protected function producerId(): string;
 
     #[Test]
     public function it_finds_what_was_saved(): void
@@ -75,5 +78,43 @@ trait AccountRepositoryContract
 
         $this->assertCount(2, $repository->membersOf($this->householdId()));
         $this->assertSame([], $repository->membersOf($repository->nextId()));
+    }
+
+    #[Test]
+    public function it_finds_a_producer_account_with_its_role_and_producer(): void
+    {
+        $repository = $this->repository();
+        $account = Account::inviteProducer($repository->nextId(), 'Baker', Email::from('baker@example.org'), $this->producerId());
+
+        $repository->save($account);
+
+        $found = $repository->get($account->id);
+        $this->assertSame([Role::Producer], $found?->roles);
+        $this->assertSame($this->producerId(), $found->producerId);
+        $this->assertNull($found->householdId);
+    }
+
+    #[Test]
+    public function it_tells_whether_a_producer_has_an_account(): void
+    {
+        $repository = $this->repository();
+        $this->assertFalse($repository->producerHasAccount($this->producerId()));
+
+        $repository->save(Account::inviteProducer($repository->nextId(), 'Baker', Email::from('baker@example.org'), $this->producerId()));
+
+        $this->assertTrue($repository->producerHasAccount($this->producerId()));
+    }
+
+    #[Test]
+    public function it_lists_only_the_accounts_that_belong_to_a_producer(): void
+    {
+        $repository = $this->repository();
+        $repository->save(Account::inviteMember($repository->nextId(), 'Anna', Email::from('anna@example.org'), $this->householdId()));
+        $baker = Account::inviteProducer($repository->nextId(), 'Baker', Email::from('baker@example.org'), $this->producerId());
+        $repository->save($baker);
+
+        $ids = array_map(fn (Account $account) => $account->id, $repository->producerAccounts());
+
+        $this->assertSame([$baker->id], $ids);
     }
 }

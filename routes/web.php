@@ -4,8 +4,11 @@ use App\Http\Controllers\AcceptInvitationController;
 use App\Http\Controllers\Manage\HouseholdController;
 use App\Http\Controllers\Manage\HouseholdMemberController;
 use App\Http\Controllers\Manage\InvitationController;
+use App\Http\Controllers\Manage\ProducerAccountController;
+use App\Http\Controllers\Manage\ProducerController;
 use App\Http\Controllers\Manage\ReturnItemController;
 use App\Http\Controllers\Manage\StockProductController;
+use App\Http\Controllers\Producer\CutoffController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'Welcome')->name('home');
@@ -41,12 +44,23 @@ Route::middleware(['auth', 'verified', 'role:manager'])->prefix('manage')->name(
         ->whereUuid('household')
         ->name('households.members.store');
 
+    Route::get('producers', [ProducerController::class, 'index'])->name('producers.index');
+    Route::post('producers', [ProducerController::class, 'store'])->name('producers.store');
+    Route::post('producers/{producer}/account', [ProducerAccountController::class, 'store'])
+        ->whereUuid('producer')
+        ->name('producers.account.store');
+
     Route::post('accounts/{account}/invitation', [InvitationController::class, 'resend'])
         ->whereUuid('account')
         ->name('accounts.invitation.resend');
     Route::put('accounts/{account}/invitation', [InvitationController::class, 'changeEmail'])
         ->whereUuid('account')
         ->name('accounts.invitation.email');
+});
+
+Route::middleware(['auth', 'verified', 'role:producer'])->prefix('producer')->name('producer.')->group(function () {
+    Route::get('cutoff', [CutoffController::class, 'show'])->name('cutoff.show');
+    Route::put('cutoff', [CutoffController::class, 'update'])->name('cutoff.update');
 });
 
 require __DIR__.'/settings.php';

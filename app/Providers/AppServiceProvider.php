@@ -3,11 +3,15 @@
 namespace App\Providers;
 
 use Carbon\CarbonImmutable;
+use Guixa\Catalog\Domain\ProducerRepository;
+use Guixa\Catalog\Infrastructure\Persistence\EloquentProducerRepository;
 use Guixa\Membership\Domain\AccountPasswords;
 use Guixa\Membership\Domain\AccountRepository;
 use Guixa\Membership\Domain\HouseholdRepository;
 use Guixa\Membership\Domain\InvitationRepository;
 use Guixa\Membership\Domain\InvitationSender;
+use Guixa\Membership\Domain\ProducerDirectory;
+use Guixa\Membership\Infrastructure\Catalog\CatalogProducerDirectory;
 use Guixa\Membership\Infrastructure\Mail\MailInvitationSender;
 use Guixa\Membership\Infrastructure\Persistence\DatabaseAccountPasswords;
 use Guixa\Membership\Infrastructure\Persistence\DatabaseAccountRepository;
@@ -47,6 +51,9 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(InvitationRepository::class, DatabaseInvitationRepository::class);
         $this->app->bind(InvitationSender::class, MailInvitationSender::class);
         $this->app->bind(AccountPasswords::class, DatabaseAccountPasswords::class);
+        $this->app->bind(ProducerDirectory::class, CatalogProducerDirectory::class);
+
+        $this->app->bind(ProducerRepository::class, EloquentProducerRepository::class);
     }
 
     /**

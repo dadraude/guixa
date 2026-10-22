@@ -14,6 +14,11 @@ interface AccountRepository
 
     public function emailIsTaken(Email $email): bool;
 
+    public function producerHasAccount(string $producerId): bool;
+
+    /** @return list<Account> accounts that belong to a producer */
+    public function producerAccounts(): array;
+
     /** @return list<Account> */
     public function membersOf(string $householdId): array;
 }

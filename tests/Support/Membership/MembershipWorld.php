@@ -8,13 +8,16 @@ use Guixa\Membership\Application\CanLogIn;
 use Guixa\Membership\Application\ChangeInvitationEmail;
 use Guixa\Membership\Application\CreateHousehold;
 use Guixa\Membership\Application\GetHousehold;
+use Guixa\Membership\Application\InviteProducerAccount;
 use Guixa\Membership\Application\ListHouseholds;
+use Guixa\Membership\Application\ListProducerAccounts;
 use Guixa\Membership\Application\RenameHousehold;
 use Guixa\Membership\Application\ResendInvitation;
 use Guixa\Membership\Application\SendInvitation;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Role;
 use Tests\Support\FrozenClock;
+use Tests\Support\InMemory\FakeProducerDirectory;
 use Tests\Support\InMemory\ImmediateTransactionRunner;
 use Tests\Support\InMemory\InMemoryAccountRepository;
 use Tests\Support\InMemory\InMemoryHouseholdRepository;
@@ -37,6 +40,8 @@ final class MembershipWorld
 
     public readonly RecordingAccountPasswords $passwords;
 
+    public readonly FakeProducerDirectory $producerDirectory;
+
     public readonly ImmediateTransactionRunner $transactions;
 
     public readonly CreateHousehold $createHousehold;
@@ -49,6 +54,8 @@ final class MembershipWorld
 
     public readonly ChangeInvitationEmail $changeInvitationEmail;
 
+    public readonly InviteProducerAccount $inviteProducerAccount;
+
     public readonly AcceptInvitation $acceptInvitation;
 
     public readonly CanLogIn $canLogIn;
@@ -56,6 +63,8 @@ final class MembershipWorld
     public readonly ListHouseholds $listHouseholds;
 
     public readonly GetHousehold $getHousehold;
+
+    public readonly ListProducerAccounts $listProducerAccounts;
 
     public readonly Actor $manager;
 
@@ -69,6 +78,7 @@ final class MembershipWorld
         $this->invitations = new InMemoryInvitationRepository;
         $this->sender = new RecordingInvitationSender;
         $this->passwords = new RecordingAccountPasswords;
+        $this->producerDirectory = new FakeProducerDirectory;
         $this->transactions = new ImmediateTransactionRunner;
 
         $sendInvitation = new SendInvitation($this->invitations, $this->sender, $this->transactions, $this->clock);
@@ -76,6 +86,12 @@ final class MembershipWorld
         $this->createHousehold = new CreateHousehold($this->households);
         $this->renameHousehold = new RenameHousehold($this->households);
         $this->addMember = new AddMember($this->households, $this->accounts, $sendInvitation, $this->transactions);
+        $this->inviteProducerAccount = new InviteProducerAccount(
+            $this->producerDirectory,
+            $this->accounts,
+            $sendInvitation,
+            $this->transactions,
+        );
         $this->resendInvitation = new ResendInvitation($this->accounts, $sendInvitation, $this->transactions);
         $this->changeInvitationEmail = new ChangeInvitationEmail($this->accounts, $sendInvitation, $this->transactions);
         $this->acceptInvitation = new AcceptInvitation(
@@ -87,6 +103,7 @@ final class MembershipWorld
         );
         $this->canLogIn = new CanLogIn($this->accounts);
         $this->listHouseholds = new ListHouseholds($this->households, $this->accounts);
+        $this->listProducerAccounts = new ListProducerAccounts($this->accounts);
         $this->getHousehold = new GetHousehold($this->households, $this->accounts, $this->invitations, $this->clock);
 
         $this->manager = new Actor('00000000-0000-7000-8000-00000000000a', [Role::Manager]);

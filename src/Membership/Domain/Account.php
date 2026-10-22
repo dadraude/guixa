@@ -29,6 +29,12 @@ final class Account
         return new self($id, trim($name), $email, [Role::Member], $householdId, null, null, null);
     }
 
+    /** The one account of a producer: it cannot log in until the invitation is accepted (R34, R36). */
+    public static function inviteProducer(string $id, string $name, Email $email, string $producerId): self
+    {
+        return new self($id, trim($name), $email, [Role::Producer], null, $producerId, null, null);
+    }
+
     /**
      * @param  list<Role>  $roles
      */
