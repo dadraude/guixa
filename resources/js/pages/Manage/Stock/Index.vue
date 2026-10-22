@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Form, Head, Link } from '@inertiajs/vue3';
+import StockMovementController from '@/actions/App/Http/Controllers/Manage/StockMovementController';
 import StockProductController from '@/actions/App/Http/Controllers/Manage/StockProductController';
 import Heading from '@/components/Heading.vue';
 import { Button } from '@/components/ui/button';
@@ -11,7 +12,7 @@ defineOptions({
 });
 
 defineProps<{
-    products: App.Http.StockProductRow[];
+    products: App.Http.StockLevelRow[];
 }>();
 </script>
 
@@ -40,6 +41,7 @@ defineProps<{
                     <th class="py-2">Unit</th>
                     <th class="py-2">Price</th>
                     <th class="py-2">Containers per unit</th>
+                    <th class="py-2">Available</th>
                     <th class="py-2">Status</th>
                     <th class="py-2" />
                 </tr>
@@ -58,10 +60,17 @@ defineProps<{
                     </td>
                     <td class="py-2">{{ product.price }} EUR</td>
                     <td class="py-2">{{ product.containersPerUnit ?? '-' }}</td>
+                    <td class="py-2">{{ product.available }}</td>
                     <td class="py-2">
                         {{ product.active ? 'Active' : 'Deactivated' }}
                     </td>
                     <td class="flex justify-end gap-2 py-2">
+                        <Button variant="outline" size="sm" as-child>
+                            <Link
+                                :href="StockMovementController.show(product.id)"
+                                >Movements</Link
+                            >
+                        </Button>
                         <Button variant="outline" size="sm" as-child>
                             <Link
                                 :href="StockProductController.edit(product.id)"
