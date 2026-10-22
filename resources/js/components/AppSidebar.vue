@@ -1,7 +1,15 @@
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
-import { BookOpen, FolderGit2, LayoutGrid, Package, Undo2 } from '@lucide/vue';
+import {
+    BookOpen,
+    FolderGit2,
+    Home,
+    LayoutGrid,
+    Package,
+    Undo2,
+} from '@lucide/vue';
 import { computed } from 'vue';
+import HouseholdController from '@/actions/App/Http/Controllers/Manage/HouseholdController';
 import ReturnItemController from '@/actions/App/Http/Controllers/Manage/ReturnItemController';
 import StockProductController from '@/actions/App/Http/Controllers/Manage/StockProductController';
 import AppLogo from '@/components/AppLogo.vue';
@@ -25,6 +33,11 @@ const page = usePage();
 const roleAreas = computed(() => page.props.roleAreas);
 
 const managerNavItems: NavItem[] = [
+    {
+        title: 'Households',
+        href: HouseholdController.index(),
+        icon: Home,
+    },
     {
         title: 'Stock',
         href: StockProductController.index(),

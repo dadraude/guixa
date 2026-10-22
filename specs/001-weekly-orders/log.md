@@ -158,3 +158,30 @@ as T05 anticipated, and the manager sidebar gets "Stock" and "Return items" link
 Why: the plan did not say how entities validate on create and update, how money crosses the HTTP boundary, or how the
 pages are reached.
 
+## 2026-10-22 · Deviation
+
+T06: D15 said invitations use Laravel's password broker. They are now an `Invitation` record (`invitations` table: account, SHA-256
+token hash, `sent_at`), issued by an internal `SendInvitation` use case, with a new `InvitationRepository` port. Setting the password
+goes through a new `AccountPasswords` port. Accepting checks `now > sentAt + 7 days` against the `Clock`, so S25's expiry runs at the
+Application level; a resent or changed-email invitation replaces the row, so the old link stops working. `plan.md` (Membership, D15) now says so.
+Why: the broker's expiry is configured for every password reset and it reads the real clock, so S25 could not be tested with `FrozenClock`.
+
+T06: `plan.md` listed no query for the households admin pages. Added `ListHouseholds` and `GetHousehold` (manager only; the latter
+returns each member's pending-invitation state and expiry). `plan.md` (Membership use cases) now lists them. `users.household_id` now has a
+foreign key to `households` (T04 had left it open until this table existed); `producer_id` stays without one until Catalog.
+Why: the pages need to read what the use cases write, and T04 promised the foreign key.
+
+T06: login is refused until `activated_at` is set (and after `deactivated_at`, for T07), through Fortify's `authenticateUsing`
+(`App\Actions\Fortify\AuthenticateAccount`). The Membership repositories' contract tests in `tests/Support/Contracts` run in `tests/Unit/Membership` (in-memory) and
+`tests/Integration/Membership` (database), using the `Application`/`Integration` suites T24 added.
+Why: R34 says an invited person cannot log in until they accept.
+
+T07 (note from T06): passkey login is enabled in Fortify and does not go through `authenticateUsing`, so `CanLogIn` does not guard it.
+Once `DeactivateAccount` exists, a deactivated account with a passkey could still log in. T07 must cover that path (R36b).
+Why: found in the T06 review; no code changed in T06 because nothing can deactivate an account yet.
+
+## 2026-10-22 · Deviation
+
+T06: Inertia prop DTOs are named `App\Http\<Noun>Row` (`HouseholdRow`, `HouseholdSummaryRow`, `MemberRow`), like T24's `StockProductRow`,
+not `App\Http\Props\*Prop`. `plan.md` (HTTP & pages) now says so.
+Why: two naming schemes for the same kind of class.
