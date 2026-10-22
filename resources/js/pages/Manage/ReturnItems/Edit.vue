@@ -1,0 +1,44 @@
+<script setup lang="ts">
+import { Form, Head } from '@inertiajs/vue3';
+import ReturnItemController from '@/actions/App/Http/Controllers/Manage/ReturnItemController';
+import Heading from '@/components/Heading.vue';
+import ReturnItemFields from '@/components/ReturnItemFields.vue';
+import { Button } from '@/components/ui/button';
+
+defineOptions({
+    layout: {
+        breadcrumbs: [
+            { title: 'Return items', href: ReturnItemController.index() },
+            { title: 'Edit return item', href: '#' },
+        ],
+    },
+});
+
+defineProps<{
+    item: App.Http.ReturnItemRow;
+}>();
+</script>
+
+<template>
+    <Head title="Edit return item" />
+
+    <div class="max-w-xl p-4">
+        <Heading :title="`Edit ${item.name}`" />
+
+        <Form
+            v-bind="ReturnItemController.update.form(item.id)"
+            class="space-y-6"
+            v-slot="{ errors, processing }"
+        >
+            <ReturnItemFields :item="item" :errors="errors" />
+
+            <Button
+                type="submit"
+                :disabled="processing"
+                data-test="save-return-item"
+            >
+                Save
+            </Button>
+        </Form>
+    </div>
+</template>

@@ -1,0 +1,21 @@
+<?php
+
+namespace Guixa\Stock\Application;
+
+use Guixa\Shared\Application\Actor;
+use Guixa\Stock\Domain\Error\ReturnItemNotFound;
+use Guixa\Stock\Domain\ReturnItemRepository;
+
+final class DeactivateReturnItem
+{
+    public function __construct(private readonly ReturnItemRepository $items) {}
+
+    public function __invoke(Actor $actor, string $id): void
+    {
+        $actor->assertManager();
+
+        $item = $this->items->get($id) ?? throw ReturnItemNotFound::withId($id);
+        $item->deactivate();
+        $this->items->add($item);
+    }
+}

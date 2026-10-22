@@ -1,6 +1,9 @@
 <?php
 
+use App\Models\User;
+use Guixa\Shared\Domain\Role;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 /*
@@ -93,4 +96,16 @@ function architectureClasses(string $namespace, bool $concreteOnly = true): arra
     }
 
     return $classes;
+}
+
+/** An account holding exactly the given roles. */
+function accountWith(Role ...$roles): User
+{
+    $user = User::factory()->create();
+
+    foreach ($roles as $role) {
+        DB::table('account_roles')->insert(['user_id' => $user->id, 'role' => $role->value]);
+    }
+
+    return $user;
 }

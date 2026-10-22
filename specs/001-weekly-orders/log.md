@@ -145,3 +145,16 @@ not a base class, so the Eloquent test keeps the Laravel parent. The `Applicatio
 `phpunit.xml` yet; the probe's in-memory test sits in `tests/Unit/Support`, and the task that adds the first real
 repository adds its suite.
 Why: the plan named `tests/Support/InMemory` but not the contract mechanism, and no real repository exists yet to prove it on.
+
+T24: `plan.md` (Stock) now says how the two entities are shaped and which errors they throw, and lists the
+`ListStockProducts` and `ListReturnItems` queries the manage pages need (they return inactive items too, by name).
+The edit pages find their item in that list, so no `GetStockProduct` was added; `GetReturnItem` stays T25's snapshot
+query for Ordering. Prices and amounts are typed in euros (`6.50` or `6,5`) and converted to cents by `App\Http\EuroAmount`
+in the form request, so the use cases still take integer cents; the pages receive them back as decimal strings through
+the `StockProductRow` / `ReturnItemRow` props (TypeScript types generated). Deactivation is the only state change (the plan
+lists no reactivation). The first real repositories add the `Application` and `Integration` suites to `phpunit.xml`,
+as T05 anticipated, and the manager sidebar gets "Stock" and "Return items" links because the role-area link
+(`/manage/cycles`) does not exist yet.
+Why: the plan did not say how entities validate on create and update, how money crosses the HTTP boundary, or how the
+pages are reached.
+

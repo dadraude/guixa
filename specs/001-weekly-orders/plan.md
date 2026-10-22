@@ -314,12 +314,17 @@ Domain
   non-empty note; sale < 0 with an orderId (R26–R28).
 - `available = Σ movements`; a movement that would make it negative is rejected (R27).
 - Ports: `StockProductRepository`, `ReturnItemRepository`, `StockMovementRepository` (append-only).
+- `StockProduct` and `ReturnItem` are mutable entities with a private constructor, `create` and `restore`; `change`
+  re-checks every rule, so create and update share them. Rule breaches throw `NameRequired`, `UnitRequired`,
+  `InvalidPrice`, `InvalidContainersPerUnit` (zero or not a valid quantity) and `InvalidReturnAmount`.
+  Only deactivation exists (no reactivation).
 
 Use cases
 | Use case | Actor | Covers |
 | --- | --- | --- |
 | `CreateStockProduct`, `UpdateStockProduct`, `DeactivateStockProduct` | manager | R25 |
 | `CreateReturnItem`, `UpdateReturnItem`, `DeactivateReturnItem` | manager | R25 |
+| `ListStockProducts`, `ListReturnItems` (inactive ones included, by name) | manager | R25 |
 | `RecordStockEntry` | manager | R26, S23 |
 | `RecordStockAdjustment` (optional cycle) | manager | R27, S23 |
 | `ListStock` (with available quantity) | manager | R28 |
@@ -418,7 +423,7 @@ role areas (R36a); the layout shows a switch between them.
 | `POST/DELETE …/pickups/{household}/stock-lines[/{stockProduct}]` | partial reload | `AddStockToPickup`, `RemoveStockFromPickup` |
 | `POST/DELETE …/pickups/{household}/return-lines[/{returnItem}]` | partial reload | `AddReturnToPickup`, `RemoveReturnFromPickup` |
 | `POST …/pickups/{household}/complete`, `…/not-collected` | redirect to pickups index | `CompletePickup`, `MarkPickupNotCollected` |
-| `/manage/stock…`, `/manage/return-items…` | `Manage/Stock/*`, `Manage/ReturnItems/*` | Stock CRUD, entries, adjustments |
+| `/manage/stock…`, `/manage/return-items…` | `Manage/Stock/{Index,Create,Edit}`, `Manage/ReturnItems/{Index,Create,Edit}` | Stock CRUD (T24); entries and adjustments (T25) |
 | `/manage/households…`, `/manage/producers…`, `/manage/accounts…` | `Manage/Households/*`, `Manage/Producers/*`, `Manage/Accounts/*` | Membership + Catalog |
 | `POST /manage/households/{household}/wallet/{top-ups,corrections}` | — | `RecordTopUp`, `RecordCorrection` |
 

@@ -9,6 +9,10 @@ use Guixa\Shared\Domain\Clock;
 use Guixa\Shared\Infrastructure\DatabaseActorResolver;
 use Guixa\Shared\Infrastructure\DatabaseTransactionRunner;
 use Guixa\Shared\Infrastructure\SystemClock;
+use Guixa\Stock\Domain\ReturnItemRepository;
+use Guixa\Stock\Domain\StockProductRepository;
+use Guixa\Stock\Infrastructure\Persistence\EloquentReturnItemRepository;
+use Guixa\Stock\Infrastructure\Persistence\EloquentStockProductRepository;
 use Illuminate\Foundation\DevCommands;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -25,6 +29,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(Clock::class, fn (): Clock => new SystemClock(config('guixa.timezone')));
         $this->app->bind(TransactionRunner::class, DatabaseTransactionRunner::class);
         $this->app->bind(ActorResolver::class, DatabaseActorResolver::class);
+        $this->app->bind(StockProductRepository::class, EloquentStockProductRepository::class);
+        $this->app->bind(ReturnItemRepository::class, EloquentReturnItemRepository::class);
     }
 
     /**

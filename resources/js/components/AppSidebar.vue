@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
-import { BookOpen, FolderGit2, LayoutGrid } from '@lucide/vue';
+import { BookOpen, FolderGit2, LayoutGrid, Package, Undo2 } from '@lucide/vue';
 import { computed } from 'vue';
+import ReturnItemController from '@/actions/App/Http/Controllers/Manage/ReturnItemController';
+import StockProductController from '@/actions/App/Http/Controllers/Manage/StockProductController';
 import AppLogo from '@/components/AppLogo.vue';
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
@@ -22,13 +24,29 @@ import type { NavItem } from '@/types';
 const page = usePage();
 const roleAreas = computed(() => page.props.roleAreas);
 
-const mainNavItems: NavItem[] = [
+const managerNavItems: NavItem[] = [
+    {
+        title: 'Stock',
+        href: StockProductController.index(),
+        icon: Package,
+    },
+    {
+        title: 'Return items',
+        href: ReturnItemController.index(),
+        icon: Undo2,
+    },
+];
+
+const mainNavItems = computed<NavItem[]>(() => [
     {
         title: 'Dashboard',
         href: dashboard(),
         icon: LayoutGrid,
     },
-];
+    ...(roleAreas.value.some((area) => area.role === 'manager')
+        ? managerNavItems
+        : []),
+]);
 
 const footerNavItems: NavItem[] = [
     {
