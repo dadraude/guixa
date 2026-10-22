@@ -129,6 +129,15 @@ where roles are stored before Membership exists.
 
 ## 2026-10-22 · Deviation
 
+T21: `plan.md` did not say the allocator's input type, how `step` is passed, or what it does with an empty claim list or
+off-step quantities. `ProportionalAllocator` takes `ProportionalClaim` value objects (`Ordering\Domain\ValueObject`) (household id, ordered, createdAt,
+line id) and `step` as a `Quantity` (1.000 or 0.001); it throws `NobodyOrderedProduct` for no claims or a zero ordered
+total, and `InvalidArgumentException` for a target or claim that is not a multiple of the step (a caller bug, since
+non-variable products carry whole units). It works in steps and splits `target × ordered / Σ ordered` as
+`floor(T/S)·o + floor((T mod S)·o/S)` (S = Σ ordered), so no intermediate product exceeds (Σ ordered)².
+`plan.md` (Ordering · Domain) now says so.
+Why: the plan left these gaps for the code to fill.
+
 T05: `plan.md` (Testing) now says where the contract tests live and how they are shared: one
 `<Noun>RepositoryContract` trait per port in `tests/Support/Contracts`, used by the in-memory test (PHPUnit
 `TestCase`) and by the Eloquent test in `tests/Integration` (`Tests\TestCase` with `RefreshDatabase`); a trait,
