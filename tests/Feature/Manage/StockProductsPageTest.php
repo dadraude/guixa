@@ -2,6 +2,7 @@
 
 use Guixa\Shared\Domain\Role;
 use Guixa\Stock\Infrastructure\Persistence\StockProductModel;
+use Illuminate\Support\Facades\DB;
 use Inertia\Testing\AssertableInertia as Assert;
 
 function honey(array $overrides = []): StockProductModel
@@ -150,4 +151,73 @@ it('shows a malformed containers per unit under its field', function () {
         ->assertSessionHasErrors('containers_per_unit');
 
     expect(StockProductModel::query()->count())->toBe(0);
+});
+
+it('keeps the stock movement pages to managers (R26, R27)', function (string $method, string $uri) {
+    $product = honey();
+    $uri = str_replace('{id}', $product->id, $uri);
+
+    $this->{$method}($uri)->assertRedirect(route('login'));
+    $this->actingAs(accountWith(Role::Member, Role::Producer))->{$method}($uri)->assertForbidden();
+})->with([
+    ['get', '/manage/stock/{id}/movements'],
+    ['post', '/manage/stock/{id}/entries'],
+    ['post', '/manage/stock/{id}/adjustments'],
+]);
+
+it('lists the available quantity next to each stock product (R28)', function () {
+    $product = honey();
+    $manager = accountWith(Role::Manager);
+
+    $this->actingAs($manager)->post("/manage/stock/{$product->id}/entries", ['quantity' => '10']);
+
+    $this->actingAs($manager)->get('/manage/stock')
+        ->assertInertia(fn (Assert $page) => $page->where('products.0.available', '10.000'));
+});
+
+it('records an entry and shows the new available quantity (R26)', function () {
+    $product = honey();
+    $manager = accountWith(Role::Manager);
+
+    $this->actingAs($manager)
+        ->post("/manage/stock/{$product->id}/entries", ['quantity' => '2,5', 'note' => 'bought from X'])
+        ->assertRedirect("/manage/stock/{$product->id}/movements");
+
+    $this->actingAs($manager)->get("/manage/stock/{$product->id}/movements")
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('Manage/Stock/Movements')
+            ->where('product.id', $product->id)
+            ->where('product.available', '2.500'));
+    expect(DB::table('stock_movements')->where('note', 'bought from X')->value('recorded_by'))->toBe($manager->id);
+});
+
+it('records an adjustment and rejects one below zero with the domain error (S23, R27)', function () {
+    $product = honey();
+    $manager = accountWith(Role::Manager);
+    $this->actingAs($manager)->post("/manage/stock/{$product->id}/entries", ['quantity' => '10']);
+
+    $this->actingAs($manager)
+        ->post("/manage/stock/{$product->id}/adjustments", ['quantity' => '-1', 'note' => 'broken jar'])
+        ->assertRedirect("/manage/stock/{$product->id}/movements");
+    $this->actingAs($manager)
+        ->from("/manage/stock/{$product->id}/movements")
+        ->post("/manage/stock/{$product->id}/adjustments", ['quantity' => '-10', 'note' => 'inventory count'])
+        ->assertRedirect("/manage/stock/{$product->id}/movements")
+        ->assertSessionHasErrors('domain');
+
+    expect(DB::table('stock_movements')->count())->toBe(2);
+});
+
+it('rejects malformed quantities and a missing adjustment note before the use case', function () {
+    $product = honey();
+    $manager = accountWith(Role::Manager);
+
+    $this->actingAs($manager)->post("/manage/stock/{$product->id}/entries", ['quantity' => '-1'])->assertSessionHasErrors('quantity');
+    $this->actingAs($manager)->post("/manage/stock/{$product->id}/adjustments", ['quantity' => 'abc', 'note' => 'x'])->assertSessionHasErrors('quantity');
+    $this->actingAs($manager)->post("/manage/stock/{$product->id}/adjustments", ['quantity' => '-1'])->assertSessionHasErrors('note');
+});
+
+it('answers 404 to the movements of an unknown stock product', function () {
+    $this->actingAs(accountWith(Role::Manager))->get('/manage/stock/'.fake()->uuid().'/movements')->assertNotFound();
 });

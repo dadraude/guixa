@@ -31,6 +31,16 @@ readonly role: Guixa.Shared.Domain.Role,
 readonly label: string,
 readonly href: string,
 };
+export type StockLevelRow = {
+readonly id: string,
+readonly name: string,
+readonly unit: string,
+readonly price: string,
+readonly variable: boolean,
+readonly containersPerUnit: string | null,
+readonly active: boolean,
+readonly available: string,
+};
 export type StockProductRow = {
 readonly id: string,
 readonly name: string,
@@ -46,6 +56,11 @@ declare namespace Guixa {
 namespace Shared {
 namespace Domain {
 export type Role = 'manager' | 'member' | 'producer';
+}
+}
+namespace Stock {
+namespace Domain {
+export type MovementType = 'entry' | 'adjustment' | 'sale';
 }
 }
 }
