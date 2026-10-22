@@ -126,3 +126,13 @@ components exempt from A9, so `NavRoleAreas.vue` is added to the exception list 
 (`AppSidebar.vue` was already there).
 Why: the plan did not say which layer holds `Actor`, how the 422 reaches Inertia, the type of account ids, or
 where roles are stored before Membership exists.
+
+## 2026-10-22 · Deviation
+
+T05: `plan.md` (Testing) now says where the contract tests live and how they are shared: one
+`<Noun>RepositoryContract` trait per port in `tests/Support/Contracts`, used by the in-memory test (PHPUnit
+`TestCase`) and by the Eloquent test in `tests/Integration` (`Tests\TestCase` with `RefreshDatabase`); a trait,
+not a base class, so the Eloquent test keeps the Laravel parent. The `Application` and `Integration` test suites do not exist in
+`phpunit.xml` yet; the probe's in-memory test sits in `tests/Unit/Support`, and the task that adds the first real
+repository adds its suite.
+Why: the plan named `tests/Support/InMemory` but not the contract mechanism, and no real repository exists yet to prove it on.
