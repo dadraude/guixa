@@ -193,3 +193,19 @@ T34: the plan did not name how `CreateFirstManager` knows a manager exists or bu
 check and the write run in one transaction. `guixa:create-manager` is `App\Console\Commands\CreateManager` and prints the
 domain error and fails when a manager already exists or the email is taken.
 Why: the use case needs both to enforce "rejected once any manager exists" (R36a, D17).
+
+T25: `plan.md` had no way to hold a negative quantity, since `Quantity` rejects negatives. Added a Stock value object `SignedQuantity` for
+movements, and a `StockLedger` domain service that checks "never below 0" under the `stock_products` row lock (new port method
+`StockMovementRepository::availableForUpdate`, plus `forProduct`, `available` and `availableByProduct`). `plan.md` (Stock) now says so.
+Why: R27 and R28 need signed movements and one place that enforces the floor for entries, adjustments and sales alike.
+
+T25: `GetStockOffer` returns the same `StockLevelData` as `ListStock`, with an `active` flag, and does not reject a deactivated product; whether
+a deactivated product can be added to a pickup is left to T28 (S55 only says an existing line survives deactivation). `SellStock` takes the
+`Actor` to record who sold and does no role check, since only Ordering calls it. `plan.md` (Stock use cases) now says so.
+Why: the spec is silent on adding a deactivated product, so the query reports the fact and does not decide.
+
+T25: `plan.md` named no route or page for entries and adjustments. Added `GET /manage/stock/{stockProduct}/movements` (`Manage/Stock/Movements`,
+with the two forms) and `POST …/entries`, `POST …/adjustments`; the stock index now shows the available quantity (`StockLevelRow`).
+`stock_movements.cycle_id` and `order_id` have no foreign key until the Ordering tables exist. `plan.md` (HTTP & pages) now says so.
+The adjustment form records no cycle until cycles exist (the controller passes none; `RecordStockAdjustment` already accepts one); T11 adds the cycle picker.
+Why: R26 and R27 are manager actions, so they need a way to be performed.
