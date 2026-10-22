@@ -137,3 +137,11 @@ non-variable products carry whole units). It works in steps and splits `target �
 `floor(T/S)·o + floor((T mod S)·o/S)` (S = Σ ordered), so no intermediate product exceeds (Σ ordered)².
 `plan.md` (Ordering · Domain) now says so.
 Why: the plan left these gaps for the code to fill.
+
+T05: `plan.md` (Testing) now says where the contract tests live and how they are shared: one
+`<Noun>RepositoryContract` trait per port in `tests/Support/Contracts`, used by the in-memory test (PHPUnit
+`TestCase`) and by the Eloquent test in `tests/Integration` (`Tests\TestCase` with `RefreshDatabase`); a trait,
+not a base class, so the Eloquent test keeps the Laravel parent. The `Application` and `Integration` test suites do not exist in
+`phpunit.xml` yet; the probe's in-memory test sits in `tests/Unit/Support`, and the task that adds the first real
+repository adds its suite.
+Why: the plan named `tests/Support/InMemory` but not the contract mechanism, and no real repository exists yet to prove it on.

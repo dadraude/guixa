@@ -445,7 +445,10 @@ Client-side logic (Vitest): order running total, pickup resulting balance, both 
 | Frontend | Display totals, A9 via Oxlint | `resources/js/**/*.spec.ts` |
 
 In-memory repositories live in `tests/Support/InMemory` and must pass the same contract tests
-as the Eloquent ones, so the Application tests stay trustworthy.
+as the Eloquent ones, so the Application tests stay trustworthy. Each port has one
+`<Noun>RepositoryContract` trait in `tests/Support/Contracts`; the in-memory test (PHPUnit `TestCase`) and the
+Eloquent test (`Tests\TestCase` with `RefreshDatabase`) both use it and only implement `repository()`. In-memory repositories extend
+`InMemoryRepository` (id-keyed store, `nextId()` returning UUID v7). `ProbeNoteRepository` shows the shape.
 
 ## Decisions taken in this plan
 
