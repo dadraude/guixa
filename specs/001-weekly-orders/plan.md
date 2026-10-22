@@ -73,6 +73,7 @@ Domain
 - `Account` (id, name, email, roles, `?householdId`, `?producerId`, `?activatedAt`, `?deactivatedAt`).
   - A member belongs to at most one household (R35); moving relinks the same account; unlinking keeps it
     active without a household.
+  - `inviteManager` (the first manager: no household, cannot log in until the invitation is accepted, R36a); `AccountRepository::hasManager()` lets `CreateFirstManager` refuse once any manager exists.
   - `grantManager` / `removeManager`: removing it from the last manager throws `LastManager` (R36a).
   - `deactivate`: unlinks from the household; the last active manager cannot be deactivated (R36b).
   - Login requires `activatedAt`, no `deactivatedAt`, and at least one effective role: a producer role counts

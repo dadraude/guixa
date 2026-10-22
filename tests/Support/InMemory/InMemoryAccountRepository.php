@@ -5,6 +5,7 @@ namespace Tests\Support\InMemory;
 use Guixa\Membership\Domain\Account;
 use Guixa\Membership\Domain\AccountRepository;
 use Guixa\Membership\Domain\ValueObject\Email;
+use Guixa\Shared\Domain\Role;
 
 /** @extends InMemoryRepository<Account> */
 final class InMemoryAccountRepository extends InMemoryRepository implements AccountRepository
@@ -24,6 +25,17 @@ final class InMemoryAccountRepository extends InMemoryRepository implements Acco
     {
         foreach ($this->all() as $account) {
             if ($account->email->value === $email->value) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function hasManager(): bool
+    {
+        foreach ($this->all() as $account) {
+            if (in_array(Role::Manager, $account->roles, true)) {
                 return true;
             }
         }

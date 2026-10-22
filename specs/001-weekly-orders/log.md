@@ -188,6 +188,12 @@ Why: two naming schemes for the same kind of class.
 
 ## 2026-10-22 · Deviation
 
+T34: the plan did not name how `CreateFirstManager` knows a manager exists or builds the account. Added `Account::inviteManager` and
+`AccountRepository::hasManager()` (in-memory, database and contract test); `plan.md` (Membership, Domain) now says so. The
+check and the write run in one transaction. `guixa:create-manager` is `App\Console\Commands\CreateManager` and prints the
+domain error and fails when a manager already exists or the email is taken.
+Why: the use case needs both to enforce "rejected once any manager exists" (R36a, D17).
+
 T25: `plan.md` had no way to hold a negative quantity, since `Quantity` rejects negatives. Added a Stock value object `SignedQuantity` for
 movements, and a `StockLedger` domain service that checks "never below 0" under the `stock_products` row lock (new port method
 `StockMovementRepository::availableForUpdate`, plus `forProduct`, `available` and `availableByProduct`). `plan.md` (Stock) now says so.
