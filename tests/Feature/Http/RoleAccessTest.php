@@ -17,6 +17,12 @@ function userWithRoles(Role ...$roles): User
     $user = User::factory()->create();
 
     foreach ($roles as $role) {
+        if ($role === Role::Member) {
+            linkToNewHousehold($user);
+
+            continue;
+        }
+
         DB::table('account_roles')->insert(['user_id' => $user->id, 'role' => $role->value]);
     }
 
@@ -112,7 +118,7 @@ it('resolves the actor with UUID account, household and producer ids', function 
     $householdId = (string) Str::uuid7();
     DB::table('households')->insert(['id' => $householdId, 'name' => 'Household H', 'created_at' => now(), 'updated_at' => now()]);
     $producerId = (string) Str::uuid7();
-    $user = userWithRoles(Role::Member, Role::Producer);
+    $user = userWithRoles(Role::Producer);
     DB::table('users')->where('id', $user->id)->update(['household_id' => $householdId, 'producer_id' => $producerId]);
 
     $actor = app(ActorResolver::class)->forAccount($user->id);

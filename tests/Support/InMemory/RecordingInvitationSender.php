@@ -16,6 +16,17 @@ final class RecordingInvitationSender implements InvitationSender
         $this->sent[] = ['email' => $account->email->value, 'token' => $token];
     }
 
+    public function tokenFor(string $email): string
+    {
+        foreach (array_reverse($this->sent) as $sent) {
+            if ($sent['email'] === $email) {
+                return $sent['token'];
+            }
+        }
+
+        throw new \LogicException("No invitation was sent to {$email}.");
+    }
+
     public function lastToken(): string
     {
         return $this->sent[array_key_last($this->sent)]['token'];

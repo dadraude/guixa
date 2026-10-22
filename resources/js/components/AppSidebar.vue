@@ -4,11 +4,13 @@ import {
     BookOpen,
     FolderGit2,
     Home,
+    UserCog,
     LayoutGrid,
     Package,
     Undo2,
 } from '@lucide/vue';
 import { computed } from 'vue';
+import AccountController from '@/actions/App/Http/Controllers/Manage/AccountController';
 import HouseholdController from '@/actions/App/Http/Controllers/Manage/HouseholdController';
 import ReturnItemController from '@/actions/App/Http/Controllers/Manage/ReturnItemController';
 import StockProductController from '@/actions/App/Http/Controllers/Manage/StockProductController';
@@ -37,6 +39,11 @@ const managerNavItems: NavItem[] = [
         title: 'Households',
         href: HouseholdController.index(),
         icon: Home,
+    },
+    {
+        title: 'Accounts',
+        href: AccountController.index(),
+        icon: UserCog,
     },
     {
         title: 'Stock',

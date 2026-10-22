@@ -58,10 +58,10 @@ only call the other context's use cases (rule A4). Every write that spans contex
   `SystemClock` (Infrastructure, reads `config('guixa.timezone')` ← `COOP_TIMEZONE`) and `FrozenClock` (`tests/Support`,
   any timezone). `LocalTime::at(date, HH:MM, timezone)` resolves a local time to one instant: a time that does
   not exist moves forward by the gap, a repeated one takes its first occurrence (Time, S38).
-- **`Actor`** (`Shared\Application`; `Role` and `NotAllowed` live in `Shared\Domain`) `final readonly`: `accountId` (UUID v7 string), `roles` (set of `Manager|Member|Producer`), `?householdId`,
+- **`Actor`** (`Shared\Application`; `Role` and `NotAllowed` live in `Shared\Domain`) `final readonly`: `accountId` (UUID v7 string), `roles` (set of `Manager|Member|Producer`; `Member` is derived: present exactly when `householdId` is set, never stored), `?householdId`,
   `?producerId`. Built by an HTTP middleware from the authenticated account and passed to every use case.
   Authorization is checked inside use cases (`assertManager()`, `assertMemberOf($householdId)`…),
-  so scenarios test it without HTTP (R36a). A failed check throws `Shared\Domain\Error\NotAllowed`.
+  so scenarios test it without HTTP (R36a). `assertMemberOf($householdId)` checks that the account is linked to that household (R35). A failed check throws `Shared\Domain\Error\NotAllowed`.
 - **`TransactionRunner`** port (`Shared\Application`): `run(callable)` and `afterCommit(callable)`. DB adapter
   wraps `DB::transaction` and `DB::afterCommit`. Emails (sent orders, invitations) go out after commit, so a
   rolled-back write sends nothing.
@@ -74,9 +74,14 @@ Domain
   - A member belongs to at most one household (R35); moving relinks the same account; unlinking keeps it
     active without a household.
   - `grantManager` / `removeManager`: removing it from the last manager throws `LastManager` (R36a).
-  - `deactivate`: unlinks from the household; the last active manager cannot be deactivated (R36b).
-  - Login requires `activatedAt`, no `deactivatedAt`, and at least one effective role: a producer role counts
-    only while its producer is active (R3a).
+  - `deactivate`: unlinks from the household; the last active manager cannot be deactivated (R36b). A deactivated
+    account cannot be linked to a household until it is reactivated (`AccountDeactivated`); reactivating leaves it
+    without a household.
+  - "Last manager" counts active managers (holding the role, not deactivated): removing the role from the only
+    active manager throws `LastManager`, deactivating the only active manager throws `LastActiveManager`.
+  - Login requires `activatedAt`, no `deactivatedAt`, and at least one effective role: a household link (a member),
+    the manager role, or a producer role, which counts only while its producer is active (R3a). `account_roles` holds
+    only `manager` and `producer`; a migration deleted the stored `member` rows.
 - `Invitation` (account id, SHA-256 hash of the token, `sentAt`): one per account, expires 7 days after it is
   sent (`now > sentAt + 7 days` is expired; 7 days means 168 elapsed hours, so the expiry is the same across a daylight-saving change and whatever timezone `sentAt` carries); issuing another replaces it, so resending or changing the email
   invalidates the previous link (R34). The plain token only exists in the email.
@@ -91,7 +96,7 @@ Use cases
 | `AddMember` → sends invitation (an inactive household is reactivated) | manager | R33, R34, R35a, S25 |
 | `ResendInvitation`, `ChangeInvitationEmail` | manager | R34, S25 |
 | `AcceptInvitation` (sets password, activates) | invitee | R34, S25 |
-| `MoveMember` (an inactive target household is reactivated), `UnlinkMember` | manager | R35, R35a, S43 |
+| `MoveMember` (an inactive target household is reactivated; it also links an unlinked account; moving to the current household does nothing), `UnlinkMember` | manager | R35, R35a, S43 |
 | `DeactivateHousehold` (returns the warning first), `ReactivateHousehold` | manager | R35a, S58 |
 | `ListHouseholdsToSettle` | manager | R35a, S43, S58 |
 | `ListHouseholds`, `GetHousehold` (members with pending invitation and its expiry) | manager | R33, R34 (admin pages) |
@@ -100,13 +105,14 @@ Use cases
 | `InviteProducerAccount` (one per producer) | manager | R36, S57 |
 | `GrantManagerRole`, `RemoveManagerRole` | manager | R36a, S44 |
 | `DeactivateAccount`, `ReactivateAccount` | manager | R36b, S59 |
+| `ListAccounts` (roles, household name, active, invitation pending) | manager | R36a, R36b (accounts admin page) |
 | `SuspendProducerRole`, `RestoreProducerRole` | — (called by Catalog) | R3a |
 | `GetProducerAccountEmail` | — (called by Ordering) | R12a |
 | `GetHouseholds` (name, active) | — (called by Ordering) | R13, R16, R19 |
 | `CreateFirstManager` (rejected once any manager exists) | — (installation command) | R36a |
 
 A household is deactivated automatically when `MoveMember`, `UnlinkMember` or `DeactivateAccount` leaves it
-without members (R35a). Deactivating it unlinks its members; its orders and pickups stay in Ordering.
+without members (R35a), through the shared `DeactivateEmptyHousehold` service. Deactivating it unlinks its members; its orders and pickups stay in Ordering.
 
 Infrastructure: accounts are the `users` table through `App\Models\User` (A6 exception).
 Households live in `households`; invitations in `invitations` (one row per account, `token_hash`, `sent_at`);
@@ -114,6 +120,10 @@ Households live in `households`; invitations in `invitations` (one row per accou
 `InvitationSender` emails the link `/invitations/{token}` (D15). Login (Fortify `authenticateUsing`) needs the right
 password, `activated_at` set and `deactivated_at` empty; accepting an invitation also marks the email verified.
 An account created by an invitation holds a random password nobody knows until the invitee sets theirs.
+Passkey login does not go through `authenticateUsing`, so `Passkeys::authorizeLoginUsing` asks `CanLogIn` too, and the
+`LogOutDeactivatedAccount` web middleware ends the session an account already had when it is deactivated (R36b).
+`AccountRepository::lockManagers()` locks every manager row in id order (`SELECT … FOR UPDATE`) and `hasOtherActiveManager()`
+reads them afterwards, in a new statement, so a waiting transaction sees the other one's commit.
 
 ## Catalog
 
@@ -434,6 +444,7 @@ role areas (R36a); the layout shows a switch between them.
 | `POST/DELETE …/pickups/{household}/return-lines[/{returnItem}]` | partial reload | `AddReturnToPickup`, `RemoveReturnFromPickup` |
 | `POST …/pickups/{household}/complete`, `…/not-collected` | redirect to pickups index | `CompletePickup`, `MarkPickupNotCollected` |
 | `/manage/stock…`, `/manage/return-items…` | `Manage/Stock/{Index,Create,Edit}`, `Manage/ReturnItems/{Index,Create,Edit}` | Stock CRUD (T24); entries and adjustments (T25) |
+| `PUT/DELETE /manage/accounts/{account}/household`, `PUT/DELETE …/manager-role`, `POST/DELETE …/deactivation` | redirect back | `MoveMember`/`UnlinkMember`, `GrantManagerRole`/`RemoveManagerRole`, `DeactivateAccount`/`ReactivateAccount` |
 | `/manage/households…`, `/manage/producers…`, `/manage/accounts…` | `Manage/Households/*`, `Manage/Producers/*`, `Manage/Accounts/*` | Membership + Catalog |
 | `POST /manage/households/{household}/wallet/{top-ups,corrections}` | — | `RecordTopUp`, `RecordCorrection` |
 

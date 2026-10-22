@@ -19,7 +19,13 @@ final readonly class Actor
         public ?string $householdId = null,
         public ?string $producerId = null,
     ) {
-        $this->roles = array_values(array_unique($roles, SORT_REGULAR));
+        $stored = array_filter($roles, fn (Role $role) => $role !== Role::Member);
+
+        // Membership comes from the household link, not from a role someone was given (R35).
+        $this->roles = array_values(array_unique(
+            $householdId === null ? $stored : [...$stored, Role::Member],
+            SORT_REGULAR,
+        ));
     }
 
     public function hasRole(Role $role): bool

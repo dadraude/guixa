@@ -50,7 +50,7 @@ final class DatabaseAccountRepositoryTest extends TestCase
         $repository->save($account);
 
         $this->assertDatabaseHas('users', ['id' => $account->id, 'activated_at' => null, 'email_verified_at' => null]);
-        $this->assertDatabaseHas('account_roles', ['user_id' => $account->id, 'role' => 'member']);
+        $this->assertDatabaseMissing('account_roles', ['user_id' => $account->id]);
     }
 
     public function test_saving_an_active_account_keeps_its_email_verification_time(): void

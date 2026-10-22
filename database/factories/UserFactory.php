@@ -3,7 +3,9 @@
 namespace Database\Factories;
 
 use App\Models\User;
+use Guixa\Shared\Domain\Role;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
@@ -54,6 +56,15 @@ class UserFactory extends Factory
             'email_verified_at' => null,
             'activated_at' => null,
         ]);
+    }
+
+    /** An account that can log in: with no household and no role of its own it would have nothing to do (R35). */
+    public function manager(): static
+    {
+        return $this->afterCreating(fn (User $user) => DB::table('account_roles')->insert([
+            'user_id' => $user->id,
+            'role' => Role::Manager->value,
+        ]));
     }
 
     /**

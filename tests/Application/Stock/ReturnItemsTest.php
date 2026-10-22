@@ -67,7 +67,7 @@ it('fails on an unknown return item', function () {
 });
 
 it('only lets a manager manage return items (R25, R36a)', function (Role $role) {
-    $actor = new Actor('other-account', [$role]);
+    $actor = new Actor('other-account', [$role], $role === Role::Member ? 'h1' : null);
     $id = ($this->create)($this->manager, 'Glass jar', 50);
 
     expect(fn () => ($this->create)($actor, 'Crate', 100))->toThrow(NotAllowed::class);

@@ -1,9 +1,13 @@
 <?php
 
 use App\Http\Controllers\AcceptInvitationController;
+use App\Http\Controllers\Manage\AccountController;
+use App\Http\Controllers\Manage\AccountDeactivationController;
+use App\Http\Controllers\Manage\AccountHouseholdController;
 use App\Http\Controllers\Manage\HouseholdController;
 use App\Http\Controllers\Manage\HouseholdMemberController;
 use App\Http\Controllers\Manage\InvitationController;
+use App\Http\Controllers\Manage\ManagerRoleController;
 use App\Http\Controllers\Manage\ReturnItemController;
 use App\Http\Controllers\Manage\StockProductController;
 use Illuminate\Support\Facades\Route;
@@ -40,6 +44,26 @@ Route::middleware(['auth', 'verified', 'role:manager'])->prefix('manage')->name(
     Route::post('households/{household}/members', [HouseholdMemberController::class, 'store'])
         ->whereUuid('household')
         ->name('households.members.store');
+
+    Route::get('accounts', [AccountController::class, 'index'])->name('accounts.index');
+    Route::put('accounts/{account}/household', [AccountHouseholdController::class, 'update'])
+        ->whereUuid('account')
+        ->name('accounts.household.update');
+    Route::delete('accounts/{account}/household', [AccountHouseholdController::class, 'destroy'])
+        ->whereUuid('account')
+        ->name('accounts.household.destroy');
+    Route::put('accounts/{account}/manager-role', [ManagerRoleController::class, 'update'])
+        ->whereUuid('account')
+        ->name('accounts.manager-role.update');
+    Route::delete('accounts/{account}/manager-role', [ManagerRoleController::class, 'destroy'])
+        ->whereUuid('account')
+        ->name('accounts.manager-role.destroy');
+    Route::post('accounts/{account}/deactivation', [AccountDeactivationController::class, 'store'])
+        ->whereUuid('account')
+        ->name('accounts.deactivation.store');
+    Route::delete('accounts/{account}/deactivation', [AccountDeactivationController::class, 'destroy'])
+        ->whereUuid('account')
+        ->name('accounts.deactivation.destroy');
 
     Route::post('accounts/{account}/invitation', [InvitationController::class, 'resend'])
         ->whereUuid('account')

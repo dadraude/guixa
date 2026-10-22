@@ -111,7 +111,7 @@ it('lists stock products by name', function () {
 });
 
 it('only lets a manager manage stock products (R25, R36a)', function (Role $role) {
-    $actor = new Actor('other-account', [$role]);
+    $actor = new Actor('other-account', [$role], $role === Role::Member ? 'h1' : null);
     $id = ($this->create)($this->manager, 'Honey', 'jar', 650, false, null);
 
     expect(fn () => ($this->create)($actor, 'Oil', 'bottle', 900, false, null))->toThrow(NotAllowed::class);

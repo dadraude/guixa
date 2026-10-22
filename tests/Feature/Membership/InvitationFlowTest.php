@@ -114,7 +114,7 @@ it('requires a confirmed password to accept the invitation', function () {
 });
 
 it('still lets accounts without an invitation log in as before', function () {
-    $user = User::factory()->create();
+    $user = User::factory()->manager()->create();
 
     $this->post(route('login.store'), ['email' => $user->email, 'password' => 'password']);
 
@@ -122,7 +122,7 @@ it('still lets accounts without an invitation log in as before', function () {
 });
 
 it('logs in an account whose stored email has mixed case', function () {
-    $user = User::factory()->create(['email' => 'Anna@Example.org']);
+    $user = User::factory()->manager()->create(['email' => 'Anna@Example.org']);
 
     $this->post(route('login.store'), ['email' => 'anna@example.org', 'password' => 'password']);
 

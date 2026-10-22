@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Actions\Fortify\AuthenticateAccount;
 use App\Actions\Fortify\ResetUserPassword;
+use Guixa\Membership\Application\CanLogIn;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
@@ -13,6 +14,8 @@ use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
 use Laravel\Fortify\Fortify;
+use Laravel\Passkeys\Contracts\PasskeyUser;
+use Laravel\Passkeys\Passkeys;
 
 class FortifyServiceProvider extends ServiceProvider
 {
@@ -41,6 +44,11 @@ class FortifyServiceProvider extends ServiceProvider
     {
         Fortify::resetUserPasswordsUsing(ResetUserPassword::class);
         Fortify::authenticateUsing(app(AuthenticateAccount::class));
+
+        // Passkey login skips `authenticateUsing`, so it asks the same question (R34, R36b).
+        Passkeys::authorizeLoginUsing(
+            fn (Request $request, PasskeyUser $user) => app(CanLogIn::class)((string) $user->getAuthIdentifier()),
+        );
     }
 
     /**

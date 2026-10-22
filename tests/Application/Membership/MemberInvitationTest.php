@@ -9,7 +9,6 @@ use Guixa\Membership\Domain\Error\InvitationExpired;
 use Guixa\Membership\Domain\Error\InvitationNotValid;
 use Guixa\Membership\Domain\Household;
 use Guixa\Shared\Domain\Error\NotAllowed;
-use Guixa\Shared\Domain\Role;
 use Tests\Support\Membership\MembershipWorld;
 
 beforeEach(function () {
@@ -35,7 +34,7 @@ it('creates a household and links the invited person as a member who cannot log 
     expect($household->name)->toBe('Household H')
         ->and($household->isActive())->toBeTrue()
         ->and($account->householdId)->toBe($householdId)
-        ->and($account->roles)->toBe([Role::Member])
+        ->and($account->roles)->toBe([])
         ->and($account->hasAcceptedInvitation())->toBeFalse();
 });
 

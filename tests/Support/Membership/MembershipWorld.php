@@ -7,11 +7,21 @@ use Guixa\Membership\Application\AddMember;
 use Guixa\Membership\Application\CanLogIn;
 use Guixa\Membership\Application\ChangeInvitationEmail;
 use Guixa\Membership\Application\CreateHousehold;
+use Guixa\Membership\Application\DeactivateAccount;
+use Guixa\Membership\Application\DeactivateEmptyHousehold;
 use Guixa\Membership\Application\GetHousehold;
+use Guixa\Membership\Application\GrantManagerRole;
+use Guixa\Membership\Application\ListAccounts;
 use Guixa\Membership\Application\ListHouseholds;
+use Guixa\Membership\Application\MoveMember;
+use Guixa\Membership\Application\ReactivateAccount;
+use Guixa\Membership\Application\RemoveManagerRole;
 use Guixa\Membership\Application\RenameHousehold;
 use Guixa\Membership\Application\ResendInvitation;
 use Guixa\Membership\Application\SendInvitation;
+use Guixa\Membership\Application\UnlinkMember;
+use Guixa\Membership\Domain\Account;
+use Guixa\Membership\Domain\ValueObject\Email;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Role;
 use Tests\Support\FrozenClock;
@@ -57,6 +67,20 @@ final class MembershipWorld
 
     public readonly GetHousehold $getHousehold;
 
+    public readonly MoveMember $moveMember;
+
+    public readonly UnlinkMember $unlinkMember;
+
+    public readonly GrantManagerRole $grantManagerRole;
+
+    public readonly RemoveManagerRole $removeManagerRole;
+
+    public readonly DeactivateAccount $deactivateAccount;
+
+    public readonly ReactivateAccount $reactivateAccount;
+
+    public readonly ListAccounts $listAccounts;
+
     public readonly Actor $manager;
 
     public readonly Actor $member;
@@ -89,7 +113,35 @@ final class MembershipWorld
         $this->listHouseholds = new ListHouseholds($this->households, $this->accounts);
         $this->getHousehold = new GetHousehold($this->households, $this->accounts, $this->invitations, $this->clock);
 
+        $deactivateEmptyHousehold = new DeactivateEmptyHousehold($this->households, $this->accounts, $this->clock);
+
+        $this->moveMember = new MoveMember($this->households, $this->accounts, $deactivateEmptyHousehold, $this->transactions);
+        $this->unlinkMember = new UnlinkMember($this->accounts, $deactivateEmptyHousehold, $this->transactions);
+        $this->grantManagerRole = new GrantManagerRole($this->accounts);
+        $this->removeManagerRole = new RemoveManagerRole($this->accounts, $this->transactions);
+        $this->deactivateAccount = new DeactivateAccount($this->accounts, $deactivateEmptyHousehold, $this->transactions, $this->clock);
+        $this->reactivateAccount = new ReactivateAccount($this->accounts);
+        $this->listAccounts = new ListAccounts($this->accounts, $this->households);
+
         $this->manager = new Actor('00000000-0000-7000-8000-00000000000a', [Role::Manager]);
         $this->member = new Actor('00000000-0000-7000-8000-00000000000b', [Role::Member], '00000000-0000-7000-8000-00000000000c');
+    }
+
+    /** An active account that holds only the manager role, as the installation command would leave it. */
+    public function addManager(string $name, string $email): string
+    {
+        $account = Account::restore(
+            $this->accounts->nextId(),
+            $name,
+            Email::from($email),
+            [Role::Manager],
+            null,
+            null,
+            $this->clock->now(),
+            null,
+        );
+        $this->accounts->save($account);
+
+        return $account->id;
     }
 }

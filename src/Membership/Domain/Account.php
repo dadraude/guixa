@@ -3,6 +3,7 @@
 namespace Guixa\Membership\Domain;
 
 use DateTimeImmutable;
+use Guixa\Membership\Domain\Error\AccountDeactivated;
 use Guixa\Membership\Domain\Error\InvitationAlreadyAccepted;
 use Guixa\Membership\Domain\ValueObject\Email;
 use Guixa\Shared\Domain\Role;
@@ -16,17 +17,17 @@ final class Account
         public readonly string $id,
         public readonly string $name,
         public private(set) Email $email,
-        public readonly array $roles,
-        public readonly ?string $householdId,
+        public private(set) array $roles,
+        public private(set) ?string $householdId,
         public readonly ?string $producerId,
         public private(set) ?DateTimeImmutable $activatedAt,
-        public readonly ?DateTimeImmutable $deactivatedAt,
+        public private(set) ?DateTimeImmutable $deactivatedAt,
     ) {}
 
-    /** A person added to a household: a member who cannot log in until the invitation is accepted (R34). */
+    /** A person added to a household, so a member of it; they cannot log in until the invitation is accepted (R34). */
     public static function inviteMember(string $id, string $name, Email $email, string $householdId): self
     {
-        return new self($id, trim($name), $email, [Role::Member], $householdId, null, null, null);
+        return new self($id, trim($name), $email, [], $householdId, null, null, null);
     }
 
     /**
@@ -50,10 +51,77 @@ final class Account
         return $this->activatedAt !== null;
     }
 
-    /** Login needs an accepted invitation and an account that is not deactivated (R34, R36b). */
+    /** Login needs an accepted invitation, an account that is not deactivated and something to do (R34, R36b, R35). */
     public function canLogIn(): bool
     {
-        return $this->hasAcceptedInvitation() && $this->deactivatedAt === null;
+        return $this->hasAcceptedInvitation() && $this->isActive() && $this->hasEffectiveRole();
+    }
+
+    /** A household link makes a member; otherwise the account needs a stored role (manager, producer). */
+    private function hasEffectiveRole(): bool
+    {
+        return $this->householdId !== null || $this->roles !== [];
+    }
+
+    public function isManager(): bool
+    {
+        return in_array(Role::Manager, $this->roles, true);
+    }
+
+    public function isActive(): bool
+    {
+        return $this->deactivatedAt === null;
+    }
+
+    public function isActiveManager(): bool
+    {
+        return $this->isManager() && $this->isActive();
+    }
+
+    /** Moving relinks the same account; linking an unlinked one works the same way (R35). */
+    public function moveTo(string $householdId): void
+    {
+        if (! $this->isActive()) {
+            throw AccountDeactivated::for($this->id);
+        }
+
+        $this->householdId = $householdId;
+    }
+
+    public function unlink(): void
+    {
+        $this->householdId = null;
+    }
+
+    public function grantManager(): void
+    {
+        if ($this->isManager()) {
+            return;
+        }
+
+        $this->roles = [...$this->roles, Role::Manager];
+    }
+
+    /** The caller checks that another active manager remains (R36a). */
+    public function removeManager(): void
+    {
+        $this->roles = array_values(array_filter($this->roles, fn (Role $role) => $role !== Role::Manager));
+    }
+
+    /** Deactivating unlinks the account from its household and keeps the rest of its history (R36b). */
+    public function deactivate(DateTimeImmutable $now): void
+    {
+        if (! $this->isActive()) {
+            return;
+        }
+
+        $this->deactivatedAt = $now;
+        $this->householdId = null;
+    }
+
+    public function reactivate(): void
+    {
+        $this->deactivatedAt = null;
     }
 
     public function changeInvitationEmail(Email $email): void
