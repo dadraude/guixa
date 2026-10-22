@@ -3,9 +3,11 @@
 use App\Http\Controllers\AcceptInvitationController;
 use App\Http\Controllers\Manage\HouseholdController;
 use App\Http\Controllers\Manage\HouseholdMemberController;
+use App\Http\Controllers\Manage\HouseholdWalletController;
 use App\Http\Controllers\Manage\InvitationController;
 use App\Http\Controllers\Manage\ReturnItemController;
 use App\Http\Controllers\Manage\StockProductController;
+use App\Http\Controllers\WalletController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'Welcome')->name('home');
@@ -13,6 +15,8 @@ Route::inertia('/', 'Welcome')->name('home');
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'Dashboard')->name('dashboard');
 });
+
+Route::middleware(['auth', 'verified', 'role:member'])->get('wallet', [WalletController::class, 'show'])->name('wallet.show');
 
 Route::middleware('guest')->group(function () {
     Route::get('invitations/{token}', [AcceptInvitationController::class, 'show'])->name('invitation.show');
@@ -40,6 +44,15 @@ Route::middleware(['auth', 'verified', 'role:manager'])->prefix('manage')->name(
     Route::post('households/{household}/members', [HouseholdMemberController::class, 'store'])
         ->whereUuid('household')
         ->name('households.members.store');
+    Route::get('households/{household}/wallet', [HouseholdWalletController::class, 'show'])
+        ->whereUuid('household')
+        ->name('households.wallet.show');
+    Route::post('households/{household}/wallet/top-ups', [HouseholdWalletController::class, 'topUp'])
+        ->whereUuid('household')
+        ->name('households.wallet.top-ups.store');
+    Route::post('households/{household}/wallet/corrections', [HouseholdWalletController::class, 'correct'])
+        ->whereUuid('household')
+        ->name('households.wallet.corrections.store');
 
     Route::post('accounts/{account}/invitation', [InvitationController::class, 'resend'])
         ->whereUuid('account')

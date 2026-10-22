@@ -23,6 +23,8 @@ use Guixa\Stock\Domain\ReturnItemRepository;
 use Guixa\Stock\Domain\StockProductRepository;
 use Guixa\Stock\Infrastructure\Persistence\EloquentReturnItemRepository;
 use Guixa\Stock\Infrastructure\Persistence\EloquentStockProductRepository;
+use Guixa\Wallet\Domain\MovementRepository;
+use Guixa\Wallet\Infrastructure\Persistence\EloquentMovementRepository;
 use Illuminate\Foundation\DevCommands;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -41,6 +43,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(ActorResolver::class, DatabaseActorResolver::class);
         $this->app->bind(StockProductRepository::class, EloquentStockProductRepository::class);
         $this->app->bind(ReturnItemRepository::class, EloquentReturnItemRepository::class);
+        $this->app->bind(MovementRepository::class, EloquentMovementRepository::class);
 
         $this->app->bind(HouseholdRepository::class, DatabaseHouseholdRepository::class);
         $this->app->bind(AccountRepository::class, DatabaseAccountRepository::class);

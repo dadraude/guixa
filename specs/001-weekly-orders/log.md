@@ -185,3 +185,24 @@ Why: found in the T06 review; no code changed in T06 because nothing can deactiv
 T06: Inertia prop DTOs are named `App\Http\<Noun>Row` (`HouseholdRow`, `HouseholdSummaryRow`, `MemberRow`), like T24's `StockProductRow`,
 not `App\Http\Props\*Prop`. `plan.md` (HTTP & pages) now says so.
 Why: two naming schemes for the same kind of class.
+
+## 2026-10-22 · Deviation
+
+T26: `ChargeForPickup` and `GetBalance` take the `Actor` and require a manager, where `plan.md` listed no actor. A movement records who recorded it
+(`recordedBy`), and Ordering calls them from a manager's pickup; `GetBalance` stays manager-only until a caller needs more. They take and return integer
+cents like the other use cases. `plan.md` (Wallet use cases) now says so.
+Why: `Movement.recordedBy` has no value without an actor, and a use case that skips the role check would be the only one.
+
+T26: added `GET /manage/households/{household}/wallet`, which reuses `Wallet/Statement` and carries the top-up and correction forms; `plan.md` listed only the
+two POST routes. The manager household page links to it, and members get a Wallet entry in the sidebar. `plan.md` (HTTP & pages) now lists the route.
+Why: the forms need a page with the household's balance and movements, and `Manage/Households/Show` is the membership page.
+
+T26: R31 says members see each movement's cycle. `GetWalletStatement` returns `cycleId`, but the page shows no cycle label yet because cycles do not
+exist until the Ordering context. The page gets the label when the cycle queries land (with the Ordering work).
+For the same reason the correction form has no optional cycle field (R32) yet, although `CorrectionRequest` and `RecordCorrection` accept `cycle_id`; it gets its cycle picker when the Ordering context's cycle queries land, like the label. No task row names the wallet picker on this branch, so tasks.md is unchanged.
+The page has no static breadcrumb: it serves both the member route (`/wallet`, member-only) and the manager route, and a static crumb would send managers to a 403.
+Why: a raw cycle id is no use to a member.
+
+T26: `wallet_movements` also has a `CHECK` per type (sign, cycle, note) and `recorded_by` references `users`; `cycle_id` has no foreign key (Ordering owns cycles).
+`PickupAlreadyCharged` is the domain error for the partial unique index, so a double charge reads as a form error rather than a 500.
+Why: the invariants of `Movement` hold in the database too; the cycle table is another context's.
