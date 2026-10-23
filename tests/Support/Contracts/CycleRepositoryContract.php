@@ -139,6 +139,24 @@ trait CycleRepositoryContract
     }
 
     #[Test]
+    public function it_stores_a_cancelled_cycle_and_no_longer_counts_its_pickup_date(): void
+    {
+        $repository = $this->repository();
+        $cycle = $this->cycle($repository, '2026-11-07');
+        $repository->add($cycle);
+        $this->assertFalse($repository->get($cycle->id)->isCancelled());
+
+        $stored = $repository->getForUpdate($cycle->id);
+        $stored->cancel($this->madrid('2026-10-23 09:00'));
+        $repository->add($stored);
+
+        $found = $repository->get($cycle->id);
+        $this->assertTrue($found->isCancelled());
+        $this->assertSame($this->madrid('2026-10-23 09:00')->getTimestamp(), $found->cancelledAt()->getTimestamp());
+        $this->assertFalse($repository->existsOnPickupDate($this->madrid('2026-11-07')));
+    }
+
+    #[Test]
     public function it_stores_a_moved_and_a_cleared_cutoff(): void
     {
         $repository = $this->repository();

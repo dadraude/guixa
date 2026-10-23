@@ -28,6 +28,7 @@ readonly open: boolean,
 export type CycleRow = {
 readonly id: string,
 readonly pickupDate: string,
+readonly cancelled: boolean,
 readonly participants: App.Http.CycleParticipantRow[],
 };
 export type CycleSummaryRow = {
@@ -93,6 +94,7 @@ readonly products: App.Http.OfferedProductRow[],
 export type OrderRow = {
 readonly cycleId: string,
 readonly pickupDate: string,
+readonly cancelled: boolean,
 readonly producers: App.Http.OrderProducerRow[],
 readonly lines: App.Http.OrderLineRow[],
 };

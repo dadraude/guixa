@@ -57,6 +57,7 @@ final class GetHouseholdOrder
         return new HouseholdOrderData(
             $cycle->id,
             $cycle->pickupDate()->format('Y-m-d'),
+            $cycle->isCancelled(),
             $producers,
             array_map(fn (OrderLine $line) => OrderLineData::of($line, isset($marked[$line->productId])), $lines),
         );

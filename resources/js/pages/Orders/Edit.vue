@@ -86,14 +86,22 @@ const lineTotal = (price: string, quantity: string) =>
         <InputError :message="domainError" />
 
         <p
-            v-if="order.producers.length === 0"
+            v-if="order.cancelled"
+            class="text-sm font-medium"
+            data-test="order-cancelled"
+        >
+            This cycle was cancelled. Your orders in it were discarded.
+        </p>
+
+        <p
+            v-else-if="order.producers.length === 0"
             class="text-sm text-muted-foreground"
         >
             No producer takes part in this cycle yet.
         </p>
 
         <section
-            v-for="group in groups"
+            v-for="group in order.cancelled ? [] : groups"
             :key="group.producerId"
             class="flex flex-col gap-3"
         >

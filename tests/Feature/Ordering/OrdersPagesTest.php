@@ -239,3 +239,16 @@ it('keeps the welcome page for guests and for accounts that are not members', fu
     $this->get('/')->assertInertia(fn (Assert $page) => $page->component('Welcome'));
     $this->actingAs(accountWith(Role::Manager))->get('/')->assertInertia(fn (Assert $page) => $page->component('Welcome'));
 });
+
+it('tells the member the cycle is cancelled and shows no lines (R4b, S37)', function () {
+    [$cycleId, , $loaf] = cycleWithBaker();
+    $anna = accountWith(Role::Member);
+    $this->actingAs($anna)->put("/cycles/{$cycleId}/order/lines/{$loaf}", ['quantity' => '2'])->assertRedirect();
+    $this->actingAs($anna)->get("/cycles/{$cycleId}/order")
+        ->assertInertia(fn (Assert $page) => $page->where('order.cancelled', false));
+
+    $this->actingAs(accountWith(Role::Manager))->post("/manage/cycles/{$cycleId}/cancel")->assertRedirect();
+
+    $this->actingAs($anna)->get("/cycles/{$cycleId}/order")
+        ->assertInertia(fn (Assert $page) => $page->where('order.cancelled', true)->has('order.lines', 0));
+});

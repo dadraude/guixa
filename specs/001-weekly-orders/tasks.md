@@ -59,8 +59,8 @@ including the weeks when daylight saving time changes (S38).
 | T14 | `ListMemberCycles`, `Orders/Index` page: open cycles, pending pickups, cancelled and closed cycles | R4a (open for members), R23a (before settlement) | T13 |
 | T15 | `SetProductAvailability`, *will not be delivered* derived on read, `RemoveMarkedLine`, product deactivation; unit and variable flag locked while the product has unsettled lines (`HasUnsettledLines`) | R1 (lock), R3, R3b, R3c, S5 (lock), S32, S48 | T13 |
 | T16 | `StopParticipating`, `ParticipateAgain`, `DeactivateProducer`, `ReactivateProducer` (producer role, participation where not sent) | R3a, R6c, S50 | T15 |
-| T17 | `CancelCycle` (orders deleted, cycle shown as cancelled) | R4b, S37 | T13 |
-| T18 | `SendProducerOrder` + producer email, cutoff frozen once sent, marked lines stored as not delivered, `SendEmptyProducerOrders` scheduled command (sends only) | R6b, R12a (sending), S34 (frozen), S36 | T16 |
+| T17 | `CancelCycle` (orders deleted, cycle shown as cancelled) | R4b (cancel before sending), S37 (cancel) | T13 |
+| T18 | `SendProducerOrder` + producer email, cutoff frozen once sent, marked lines stored as not delivered, `SendEmptyProducerOrders` scheduled command (sends only) | R6b, R12a (sending), R4b (rejected once sent), S34 (frozen), S36, S37 (sent) | T16 |
 | T19 | `GetProducerCycleSummary`, `Producer/CycleSummary` page with availability per product | R12, S7, S8 | T18 |
 | T20 | `GetHouseholds` (Membership) behind Ordering's `Households` port, `GetCycleSummary` (totals per producer and product, per household), `Manage/Cycles/Show` page | R13, S52 | T13 |
 | T35 | `GetCycleSummary` carries `cancelled` and returns no totals for a cancelled cycle; `Manage/Cycles/Show` shows a "Cancelled" notice instead of totals | R13 (cancelled), S62 | T17, T20 |
@@ -138,7 +138,7 @@ products, added in opposite order, both complete.
 | S20 | T23 | S34 | T12, T18 | S53 | T29 |
 | S21, S22 | T29 | S35 | T12 | S54 | T30 |
 | | | S36 | T18 | S55 | T29 |
-| | | S37 | T11, T17 | S56 | T06 |
+| | | S37 | T11, T17, T18 | S56 | T06 |
 | | | S38 | T11 | S57 | T09 |
 | | | S39 | T22 | S58 | T32 |
 | | | S40 | T22, T23 | S59 | T07 |

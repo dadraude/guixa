@@ -184,7 +184,7 @@ role only; participation is not restored.
   - `markDistributed(producerId, balanced, now)`: sent, validated and balanced; settles the cycle the first
     time every participating producer is distributed and returns whether it did (R18).
   - `reopen(producerId)`: rejected once the cycle is closed (R18, R24b).
-  - `cancel(now)`: rejected once any producer order is sent (R4b).
+  - `cancel(now)`: rejected once any producer order is sent (R4b; the sent state arrives in T18) and once already cancelled. A cancelled cycle refuses `addParticipant`, `setCutoff`, `closeNow`, `clearCutoff` and `assertOpenFor` with `CycleCancelled`, and `isOpenFor` is false.
   - `close(now, everyPickupDone)`: settled, every participating producer distributed and every pickup done (R24b).
 
 - **`Order`** aggregate — everything a household has in one cycle. Created on the first ordered line, on an
@@ -283,7 +283,7 @@ role only; participation is not restored.
 | `OpenCycle` (with participants and an optional `weekday` + `permanent` flag; the date is `YYYY-MM-DD`; returns the cycle id. While the cooperative has no weekday, a `weekday` must be given: permanent also saves it, in the same transaction, and provisional saves nothing. A `weekday` given when the cooperative has one is refused), `ListCycles` (`CycleData`: pickup date and participants with ISO 8601 cutoff in the cooperative's timezone) | manager | R4, R4a, R5, S6, S38, S51 |
 | `AddParticipant`, `StopParticipating`, `ParticipateAgain` | manager | R4a, R6c, S50, S51 |
 | `SetCutoff` (`at` is ISO 8601; without an offset it is read in the cooperative's timezone), `CloseProducerNow`, `ClearCutoff` (a producer not in the cycle is refused with `ProducerNotInCycle`; `ListCycles` participants carry `open`, from `isOpenFor`) | manager | R6, R6a, R6b, S6, S34, S35 |
-| `CancelCycle` | manager | R4b, S37 |
+| `CancelCycle` (deletes the cycle's orders in the same transaction; `ListCycles` cycles carry `cancelled`; a cancelled cycle refuses line changes, new participants and cutoff changes with `CycleCancelled`, and cancelling twice too; the sent check arrives with `send` in T18) | manager | R4b, S37 |
 | `SetProductAvailability` (`cycleId`, `productId`, `available`; the product must be orderable, so an unknown or deactivated one is refused with `ProductNotOrderable`, and its producer must be the actor; `SetOrderLine` refuses an unavailable product with `ProductNotOrderable` and `GetHouseholdOrder` stops offering it) | producer (own) | R3c, S48 |
 | `SetOrderLine` (the household is the actor's, so an account without one is refused with `NoHousehold`; `quantity` is a string of at most 3 decimals, 0 removes) | member of household | R3, R7–R11, S1–S5, S33, S49, S51 |
 | `RemoveMarkedLine` (`cycleId`, `productId`; a line that is not marked is refused with `LineNotMarked`) | member of household | R3b, R8, S32 |
@@ -447,7 +447,7 @@ role areas (R36a); the layout shows a switch between them.
 | Route | Page / action | Use case |
 | --- | --- | --- |
 | `GET /` | `Orders/Index` for a member with a verified email (the `Welcome` page for guests, accounts that are not members and members whose email is not verified) | `ListMemberCycles` |
-| `GET /cycles/{cycle}/order` | `Orders/Edit` (producers with what they offer, the order's lines and a running total; the pickup once settled arrives later; a line marked *will not be delivered* shows the mark, counts as zero in the total and has a Remove action instead of the quantity box, R3b, R6c, R8; the lines of a producer that no longer takes part stay under that producer's name, marked) | `GetHouseholdOrder` (it lists the offered products itself, and the controller names the producers with Catalog's `GetProducer`) |
+| `GET /cycles/{cycle}/order` | `Orders/Edit` (producers with what they offer, the order's lines and a running total; `cancelled` from `HouseholdOrderData`, shown as a notice with no producers or lines when the cycle is cancelled, R4b, S37; the pickup once settled arrives later; a line marked *will not be delivered* shows the mark, counts as zero in the total and has a Remove action instead of the quantity box, R3b, R6c, R8; the lines of a producer that no longer takes part stay under that producer's name, marked) | `GetHouseholdOrder` (it lists the offered products itself, and the controller names the producers with Catalog's `GetProducer`) |
 | `PUT /cycles/{cycle}/order/lines/{product}` (`quantity`; 0 removes the line) | partial reload of `order` prop | `SetOrderLine` |
 | `DELETE /cycles/{cycle}/order/lines/{product}` | partial reload | `RemoveMarkedLine` |
 | `GET /wallet` | `Wallet/Statement` (member's own household) | `GetWalletStatement` |
@@ -461,7 +461,7 @@ role areas (R36a); the layout shows a switch between them.
 | `GET /manage/settings`, `PUT /manage/settings/pickup-weekday` | `Manage/Settings` | `GetPickupWeekday`, `SetPickupWeekday` |
 | `GET/POST /manage/cycles` | `Manage/Cycles/Index` (cycles with named participants, active producers to pick, the pickup weekday or null; while it is null the open form also shows a weekday picker and a permanent/provisional choice, sent as `pickup_weekday` and `permanent`) | `ListCycles`, `OpenCycle` |
 | `GET /manage/cycles/{cycle}` | `Manage/Cycles/Show` (totals, producers, containers; a "Cancelled" notice instead of totals when the cycle is cancelled) | `GetCycleSummary`, `GetContainerCount` |
-| `DELETE /manage/cycles/{cycle}` | — | `CancelCycle` |
+| `POST /manage/cycles/{cycle}/cancel` | — (the cycles page shows a cancel button that opens a confirmation dialog warning that every household's orders are discarded and it cannot be undone, and a cancelled cycle with its producer controls hidden) | `CancelCycle` |
 | `POST/DELETE /manage/cycles/{cycle}/producers/{producer}` | — | `AddParticipant`, `ParticipateAgain`, `StopParticipating` |
 | `PUT/DELETE …/producers/{producer}/cutoff`, `POST …/close` | — | `SetCutoff`, `ClearCutoff`, `CloseProducerNow` |
 | `POST …/producers/{producer}/send` | — | `SendProducerOrder` |

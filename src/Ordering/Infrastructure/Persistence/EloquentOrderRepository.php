@@ -58,6 +58,11 @@ final class EloquentOrderRepository implements OrderRepository
         );
     }
 
+    public function deleteOfCycle(string $cycleId): void
+    {
+        DB::table('orders')->where('cycle_id', $cycleId)->delete();
+    }
+
     public function ofHousehold(string $cycleId, string $householdId): ?Order
     {
         $row = DB::table('orders')->where('cycle_id', $cycleId)->where('household_id', $householdId)->first();

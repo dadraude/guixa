@@ -8,7 +8,7 @@ interface CycleRepository
 {
     public function nextId(): string;
 
-    /** Inserts the cycle or replaces its producers' participation. */
+    /** Inserts the cycle or replaces its cancellation and its producers' participation. */
     public function add(Cycle $cycle): void;
 
     public function get(string $id): ?Cycle;

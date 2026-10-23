@@ -13,6 +13,7 @@ final readonly class CycleData
     public function __construct(
         public string $id,
         public string $pickupDate,
+        public bool $cancelled,
         public array $participants,
     ) {}
 
@@ -21,6 +22,7 @@ final readonly class CycleData
         return new self(
             $cycle->id,
             $cycle->pickupDate()->format('Y-m-d'),
+            $cycle->isCancelled(),
             array_map(
                 fn (ProducerOrder $order) => new ParticipantData(
                     $order->producerId,

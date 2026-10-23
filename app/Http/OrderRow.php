@@ -16,6 +16,7 @@ final readonly class OrderRow
     public function __construct(
         public string $cycleId,
         public string $pickupDate,
+        public bool $cancelled,
         public array $producers,
         public array $lines,
     ) {}
@@ -29,6 +30,6 @@ final readonly class OrderRow
         );
         usort($producers, fn (OrderProducerRow $a, OrderProducerRow $b) => mb_strtolower($a->producerName) <=> mb_strtolower($b->producerName));
 
-        return new self($order->cycleId, $order->pickupDate, $producers, array_map(fn ($line) => OrderLineRow::from($line, $producerNames[$line->producerId] ?? $line->producerId), $order->lines));
+        return new self($order->cycleId, $order->pickupDate, $order->cancelled, $producers, array_map(fn ($line) => OrderLineRow::from($line, $producerNames[$line->producerId] ?? $line->producerId), $order->lines));
     }
 }
