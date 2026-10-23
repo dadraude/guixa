@@ -45,6 +45,18 @@ final class DatabaseAccountRepository implements AccountRepository
         return DB::table('users')->whereRaw('lower(email) = ?', [$email->value])->exists();
     }
 
+    public function producerHasAccount(string $producerId): bool
+    {
+        return DB::table('users')->where('producer_id', $producerId)->exists();
+    }
+
+    public function producerAccounts(): array
+    {
+        return array_values(DB::table('users')->whereNotNull('producer_id')->orderBy('id')->get()
+            ->map($this->hydrate(...))
+            ->all());
+    }
+
     public function hasManager(): bool
     {
         return DB::table('account_roles')->where('role', Role::Manager->value)->exists();

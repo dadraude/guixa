@@ -1,5 +1,9 @@
 declare namespace App {
 namespace Http {
+export type CutoffRuleRow = {
+readonly daysBefore: number,
+readonly time: string,
+};
 export type HouseholdRow = {
 readonly id: string,
 readonly name: string,
@@ -19,6 +23,15 @@ readonly email: string,
 readonly invitationPending: boolean,
 readonly invitationExpiresAt: string | null,
 readonly invitationExpired: boolean,
+};
+export type ProducerRow = {
+readonly id: string,
+readonly name: string,
+readonly active: boolean,
+readonly cutoffDaysBefore: number,
+readonly cutoffTime: string,
+readonly accountEmail: string | null,
+readonly accountInvitationPending: boolean,
 };
 export type ReturnItemRow = {
 readonly id: string,

@@ -112,6 +112,7 @@ it('resolves the actor with UUID account, household and producer ids', function 
     $householdId = (string) Str::uuid7();
     DB::table('households')->insert(['id' => $householdId, 'name' => 'Household H', 'created_at' => now(), 'updated_at' => now()]);
     $producerId = (string) Str::uuid7();
+    DB::table('producers')->insert(['id' => $producerId, 'name' => 'Baker', 'active' => true, 'cutoff_days_before' => 3, 'cutoff_time' => '20:00']);
     $user = userWithRoles(Role::Member, Role::Producer);
     DB::table('users')->where('id', $user->id)->update(['household_id' => $householdId, 'producer_id' => $producerId]);
 

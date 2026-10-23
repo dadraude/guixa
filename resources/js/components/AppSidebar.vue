@@ -6,13 +6,17 @@ import {
     Home,
     LayoutGrid,
     Package,
-    Wallet,
+    Timer,
     Undo2,
+    Wallet,
+    Wheat,
 } from '@lucide/vue';
 import { computed } from 'vue';
 import HouseholdController from '@/actions/App/Http/Controllers/Manage/HouseholdController';
+import ProducerController from '@/actions/App/Http/Controllers/Manage/ProducerController';
 import ReturnItemController from '@/actions/App/Http/Controllers/Manage/ReturnItemController';
 import StockProductController from '@/actions/App/Http/Controllers/Manage/StockProductController';
+import CutoffController from '@/actions/App/Http/Controllers/Producer/CutoffController';
 import WalletController from '@/actions/App/Http/Controllers/WalletController';
 import AppLogo from '@/components/AppLogo.vue';
 import NavFooter from '@/components/NavFooter.vue';
@@ -41,6 +45,11 @@ const managerNavItems: NavItem[] = [
         icon: Home,
     },
     {
+        title: 'Producers',
+        href: ProducerController.index(),
+        icon: Wheat,
+    },
+    {
         title: 'Stock',
         href: StockProductController.index(),
         icon: Package,
@@ -49,6 +58,14 @@ const managerNavItems: NavItem[] = [
         title: 'Return items',
         href: ReturnItemController.index(),
         icon: Undo2,
+    },
+];
+
+const producerNavItems: NavItem[] = [
+    {
+        title: 'Default cutoff',
+        href: CutoffController.show(),
+        icon: Timer,
     },
 ];
 
@@ -71,6 +88,9 @@ const mainNavItems = computed<NavItem[]>(() => [
         : []),
     ...(roleAreas.value.some((area) => area.role === 'manager')
         ? managerNavItems
+        : []),
+    ...(roleAreas.value.some((area) => area.role === 'producer')
+        ? producerNavItems
         : []),
 ]);
 

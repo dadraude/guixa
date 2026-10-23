@@ -188,6 +188,29 @@ Why: two naming schemes for the same kind of class.
 
 ## 2026-10-22 · Deviation
 
+T08: `plan.md` had no way to create a producer with its first cutoff, and Membership had no way to know a producer exists. `CreateProducer`
+now takes the name and the initial default cutoff (both required: R5 says every producer has one and the spec names no standard value), and
+Membership gets a `ProducerDirectory` port (`exists`) implemented over a new internal Catalog query `GetProducer`, so `InviteProducerAccount`
+rejects an unknown producer without touching Catalog's Domain (A4). `plan.md` (context ports, Membership, Catalog) now says so.
+Why: R36 needs the account to point at a real producer, and A4 forbids Membership from reading `producers` directly.
+
+T08: added `ListProducers` (admin page) and `GetDefaultCutoff` (the producer's own cutoff page), and `users.producer_id` now has a foreign key
+to `producers` (T06 left it open until this table existed). `GetProducerCutoffRule` stays in T10 as the internal query for Ordering.
+`plan.md` (Catalog use cases, HTTP & pages, Persistence) now lists them.
+Why: the pages need to read what the use cases write, and T06 promised the foreign key.
+
+T08: `CutoffRule` lives in `Domain\ValueObject` (A7 finds value objects by that folder) and counts the days back on the bare pickup date before
+resolving the local time, so a daylight-saving change cannot shift the day (S38). `plan.md` (Catalog domain) now says so.
+Why: A7's architecture test only recognises value objects in that namespace.
+
+## 2026-10-23 · Change
+
+T08: the producers admin page shows whether each producer already has its account, with the account's email and whether its invitation is
+still pending, and shows the invite form only for producers without one. Membership provides it through a new manager query
+`ListProducerAccounts`; the controller joins it with Catalog's `ListProducers` into `ProducerRow`, so Catalog never reads Membership (A4).
+`plan.md` (Membership use cases, HTTP & pages) now says so. No `R#` or `S#` changed.
+User's answer to the review question "should the producers admin page show whether a producer already has its account (with its email) and hide the invite form for those producers?": "Si".
+Why: without it a manager only learns a producer has an account by getting the S57 rejection.
 T26: `ChargeForPickup` and `GetBalance` take the `Actor` and require a manager, where `plan.md` listed no actor. A movement records who recorded it
 (`recordedBy`), and Ordering calls them from a manager's pickup; `GetBalance` stays manager-only until a caller needs more. They take and return integer
 cents like the other use cases. `plan.md` (Wallet use cases) now says so.
