@@ -362,3 +362,18 @@ T20 (review): `OrderRepository::ofCycle` loads a cycle's lines in one query, and
 T14 (`plan.md`, use cases, HTTP & pages): `Cycle` has no cancelled, settled or closed state and there are no pickups yet, so `ListMemberCycles` lists every cycle by pickup date with `open` (`Cycle::isOpenForMembers`, R4a) and the household's `lineCount` (R23a, before settlement). The page shows two sections, open for orders and closed to orders. The pending-pickup, cancelled and closed sections arrive with T17 and the pickup tasks, which also decide when a past cycle stops being listed.
 `GET /` now renders `Orders/Index` for a member with a verified email and `Welcome` for guests, accounts that are not members and members whose email is not verified, because the role areas send the member area to `/`.
 Why: the plan listed the four states before the domain had them, and `/` was already the public welcome page.
+
+## 2026-10-23 · Change
+
+R13 (`ordering.md`): a cancelled cycle still opens for the manager and is shown as cancelled, with no totals. New scenario S62 (R4b, R13). The "Orders" link on the cycles list stays, since it leads to a valid page.
+Why: the spec was silent on the summary of a cancelled cycle (found while delivering T17 on top of T20, DRA-187). The user decided: "mostrar-lo com a cancel·lat".
+
+## 2026-10-23 · Change
+
+`plan.md` (use cases, HTTP & pages): `GetCycleSummary` carries `cancelled` and returns no totals for a cancelled cycle (R13, S52, S62); `Manage/Cycles/Show` shows a "Cancelled" notice instead of totals. No new port or table: `Cycle::isCancelled()` exists since T17, and cancelling deletes the cycle's orders.
+Why: follows the R13 / S62 change above.
+
+## 2026-10-23 · Change
+
+`tasks.md`: new task T35 (R13 cancelled, S62; after T17 and T20), S62 added to Coverage, and T33 now covers S1–S62 and waits for T35. Tracked in Linear as DRA-187.
+Why: follows the R13 / S62 and plan changes above.

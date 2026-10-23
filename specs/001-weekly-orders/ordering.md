@@ -92,6 +92,7 @@ Catalog, cycles and cutoffs, ordering, sending orders to producers and what prod
 - **R12** A producer sees the total quantity per product of a cycle only once its order is sent,
   without household names. Before that, the producer sees nothing for that cycle.
 - **R13** A manager sees, per cycle, totals per producer and product and the breakdown per household.
+  A cancelled cycle still opens and is shown as cancelled, with no totals (its orders were discarded, R4b).
 
 ## Acceptance scenarios
 
@@ -217,3 +218,8 @@ And the cycle is open for members until both the baker and the grower are closed
 Given households A and B ordered 2 and 3 loaves from the baker
 When the manager opens the cycle
 Then they see 5 loaves for the baker, with A 2 and B 3.
+
+**S62 — Totals of a cancelled cycle** (R4b, R13)
+Given cycle A had orders and the manager cancelled it
+When the manager opens cycle A
+Then they see it as cancelled, with no totals and no households.

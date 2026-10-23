@@ -63,6 +63,7 @@ including the weeks when daylight saving time changes (S38).
 | T18 | `SendProducerOrder` + producer email, cutoff frozen once sent, marked lines stored as not delivered, `SendEmptyProducerOrders` scheduled command (sends only) | R6b, R12a (sending), S34 (frozen), S36 | T16 |
 | T19 | `GetProducerCycleSummary`, `Producer/CycleSummary` page with availability per product | R12, S7, S8 | T18 |
 | T20 | `GetHouseholds` (Membership) behind Ordering's `Households` port, `GetCycleSummary` (totals per producer and product, per household), `Manage/Cycles/Show` page | R13, S52 | T13 |
+| T35 | `GetCycleSummary` carries `cancelled` and returns no totals for a cancelled cycle; `Manage/Cycles/Show` shows a "Cancelled" notice instead of totals | R13 (cancelled), S62 | T17, T20 |
 
 **Done when** T13: two concurrent `SetOrderLine` calls for a household with no order yet (integration test)
 create one order with both lines.
@@ -118,7 +119,7 @@ products, added in opposite order, both complete.
 
 | ID | Task | Covers | After |
 | --- | --- | --- | --- |
-| T33 | Traceability check: every `R#` and `S#` is named in at least one test (`->group('S14')` or test name); fill the gaps; set feature 001 to *Done* in `specs/README.md` | R1–R36b, S1–S61 | T14, T17, T19, T31, T32, T34 |
+| T33 | Traceability check: every `R#` and `S#` is named in at least one test (`->group('S14')` or test name); fill the gaps; set feature 001 to *Done* in `specs/README.md` | R1–R36b, S1–S62 | T14, T17, T19, T31, T32, T34, T35 |
 
 ## Coverage
 
@@ -143,3 +144,4 @@ products, added in opposite order, both complete.
 | | | S40 | T22, T23 | S59 | T07 |
 | | | S41, S42 | T29, T30 | S60 | T31 |
 | | | | | S61 | T30 |
+| | | | | S62 | T35 |

@@ -292,7 +292,7 @@ role only; participation is not restored.
 | `SendProducerOrder` → notifies the producer | manager | R12a, R6b, S34, S36 |
 | `SendEmptyProducerOrders` (scheduled) | — (scheduler) | R12a, D10 |
 | `GetProducerCycleSummary` | producer (own) | R12, S7, S8 |
-| `GetCycleSummary` (ordered quantity per product under its producer, per household; households Membership does not know show their id) | manager | R13, S52 |
+| `GetCycleSummary` (ordered quantity per product under its producer, per household; households Membership does not know show their id; carries `cancelled`, and a cancelled cycle has no totals) | manager | R13, S52, S62 |
 | `HasUnsettledLines(productId): bool`, `StopParticipatingWhereNotSent` (T16) | — (called by Catalog) | R1, R3a |
 | `ListPendingPickups` | — (called by Membership) | R35a |
 | `GetReception` | manager | R14, R17 |
@@ -460,7 +460,7 @@ role areas (R36a); the layout shows a switch between them.
 | `PUT /producer/cycles/{cycle}/products/{product}/availability` (`available`: boolean; no page uses it until T19) | partial reload | `SetProductAvailability` |
 | `GET /manage/settings`, `PUT /manage/settings/pickup-weekday` | `Manage/Settings` | `GetPickupWeekday`, `SetPickupWeekday` |
 | `GET/POST /manage/cycles` | `Manage/Cycles/Index` (cycles with named participants, active producers to pick, the pickup weekday or null; while it is null the open form also shows a weekday picker and a permanent/provisional choice, sent as `pickup_weekday` and `permanent`) | `ListCycles`, `OpenCycle` |
-| `GET /manage/cycles/{cycle}` | `Manage/Cycles/Show` (totals, producers, containers) | `GetCycleSummary`, `GetContainerCount` |
+| `GET /manage/cycles/{cycle}` | `Manage/Cycles/Show` (totals, producers, containers; a "Cancelled" notice instead of totals when the cycle is cancelled) | `GetCycleSummary`, `GetContainerCount` |
 | `DELETE /manage/cycles/{cycle}` | — | `CancelCycle` |
 | `POST/DELETE /manage/cycles/{cycle}/producers/{producer}` | — | `AddParticipant`, `ParticipateAgain`, `StopParticipating` |
 | `PUT/DELETE …/producers/{producer}/cutoff`, `POST …/close` | — | `SetCutoff`, `ClearCutoff`, `CloseProducerNow` |
