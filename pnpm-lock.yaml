@@ -173,8 +173,8 @@ importers:
         specifier: ^3.0.0
         version: 3.9.1(vue@3.5.44(typescript@5.9.3))
       '@laravel/passkeys':
-        specifier: ^0.2.0
-        version: 0.2.0(react@19.3.1)(vue@3.5.44(typescript@5.9.3))
+        specifier: ^0.4.0
+        version: 0.4.0(react@19.3.1)(vue@3.5.44(typescript@5.9.3))
       '@lucide/vue':
         specifier: ^1.17.0
         version: 1.61.0(vue@3.5.44(typescript@5.9.3))
@@ -206,8 +206,8 @@ importers:
         specifier: ^3.5.13
         version: 3.5.44(typescript@5.9.3)
       vue-input-otp:
-        specifier: ^0.3.2
-        version: 0.3.2(typescript@5.9.3)(vue@3.5.44(typescript@5.9.3))
+        specifier: ^0.4.0
+        version: 0.4.0(typescript@5.9.3)(vue@3.5.44(typescript@5.9.3))
       vue-sonner:
         specifier: ^2.0.0
         version: 2.0.9
@@ -244,11 +244,11 @@ importers:
         specifier: ^0.4.1
         version: 0.4.5
       '@rollup/rollup-linux-x64-gnu':
-        specifier: 4.9.5
-        version: 4.9.5
+        specifier: 4.64.10
+        version: 4.64.10
       '@rollup/rollup-win32-x64-msvc':
-        specifier: 4.9.5
-        version: 4.9.5
+        specifier: 4.64.10
+        version: 4.64.10
       '@tailwindcss/oxide-linux-x64-gnu':
         specifier: ^4.0.1
         version: 4.3.3
@@ -356,13 +356,13 @@ packages:
     os: [darwin, linux]
     hasBin: true
 
-  '@laravel/passkeys@0.2.0':
-    resolution: {integrity: sha512-K+owv26weKrYaoTJutqU40UsJZpwYkqB9jdlz5Bv/C54nxj2+Py9jbVwxASWg21fLsPhn3ngPKZE5RnfakCQKg==}
+  '@laravel/passkeys@0.4.0':
+    resolution: {integrity: sha512-59UHJHZPrIT8f5hFQJUR1EXhazWZTg3DcJefxSfA3aRj6xu40I/lYDveUY4oL2/h/crq9jjptSKykZDDold7aA==}
     engines: {node: '>=20.19.0'}
     peerDependencies:
       react: ^18.0.0 || ^19.0.0
       svelte: ^5.0.0
-      vue: ^3.0.0
+      vue: ^3.3.0
     peerDependenciesMeta:
       react:
         optional: true
@@ -769,14 +769,14 @@ packages:
   '@rolldown/pluginutils@1.0.1':
     resolution: {integrity: sha512-2j9bGt5Jh8hj+vPtgzPtl72j0yRxHAyumoo6TNfAjsLB04UtpSvPbPcDcBMxz7n+9CYB0c1GxQFxYRg2jimqGw==}
 
-  '@rollup/rollup-linux-x64-gnu@4.9.5':
-    resolution: {integrity: sha512-Dq1bqBdLaZ1Gb/l2e5/+o3B18+8TI9ANlA1SkejZqDgdU/jK/ThYaMPMJpVMMXy2uRHvGKbkz9vheVGdq3cJfA==}
+  '@rollup/rollup-linux-x64-gnu@4.64.10':
+    resolution: {integrity: sha512-ntHtQOMw7oIshHRF1swV3vyBw+beQt9PeZ04O3D32EeDZUMoHMJuZKp4/fDllH/+xogeK0GUCONVfjjKusqKLg==}
     cpu: [x64]
     os: [linux]
     libc: [glibc]
 
-  '@rollup/rollup-win32-x64-msvc@4.9.5':
-    resolution: {integrity: sha512-1q+mykKE3Vot1kaFJIDoUFv5TuW+QQVaf2FmTT9krg86pQrGStOSJJ0Zil7CFagyxDuouTepzt5Y5TVzyajOdQ==}
+  '@rollup/rollup-win32-x64-msvc@4.64.10':
+    resolution: {integrity: sha512-vrvuasIpm/xf+BpZbzgirku0WnrQZMAc+H2Ai26jzqBxYEmQQE4DdJb7h8erkJMfRRipx0ma2Cty8jJwUm9ocQ==}
     cpu: [x64]
     os: [win32]
 
@@ -2030,8 +2030,8 @@ packages:
   vscode-uri@3.2.0:
     resolution: {integrity: sha512-m2gXo3bn0G1kT9InzMf07fTbqMbGtyckj3bH5ktLO+1Ssv+yiATZ4dhwaQv9UZWxJh6E9IFGnQyjgWVDWVBDrg==}
 
-  vue-input-otp@0.3.2:
-    resolution: {integrity: sha512-QMl1842WB6uNAsK4+mZXIskb00TOfahH3AQt8rpRecbtQnOp+oHSUbL/Z3wekfy6pAl+hyN3e1rCUSkCMzbDLQ==}
+  vue-input-otp@0.4.0:
+    resolution: {integrity: sha512-LW+nsZmeXFVdfmPPtoGAXd3vd3T8UBjvwqs6ER4NB7TIoxTuj/reT61HNGe0NyvYDtAHZwjcTmOIX/99f4gpvA==}
     peerDependencies:
       vue: ^3.2.0
 
@@ -2228,7 +2228,7 @@ snapshots:
       - utf-8-validate
     optional: true
 
-  '@laravel/passkeys@0.2.0(react@19.3.1)(vue@3.5.44(typescript@5.9.3))':
+  '@laravel/passkeys@0.4.0(react@19.3.1)(vue@3.5.44(typescript@5.9.3))':
     dependencies:
       '@simplewebauthn/browser': 13.3.0
     optionalDependencies:
@@ -2430,10 +2430,10 @@ snapshots:
 
   '@rolldown/pluginutils@1.0.1': {}
 
-  '@rollup/rollup-linux-x64-gnu@4.9.5':
+  '@rollup/rollup-linux-x64-gnu@4.64.10':
     optional: true
 
-  '@rollup/rollup-win32-x64-msvc@4.9.5':
+  '@rollup/rollup-win32-x64-msvc@4.64.10':
     optional: true
 
   '@simplewebauthn/browser@13.3.0': {}
@@ -3525,7 +3525,7 @@ snapshots:
 
   vscode-uri@3.2.0: {}
 
-  vue-input-otp@0.3.2(typescript@5.9.3)(vue@3.5.44(typescript@5.9.3)):
+  vue-input-otp@0.4.0(typescript@5.9.3)(vue@3.5.44(typescript@5.9.3)):
     dependencies:
       '@vueuse/core': 12.8.2(typescript@5.9.3)
       reka-ui: 2.11.0(vue@3.5.44(typescript@5.9.3))
