@@ -137,7 +137,8 @@ Domain
   `closesAt(pickupDate, timezone): DateTimeImmutable` subtracts the days from the bare date, then resolves the time through `LocalTime` (R5, S6, S38).
 - `Product` (id, producerId, name, unit, `Money` price ≥ 0, variable, `?Quantity containersPerUnit` > 0,
   active). Unit and variable flag cannot change while the product has lines in an unsettled cycle
-  (`ProducerCycles::hasUnsettledLines`, R1, S5).
+  (`ProducerCycles::hasUnsettledLines`, R1, S5); that lock and its port arrive with T15, so `Product::change` takes every field until then.
+  Ownership is checked in each use case with `Actor::assertProducerOf(product.producerId)` (R2).
 - Ports: `ProducerRepository`, `ProductRepository`, `ProducerCycles`, `ProducerAccess`.
 
 Use cases
@@ -150,7 +151,7 @@ Use cases
 | `CreateProduct`, `UpdateProduct`, `DeactivateProduct`, `ReactivateProduct` | producer (own) | R1, R2, S5 |
 | `SetDefaultCutoff` | producer (own) | R5 |
 | `GetDefaultCutoff` (the producer's own rule, for its cutoff page) | producer (own) | R5 |
-| `ListProducerProducts` | producer (own) | R2, S57 |
+| `ListProducerProducts` (inactive ones included, by name; returns `ProductData`) | producer (own) | R2, S57 |
 | `GetOrderableProduct`, `ListOrderableProducts` | — (internal queries for Ordering) | R3, R10 |
 | `GetProducerCutoffRule` | — (internal query for Ordering) | R5 |
 
@@ -434,7 +435,9 @@ role areas (R36a); the layout shows a switch between them.
 | `DELETE /cycles/{cycle}/order/lines/{product}` | partial reload | `RemoveMarkedLine` |
 | `GET /wallet` | `Wallet/Statement` (member's own household) | `GetWalletStatement` |
 | `GET /manage/households/{household}/wallet` | `Wallet/Statement` with the top-up and correction forms | `GetWalletStatement` |
-| `GET /producer/products` … | `Producer/Products/*` | Catalog CRUD |
+| `GET /producer/products`, `GET /producer/products/create`, `GET /producer/products/{product}/edit` | `Producer/Products/Index`, `Create`, `Edit` | `ListProducerProducts` |
+| `POST /producer/products`, `PUT /producer/products/{product}` | redirect to the list | `CreateProduct`, `UpdateProduct` |
+| `DELETE /producer/products/{product}`, `PUT /producer/products/{product}/reactivation` | redirect to the list | `DeactivateProduct`, `ReactivateProduct` |
 | `GET/PUT /producer/cutoff` | `Producer/Cutoff` | `GetDefaultCutoff`, `SetDefaultCutoff` |
 | `GET /producer/cycles/{cycle}` | `Producer/CycleSummary` | `GetProducerCycleSummary` |
 | `PUT /producer/cycles/{cycle}/products/{product}/availability` | partial reload | `SetProductAvailability` |

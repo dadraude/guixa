@@ -19,6 +19,7 @@ import ProducerController from '@/actions/App/Http/Controllers/Manage/ProducerCo
 import ReturnItemController from '@/actions/App/Http/Controllers/Manage/ReturnItemController';
 import StockProductController from '@/actions/App/Http/Controllers/Manage/StockProductController';
 import CutoffController from '@/actions/App/Http/Controllers/Producer/CutoffController';
+import ProductController from '@/actions/App/Http/Controllers/Producer/ProductController';
 import WalletController from '@/actions/App/Http/Controllers/WalletController';
 import AppLogo from '@/components/AppLogo.vue';
 import NavFooter from '@/components/NavFooter.vue';
@@ -69,6 +70,11 @@ const managerNavItems: NavItem[] = [
 ];
 
 const producerNavItems: NavItem[] = [
+    {
+        title: 'Products',
+        href: ProductController.index(),
+        icon: Package,
+    },
     {
         title: 'Default cutoff',
         href: CutoffController.show(),

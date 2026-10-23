@@ -43,6 +43,15 @@ readonly cutoffTime: string,
 readonly accountEmail: string | null,
 readonly accountInvitationPending: boolean,
 };
+export type ProductRow = {
+readonly id: string,
+readonly name: string,
+readonly unit: string,
+readonly price: string,
+readonly variable: boolean,
+readonly containersPerUnit: string | null,
+readonly active: boolean,
+};
 export type ReturnItemRow = {
 readonly id: string,
 readonly name: string,

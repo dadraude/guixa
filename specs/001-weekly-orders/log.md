@@ -275,3 +275,14 @@ Why: R26 and R27 are manager actions, so they need a way to be performed.
 Added `diagrams.md` (Mermaid): bounded contexts and their ports, model relations and the user paths of manager, member and
 producer, drawn from `plan.md`; `spec.md` (Areas) links it. No `R#`, `S#` or plan decision changed.
 Why: the user asked for a diagram of model relations, domains and user paths (DRA-184).
+
+## 2026-10-23 · Deviation
+
+T09: `plan.md` listed `GET /producer/products` … without the routes or the product use case result. Added the product routes (list, create, edit,
+store, update, `DELETE` to deactivate, `PUT …/reactivation`) and said `ListProducerProducts` returns `ProductData` with inactive products included;
+`plan.md` (Catalog, HTTP & pages) now says so. The producer pages reuse the `StockProductFields` form component, since the fields are the same (R1).
+Why: R1 names reactivation as a producer action only through the plan's `ReactivateProduct`, which needed a route.
+
+T09: the unit and variable-flag lock (`ProducerCycles::hasUnsettledLines`) is left to T15, which lists "R1 (lock)"; `Product::change` takes every field until then.
+`plan.md` (Catalog, Domain) now says so. A product of another producer is refused with `NotAllowed` (R2) through `Actor::assertProducerOf` in each use case.
+Why: T09 covers "R1 (fields)" and T15 owns the lock and its port.
