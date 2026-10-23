@@ -250,3 +250,9 @@ with the two forms) and `POST …/entries`, `POST …/adjustments`; the stock in
 `stock_movements.cycle_id` and `order_id` have no foreign key until the Ordering tables exist. `plan.md` (HTTP & pages) now says so.
 The adjustment form records no cycle until cycles exist (the controller passes none; `RecordStockAdjustment` already accepts one); T11 adds the cycle picker.
 Why: R26 and R27 are manager actions, so they need a way to be performed.
+
+## 2026-10-23 · Change
+
+Added `diagrams.md` (Mermaid): bounded contexts and their ports, model relations and the user paths of manager, member and
+producer, drawn from `plan.md`; `spec.md` (Areas) links it. No `R#`, `S#` or plan decision changed.
+Why: the user asked for a diagram of model relations, domains and user paths (DRA-184).
