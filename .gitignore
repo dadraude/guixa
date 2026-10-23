@@ -27,9 +27,28 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
-/.agents
+/.agents/*
+!/.agents/skills/
+/.agents/skills/*
+!/.agents/skills/guixa-implement-session/
+!/.agents/skills/guixa-implement-task/
+!/.agents/skills/guixa-to-tickets/
+/.agents/skills/guixa-*/*
+!/.agents/skills/guixa-*/SKILL.md
+!/.agents/skills/guixa-*/agents/
+/.agents/skills/guixa-*/agents/*
+!/.agents/skills/guixa-*/agents/openai.yaml
 /.amp
-/.claude
+/.claude/*
+!/.claude/skills/
+/.claude/skills/*
+!/.claude/skills/implement-session/
+!/.claude/skills/to-tickets/
+/.claude/skills/implement-session/*
+!/.claude/skills/implement-session/SKILL.md
+!/.claude/skills/implement-session/scheduling.md
+/.claude/skills/to-tickets/*
+!/.claude/skills/to-tickets/SKILL.md
 /.cursor
 /.factory
 /.grok
@@ -43,3 +62,5 @@ yarn-error.log
 /opencode.json
 /opencode.jsonc
 .vitest/
+# Local AI runtime state
+.atl/
