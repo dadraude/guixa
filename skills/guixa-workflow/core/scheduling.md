@@ -11,7 +11,7 @@ For each candidate record:
 - Allowed edit surfaces: exact repository-relative paths or narrow globs, including tests and any
   authorized new-file directories. Unknown surfaces mean `needs-scope`, not permission to edit anywhere.
 - Shared contracts it changes or consumes, and expected writes to shared artifacts with their owner.
-- Lifecycle: queued, running, PR-open, stopped, or integrated; the reason for any wait.
+- Lifecycle: queued, running, pending-ci, ci-failed, ci-passed, stopped, or integrated; PR and wait reason.
 
 Inspect the shared hotspots listed in the [project profile](../project.md), including source contracts,
 generated outputs and feature documents. Reading a file is not a write reservation. Reserve document
@@ -60,10 +60,7 @@ Closed-unmerged or stopped work is not integrated. Remove its reservation only a
 has verified that it is explicitly abandoned or superseded and no active worker will keep writing it;
 do not delete worktrees or branches as a scheduling shortcut. Abandoning a dependency does not satisfy it.
 
-Before delivery, capture the checked HEAD and base SHA. Update the scheduling/reviewer handoff to the
-new base after rebasing; never review the new candidate against a stale base. After any base change or conflict resolution,
-regenerate affected derived files with the project's generator and run the full task gate on the final
-bytes, even if the rebase was textually clean. Never hand-merge generated files or blindly concatenate
-additive routes/imports: duplicate names, ordering and contracts still need checking. If resolution changes
-task behavior or contracts, send that changed candidate through review again within the existing round
-budget; exhaustion stops the task. Report any later PR conflict as an integration follow-up, not as done.
+Use [the task pipeline](task.md) as the authority for candidate preparation, focused rechecks, independent
+review, publication and candidate-bound CI evidence. Update the handoff base after any integration change;
+never reuse stale results. Regenerate affected derived files rather than hand-merging or blindly
+concatenating routes/imports. Report later PR conflicts as integration follow-ups, not as done.

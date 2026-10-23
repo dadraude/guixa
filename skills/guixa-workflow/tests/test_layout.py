@@ -56,7 +56,7 @@ class WorkflowLayoutTest(unittest.TestCase):
     def test_core_does_not_bind_a_provider_or_machine(self):
         files = list((WORKFLOW / "core").glob("*.md"))
         self.assertEqual({file.stem for file in files},
-                         {"session", "task", "scheduling", "implementer", "reviewer", "tickets"})
+                         {"session", "task", "scheduling", "implementer", "reviewer", "tickets", "handoff"})
         for file in files:
             with self.subTest(source=file):
                 self.assertNotRegex(file.read_text(),

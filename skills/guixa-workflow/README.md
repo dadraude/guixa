@@ -21,7 +21,9 @@ reload its skills or start a fresh session; do not claim discovery from the regi
 
 - One coordinator per feature across all runtimes; worktree isolation is not a distributed lock.
 - Shared-file/contract reservations last through verified integration, including after PR opening.
-- Fresh independent review, isolated task databases and rechecking after a base change remain required.
+- Fresh independent review, isolated task databases and focused rechecking after a base change remain required.
+- Local checks cover the changed behavior; full build/lint/types/tests run in CI after authorized publication.
+- An opened PR is `pending-ci`, not validated. Current candidate-bound CI success is required before cleanup.
 - Grouping parents are not executable; hierarchy, prerequisites and contextual relations stay distinct.
 - Missing tools, permissions, independent review or native relation support stop the affected action.
 - Existing ticket reorganization and remote actions still require explicit authorization.
@@ -29,6 +31,18 @@ reload its skills or start a fresh session; do not claim discovery from the regi
 To add a runtime, implement capability mappings in an adapter and a thin entrypoint. Do not fork the
 core or claim that every AI chat service can run it: it needs repository access, required execution
 and delegation capabilities, and authorized connectors. Keep explicit-only invocation in its metadata.
+
+## Verification and context ownership
+
+The implementer proves focused RED/GREEN; the coordinator reuses matching evidence rather than
+repeating it. A fresh reviewer checks semantics and requirements, not another full suite. After explicit
+publication approval, CI owns broad validation. See [the task lifecycle](core/task.md) for pending,
+failed, stale and successful results, bounded corrections and post-publication authorization.
+
+Only the coordinator loads the whole adapter/profile/process. Follow [role-scoped context](core/handoff.md)
+for workers: exact relevant briefs, source sections, resolved settings and candidate evidence, not the
+whole conversation. Keep passing logs out of prompts; request bounded failure output when needed.
+This reduces duplicated work/context, not the checks required for a validated delivery.
 
 ## Verify without side effects
 
@@ -45,3 +59,7 @@ These structural checks validate shared references, entrypoints and separation, 
 Also dry-run the same scenarios for both adapters: overlapping vs disjoint tasks, PR-open reservation,
 squash integration, scope expansion, clean rebase, exhausted review, unavailable capabilities, grouping
 parents and partial ticket publication. Never run a live implementation or create a ticket as a smoke test.
+Also exercise focused-only local verification, CI failure/fix, pending/skipped/stale CI, changed PR head
+or base, merge-ref identity, missing publication/update permission, and each role's minimum handoff.
+Instruction-only changes have no executable application behavior for RED/GREEN; structural tests
+and independent scenario walkthroughs are the proportional checks, not `composer ci:check` locally.

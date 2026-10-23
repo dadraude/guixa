@@ -5,19 +5,19 @@ configuration, not permission to run the commands or access a remote service.
 
 ## Identities and paths
 
-| Setting                                   | Value                                                                           |
-| ----------------------------------------- | ------------------------------------------------------------------------------- |
-| Tracker                                   | Linear; workspace URL slug `draude`, team `DRA`, project `Coop`                 |
-| Eligible statuses / dependency completion | `Backlog`, `Todo` / `Done`                                                      |
-| Active / stopped status                   | `In Progress` / `Todo`                                                          |
-| Executable task                           | `Tnn` title prefix matching a row in `specs/*/tasks.md`                         |
-| Ready label                               | `ready-for-agent`, executable mapped leaves only                                |
-| Remote / base                             | `origin` / `main`                                                               |
-| Task branch                               | `feature/dra-NN-<3-6 title words>`; `chore/` for tooling, test support or CI    |
-| Worktree root                             | Sibling of the selected repository: `<repo-parent>/<repo-name>-worktrees`       |
-| Task worktree                             | `<worktree-root>/dra-NN`                                                        |
-| Test database                             | `guixa_test_draNN`; parallel workers may add `_test_N`                          |
-| Limits                                    | 3 task pipelines in flight; 3 review rounds; stop after 2 consecutive red gates |
+| Setting                                   | Value                                                                                                      |
+| ----------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| Tracker                                   | Linear; workspace URL slug `draude`, team `DRA`, project `Coop`                                            |
+| Eligible statuses / dependency completion | `Backlog`, `Todo` / `Done`                                                                                 |
+| Active / stopped status                   | `In Progress` / `Todo`                                                                                     |
+| Executable task                           | `Tnn` title prefix matching a row in `specs/*/tasks.md`                                                    |
+| Ready label                               | `ready-for-agent`, executable mapped leaves only                                                           |
+| Remote / base                             | `origin` / `main`                                                                                          |
+| Task branch                               | `feature/dra-NN-<3-6 title words>`; `chore/` for tooling, test support or CI                               |
+| Worktree root                             | Sibling of the selected repository: `<repo-parent>/<repo-name>-worktrees`                                  |
+| Task worktree                             | `<worktree-root>/dra-NN`                                                                                   |
+| Test database                             | `guixa_test_draNN`; parallel workers may add `_test_N`                                                     |
+| Limits                                    | 3 task pipelines in flight; 3 review rounds; stop after 2 consecutive failed attempts per validation stage |
 
 Resolve `REPO_ROOT` with `git rev-parse --show-toplevel` in the coordinator's selected checkout;
 retain it across all workers instead of recomputing it from their working directory. Derive
@@ -43,19 +43,28 @@ with `TEST_DB`, and verify the replacement without logging credentials. Never ch
 All setup, tests and artisan commands use the worktree prefix above; the user's `guixa` database and
 shared `guixa_test` are not task databases. If isolated database configuration cannot be verified, stop.
 
-| Operation      | Command in the task worktree                                                             |
-| -------------- | ---------------------------------------------------------------------------------------- |
-| Setup          | `composer install && pnpm install --frozen-lockfile && pnpm run build`                   |
-| Focused test   | `php artisan test --filter=<test>` (run serially initially)                              |
-| Focused checks | `composer lint:check`, `composer types:check`, focused tests for every changed test file |
-| Full gate      | `composer ci:check`                                                                      |
+| Operation                 | Command in the task worktree                                                                                                                                                             |
+| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Setup                     | `composer install && pnpm install --frozen-lockfile`; build only for a focused-test prerequisite or build reproduction                                                                   |
+| Focused test              | `php artisan test --filter=<test>` (run serially initially)                                                                                                                              |
+| Focused checks            | Tests for affected behavior and every changed test file; select frontend files/tests using the installed runner's supported selectors; affected-file format/type checks only when needed |
+| Full validation (CI only) | `.github/workflows/tests.yml`: `composer setup`, then `composer ci:check`; resolve their current definitions from `composer.json` and `package.json`                                     |
+
+Verify selector syntax from the installed runner before execution; do not guess a command or silently
+expand it to a full local suite. For changes without executable behavior, record the test-first exception
+and run relevant structural checks. Never report an omitted check as passed.
+
+The current CI triggers on PRs and pushes to `main`, not a feature-branch push alone. Resolve expected
+checks from the current workflow (currently `ci` in `tests`) plus branch requirements before accepting
+results. This application pipeline does not automatically cover workflow-skill structural tests; run
+the README's offline checks locally when these instruction documents change.
 
 The prefix's `PGTZ=UTC` matches CI; a local Europe/Madrid database session can hide timestamp failures.
 Discover affected generators from the repository scripts before regenerating; do not invent a command.
 Only the coordinator runs shared `git fetch origin`, `git worktree add/remove`, one at a time.
 Create worktrees with `git worktree add "$WORKTREE" -b "$BRANCH" "$BASE_REF"`.
 
-After a confirmed PR, remove only the clean, task-owned worktree (never `--force`) and run the existing
+After a confirmed PR with current successful CI evidence, remove only the clean, task-owned worktree (never `--force`) and run the existing
 guarded cleanup helper from the coordinator with the verified PHP runtime:
 `php skills/guixa-workflow/scripts/drop-test-databases.php NN`.
 Its allowed namespace is `guixa_test_draNN` and its suffixed worker databases. A cleanup failure is

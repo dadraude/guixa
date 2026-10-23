@@ -4,6 +4,8 @@
 
 Use the selected adapter and [project profile](../project.md) for future ticket batches. Auditing or drafting does not authorize publishing. Reorganizing
 existing tickets is a separate request; do not migrate them as a side effect of creating new work.
+If a reader is needed, use [role-scoped context](handoff.md); ticket drafting does not load worker
+execution/setup instructions or authorize implementation.
 
 ## Hard Rules
 

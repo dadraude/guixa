@@ -32,15 +32,16 @@ Run [the task pipeline](task.md) for admitted tasks, using task order as a tie-b
 of the project's task limit and available runtime capacity. No available independent reviewer means
 stop the affected pipeline; do not replace independent review with writer self-review.
 
-Pass resolved project configuration, the adapter, relevant briefs and scheduling handoff to every worker.
+Use the [role-scoped handoff](handoff.md); keep the adapter and orchestration context in the coordinator.
 Workers do not delegate. The coordinator waits for actual completion and reconciles results before
 dependent steps. Partial/empty worker output is not success. Verify actual paths against admitted scope.
 
 An open PR frees an execution slot, not its reservation. Recompute compatibility before admitting the
 next task. A stopped task holds overlapping work while its changes remain pending, but not disjoint work.
-When only integration waits remain, report the exact prerequisite PRs and stop, without polling or merging.
+When only CI/integration waits remain, report exact PRs, candidate identities and pending checks and
+stop without busy-polling or merging. Retain pending-CI environments for fixes; resume with current evidence.
 On resume reconstruct reservations from live worktrees and authorized PR evidence, not chat alone.
 
-Return one table: task, outcome (PR/stopped/waiting-integration), review rounds, deviations, retained
+Return one table: task, outcome (pending-ci/ci-failed/ci-passed/stopped/waiting-integration), PR, review rounds, deviations, retained
 worktree, reserved surfaces and predecessor PRs. Include pending checks and unresolved decisions.
 A PR is not an integrated task. Do not mark missing proof as passed.
