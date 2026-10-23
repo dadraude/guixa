@@ -18,6 +18,9 @@ trait StockMovementRepositoryContract
     /** An id the repository accepts as a stock product (the database needs a real one). */
     abstract protected function stockProductId(): string;
 
+    /** Lets an adapter that enforces foreign keys create the cycle the tests refer to. */
+    protected function cycleExists(string $cycleId): void {}
+
     private const string ACCOUNT = '0198f0a0-0000-7000-8000-000000000001';
 
     private function entry(StockMovementRepository $repository, string $productId, string $quantity, string $at = '2026-10-22T10:00:00+00:00'): StockMovement
@@ -42,6 +45,7 @@ trait StockMovementRepositoryContract
         $repository = $this->repository();
         $productId = $this->stockProductId();
         $cycleId = '0198f0a0-0000-7000-8000-0000000000c1';
+        $this->cycleExists($cycleId);
         $orderId = '0198f0a0-0000-7000-8000-0000000000d1';
         $at = new DateTimeImmutable('2026-10-22T10:00:00+00:00');
 

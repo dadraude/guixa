@@ -221,3 +221,50 @@ it('rejects malformed quantities and a missing adjustment note before the use ca
 it('answers 404 to the movements of an unknown stock product', function () {
     $this->actingAs(accountWith(Role::Manager))->get('/manage/stock/'.fake()->uuid().'/movements')->assertNotFound();
 });
+
+it('offers the cycles on the movements page so an adjustment can name one (R27)', function () {
+    $product = honey();
+    $first = (string) fake()->uuid();
+    $second = (string) fake()->uuid();
+    DB::table('cycles')->insert([
+        ['id' => $second, 'pickup_date' => '2026-11-14'],
+        ['id' => $first, 'pickup_date' => '2026-11-07'],
+    ]);
+
+    $this->actingAs(accountWith(Role::Manager))->get("/manage/stock/{$product->id}/movements")
+        ->assertInertia(fn (Assert $page) => $page
+            ->has('cycles', 2)
+            ->where('cycles.0.id', $first)
+            ->where('cycles.0.pickupDate', '2026-11-07')
+            ->where('cycles.1.id', $second));
+});
+
+it('records the cycle an adjustment refers to, and none when left empty (R27)', function () {
+    $product = honey();
+    $manager = accountWith(Role::Manager);
+    $cycleId = (string) fake()->uuid();
+    DB::table('cycles')->insert(['id' => $cycleId, 'pickup_date' => '2026-11-07']);
+    $this->actingAs($manager)->post("/manage/stock/{$product->id}/entries", ['quantity' => '10']);
+
+    $this->actingAs($manager)
+        ->post("/manage/stock/{$product->id}/adjustments", ['quantity' => '-1', 'note' => 'broken jar', 'cycle_id' => $cycleId])
+        ->assertRedirect("/manage/stock/{$product->id}/movements");
+    $this->actingAs($manager)
+        ->post("/manage/stock/{$product->id}/adjustments", ['quantity' => '-1', 'note' => 'inventory count', 'cycle_id' => ''])
+        ->assertRedirect("/manage/stock/{$product->id}/movements");
+
+    expect(DB::table('stock_movements')->where('note', 'broken jar')->value('cycle_id'))->toBe($cycleId)
+        ->and(DB::table('stock_movements')->where('note', 'inventory count')->value('cycle_id'))->toBeNull();
+});
+
+it('rejects an adjustment that names a cycle that does not exist (R27)', function () {
+    $product = honey();
+    $manager = accountWith(Role::Manager);
+    $this->actingAs($manager)->post("/manage/stock/{$product->id}/entries", ['quantity' => '10']);
+
+    $this->actingAs($manager)
+        ->post("/manage/stock/{$product->id}/adjustments", ['quantity' => '-1', 'note' => 'x', 'cycle_id' => (string) fake()->uuid()])
+        ->assertSessionHasErrors('cycle_id');
+
+    expect(DB::table('stock_movements')->count())->toBe(1);
+});

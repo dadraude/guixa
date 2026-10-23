@@ -30,6 +30,11 @@ final class EloquentStockMovementRepositoryTest extends TestCase
         ])->id;
     }
 
+    protected function cycleExists(string $cycleId): void
+    {
+        DB::table('cycles')->insert(['id' => $cycleId, 'pickup_date' => '2026-11-07']);
+    }
+
     /** @param  array<string, mixed>  $overrides */
     private function insert(array $overrides): void
     {
@@ -67,6 +72,25 @@ final class EloquentStockMovementRepositoryTest extends TestCase
     {
         $this->assertThrows(fn () => $this->insert(['type' => 'gift']), QueryException::class);
         $this->assertThrows(fn () => $this->insert(['stock_product_id' => (string) Str::uuid7()]), QueryException::class);
+    }
+
+    #[Test]
+    public function the_database_refuses_a_movement_of_an_unknown_cycle(): void
+    {
+        $this->assertThrows(
+            fn () => $this->insert(['type' => 'adjustment', 'quantity' => '-1.000', 'note' => 'x', 'cycle_id' => (string) Str::uuid7()]),
+            QueryException::class,
+        );
+    }
+
+    #[Test]
+    public function the_database_accepts_a_movement_of_an_existing_cycle(): void
+    {
+        $cycleId = (string) Str::uuid7();
+        DB::table('cycles')->insert(['id' => $cycleId, 'pickup_date' => '2026-11-07']);
+        $this->insert(['type' => 'adjustment', 'quantity' => '-1.000', 'note' => 'x', 'cycle_id' => $cycleId]);
+
+        $this->assertSame(1, DB::table('stock_movements')->where('cycle_id', $cycleId)->count());
     }
 
     #[Test]

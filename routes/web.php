@@ -4,6 +4,8 @@ use App\Http\Controllers\AcceptInvitationController;
 use App\Http\Controllers\Manage\AccountController;
 use App\Http\Controllers\Manage\AccountDeactivationController;
 use App\Http\Controllers\Manage\AccountHouseholdController;
+use App\Http\Controllers\Manage\CycleController;
+use App\Http\Controllers\Manage\CycleParticipantController;
 use App\Http\Controllers\Manage\HouseholdController;
 use App\Http\Controllers\Manage\HouseholdMemberController;
 use App\Http\Controllers\Manage\HouseholdWalletController;
@@ -12,6 +14,7 @@ use App\Http\Controllers\Manage\ManagerRoleController;
 use App\Http\Controllers\Manage\ProducerAccountController;
 use App\Http\Controllers\Manage\ProducerController;
 use App\Http\Controllers\Manage\ReturnItemController;
+use App\Http\Controllers\Manage\SettingsController;
 use App\Http\Controllers\Manage\StockMovementController;
 use App\Http\Controllers\Manage\StockProductController;
 use App\Http\Controllers\Producer\CutoffController;
@@ -54,6 +57,15 @@ Route::middleware(['auth', 'verified', 'role:manager'])->prefix('manage')->name(
         ->except(['show'])
         ->whereUuid('returnItem')
         ->names('return-items');
+
+    Route::get('cycles', [CycleController::class, 'index'])->name('cycles.index');
+    Route::post('cycles', [CycleController::class, 'store'])->name('cycles.store');
+    Route::post('cycles/{cycle}/producers/{producer}', [CycleParticipantController::class, 'store'])
+        ->whereUuid(['cycle', 'producer'])
+        ->name('cycles.producers.store');
+
+    Route::get('settings', [SettingsController::class, 'show'])->name('settings.show');
+    Route::put('settings/pickup-weekday', [SettingsController::class, 'updatePickupWeekday'])->name('settings.pickup-weekday.update');
 
     Route::get('households', [HouseholdController::class, 'index'])->name('households.index');
     Route::post('households', [HouseholdController::class, 'store'])->name('households.store');

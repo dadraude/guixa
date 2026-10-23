@@ -14,6 +14,21 @@ export type CutoffRuleRow = {
 readonly daysBefore: number,
 readonly time: string,
 };
+export type CycleOptionRow = {
+readonly id: string,
+readonly pickupDate: string,
+};
+export type CycleParticipantRow = {
+readonly producerId: string,
+readonly producerName: string,
+readonly participating: boolean,
+readonly cutoff: string | null,
+};
+export type CycleRow = {
+readonly id: string,
+readonly pickupDate: string,
+readonly participants: App.Http.CycleParticipantRow[],
+};
 export type HouseholdRow = {
 readonly id: string,
 readonly name: string,
@@ -33,6 +48,10 @@ readonly email: string,
 readonly invitationPending: boolean,
 readonly invitationExpiresAt: string | null,
 readonly invitationExpired: boolean,
+};
+export type ProducerOptionRow = {
+readonly id: string,
+readonly name: string,
 };
 export type ProducerRow = {
 readonly id: string,

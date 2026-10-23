@@ -294,3 +294,35 @@ null when the product is unknown or deactivated or its producer is deactivated; 
 empty for an unknown or deactivated producer, so Ordering lists the participating producers itself; `GetProducerCutoffRule(producerId)` returns `?ProducerCutoffRuleData`
 (active flag, days before, time). Availability in a cycle (R3c) stays with Ordering (T15). `plan.md` (Catalog use cases) now says so.
 Why: R3's catalog part is "active product of an active producer"; the rest of R3 needs cycles, which do not exist yet.
+
+## 2026-10-23 · Deviation
+
+T11: `plan.md` did not say how Ordering reads a producer's rule across the A4 boundary, what `OpenCycle` takes and returns, or what the pickup weekday is before a manager chooses.
+Ordering now has its own `CutoffRule` value object, filled by the `ProducerCutoffRules` port (Catalog adapter; null for an unknown or deactivated producer, so `ProducerNotActive` covers
+S50's "cannot be made to participate in a new cycle"). `OpenCycle` takes `YYYY-MM-DD` and the producer ids (none allowed, R12a) and returns the cycle id; `addParticipant` leaves a producer
+already in the cycle untouched (R5: never recomputed). `ListCycles` and `GetPickupWeekday` are added for the pages. The pickup weekday is Saturday (ISO 6) until changed, seeded by the migration (assumption: the spec's examples use Saturday).
+`Cycle` holds only pickup date, participation and cutoff; the other states arrive with their tasks. `plan.md` (Ordering domain, use cases, HTTP & pages) now says so.
+Why: R4, R4a, R4c and R5 need these decisions and the plan was silent.
+
+T11: the stock adjustment's cycle picker (R27) lists every cycle and the request checks `cycle_id` exists in `cycles` as friendly validation, and the T11 migration adds the foreign key `stock_movements.cycle_id` → `cycles.id`
+(the stock migration had deferred it until the cycles table existed). `wallet_movements.cycle_id` stays a plain id: its migration chose that because cycles belong to Ordering, not because the table was missing.
+`plan.md` (HTTP & pages) now says so.
+Why: R27 lets an adjustment reference a cycle, and T25 left the picker to T11.
+
+## 2026-10-23 · Q&A
+
+Q: Before a manager configures it, should the pickup weekday default to Saturday, or should opening a cycle be blocked until a manager has chosen one?
+A: "a la configuració de la cooperativa s'ha d'indicar el dia de recollida, sense aquest valor indicat no es pot començar un cicle. el què podem fer és demanar aquest valor en iniciar el cicle i al confirmar demanar si és permanent o provisional."
+
+## 2026-10-23 · Change
+
+R4c (`ordering.md`): no default pickup weekday. A cycle cannot be opened without one; opening a cycle when the cooperative has none asks the manager for it, and on confirming they choose permanent (it becomes the cooperative's weekday) or provisional (only this cycle; the next opening asks again).
+Why: the Q&A above, raised by the T11 review; it replaces the T11 Deviation's Saturday assumption.
+
+## 2026-10-23 · Change
+
+`plan.md` (Ordering domain, use cases, persistence, HTTP & pages, D11) and `tasks.md` (T11): following the R4c change above, there is no default pickup weekday. `cooperative_settings.pickup_weekday` is nullable and the migration creates the row empty;
+`GetPickupWeekday` returns null while unset. `OpenCycle` takes an optional `weekday` and a `permanent` flag: with a cooperative weekday it uses that and refuses a given one (`PickupWeekdayAlreadySet`); without one and none given it
+refuses (`PickupWeekdayNotSet`); a given one validates the pickup date, and permanent also saves it in the same transaction while provisional saves nothing. The cycles page shows the weekday picker and the permanent/provisional choice only while the
+cooperative has none; the settings page shows "not set".
+Why: the R4c decision in the Q&A above. It supersedes the Saturday sentence of the T11 Deviation.
