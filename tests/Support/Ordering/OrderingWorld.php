@@ -5,6 +5,7 @@ namespace Tests\Support\Ordering;
 use Guixa\Ordering\Application\AddParticipant;
 use Guixa\Ordering\Application\ClearCutoff;
 use Guixa\Ordering\Application\CloseProducerNow;
+use Guixa\Ordering\Application\GetCycleSummary;
 use Guixa\Ordering\Application\GetHouseholdOrder;
 use Guixa\Ordering\Application\GetPickupWeekday;
 use Guixa\Ordering\Application\HasUnsettledLines;
@@ -19,6 +20,7 @@ use Guixa\Ordering\Domain\ValueObject\PickupWeekday;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Role;
 use Tests\Support\FrozenClock;
+use Tests\Support\InMemory\FakeHouseholds;
 use Tests\Support\InMemory\FakeProducerCutoffRules;
 use Tests\Support\InMemory\FakeProductCatalog;
 use Tests\Support\InMemory\ImmediateTransactionRunner;
@@ -48,6 +50,8 @@ final class OrderingWorld
 
     public readonly InMemoryProductAvailabilityRepository $availability;
 
+    public readonly FakeHouseholds $households;
+
     public readonly SetPickupWeekday $setPickupWeekday;
 
     public readonly GetPickupWeekday $getPickupWeekday;
@@ -74,6 +78,8 @@ final class OrderingWorld
 
     public readonly HasUnsettledLines $hasUnsettledLines;
 
+    public readonly GetCycleSummary $getCycleSummary;
+
     public readonly Actor $manager;
 
     /** @param  ?int  $pickupWeekday  the cooperative's weekday (ISO), or null while a manager has not chosen one (R4c) */
@@ -86,6 +92,7 @@ final class OrderingWorld
         $this->orders = new InMemoryOrderRepository;
         $this->catalog = new FakeProductCatalog;
         $this->availability = new InMemoryProductAvailabilityRepository;
+        $this->households = new FakeHouseholds;
         $transactions = new ImmediateTransactionRunner;
 
         if ($pickupWeekday !== null) {
@@ -105,6 +112,7 @@ final class OrderingWorld
         $this->removeMarkedLine = new RemoveMarkedLine($this->cycles, $this->orders, $this->catalog, $this->availability, $transactions);
         $this->setProductAvailability = new SetProductAvailability($this->cycles, $this->catalog, $this->availability, $transactions);
         $this->hasUnsettledLines = new HasUnsettledLines($this->orders);
+        $this->getCycleSummary = new GetCycleSummary($this->cycles, $this->orders, $this->households);
 
         $this->manager = new Actor('00000000-0000-7000-8000-00000000000a', [Role::Manager]);
 

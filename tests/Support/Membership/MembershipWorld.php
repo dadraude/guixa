@@ -11,6 +11,7 @@ use Guixa\Membership\Application\CreateHousehold;
 use Guixa\Membership\Application\DeactivateAccount;
 use Guixa\Membership\Application\DeactivateEmptyHousehold;
 use Guixa\Membership\Application\GetHousehold;
+use Guixa\Membership\Application\GetHouseholds;
 use Guixa\Membership\Application\GrantManagerRole;
 use Guixa\Membership\Application\InviteProducerAccount;
 use Guixa\Membership\Application\ListAccounts;
@@ -77,6 +78,8 @@ final class MembershipWorld
 
     public readonly GetHousehold $getHousehold;
 
+    public readonly GetHouseholds $getHouseholds;
+
     public readonly MoveMember $moveMember;
 
     public readonly UnlinkMember $unlinkMember;
@@ -132,6 +135,7 @@ final class MembershipWorld
         $this->canLogIn = new CanLogIn($this->accounts);
         $this->listHouseholds = new ListHouseholds($this->households, $this->accounts);
         $this->listProducerAccounts = new ListProducerAccounts($this->accounts);
+        $this->getHouseholds = new GetHouseholds($this->households);
         $this->getHousehold = new GetHousehold($this->households, $this->accounts, $this->invitations, $this->clock);
 
         $deactivateEmptyHousehold = new DeactivateEmptyHousehold($this->households, $this->accounts, $this->clock);

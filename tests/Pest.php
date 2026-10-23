@@ -1,6 +1,8 @@
 <?php
 
 use App\Models\User;
+use Carbon\CarbonImmutable;
+use Guixa\Catalog\Infrastructure\Persistence\ProducerModel;
 use Guixa\Shared\Domain\Role;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -134,4 +136,23 @@ function memberOf(string $householdId, string $name = 'Anna'): User
     $user->forceFill(['name' => $name, 'household_id' => $householdId])->save();
 
     return $user;
+}
+
+/** A cycle in a month, with a baker taking part (open until its cutoff, or the pickup date when it has none) and one loaf product. */
+function cycleWithBaker(?CarbonImmutable $cutoff = null): array
+{
+    $baker = ProducerModel::query()->create([
+        'name' => 'Baker', 'active' => true, 'cutoff_days_before' => 3, 'cutoff_time' => '20:00',
+    ]);
+    $loaf = (string) Str::uuid7();
+    DB::table('products')->insert([
+        'id' => $loaf, 'producer_id' => $baker->id, 'name' => 'Loaf', 'unit' => 'loaf', 'price_cents' => 350, 'variable' => false, 'active' => true,
+    ]);
+    $cycleId = (string) Str::uuid7();
+    DB::table('cycles')->insert(['id' => $cycleId, 'pickup_date' => CarbonImmutable::now()->addDays(30)->toDateString()]);
+    DB::table('cycle_producers')->insert([
+        'cycle_id' => $cycleId, 'producer_id' => $baker->id, 'participating' => true, 'closes_at' => $cutoff?->toDateTimeString(),
+    ]);
+
+    return [$cycleId, $baker, $loaf];
 }

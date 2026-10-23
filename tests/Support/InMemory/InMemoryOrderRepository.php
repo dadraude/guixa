@@ -24,6 +24,11 @@ final class InMemoryOrderRepository extends InMemoryRepository implements OrderR
         return null;
     }
 
+    public function ofCycle(string $cycleId): array
+    {
+        return array_values(array_filter($this->all(), fn (Order $order) => $order->cycleId === $cycleId));
+    }
+
     public function lockFor(string $cycleId, string $householdId): Order
     {
         $order = $this->ofHousehold($cycleId, $householdId);

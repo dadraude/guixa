@@ -112,7 +112,7 @@ Use cases
 | `SuspendProducerRole`, `RestoreProducerRole` | — (called by Catalog) | R3a |
 | `ListProducerAccounts` (producer id → account email and whether its invitation is pending; the producers admin page shows it and hides the invite form for producers that have one) | manager | R36, S57 |
 | `GetProducerAccountEmail` | — (called by Ordering) | R12a |
-| `GetHouseholds` (name, active) | — (called by Ordering) | R13, R16, R19 |
+| `GetHouseholds` (household ids → name and active by id; unknown ids left out) | — (called by Ordering) | R13, R16, R19 |
 | `CreateFirstManager` (rejected once any manager exists) | — (installation command) | R36a |
 
 A household is deactivated automatically when `MoveMember`, `UnlinkMember` or `DeactivateAccount` leaves it
@@ -265,13 +265,15 @@ role only; participation is not restored.
 - `Cycle` and `ProducerOrder` carry only the fields T11 needs (pickup date, participation, cutoff); cancelled, settled, closed, sent, validated and
   distributed come with the tasks that use them, though the tables have the columns. `CycleRepository` adds `getForUpdate` (the `FOR UPDATE` lock)
   and `existsOnPickupDate` (cancelled cycles do not count).
-- `OrderRepository`: `nextId`, `add`, `ofHousehold(cycleId, householdId): ?Order`, `hasUnsettledLinesOf(productId)` (a line in a cycle with no `settled_at`, R1) and `lockFor(cycleId, householdId): Order`, which creates the empty
+- `OrderRepository`: `nextId`, `add`, `ofHousehold(cycleId, householdId): ?Order`, `hasUnsettledLinesOf(productId)` (a line in a cycle with no `settled_at`, R1), `ofCycle(cycleId): list<Order>` (one query for the orders, one for all their lines) and `lockFor(cycleId, householdId): Order`, which creates the empty
   order if there is none and locks it (`INSERT … ON CONFLICT DO NOTHING`, then `FOR UPDATE`, R7). `ProductCatalog`: `orderable(productId): ?OrderableProduct`
   and `orderableOf(producerId)`, both with Ordering's own `OrderableProduct` value object (A4); its Catalog adapter calls `GetOrderableProduct` and `ListOrderableProducts`.
   `CycleRepository` adds `getForShare` (the `FOR SHARE` lock).
 - Ports: `CooperativeSettings`, `CycleRepository`, `OrderRepository`, `ProductAvailabilityRepository`,
   `ReceivedTotalRepository`, `ProductCatalog`, `ProducerCutoffRules`, `StockCatalog`, `ReturnItemCatalog`,
   `StockSeller`, `WalletLedger`, `ProducerNotifier`, `Households`.
+- `Households` (Ordering port): `find(householdIds): array<id, HouseholdInfo>`, unknown ids left out; its Membership adapter calls `GetHouseholds`, which reads
+  them with one `HouseholdRepository::getMany(ids)` query.
 
 ### Use cases
 
@@ -290,7 +292,7 @@ role only; participation is not restored.
 | `SendProducerOrder` → notifies the producer | manager | R12a, R6b, S34, S36 |
 | `SendEmptyProducerOrders` (scheduled) | — (scheduler) | R12a, D10 |
 | `GetProducerCycleSummary` | producer (own) | R12, S7, S8 |
-| `GetCycleSummary` (totals + per household) | manager | R13, S52 |
+| `GetCycleSummary` (ordered quantity per product under its producer, per household; households Membership does not know show their id) | manager | R13, S52 |
 | `HasUnsettledLines(productId): bool`, `StopParticipatingWhereNotSent` (T16) | — (called by Catalog) | R1, R3a |
 | `ListPendingPickups` | — (called by Membership) | R35a |
 | `GetReception` | manager | R14, R17 |

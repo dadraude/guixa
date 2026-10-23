@@ -69,6 +69,7 @@ Route::middleware(['auth', 'verified', 'role:manager'])->prefix('manage')->name(
 
     Route::get('cycles', [CycleController::class, 'index'])->name('cycles.index');
     Route::post('cycles', [CycleController::class, 'store'])->name('cycles.store');
+    Route::get('cycles/{cycle}', [CycleController::class, 'show'])->whereUuid('cycle')->name('cycles.show');
     Route::post('cycles/{cycle}/producers/{producer}', [CycleParticipantController::class, 'store'])
         ->whereUuid(['cycle', 'producer'])
         ->name('cycles.producers.store');

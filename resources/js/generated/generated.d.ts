@@ -30,6 +30,16 @@ readonly id: string,
 readonly pickupDate: string,
 readonly participants: App.Http.CycleParticipantRow[],
 };
+export type CycleSummaryRow = {
+readonly cycleId: string,
+readonly pickupDate: string,
+readonly producers: App.Http.ProducerTotalsRow[],
+};
+export type HouseholdQuantityRow = {
+readonly householdId: string,
+readonly householdName: string,
+readonly quantity: string,
+};
 export type HouseholdRow = {
 readonly id: string,
 readonly name: string,
@@ -93,6 +103,11 @@ readonly cutoffTime: string,
 readonly accountEmail: string | null,
 readonly accountInvitationPending: boolean,
 };
+export type ProducerTotalsRow = {
+readonly producerId: string,
+readonly producerName: string,
+readonly products: App.Http.ProductTotalRow[],
+};
 export type ProductRow = {
 readonly id: string,
 readonly name: string,
@@ -101,6 +116,13 @@ readonly price: string,
 readonly variable: boolean,
 readonly containersPerUnit: string | null,
 readonly active: boolean,
+};
+export type ProductTotalRow = {
+readonly productId: string,
+readonly name: string,
+readonly unit: string,
+readonly quantity: string,
+readonly households: App.Http.HouseholdQuantityRow[],
 };
 export type ReturnItemRow = {
 readonly id: string,

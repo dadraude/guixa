@@ -4,12 +4,15 @@ namespace App\Http\Controllers\Manage;
 
 use App\Http\Controllers\Controller;
 use App\Http\CycleRow;
+use App\Http\CycleSummaryRow;
 use App\Http\ProducerOptionRow;
 use Guixa\Catalog\Application\ListProducers;
 use Guixa\Catalog\Application\ProducerData;
+use Guixa\Ordering\Application\GetCycleSummary;
 use Guixa\Ordering\Application\GetPickupWeekday;
 use Guixa\Ordering\Application\ListCycles;
 use Guixa\Ordering\Application\OpenCycle;
+use Guixa\Ordering\Domain\Error\CycleNotFound;
 use Guixa\Shared\Application\Actor;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -28,6 +31,21 @@ class CycleController extends Controller
             'cycles' => array_map(fn ($cycle) => CycleRow::from($cycle, $names), $listCycles($actor)),
             'producers' => array_map(ProducerOptionRow::from(...), array_values($active)),
             'pickupWeekday' => $getPickupWeekday($actor),
+        ]);
+    }
+
+    public function show(string $cycle, Actor $actor, GetCycleSummary $getCycleSummary, ListProducers $listProducers): Response
+    {
+        try {
+            $summary = $getCycleSummary($actor, $cycle);
+        } catch (CycleNotFound) {
+            abort(404);
+        }
+
+        $names = array_column(array_map(fn (ProducerData $producer) => ['id' => $producer->id, 'name' => $producer->name], $listProducers($actor)), 'name', 'id');
+
+        return Inertia::render('Manage/Cycles/Show', [
+            'summary' => CycleSummaryRow::from($summary, $names),
         ]);
     }
 
