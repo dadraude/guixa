@@ -74,6 +74,7 @@ Domain
 - `Account` (id, name, email, roles, `?householdId`, `?producerId`, `?activatedAt`, `?deactivatedAt`).
   - A member belongs to at most one household (R35); moving relinks the same account; unlinking keeps it
     active without a household.
+  - `inviteManager` (the first manager: no household, cannot log in until the invitation is accepted, R36a); `AccountRepository::hasManager()` lets `CreateFirstManager` refuse once any manager exists.
   - `grantManager` / `removeManager`: removing it from the last manager throws `LastManager` (R36a).
   - `deactivate`: unlinks from the household; the last active manager cannot be deactivated (R36b).
   - Login requires `activatedAt`, no `deactivatedAt`, and at least one effective role: a producer role counts
@@ -324,11 +325,15 @@ Any failure rolls everything back. `MarkPickupNotCollected` follows steps 1, 3 (
 Domain
 - **`StockProduct`** (id, name, unit, `Money` price ≥ 0, variable, `?Quantity containersPerUnit`, active) (R25).
 - **`ReturnItem`** (id, name, `Money` amount > 0, active) (R25).
-- **`StockMovement`** `final readonly`: id, stockProductId, type (`Entry|Adjustment|Sale`), signed `Quantity`,
+- **`StockMovement`** `final readonly`: id, stockProductId, type (`Entry|Adjustment|Sale`), `SignedQuantity` (a Stock value object,
+  since `Quantity` is never negative),
   occurredAt, recordedBy, `?note`, `?cycleId`, `?orderId`. Invariants: entry > 0; adjustment ≠ 0 with a
   non-empty note; sale < 0 with an orderId (R26–R28).
 - `available = Σ movements`; a movement that would make it negative is rejected (R27).
-- Ports: `StockProductRepository`, `ReturnItemRepository`, `StockMovementRepository` (append-only).
+- Ports: `StockProductRepository`, `ReturnItemRepository`, `StockMovementRepository` (append-only: `add`, `forProduct`, `available`,
+  `availableByProduct`, and `availableForUpdate`, which locks the `stock_products` row until the transaction ends).
+- **`StockLedger`** domain service: `record(StockMovement)` reads `availableForUpdate`, throws `NotEnoughStock` if the movement would take it
+  below 0, then adds it. `RecordStockEntry`, `RecordStockAdjustment` and `SellStock` call it inside a `TransactionRunner` run.
 - `StockProduct` and `ReturnItem` are mutable entities with a private constructor, `create` and `restore`; `change`
   re-checks every rule, so create and update share them. Rule breaches throw `NameRequired`, `UnitRequired`,
   `InvalidPrice`, `InvalidContainersPerUnit` (zero or not a valid quantity) and `InvalidReturnAmount`.
@@ -342,9 +347,9 @@ Use cases
 | `ListStockProducts`, `ListReturnItems` (inactive ones included, by name) | manager | R25 |
 | `RecordStockEntry` | manager | R26, S23 |
 | `RecordStockAdjustment` (optional cycle) | manager | R27, S23 |
-| `ListStock` (with available quantity) | manager | R28 |
-| `GetStockOffer`, `GetReturnItem` | — (internal queries for Ordering) | R20, R20a |
-| `SellStock` | — (called by Ordering) | R22, R28 |
+| `ListStock` (with available quantity, as `StockLevelData`) | manager | R28 |
+| `GetStockOffer` (a `StockLevelData`, `active` flag included: a deactivated product is still returned, Ordering decides), `GetReturnItem` | — (internal queries for Ordering) | R20, R20a |
+| `SellStock` (takes the `Actor` only to record who sold; no role check) | — (called by Ordering) | R22, R28 |
 
 ## Wallet
 
@@ -352,16 +357,18 @@ Domain
 - **`Movement`** `final readonly`: id, householdId, type (`TopUp|Charge|Credit|Correction`), signed `Money`
   amount, occurredAt, recordedBy, `?note`, `?cycleId`. Invariants: top-up > 0 with no cycle; charge < 0 and
   credit > 0, both with a cycleId; correction ≠ 0 with a non-empty note (R29, R32).
-- Port: `MovementRepository` — append-only: `add`, `balanceOf`, `statementOf`. No update, no delete (R32).
+- Port: `MovementRepository` — append-only: `add`, `balanceOf`, `statementOf` (newest first). No update, no delete (R32).
+  `add` throws `PickupAlreadyCharged` for a second charge or credit of the same household and cycle (R23); the
+  partial unique index is the second line of defence.
 - A deactivated household's wallet still accepts top-ups and corrections (R35a).
 
 Use cases
 | Use case | Actor | Covers |
 | --- | --- | --- |
-| `RecordTopUp` | manager (also called by Ordering at pickup) | R29, S19, S24 |
+| `RecordTopUp` | manager (also called by Ordering at pickup, with the manager's `Actor`) | R29, S19, S24 |
 | `RecordCorrection` (optional cycle) | manager | R32, S24, S54 |
-| `ChargeForPickup` (charge, credit or nothing) | — (called by Ordering) | R22, R30 |
-| `GetBalance` | — (internal query) / manager | R21, R35a |
+| `ChargeForPickup` (charge, credit or nothing; takes the signed total in cents) | manager (called by Ordering with the pickup's `Actor`, who is `recordedBy`) | R22, R30 |
+| `GetBalance` | manager (internal query for Ordering and Membership adapters) | R21, R35a |
 | `GetWalletStatement` | member of household / manager | R30, R31, S21 |
 
 ## Persistence (Postgres)
@@ -415,7 +422,8 @@ role areas (R36a); the layout shows a switch between them.
 | `GET /cycles/{cycle}/order` | `Orders/Edit` (order, then pickup once settled) | `GetHouseholdOrder`, `ListOrderableProducts` |
 | `PUT /cycles/{cycle}/order/lines/{product}` | partial reload of `order` prop | `SetOrderLine` |
 | `DELETE /cycles/{cycle}/order/lines/{product}` | partial reload | `RemoveMarkedLine` |
-| `GET /wallet` | `Wallet/Statement` | `GetWalletStatement` |
+| `GET /wallet` | `Wallet/Statement` (member's own household) | `GetWalletStatement` |
+| `GET /manage/households/{household}/wallet` | `Wallet/Statement` with the top-up and correction forms | `GetWalletStatement` |
 | `GET /producer/products` … | `Producer/Products/*` | Catalog CRUD |
 | `GET/PUT /producer/cutoff` | `Producer/Cutoff` | `GetDefaultCutoff`, `SetDefaultCutoff` |
 | `GET /producer/cycles/{cycle}` | `Producer/CycleSummary` | `GetProducerCycleSummary` |
@@ -439,7 +447,7 @@ role areas (R36a); the layout shows a switch between them.
 | `POST/DELETE …/pickups/{household}/stock-lines[/{stockProduct}]` | partial reload | `AddStockToPickup`, `RemoveStockFromPickup` |
 | `POST/DELETE …/pickups/{household}/return-lines[/{returnItem}]` | partial reload | `AddReturnToPickup`, `RemoveReturnFromPickup` |
 | `POST …/pickups/{household}/complete`, `…/not-collected` | redirect to pickups index | `CompletePickup`, `MarkPickupNotCollected` |
-| `/manage/stock…`, `/manage/return-items…` | `Manage/Stock/{Index,Create,Edit}`, `Manage/ReturnItems/{Index,Create,Edit}` | Stock CRUD (T24); entries and adjustments (T25) |
+| `/manage/stock…`, `/manage/return-items…` | `Manage/Stock/{Index,Create,Edit,Movements}`, `Manage/ReturnItems/{Index,Create,Edit}` | Stock CRUD (T24); `GET /manage/stock/{stockProduct}/movements` and `POST …/entries`, `POST …/adjustments` (T25): `ListStock`, `RecordStockEntry`, `RecordStockAdjustment`. The stock index lists `StockLevelRow`s (available quantity). The adjustment form has no cycle picker until T11 adds it |
 | `/manage/households…`, `/manage/producers…`, `/manage/accounts…` | `Manage/Households/*`, `Manage/Producers/*`, `Manage/Accounts/*` | Membership + Catalog |
 | `GET/POST /manage/producers`, `POST /manage/producers/{producer}/account` | `Manage/Producers/Index` (list with each producer's account email and invitation state, create form, invite form only for producers without an account) | `ListProducers` + `ListProducerAccounts` (the controller joins them into `ProducerRow`), `CreateProducer`, `InviteProducerAccount` |
 | `POST /manage/households/{household}/wallet/{top-ups,corrections}` | — | `RecordTopUp`, `RecordCorrection` |

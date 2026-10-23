@@ -7,8 +7,9 @@ import {
     LayoutGrid,
     Package,
     Timer,
-    Wheat,
     Undo2,
+    Wallet,
+    Wheat,
 } from '@lucide/vue';
 import { computed } from 'vue';
 import HouseholdController from '@/actions/App/Http/Controllers/Manage/HouseholdController';
@@ -16,6 +17,7 @@ import ProducerController from '@/actions/App/Http/Controllers/Manage/ProducerCo
 import ReturnItemController from '@/actions/App/Http/Controllers/Manage/ReturnItemController';
 import StockProductController from '@/actions/App/Http/Controllers/Manage/StockProductController';
 import CutoffController from '@/actions/App/Http/Controllers/Producer/CutoffController';
+import WalletController from '@/actions/App/Http/Controllers/WalletController';
 import AppLogo from '@/components/AppLogo.vue';
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
@@ -67,12 +69,23 @@ const producerNavItems: NavItem[] = [
     },
 ];
 
+const memberNavItems: NavItem[] = [
+    {
+        title: 'Wallet',
+        href: WalletController.show(),
+        icon: Wallet,
+    },
+];
+
 const mainNavItems = computed<NavItem[]>(() => [
     {
         title: 'Dashboard',
         href: dashboard(),
         icon: LayoutGrid,
     },
+    ...(roleAreas.value.some((area) => area.role === 'member')
+        ? memberNavItems
+        : []),
     ...(roleAreas.value.some((area) => area.role === 'manager')
         ? managerNavItems
         : []),

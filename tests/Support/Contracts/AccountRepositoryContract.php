@@ -117,4 +117,15 @@ trait AccountRepositoryContract
 
         $this->assertSame([$baker->id], $ids);
     }
+
+    #[Test]
+    public function it_tells_whether_a_manager_exists(): void
+    {
+        $repository = $this->repository();
+        $repository->save(Account::inviteMember($repository->nextId(), 'Anna', Email::from('anna@example.org'), $this->householdId()));
+        $this->assertFalse($repository->hasManager());
+
+        $repository->save(Account::inviteManager($repository->nextId(), 'Marta', Email::from('marta@example.org')));
+        $this->assertTrue($repository->hasManager());
+    }
 }

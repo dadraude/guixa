@@ -211,3 +211,42 @@ still pending, and shows the invite form only for producers without one. Members
 `plan.md` (Membership use cases, HTTP & pages) now says so. No `R#` or `S#` changed.
 User's answer to the review question "should the producers admin page show whether a producer already has its account (with its email) and hide the invite form for those producers?": "Si".
 Why: without it a manager only learns a producer has an account by getting the S57 rejection.
+T26: `ChargeForPickup` and `GetBalance` take the `Actor` and require a manager, where `plan.md` listed no actor. A movement records who recorded it
+(`recordedBy`), and Ordering calls them from a manager's pickup; `GetBalance` stays manager-only until a caller needs more. They take and return integer
+cents like the other use cases. `plan.md` (Wallet use cases) now says so.
+Why: `Movement.recordedBy` has no value without an actor, and a use case that skips the role check would be the only one.
+
+T26: added `GET /manage/households/{household}/wallet`, which reuses `Wallet/Statement` and carries the top-up and correction forms; `plan.md` listed only the
+two POST routes. The manager household page links to it, and members get a Wallet entry in the sidebar. `plan.md` (HTTP & pages) now lists the route.
+Why: the forms need a page with the household's balance and movements, and `Manage/Households/Show` is the membership page.
+
+T26: R31 says members see each movement's cycle. `GetWalletStatement` returns `cycleId`, but the page shows no cycle label yet because cycles do not
+exist until the Ordering context. The page gets the label when the cycle queries land (with the Ordering work).
+For the same reason the correction form has no optional cycle field (R32) yet, although `CorrectionRequest` and `RecordCorrection` accept `cycle_id`; it gets its cycle picker when the Ordering context's cycle queries land, like the label. No task row names the wallet picker on this branch, so tasks.md is unchanged.
+The page has no static breadcrumb: it serves both the member route (`/wallet`, member-only) and the manager route, and a static crumb would send managers to a 403.
+Why: a raw cycle id is no use to a member.
+
+T26: `wallet_movements` also has a `CHECK` per type (sign, cycle, note) and `recorded_by` references `users`; `cycle_id` has no foreign key (Ordering owns cycles).
+`PickupAlreadyCharged` is the domain error for the partial unique index, so a double charge reads as a form error rather than a 500.
+Why: the invariants of `Movement` hold in the database too; the cycle table is another context's.
+T34: the plan did not name how `CreateFirstManager` knows a manager exists or builds the account. Added `Account::inviteManager` and
+`AccountRepository::hasManager()` (in-memory, database and contract test); `plan.md` (Membership, Domain) now says so. The
+check and the write run in one transaction. `guixa:create-manager` is `App\Console\Commands\CreateManager` and prints the
+domain error and fails when a manager already exists or the email is taken.
+Why: the use case needs both to enforce "rejected once any manager exists" (R36a, D17).
+
+T25: `plan.md` had no way to hold a negative quantity, since `Quantity` rejects negatives. Added a Stock value object `SignedQuantity` for
+movements, and a `StockLedger` domain service that checks "never below 0" under the `stock_products` row lock (new port method
+`StockMovementRepository::availableForUpdate`, plus `forProduct`, `available` and `availableByProduct`). `plan.md` (Stock) now says so.
+Why: R27 and R28 need signed movements and one place that enforces the floor for entries, adjustments and sales alike.
+
+T25: `GetStockOffer` returns the same `StockLevelData` as `ListStock`, with an `active` flag, and does not reject a deactivated product; whether
+a deactivated product can be added to a pickup is left to T28 (S55 only says an existing line survives deactivation). `SellStock` takes the
+`Actor` to record who sold and does no role check, since only Ordering calls it. `plan.md` (Stock use cases) now says so.
+Why: the spec is silent on adding a deactivated product, so the query reports the fact and does not decide.
+
+T25: `plan.md` named no route or page for entries and adjustments. Added `GET /manage/stock/{stockProduct}/movements` (`Manage/Stock/Movements`,
+with the two forms) and `POST …/entries`, `POST …/adjustments`; the stock index now shows the available quantity (`StockLevelRow`).
+`stock_movements.cycle_id` and `order_id` have no foreign key until the Ordering tables exist. `plan.md` (HTTP & pages) now says so.
+The adjustment form records no cycle until cycles exist (the controller passes none; `RecordStockAdjustment` already accepts one); T11 adds the cycle picker.
+Why: R26 and R27 are manager actions, so they need a way to be performed.

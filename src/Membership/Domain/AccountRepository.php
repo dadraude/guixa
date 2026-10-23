@@ -19,6 +19,8 @@ interface AccountRepository
     /** @return list<Account> accounts that belong to a producer */
     public function producerAccounts(): array;
 
+    public function hasManager(): bool;
+
     /** @return list<Account> */
     public function membersOf(string $householdId): array;
 }

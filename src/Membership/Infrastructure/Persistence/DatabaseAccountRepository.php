@@ -57,6 +57,11 @@ final class DatabaseAccountRepository implements AccountRepository
             ->all());
     }
 
+    public function hasManager(): bool
+    {
+        return DB::table('account_roles')->where('role', Role::Manager->value)->exists();
+    }
+
     public function membersOf(string $householdId): array
     {
         return array_values(DB::table('users')->where('household_id', $householdId)->orderBy('name')->orderBy('id')->get()

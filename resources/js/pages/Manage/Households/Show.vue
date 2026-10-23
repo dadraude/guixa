@@ -2,6 +2,7 @@
 import { Form, Head, Link } from '@inertiajs/vue3';
 import HouseholdController from '@/actions/App/Http/Controllers/Manage/HouseholdController';
 import HouseholdMemberController from '@/actions/App/Http/Controllers/Manage/HouseholdMemberController';
+import HouseholdWalletController from '@/actions/App/Http/Controllers/Manage/HouseholdWalletController';
 import InvitationController from '@/actions/App/Http/Controllers/Manage/InvitationController';
 import Heading from '@/components/Heading.vue';
 import InputError from '@/components/InputError.vue';
@@ -196,6 +197,13 @@ const expiry = (iso: string | null) =>
                 </Button>
             </Form>
         </section>
+
+        <Link
+            :href="HouseholdWalletController.show(household.id)"
+            class="text-sm font-medium underline-offset-4 hover:underline"
+        >
+            Wallet: balance, top-ups and corrections
+        </Link>
 
         <Link
             :href="HouseholdController.index()"
