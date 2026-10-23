@@ -216,4 +216,24 @@ trait OrderRepositoryContract
         $this->assertTrue($repository->hasUnsettledLinesOf(self::BREAD));
         $this->assertFalse($repository->hasUnsettledLinesOf(self::APPLES));
     }
+
+    #[Test]
+    public function it_deletes_every_order_of_a_cycle_with_its_lines(): void
+    {
+        $cycle = $this->openCycle();
+        $repository = $this->repository();
+        $order = $repository->lockFor(self::CYCLE, self::HOUSEHOLD);
+        $order->setLine(
+            $this->product(self::BREAD, 'Bread', 350), Quantity::fromString('2'), $cycle,
+            $repository->nextId(), self::ANNA, $this->madrid('2026-10-22 10:00'),
+        );
+        $repository->add($order);
+        $other = $repository->lockFor(self::CYCLE, self::OTHER_HOUSEHOLD);
+
+        $repository->deleteOfCycle(self::CYCLE);
+
+        $this->assertNull($repository->ofHousehold(self::CYCLE, self::HOUSEHOLD));
+        $this->assertNull($repository->ofHousehold(self::CYCLE, self::OTHER_HOUSEHOLD));
+        $this->assertNotSame($other->id, $repository->lockFor(self::CYCLE, self::OTHER_HOUSEHOLD)->id);
+    }
 }

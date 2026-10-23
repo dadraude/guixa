@@ -312,3 +312,34 @@ it('answers with the domain error when the producer is not in the cycle (R6)', f
         ->delete("/manage/cycles/{$cycleId}/producers/{$other->id}/cutoff")
         ->assertSessionHasErrors('domain');
 });
+
+it('keeps the cancel route to managers (R4b)', function () {
+    [$cycleId] = openCycleWithBaker();
+
+    auth()->logout();
+    $this->post("/manage/cycles/{$cycleId}/cancel")->assertRedirect(route('login'));
+    $this->actingAs(accountWith(Role::Member, Role::Producer))->post("/manage/cycles/{$cycleId}/cancel")->assertForbidden();
+});
+
+it('cancels a cycle, discards its orders and shows it as cancelled (R4b, S37)', function () {
+    [$cycleId] = openCycleWithBaker();
+    $manager = accountWith(Role::Manager);
+
+    $this->actingAs($manager)->post("/manage/cycles/{$cycleId}/cancel")->assertRedirect();
+
+    expect(DB::table('cycles')->where('id', $cycleId)->value('cancelled_at'))->not->toBeNull();
+    $this->actingAs($manager)->get('/manage/cycles')
+        ->assertInertia(fn (Assert $page) => $page->where('cycles.0.cancelled', true));
+});
+
+it('answers with the domain error when the cycle is already cancelled (R4b)', function () {
+    [$cycleId] = openCycleWithBaker();
+    $manager = accountWith(Role::Manager);
+    $this->actingAs($manager)->post("/manage/cycles/{$cycleId}/cancel");
+
+    $this->actingAs($manager)
+        ->from('/manage/cycles')
+        ->post("/manage/cycles/{$cycleId}/cancel")
+        ->assertRedirect('/manage/cycles')
+        ->assertSessionHasErrors('domain');
+});

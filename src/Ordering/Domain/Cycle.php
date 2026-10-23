@@ -6,6 +6,7 @@ use DateTimeImmutable;
 use DateTimeZone;
 use Guixa\Ordering\Domain\Error\CutoffNotInFuture;
 use Guixa\Ordering\Domain\Error\CutoffOutsideWindow;
+use Guixa\Ordering\Domain\Error\CycleCancelled;
 use Guixa\Ordering\Domain\Error\NotOnPickupWeekday;
 use Guixa\Ordering\Domain\Error\PickupDateNotInFuture;
 use Guixa\Ordering\Domain\Error\ProducerClosed;
@@ -23,6 +24,7 @@ final class Cycle
         public readonly string $id,
         private readonly DateTimeImmutable $pickupDate,
         private array $producerOrders,
+        private ?DateTimeImmutable $cancelledAt = null,
     ) {}
 
     /** `$now` is read in the cooperative's timezone: "after today" is a local calendar date (R4, R4c). */
@@ -42,7 +44,7 @@ final class Cycle
     }
 
     /** @param list<ProducerOrder> $producerOrders */
-    public static function restore(string $id, DateTimeImmutable $pickupDate, array $producerOrders): self
+    public static function restore(string $id, DateTimeImmutable $pickupDate, array $producerOrders, ?DateTimeImmutable $cancelledAt = null): self
     {
         $byProducer = [];
 
@@ -50,7 +52,7 @@ final class Cycle
             $byProducer[$producerOrder->producerId] = $producerOrder;
         }
 
-        return new self($id, $pickupDate, $byProducer);
+        return new self($id, $pickupDate, $byProducer, $cancelledAt);
     }
 
     /**
@@ -59,6 +61,8 @@ final class Cycle
      */
     public function addParticipant(string $producerId, CutoffRule $rule, DateTimeImmutable $now): void
     {
+        $this->assertNotCancelled();
+
         if (isset($this->producerOrders[$producerId])) {
             return;
         }
@@ -74,6 +78,7 @@ final class Cycle
      */
     public function setCutoff(string $producerId, DateTimeImmutable $at, DateTimeImmutable $now): void
     {
+        $this->assertNotCancelled();
         $producerOrder = $this->producerOrderOf($producerId);
 
         if ($at <= $now) {
@@ -92,11 +97,13 @@ final class Cycle
 
     public function closeNow(string $producerId, DateTimeImmutable $now): void
     {
+        $this->assertNotCancelled();
         $this->producerOrderOf($producerId)->changeCutoff($now);
     }
 
     public function clearCutoff(string $producerId): void
     {
+        $this->assertNotCancelled();
         $this->producerOrderOf($producerId)->changeCutoff(null);
     }
 
@@ -105,7 +112,7 @@ final class Cycle
     {
         $producerOrder = $this->producerOrders[$producerId] ?? null;
 
-        if ($producerOrder === null || ! $producerOrder->isParticipating()) {
+        if ($this->isCancelled() || $producerOrder === null || ! $producerOrder->isParticipating()) {
             return false;
         }
 
@@ -132,6 +139,8 @@ final class Cycle
     /** What a line change needs: the producer takes part in the cycle and is open (R3, R8). */
     public function assertOpenFor(string $producerId, DateTimeImmutable $now): void
     {
+        $this->assertNotCancelled();
+
         if (! $this->isParticipating($producerId)) {
             throw ProducerNotParticipating::withId($producerId);
         }
@@ -139,6 +148,27 @@ final class Cycle
         if (! $this->isOpenFor($producerId, $now)) {
             throw ProducerClosed::withId($producerId);
         }
+    }
+
+    /**
+     * Cancels the cycle; its orders are discarded by the caller (R4b, D14). Rejecting a cycle with a
+     * producer order already sent arrives with the sent state in T18.
+     */
+    public function cancel(DateTimeImmutable $now): void
+    {
+        $this->assertNotCancelled();
+
+        $this->cancelledAt = $now;
+    }
+
+    public function isCancelled(): bool
+    {
+        return $this->cancelledAt !== null;
+    }
+
+    public function cancelledAt(): ?DateTimeImmutable
+    {
+        return $this->cancelledAt;
     }
 
     public function pickupDate(): DateTimeImmutable
@@ -150,6 +180,13 @@ final class Cycle
     public function producerOrders(): array
     {
         return array_values($this->producerOrders);
+    }
+
+    private function assertNotCancelled(): void
+    {
+        if ($this->isCancelled()) {
+            throw CycleCancelled::withId($this->id);
+        }
     }
 
     private function producerOrderOf(string $producerId): ProducerOrder

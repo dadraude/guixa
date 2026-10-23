@@ -21,6 +21,7 @@ final class EloquentCycleRepository implements CycleRepository
     {
         CycleModel::query()->updateOrCreate(['id' => $cycle->id], [
             'pickup_date' => $cycle->pickupDate()->format('Y-m-d'),
+            'cancelled_at' => $cycle->cancelledAt()?->format(DATE_ATOM),
         ]);
 
         $rows = array_map(fn (ProducerOrder $order) => [
@@ -89,6 +90,11 @@ final class EloquentCycleRepository implements CycleRepository
             ))
             ->all();
 
-        return Cycle::restore($model->id, new DateTimeImmutable($model->pickup_date), array_values($orders));
+        return Cycle::restore(
+            $model->id,
+            new DateTimeImmutable($model->pickup_date),
+            array_values($orders),
+            $model->cancelled_at === null ? null : new DateTimeImmutable($model->cancelled_at),
+        );
     }
 }

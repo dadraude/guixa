@@ -1,11 +1,22 @@
 <script setup lang="ts">
 import { Form, Head, Link } from '@inertiajs/vue3';
+import CycleCancellationController from '@/actions/App/Http/Controllers/Manage/CycleCancellationController';
 import CycleController from '@/actions/App/Http/Controllers/Manage/CycleController';
 import CycleCutoffController from '@/actions/App/Http/Controllers/Manage/CycleCutoffController';
 import CycleParticipantController from '@/actions/App/Http/Controllers/Manage/CycleParticipantController';
 import Heading from '@/components/Heading.vue';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
@@ -166,7 +177,7 @@ const missingProducers = (cycle: App.Http.CycleRow) =>
                 class="flex flex-col gap-3 p-3"
                 :data-test="`cycle-${cycle.id}`"
             >
-                <div class="flex justify-between gap-2">
+                <div class="flex items-center justify-between gap-2">
                     <span class="font-medium">
                         Pickup {{ cycle.pickupDate }}
                     </span>
@@ -177,6 +188,64 @@ const missingProducers = (cycle: App.Http.CycleRow) =>
                     >
                         Orders
                     </Link>
+                    <span
+                        v-if="cycle.cancelled"
+                        class="text-sm text-muted-foreground"
+                        :data-test="`cancelled-${cycle.id}`"
+                    >
+                        Cancelled
+                    </span>
+                    <Dialog v-else>
+                        <DialogTrigger as-child>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                :data-test="`cancel-${cycle.id}`"
+                            >
+                                Cancel cycle
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                            <Form
+                                v-bind="
+                                    CycleCancellationController.store.form({
+                                        cycle: cycle.id,
+                                    })
+                                "
+                                class="space-y-6"
+                                v-slot="{ errors, processing }"
+                            >
+                                <DialogHeader class="space-y-3">
+                                    <DialogTitle>
+                                        Cancel the cycle with pickup
+                                        {{ cycle.pickupDate }}?
+                                    </DialogTitle>
+                                    <DialogDescription>
+                                        This discards the orders of every
+                                        household in this cycle and cannot be
+                                        undone. Members will see the cycle as
+                                        cancelled.
+                                    </DialogDescription>
+                                </DialogHeader>
+                                <InputError :message="errors.domain" />
+                                <DialogFooter class="gap-2">
+                                    <DialogClose as-child>
+                                        <Button variant="secondary">
+                                            Keep cycle
+                                        </Button>
+                                    </DialogClose>
+                                    <Button
+                                        type="submit"
+                                        variant="destructive"
+                                        :disabled="processing"
+                                        :data-test="`confirm-cancel-${cycle.id}`"
+                                    >
+                                        Cancel cycle
+                                    </Button>
+                                </DialogFooter>
+                            </Form>
+                        </DialogContent>
+                    </Dialog>
                 </div>
 
                 <p
@@ -201,7 +270,7 @@ const missingProducers = (cycle: App.Http.CycleRow) =>
                         </div>
 
                         <div
-                            v-if="participant.participating"
+                            v-if="participant.participating && !cycle.cancelled"
                             class="flex flex-wrap items-center gap-2"
                         >
                             <Form
@@ -278,7 +347,9 @@ const missingProducers = (cycle: App.Http.CycleRow) =>
                 </ul>
 
                 <Form
-                    v-for="producer in missingProducers(cycle)"
+                    v-for="producer in cycle.cancelled
+                        ? []
+                        : missingProducers(cycle)"
                     :key="producer.id"
                     v-bind="
                         CycleParticipantController.store.form({

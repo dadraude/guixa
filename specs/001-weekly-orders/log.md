@@ -377,3 +377,13 @@ Why: follows the R13 / S62 change above.
 
 `tasks.md`: new task T35 (R13 cancelled, S62; after T17 and T20), S62 added to Coverage, and T33 now covers S1–S62 and waits for T35. Tracked in Linear as DRA-187.
 Why: follows the R13 / S62 and plan changes above.
+
+## 2026-10-23 · Deviation
+
+T17 (`plan.md`, Ordering domain, use cases, HTTP & pages): cancelling is `POST /manage/cycles/{cycle}/cancel`, not `DELETE /manage/cycles/{cycle}`, because the cycle is kept with `cancelled_at` (D14). `Cycle::cancel` does not check "no producer order sent" (R4b, S37) yet: the sent state arrives with `send` in T18, which adds the check, as T12 did for R6b. A cancelled cycle also refuses `addParticipant`, `setCutoff`, `closeNow`, `clearCutoff` and line changes with `CycleCancelled` (the T13 assumption that T17 adds the cancelled check), and cancelling twice is refused the same way. `CycleData` and `CycleRow` carry `cancelled`, and `OrderRepository` gains `deleteOfCycle`. `HouseholdOrderData` and `OrderRow` also carry `cancelled`, so the member's order page shows a "cancelled" notice and no producers or lines (S37 "members see it as cancelled"). `tasks.md` now splits S37 and R4b: T17 covers "R4b (cancel before sending), S37 (cancel)" and T18 covers "R4b (rejected once sent), S37 (sent)".
+Why: the plan did not say which verb or which guards, and the sent state does not exist before T18.
+
+## 2026-10-23 · Change
+
+T17 (`plan.md`, HTTP & pages): cancelling a cycle asks the manager to confirm first, in a dialog that says every household's orders are discarded and it cannot be undone. User decision: "sí, que demani confirmació abans de cancel·lar".
+Why: the cancel discards every household's orders irreversibly (R4b).

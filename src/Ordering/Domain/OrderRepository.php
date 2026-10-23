@@ -9,6 +9,9 @@ interface OrderRepository
     /** Stores the order and its lines, replacing what was stored. */
     public function add(Order $order): void;
 
+    /** Discards every order of a cycle, lines included (R4b, D14). */
+    public function deleteOfCycle(string $cycleId): void;
+
     public function ofHousehold(string $cycleId, string $householdId): ?Order;
 
     /** @return list<Order> every household's order in the cycle, in no particular order */

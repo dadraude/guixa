@@ -40,7 +40,7 @@ final class InMemoryCycleRepository extends InMemoryRepository implements CycleR
     public function existsOnPickupDate(DateTimeInterface $pickupDate): bool
     {
         foreach ($this->all() as $cycle) {
-            if ($cycle->pickupDate()->format('Y-m-d') === $pickupDate->format('Y-m-d')) {
+            if (! $cycle->isCancelled() && $cycle->pickupDate()->format('Y-m-d') === $pickupDate->format('Y-m-d')) {
                 return true;
             }
         }

@@ -3,6 +3,7 @@
 namespace Tests\Support\Ordering;
 
 use Guixa\Ordering\Application\AddParticipant;
+use Guixa\Ordering\Application\CancelCycle;
 use Guixa\Ordering\Application\ClearCutoff;
 use Guixa\Ordering\Application\CloseProducerNow;
 use Guixa\Ordering\Application\GetCycleSummary;
@@ -63,6 +64,8 @@ final class OrderingWorld
 
     public readonly SetCutoff $setCutoff;
 
+    public readonly CancelCycle $cancelCycle;
+
     public readonly CloseProducerNow $closeProducerNow;
 
     public readonly ClearCutoff $clearCutoff;
@@ -107,6 +110,7 @@ final class OrderingWorld
         $this->openCycle = new OpenCycle($this->cycles, $this->settings, $this->rules, $transactions, $this->clock);
         $this->addParticipant = new AddParticipant($this->cycles, $this->rules, $transactions, $this->clock);
         $this->setCutoff = new SetCutoff($this->cycles, $transactions, $this->clock);
+        $this->cancelCycle = new CancelCycle($this->cycles, $this->orders, $transactions, $this->clock);
         $this->closeProducerNow = new CloseProducerNow($this->cycles, $transactions, $this->clock);
         $this->clearCutoff = new ClearCutoff($this->cycles, $transactions);
         $this->listCycles = new ListCycles($this->cycles, $this->clock);

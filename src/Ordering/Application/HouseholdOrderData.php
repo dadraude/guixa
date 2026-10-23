@@ -11,6 +11,7 @@ final readonly class HouseholdOrderData
     public function __construct(
         public string $cycleId,
         public string $pickupDate,
+        public bool $cancelled,
         public array $producers,
         public array $lines,
     ) {}

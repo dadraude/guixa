@@ -13,6 +13,15 @@ final class InMemoryOrderRepository extends InMemoryRepository implements OrderR
         $this->save($order);
     }
 
+    public function deleteOfCycle(string $cycleId): void
+    {
+        foreach ($this->all() as $order) {
+            if ($order->cycleId === $cycleId) {
+                $this->remove($order->id);
+            }
+        }
+    }
+
     public function ofHousehold(string $cycleId, string $householdId): ?Order
     {
         foreach ($this->all() as $order) {
