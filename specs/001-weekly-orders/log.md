@@ -331,3 +331,19 @@ Why: the R4c decision in the Q&A above. It supersedes the Saturday sentence of t
 
 T12 (`plan.md`, Ordering domain and use cases): `Cycle` has no sent state until T18, so `setCutoff`, `closeNow` and `clearCutoff` do not check "not sent" (R6b, S34 frozen) yet; T18 adds it with `send`. `SetCutoff` takes `at` as an ISO 8601 string (no offset means the cooperative's timezone) and rejects anything else with `InvalidCutoff`; a producer absent from the cycle is refused with `ProducerNotInCycle`. `ParticipantData` gains `open` (R6a, from `Cycle::isOpenFor`) so the cycles page and tests can read it.
 Why: the plan did not say how `at` arrives, what happens for a producer outside the cycle, or where R6a is observable before T13.
+
+## 2026-10-23 · Deviation
+
+T13 (`plan.md`, Ordering domain, use cases, HTTP & pages): the plan folded zero into `setLine` and listed products through a separate `ListOrderableProducts` call. Now `Order::setLine` takes the snapshot product, the line id and `addedBy`, `Order::removeLine` is the zero quantity, and `Cycle::assertOpenFor` raises `ProducerNotParticipating` or `ProducerClosed` (R3, R8, S2, S51).
+`OrderRepository` has `ofHousehold` and `lockFor` (creates the empty order and locks it; the unique `(cycle_id, household_id)` plus `FOR UPDATE` keep concurrent first lines in one order), `CycleRepository` gains `getForShare`, and Ordering has its own `ProductCatalog` port and `OrderableProduct` value object over Catalog's `GetOrderableProduct` / `ListOrderableProducts`.
+`GetHouseholdOrder` returns the participating producers (open flag, offered products) with the lines, so the page needs no second call; the controller names the producers through `GetProducer`. There is no `DELETE` route: zero removes (R9), and `RemoveMarkedLine` with its route is T15's.
+An account without a household is refused with `NoHousehold` in the use cases and with 403 by `role:member` over HTTP (S33). The running total is display-only in `resources/js/lib/orderTotal.ts` (Vitest).
+Why: the plan was silent on these signatures and on how the page gets what it offers.
+
+T13 assumptions the spec does not state: a line changed by another member of the household keeps its original `addedBy` (the plan says "keeps `createdAt` unless the line is new" and names `addedBy` only as a field); availability in a cycle (R3c) and the *will not be delivered* mark (R3b) are not checked yet, they belong to T15; a cycle's cancelled state (R4b) is not checked either, T17 adds it.
+Why: `addedBy` records who added the line; the other rules are listed under later tasks in `tasks.md`.
+
+## 2026-10-23 · Deviation
+
+T13 (`plan.md`, HTTP & pages): the lines of a producer that no longer takes part in the cycle (R6c) are shown read-only under that producer's name, and the controller names every producer that has a line, not only the participants (`OrderLineRow` carries `producerName`). This is an interim choice the user made. T15 replaces it with the *will not be delivered* mark and the remove action (R3b, R6c, R8).
+Why: until T15 nothing marks those lines, and a heading without a name left the member unable to tell whose they were.

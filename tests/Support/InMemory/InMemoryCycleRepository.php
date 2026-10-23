@@ -24,6 +24,11 @@ final class InMemoryCycleRepository extends InMemoryRepository implements CycleR
         return $this->find($id);
     }
 
+    public function getForShare(string $id): ?Cycle
+    {
+        return $this->find($id);
+    }
+
     public function list(): array
     {
         $cycles = $this->all();

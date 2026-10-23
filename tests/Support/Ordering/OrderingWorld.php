@@ -5,19 +5,23 @@ namespace Tests\Support\Ordering;
 use Guixa\Ordering\Application\AddParticipant;
 use Guixa\Ordering\Application\ClearCutoff;
 use Guixa\Ordering\Application\CloseProducerNow;
+use Guixa\Ordering\Application\GetHouseholdOrder;
 use Guixa\Ordering\Application\GetPickupWeekday;
 use Guixa\Ordering\Application\ListCycles;
 use Guixa\Ordering\Application\OpenCycle;
 use Guixa\Ordering\Application\SetCutoff;
+use Guixa\Ordering\Application\SetOrderLine;
 use Guixa\Ordering\Application\SetPickupWeekday;
 use Guixa\Ordering\Domain\ValueObject\PickupWeekday;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Role;
 use Tests\Support\FrozenClock;
 use Tests\Support\InMemory\FakeProducerCutoffRules;
+use Tests\Support\InMemory\FakeProductCatalog;
 use Tests\Support\InMemory\ImmediateTransactionRunner;
 use Tests\Support\InMemory\InMemoryCooperativeSettings;
 use Tests\Support\InMemory\InMemoryCycleRepository;
+use Tests\Support\InMemory\InMemoryOrderRepository;
 
 /** The Ordering use cases wired to in-memory adapters, for the Application tests. */
 final class OrderingWorld
@@ -33,6 +37,10 @@ final class OrderingWorld
     public readonly InMemoryCooperativeSettings $settings;
 
     public readonly FakeProducerCutoffRules $rules;
+
+    public readonly InMemoryOrderRepository $orders;
+
+    public readonly FakeProductCatalog $catalog;
 
     public readonly SetPickupWeekday $setPickupWeekday;
 
@@ -50,6 +58,10 @@ final class OrderingWorld
 
     public readonly ListCycles $listCycles;
 
+    public readonly SetOrderLine $setOrderLine;
+
+    public readonly GetHouseholdOrder $getHouseholdOrder;
+
     public readonly Actor $manager;
 
     /** @param  ?int  $pickupWeekday  the cooperative's weekday (ISO), or null while a manager has not chosen one (R4c) */
@@ -59,6 +71,8 @@ final class OrderingWorld
         $this->cycles = new InMemoryCycleRepository;
         $this->settings = new InMemoryCooperativeSettings;
         $this->rules = new FakeProducerCutoffRules;
+        $this->orders = new InMemoryOrderRepository;
+        $this->catalog = new FakeProductCatalog;
         $transactions = new ImmediateTransactionRunner;
 
         if ($pickupWeekday !== null) {
@@ -73,6 +87,8 @@ final class OrderingWorld
         $this->closeProducerNow = new CloseProducerNow($this->cycles, $transactions, $this->clock);
         $this->clearCutoff = new ClearCutoff($this->cycles, $transactions);
         $this->listCycles = new ListCycles($this->cycles, $this->clock);
+        $this->setOrderLine = new SetOrderLine($this->cycles, $this->orders, $this->catalog, $transactions, $this->clock);
+        $this->getHouseholdOrder = new GetHouseholdOrder($this->cycles, $this->orders, $this->catalog, $this->clock);
 
         $this->manager = new Actor('00000000-0000-7000-8000-00000000000a', [Role::Manager]);
 

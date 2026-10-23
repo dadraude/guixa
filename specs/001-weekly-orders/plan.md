@@ -199,10 +199,14 @@ role only; participation is not restored.
     `?containersPerUnit`, quantity.
   - `returnLines`, keyed by returnItemId. **`ReturnLine`**: name, amount, whole quantity (R20a).
   - `pickup`: `none | pending | completed | notCollected | nothingToCollect`, `?doneAt`, `?charged Money`.
-  - Ordering: `setLine(OrderableProduct, Quantity, Cycle, actor, now)` checks the producer is open (R8), zero
-    removes (R9), whole units for non-variable products (R9), snapshots name/unit/variable/price/containers
-    (R10), sets `allocated = ordered`, and keeps `createdAt` unless the line is new (R15 tie). No balance
-    check (R11). `removeMarkedLine` is allowed after the cutoff (R8).
+  - Ordering: `setLine(OrderableProduct, Quantity, Cycle, lineId, addedBy, now)` checks the producer participates and is open
+    (`Cycle::assertOpenFor`, R3, R8; `ProducerNotParticipating`, `ProducerClosed`), whole units for non-variable products (R9),
+    snapshots name/unit/variable/price/containers (R10), sets `allocated = ordered`, and keeps `createdAt` and `addedBy` of an
+    existing line (R15 tie). `removeLine(productId, Cycle, now)` is the zero quantity (R9): it checks the line's producer is open
+    and leaves a product that is not in the order alone. `SetOrderLine` picks between them. No balance check (R11).
+    `removeMarkedLine` is allowed after the cutoff (R8).
+  - T13 carries only the ordering part: `OrderLine` has id, productId, producerId, snapshot, `ordered`, `allocated`, `createdAt`, `addedBy`; the other
+    fields come with the tasks that use them, though the `orders` and `order_lines` tables have every column.
   - Reception: `allocate(productId, Quantity)` marks `allocatedByHand` (R16); `allocateNew(product snapshot,
     Quantity)` adds an allocation-only line (R16, S39); `reallocate(productId, Quantity)` clears the mark (R15).
     All three clear `delivered`: a new allocation replaces a pending pickup's adjustment (R18).
@@ -260,6 +264,10 @@ role only; participation is not restored.
 - `Cycle` and `ProducerOrder` carry only the fields T11 needs (pickup date, participation, cutoff); cancelled, settled, closed, sent, validated and
   distributed come with the tasks that use them, though the tables have the columns. `CycleRepository` adds `getForUpdate` (the `FOR UPDATE` lock)
   and `existsOnPickupDate` (cancelled cycles do not count).
+- `OrderRepository`: `nextId`, `add`, `ofHousehold(cycleId, householdId): ?Order` and `lockFor(cycleId, householdId): Order`, which creates the empty
+  order if there is none and locks it (`INSERT … ON CONFLICT DO NOTHING`, then `FOR UPDATE`, R7). `ProductCatalog`: `orderable(productId): ?OrderableProduct`
+  and `orderableOf(producerId)`, both with Ordering's own `OrderableProduct` value object (A4); its Catalog adapter calls `GetOrderableProduct` and `ListOrderableProducts`.
+  `CycleRepository` adds `getForShare` (the `FOR SHARE` lock).
 - Ports: `CooperativeSettings`, `CycleRepository`, `OrderRepository`, `ProductAvailabilityRepository`,
   `ReceivedTotalRepository`, `ProductCatalog`, `ProducerCutoffRules`, `StockCatalog`, `ReturnItemCatalog`,
   `StockSeller`, `WalletLedger`, `ProducerNotifier`, `Households`.
@@ -274,9 +282,9 @@ role only; participation is not restored.
 | `SetCutoff` (`at` is ISO 8601; without an offset it is read in the cooperative's timezone), `CloseProducerNow`, `ClearCutoff` (a producer not in the cycle is refused with `ProducerNotInCycle`; `ListCycles` participants carry `open`, from `isOpenFor`) | manager | R6, R6a, R6b, S6, S34, S35 |
 | `CancelCycle` | manager | R4b, S37 |
 | `SetProductAvailability` | producer (own) | R3c, S48 |
-| `SetOrderLine` (quantity 0 removes) | member of household | R3, R7–R11, S1–S5, S33, S49, S51 |
+| `SetOrderLine` (the household is the actor's, so an account without one is refused with `NoHousehold`; `quantity` is a string of at most 3 decimals, 0 removes) | member of household | R3, R7–R11, S1–S5, S33, S49, S51 |
 | `RemoveMarkedLine` | member of household | R3b, R8, S32 |
-| `GetHouseholdOrder` (with *will not be delivered* marks and, once settled, the pickup) | member of household | R3b, R7, R23a, S4 |
+| `GetHouseholdOrder` (the lines with their snapshot, and the participating producers with whether each is open and the products it offers; the *will not be delivered* marks and, once settled, the pickup arrive with T15 and the pickup tasks) | member of household | R3b, R7, R23a, S4 |
 | `ListMemberCycles` (open, pending, cancelled, closed) | member | R4a, R23a |
 | `SendProducerOrder` → notifies the producer | manager | R12a, R6b, S34, S36 |
 | `SendEmptyProducerOrders` (scheduled) | — (scheduler) | R12a, D10 |
@@ -436,8 +444,8 @@ role areas (R36a); the layout shows a switch between them.
 | Route | Page / action | Use case |
 | --- | --- | --- |
 | `GET /` | `Orders/Index` | `ListMemberCycles` |
-| `GET /cycles/{cycle}/order` | `Orders/Edit` (order, then pickup once settled) | `GetHouseholdOrder`, `ListOrderableProducts` |
-| `PUT /cycles/{cycle}/order/lines/{product}` | partial reload of `order` prop | `SetOrderLine` |
+| `GET /cycles/{cycle}/order` | `Orders/Edit` (producers with what they offer, the order's lines and a running total; the pickup once settled arrives later; interim, until T15: the lines of a producer that no longer takes part stay under that producer's name, read-only, which the user chose, and T15 replaces it with the *will not be delivered* mark and the remove action, R3b, R6c, R8) | `GetHouseholdOrder` (it lists the offered products itself, and the controller names the producers with Catalog's `GetProducer`) |
+| `PUT /cycles/{cycle}/order/lines/{product}` (`quantity`; 0 removes the line) | partial reload of `order` prop | `SetOrderLine` |
 | `DELETE /cycles/{cycle}/order/lines/{product}` | partial reload | `RemoveMarkedLine` |
 | `GET /wallet` | `Wallet/Statement` (member's own household) | `GetWalletStatement` |
 | `GET /manage/households/{household}/wallet` | `Wallet/Statement` with the top-up and correction forms | `GetWalletStatement` |

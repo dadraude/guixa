@@ -18,6 +18,7 @@ use App\Http\Controllers\Manage\ReturnItemController;
 use App\Http\Controllers\Manage\SettingsController;
 use App\Http\Controllers\Manage\StockMovementController;
 use App\Http\Controllers\Manage\StockProductController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\Producer\CutoffController;
 use App\Http\Controllers\Producer\ProductController;
 use App\Http\Controllers\WalletController;
@@ -30,6 +31,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 Route::middleware(['auth', 'verified', 'role:member'])->get('wallet', [WalletController::class, 'show'])->name('wallet.show');
+
+Route::middleware(['auth', 'verified', 'role:member'])->prefix('cycles/{cycle}/order')->whereUuid(['cycle', 'product'])->name('orders.')->group(function () {
+    Route::get('/', [OrderController::class, 'edit'])->name('edit');
+    Route::put('lines/{product}', [OrderController::class, 'updateLine'])->name('lines.update');
+});
 
 Route::middleware('guest')->group(function () {
     Route::get('invitations/{token}', [AcceptInvitationController::class, 'show'])->name('invitation.show');

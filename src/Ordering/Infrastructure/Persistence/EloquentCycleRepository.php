@@ -49,6 +49,13 @@ final class EloquentCycleRepository implements CycleRepository
         return $model === null ? null : $this->toDomain($model);
     }
 
+    public function getForShare(string $id): ?Cycle
+    {
+        $model = CycleModel::query()->whereKey($id)->sharedLock()->first();
+
+        return $model === null ? null : $this->toDomain($model);
+    }
+
     public function list(): array
     {
         $cycles = CycleModel::query()

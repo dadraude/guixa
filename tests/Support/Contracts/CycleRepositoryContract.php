@@ -84,6 +84,7 @@ trait CycleRepositoryContract
 
         $this->assertNull($repository->get($repository->nextId()));
         $this->assertNull($repository->getForUpdate($repository->nextId()));
+        $this->assertNull($repository->getForShare($repository->nextId()));
     }
 
     #[Test]
@@ -158,5 +159,19 @@ trait CycleRepositoryContract
         }
         $this->assertSame('2026-11-05T12:00:00+01:00', $orders[self::BAKER]);
         $this->assertNull($orders[self::GROWER]);
+    }
+
+    #[Test]
+    public function it_finds_a_cycle_to_read_under_a_shared_lock(): void
+    {
+        $repository = $this->repository();
+        $cycle = $this->cycle($repository);
+        $cycle->addParticipant(self::BAKER, CutoffRule::of(3, '20:00'), $this->madrid('2026-10-22 10:00'));
+        $repository->add($cycle);
+
+        $found = $repository->getForShare($cycle->id);
+
+        $this->assertSame($cycle->id, $found?->id);
+        $this->assertCount(1, $found->producerOrders());
     }
 }

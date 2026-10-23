@@ -16,6 +16,9 @@ interface CycleRepository
     /** Locks the cycle until the surrounding transaction ends, so two changes to it cannot interleave. */
     public function getForUpdate(string $id): ?Cycle;
 
+    /** Locks the cycle against changes until the transaction ends, while letting other readers in (R6b, R8). */
+    public function getForShare(string $id): ?Cycle;
+
     /** @return list<Cycle> by pickup date, earliest first */
     public function list(): array;
 

@@ -8,7 +8,9 @@ use Guixa\Ordering\Domain\Error\CutoffNotInFuture;
 use Guixa\Ordering\Domain\Error\CutoffOutsideWindow;
 use Guixa\Ordering\Domain\Error\NotOnPickupWeekday;
 use Guixa\Ordering\Domain\Error\PickupDateNotInFuture;
+use Guixa\Ordering\Domain\Error\ProducerClosed;
 use Guixa\Ordering\Domain\Error\ProducerNotInCycle;
+use Guixa\Ordering\Domain\Error\ProducerNotParticipating;
 use Guixa\Ordering\Domain\ValueObject\CutoffRule;
 use Guixa\Ordering\Domain\ValueObject\PickupWeekday;
 use Guixa\Shared\Domain\LocalTime;
@@ -108,6 +110,18 @@ final class Cycle
         }
 
         return $now < ($producerOrder->cutoff() ?? $this->closesWithoutCutoff($now->getTimezone()));
+    }
+
+    /** What a line change needs: the producer takes part in the cycle and is open (R3, R8). */
+    public function assertOpenFor(string $producerId, DateTimeImmutable $now): void
+    {
+        if (! ($this->producerOrders[$producerId] ?? null)?->isParticipating()) {
+            throw ProducerNotParticipating::withId($producerId);
+        }
+
+        if (! $this->isOpenFor($producerId, $now)) {
+            throw ProducerClosed::withId($producerId);
+        }
     }
 
     public function pickupDate(): DateTimeImmutable
