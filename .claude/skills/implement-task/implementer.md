@@ -20,7 +20,7 @@ With the worktree prefix:
 ```sh
 cp /Users/eduard/code/practice/guixa/.env .env
 sd '^DB_DATABASE=.*' 'DB_DATABASE=guixa_test_draNN' .env
-composer install && npm ci && npm run build
+composer install && pnpm install --frozen-lockfile && pnpm run build
 ```
 
 Every artisan command in the worktree (tests, `migrate`, `tinker`) uses `guixa_test_draNN`, so the
