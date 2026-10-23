@@ -56,4 +56,22 @@ trait HouseholdRepositoryContract
 
         $this->assertCount(2, $repository->list());
     }
+
+    #[Test]
+    public function it_finds_several_households_by_id_and_leaves_unknown_ones_out(): void
+    {
+        $repository = $this->repository();
+        $first = Household::create($repository->nextId(), 'A');
+        $second = Household::create($repository->nextId(), 'B');
+        $repository->save($first);
+        $repository->save($second);
+        $repository->save(Household::create($repository->nextId(), 'C'));
+        $unknown = $repository->nextId();
+
+        $found = $repository->getMany([$second->id, $unknown, $first->id]);
+
+        $this->assertEqualsCanonicalizing([$first->id, $second->id], array_keys($found));
+        $this->assertSame('A', $found[$first->id]->name);
+        $this->assertSame([], $repository->getMany([]));
+    }
 }

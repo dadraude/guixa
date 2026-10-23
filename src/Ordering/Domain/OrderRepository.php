@@ -11,6 +11,9 @@ interface OrderRepository
 
     public function ofHousehold(string $cycleId, string $householdId): ?Order;
 
+    /** @return list<Order> every household's order in the cycle, in no particular order */
+    public function ofCycle(string $cycleId): array;
+
     /**
      * The household's order in the cycle, created empty if it has none, and locked until the surrounding
      * transaction ends, so two members adding the first lines at once share one order.

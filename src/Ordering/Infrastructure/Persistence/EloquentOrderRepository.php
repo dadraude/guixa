@@ -65,6 +65,24 @@ final class EloquentOrderRepository implements OrderRepository
         return $row === null ? null : $this->toDomain($row);
     }
 
+    public function ofCycle(string $cycleId): array
+    {
+        $rows = array_values(DB::table('orders')->where('cycle_id', $cycleId)->get()->all());
+
+        if ($rows === []) {
+            return [];
+        }
+
+        $linesByOrder = DB::table('order_lines')
+            ->whereIn('order_id', array_map(fn (stdClass $row) => $row->id, $rows))
+            ->orderBy('created_at')
+            ->orderBy('id')
+            ->get()
+            ->groupBy('order_id');
+
+        return array_map(fn (stdClass $row) => $this->toDomain($row, array_values($linesByOrder->get($row->id, collect())->all())), $rows);
+    }
+
     public function lockFor(string $cycleId, string $householdId): Order
     {
         // The unique (cycle, household) index makes a second concurrent insert wait for the first and then do nothing.
@@ -85,13 +103,17 @@ final class EloquentOrderRepository implements OrderRepository
             ->exists();
     }
 
-    private function toDomain(stdClass $row): Order
+    /** @param  list<stdClass>|null  $lineRows  the order's lines when already loaded */
+    private function toDomain(stdClass $row, ?array $lineRows = null): Order
     {
-        $lines = DB::table('order_lines')
+        $lineRows ??= DB::table('order_lines')
             ->where('order_id', $row->id)
             ->orderBy('created_at')
             ->orderBy('id')
             ->get()
+            ->all();
+
+        $lines = collect($lineRows)
             ->map(fn (stdClass $line) => new OrderLine(
                 $line->id,
                 $line->product_id,

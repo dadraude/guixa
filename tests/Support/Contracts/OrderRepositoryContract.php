@@ -103,6 +103,36 @@ trait OrderRepositoryContract
     }
 
     #[Test]
+    public function it_lists_the_orders_of_a_cycle_with_their_lines(): void
+    {
+        $cycle = $this->openCycle();
+        $repository = $this->repository();
+        $now = $this->madrid('2026-10-22 10:00');
+
+        foreach ([self::HOUSEHOLD => '2', self::OTHER_HOUSEHOLD => '3'] as $household => $quantity) {
+            $order = $repository->lockFor(self::CYCLE, $household);
+            $order->setLine($this->product(self::BREAD, 'Loaf', 350), Quantity::fromString($quantity), $cycle, $repository->nextId(), self::ANNA, $now);
+            $repository->add($order);
+        }
+
+        $orders = $repository->ofCycle(self::CYCLE);
+
+        $quantities = [];
+        foreach ($orders as $order) {
+            $quantities[$order->householdId] = $order->lines()[0]->ordered->toString();
+        }
+        $this->assertSame([self::HOUSEHOLD => '2.000', self::OTHER_HOUSEHOLD => '3.000'], $quantities);
+    }
+
+    #[Test]
+    public function it_lists_no_orders_for_a_cycle_nobody_ordered_in(): void
+    {
+        $this->openCycle();
+
+        $this->assertSame([], $this->repository()->ofCycle(self::CYCLE));
+    }
+
+    #[Test]
     public function it_stores_a_line_with_its_snapshot(): void
     {
         $cycle = $this->openCycle();

@@ -41,6 +41,17 @@ final class DatabaseHouseholdRepository implements HouseholdRepository
         return $row === null ? null : $this->hydrate($row);
     }
 
+    public function getMany(array $ids): array
+    {
+        $households = [];
+
+        foreach (DB::table('households')->whereIn('id', $ids)->get() as $row) {
+            $households[$row->id] = $this->hydrate($row);
+        }
+
+        return $households;
+    }
+
     public function list(): array
     {
         return array_values(DB::table('households')->orderBy('created_at')->orderBy('id')->get()

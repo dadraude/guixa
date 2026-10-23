@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Form, Head } from '@inertiajs/vue3';
+import { Form, Head, Link } from '@inertiajs/vue3';
 import CycleController from '@/actions/App/Http/Controllers/Manage/CycleController';
 import CycleCutoffController from '@/actions/App/Http/Controllers/Manage/CycleCutoffController';
 import CycleParticipantController from '@/actions/App/Http/Controllers/Manage/CycleParticipantController';
@@ -166,7 +166,18 @@ const missingProducers = (cycle: App.Http.CycleRow) =>
                 class="flex flex-col gap-3 p-3"
                 :data-test="`cycle-${cycle.id}`"
             >
-                <span class="font-medium"> Pickup {{ cycle.pickupDate }} </span>
+                <div class="flex justify-between gap-2">
+                    <span class="font-medium">
+                        Pickup {{ cycle.pickupDate }}
+                    </span>
+                    <Link
+                        :href="CycleController.show(cycle.id)"
+                        class="text-sm underline"
+                        :data-test="`summary-${cycle.id}`"
+                    >
+                        Orders
+                    </Link>
+                </div>
 
                 <p
                     v-if="cycle.participants.length === 0"

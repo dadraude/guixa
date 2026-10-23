@@ -19,6 +19,21 @@ final class InMemoryHouseholdRepository extends InMemoryRepository implements Ho
         return $this->find($id);
     }
 
+    public function getMany(array $ids): array
+    {
+        $found = [];
+
+        foreach ($ids as $id) {
+            $household = $this->find($id);
+
+            if ($household !== null) {
+                $found[$id] = $household;
+            }
+        }
+
+        return $found;
+    }
+
     public function list(): array
     {
         return $this->all();
