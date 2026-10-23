@@ -6,6 +6,7 @@ use App\Http\Controllers\Manage\HouseholdMemberController;
 use App\Http\Controllers\Manage\HouseholdWalletController;
 use App\Http\Controllers\Manage\InvitationController;
 use App\Http\Controllers\Manage\ReturnItemController;
+use App\Http\Controllers\Manage\StockMovementController;
 use App\Http\Controllers\Manage\StockProductController;
 use App\Http\Controllers\WalletController;
 use Illuminate\Support\Facades\Route;
@@ -31,6 +32,15 @@ Route::middleware(['auth', 'verified', 'role:manager'])->prefix('manage')->name(
         ->except(['show'])
         ->whereUuid('stockProduct')
         ->names('stock');
+    Route::get('stock/{stockProduct}/movements', [StockMovementController::class, 'show'])
+        ->whereUuid('stockProduct')
+        ->name('stock.movements.show');
+    Route::post('stock/{stockProduct}/entries', [StockMovementController::class, 'storeEntry'])
+        ->whereUuid('stockProduct')
+        ->name('stock.entries.store');
+    Route::post('stock/{stockProduct}/adjustments', [StockMovementController::class, 'storeAdjustment'])
+        ->whereUuid('stockProduct')
+        ->name('stock.adjustments.store');
     Route::resource('return-items', ReturnItemController::class)
         ->parameters(['return-items' => 'returnItem'])
         ->except(['show'])
