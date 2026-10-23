@@ -29,6 +29,11 @@ final class ProducerOrder
         return $this->participating;
     }
 
+    public function changeCutoff(?DateTimeImmutable $cutoff): void
+    {
+        $this->cutoff = $cutoff;
+    }
+
     public function cutoff(): ?DateTimeImmutable
     {
         return $this->cutoff;

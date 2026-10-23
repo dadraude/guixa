@@ -175,7 +175,7 @@ role only; participation is not restored.
   - `open(id, pickupDate, weekday, today, participants)`: pickup date after today and on the weekday (R4, R4c).
   - `addParticipant(producerId, CutoffRule, now)`: until settled (the settled state arrives with T20+); the cutoff is computed once, and is null if
     that moment already passed (R4a, R5). A producer already in the cycle is left as it is, so the call is idempotent and never recomputes. `stopParticipating` / `participateAgain`: only while not sent (R6c).
-  - `setCutoff(producerId, at, now)`: not sent (R6b), `at > now`, and
+  - `setCutoff(producerId, at, now)`: not sent (R6b; the sent state arrives with T18, so T12 does not check it), `at > now`, and
     `pickupDate − 6 days 00:00 ≤ at < pickupDate 00:00` (R6). `closeNow(producerId, now)`, `clearCutoff(producerId)`.
   - `isOpenFor(producerId, now)`: participating, not sent and `now < (cutoff ?? pickupDate 00:00)` (R6a, R8).
     `isOpenForMembers(now)`: any participating producer open (R4a).
@@ -271,7 +271,7 @@ role only; participation is not restored.
 | `SetPickupWeekday`, `GetPickupWeekday` (null while unset) | manager | R4c, S37 |
 | `OpenCycle` (with participants and an optional `weekday` + `permanent` flag; the date is `YYYY-MM-DD`; returns the cycle id. While the cooperative has no weekday, a `weekday` must be given: permanent also saves it, in the same transaction, and provisional saves nothing. A `weekday` given when the cooperative has one is refused), `ListCycles` (`CycleData`: pickup date and participants with ISO 8601 cutoff in the cooperative's timezone) | manager | R4, R4a, R5, S6, S38, S51 |
 | `AddParticipant`, `StopParticipating`, `ParticipateAgain` | manager | R4a, R6c, S50, S51 |
-| `SetCutoff`, `CloseProducerNow`, `ClearCutoff` | manager | R6, R6a, R6b, S6, S34, S35 |
+| `SetCutoff` (`at` is ISO 8601; without an offset it is read in the cooperative's timezone), `CloseProducerNow`, `ClearCutoff` (a producer not in the cycle is refused with `ProducerNotInCycle`; `ListCycles` participants carry `open`, from `isOpenFor`) | manager | R6, R6a, R6b, S6, S34, S35 |
 | `CancelCycle` | manager | R4b, S37 |
 | `SetProductAvailability` | producer (own) | R3c, S48 |
 | `SetOrderLine` (quantity 0 removes) | member of household | R3, R7–R11, S1–S5, S33, S49, S51 |

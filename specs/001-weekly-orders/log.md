@@ -326,3 +326,8 @@ Why: the Q&A above, raised by the T11 review; it replaces the T11 Deviation's Sa
 refuses (`PickupWeekdayNotSet`); a given one validates the pickup date, and permanent also saves it in the same transaction while provisional saves nothing. The cycles page shows the weekday picker and the permanent/provisional choice only while the
 cooperative has none; the settings page shows "not set".
 Why: the R4c decision in the Q&A above. It supersedes the Saturday sentence of the T11 Deviation.
+
+## 2026-10-23 · Deviation
+
+T12 (`plan.md`, Ordering domain and use cases): `Cycle` has no sent state until T18, so `setCutoff`, `closeNow` and `clearCutoff` do not check "not sent" (R6b, S34 frozen) yet; T18 adds it with `send`. `SetCutoff` takes `at` as an ISO 8601 string (no offset means the cooperative's timezone) and rejects anything else with `InvalidCutoff`; a producer absent from the cycle is refused with `ProducerNotInCycle`. `ParticipantData` gains `open` (R6a, from `Cycle::isOpenFor`) so the cycles page and tests can read it.
+Why: the plan did not say how `at` arrives, what happens for a producer outside the cycle, or where R6a is observable before T13.

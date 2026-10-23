@@ -23,6 +23,7 @@ readonly producerId: string,
 readonly producerName: string,
 readonly participating: boolean,
 readonly cutoff: string | null,
+readonly open: boolean,
 };
 export type CycleRow = {
 readonly id: string,

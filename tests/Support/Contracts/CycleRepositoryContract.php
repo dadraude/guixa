@@ -136,4 +136,27 @@ trait CycleRepositoryContract
         $this->assertTrue($repository->existsOnPickupDate($this->madrid('2026-11-07')));
         $this->assertFalse($repository->existsOnPickupDate($this->madrid('2026-11-14')));
     }
+
+    #[Test]
+    public function it_stores_a_moved_and_a_cleared_cutoff(): void
+    {
+        $repository = $this->repository();
+        $now = $this->madrid('2026-10-22 10:00');
+        $cycle = $this->cycle($repository);
+        $cycle->addParticipant(self::BAKER, CutoffRule::of(3, '20:00'), $now);
+        $cycle->addParticipant(self::GROWER, CutoffRule::of(2, '12:00'), $now);
+        $repository->add($cycle);
+
+        $stored = $repository->getForUpdate($cycle->id);
+        $stored->setCutoff(self::BAKER, $this->madrid('2026-11-05 12:00'), $now);
+        $stored->clearCutoff(self::GROWER);
+        $repository->add($stored);
+
+        $orders = [];
+        foreach ($repository->get($cycle->id)->producerOrders() as $order) {
+            $orders[$order->producerId] = $order->cutoff()?->format('c');
+        }
+        $this->assertSame('2026-11-05T12:00:00+01:00', $orders[self::BAKER]);
+        $this->assertNull($orders[self::GROWER]);
+    }
 }

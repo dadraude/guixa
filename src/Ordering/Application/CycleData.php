@@ -2,6 +2,7 @@
 
 namespace Guixa\Ordering\Application;
 
+use DateTimeImmutable;
 use DateTimeZone;
 use Guixa\Ordering\Domain\Cycle;
 use Guixa\Ordering\Domain\ProducerOrder;
@@ -15,7 +16,7 @@ final readonly class CycleData
         public array $participants,
     ) {}
 
-    public static function of(Cycle $cycle, DateTimeZone $timezone): self
+    public static function of(Cycle $cycle, DateTimeImmutable $now, DateTimeZone $timezone): self
     {
         return new self(
             $cycle->id,
@@ -25,6 +26,7 @@ final readonly class CycleData
                     $order->producerId,
                     $order->isParticipating(),
                     $order->cutoff()?->setTimezone($timezone)->format('c'),
+                    $cycle->isOpenFor($order->producerId, $now),
                 ),
                 $cycle->producerOrders(),
             ),

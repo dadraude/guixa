@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Form, Head } from '@inertiajs/vue3';
 import CycleController from '@/actions/App/Http/Controllers/Manage/CycleController';
+import CycleCutoffController from '@/actions/App/Http/Controllers/Manage/CycleCutoffController';
 import CycleParticipantController from '@/actions/App/Http/Controllers/Manage/CycleParticipantController';
 import Heading from '@/components/Heading.vue';
 import InputError from '@/components/InputError.vue';
@@ -173,16 +174,95 @@ const missingProducers = (cycle: App.Http.CycleRow) =>
                 >
                     No producer participates yet.
                 </p>
-                <ul v-else class="text-sm">
+                <ul v-else class="divide-y text-sm">
                     <li
                         v-for="participant in cycle.participants"
                         :key="participant.producerId"
-                        class="flex justify-between gap-2"
+                        class="flex flex-col gap-2 py-2"
+                        :data-test="`participant-${cycle.id}-${participant.producerId}`"
                     >
-                        <span>{{ participant.producerName }}</span>
-                        <span class="text-muted-foreground">
-                            {{ cutoffLabel(participant.cutoff) }}
-                        </span>
+                        <div class="flex justify-between gap-2">
+                            <span>{{ participant.producerName }}</span>
+                            <span class="text-muted-foreground">
+                                {{ participant.open ? 'Open' : 'Closed' }},
+                                {{ cutoffLabel(participant.cutoff) }}
+                            </span>
+                        </div>
+
+                        <div
+                            v-if="participant.participating"
+                            class="flex flex-wrap items-center gap-2"
+                        >
+                            <Form
+                                v-bind="
+                                    CycleCutoffController.update.form({
+                                        cycle: cycle.id,
+                                        producer: participant.producerId,
+                                    })
+                                "
+                                class="flex items-center gap-2"
+                                v-slot="{ errors, processing }"
+                            >
+                                <Input
+                                    name="cutoff"
+                                    type="datetime-local"
+                                    required
+                                    class="w-fit"
+                                    :aria-label="`New cutoff for ${participant.producerName}`"
+                                />
+                                <Button
+                                    type="submit"
+                                    variant="outline"
+                                    size="sm"
+                                    :disabled="processing"
+                                    :data-test="`set-cutoff-${cycle.id}-${participant.producerId}`"
+                                >
+                                    Set cutoff
+                                </Button>
+                                <InputError
+                                    :message="errors.cutoff ?? errors.domain"
+                                />
+                            </Form>
+                            <Form
+                                v-bind="
+                                    CycleCutoffController.close.form({
+                                        cycle: cycle.id,
+                                        producer: participant.producerId,
+                                    })
+                                "
+                                v-slot="{ processing }"
+                            >
+                                <Button
+                                    type="submit"
+                                    variant="outline"
+                                    size="sm"
+                                    :disabled="processing"
+                                    :data-test="`close-now-${cycle.id}-${participant.producerId}`"
+                                >
+                                    Close now
+                                </Button>
+                            </Form>
+                            <Form
+                                v-if="participant.cutoff !== null"
+                                v-bind="
+                                    CycleCutoffController.destroy.form({
+                                        cycle: cycle.id,
+                                        producer: participant.producerId,
+                                    })
+                                "
+                                v-slot="{ processing }"
+                            >
+                                <Button
+                                    type="submit"
+                                    variant="outline"
+                                    size="sm"
+                                    :disabled="processing"
+                                    :data-test="`clear-cutoff-${cycle.id}-${participant.producerId}`"
+                                >
+                                    Clear cutoff
+                                </Button>
+                            </Form>
+                        </div>
                     </li>
                 </ul>
 

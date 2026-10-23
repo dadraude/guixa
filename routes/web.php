@@ -5,6 +5,7 @@ use App\Http\Controllers\Manage\AccountController;
 use App\Http\Controllers\Manage\AccountDeactivationController;
 use App\Http\Controllers\Manage\AccountHouseholdController;
 use App\Http\Controllers\Manage\CycleController;
+use App\Http\Controllers\Manage\CycleCutoffController;
 use App\Http\Controllers\Manage\CycleParticipantController;
 use App\Http\Controllers\Manage\HouseholdController;
 use App\Http\Controllers\Manage\HouseholdMemberController;
@@ -63,6 +64,11 @@ Route::middleware(['auth', 'verified', 'role:manager'])->prefix('manage')->name(
     Route::post('cycles/{cycle}/producers/{producer}', [CycleParticipantController::class, 'store'])
         ->whereUuid(['cycle', 'producer'])
         ->name('cycles.producers.store');
+    Route::prefix('cycles/{cycle}/producers/{producer}/cutoff')->whereUuid(['cycle', 'producer'])->group(function () {
+        Route::put('/', [CycleCutoffController::class, 'update'])->name('cycles.producers.cutoff.update');
+        Route::post('close', [CycleCutoffController::class, 'close'])->name('cycles.producers.cutoff.close');
+        Route::delete('/', [CycleCutoffController::class, 'destroy'])->name('cycles.producers.cutoff.destroy');
+    });
 
     Route::get('settings', [SettingsController::class, 'show'])->name('settings.show');
     Route::put('settings/pickup-weekday', [SettingsController::class, 'updatePickupWeekday'])->name('settings.pickup-weekday.update');

@@ -3,10 +3,15 @@
 namespace Guixa\Ordering\Domain;
 
 use DateTimeImmutable;
+use DateTimeZone;
+use Guixa\Ordering\Domain\Error\CutoffNotInFuture;
+use Guixa\Ordering\Domain\Error\CutoffOutsideWindow;
 use Guixa\Ordering\Domain\Error\NotOnPickupWeekday;
 use Guixa\Ordering\Domain\Error\PickupDateNotInFuture;
+use Guixa\Ordering\Domain\Error\ProducerNotInCycle;
 use Guixa\Ordering\Domain\ValueObject\CutoffRule;
 use Guixa\Ordering\Domain\ValueObject\PickupWeekday;
+use Guixa\Shared\Domain\LocalTime;
 
 /** One week's round of orders, picked up on one date (R4). */
 final class Cycle
@@ -61,6 +66,50 @@ final class Cycle
         $this->producerOrders[$producerId] = ProducerOrder::participate($producerId, $cutoff > $now ? $cutoff : null);
     }
 
+    /**
+     * Moves the cutoff to a future moment from 6 days before the pickup date at 00:00 up to, not including,
+     * the pickup date at 00:00; it works even if the current cutoff has passed (R6).
+     */
+    public function setCutoff(string $producerId, DateTimeImmutable $at, DateTimeImmutable $now): void
+    {
+        $producerOrder = $this->producerOrderOf($producerId);
+
+        if ($at <= $now) {
+            throw CutoffNotInFuture::at($at->format('c'));
+        }
+
+        $timezone = $now->getTimezone();
+        $earliest = CutoffRule::of(6, '00:00')->closesAt($this->pickupDate, $timezone);
+
+        if ($at < $earliest || $at >= $this->closesWithoutCutoff($timezone)) {
+            throw CutoffOutsideWindow::at($at->format('c'), $this->pickupDate->format('Y-m-d'));
+        }
+
+        $producerOrder->changeCutoff($at);
+    }
+
+    public function closeNow(string $producerId, DateTimeImmutable $now): void
+    {
+        $this->producerOrderOf($producerId)->changeCutoff($now);
+    }
+
+    public function clearCutoff(string $producerId): void
+    {
+        $this->producerOrderOf($producerId)->changeCutoff(null);
+    }
+
+    /** Open until its cutoff, or until the pickup date at 00:00 when it has none (R6a). */
+    public function isOpenFor(string $producerId, DateTimeImmutable $now): bool
+    {
+        $producerOrder = $this->producerOrders[$producerId] ?? null;
+
+        if ($producerOrder === null || ! $producerOrder->isParticipating()) {
+            return false;
+        }
+
+        return $now < ($producerOrder->cutoff() ?? $this->closesWithoutCutoff($now->getTimezone()));
+    }
+
     public function pickupDate(): DateTimeImmutable
     {
         return $this->pickupDate;
@@ -70,6 +119,16 @@ final class Cycle
     public function producerOrders(): array
     {
         return array_values($this->producerOrders);
+    }
+
+    private function producerOrderOf(string $producerId): ProducerOrder
+    {
+        return $this->producerOrders[$producerId] ?? throw ProducerNotInCycle::withId($this->id, $producerId);
+    }
+
+    private function closesWithoutCutoff(DateTimeZone $timezone): DateTimeImmutable
+    {
+        return LocalTime::at($this->pickupDate, '00:00', $timezone);
     }
 
     public function __clone()

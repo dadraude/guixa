@@ -223,3 +223,92 @@ it('refuses a weekday given when the cooperative already has one (R4c)', functio
     expect(DB::table('cycles')->count())->toBe(0)
         ->and(DB::table('cooperative_settings')->value('pickup_weekday'))->toBe(6);
 });
+
+function openCycleWithBaker(): array
+{
+    pickupOnSaturdays();
+    $baker = cyclesBaker();
+    $date = upcoming();
+    test()->actingAs(accountWith(Role::Manager))
+        ->post('/manage/cycles', ['pickup_date' => $date->toDateString(), 'producer_ids' => [$baker->id]]);
+
+    return [DB::table('cycles')->value('id'), $baker, $date];
+}
+
+it('keeps the cutoff routes to managers (R6)', function (string $method, string $suffix) {
+    [$cycleId, $baker] = openCycleWithBaker();
+    $uri = "/manage/cycles/{$cycleId}/producers/{$baker->id}/cutoff{$suffix}";
+
+    auth()->logout();
+    $this->{$method}($uri)->assertRedirect(route('login'));
+    $this->actingAs(accountWith(Role::Member, Role::Producer))->{$method}($uri)->assertForbidden();
+})->with([
+    ['put', ''],
+    ['post', '/close'],
+    ['delete', ''],
+]);
+
+it('moves a producer\'s cutoff and shows whether it is open (R6, R6a, S6)', function () {
+    [$cycleId, $baker, $date] = openCycleWithBaker();
+    $manager = accountWith(Role::Manager);
+    $moved = $date->subDays(2)->setTime(12, 0);
+
+    $this->actingAs($manager)
+        ->put("/manage/cycles/{$cycleId}/producers/{$baker->id}/cutoff", ['cutoff' => $moved->format('Y-m-d\TH:i')])
+        ->assertRedirect();
+
+    $this->actingAs($manager)->get('/manage/cycles')
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('cycles.0.participants.0.cutoff', $moved->format('c'))
+            ->where('cycles.0.participants.0.open', true));
+});
+
+it('shows the domain error for a cutoff outside the allowed window (R6, S6)', function () {
+    [$cycleId, $baker, $date] = openCycleWithBaker();
+
+    $this->actingAs(accountWith(Role::Manager))
+        ->from('/manage/cycles')
+        ->put("/manage/cycles/{$cycleId}/producers/{$baker->id}/cutoff", ['cutoff' => $date->setTime(8, 0)->format('Y-m-d\TH:i')])
+        ->assertRedirect('/manage/cycles')
+        ->assertSessionHasErrors('domain');
+});
+
+it('validates that a cutoff is given (R6)', function () {
+    [$cycleId, $baker] = openCycleWithBaker();
+
+    $this->actingAs(accountWith(Role::Manager))
+        ->put("/manage/cycles/{$cycleId}/producers/{$baker->id}/cutoff", ['cutoff' => ''])
+        ->assertSessionHasErrors('cutoff');
+});
+
+it('closes a producer now (R6, S35)', function () {
+    [$cycleId, $baker] = openCycleWithBaker();
+    $manager = accountWith(Role::Manager);
+
+    $this->actingAs($manager)->post("/manage/cycles/{$cycleId}/producers/{$baker->id}/cutoff/close")->assertRedirect();
+
+    $this->actingAs($manager)->get('/manage/cycles')
+        ->assertInertia(fn (Assert $page) => $page->where('cycles.0.participants.0.open', false));
+});
+
+it('clears a producer\'s cutoff (R6, S35)', function () {
+    [$cycleId, $baker] = openCycleWithBaker();
+    $manager = accountWith(Role::Manager);
+
+    $this->actingAs($manager)->delete("/manage/cycles/{$cycleId}/producers/{$baker->id}/cutoff")->assertRedirect();
+
+    $this->actingAs($manager)->get('/manage/cycles')
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('cycles.0.participants.0.cutoff', null)
+            ->where('cycles.0.participants.0.open', true));
+});
+
+it('answers with the domain error when the producer is not in the cycle (R6)', function () {
+    [$cycleId] = openCycleWithBaker();
+    $other = cyclesBaker(['name' => 'Other']);
+
+    $this->actingAs(accountWith(Role::Manager))
+        ->from('/manage/cycles')
+        ->delete("/manage/cycles/{$cycleId}/producers/{$other->id}/cutoff")
+        ->assertSessionHasErrors('domain');
+});

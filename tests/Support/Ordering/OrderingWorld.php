@@ -3,9 +3,12 @@
 namespace Tests\Support\Ordering;
 
 use Guixa\Ordering\Application\AddParticipant;
+use Guixa\Ordering\Application\ClearCutoff;
+use Guixa\Ordering\Application\CloseProducerNow;
 use Guixa\Ordering\Application\GetPickupWeekday;
 use Guixa\Ordering\Application\ListCycles;
 use Guixa\Ordering\Application\OpenCycle;
+use Guixa\Ordering\Application\SetCutoff;
 use Guixa\Ordering\Application\SetPickupWeekday;
 use Guixa\Ordering\Domain\ValueObject\PickupWeekday;
 use Guixa\Shared\Application\Actor;
@@ -39,6 +42,12 @@ final class OrderingWorld
 
     public readonly AddParticipant $addParticipant;
 
+    public readonly SetCutoff $setCutoff;
+
+    public readonly CloseProducerNow $closeProducerNow;
+
+    public readonly ClearCutoff $clearCutoff;
+
     public readonly ListCycles $listCycles;
 
     public readonly Actor $manager;
@@ -60,6 +69,9 @@ final class OrderingWorld
         $this->getPickupWeekday = new GetPickupWeekday($this->settings);
         $this->openCycle = new OpenCycle($this->cycles, $this->settings, $this->rules, $transactions, $this->clock);
         $this->addParticipant = new AddParticipant($this->cycles, $this->rules, $transactions, $this->clock);
+        $this->setCutoff = new SetCutoff($this->cycles, $transactions, $this->clock);
+        $this->closeProducerNow = new CloseProducerNow($this->cycles, $transactions, $this->clock);
+        $this->clearCutoff = new ClearCutoff($this->cycles, $transactions);
         $this->listCycles = new ListCycles($this->cycles, $this->clock);
 
         $this->manager = new Actor('00000000-0000-7000-8000-00000000000a', [Role::Manager]);

@@ -19,8 +19,11 @@ final class ListCycles
     {
         $actor->assertManager();
 
+        $timezone = $this->clock->timezone();
+        $now = $this->clock->now()->setTimezone($timezone);
+
         return array_map(
-            fn (Cycle $cycle) => CycleData::of($cycle, $this->clock->timezone()),
+            fn (Cycle $cycle) => CycleData::of($cycle, $now, $timezone),
             $this->cycles->list(),
         );
     }
