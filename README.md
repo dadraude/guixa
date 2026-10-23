@@ -17,32 +17,32 @@ for principles and architecture, and [`specs/README.md`](specs/README.md) for ho
 1. Create the database. The defaults in `.env.example` expect a database `guixa` on `127.0.0.1:5432`,
    user `postgres`, no password; edit `.env` if yours differs.
 
-   ```sh
-   createdb guixa
-   ```
+    ```sh
+    createdb guixa
+    ```
 
 2. Install dependencies, create `.env`, generate the app key, run migrations and build the frontend:
 
-   ```sh
-   composer setup
-   ```
+    ```sh
+    composer setup
+    ```
 
 3. Start the server, queue worker, scheduler, logs and Vite together:
 
-   ```sh
-   composer dev
-   ```
+    ```sh
+    composer dev
+    ```
 
-   The app runs at <http://localhost:8000>.
+    The app runs at <http://localhost:8000>.
 
 4. Create the first manager. This only works while no manager exists:
 
-   ```sh
-   php artisan guixa:create-manager "Your Name" you@example.com
-   ```
+    ```sh
+    php artisan guixa:create-manager "Your Name" you@example.com
+    ```
 
-   Open the invitation email in Mailpit (<http://localhost:8025>) and follow the link to set up the account.
-   From there, the manager invites the rest of the members from the app.
+    Open the invitation email in Mailpit (<http://localhost:8025>) and follow the link to set up the account.
+    From there, the manager invites the rest of the members from the app.
 
 ## Tests and checks
 
