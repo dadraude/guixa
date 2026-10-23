@@ -13,6 +13,9 @@ final class FakeProductCatalog implements ProductCatalog
     /** @var array<string, OrderableProduct> */
     private array $orderable = [];
 
+    /** @var array<string, OrderableProduct> */
+    private array $deactivated = [];
+
     /** @return string the new product's id */
     public function offer(string $producerId, string $name, string $unit, int $priceCents, bool $variable, ?string $containersPerUnit = null): string
     {
@@ -36,7 +39,14 @@ final class FakeProductCatalog implements ProductCatalog
 
     public function deactivate(string $productId): void
     {
+        $this->deactivated[$productId] = $this->orderable[$productId];
         unset($this->orderable[$productId]);
+    }
+
+    public function reactivate(string $productId): void
+    {
+        $this->orderable[$productId] = $this->deactivated[$productId];
+        unset($this->deactivated[$productId]);
     }
 
     public function orderable(string $productId): ?OrderableProduct

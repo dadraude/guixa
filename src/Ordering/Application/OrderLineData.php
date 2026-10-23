@@ -17,9 +17,11 @@ final readonly class OrderLineData
         public ?string $containersPerUnit,
         public string $quantity,
         public string $addedBy,
+        public bool $notDelivered,
     ) {}
 
-    public static function of(OrderLine $line): self
+    /** @param  bool  $notDelivered  the line carries the *will not be delivered* mark (R3b) */
+    public static function of(OrderLine $line, bool $notDelivered): self
     {
         return new self(
             $line->productId,
@@ -31,6 +33,7 @@ final readonly class OrderLineData
             $line->containersPerUnit?->toString(),
             $line->ordered->toString(),
             $line->addedBy,
+            $notDelivered,
         );
     }
 }

@@ -6,6 +6,7 @@ use App\Models\User;
 use Guixa\Catalog\Infrastructure\Persistence\ProducerModel;
 use Guixa\Ordering\Domain\OrderRepository;
 use Guixa\Ordering\Infrastructure\Persistence\EloquentOrderRepository;
+use Guixa\Shared\Domain\Quantity;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -67,5 +68,19 @@ final class EloquentOrderRepositoryTest extends TestCase
             'product_name' => 'Loaf', 'unit' => 'unit', 'unit_price_cents' => 100, 'variable' => false,
             'ordered_quantity' => '-1', 'allocated_quantity' => '0', 'created_at' => now(), 'added_by' => self::ANNA,
         ]), QueryException::class);
+    }
+
+    #[Test]
+    public function a_product_has_no_unsettled_lines_once_its_cycle_is_settled(): void
+    {
+        $cycle = $this->openCycle();
+        $repository = $this->repository();
+        $order = $repository->lockFor(self::CYCLE, self::HOUSEHOLD);
+        $order->setLine($this->product(self::BREAD, 'Loaf', 350), Quantity::fromString('2'), $cycle, $repository->nextId(), self::ANNA, $this->madrid('2026-10-22 10:00'));
+        $repository->add($order);
+
+        DB::table('cycles')->where('id', self::CYCLE)->update(['settled_at' => now()]);
+
+        $this->assertFalse($repository->hasUnsettledLinesOf(self::BREAD));
     }
 }

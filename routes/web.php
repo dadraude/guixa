@@ -20,6 +20,7 @@ use App\Http\Controllers\Manage\StockMovementController;
 use App\Http\Controllers\Manage\StockProductController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\Producer\CutoffController;
+use App\Http\Controllers\Producer\ProductAvailabilityController;
 use App\Http\Controllers\Producer\ProductController;
 use App\Http\Controllers\WalletController;
 use Illuminate\Support\Facades\Route;
@@ -35,6 +36,7 @@ Route::middleware(['auth', 'verified', 'role:member'])->get('wallet', [WalletCon
 Route::middleware(['auth', 'verified', 'role:member'])->prefix('cycles/{cycle}/order')->whereUuid(['cycle', 'product'])->name('orders.')->group(function () {
     Route::get('/', [OrderController::class, 'edit'])->name('edit');
     Route::put('lines/{product}', [OrderController::class, 'updateLine'])->name('lines.update');
+    Route::delete('lines/{product}', [OrderController::class, 'removeMarkedLine'])->name('lines.destroy');
 });
 
 Route::middleware('guest')->group(function () {
@@ -141,6 +143,9 @@ Route::middleware(['auth', 'verified', 'role:producer'])->prefix('producer')->na
     Route::put('products/{product}/reactivation', [ProductController::class, 'reactivate'])
         ->whereUuid('product')
         ->name('products.reactivate');
+    Route::put('cycles/{cycle}/products/{product}/availability', [ProductAvailabilityController::class, 'update'])
+        ->whereUuid(['cycle', 'product'])
+        ->name('products.availability');
 });
 
 require __DIR__.'/settings.php';

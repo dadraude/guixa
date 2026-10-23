@@ -22,6 +22,7 @@ type Line = {
     price: string;
     variable: boolean;
     quantity: string;
+    notDelivered: boolean;
 };
 
 export type OrderRow = {
@@ -32,6 +33,8 @@ export type OrderRow = {
     variable: boolean;
     /** The saved quantity, empty when the product is not in the order. */
     quantity: string;
+    /** The line carries the *will not be delivered* mark (R3b). */
+    notDelivered: boolean;
 };
 
 export type ProducerRows = {
@@ -48,6 +51,7 @@ const fromLine = (line: Line): OrderRow => ({
     price: line.price,
     variable: line.variable,
     quantity: line.quantity,
+    notDelivered: line.notDelivered,
 });
 
 const fromOffer = (product: Offered): OrderRow => ({
@@ -57,11 +61,12 @@ const fromOffer = (product: Offered): OrderRow => ({
     price: product.price,
     variable: product.variable,
     quantity: '',
+    notDelivered: false,
 });
 
 /**
  * One group per producer: a line shows the product as it was when the line was last changed (R10), whatever the
- * catalog says now; the other offered products follow. Lines of a producer that no longer takes part stay under its name, read-only (T15 replaces this).
+ * catalog says now; the other offered products follow. Lines of a producer that no longer takes part stay under its name, marked *will not be delivered* (R6c).
  */
 export function orderRows(order: {
     producers: Producer[];

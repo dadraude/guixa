@@ -5,6 +5,7 @@ use Guixa\Catalog\Infrastructure\Persistence\ProducerModel;
 use Guixa\Catalog\Infrastructure\Persistence\ProductModel;
 use Guixa\Shared\Domain\Role;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Inertia\Testing\AssertableInertia as Assert;
 
 function catalogProducer(string $name = 'Baker'): ProducerModel
@@ -173,4 +174,37 @@ it('shows the domain error for an unknown product id', function () {
     $this->actingAs(accountOfProducer(catalogProducer()))
         ->put('/producer/products/'.fake()->uuid(), ['name' => 'Bread', 'unit' => 'loaf', 'price' => '1', 'variable' => false])
         ->assertSessionHasErrors('domain');
+});
+
+it('keeps the unit and the variable flag while the product has lines in a cycle that is not settled, and lets the rest change (R1, S5)', function () {
+    $baker = catalogProducer();
+    $product = productOf($baker);
+    $cycleId = (string) Str::uuid7();
+    DB::table('cycles')->insert(['id' => $cycleId, 'pickup_date' => '2026-11-07']);
+    $household = linkToNewHousehold($account = accountOfProducer($baker));
+    $orderId = (string) Str::uuid7();
+    DB::table('orders')->insert(['id' => $orderId, 'cycle_id' => $cycleId, 'household_id' => $household]);
+    DB::table('order_lines')->insert([
+        'id' => (string) Str::uuid7(), 'order_id' => $orderId, 'product_id' => $product->id, 'producer_id' => $baker->id,
+        'product_name' => 'Bread', 'unit' => 'loaf', 'unit_price_cents' => 350, 'variable' => false,
+        'ordered_quantity' => '1', 'allocated_quantity' => '1', 'created_at' => now(), 'added_by' => $account->id,
+    ]);
+
+    $this->actingAs($account)
+        ->from("/producer/products/{$product->id}/edit")
+        ->put("/producer/products/{$product->id}", ['name' => 'Bread', 'unit' => 'kg', 'price' => '3.50', 'variable' => false, 'containers_per_unit' => '2'])
+        ->assertSessionHasErrors('domain');
+    expect($product->refresh()->unit)->toBe('loaf');
+
+    $this->actingAs($account)
+        ->put("/producer/products/{$product->id}", ['name' => 'Rye bread', 'unit' => 'loaf', 'price' => '4.00', 'variable' => false, 'containers_per_unit' => '2'])
+        ->assertRedirect('/producer/products');
+    expect($product->refresh()->name)->toBe('Rye bread');
+
+    DB::table('cycles')->where('id', $cycleId)->update(['settled_at' => now()]);
+
+    $this->actingAs($account)
+        ->put("/producer/products/{$product->id}", ['name' => 'Rye bread', 'unit' => 'kg', 'price' => '4.00', 'variable' => true, 'containers_per_unit' => null])
+        ->assertRedirect('/producer/products');
+    expect($product->refresh()->unit)->toBe('kg');
 });

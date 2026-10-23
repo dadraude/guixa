@@ -3,13 +3,17 @@
 namespace Guixa\Catalog\Application;
 
 use Guixa\Catalog\Domain\Error\ProductNotFound;
+use Guixa\Catalog\Domain\ProducerCycles;
 use Guixa\Catalog\Domain\ProductRepository;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Money;
 
 final class UpdateProduct
 {
-    public function __construct(private readonly ProductRepository $products) {}
+    public function __construct(
+        private readonly ProductRepository $products,
+        private readonly ProducerCycles $cycles,
+    ) {}
 
     public function __invoke(
         Actor $actor,
@@ -23,7 +27,7 @@ final class UpdateProduct
         $product = $this->products->get($id) ?? throw ProductNotFound::withId($id);
         $actor->assertProducerOf($product->producerId);
 
-        $product->change($name, $unit, Money::ofCents($priceCents), $variable, $containersPerUnit);
+        $product->change($name, $unit, Money::ofCents($priceCents), $variable, $containersPerUnit, $this->cycles->hasUnsettledLines($id));
         $this->products->add($product);
     }
 }

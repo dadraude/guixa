@@ -75,6 +75,16 @@ final class EloquentOrderRepository implements OrderRepository
         return $this->toDomain($row);
     }
 
+    public function hasUnsettledLinesOf(string $productId): bool
+    {
+        return DB::table('order_lines')
+            ->join('orders', 'orders.id', '=', 'order_lines.order_id')
+            ->join('cycles', 'cycles.id', '=', 'orders.cycle_id')
+            ->where('order_lines.product_id', $productId)
+            ->whereNull('cycles.settled_at')
+            ->exists();
+    }
+
     private function toDomain(stdClass $row): Order
     {
         $lines = DB::table('order_lines')

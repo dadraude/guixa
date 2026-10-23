@@ -3,8 +3,10 @@
 namespace App\Providers;
 
 use Carbon\CarbonImmutable;
+use Guixa\Catalog\Domain\ProducerCycles;
 use Guixa\Catalog\Domain\ProducerRepository;
 use Guixa\Catalog\Domain\ProductRepository;
+use Guixa\Catalog\Infrastructure\Ordering\OrderingProducerCycles;
 use Guixa\Catalog\Infrastructure\Persistence\EloquentProducerRepository;
 use Guixa\Catalog\Infrastructure\Persistence\EloquentProductRepository;
 use Guixa\Membership\Domain\AccountPasswords;
@@ -23,12 +25,14 @@ use Guixa\Ordering\Domain\CooperativeSettings;
 use Guixa\Ordering\Domain\CycleRepository;
 use Guixa\Ordering\Domain\OrderRepository;
 use Guixa\Ordering\Domain\ProducerCutoffRules;
+use Guixa\Ordering\Domain\ProductAvailabilityRepository;
 use Guixa\Ordering\Domain\ProductCatalog;
 use Guixa\Ordering\Infrastructure\Catalog\CatalogProducerCutoffRules;
 use Guixa\Ordering\Infrastructure\Catalog\CatalogProductCatalog;
 use Guixa\Ordering\Infrastructure\Persistence\EloquentCooperativeSettings;
 use Guixa\Ordering\Infrastructure\Persistence\EloquentCycleRepository;
 use Guixa\Ordering\Infrastructure\Persistence\EloquentOrderRepository;
+use Guixa\Ordering\Infrastructure\Persistence\EloquentProductAvailabilityRepository;
 use Guixa\Shared\Application\ActorResolver;
 use Guixa\Shared\Application\TransactionRunner;
 use Guixa\Shared\Domain\Clock;
@@ -73,12 +77,14 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->bind(ProducerRepository::class, EloquentProducerRepository::class);
         $this->app->bind(ProductRepository::class, EloquentProductRepository::class);
+        $this->app->bind(ProducerCycles::class, OrderingProducerCycles::class);
 
         $this->app->bind(CooperativeSettings::class, EloquentCooperativeSettings::class);
         $this->app->bind(CycleRepository::class, EloquentCycleRepository::class);
         $this->app->bind(ProducerCutoffRules::class, CatalogProducerCutoffRules::class);
         $this->app->bind(OrderRepository::class, EloquentOrderRepository::class);
         $this->app->bind(ProductCatalog::class, CatalogProductCatalog::class);
+        $this->app->bind(ProductAvailabilityRepository::class, EloquentProductAvailabilityRepository::class);
     }
 
     /**

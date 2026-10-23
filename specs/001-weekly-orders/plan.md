@@ -137,7 +137,7 @@ Domain
   `closesAt(pickupDate, timezone): DateTimeImmutable` subtracts the days from the bare date, then resolves the time through `LocalTime` (R5, S6, S38).
 - `Product` (id, producerId, name, unit, `Money` price ≥ 0, variable, `?Quantity containersPerUnit` > 0,
   active). Unit and variable flag cannot change while the product has lines in an unsettled cycle
-  (`ProducerCycles::hasUnsettledLines`, R1, S5); that lock and its port arrive with T15, so `Product::change` takes every field until then.
+  (`ProducerCycles::hasUnsettledLines`, R1, S5): `UpdateProduct` asks the port and passes the answer to `Product::change`, which throws `ProductHasUnsettledLines` when the unit or the variable flag would change. The port's adapter calls Ordering's `HasUnsettledLines`.
   Ownership is checked in each use case with `Actor::assertProducerOf(product.producerId)` (R2).
 - Ports: `ProducerRepository`, `ProductRepository`, `ProducerCycles`, `ProducerAccess`.
 
@@ -204,7 +204,7 @@ role only; participation is not restored.
     snapshots name/unit/variable/price/containers (R10), sets `allocated = ordered`, and keeps `createdAt` and `addedBy` of an
     existing line (R15 tie). `removeLine(productId, Cycle, now)` is the zero quantity (R9): it checks the line's producer is open
     and leaves a product that is not in the order alone. `SetOrderLine` picks between them. No balance check (R11).
-    `removeMarkedLine` is allowed after the cutoff (R8).
+    `removeMarkedLine(productId, marked)` is allowed after the cutoff (R8); `marked` comes from `NotDeliveredMarks::of(cycle, order)`, it ignores a product that is not in the order and throws `LineNotMarked` for a line that is not marked.
   - T13 carries only the ordering part: `OrderLine` has id, productId, producerId, snapshot, `ordered`, `allocated`, `createdAt`, `addedBy`; the other
     fields come with the tasks that use them, though the `orders` and `order_lines` tables have every column.
   - Reception: `allocate(productId, Quantity)` marks `allocatedByHand` (R16); `allocateNew(product snapshot,
@@ -227,7 +227,8 @@ role only; participation is not restored.
   `notDelivered` on the marked lines of that producer, so later catalog changes do not affect them.
 
 - **`ProductAvailability`**: `(cycleId, productId)` rows for products marked unavailable in a cycle; only while
-  the producer order is not sent (R3c).
+  the producer order is not sent (R3c). `ProductAvailabilityRepository`: `markUnavailable`, `markAvailable`, `unavailableIn(cycleId)`.
+- **`NotDeliveredMarks`** domain service (`ProductCatalog` + `ProductAvailabilityRepository`): `of(cycle, order)` returns the product ids of the marked lines: the cycle does not have the producer participating, the product is unavailable in the cycle, or `ProductCatalog::orderable` is null (R3b, R6c). Until T18 adds the sent state, every producer order counts as not sent.
 
 - **`ReceivedTotal`** (cycleId, producerId, productId, `Quantity`): absent means "equal to the ordered total";
   a manager adds one with 0 for a product nobody ordered (R14).
@@ -256,7 +257,7 @@ role only; participation is not restored.
 - Errors (`Ordering\Domain\Error`): `NotOnPickupWeekday`, `PickupDateNotInFuture`, `CycleAlreadyExists`,
   `InvalidPickupWeekday`, `InvalidPickupDate`, `CycleNotFound`, `ProducerNotActive` (unknown or deactivated producer, S50),
   `CycleCancelled`, `CycleAlreadySettled`, `CycleClosed`, `ProducerNotParticipating`, `ProducerClosed`,
-  `ProducerOrderSent`, `ProducerOrderNotSent`, `ProducerStillOpen`, `CutoffOutOfRange`, `ProductNotOrderable`,
+  `ProducerOrderSent`, `ProducerOrderNotSent`, `ProducerStillOpen`, `CutoffOutOfRange`, `ProductNotOrderable`, `LineNotMarked`,
   `FractionalQuantityNotAllowed`, `NoHousehold`, `ReceptionNotValidated`, `ReceptionUnbalanced`,
   `ManualAllocationsWouldBeLost`, `NobodyOrderedProduct`, `CycleNotSettled`, `NotEnoughStock`,
   `PickupNotPending`, `HouseholdInactive`.
@@ -264,7 +265,7 @@ role only; participation is not restored.
 - `Cycle` and `ProducerOrder` carry only the fields T11 needs (pickup date, participation, cutoff); cancelled, settled, closed, sent, validated and
   distributed come with the tasks that use them, though the tables have the columns. `CycleRepository` adds `getForUpdate` (the `FOR UPDATE` lock)
   and `existsOnPickupDate` (cancelled cycles do not count).
-- `OrderRepository`: `nextId`, `add`, `ofHousehold(cycleId, householdId): ?Order` and `lockFor(cycleId, householdId): Order`, which creates the empty
+- `OrderRepository`: `nextId`, `add`, `ofHousehold(cycleId, householdId): ?Order`, `hasUnsettledLinesOf(productId)` (a line in a cycle with no `settled_at`, R1) and `lockFor(cycleId, householdId): Order`, which creates the empty
   order if there is none and locks it (`INSERT … ON CONFLICT DO NOTHING`, then `FOR UPDATE`, R7). `ProductCatalog`: `orderable(productId): ?OrderableProduct`
   and `orderableOf(producerId)`, both with Ordering's own `OrderableProduct` value object (A4); its Catalog adapter calls `GetOrderableProduct` and `ListOrderableProducts`.
   `CycleRepository` adds `getForShare` (the `FOR SHARE` lock).
@@ -281,16 +282,16 @@ role only; participation is not restored.
 | `AddParticipant`, `StopParticipating`, `ParticipateAgain` | manager | R4a, R6c, S50, S51 |
 | `SetCutoff` (`at` is ISO 8601; without an offset it is read in the cooperative's timezone), `CloseProducerNow`, `ClearCutoff` (a producer not in the cycle is refused with `ProducerNotInCycle`; `ListCycles` participants carry `open`, from `isOpenFor`) | manager | R6, R6a, R6b, S6, S34, S35 |
 | `CancelCycle` | manager | R4b, S37 |
-| `SetProductAvailability` | producer (own) | R3c, S48 |
+| `SetProductAvailability` (`cycleId`, `productId`, `available`; the product must be orderable, so an unknown or deactivated one is refused with `ProductNotOrderable`, and its producer must be the actor; `SetOrderLine` refuses an unavailable product with `ProductNotOrderable` and `GetHouseholdOrder` stops offering it) | producer (own) | R3c, S48 |
 | `SetOrderLine` (the household is the actor's, so an account without one is refused with `NoHousehold`; `quantity` is a string of at most 3 decimals, 0 removes) | member of household | R3, R7–R11, S1–S5, S33, S49, S51 |
-| `RemoveMarkedLine` | member of household | R3b, R8, S32 |
-| `GetHouseholdOrder` (the lines with their snapshot, and the participating producers with whether each is open and the products it offers; the *will not be delivered* marks and, once settled, the pickup arrive with T15 and the pickup tasks) | member of household | R3b, R7, R23a, S4 |
+| `RemoveMarkedLine` (`cycleId`, `productId`; a line that is not marked is refused with `LineNotMarked`) | member of household | R3b, R8, S32 |
+| `GetHouseholdOrder` (the lines with their snapshot, and the participating producers with whether each is open and the products it offers; each line carries `notDelivered`, the derived *will not be delivered* mark (R3b); the pickup, once settled, arrives with the pickup tasks) | member of household | R3b, R7, R23a, S4 |
 | `ListMemberCycles` (open, pending, cancelled, closed) | member | R4a, R23a |
 | `SendProducerOrder` → notifies the producer | manager | R12a, R6b, S34, S36 |
 | `SendEmptyProducerOrders` (scheduled) | — (scheduler) | R12a, D10 |
 | `GetProducerCycleSummary` | producer (own) | R12, S7, S8 |
 | `GetCycleSummary` (totals + per household) | manager | R13, S52 |
-| `HasUnsettledLines`, `StopParticipatingWhereNotSent` | — (called by Catalog) | R1, R3a |
+| `HasUnsettledLines(productId): bool`, `StopParticipatingWhereNotSent` (T16) | — (called by Catalog) | R1, R3a |
 | `ListPendingPickups` | — (called by Membership) | R35a |
 | `GetReception` | manager | R14, R17 |
 | `AddUnorderedProduct` | manager | R14, S40 |
@@ -411,7 +412,7 @@ All ids are UUID v7 generated by repositories (`nextId()`); timestamps are `time
 | `products` | id, producer_id, name, unit, price_cents, variable, containers_per_unit?, active | `CHECK (price_cents >= 0)`; `CHECK (containers_per_unit > 0)` |
 | `cycles` | id, pickup_date, cancelled_at?, settled_at?, closed_at? | partial `UNIQUE (pickup_date) WHERE cancelled_at IS NULL` |
 | `cycle_producers` | cycle_id, producer_id, participating, closes_at?, sent_at?, validated_at?, distributed_at? | `PK (cycle_id, producer_id)` |
-| `product_unavailabilities` | cycle_id, product_id | `PK (cycle_id, product_id)` |
+| `product_unavailabilities` | cycle_id, product_id | `PK (cycle_id, product_id)`; both reference their tables |
 | `orders` | id, cycle_id, household_id, pickup_status, pickup_done_at?, charged_cents? | `UNIQUE (cycle_id, household_id)` |
 | `order_lines` | id, order_id, product_id, producer_id, product_name, unit, unit_price_cents, variable, containers_per_unit?, ordered_quantity, allocated_quantity, allocated_by_hand, delivered_quantity?, created_at, added_by, not_delivered, dropped | `UNIQUE (order_id, product_id)`; `CHECK (ordered_quantity >= 0)`; `CHECK (allocated_quantity >= 0)`; `CHECK (delivered_quantity >= 0)` |
 | `received_totals` | cycle_id, producer_id, product_id, received_quantity | `PK (cycle_id, product_id)`; `CHECK (received_quantity >= 0)` |
@@ -444,7 +445,7 @@ role areas (R36a); the layout shows a switch between them.
 | Route | Page / action | Use case |
 | --- | --- | --- |
 | `GET /` | `Orders/Index` | `ListMemberCycles` |
-| `GET /cycles/{cycle}/order` | `Orders/Edit` (producers with what they offer, the order's lines and a running total; the pickup once settled arrives later; interim, until T15: the lines of a producer that no longer takes part stay under that producer's name, read-only, which the user chose, and T15 replaces it with the *will not be delivered* mark and the remove action, R3b, R6c, R8) | `GetHouseholdOrder` (it lists the offered products itself, and the controller names the producers with Catalog's `GetProducer`) |
+| `GET /cycles/{cycle}/order` | `Orders/Edit` (producers with what they offer, the order's lines and a running total; the pickup once settled arrives later; a line marked *will not be delivered* shows the mark, counts as zero in the total and has a Remove action instead of the quantity box, R3b, R6c, R8; the lines of a producer that no longer takes part stay under that producer's name, marked) | `GetHouseholdOrder` (it lists the offered products itself, and the controller names the producers with Catalog's `GetProducer`) |
 | `PUT /cycles/{cycle}/order/lines/{product}` (`quantity`; 0 removes the line) | partial reload of `order` prop | `SetOrderLine` |
 | `DELETE /cycles/{cycle}/order/lines/{product}` | partial reload | `RemoveMarkedLine` |
 | `GET /wallet` | `Wallet/Statement` (member's own household) | `GetWalletStatement` |
@@ -454,7 +455,7 @@ role areas (R36a); the layout shows a switch between them.
 | `DELETE /producer/products/{product}`, `PUT /producer/products/{product}/reactivation` | redirect to the list | `DeactivateProduct`, `ReactivateProduct` |
 | `GET/PUT /producer/cutoff` | `Producer/Cutoff` | `GetDefaultCutoff`, `SetDefaultCutoff` |
 | `GET /producer/cycles/{cycle}` | `Producer/CycleSummary` | `GetProducerCycleSummary` |
-| `PUT /producer/cycles/{cycle}/products/{product}/availability` | partial reload | `SetProductAvailability` |
+| `PUT /producer/cycles/{cycle}/products/{product}/availability` (`available`: boolean; no page uses it until T19) | partial reload | `SetProductAvailability` |
 | `GET /manage/settings`, `PUT /manage/settings/pickup-weekday` | `Manage/Settings` | `GetPickupWeekday`, `SetPickupWeekday` |
 | `GET/POST /manage/cycles` | `Manage/Cycles/Index` (cycles with named participants, active producers to pick, the pickup weekday or null; while it is null the open form also shows a weekday picker and a permanent/provisional choice, sent as `pickup_weekday` and `permanent`) | `ListCycles`, `OpenCycle` |
 | `GET /manage/cycles/{cycle}` | `Manage/Cycles/Show` (totals, producers, containers) | `GetCycleSummary`, `GetContainerCount` |

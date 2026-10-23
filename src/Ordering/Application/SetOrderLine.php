@@ -7,6 +7,7 @@ use Guixa\Ordering\Domain\Error\CycleNotFound;
 use Guixa\Ordering\Domain\Error\NoHousehold;
 use Guixa\Ordering\Domain\Error\ProductNotOrderable;
 use Guixa\Ordering\Domain\OrderRepository;
+use Guixa\Ordering\Domain\ProductAvailabilityRepository;
 use Guixa\Ordering\Domain\ProductCatalog;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Application\TransactionRunner;
@@ -19,6 +20,7 @@ final class SetOrderLine
         private readonly CycleRepository $cycles,
         private readonly OrderRepository $orders,
         private readonly ProductCatalog $catalog,
+        private readonly ProductAvailabilityRepository $availability,
         private readonly TransactionRunner $transactions,
         private readonly Clock $clock,
     ) {}
@@ -41,6 +43,11 @@ final class SetOrderLine
                 $order->removeLine($productId, $cycle, $now);
             } else {
                 $product = $this->catalog->orderable($productId) ?? throw ProductNotOrderable::withId($productId);
+
+                if (in_array($productId, $this->availability->unavailableIn($cycleId), true)) {
+                    throw ProductNotOrderable::unavailableInCycle($productId, $cycleId);
+                }
+
                 $order->setLine($product, $ordered, $cycle, $this->orders->nextId(), $actor->accountId, $now);
             }
 

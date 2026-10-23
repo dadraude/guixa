@@ -38,6 +38,20 @@ final class InMemoryOrderRepository extends InMemoryRepository implements OrderR
         return $order;
     }
 
+    /** Nothing in memory settles a cycle yet, so every line counts. */
+    public function hasUnsettledLinesOf(string $productId): bool
+    {
+        foreach ($this->all() as $order) {
+            foreach ($order->lines() as $line) {
+                if ($line->productId === $productId) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     protected function idOf(object $item): string
     {
         return $item->id;
