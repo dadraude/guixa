@@ -52,6 +52,12 @@ readonly name: string,
 readonly active: boolean,
 readonly memberCount: number,
 };
+export type MemberCycleRow = {
+readonly cycleId: string,
+readonly pickupDate: string,
+readonly open: boolean,
+readonly lineCount: number,
+};
 export type MemberRow = {
 readonly accountId: string,
 readonly name: string,

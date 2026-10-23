@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\MemberCycleRow;
 use App\Http\OrderRow;
 use Guixa\Catalog\Application\GetProducer;
 use Guixa\Ordering\Application\GetHouseholdOrder;
+use Guixa\Ordering\Application\ListMemberCycles;
 use Guixa\Ordering\Application\RemoveMarkedLine;
 use Guixa\Ordering\Application\SetOrderLine;
 use Guixa\Ordering\Domain\Error\CycleNotFound;
@@ -16,6 +18,20 @@ use Inertia\Response;
 
 class OrderController extends Controller
 {
+    /** The home page: a member sees the cycles to order in (R4a, R23a); anyone else, including an unverified account, the welcome page. */
+    public function index(Request $request, ListMemberCycles $listMemberCycles): Response
+    {
+        $actor = app()->bound(Actor::class) ? app(Actor::class) : null;
+
+        if ($actor === null || ! $actor->hasAnyRole('member') || ! $request->user()?->hasVerifiedEmail()) {
+            return Inertia::render('Welcome');
+        }
+
+        return Inertia::render('Orders/Index', [
+            'cycles' => array_map(MemberCycleRow::from(...), $listMemberCycles($actor)),
+        ]);
+    }
+
     /** The member's household order in a cycle (R7). */
     public function edit(string $cycle, Actor $actor, GetHouseholdOrder $getHouseholdOrder, GetProducer $getProducer): Response
     {

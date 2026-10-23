@@ -359,3 +359,6 @@ T20: `plan.md` (Membership use cases, Ordering) now says that `GetHouseholds` ta
 Why: the plan named the use case and port but not their shape, and R13 and S52 do not say how an unknown household shows.
 
 T20 (review): `OrderRepository::ofCycle` loads a cycle's lines in one query, and Membership's `HouseholdRepository` gains `getMany(ids)` (one `whereIn`), so the cycle summary does not query per household. `plan.md` records both.
+T14 (`plan.md`, use cases, HTTP & pages): `Cycle` has no cancelled, settled or closed state and there are no pickups yet, so `ListMemberCycles` lists every cycle by pickup date with `open` (`Cycle::isOpenForMembers`, R4a) and the household's `lineCount` (R23a, before settlement). The page shows two sections, open for orders and closed to orders. The pending-pickup, cancelled and closed sections arrive with T17 and the pickup tasks, which also decide when a past cycle stops being listed.
+`GET /` now renders `Orders/Index` for a member with a verified email and `Welcome` for guests, accounts that are not members and members whose email is not verified, because the role areas send the member area to `/`.
+Why: the plan listed the four states before the domain had them, and `/` was already the public welcome page.

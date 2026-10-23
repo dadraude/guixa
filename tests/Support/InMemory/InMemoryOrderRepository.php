@@ -29,6 +29,19 @@ final class InMemoryOrderRepository extends InMemoryRepository implements OrderR
         return array_values(array_filter($this->all(), fn (Order $order) => $order->cycleId === $cycleId));
     }
 
+    public function lineCountsOfHousehold(string $householdId): array
+    {
+        $counts = [];
+
+        foreach ($this->all() as $order) {
+            if ($order->householdId === $householdId && $order->lines() !== []) {
+                $counts[$order->cycleId] = count($order->lines());
+            }
+        }
+
+        return $counts;
+    }
+
     public function lockFor(string $cycleId, string $householdId): Order
     {
         $order = $this->ofHousehold($cycleId, $householdId);

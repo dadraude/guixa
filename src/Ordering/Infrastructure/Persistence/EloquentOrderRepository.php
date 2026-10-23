@@ -83,6 +83,19 @@ final class EloquentOrderRepository implements OrderRepository
         return array_map(fn (stdClass $row) => $this->toDomain($row, array_values($linesByOrder->get($row->id, collect())->all())), $rows);
     }
 
+    /** @return array<string, int> */
+    public function lineCountsOfHousehold(string $householdId): array
+    {
+        return DB::table('orders')
+            ->join('order_lines', 'order_lines.order_id', '=', 'orders.id')
+            ->where('orders.household_id', $householdId)
+            ->groupBy('orders.cycle_id')
+            ->selectRaw('orders.cycle_id, count(*) as line_count')
+            ->pluck('line_count', 'cycle_id')
+            ->map(fn ($count) => (int) $count)
+            ->all();
+    }
+
     public function lockFor(string $cycleId, string $householdId): Order
     {
         // The unique (cycle, household) index makes a second concurrent insert wait for the first and then do nothing.

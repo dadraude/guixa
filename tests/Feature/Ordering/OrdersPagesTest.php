@@ -213,3 +213,29 @@ it('shows the order line of a product that is orderable as not marked (R3b)', fu
     $this->actingAs($anna)->get("/cycles/{$cycleId}/order")
         ->assertInertia(fn (Assert $page) => $page->where('order.lines.0.notDelivered', false));
 });
+
+it('lists the cycles on the home page of a member, open ones first (R4a, R23a)', function () {
+    [$cycleId, , $loaf] = cycleWithBaker();
+    $anna = accountWith(Role::Member);
+    $this->actingAs($anna)->put("/cycles/{$cycleId}/order/lines/{$loaf}", ['quantity' => '2']);
+
+    $this->actingAs($anna)->get('/')
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('Orders/Index')
+            ->has('cycles', 1)
+            ->where('cycles.0.cycleId', $cycleId)
+            ->where('cycles.0.open', true)
+            ->where('cycles.0.lineCount', 1));
+});
+
+it('keeps the welcome page for a member whose email is not verified', function () {
+    $anna = accountWith(Role::Member);
+    $anna->forceFill(['email_verified_at' => null])->save();
+
+    $this->actingAs($anna)->get('/')->assertInertia(fn (Assert $page) => $page->component('Welcome'));
+});
+
+it('keeps the welcome page for guests and for accounts that are not members', function () {
+    $this->get('/')->assertInertia(fn (Assert $page) => $page->component('Welcome'));
+    $this->actingAs(accountWith(Role::Manager))->get('/')->assertInertia(fn (Assert $page) => $page->component('Welcome'));
+});
