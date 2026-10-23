@@ -13,11 +13,12 @@ final readonly class MemberCycleRow
         public string $cycleId,
         public string $pickupDate,
         public bool $open,
+        public bool $cancelled,
         public int $lineCount,
     ) {}
 
     public static function from(MemberCycleData $cycle): self
     {
-        return new self($cycle->cycleId, $cycle->pickupDate, $cycle->open, $cycle->lineCount);
+        return new self($cycle->cycleId, $cycle->pickupDate, $cycle->open, $cycle->cancelled, $cycle->lineCount);
     }
 }

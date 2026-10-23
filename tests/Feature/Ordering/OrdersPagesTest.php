@@ -252,3 +252,15 @@ it('tells the member the cycle is cancelled and shows no lines (R4b, S37)', func
     $this->actingAs($anna)->get("/cycles/{$cycleId}/order")
         ->assertInertia(fn (Assert $page) => $page->where('order.cancelled', true)->has('order.lines', 0));
 });
+
+it('tells the home page which listed cycles are cancelled (R23a)', function () {
+    [$cycleId] = cycleWithBaker();
+    $anna = accountWith(Role::Member);
+    $this->actingAs($anna)->get('/')
+        ->assertInertia(fn (Assert $page) => $page->where('cycles.0.cancelled', false));
+
+    $this->actingAs(accountWith(Role::Manager))->post("/manage/cycles/{$cycleId}/cancel")->assertRedirect();
+
+    $this->actingAs($anna)->get('/')
+        ->assertInertia(fn (Assert $page) => $page->where('cycles.0.cancelled', true)->where('cycles.0.open', false));
+});

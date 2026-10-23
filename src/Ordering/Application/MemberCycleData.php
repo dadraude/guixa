@@ -9,6 +9,7 @@ final readonly class MemberCycleData
         public string $cycleId,
         public string $pickupDate,
         public bool $open,
+        public bool $cancelled,
         public int $lineCount,
     ) {}
 }

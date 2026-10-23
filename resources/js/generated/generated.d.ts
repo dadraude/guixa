@@ -57,6 +57,7 @@ export type MemberCycleRow = {
 readonly cycleId: string,
 readonly pickupDate: string,
 readonly open: boolean,
+readonly cancelled: boolean,
 readonly lineCount: number,
 };
 export type MemberRow = {
