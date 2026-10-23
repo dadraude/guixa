@@ -6,13 +6,16 @@ use Guixa\Membership\Application\AcceptInvitation;
 use Guixa\Membership\Application\AddMember;
 use Guixa\Membership\Application\CanLogIn;
 use Guixa\Membership\Application\ChangeInvitationEmail;
+use Guixa\Membership\Application\CreateFirstManager;
 use Guixa\Membership\Application\CreateHousehold;
 use Guixa\Membership\Application\DeactivateAccount;
 use Guixa\Membership\Application\DeactivateEmptyHousehold;
 use Guixa\Membership\Application\GetHousehold;
 use Guixa\Membership\Application\GrantManagerRole;
+use Guixa\Membership\Application\InviteProducerAccount;
 use Guixa\Membership\Application\ListAccounts;
 use Guixa\Membership\Application\ListHouseholds;
+use Guixa\Membership\Application\ListProducerAccounts;
 use Guixa\Membership\Application\MoveMember;
 use Guixa\Membership\Application\ReactivateAccount;
 use Guixa\Membership\Application\RemoveManagerRole;
@@ -25,6 +28,7 @@ use Guixa\Membership\Domain\ValueObject\Email;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Role;
 use Tests\Support\FrozenClock;
+use Tests\Support\InMemory\FakeProducerDirectory;
 use Tests\Support\InMemory\ImmediateTransactionRunner;
 use Tests\Support\InMemory\InMemoryAccountRepository;
 use Tests\Support\InMemory\InMemoryHouseholdRepository;
@@ -47,9 +51,13 @@ final class MembershipWorld
 
     public readonly RecordingAccountPasswords $passwords;
 
+    public readonly FakeProducerDirectory $producerDirectory;
+
     public readonly ImmediateTransactionRunner $transactions;
 
     public readonly CreateHousehold $createHousehold;
+
+    public readonly CreateFirstManager $createFirstManager;
 
     public readonly RenameHousehold $renameHousehold;
 
@@ -58,6 +66,8 @@ final class MembershipWorld
     public readonly ResendInvitation $resendInvitation;
 
     public readonly ChangeInvitationEmail $changeInvitationEmail;
+
+    public readonly InviteProducerAccount $inviteProducerAccount;
 
     public readonly AcceptInvitation $acceptInvitation;
 
@@ -81,6 +91,8 @@ final class MembershipWorld
 
     public readonly ListAccounts $listAccounts;
 
+    public readonly ListProducerAccounts $listProducerAccounts;
+
     public readonly Actor $manager;
 
     public readonly Actor $member;
@@ -93,13 +105,21 @@ final class MembershipWorld
         $this->invitations = new InMemoryInvitationRepository;
         $this->sender = new RecordingInvitationSender;
         $this->passwords = new RecordingAccountPasswords;
+        $this->producerDirectory = new FakeProducerDirectory;
         $this->transactions = new ImmediateTransactionRunner;
 
         $sendInvitation = new SendInvitation($this->invitations, $this->sender, $this->transactions, $this->clock);
 
         $this->createHousehold = new CreateHousehold($this->households);
+        $this->createFirstManager = new CreateFirstManager($this->accounts, $sendInvitation, $this->transactions);
         $this->renameHousehold = new RenameHousehold($this->households);
         $this->addMember = new AddMember($this->households, $this->accounts, $sendInvitation, $this->transactions);
+        $this->inviteProducerAccount = new InviteProducerAccount(
+            $this->producerDirectory,
+            $this->accounts,
+            $sendInvitation,
+            $this->transactions,
+        );
         $this->resendInvitation = new ResendInvitation($this->accounts, $sendInvitation, $this->transactions);
         $this->changeInvitationEmail = new ChangeInvitationEmail($this->accounts, $sendInvitation, $this->transactions);
         $this->acceptInvitation = new AcceptInvitation(
@@ -111,6 +131,7 @@ final class MembershipWorld
         );
         $this->canLogIn = new CanLogIn($this->accounts);
         $this->listHouseholds = new ListHouseholds($this->households, $this->accounts);
+        $this->listProducerAccounts = new ListProducerAccounts($this->accounts);
         $this->getHousehold = new GetHousehold($this->households, $this->accounts, $this->invitations, $this->clock);
 
         $deactivateEmptyHousehold = new DeactivateEmptyHousehold($this->households, $this->accounts, $this->clock);

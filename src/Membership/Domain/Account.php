@@ -30,6 +30,18 @@ final class Account
         return new self($id, trim($name), $email, [], $householdId, null, null, null);
     }
 
+    /** The one account of a producer: it cannot log in until the invitation is accepted (R34, R36). */
+    public static function inviteProducer(string $id, string $name, Email $email, string $producerId): self
+    {
+        return new self($id, trim($name), $email, [Role::Producer], null, $producerId, null, null);
+    }
+
+    /** The installation's first manager: no household, cannot log in until the invitation is accepted (R36a, D17). */
+    public static function inviteManager(string $id, string $name, Email $email): self
+    {
+        return new self($id, trim($name), $email, [Role::Manager], null, null, null, null);
+    }
+
     /**
      * @param  list<Role>  $roles
      */

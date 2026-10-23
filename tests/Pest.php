@@ -126,3 +126,12 @@ function linkToNewHousehold(User $user): string
 
     return $householdId;
 }
+
+/** A member account linked to the given household. */
+function memberOf(string $householdId, string $name = 'Anna'): User
+{
+    $user = accountWith();
+    $user->forceFill(['name' => $name, 'household_id' => $householdId])->save();
+
+    return $user;
+}

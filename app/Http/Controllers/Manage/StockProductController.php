@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Manage;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Manage\StockProductRequest;
+use App\Http\StockLevelRow;
 use App\Http\StockProductRow;
 use Guixa\Shared\Application\Actor;
 use Guixa\Stock\Application\CreateStockProduct;
 use Guixa\Stock\Application\DeactivateStockProduct;
+use Guixa\Stock\Application\ListStock;
 use Guixa\Stock\Application\ListStockProducts;
 use Guixa\Stock\Application\UpdateStockProduct;
 use Illuminate\Http\RedirectResponse;
@@ -16,10 +18,10 @@ use Inertia\Response;
 
 class StockProductController extends Controller
 {
-    public function index(Actor $actor, ListStockProducts $list): Response
+    public function index(Actor $actor, ListStock $list): Response
     {
         return Inertia::render('Manage/Stock/Index', [
-            'products' => array_map(StockProductRow::from(...), $list($actor)),
+            'products' => array_map(StockLevelRow::from(...), $list($actor)),
         ]);
     }
 

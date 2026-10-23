@@ -6,10 +6,16 @@ use App\Http\Controllers\Manage\AccountDeactivationController;
 use App\Http\Controllers\Manage\AccountHouseholdController;
 use App\Http\Controllers\Manage\HouseholdController;
 use App\Http\Controllers\Manage\HouseholdMemberController;
+use App\Http\Controllers\Manage\HouseholdWalletController;
 use App\Http\Controllers\Manage\InvitationController;
 use App\Http\Controllers\Manage\ManagerRoleController;
+use App\Http\Controllers\Manage\ProducerAccountController;
+use App\Http\Controllers\Manage\ProducerController;
 use App\Http\Controllers\Manage\ReturnItemController;
+use App\Http\Controllers\Manage\StockMovementController;
 use App\Http\Controllers\Manage\StockProductController;
+use App\Http\Controllers\Producer\CutoffController;
+use App\Http\Controllers\WalletController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'Welcome')->name('home');
@@ -17,6 +23,8 @@ Route::inertia('/', 'Welcome')->name('home');
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'Dashboard')->name('dashboard');
 });
+
+Route::middleware(['auth', 'verified', 'role:member'])->get('wallet', [WalletController::class, 'show'])->name('wallet.show');
 
 Route::middleware('guest')->group(function () {
     Route::get('invitations/{token}', [AcceptInvitationController::class, 'show'])->name('invitation.show');
@@ -31,6 +39,15 @@ Route::middleware(['auth', 'verified', 'role:manager'])->prefix('manage')->name(
         ->except(['show'])
         ->whereUuid('stockProduct')
         ->names('stock');
+    Route::get('stock/{stockProduct}/movements', [StockMovementController::class, 'show'])
+        ->whereUuid('stockProduct')
+        ->name('stock.movements.show');
+    Route::post('stock/{stockProduct}/entries', [StockMovementController::class, 'storeEntry'])
+        ->whereUuid('stockProduct')
+        ->name('stock.entries.store');
+    Route::post('stock/{stockProduct}/adjustments', [StockMovementController::class, 'storeAdjustment'])
+        ->whereUuid('stockProduct')
+        ->name('stock.adjustments.store');
     Route::resource('return-items', ReturnItemController::class)
         ->parameters(['return-items' => 'returnItem'])
         ->except(['show'])
@@ -44,6 +61,21 @@ Route::middleware(['auth', 'verified', 'role:manager'])->prefix('manage')->name(
     Route::post('households/{household}/members', [HouseholdMemberController::class, 'store'])
         ->whereUuid('household')
         ->name('households.members.store');
+    Route::get('households/{household}/wallet', [HouseholdWalletController::class, 'show'])
+        ->whereUuid('household')
+        ->name('households.wallet.show');
+    Route::post('households/{household}/wallet/top-ups', [HouseholdWalletController::class, 'topUp'])
+        ->whereUuid('household')
+        ->name('households.wallet.top-ups.store');
+    Route::post('households/{household}/wallet/corrections', [HouseholdWalletController::class, 'correct'])
+        ->whereUuid('household')
+        ->name('households.wallet.corrections.store');
+
+    Route::get('producers', [ProducerController::class, 'index'])->name('producers.index');
+    Route::post('producers', [ProducerController::class, 'store'])->name('producers.store');
+    Route::post('producers/{producer}/account', [ProducerAccountController::class, 'store'])
+        ->whereUuid('producer')
+        ->name('producers.account.store');
 
     Route::get('accounts', [AccountController::class, 'index'])->name('accounts.index');
     Route::put('accounts/{account}/household', [AccountHouseholdController::class, 'update'])
@@ -71,6 +103,11 @@ Route::middleware(['auth', 'verified', 'role:manager'])->prefix('manage')->name(
     Route::put('accounts/{account}/invitation', [InvitationController::class, 'changeEmail'])
         ->whereUuid('account')
         ->name('accounts.invitation.email');
+});
+
+Route::middleware(['auth', 'verified', 'role:producer'])->prefix('producer')->name('producer.')->group(function () {
+    Route::get('cutoff', [CutoffController::class, 'show'])->name('cutoff.show');
+    Route::put('cutoff', [CutoffController::class, 'update'])->name('cutoff.update');
 });
 
 require __DIR__.'/settings.php';

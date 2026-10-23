@@ -17,6 +17,13 @@ interface AccountRepository
     /** @return list<Account> every account, by name */
     public function list(): array;
 
+    public function producerHasAccount(string $producerId): bool;
+
+    /** @return list<Account> accounts that belong to a producer */
+    public function producerAccounts(): array;
+
+    public function hasManager(): bool;
+
     /** @return list<Account> */
     public function membersOf(string $householdId): array;
 

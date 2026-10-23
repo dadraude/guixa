@@ -2,6 +2,9 @@
 
 namespace Tests\Integration\Membership;
 
+use Guixa\Catalog\Domain\Producer;
+use Guixa\Catalog\Domain\ValueObject\CutoffRule;
+use Guixa\Catalog\Infrastructure\Persistence\EloquentProducerRepository;
 use Guixa\Membership\Domain\Account;
 use Guixa\Membership\Domain\AccountRepository;
 use Guixa\Membership\Domain\Household;
@@ -20,9 +23,23 @@ final class DatabaseAccountRepositoryTest extends TestCase
 
     private ?string $householdId = null;
 
+    private ?string $producerId = null;
+
     protected function repository(): AccountRepository
     {
         return new DatabaseAccountRepository;
+    }
+
+    protected function producerId(): string
+    {
+        if ($this->producerId === null) {
+            $producers = new EloquentProducerRepository;
+            $producer = Producer::create($producers->nextId(), 'Baker', CutoffRule::of(3, '20:00'));
+            $producers->add($producer);
+            $this->producerId = $producer->id;
+        }
+
+        return $this->producerId;
     }
 
     protected function householdId(): string

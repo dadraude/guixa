@@ -3,11 +3,15 @@
 namespace App\Providers;
 
 use Carbon\CarbonImmutable;
+use Guixa\Catalog\Domain\ProducerRepository;
+use Guixa\Catalog\Infrastructure\Persistence\EloquentProducerRepository;
 use Guixa\Membership\Domain\AccountPasswords;
 use Guixa\Membership\Domain\AccountRepository;
 use Guixa\Membership\Domain\HouseholdRepository;
 use Guixa\Membership\Domain\InvitationRepository;
 use Guixa\Membership\Domain\InvitationSender;
+use Guixa\Membership\Domain\ProducerDirectory;
+use Guixa\Membership\Infrastructure\Catalog\CatalogProducerDirectory;
 use Guixa\Membership\Infrastructure\Mail\MailInvitationSender;
 use Guixa\Membership\Infrastructure\Persistence\DatabaseAccountPasswords;
 use Guixa\Membership\Infrastructure\Persistence\DatabaseAccountRepository;
@@ -20,9 +24,13 @@ use Guixa\Shared\Infrastructure\DatabaseActorResolver;
 use Guixa\Shared\Infrastructure\DatabaseTransactionRunner;
 use Guixa\Shared\Infrastructure\SystemClock;
 use Guixa\Stock\Domain\ReturnItemRepository;
+use Guixa\Stock\Domain\StockMovementRepository;
 use Guixa\Stock\Domain\StockProductRepository;
 use Guixa\Stock\Infrastructure\Persistence\EloquentReturnItemRepository;
+use Guixa\Stock\Infrastructure\Persistence\EloquentStockMovementRepository;
 use Guixa\Stock\Infrastructure\Persistence\EloquentStockProductRepository;
+use Guixa\Wallet\Domain\MovementRepository;
+use Guixa\Wallet\Infrastructure\Persistence\EloquentMovementRepository;
 use Illuminate\Foundation\DevCommands;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -41,12 +49,17 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(ActorResolver::class, DatabaseActorResolver::class);
         $this->app->bind(StockProductRepository::class, EloquentStockProductRepository::class);
         $this->app->bind(ReturnItemRepository::class, EloquentReturnItemRepository::class);
+        $this->app->bind(StockMovementRepository::class, EloquentStockMovementRepository::class);
+        $this->app->bind(MovementRepository::class, EloquentMovementRepository::class);
 
         $this->app->bind(HouseholdRepository::class, DatabaseHouseholdRepository::class);
         $this->app->bind(AccountRepository::class, DatabaseAccountRepository::class);
         $this->app->bind(InvitationRepository::class, DatabaseInvitationRepository::class);
         $this->app->bind(InvitationSender::class, MailInvitationSender::class);
         $this->app->bind(AccountPasswords::class, DatabaseAccountPasswords::class);
+        $this->app->bind(ProducerDirectory::class, CatalogProducerDirectory::class);
+
+        $this->app->bind(ProducerRepository::class, EloquentProducerRepository::class);
     }
 
     /**

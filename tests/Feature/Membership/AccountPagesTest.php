@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\User;
 use Guixa\Membership\Application\CanLogIn;
 use Guixa\Shared\Domain\Role;
 use Illuminate\Http\Request;
@@ -9,14 +8,6 @@ use Illuminate\Support\Str;
 use Inertia\Testing\AssertableInertia as Assert;
 use Laravel\Passkeys\Passkey;
 use Laravel\Passkeys\Passkeys;
-
-function memberOf(string $householdId, string $name = 'Anna'): User
-{
-    $user = accountWith();
-    $user->forceFill(['name' => $name, 'household_id' => $householdId])->save();
-
-    return $user;
-}
 
 beforeEach(function () {
     $this->manager = accountWith(Role::Manager);

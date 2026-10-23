@@ -5,6 +5,7 @@ namespace Tests\Support\InMemory;
 use Guixa\Membership\Domain\Account;
 use Guixa\Membership\Domain\AccountRepository;
 use Guixa\Membership\Domain\ValueObject\Email;
+use Guixa\Shared\Domain\Role;
 
 /** @extends InMemoryRepository<Account> */
 final class InMemoryAccountRepository extends InMemoryRepository implements AccountRepository
@@ -37,6 +38,33 @@ final class InMemoryAccountRepository extends InMemoryRepository implements Acco
         usort($accounts, fn (Account $a, Account $b) => [$a->name, $a->id] <=> [$b->name, $b->id]);
 
         return $accounts;
+    }
+
+    public function producerHasAccount(string $producerId): bool
+    {
+        foreach ($this->all() as $account) {
+            if ($account->producerId === $producerId) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function producerAccounts(): array
+    {
+        return array_values(array_filter($this->all(), fn (Account $account) => $account->producerId !== null));
+    }
+
+    public function hasManager(): bool
+    {
+        foreach ($this->all() as $account) {
+            if (in_array(Role::Manager, $account->roles, true)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function membersOf(string $householdId): array
