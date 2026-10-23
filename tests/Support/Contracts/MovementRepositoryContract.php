@@ -1,0 +1,140 @@
+<?php
+
+namespace Tests\Support\Contracts;
+
+use DateTimeImmutable;
+use Guixa\Shared\Domain\Money;
+use Guixa\Wallet\Domain\Error\PickupAlreadyCharged;
+use Guixa\Wallet\Domain\Movement;
+use Guixa\Wallet\Domain\MovementRepository;
+use Illuminate\Support\Str;
+use PHPUnit\Framework\Attributes\Test;
+
+/** Behaviour every MovementRepository promises; see ProbeNoteRepositoryContract for how it is shared. */
+trait MovementRepositoryContract
+{
+    abstract protected function repository(): MovementRepository;
+
+    /** The household and cycle must exist where the repository needs them to (a foreign key). */
+    abstract protected function household(): string;
+
+    abstract protected function account(): string;
+
+    private function at(string $time): DateTimeImmutable
+    {
+        return new DateTimeImmutable($time);
+    }
+
+    private function topUp(MovementRepository $repository, string $household, int $cents, string $time = '2026-10-22 10:00:00+00'): Movement
+    {
+        return Movement::topUp($repository->nextId(), $household, Money::ofCents($cents), $this->at($time), $this->account(), 'cash');
+    }
+
+    #[Test]
+    public function it_generates_distinct_uuid_v7_ids(): void
+    {
+        $repository = $this->repository();
+
+        $first = $repository->nextId();
+
+        $this->assertNotSame($first, $repository->nextId());
+        $this->assertMatchesRegularExpression('/^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/', $first);
+    }
+
+    #[Test]
+    public function it_returns_what_was_added_with_every_field(): void
+    {
+        $repository = $this->repository();
+        $household = $this->household();
+        $correction = Movement::correction($repository->nextId(), $household, Money::ofCents(-250), 'duplicated', (string) Str::uuid7(), $this->at('2026-10-22 10:00:00+00'), $this->account());
+        $repository->add($correction);
+
+        $found = $repository->statementOf($household)[0];
+
+        $this->assertSame($correction->id, $found->id);
+        $this->assertSame($household, $found->householdId);
+        $this->assertSame($correction->type, $found->type);
+        $this->assertSame(-250, $found->amount->cents);
+        $this->assertEquals($correction->occurredAt, $found->occurredAt);
+        $this->assertSame($this->account(), $found->recordedBy);
+        $this->assertSame('duplicated', $found->note);
+        $this->assertSame($correction->cycleId, $found->cycleId);
+    }
+
+    #[Test]
+    public function it_sums_signed_amounts_into_the_balance_which_may_be_negative(): void
+    {
+        $repository = $this->repository();
+        $household = $this->household();
+
+        $this->assertSame(0, $repository->balanceOf($household)->cents);
+
+        $repository->add($this->topUp($repository, $household, 5000));
+        $repository->add(Movement::charge($repository->nextId(), $household, Money::ofCents(7000), (string) Str::uuid7(), $this->at('2026-10-22 11:00:00+00'), $this->account()));
+
+        $this->assertSame(-2000, $repository->balanceOf($household)->cents);
+    }
+
+    #[Test]
+    public function it_keeps_each_household_balance_apart(): void
+    {
+        $repository = $this->repository();
+        $household = $this->household();
+        $other = $this->household();
+
+        $repository->add($this->topUp($repository, $household, 5000));
+        $repository->add($this->topUp($repository, $other, 300));
+
+        $this->assertSame(5000, $repository->balanceOf($household)->cents);
+        $this->assertCount(1, $repository->statementOf($other));
+    }
+
+    #[Test]
+    public function it_lists_the_statement_newest_first(): void
+    {
+        $repository = $this->repository();
+        $household = $this->household();
+        $oldest = $this->topUp($repository, $household, 100, '2026-10-20 10:00:00+00');
+        $newest = $this->topUp($repository, $household, 300, '2026-10-22 10:00:00+00');
+        $middle = $this->topUp($repository, $household, 200, '2026-10-21 10:00:00+00');
+        foreach ([$oldest, $newest, $middle] as $movement) {
+            $repository->add($movement);
+        }
+
+        $amounts = array_map(fn (Movement $movement) => $movement->amount->cents, $repository->statementOf($household));
+
+        $this->assertSame([300, 200, 100], $amounts);
+    }
+
+    #[Test]
+    public function it_rejects_a_second_charge_or_credit_for_the_same_household_and_cycle(): void
+    {
+        $repository = $this->repository();
+        $household = $this->household();
+        $cycle = (string) Str::uuid7();
+        $repository->add(Movement::charge($repository->nextId(), $household, Money::ofCents(1000), $cycle, $this->at('2026-10-22 10:00:00+00'), $this->account()));
+
+        try {
+            $repository->add(Movement::credit($repository->nextId(), $household, Money::ofCents(50), $cycle, $this->at('2026-10-22 10:01:00+00'), $this->account()));
+            $this->fail('A second credit for the same household and cycle was accepted.');
+        } catch (PickupAlreadyCharged) {
+            $this->addToAssertionCount(1);
+        }
+
+        $this->assertCount(1, $repository->statementOf($household));
+    }
+
+    #[Test]
+    public function it_allows_a_charge_in_another_cycle_and_corrections_in_the_same_cycle(): void
+    {
+        $repository = $this->repository();
+        $household = $this->household();
+        $cycle = (string) Str::uuid7();
+        $repository->add(Movement::charge($repository->nextId(), $household, Money::ofCents(1000), $cycle, $this->at('2026-10-22 10:00:00+00'), $this->account()));
+
+        $repository->add(Movement::charge($repository->nextId(), $household, Money::ofCents(1000), (string) Str::uuid7(), $this->at('2026-10-29 10:00:00+00'), $this->account()));
+        $repository->add(Movement::correction($repository->nextId(), $household, Money::ofCents(100), 'typo', $cycle, $this->at('2026-10-22 12:00:00+00'), $this->account()));
+
+        $this->assertCount(3, $repository->statementOf($household));
+    }
+}

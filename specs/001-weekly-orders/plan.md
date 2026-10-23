@@ -351,16 +351,18 @@ Domain
 - **`Movement`** `final readonly`: id, householdId, type (`TopUp|Charge|Credit|Correction`), signed `Money`
   amount, occurredAt, recordedBy, `?note`, `?cycleId`. Invariants: top-up > 0 with no cycle; charge < 0 and
   credit > 0, both with a cycleId; correction ≠ 0 with a non-empty note (R29, R32).
-- Port: `MovementRepository` — append-only: `add`, `balanceOf`, `statementOf`. No update, no delete (R32).
+- Port: `MovementRepository` — append-only: `add`, `balanceOf`, `statementOf` (newest first). No update, no delete (R32).
+  `add` throws `PickupAlreadyCharged` for a second charge or credit of the same household and cycle (R23); the
+  partial unique index is the second line of defence.
 - A deactivated household's wallet still accepts top-ups and corrections (R35a).
 
 Use cases
 | Use case | Actor | Covers |
 | --- | --- | --- |
-| `RecordTopUp` | manager (also called by Ordering at pickup) | R29, S19, S24 |
+| `RecordTopUp` | manager (also called by Ordering at pickup, with the manager's `Actor`) | R29, S19, S24 |
 | `RecordCorrection` (optional cycle) | manager | R32, S24, S54 |
-| `ChargeForPickup` (charge, credit or nothing) | — (called by Ordering) | R22, R30 |
-| `GetBalance` | — (internal query) / manager | R21, R35a |
+| `ChargeForPickup` (charge, credit or nothing; takes the signed total in cents) | manager (called by Ordering with the pickup's `Actor`, who is `recordedBy`) | R22, R30 |
+| `GetBalance` | manager (internal query for Ordering and Membership adapters) | R21, R35a |
 | `GetWalletStatement` | member of household / manager | R30, R31, S21 |
 
 ## Persistence (Postgres)
@@ -414,7 +416,8 @@ role areas (R36a); the layout shows a switch between them.
 | `GET /cycles/{cycle}/order` | `Orders/Edit` (order, then pickup once settled) | `GetHouseholdOrder`, `ListOrderableProducts` |
 | `PUT /cycles/{cycle}/order/lines/{product}` | partial reload of `order` prop | `SetOrderLine` |
 | `DELETE /cycles/{cycle}/order/lines/{product}` | partial reload | `RemoveMarkedLine` |
-| `GET /wallet` | `Wallet/Statement` | `GetWalletStatement` |
+| `GET /wallet` | `Wallet/Statement` (member's own household) | `GetWalletStatement` |
+| `GET /manage/households/{household}/wallet` | `Wallet/Statement` with the top-up and correction forms | `GetWalletStatement` |
 | `GET /producer/products` … | `Producer/Products/*` | Catalog CRUD |
 | `PUT /producer/cutoff` | `Producer/Cutoff` | `SetDefaultCutoff` |
 | `GET /producer/cycles/{cycle}` | `Producer/CycleSummary` | `GetProducerCycleSummary` |

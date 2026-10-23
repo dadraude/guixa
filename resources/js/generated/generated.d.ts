@@ -50,6 +50,22 @@ readonly variable: boolean,
 readonly containersPerUnit: string | null,
 readonly active: boolean,
 };
+export type WalletHouseholdRow = {
+readonly id: string,
+readonly name: string,
+};
+export type WalletMovementRow = {
+readonly id: string,
+readonly type: string,
+readonly amount: string,
+readonly occurredAt: string,
+readonly note: string | null,
+readonly cycleId: string | null,
+};
+export type WalletStatementRow = {
+readonly balance: string,
+readonly movements: App.Http.WalletMovementRow[],
+};
 }
 }
 declare namespace Guixa {
@@ -61,6 +77,11 @@ export type Role = 'manager' | 'member' | 'producer';
 namespace Stock {
 namespace Domain {
 export type MovementType = 'entry' | 'adjustment' | 'sale';
+}
+}
+namespace Wallet {
+namespace Domain {
+export type MovementType = 'top_up' | 'charge' | 'credit' | 'correction';
 }
 }
 }
