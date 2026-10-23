@@ -32,6 +32,7 @@ final class ListMemberCycles
                 $cycle->id,
                 $cycle->pickupDate()->format('Y-m-d'),
                 $cycle->isOpenForMembers($now),
+                $cycle->isCancelled(),
                 $lineCounts[$cycle->id] ?? 0,
             ),
             $this->cycles->list(),

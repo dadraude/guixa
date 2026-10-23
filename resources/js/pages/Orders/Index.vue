@@ -9,9 +9,12 @@ const props = defineProps<{
 }>();
 
 const openCycles = computed(() => props.cycles.filter((cycle) => cycle.open));
-// Until cancelled, settled and closed cycles exist, a cycle that stopped taking orders waits here.
+// Until settled and closed cycles exist, a cycle that stopped taking orders waits here.
 const closedCycles = computed(() =>
-    props.cycles.filter((cycle) => !cycle.open),
+    props.cycles.filter((cycle) => !cycle.open && !cycle.cancelled),
+);
+const cancelledCycles = computed(() =>
+    props.cycles.filter((cycle) => cycle.cancelled),
 );
 
 const linesLabel = (count: number) =>
@@ -39,6 +42,7 @@ const linesLabel = (count: number) =>
             v-for="section in [
                 { title: 'Open for orders', cycles: openCycles },
                 { title: 'Closed to orders', cycles: closedCycles },
+                { title: 'Cancelled', cycles: cancelledCycles },
             ]"
             v-show="section.cycles.length > 0"
             :key="section.title"

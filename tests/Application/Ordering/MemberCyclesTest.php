@@ -64,3 +64,15 @@ it('does not count the lines of another household (R7)', function () {
 it('refuses an account without a household', function () {
     expect(fn () => ($this->list)(new Actor(MEMBER_ANNA, [Role::Member])))->toThrow(NoHousehold::class);
 });
+
+it('lists a cancelled cycle as cancelled and not open (R23a)', function () {
+    $cancelled = ($this->world->openCycle)($this->world->manager, '2026-11-07', [OrderingWorld::BAKER]);
+    ($this->world->openCycle)($this->world->manager, '2026-11-14', [OrderingWorld::BAKER]);
+    ($this->world->cancelCycle)($this->world->manager, $cancelled);
+
+    $cycles = ($this->list)();
+
+    expect($cycles[0]->cancelled)->toBeTrue()
+        ->and($cycles[0]->open)->toBeFalse()
+        ->and($cycles[1]->cancelled)->toBeFalse();
+});
