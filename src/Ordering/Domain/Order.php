@@ -4,6 +4,7 @@ namespace Guixa\Ordering\Domain;
 
 use DateTimeImmutable;
 use Guixa\Ordering\Domain\Error\FractionalQuantityNotAllowed;
+use Guixa\Ordering\Domain\Error\LineNotMarked;
 use Guixa\Ordering\Domain\ValueObject\OrderableProduct;
 use Guixa\Shared\Domain\Quantity;
 
@@ -81,6 +82,25 @@ final class Order
         }
 
         $cycle->assertOpenFor($line->producerId, $now);
+
+        unset($this->lines[$productId]);
+    }
+
+    /**
+     * Removes a line marked *will not be delivered*, which stays allowed after its producer's cutoff (R3b, R8).
+     * A product that is not in the order is left alone, like a zero quantity.
+     *
+     * @param  array<string, true>  $marked  product ids of the marked lines (`NotDeliveredMarks::of`)
+     */
+    public function removeMarkedLine(string $productId, array $marked): void
+    {
+        if (! isset($this->lines[$productId])) {
+            return;
+        }
+
+        if (! isset($marked[$productId])) {
+            throw LineNotMarked::forProduct($productId);
+        }
 
         unset($this->lines[$productId]);
     }

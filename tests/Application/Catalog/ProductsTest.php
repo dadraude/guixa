@@ -3,6 +3,7 @@
 use Guixa\Catalog\Domain\Error\InvalidContainersPerUnit;
 use Guixa\Catalog\Domain\Error\InvalidPrice;
 use Guixa\Catalog\Domain\Error\NameRequired;
+use Guixa\Catalog\Domain\Error\ProductHasUnsettledLines;
 use Guixa\Catalog\Domain\Error\ProductNotFound;
 use Guixa\Catalog\Domain\Error\UnitRequired;
 use Guixa\Shared\Application\Actor;
@@ -121,6 +122,37 @@ it('fails on an unknown product', function () {
     expect(fn () => ($this->world->updateProduct)($this->bakerActor, $unknown, 'Bread', 'loaf', 100, false, null))->toThrow(ProductNotFound::class)
         ->and(fn () => ($this->world->deactivateProduct)($this->bakerActor, $unknown))->toThrow(ProductNotFound::class)
         ->and(fn () => ($this->world->reactivateProduct)($this->bakerActor, $unknown))->toThrow(ProductNotFound::class);
+});
+
+// R1 (lock), S5 — unit and variable flag while the product has lines in a cycle that is not settled
+
+it('keeps the unit and the variable flag while the product has unsettled lines, and changes the rest (R1, S5)', function () {
+    $id = bread($this);
+    $this->world->cycles->lock($id);
+
+    ($this->world->updateProduct)($this->bakerActor, $id, 'Sourdough', 'loaf', 400, false, '3.000');
+
+    $product = bakerProducts($this)[0];
+    expect($product->name)->toBe('Sourdough')
+        ->and($product->priceCents)->toBe(400)
+        ->and($product->containersPerUnit)->toBe('3.000');
+
+    expect(fn () => ($this->world->updateProduct)($this->bakerActor, $id, 'Sourdough', 'kg', 400, false, '3.000'))->toThrow(ProductHasUnsettledLines::class);
+    expect(fn () => ($this->world->updateProduct)($this->bakerActor, $id, 'Sourdough', 'loaf', 400, true, '3.000'))->toThrow(ProductHasUnsettledLines::class);
+
+    $product = bakerProducts($this)[0];
+    expect($product->unit)->toBe('loaf')->and($product->variable)->toBeFalse();
+});
+
+it('changes the unit and the variable flag once the product has no unsettled lines (R1)', function () {
+    $id = bread($this);
+    $this->world->cycles->lock($id);
+    $this->world->cycles->release($id);
+
+    ($this->world->updateProduct)($this->bakerActor, $id, 'Bread', 'kg', 350, true, null);
+
+    $product = bakerProducts($this)[0];
+    expect($product->unit)->toBe('kg')->and($product->variable)->toBeTrue();
 });
 
 // R2 — a producer cannot see or edit another producer's products

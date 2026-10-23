@@ -18,6 +18,7 @@ use Guixa\Catalog\Application\UpdateProduct;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Role;
 use Tests\Support\FrozenClock;
+use Tests\Support\InMemory\FakeProducerCycles;
 use Tests\Support\InMemory\InMemoryProducerRepository;
 use Tests\Support\InMemory\InMemoryProductRepository;
 
@@ -29,6 +30,8 @@ final class CatalogWorld
     public readonly InMemoryProducerRepository $producers;
 
     public readonly InMemoryProductRepository $products;
+
+    public readonly FakeProducerCycles $cycles;
 
     public readonly CreateProducer $createProducer;
 
@@ -63,6 +66,7 @@ final class CatalogWorld
         $this->clock = new FrozenClock($now);
         $this->producers = new InMemoryProducerRepository;
         $this->products = new InMemoryProductRepository;
+        $this->cycles = new FakeProducerCycles;
 
         $this->createProducer = new CreateProducer($this->producers);
         $this->listProducers = new ListProducers($this->producers);
@@ -71,7 +75,7 @@ final class CatalogWorld
         $this->getDefaultCutoff = new GetDefaultCutoff($this->producers);
 
         $this->createProduct = new CreateProduct($this->products);
-        $this->updateProduct = new UpdateProduct($this->products);
+        $this->updateProduct = new UpdateProduct($this->products, $this->cycles);
         $this->deactivateProduct = new DeactivateProduct($this->products);
         $this->reactivateProduct = new ReactivateProduct($this->products);
         $this->listProducerProducts = new ListProducerProducts($this->products);

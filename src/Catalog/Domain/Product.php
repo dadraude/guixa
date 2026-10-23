@@ -5,6 +5,7 @@ namespace Guixa\Catalog\Domain;
 use Guixa\Catalog\Domain\Error\InvalidContainersPerUnit;
 use Guixa\Catalog\Domain\Error\InvalidPrice;
 use Guixa\Catalog\Domain\Error\NameRequired;
+use Guixa\Catalog\Domain\Error\ProductHasUnsettledLines;
 use Guixa\Catalog\Domain\Error\UnitRequired;
 use Guixa\Shared\Domain\Error\InvalidQuantity;
 use Guixa\Shared\Domain\Money;
@@ -53,10 +54,15 @@ final class Product
         return new self($id, $producerId, $name, $unit, $price, $variable, $containersPerUnit, $active);
     }
 
-    public function change(string $name, string $unit, Money $price, bool $variable, ?string $containersPerUnit): void
+    /** @param  bool  $hasUnsettledLines  the product is on lines of a cycle that is not settled, which freezes its unit and variable flag (R1) */
+    public function change(string $name, string $unit, Money $price, bool $variable, ?string $containersPerUnit, bool $hasUnsettledLines = false): void
     {
         $name = trim($name);
         $unit = trim($unit);
+
+        if ($hasUnsettledLines && ($unit !== $this->unit || $variable !== $this->variable)) {
+            throw ProductHasUnsettledLines::create();
+        }
 
         if ($name === '') {
             throw NameRequired::create();

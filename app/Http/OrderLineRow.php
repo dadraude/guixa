@@ -5,7 +5,7 @@ namespace App\Http;
 use Guixa\Ordering\Application\OrderLineData;
 use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 
-/** A line, named after its producer even when the producer no longer takes part, with the product as it was when the line was last changed; the price is in euros. */
+/** A line, named after its producer even when the producer no longer takes part, with the product as it was when the line was last changed; the price is in euros. `notDelivered` is the *will not be delivered* mark (R3b). */
 #[TypeScript]
 final readonly class OrderLineRow
 {
@@ -18,6 +18,7 @@ final readonly class OrderLineRow
         public string $price,
         public bool $variable,
         public string $quantity,
+        public bool $notDelivered,
     ) {}
 
     public static function from(OrderLineData $line, string $producerName): self
@@ -31,6 +32,7 @@ final readonly class OrderLineRow
             EuroAmount::format($line->unitPriceCents),
             $line->variable,
             $line->quantity,
+            $line->notDelivered,
         );
     }
 }

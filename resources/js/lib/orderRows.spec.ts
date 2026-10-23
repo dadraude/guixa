@@ -28,6 +28,7 @@ const line = (
     name: string,
     price: string,
     quantity = '2.000',
+    notDelivered = false,
 ) => ({
     productId,
     producerId: 'baker',
@@ -37,9 +38,24 @@ const line = (
     price,
     variable: false,
     quantity,
+    notDelivered,
 });
 
 describe('orderRows', () => {
+    it('carries the will-not-be-delivered mark of a line, and none for an offered product', () => {
+        const [group] = orderRows({
+            producers: [baker],
+            lines: [line('loaf', 'Loaf', '3.50', '2.000', true)],
+        });
+
+        expect(
+            group.rows.map((row) => [row.productId, row.notDelivered]),
+        ).toEqual([
+            ['loaf', true],
+            ['roll', false],
+        ]);
+    });
+
     it('shows a line with the snapshot, not the current catalog product', () => {
         const [group] = orderRows({
             producers: [

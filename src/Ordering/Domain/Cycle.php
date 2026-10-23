@@ -112,10 +112,15 @@ final class Cycle
         return $now < ($producerOrder->cutoff() ?? $this->closesWithoutCutoff($now->getTimezone()));
     }
 
+    public function isParticipating(string $producerId): bool
+    {
+        return ($this->producerOrders[$producerId] ?? null)?->isParticipating() ?? false;
+    }
+
     /** What a line change needs: the producer takes part in the cycle and is open (R3, R8). */
     public function assertOpenFor(string $producerId, DateTimeImmutable $now): void
     {
-        if (! ($this->producerOrders[$producerId] ?? null)?->isParticipating()) {
+        if (! $this->isParticipating($producerId)) {
             throw ProducerNotParticipating::withId($producerId);
         }
 

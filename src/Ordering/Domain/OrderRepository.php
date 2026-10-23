@@ -16,4 +16,7 @@ interface OrderRepository
      * transaction ends, so two members adding the first lines at once share one order.
      */
     public function lockFor(string $cycleId, string $householdId): Order;
+
+    /** Whether any order has a line of this product in a cycle that is not settled (R1). */
+    public function hasUnsettledLinesOf(string $productId): bool;
 }

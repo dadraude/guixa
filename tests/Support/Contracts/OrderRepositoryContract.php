@@ -155,4 +155,19 @@ trait OrderRepositoryContract
 
         $this->assertSame([], $repository->ofHousehold(self::CYCLE, self::HOUSEHOLD)?->lines());
     }
+
+    #[Test]
+    public function it_knows_whether_a_product_has_lines_in_a_cycle_that_is_not_settled(): void
+    {
+        $cycle = $this->openCycle();
+        $repository = $this->repository();
+        $this->assertFalse($repository->hasUnsettledLinesOf(self::BREAD));
+
+        $order = $repository->lockFor(self::CYCLE, self::HOUSEHOLD);
+        $order->setLine($this->product(self::BREAD, 'Loaf', 350), Quantity::fromString('2'), $cycle, $repository->nextId(), self::ANNA, $this->madrid('2026-10-22 10:00'));
+        $repository->add($order);
+
+        $this->assertTrue($repository->hasUnsettledLinesOf(self::BREAD));
+        $this->assertFalse($repository->hasUnsettledLinesOf(self::APPLES));
+    }
 }

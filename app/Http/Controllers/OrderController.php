@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\OrderRow;
 use Guixa\Catalog\Application\GetProducer;
 use Guixa\Ordering\Application\GetHouseholdOrder;
+use Guixa\Ordering\Application\RemoveMarkedLine;
 use Guixa\Ordering\Application\SetOrderLine;
 use Guixa\Ordering\Domain\Error\CycleNotFound;
 use Guixa\Shared\Application\Actor;
@@ -43,6 +44,14 @@ class OrderController extends Controller
         $data = $request->validate(['quantity' => ['required', 'string']]);
 
         $setOrderLine($actor, $cycle, $product, $data['quantity']);
+
+        return back();
+    }
+
+    /** Removes a line marked *will not be delivered*, even after its producer's cutoff (R3b, R8). */
+    public function removeMarkedLine(string $cycle, string $product, Actor $actor, RemoveMarkedLine $removeMarkedLine): RedirectResponse
+    {
+        $removeMarkedLine($actor, $cycle, $product);
 
         return back();
     }

@@ -35,6 +35,7 @@ it('keeps the order pages to members (R7, S33)', function (string $method, strin
 })->with([
     ['get', ''],
     ['put', '/lines/{product}'],
+    ['delete', '/lines/{product}'],
 ]);
 
 it('shows the order with what each participating producer offers (R3, R7, S4)', function () {
@@ -151,4 +152,84 @@ it('names a producer that no longer takes part in the cycle when the order has a
             ->has('order.producers', 0)
             ->where('order.lines.0.producerId', $baker->id)
             ->where('order.lines.0.producerName', 'Baker'));
+});
+
+it('marks the line of a deactivated product, which the member removes after the cutoff (R3b, R8, S32)', function () {
+    [$cycleId, , $loaf] = cycleWithBaker();
+    $anna = accountWith(Role::Member);
+    $this->actingAs($anna)->put("/cycles/{$cycleId}/order/lines/{$loaf}", ['quantity' => '2']);
+    DB::table('products')->where('id', $loaf)->update(['active' => false]);
+    DB::table('cycle_producers')->where('cycle_id', $cycleId)->update(['closes_at' => CarbonImmutable::now('UTC')->subMinute()->toDateTimeString()]);
+
+    $this->actingAs($anna)->get("/cycles/{$cycleId}/order")
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('order.producers.0.open', false)
+            ->has('order.producers.0.products', 0)
+            ->where('order.lines.0.notDelivered', true));
+
+    $this->actingAs($anna)->delete("/cycles/{$cycleId}/order/lines/{$loaf}")->assertRedirect();
+
+    expect(DB::table('order_lines')->count())->toBe(0);
+});
+
+it('marks a line whose product is unavailable in the cycle and stops offering the product (R3b, R3c, S48)', function () {
+    [$cycleId, , $loaf] = cycleWithBaker();
+    $anna = accountWith(Role::Member);
+    $this->actingAs($anna)->put("/cycles/{$cycleId}/order/lines/{$loaf}", ['quantity' => '2']);
+    DB::table('product_unavailabilities')->insert(['cycle_id' => $cycleId, 'product_id' => $loaf]);
+
+    $this->actingAs($anna)->get("/cycles/{$cycleId}/order")
+        ->assertInertia(fn (Assert $page) => $page
+            ->has('order.producers.0.products', 0)
+            ->where('order.lines.0.notDelivered', true));
+
+    DB::table('product_unavailabilities')->delete();
+
+    $this->actingAs($anna)->get("/cycles/{$cycleId}/order")
+        ->assertInertia(fn (Assert $page) => $page
+            ->has('order.producers.0.products', 1)
+            ->where('order.lines.0.notDelivered', false));
+});
+
+it('marks the line of a producer that does not take part any more (R6c)', function () {
+    [$cycleId, , $loaf] = cycleWithBaker();
+    $anna = accountWith(Role::Member);
+    $this->actingAs($anna)->put("/cycles/{$cycleId}/order/lines/{$loaf}", ['quantity' => '2']);
+    DB::table('cycle_producers')->where('cycle_id', $cycleId)->update(['participating' => false]);
+
+    $this->actingAs($anna)->get("/cycles/{$cycleId}/order")
+        ->assertInertia(fn (Assert $page) => $page->where('order.lines.0.notDelivered', true));
+});
+
+it('shows the domain error and keeps a line that is not marked (R8)', function () {
+    [$cycleId, , $loaf] = cycleWithBaker();
+    $anna = accountWith(Role::Member);
+    $this->actingAs($anna)->put("/cycles/{$cycleId}/order/lines/{$loaf}", ['quantity' => '2']);
+
+    $this->actingAs($anna)
+        ->from("/cycles/{$cycleId}/order")
+        ->delete("/cycles/{$cycleId}/order/lines/{$loaf}")
+        ->assertRedirect("/cycles/{$cycleId}/order")
+        ->assertSessionHasErrors('domain');
+
+    expect(DB::table('order_lines')->count())->toBe(1);
+});
+
+it('answers with the domain error when the cycle of a marked line is unknown (R3b)', function () {
+    [, , $loaf] = cycleWithBaker();
+    $cycleId = (string) Str::uuid7();
+
+    $this->actingAs(accountWith(Role::Member))
+        ->from("/cycles/{$cycleId}/order")
+        ->delete("/cycles/{$cycleId}/order/lines/{$loaf}")
+        ->assertSessionHasErrors('domain');
+});
+
+it('shows the order line of a product that is orderable as not marked (R3b)', function () {
+    [$cycleId, , $loaf] = cycleWithBaker();
+    $anna = accountWith(Role::Member);
+    $this->actingAs($anna)->put("/cycles/{$cycleId}/order/lines/{$loaf}", ['quantity' => '2']);
+
+    $this->actingAs($anna)->get("/cycles/{$cycleId}/order")
+        ->assertInertia(fn (Assert $page) => $page->where('order.lines.0.notDelivered', false));
 });

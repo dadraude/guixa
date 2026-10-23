@@ -66,6 +66,7 @@ readonly unit: string,
 readonly price: string,
 readonly variable: boolean,
 readonly quantity: string,
+readonly notDelivered: boolean,
 };
 export type OrderProducerRow = {
 readonly producerId: string,

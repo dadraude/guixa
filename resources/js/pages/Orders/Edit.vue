@@ -30,7 +30,7 @@ const total = computed(() =>
         groups.value.flatMap((group) =>
             group.rows.map((row) => ({
                 price: row.price,
-                quantity: draftOf(row),
+                quantity: row.notDelivered ? '0' : draftOf(row),
             })),
         ),
     ),
@@ -51,6 +51,21 @@ function save(productId: string) {
             onStart: () => (saving.value = productId),
             onFinish: () => (saving.value = null),
             onSuccess: () => delete drafts[productId],
+        },
+    );
+}
+
+function remove(productId: string) {
+    router.delete(
+        OrderController.removeMarkedLine.url({
+            cycle: props.order.cycleId,
+            product: productId,
+        }),
+        {
+            preserveScroll: true,
+            only: ['order', 'errors'],
+            onStart: () => (saving.value = productId),
+            onFinish: () => (saving.value = null),
         },
     );
 }
@@ -119,14 +134,23 @@ const lineTotal = (price: string, quantity: string) =>
                         :key="row.productId"
                         class="border-b"
                     >
-                        <td class="py-2">{{ row.name }}</td>
+                        <td class="py-2">
+                            {{ row.name }}
+                            <span
+                                v-if="row.notDelivered"
+                                class="ml-2 text-xs text-destructive"
+                                :data-test="`not-delivered-${row.productId}`"
+                            >
+                                Will not be delivered
+                            </span>
+                        </td>
                         <td class="py-2">
                             {{ row.price }} EUR / {{ row.unit }}
                         </td>
                         <td class="py-2">
                             <Input
                                 :model-value="draftOf(row)"
-                                :disabled="!group.open"
+                                :disabled="!group.open || row.notDelivered"
                                 :inputmode="
                                     row.variable ? 'decimal' : 'numeric'
                                 "
@@ -139,11 +163,26 @@ const lineTotal = (price: string, quantity: string) =>
                             />
                         </td>
                         <td class="py-2 text-right">
-                            {{ lineTotal(row.price, draftOf(row)) }}
+                            {{
+                                row.notDelivered
+                                    ? '0.00'
+                                    : lineTotal(row.price, draftOf(row))
+                            }}
                             EUR
                         </td>
                         <td class="flex justify-end py-2">
                             <Button
+                                v-if="row.notDelivered"
+                                size="sm"
+                                variant="outline"
+                                :disabled="saving === row.productId"
+                                :data-test="`remove-${row.productId}`"
+                                @click="remove(row.productId)"
+                            >
+                                Remove
+                            </Button>
+                            <Button
+                                v-else
                                 size="sm"
                                 variant="outline"
                                 :disabled="
