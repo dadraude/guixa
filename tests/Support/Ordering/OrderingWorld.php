@@ -10,6 +10,7 @@ use Guixa\Ordering\Application\GetHouseholdOrder;
 use Guixa\Ordering\Application\GetPickupWeekday;
 use Guixa\Ordering\Application\HasUnsettledLines;
 use Guixa\Ordering\Application\ListCycles;
+use Guixa\Ordering\Application\ListMemberCycles;
 use Guixa\Ordering\Application\OpenCycle;
 use Guixa\Ordering\Application\RemoveMarkedLine;
 use Guixa\Ordering\Application\SetCutoff;
@@ -68,6 +69,8 @@ final class OrderingWorld
 
     public readonly ListCycles $listCycles;
 
+    public readonly ListMemberCycles $listMemberCycles;
+
     public readonly SetOrderLine $setOrderLine;
 
     public readonly GetHouseholdOrder $getHouseholdOrder;
@@ -107,6 +110,7 @@ final class OrderingWorld
         $this->closeProducerNow = new CloseProducerNow($this->cycles, $transactions, $this->clock);
         $this->clearCutoff = new ClearCutoff($this->cycles, $transactions);
         $this->listCycles = new ListCycles($this->cycles, $this->clock);
+        $this->listMemberCycles = new ListMemberCycles($this->cycles, $this->orders, $this->clock);
         $this->setOrderLine = new SetOrderLine($this->cycles, $this->orders, $this->catalog, $this->availability, $transactions, $this->clock);
         $this->getHouseholdOrder = new GetHouseholdOrder($this->cycles, $this->orders, $this->catalog, $this->availability, $this->clock);
         $this->removeMarkedLine = new RemoveMarkedLine($this->cycles, $this->orders, $this->catalog, $this->availability, $transactions);

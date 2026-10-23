@@ -15,6 +15,13 @@ interface OrderRepository
     public function ofCycle(string $cycleId): array;
 
     /**
+     * How many lines the household has in each cycle, by cycle id; a cycle where it has no line is absent.
+     *
+     * @return array<string, int>
+     */
+    public function lineCountsOfHousehold(string $householdId): array;
+
+    /**
      * The household's order in the cycle, created empty if it has none, and locked until the surrounding
      * transaction ends, so two members adding the first lines at once share one order.
      */

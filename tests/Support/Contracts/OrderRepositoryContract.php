@@ -133,6 +133,22 @@ trait OrderRepositoryContract
     }
 
     #[Test]
+    public function it_counts_the_lines_of_a_household_per_cycle(): void
+    {
+        $cycle = $this->openCycle();
+        $repository = $this->repository();
+        $now = $this->madrid('2026-10-22 10:00');
+        $order = $repository->lockFor(self::CYCLE, self::HOUSEHOLD);
+        $order->setLine($this->product(self::BREAD, 'Loaf', 350), Quantity::fromString('2'), $cycle, $repository->nextId(), self::ANNA, $now);
+        $order->setLine($this->product(self::APPLES, 'Apples', 280, variable: true), Quantity::fromString('1'), $cycle, $repository->nextId(), self::ANNA, $now);
+        $repository->add($order);
+        $repository->lockFor(self::CYCLE, self::OTHER_HOUSEHOLD);
+
+        $this->assertSame([self::CYCLE => 2], $repository->lineCountsOfHousehold(self::HOUSEHOLD));
+        $this->assertSame([], $repository->lineCountsOfHousehold(self::OTHER_HOUSEHOLD));
+    }
+
+    #[Test]
     public function it_stores_a_line_with_its_snapshot(): void
     {
         $cycle = $this->openCycle();

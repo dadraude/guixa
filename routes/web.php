@@ -25,7 +25,7 @@ use App\Http\Controllers\Producer\ProductController;
 use App\Http\Controllers\WalletController;
 use Illuminate\Support\Facades\Route;
 
-Route::inertia('/', 'Welcome')->name('home');
+Route::get('/', [OrderController::class, 'index'])->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'Dashboard')->name('dashboard');

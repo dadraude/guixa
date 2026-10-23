@@ -117,6 +117,18 @@ final class Cycle
         return ($this->producerOrders[$producerId] ?? null)?->isParticipating() ?? false;
     }
 
+    /** A cycle is open for members while at least one participating producer is open (R4a). */
+    public function isOpenForMembers(DateTimeImmutable $now): bool
+    {
+        foreach ($this->producerOrders as $producerId => $producerOrder) {
+            if ($this->isOpenFor($producerId, $now)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /** What a line change needs: the producer takes part in the cycle and is open (R3, R8). */
     public function assertOpenFor(string $producerId, DateTimeImmutable $now): void
     {
