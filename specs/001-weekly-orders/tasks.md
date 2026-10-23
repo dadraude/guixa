@@ -53,7 +53,7 @@ including the weeks when daylight saving time changes (S38).
 
 | ID | Task | Covers | After |
 | --- | --- | --- | --- |
-| T11 | `SetPickupWeekday`, `Cycle`, `OpenCycle` with participants (cutoffs from rules, none if passed), `AddParticipant`, cycles admin page and settings page; cycle picker on the stock adjustment form (R27) | R4, R4a (adding), R4c, R5, S6 (opening), S37 (weekday), S38 | T10 |
+| T11 | `SetPickupWeekday`, `Cycle`, `OpenCycle` with participants (cutoffs from rules, none if passed; asks for the pickup weekday, permanent or provisional, while the cooperative has none), `AddParticipant`, cycles admin page and settings page; cycle picker on the stock adjustment form (R27) | R4, R4a (adding), R4c, R5, S6 (opening), S37 (weekday), S38 | T10 |
 | T12 | `SetCutoff`, `CloseProducerNow`, `ClearCutoff`; open until the cutoff or the pickup date at 00:00 | R6, R6a, S6, S34 (move), S35 | T11 |
 | T13 | `Order` ordering part, `SetOrderLine` (snapshot with containers, `addedBy`), `GetHouseholdOrder`, `Orders/Edit` page with running total | R7–R11, S1–S4, S5 (snapshot), S33, S49, S51 | T12, T07 |
 | T14 | `ListMemberCycles`, `Orders/Index` page: open cycles, pending pickups, cancelled and closed cycles | R4a (open for members), R23a (before settlement) | T13 |

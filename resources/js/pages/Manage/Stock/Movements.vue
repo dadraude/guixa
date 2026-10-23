@@ -19,6 +19,7 @@ defineOptions({
 
 defineProps<{
     product: App.Http.StockLevelRow;
+    cycles: App.Http.CycleOptionRow[];
 }>();
 </script>
 
@@ -103,6 +104,25 @@ defineProps<{
                     placeholder="Broken jar, inventory count"
                 />
                 <InputError :message="errors.note" />
+            </div>
+
+            <div class="grid gap-2">
+                <Label for="adjustment-cycle">Cycle (optional)</Label>
+                <select
+                    id="adjustment-cycle"
+                    name="cycle_id"
+                    class="h-9 rounded-md border bg-background px-2 text-sm"
+                >
+                    <option value="">No cycle</option>
+                    <option
+                        v-for="cycle in cycles"
+                        :key="cycle.id"
+                        :value="cycle.id"
+                    >
+                        Pickup {{ cycle.pickupDate }}
+                    </option>
+                </select>
+                <InputError :message="errors.cycle_id" />
             </div>
 
             <Button

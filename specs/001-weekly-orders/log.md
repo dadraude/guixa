@@ -286,3 +286,64 @@ Why: R1 names reactivation as a producer action only through the plan's `Reactiv
 T09: the unit and variable-flag lock (`ProducerCycles::hasUnsettledLines`) is left to T15, which lists "R1 (lock)"; `Product::change` takes every field until then.
 `plan.md` (Catalog, Domain) now says so. A product of another producer is refused with `NotAllowed` (R2) through `Actor::assertProducerOf` in each use case.
 Why: T09 covers "R1 (fields)" and T15 owns the lock and its port.
+
+## 2026-10-23 · Deviation
+
+T10: `plan.md` did not say what the Catalog queries take or return. `GetOrderableProduct(productId)` returns `?OrderableProductData` (the fields a line snapshots, R10),
+null when the product is unknown or deactivated or its producer is deactivated; `ListOrderableProducts(producerId)` returns that producer's active products by name,
+empty for an unknown or deactivated producer, so Ordering lists the participating producers itself; `GetProducerCutoffRule(producerId)` returns `?ProducerCutoffRuleData`
+(active flag, days before, time). Availability in a cycle (R3c) stays with Ordering (T15). `plan.md` (Catalog use cases) now says so.
+Why: R3's catalog part is "active product of an active producer"; the rest of R3 needs cycles, which do not exist yet.
+
+## 2026-10-23 · Deviation
+
+T11: `plan.md` did not say how Ordering reads a producer's rule across the A4 boundary, what `OpenCycle` takes and returns, or what the pickup weekday is before a manager chooses.
+Ordering now has its own `CutoffRule` value object, filled by the `ProducerCutoffRules` port (Catalog adapter; null for an unknown or deactivated producer, so `ProducerNotActive` covers
+S50's "cannot be made to participate in a new cycle"). `OpenCycle` takes `YYYY-MM-DD` and the producer ids (none allowed, R12a) and returns the cycle id; `addParticipant` leaves a producer
+already in the cycle untouched (R5: never recomputed). `ListCycles` and `GetPickupWeekday` are added for the pages. The pickup weekday is Saturday (ISO 6) until changed, seeded by the migration (assumption: the spec's examples use Saturday).
+`Cycle` holds only pickup date, participation and cutoff; the other states arrive with their tasks. `plan.md` (Ordering domain, use cases, HTTP & pages) now says so.
+Why: R4, R4a, R4c and R5 need these decisions and the plan was silent.
+
+T11: the stock adjustment's cycle picker (R27) lists every cycle and the request checks `cycle_id` exists in `cycles` as friendly validation, and the T11 migration adds the foreign key `stock_movements.cycle_id` → `cycles.id`
+(the stock migration had deferred it until the cycles table existed). `wallet_movements.cycle_id` stays a plain id: its migration chose that because cycles belong to Ordering, not because the table was missing.
+`plan.md` (HTTP & pages) now says so.
+Why: R27 lets an adjustment reference a cycle, and T25 left the picker to T11.
+
+## 2026-10-23 · Q&A
+
+Q: Before a manager configures it, should the pickup weekday default to Saturday, or should opening a cycle be blocked until a manager has chosen one?
+A: "a la configuració de la cooperativa s'ha d'indicar el dia de recollida, sense aquest valor indicat no es pot començar un cicle. el què podem fer és demanar aquest valor en iniciar el cicle i al confirmar demanar si és permanent o provisional."
+
+## 2026-10-23 · Change
+
+R4c (`ordering.md`): no default pickup weekday. A cycle cannot be opened without one; opening a cycle when the cooperative has none asks the manager for it, and on confirming they choose permanent (it becomes the cooperative's weekday) or provisional (only this cycle; the next opening asks again).
+Why: the Q&A above, raised by the T11 review; it replaces the T11 Deviation's Saturday assumption.
+
+## 2026-10-23 · Change
+
+`plan.md` (Ordering domain, use cases, persistence, HTTP & pages, D11) and `tasks.md` (T11): following the R4c change above, there is no default pickup weekday. `cooperative_settings.pickup_weekday` is nullable and the migration creates the row empty;
+`GetPickupWeekday` returns null while unset. `OpenCycle` takes an optional `weekday` and a `permanent` flag: with a cooperative weekday it uses that and refuses a given one (`PickupWeekdayAlreadySet`); without one and none given it
+refuses (`PickupWeekdayNotSet`); a given one validates the pickup date, and permanent also saves it in the same transaction while provisional saves nothing. The cycles page shows the weekday picker and the permanent/provisional choice only while the
+cooperative has none; the settings page shows "not set".
+Why: the R4c decision in the Q&A above. It supersedes the Saturday sentence of the T11 Deviation.
+
+## 2026-10-23 · Deviation
+
+T12 (`plan.md`, Ordering domain and use cases): `Cycle` has no sent state until T18, so `setCutoff`, `closeNow` and `clearCutoff` do not check "not sent" (R6b, S34 frozen) yet; T18 adds it with `send`. `SetCutoff` takes `at` as an ISO 8601 string (no offset means the cooperative's timezone) and rejects anything else with `InvalidCutoff`; a producer absent from the cycle is refused with `ProducerNotInCycle`. `ParticipantData` gains `open` (R6a, from `Cycle::isOpenFor`) so the cycles page and tests can read it.
+Why: the plan did not say how `at` arrives, what happens for a producer outside the cycle, or where R6a is observable before T13.
+
+## 2026-10-23 · Deviation
+
+T13 (`plan.md`, Ordering domain, use cases, HTTP & pages): the plan folded zero into `setLine` and listed products through a separate `ListOrderableProducts` call. Now `Order::setLine` takes the snapshot product, the line id and `addedBy`, `Order::removeLine` is the zero quantity, and `Cycle::assertOpenFor` raises `ProducerNotParticipating` or `ProducerClosed` (R3, R8, S2, S51).
+`OrderRepository` has `ofHousehold` and `lockFor` (creates the empty order and locks it; the unique `(cycle_id, household_id)` plus `FOR UPDATE` keep concurrent first lines in one order), `CycleRepository` gains `getForShare`, and Ordering has its own `ProductCatalog` port and `OrderableProduct` value object over Catalog's `GetOrderableProduct` / `ListOrderableProducts`.
+`GetHouseholdOrder` returns the participating producers (open flag, offered products) with the lines, so the page needs no second call; the controller names the producers through `GetProducer`. There is no `DELETE` route: zero removes (R9), and `RemoveMarkedLine` with its route is T15's.
+An account without a household is refused with `NoHousehold` in the use cases and with 403 by `role:member` over HTTP (S33). The running total is display-only in `resources/js/lib/orderTotal.ts` (Vitest).
+Why: the plan was silent on these signatures and on how the page gets what it offers.
+
+T13 assumptions the spec does not state: a line changed by another member of the household keeps its original `addedBy` (the plan says "keeps `createdAt` unless the line is new" and names `addedBy` only as a field); availability in a cycle (R3c) and the *will not be delivered* mark (R3b) are not checked yet, they belong to T15; a cycle's cancelled state (R4b) is not checked either, T17 adds it.
+Why: `addedBy` records who added the line; the other rules are listed under later tasks in `tasks.md`.
+
+## 2026-10-23 · Deviation
+
+T13 (`plan.md`, HTTP & pages): the lines of a producer that no longer takes part in the cycle (R6c) are shown read-only under that producer's name, and the controller names every producer that has a line, not only the participants (`OrderLineRow` carries `producerName`). This is an interim choice the user made. T15 replaces it with the *will not be delivered* mark and the remove action (R3b, R6c, R8).
+Why: until T15 nothing marks those lines, and a heading without a name left the member unable to tell whose they were.

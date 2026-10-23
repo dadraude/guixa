@@ -4,6 +4,9 @@ use App\Http\Controllers\AcceptInvitationController;
 use App\Http\Controllers\Manage\AccountController;
 use App\Http\Controllers\Manage\AccountDeactivationController;
 use App\Http\Controllers\Manage\AccountHouseholdController;
+use App\Http\Controllers\Manage\CycleController;
+use App\Http\Controllers\Manage\CycleCutoffController;
+use App\Http\Controllers\Manage\CycleParticipantController;
 use App\Http\Controllers\Manage\HouseholdController;
 use App\Http\Controllers\Manage\HouseholdMemberController;
 use App\Http\Controllers\Manage\HouseholdWalletController;
@@ -12,8 +15,10 @@ use App\Http\Controllers\Manage\ManagerRoleController;
 use App\Http\Controllers\Manage\ProducerAccountController;
 use App\Http\Controllers\Manage\ProducerController;
 use App\Http\Controllers\Manage\ReturnItemController;
+use App\Http\Controllers\Manage\SettingsController;
 use App\Http\Controllers\Manage\StockMovementController;
 use App\Http\Controllers\Manage\StockProductController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\Producer\CutoffController;
 use App\Http\Controllers\Producer\ProductController;
 use App\Http\Controllers\WalletController;
@@ -26,6 +31,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 Route::middleware(['auth', 'verified', 'role:member'])->get('wallet', [WalletController::class, 'show'])->name('wallet.show');
+
+Route::middleware(['auth', 'verified', 'role:member'])->prefix('cycles/{cycle}/order')->whereUuid(['cycle', 'product'])->name('orders.')->group(function () {
+    Route::get('/', [OrderController::class, 'edit'])->name('edit');
+    Route::put('lines/{product}', [OrderController::class, 'updateLine'])->name('lines.update');
+});
 
 Route::middleware('guest')->group(function () {
     Route::get('invitations/{token}', [AcceptInvitationController::class, 'show'])->name('invitation.show');
@@ -54,6 +64,20 @@ Route::middleware(['auth', 'verified', 'role:manager'])->prefix('manage')->name(
         ->except(['show'])
         ->whereUuid('returnItem')
         ->names('return-items');
+
+    Route::get('cycles', [CycleController::class, 'index'])->name('cycles.index');
+    Route::post('cycles', [CycleController::class, 'store'])->name('cycles.store');
+    Route::post('cycles/{cycle}/producers/{producer}', [CycleParticipantController::class, 'store'])
+        ->whereUuid(['cycle', 'producer'])
+        ->name('cycles.producers.store');
+    Route::prefix('cycles/{cycle}/producers/{producer}/cutoff')->whereUuid(['cycle', 'producer'])->group(function () {
+        Route::put('/', [CycleCutoffController::class, 'update'])->name('cycles.producers.cutoff.update');
+        Route::post('close', [CycleCutoffController::class, 'close'])->name('cycles.producers.cutoff.close');
+        Route::delete('/', [CycleCutoffController::class, 'destroy'])->name('cycles.producers.cutoff.destroy');
+    });
+
+    Route::get('settings', [SettingsController::class, 'show'])->name('settings.show');
+    Route::put('settings/pickup-weekday', [SettingsController::class, 'updatePickupWeekday'])->name('settings.pickup-weekday.update');
 
     Route::get('households', [HouseholdController::class, 'index'])->name('households.index');
     Route::post('households', [HouseholdController::class, 'store'])->name('households.store');

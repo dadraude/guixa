@@ -44,8 +44,12 @@ Catalog, cycles and cutoffs, ordering, sending orders to producers and what prod
   discarded (nothing was charged) and members see the cycle as cancelled. Once an order is sent,
   cancelling is handled with the producer outside the app. A holiday on the pickup weekday is handled by
   cancelling the cycle.
-- **R4c** The cooperative has one pickup weekday (e.g. Saturday), configured by a manager. Changing it
-  affects only cycles opened afterwards; cycles already open keep their pickup date.
+- **R4c** The cooperative has one pickup weekday, set by a manager; until one is set there is none. A
+  cycle cannot be opened without a weekday: opening a cycle when the cooperative has none asks the
+  manager for it, and on confirming they choose whether it is permanent (it becomes the cooperative's
+  weekday) or provisional (it applies only to this cycle; the cooperative stays without one and the
+  next opening asks again). Changing it affects only cycles opened afterwards; cycles already open keep
+  their pickup date.
 - **R5** Each producer has a default cutoff, expressed relative to the pickup date: 1 to 6 days before,
   at a time (e.g. "3 days before, at 20:00"). When a producer starts participating, its cutoff in the cycle
   is computed from it once and never recomputed: changing the default affects only the cycles

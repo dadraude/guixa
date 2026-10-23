@@ -9,7 +9,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // cycle_id and order_id have no foreign key yet: their tables arrive with the Ordering tasks.
+        // order_id has no foreign key yet (its table arrives with the Ordering tasks); cycle_id gets one in the cycles migration.
         Schema::create('stock_movements', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignUuid('stock_product_id')->constrained('stock_products');

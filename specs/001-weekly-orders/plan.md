@@ -152,8 +152,8 @@ Use cases
 | `SetDefaultCutoff` | producer (own) | R5 |
 | `GetDefaultCutoff` (the producer's own rule, for its cutoff page) | producer (own) | R5 |
 | `ListProducerProducts` (inactive ones included, by name; returns `ProductData`) | producer (own) | R2, S57 |
-| `GetOrderableProduct`, `ListOrderableProducts` | — (internal queries for Ordering) | R3, R10 |
-| `GetProducerCutoffRule` | — (internal query for Ordering) | R5 |
+| `GetOrderableProduct` (`?OrderableProductData`: null unless the product and its producer are active), `ListOrderableProducts` (by producer id: its active products by name, empty when the producer is unknown or inactive) | — (internal queries for Ordering) | R3, R10 |
+| `GetProducerCutoffRule` (`?ProducerCutoffRuleData`: active flag and the default rule) | — (internal query for Ordering) | R5 |
 
 `DeactivateProducer`, in one transaction: `producer.deactivate()`, `ProducerAccess::suspend(producerId)`
 and `ProducerCycles::stopParticipatingWhereNotSent(producerId)` (R3a, R6c, D13). Reactivating restores the
@@ -163,17 +163,19 @@ role only; participation is not restored.
 
 ### Domain
 
-- **`PickupWeekday`** setting (`CooperativeSettings` repository): the weekday every new cycle must fall on.
-  Changing it does not touch open cycles (R4c, D11).
+- **`PickupWeekday`** value object (ISO day 1–7) kept by the `CooperativeSettings` port: the weekday every new cycle must fall on.
+  Changing it does not touch open cycles (R4c, D11). There is no default: it is null until a manager sets it (R4c); the `cooperative_settings` migration creates the row empty. `PickupWeekdayNotSet` and `PickupWeekdayAlreadySet` guard `OpenCycle`.
+- **`CutoffRule`** (`Ordering\Domain\ValueObject`): Ordering's own copy of a producer's default rule (days before, time) with `closesAt`, since A4 forbids
+  using Catalog's. The `ProducerCutoffRules` port hands it over; its Catalog adapter returns null for an unknown or deactivated producer.
 
 - **`Cycle`** aggregate (id, pickupDate, `?cancelledAt`, `?settledAt`, `?closedAt`,
   `producerOrders: producerId → ProducerOrder`).
   **`ProducerOrder`** (entity): producerId, participating, `?cutoff` (instant), `?sentAt`, `?validatedAt`,
   `?distributedAt`.
   - `open(id, pickupDate, weekday, today, participants)`: pickup date after today and on the weekday (R4, R4c).
-  - `addParticipant(producerId, CutoffRule, now)`: until settled; the cutoff is computed once, and is null if
-    that moment already passed (R4a, R5). `stopParticipating` / `participateAgain`: only while not sent (R6c).
-  - `setCutoff(producerId, at, now)`: not sent (R6b), `at > now`, and
+  - `addParticipant(producerId, CutoffRule, now)`: until settled (the settled state arrives with T20+); the cutoff is computed once, and is null if
+    that moment already passed (R4a, R5). A producer already in the cycle is left as it is, so the call is idempotent and never recomputes. `stopParticipating` / `participateAgain`: only while not sent (R6c).
+  - `setCutoff(producerId, at, now)`: not sent (R6b; the sent state arrives with T18, so T12 does not check it), `at > now`, and
     `pickupDate − 6 days 00:00 ≤ at < pickupDate 00:00` (R6). `closeNow(producerId, now)`, `clearCutoff(producerId)`.
   - `isOpenFor(producerId, now)`: participating, not sent and `now < (cutoff ?? pickupDate 00:00)` (R6a, R8).
     `isOpenForMembers(now)`: any participating producer open (R4a).
@@ -197,10 +199,14 @@ role only; participation is not restored.
     `?containersPerUnit`, quantity.
   - `returnLines`, keyed by returnItemId. **`ReturnLine`**: name, amount, whole quantity (R20a).
   - `pickup`: `none | pending | completed | notCollected | nothingToCollect`, `?doneAt`, `?charged Money`.
-  - Ordering: `setLine(OrderableProduct, Quantity, Cycle, actor, now)` checks the producer is open (R8), zero
-    removes (R9), whole units for non-variable products (R9), snapshots name/unit/variable/price/containers
-    (R10), sets `allocated = ordered`, and keeps `createdAt` unless the line is new (R15 tie). No balance
-    check (R11). `removeMarkedLine` is allowed after the cutoff (R8).
+  - Ordering: `setLine(OrderableProduct, Quantity, Cycle, lineId, addedBy, now)` checks the producer participates and is open
+    (`Cycle::assertOpenFor`, R3, R8; `ProducerNotParticipating`, `ProducerClosed`), whole units for non-variable products (R9),
+    snapshots name/unit/variable/price/containers (R10), sets `allocated = ordered`, and keeps `createdAt` and `addedBy` of an
+    existing line (R15 tie). `removeLine(productId, Cycle, now)` is the zero quantity (R9): it checks the line's producer is open
+    and leaves a product that is not in the order alone. `SetOrderLine` picks between them. No balance check (R11).
+    `removeMarkedLine` is allowed after the cutoff (R8).
+  - T13 carries only the ordering part: `OrderLine` has id, productId, producerId, snapshot, `ordered`, `allocated`, `createdAt`, `addedBy`; the other
+    fields come with the tasks that use them, though the `orders` and `order_lines` tables have every column.
   - Reception: `allocate(productId, Quantity)` marks `allocatedByHand` (R16); `allocateNew(product snapshot,
     Quantity)` adds an allocation-only line (R16, S39); `reallocate(productId, Quantity)` clears the mark (R15).
     All three clear `delivered`: a new allocation replaces a pending pickup's adjustment (R18).
@@ -248,12 +254,20 @@ role only; participation is not restored.
   Σ ceil(quantity × containersPerUnit) over stock lines; and the cycle total (R18a, S60).
 
 - Errors (`Ordering\Domain\Error`): `NotOnPickupWeekday`, `PickupDateNotInFuture`, `CycleAlreadyExists`,
+  `InvalidPickupWeekday`, `InvalidPickupDate`, `CycleNotFound`, `ProducerNotActive` (unknown or deactivated producer, S50),
   `CycleCancelled`, `CycleAlreadySettled`, `CycleClosed`, `ProducerNotParticipating`, `ProducerClosed`,
   `ProducerOrderSent`, `ProducerOrderNotSent`, `ProducerStillOpen`, `CutoffOutOfRange`, `ProductNotOrderable`,
   `FractionalQuantityNotAllowed`, `NoHousehold`, `ReceptionNotValidated`, `ReceptionUnbalanced`,
   `ManualAllocationsWouldBeLost`, `NobodyOrderedProduct`, `CycleNotSettled`, `NotEnoughStock`,
   `PickupNotPending`, `HouseholdInactive`.
 
+- `Cycle` and `ProducerOrder` carry only the fields T11 needs (pickup date, participation, cutoff); cancelled, settled, closed, sent, validated and
+  distributed come with the tasks that use them, though the tables have the columns. `CycleRepository` adds `getForUpdate` (the `FOR UPDATE` lock)
+  and `existsOnPickupDate` (cancelled cycles do not count).
+- `OrderRepository`: `nextId`, `add`, `ofHousehold(cycleId, householdId): ?Order` and `lockFor(cycleId, householdId): Order`, which creates the empty
+  order if there is none and locks it (`INSERT … ON CONFLICT DO NOTHING`, then `FOR UPDATE`, R7). `ProductCatalog`: `orderable(productId): ?OrderableProduct`
+  and `orderableOf(producerId)`, both with Ordering's own `OrderableProduct` value object (A4); its Catalog adapter calls `GetOrderableProduct` and `ListOrderableProducts`.
+  `CycleRepository` adds `getForShare` (the `FOR SHARE` lock).
 - Ports: `CooperativeSettings`, `CycleRepository`, `OrderRepository`, `ProductAvailabilityRepository`,
   `ReceivedTotalRepository`, `ProductCatalog`, `ProducerCutoffRules`, `StockCatalog`, `ReturnItemCatalog`,
   `StockSeller`, `WalletLedger`, `ProducerNotifier`, `Households`.
@@ -262,15 +276,15 @@ role only; participation is not restored.
 
 | Use case | Actor | Covers |
 | --- | --- | --- |
-| `SetPickupWeekday` | manager | R4c, S37 |
-| `OpenCycle` (with participants) | manager | R4, R4a, R5, S6, S38, S51 |
+| `SetPickupWeekday`, `GetPickupWeekday` (null while unset) | manager | R4c, S37 |
+| `OpenCycle` (with participants and an optional `weekday` + `permanent` flag; the date is `YYYY-MM-DD`; returns the cycle id. While the cooperative has no weekday, a `weekday` must be given: permanent also saves it, in the same transaction, and provisional saves nothing. A `weekday` given when the cooperative has one is refused), `ListCycles` (`CycleData`: pickup date and participants with ISO 8601 cutoff in the cooperative's timezone) | manager | R4, R4a, R5, S6, S38, S51 |
 | `AddParticipant`, `StopParticipating`, `ParticipateAgain` | manager | R4a, R6c, S50, S51 |
-| `SetCutoff`, `CloseProducerNow`, `ClearCutoff` | manager | R6, R6a, R6b, S6, S34, S35 |
+| `SetCutoff` (`at` is ISO 8601; without an offset it is read in the cooperative's timezone), `CloseProducerNow`, `ClearCutoff` (a producer not in the cycle is refused with `ProducerNotInCycle`; `ListCycles` participants carry `open`, from `isOpenFor`) | manager | R6, R6a, R6b, S6, S34, S35 |
 | `CancelCycle` | manager | R4b, S37 |
 | `SetProductAvailability` | producer (own) | R3c, S48 |
-| `SetOrderLine` (quantity 0 removes) | member of household | R3, R7–R11, S1–S5, S33, S49, S51 |
+| `SetOrderLine` (the household is the actor's, so an account without one is refused with `NoHousehold`; `quantity` is a string of at most 3 decimals, 0 removes) | member of household | R3, R7–R11, S1–S5, S33, S49, S51 |
 | `RemoveMarkedLine` | member of household | R3b, R8, S32 |
-| `GetHouseholdOrder` (with *will not be delivered* marks and, once settled, the pickup) | member of household | R3b, R7, R23a, S4 |
+| `GetHouseholdOrder` (the lines with their snapshot, and the participating producers with whether each is open and the products it offers; the *will not be delivered* marks and, once settled, the pickup arrive with T15 and the pickup tasks) | member of household | R3b, R7, R23a, S4 |
 | `ListMemberCycles` (open, pending, cancelled, closed) | member | R4a, R23a |
 | `SendProducerOrder` → notifies the producer | manager | R12a, R6b, S34, S36 |
 | `SendEmptyProducerOrders` (scheduled) | — (scheduler) | R12a, D10 |
@@ -388,7 +402,7 @@ All ids are UUID v7 generated by repositories (`nextId()`); timestamps are `time
 
 | Table | Columns | Constraints |
 | --- | --- | --- |
-| `cooperative_settings` | id, pickup_weekday | single row: `CHECK (id = 1)`, `CHECK (pickup_weekday BETWEEN 1 AND 7)` |
+| `cooperative_settings` | id, pickup_weekday | single row: `CHECK (id = 1)`, `CHECK (pickup_weekday BETWEEN 1 AND 7)`; `pickup_weekday` is null until set (R4c) |
 | `households` | id, name, deactivated_at? | |
 | `users` | id, name, email, password?, household_id?, producer_id?, activated_at?, deactivated_at? | email unique; producer_id unique (R36) |
 | `account_roles` | user_id, role | `PK (user_id, role)` |
@@ -430,8 +444,8 @@ role areas (R36a); the layout shows a switch between them.
 | Route | Page / action | Use case |
 | --- | --- | --- |
 | `GET /` | `Orders/Index` | `ListMemberCycles` |
-| `GET /cycles/{cycle}/order` | `Orders/Edit` (order, then pickup once settled) | `GetHouseholdOrder`, `ListOrderableProducts` |
-| `PUT /cycles/{cycle}/order/lines/{product}` | partial reload of `order` prop | `SetOrderLine` |
+| `GET /cycles/{cycle}/order` | `Orders/Edit` (producers with what they offer, the order's lines and a running total; the pickup once settled arrives later; interim, until T15: the lines of a producer that no longer takes part stay under that producer's name, read-only, which the user chose, and T15 replaces it with the *will not be delivered* mark and the remove action, R3b, R6c, R8) | `GetHouseholdOrder` (it lists the offered products itself, and the controller names the producers with Catalog's `GetProducer`) |
+| `PUT /cycles/{cycle}/order/lines/{product}` (`quantity`; 0 removes the line) | partial reload of `order` prop | `SetOrderLine` |
 | `DELETE /cycles/{cycle}/order/lines/{product}` | partial reload | `RemoveMarkedLine` |
 | `GET /wallet` | `Wallet/Statement` (member's own household) | `GetWalletStatement` |
 | `GET /manage/households/{household}/wallet` | `Wallet/Statement` with the top-up and correction forms | `GetWalletStatement` |
@@ -441,8 +455,8 @@ role areas (R36a); the layout shows a switch between them.
 | `GET/PUT /producer/cutoff` | `Producer/Cutoff` | `GetDefaultCutoff`, `SetDefaultCutoff` |
 | `GET /producer/cycles/{cycle}` | `Producer/CycleSummary` | `GetProducerCycleSummary` |
 | `PUT /producer/cycles/{cycle}/products/{product}/availability` | partial reload | `SetProductAvailability` |
-| `PUT /manage/settings/pickup-weekday` | `Manage/Settings` | `SetPickupWeekday` |
-| `GET/POST /manage/cycles` | `Manage/Cycles/Index` | `OpenCycle` |
+| `GET /manage/settings`, `PUT /manage/settings/pickup-weekday` | `Manage/Settings` | `GetPickupWeekday`, `SetPickupWeekday` |
+| `GET/POST /manage/cycles` | `Manage/Cycles/Index` (cycles with named participants, active producers to pick, the pickup weekday or null; while it is null the open form also shows a weekday picker and a permanent/provisional choice, sent as `pickup_weekday` and `permanent`) | `ListCycles`, `OpenCycle` |
 | `GET /manage/cycles/{cycle}` | `Manage/Cycles/Show` (totals, producers, containers) | `GetCycleSummary`, `GetContainerCount` |
 | `DELETE /manage/cycles/{cycle}` | — | `CancelCycle` |
 | `POST/DELETE /manage/cycles/{cycle}/producers/{producer}` | — | `AddParticipant`, `ParticipateAgain`, `StopParticipating` |
@@ -460,7 +474,7 @@ role areas (R36a); the layout shows a switch between them.
 | `POST/DELETE …/pickups/{household}/stock-lines[/{stockProduct}]` | partial reload | `AddStockToPickup`, `RemoveStockFromPickup` |
 | `POST/DELETE …/pickups/{household}/return-lines[/{returnItem}]` | partial reload | `AddReturnToPickup`, `RemoveReturnFromPickup` |
 | `POST …/pickups/{household}/complete`, `…/not-collected` | redirect to pickups index | `CompletePickup`, `MarkPickupNotCollected` |
-| `/manage/stock…`, `/manage/return-items…` | `Manage/Stock/{Index,Create,Edit,Movements}`, `Manage/ReturnItems/{Index,Create,Edit}` | Stock CRUD (T24); `GET /manage/stock/{stockProduct}/movements` and `POST …/entries`, `POST …/adjustments` (T25): `ListStock`, `RecordStockEntry`, `RecordStockAdjustment`. The stock index lists `StockLevelRow`s (available quantity). The adjustment form has no cycle picker until T11 adds it |
+| `/manage/stock…`, `/manage/return-items…` | `Manage/Stock/{Index,Create,Edit,Movements}`, `Manage/ReturnItems/{Index,Create,Edit}` | Stock CRUD (T24); `GET /manage/stock/{stockProduct}/movements` and `POST …/entries`, `POST …/adjustments` (T25): `ListStock`, `RecordStockEntry`, `RecordStockAdjustment`. The stock index lists `StockLevelRow`s (available quantity). The movements page lists the cycles (`ListCycles`) in the adjustment form's optional cycle picker; `cycle_id` must exist in `cycles` (friendly validation; `stock_movements.cycle_id` also has a foreign key to `cycles`, added by T11) |
 | `PUT/DELETE /manage/accounts/{account}/household`, `PUT/DELETE …/manager-role`, `POST/DELETE …/deactivation` | redirect back | `MoveMember`/`UnlinkMember`, `GrantManagerRole`/`RemoveManagerRole`, `DeactivateAccount`/`ReactivateAccount` |
 | `/manage/households…`, `/manage/producers…`, `/manage/accounts…` | `Manage/Households/*`, `Manage/Producers/*`, `Manage/Accounts/*` | Membership + Catalog |
 | `GET/POST /manage/producers`, `POST /manage/producers/{producer}/account` | `Manage/Producers/Index` (list with each producer's account email and invitation state, create form, invite form only for producers without an account) | `ListProducers` + `ListProducerAccounts` (the controller joins them into `ProducerRow`), `CreateProducer`, `InviteProducerAccount` |
@@ -508,7 +522,7 @@ Eloquent test (`Tests\TestCase` with `RefreshDatabase`) both use it and only imp
   without any request, so nothing else would notice it (R12a).
 - **D11** The pickup weekday is a single-row `cooperative_settings` table, not configuration: R4c lets a
   manager change it. It is still one value per installation, as the constitution allows for settings a
-  manager changes in the app.
+  manager changes in the app. Its value is null until a manager sets it, directly or when opening a cycle as permanent (R4c).
 - **D12** Re-allocating after settlement (a reopened producer) leaves completed and not collected pickups
   as they were: their allocations are subtracted from the received total before splitting the rest (R18).
 - **D13** Producer deactivation is a Catalog use case that calls Membership (producer role) and Ordering

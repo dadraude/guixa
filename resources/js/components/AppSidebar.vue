@@ -2,11 +2,13 @@
 import { Link, usePage } from '@inertiajs/vue3';
 import {
     BookOpen,
+    CalendarDays,
     FolderGit2,
     Home,
     UserCog,
     LayoutGrid,
     Package,
+    Settings,
     Timer,
     Undo2,
     Wallet,
@@ -14,9 +16,11 @@ import {
 } from '@lucide/vue';
 import { computed } from 'vue';
 import AccountController from '@/actions/App/Http/Controllers/Manage/AccountController';
+import CycleController from '@/actions/App/Http/Controllers/Manage/CycleController';
 import HouseholdController from '@/actions/App/Http/Controllers/Manage/HouseholdController';
 import ProducerController from '@/actions/App/Http/Controllers/Manage/ProducerController';
 import ReturnItemController from '@/actions/App/Http/Controllers/Manage/ReturnItemController';
+import SettingsController from '@/actions/App/Http/Controllers/Manage/SettingsController';
 import StockProductController from '@/actions/App/Http/Controllers/Manage/StockProductController';
 import CutoffController from '@/actions/App/Http/Controllers/Producer/CutoffController';
 import ProductController from '@/actions/App/Http/Controllers/Producer/ProductController';
@@ -43,6 +47,11 @@ const roleAreas = computed(() => page.props.roleAreas);
 
 const managerNavItems: NavItem[] = [
     {
+        title: 'Cycles',
+        href: CycleController.index(),
+        icon: CalendarDays,
+    },
+    {
         title: 'Households',
         href: HouseholdController.index(),
         icon: Home,
@@ -66,6 +75,11 @@ const managerNavItems: NavItem[] = [
         title: 'Return items',
         href: ReturnItemController.index(),
         icon: Undo2,
+    },
+    {
+        title: 'Settings',
+        href: SettingsController.show(),
+        icon: Settings,
     },
 ];
 

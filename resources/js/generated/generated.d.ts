@@ -14,6 +14,22 @@ export type CutoffRuleRow = {
 readonly daysBefore: number,
 readonly time: string,
 };
+export type CycleOptionRow = {
+readonly id: string,
+readonly pickupDate: string,
+};
+export type CycleParticipantRow = {
+readonly producerId: string,
+readonly producerName: string,
+readonly participating: boolean,
+readonly cutoff: string | null,
+readonly open: boolean,
+};
+export type CycleRow = {
+readonly id: string,
+readonly pickupDate: string,
+readonly participants: App.Http.CycleParticipantRow[],
+};
 export type HouseholdRow = {
 readonly id: string,
 readonly name: string,
@@ -33,6 +49,39 @@ readonly email: string,
 readonly invitationPending: boolean,
 readonly invitationExpiresAt: string | null,
 readonly invitationExpired: boolean,
+};
+export type OfferedProductRow = {
+readonly id: string,
+readonly name: string,
+readonly unit: string,
+readonly price: string,
+readonly variable: boolean,
+};
+export type OrderLineRow = {
+readonly productId: string,
+readonly producerId: string,
+readonly producerName: string,
+readonly name: string,
+readonly unit: string,
+readonly price: string,
+readonly variable: boolean,
+readonly quantity: string,
+};
+export type OrderProducerRow = {
+readonly producerId: string,
+readonly producerName: string,
+readonly open: boolean,
+readonly products: App.Http.OfferedProductRow[],
+};
+export type OrderRow = {
+readonly cycleId: string,
+readonly pickupDate: string,
+readonly producers: App.Http.OrderProducerRow[],
+readonly lines: App.Http.OrderLineRow[],
+};
+export type ProducerOptionRow = {
+readonly id: string,
+readonly name: string,
 };
 export type ProducerRow = {
 readonly id: string,

@@ -19,6 +19,16 @@ use Guixa\Membership\Infrastructure\Persistence\DatabaseAccountPasswords;
 use Guixa\Membership\Infrastructure\Persistence\DatabaseAccountRepository;
 use Guixa\Membership\Infrastructure\Persistence\DatabaseHouseholdRepository;
 use Guixa\Membership\Infrastructure\Persistence\DatabaseInvitationRepository;
+use Guixa\Ordering\Domain\CooperativeSettings;
+use Guixa\Ordering\Domain\CycleRepository;
+use Guixa\Ordering\Domain\OrderRepository;
+use Guixa\Ordering\Domain\ProducerCutoffRules;
+use Guixa\Ordering\Domain\ProductCatalog;
+use Guixa\Ordering\Infrastructure\Catalog\CatalogProducerCutoffRules;
+use Guixa\Ordering\Infrastructure\Catalog\CatalogProductCatalog;
+use Guixa\Ordering\Infrastructure\Persistence\EloquentCooperativeSettings;
+use Guixa\Ordering\Infrastructure\Persistence\EloquentCycleRepository;
+use Guixa\Ordering\Infrastructure\Persistence\EloquentOrderRepository;
 use Guixa\Shared\Application\ActorResolver;
 use Guixa\Shared\Application\TransactionRunner;
 use Guixa\Shared\Domain\Clock;
@@ -63,6 +73,12 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->bind(ProducerRepository::class, EloquentProducerRepository::class);
         $this->app->bind(ProductRepository::class, EloquentProductRepository::class);
+
+        $this->app->bind(CooperativeSettings::class, EloquentCooperativeSettings::class);
+        $this->app->bind(CycleRepository::class, EloquentCycleRepository::class);
+        $this->app->bind(ProducerCutoffRules::class, CatalogProducerCutoffRules::class);
+        $this->app->bind(OrderRepository::class, EloquentOrderRepository::class);
+        $this->app->bind(ProductCatalog::class, CatalogProductCatalog::class);
     }
 
     /**

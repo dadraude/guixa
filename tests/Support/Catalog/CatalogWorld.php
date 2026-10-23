@@ -6,7 +6,10 @@ use Guixa\Catalog\Application\CreateProducer;
 use Guixa\Catalog\Application\CreateProduct;
 use Guixa\Catalog\Application\DeactivateProduct;
 use Guixa\Catalog\Application\GetDefaultCutoff;
+use Guixa\Catalog\Application\GetOrderableProduct;
 use Guixa\Catalog\Application\GetProducer;
+use Guixa\Catalog\Application\GetProducerCutoffRule;
+use Guixa\Catalog\Application\ListOrderableProducts;
 use Guixa\Catalog\Application\ListProducerProducts;
 use Guixa\Catalog\Application\ListProducers;
 use Guixa\Catalog\Application\ReactivateProduct;
@@ -47,6 +50,12 @@ final class CatalogWorld
 
     public readonly ListProducerProducts $listProducerProducts;
 
+    public readonly GetOrderableProduct $getOrderableProduct;
+
+    public readonly ListOrderableProducts $listOrderableProducts;
+
+    public readonly GetProducerCutoffRule $getProducerCutoffRule;
+
     public readonly Actor $manager;
 
     public function __construct(string $now = '2026-10-22 10:00')
@@ -66,6 +75,9 @@ final class CatalogWorld
         $this->deactivateProduct = new DeactivateProduct($this->products);
         $this->reactivateProduct = new ReactivateProduct($this->products);
         $this->listProducerProducts = new ListProducerProducts($this->products);
+        $this->getOrderableProduct = new GetOrderableProduct($this->products, $this->producers);
+        $this->listOrderableProducts = new ListOrderableProducts($this->products, $this->producers);
+        $this->getProducerCutoffRule = new GetProducerCutoffRule($this->producers);
 
         $this->manager = new Actor('00000000-0000-7000-8000-00000000000a', [Role::Manager]);
     }
