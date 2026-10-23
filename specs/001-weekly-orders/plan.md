@@ -152,8 +152,8 @@ Use cases
 | `SetDefaultCutoff` | producer (own) | R5 |
 | `GetDefaultCutoff` (the producer's own rule, for its cutoff page) | producer (own) | R5 |
 | `ListProducerProducts` (inactive ones included, by name; returns `ProductData`) | producer (own) | R2, S57 |
-| `GetOrderableProduct`, `ListOrderableProducts` | — (internal queries for Ordering) | R3, R10 |
-| `GetProducerCutoffRule` | — (internal query for Ordering) | R5 |
+| `GetOrderableProduct` (`?OrderableProductData`: null unless the product and its producer are active), `ListOrderableProducts` (by producer id: its active products by name, empty when the producer is unknown or inactive) | — (internal queries for Ordering) | R3, R10 |
+| `GetProducerCutoffRule` (`?ProducerCutoffRuleData`: active flag and the default rule) | — (internal query for Ordering) | R5 |
 
 `DeactivateProducer`, in one transaction: `producer.deactivate()`, `ProducerAccess::suspend(producerId)`
 and `ProducerCycles::stopParticipatingWhereNotSent(producerId)` (R3a, R6c, D13). Reactivating restores the
