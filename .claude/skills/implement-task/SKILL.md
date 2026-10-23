@@ -50,10 +50,11 @@ Done when it reports `committed` (go on) or `stopped` (go to **Stop**).
 Launch an agent with `model: "haiku"` that runs the task's single full check:
 
 ```sh
-cd /Users/eduard/code/practice/guixa-worktrees/dra-NN && PATH=/Users/eduard/code/practice/guixa-worktrees/.bin:$PATH DB_DATABASE=guixa_test_draNN composer ci:check
+cd /Users/eduard/code/practice/guixa-worktrees/dra-NN && PATH=/Users/eduard/code/practice/guixa-worktrees/.bin:$PATH PGTZ=UTC DB_DATABASE=guixa_test_draNN composer ci:check
 ```
 
-It reports `green`, or `red` with the failing checks and the last 40 lines of output.
+`PGTZ=UTC` matches CI: the local Postgres session is Europe/Madrid, so a test that compares times as
+text can pass here and fail in CI. It reports `green`, or `red` with the failing checks and the last 40 lines of output.
 
 Red: send the failures to the implementer, then gate again. A second red in a row goes to **Stop**.
 
