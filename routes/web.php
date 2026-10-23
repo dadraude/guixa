@@ -15,6 +15,7 @@ use App\Http\Controllers\Manage\ReturnItemController;
 use App\Http\Controllers\Manage\StockMovementController;
 use App\Http\Controllers\Manage\StockProductController;
 use App\Http\Controllers\Producer\CutoffController;
+use App\Http\Controllers\Producer\ProductController;
 use App\Http\Controllers\WalletController;
 use Illuminate\Support\Facades\Route;
 
@@ -108,6 +109,14 @@ Route::middleware(['auth', 'verified', 'role:manager'])->prefix('manage')->name(
 Route::middleware(['auth', 'verified', 'role:producer'])->prefix('producer')->name('producer.')->group(function () {
     Route::get('cutoff', [CutoffController::class, 'show'])->name('cutoff.show');
     Route::put('cutoff', [CutoffController::class, 'update'])->name('cutoff.update');
+
+    Route::resource('products', ProductController::class)
+        ->except(['show'])
+        ->whereUuid('product')
+        ->names('products');
+    Route::put('products/{product}/reactivation', [ProductController::class, 'reactivate'])
+        ->whereUuid('product')
+        ->name('products.reactivate');
 });
 
 require __DIR__.'/settings.php';

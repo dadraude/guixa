@@ -4,7 +4,9 @@ namespace App\Providers;
 
 use Carbon\CarbonImmutable;
 use Guixa\Catalog\Domain\ProducerRepository;
+use Guixa\Catalog\Domain\ProductRepository;
 use Guixa\Catalog\Infrastructure\Persistence\EloquentProducerRepository;
+use Guixa\Catalog\Infrastructure\Persistence\EloquentProductRepository;
 use Guixa\Membership\Domain\AccountPasswords;
 use Guixa\Membership\Domain\AccountRepository;
 use Guixa\Membership\Domain\HouseholdRepository;
@@ -60,6 +62,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(ProducerDirectory::class, CatalogProducerDirectory::class);
 
         $this->app->bind(ProducerRepository::class, EloquentProducerRepository::class);
+        $this->app->bind(ProductRepository::class, EloquentProductRepository::class);
     }
 
     /**

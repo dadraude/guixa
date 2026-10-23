@@ -1,0 +1,31 @@
+<?php
+
+namespace Guixa\Catalog\Application;
+
+use Guixa\Catalog\Domain\Product;
+use Guixa\Catalog\Domain\ProductRepository;
+use Guixa\Shared\Application\Actor;
+
+final class ListProducerProducts
+{
+    public function __construct(private readonly ProductRepository $products) {}
+
+    /** @return list<ProductData> the producer's own products, inactive ones included */
+    public function __invoke(Actor $actor, string $producerId): array
+    {
+        $actor->assertProducerOf($producerId);
+
+        return array_map(
+            fn (Product $product) => new ProductData(
+                $product->id,
+                $product->name(),
+                $product->unit(),
+                $product->price()->cents,
+                $product->isVariable(),
+                $product->containersPerUnit()?->toString(),
+                $product->isActive(),
+            ),
+            $this->products->listByProducer($producerId),
+        );
+    }
+}
