@@ -17,8 +17,8 @@ preparation worker and publisher. Inherit the session's model unless an applicab
 selects an available model. Never translate another provider's model name into a guessed model ID.
 Use only the host's allowed model/reasoning options and thread budget. No nested delegation.
 
-Pass the complete task brief, profile, adapter path, fixed base, surfaces and evidence explicitly; do
-not rely on inherited chat/MCP access. A reviewer must be a fresh independent worker, not the writer
+Use [role-scoped handoffs](../core/handoff.md), supplying relevant source paths/sections and resolved
+configuration rather than the full profile, adapter or inherited chat/MCP access. A reviewer must be a fresh independent worker, not the writer
 with a different label. If required delegation is unavailable, stop the affected implementation before
 mutation. A read-only ticket draft does not require a subagent merely to compensate for that absence.
 

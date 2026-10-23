@@ -18,7 +18,8 @@ requested model is unavailable, report it and use only an explicitly permitted f
 weaken independent review or invent a model. No nested delegation, even when the host would allow it.
 Cap parallelism by both the project limit and live host capacity.
 
-Pass task brief, profile, adapter, fixed base, edit surfaces and evidence explicitly. A resumed writer
+Use [role-scoped handoffs](../core/handoff.md) with explicit relevant paths/sections and resolved settings,
+not the whole profile, adapter or transcript. A resumed writer
 is not an independent reviewer. Missing required delegation/reviewer capability stops the affected
 implementation before mutation; ticket drafting alone does not require delegation.
 
