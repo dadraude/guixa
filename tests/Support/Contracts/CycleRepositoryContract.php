@@ -155,9 +155,9 @@ trait CycleRepositoryContract
 
         $orders = [];
         foreach ($repository->get($cycle->id)->producerOrders() as $order) {
-            $orders[$order->producerId] = $order->cutoff()?->format('c');
+            $orders[$order->producerId] = $order->cutoff()?->getTimestamp();
         }
-        $this->assertSame('2026-11-05T12:00:00+01:00', $orders[self::BAKER]);
+        $this->assertSame($this->madrid('2026-11-05 12:00')->getTimestamp(), $orders[self::BAKER]);
         $this->assertNull($orders[self::GROWER]);
     }
 
