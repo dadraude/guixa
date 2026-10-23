@@ -34,7 +34,9 @@ Stock products and movements, household wallets, households, members and invitat
 - **R34** Adding a person sends them an email invitation to set their password. Until they accept it,
   they cannot log in. An invitation expires after 7 days. While it is not accepted, a manager can resend it
   (the previous link stops working) or change its email.
-- **R35** A person belongs to at most one household.
+- **R35** A person belongs to at most one household. Being linked to a household is what makes an account a
+  member of it: it can order for it and see its wallet, whatever other roles it holds. An account with no
+  household and no other role cannot log in until a manager links it.
   - Moving a member links the same account to the new household. The old household keeps its orders,
     pickups, balance and history; nothing moves with the person.
   - Unlinking a member keeps the account active, without a household; it can be linked again to any
@@ -51,7 +53,7 @@ Stock products and movements, household wallets, households, members and invitat
   still accepts top-ups and corrections. A household created without members is active.
 - **R36** A manager creates producer accounts, with the same invitation flow. Each producer has exactly
   one account.
-- **R36a** One account can hold several roles (e.g. member of H and manager). A manager grants or removes the
+- **R36a** One account can hold several roles (e.g. linked to household H, so a member of it, and manager). A manager grants or removes the
   manager role on any account, except removing it from the last manager. The first manager is created
   when the system is installed, outside the app.
 - **R36b** A manager can deactivate and reactivate any account. A deactivated account cannot log in and is

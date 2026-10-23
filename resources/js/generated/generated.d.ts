@@ -1,5 +1,15 @@
 declare namespace App {
 namespace Http {
+export type AccountRow = {
+readonly accountId: string,
+readonly name: string,
+readonly email: string,
+readonly roles: Guixa.Shared.Domain.Role[],
+readonly householdId: string | null,
+readonly householdName: string | null,
+readonly active: boolean,
+readonly invitationPending: boolean,
+};
 export type CutoffRuleRow = {
 readonly daysBefore: number,
 readonly time: string,

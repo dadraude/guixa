@@ -7,6 +7,7 @@ use App\Http\HouseholdRow;
 use App\Http\HouseholdSummaryRow;
 use Guixa\Membership\Application\CreateHousehold;
 use Guixa\Membership\Application\GetHousehold;
+use Guixa\Membership\Application\HouseholdSummary;
 use Guixa\Membership\Application\ListHouseholds;
 use Guixa\Membership\Application\RenameHousehold;
 use Guixa\Membership\Domain\Error\HouseholdNotFound;
@@ -34,7 +35,7 @@ class HouseholdController extends Controller
         return to_route('manage.households.show', $id);
     }
 
-    public function show(string $household, Actor $actor, GetHousehold $getHousehold): Response
+    public function show(string $household, Actor $actor, GetHousehold $getHousehold, ListHouseholds $listHouseholds): Response
     {
         try {
             $detail = $getHousehold($actor, $household);
@@ -42,7 +43,13 @@ class HouseholdController extends Controller
             abort(404);
         }
 
-        return Inertia::render('Manage/Households/Show', ['household' => HouseholdRow::from($detail)]);
+        return Inertia::render('Manage/Households/Show', [
+            'household' => HouseholdRow::from($detail),
+            'otherHouseholds' => array_values(array_map(
+                HouseholdSummaryRow::from(...),
+                array_filter($listHouseholds($actor), fn (HouseholdSummary $other) => $other->id !== $detail->id),
+            )),
+        ]);
     }
 
     public function update(string $household, Request $request, Actor $actor, RenameHousehold $renameHousehold): RedirectResponse

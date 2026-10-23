@@ -32,6 +32,14 @@ final class InMemoryAccountRepository extends InMemoryRepository implements Acco
         return false;
     }
 
+    public function list(): array
+    {
+        $accounts = $this->all();
+        usort($accounts, fn (Account $a, Account $b) => [$a->name, $a->id] <=> [$b->name, $b->id]);
+
+        return $accounts;
+    }
+
     public function producerHasAccount(string $producerId): bool
     {
         foreach ($this->all() as $account) {
@@ -66,6 +74,20 @@ final class InMemoryAccountRepository extends InMemoryRepository implements Acco
             fn (Account $account) => $account->householdId === $householdId,
         ));
     }
+
+    public function hasOtherActiveManager(string $accountId): bool
+    {
+        foreach ($this->all() as $manager) {
+            if ($manager->id !== $accountId && $manager->isActiveManager()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /** Nothing runs concurrently in memory. */
+    public function lockManagers(): void {}
 
     protected function idOf(object $item): string
     {

@@ -38,6 +38,15 @@ final class Household
         $this->name = self::validName($name);
     }
 
+    public function deactivate(DateTimeImmutable $now): void
+    {
+        if (! $this->isActive()) {
+            return;
+        }
+
+        $this->deactivatedAt = $now;
+    }
+
     public function reactivate(): void
     {
         $this->deactivatedAt = null;

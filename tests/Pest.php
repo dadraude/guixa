@@ -4,6 +4,7 @@ use App\Models\User;
 use Guixa\Shared\Domain\Role;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 /*
@@ -104,8 +105,33 @@ function accountWith(Role ...$roles): User
     $user = User::factory()->create();
 
     foreach ($roles as $role) {
+        if ($role === Role::Member) {
+            linkToNewHousehold($user);
+
+            continue;
+        }
+
         DB::table('account_roles')->insert(['user_id' => $user->id, 'role' => $role->value]);
     }
+
+    return $user;
+}
+
+/** A member is an account linked to a household (R35); this links it to a new one. */
+function linkToNewHousehold(User $user): string
+{
+    $householdId = (string) Str::uuid7();
+    DB::table('households')->insert(['id' => $householdId, 'name' => 'Household '.substr($householdId, -6), 'created_at' => now(), 'updated_at' => now()]);
+    DB::table('users')->where('id', $user->id)->update(['household_id' => $householdId]);
+
+    return $householdId;
+}
+
+/** A member account linked to the given household. */
+function memberOf(string $householdId, string $name = 'Anna'): User
+{
+    $user = accountWith();
+    $user->forceFill(['name' => $name, 'household_id' => $householdId])->save();
 
     return $user;
 }

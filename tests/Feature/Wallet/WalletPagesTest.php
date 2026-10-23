@@ -13,14 +13,6 @@ function householdH(): string
     return $id;
 }
 
-function memberOf(string $household)
-{
-    $member = accountWith(Role::Member);
-    DB::table('users')->where('id', $member->id)->update(['household_id' => $household]);
-
-    return $member->refresh();
-}
-
 it('keeps the manager wallet routes to managers', function (string $method, string $uri) {
     $uri = str_replace('{id}', householdH(), $uri);
 
@@ -67,14 +59,14 @@ it('shows a manager the household wallet with its name', function () {
             ->has('wallet.movements', 0));
 });
 
-it('shows only the members own household and answers 404 to a member without one', function () {
+it('shows only the members own household and refuses an account without one', function () {
     $mine = householdH();
     $other = householdH();
     $manager = accountWith(Role::Manager);
     $this->actingAs($manager)->post("/manage/households/{$other}/wallet/top-ups", ['amount' => '9']);
 
     $this->actingAs(memberOf($mine))->get('/wallet')->assertInertia(fn (Assert $page) => $page->where('wallet.balance', '0.00'));
-    $this->actingAs(accountWith(Role::Member))->get('/wallet')->assertNotFound();
+    $this->actingAs(accountWith())->get('/wallet')->assertForbidden();
 });
 
 it('shows the domain error for a top-up of zero and a correction without a note', function () {

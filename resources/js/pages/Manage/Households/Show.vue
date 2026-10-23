@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Form, Head, Link } from '@inertiajs/vue3';
+import AccountHouseholdController from '@/actions/App/Http/Controllers/Manage/AccountHouseholdController';
 import HouseholdController from '@/actions/App/Http/Controllers/Manage/HouseholdController';
 import HouseholdMemberController from '@/actions/App/Http/Controllers/Manage/HouseholdMemberController';
 import HouseholdWalletController from '@/actions/App/Http/Controllers/Manage/HouseholdWalletController';
@@ -13,6 +14,7 @@ import { Label } from '@/components/ui/label';
 
 const props = defineProps<{
     household: App.Http.HouseholdRow;
+    otherHouseholds: App.Http.HouseholdSummaryRow[];
 }>();
 
 defineOptions({
@@ -96,6 +98,61 @@ const expiry = (iso: string | null) =>
                                     : 'Active'
                             }}
                         </Badge>
+                    </div>
+
+                    <div class="flex flex-wrap items-start gap-3">
+                        <Form
+                            v-if="otherHouseholds.length > 0"
+                            v-bind="
+                                AccountHouseholdController.update.form(
+                                    member.accountId,
+                                )
+                            "
+                            class="flex items-center gap-2"
+                            v-slot="{ errors, processing }"
+                        >
+                            <select
+                                name="household_id"
+                                required
+                                class="h-8 rounded-md border bg-background px-2 text-sm"
+                                :aria-label="`Move ${member.name} to`"
+                            >
+                                <option
+                                    v-for="other in otherHouseholds"
+                                    :key="other.id"
+                                    :value="other.id"
+                                >
+                                    {{ other.name }}
+                                </option>
+                            </select>
+                            <Button
+                                type="submit"
+                                variant="outline"
+                                size="sm"
+                                :disabled="processing"
+                            >
+                                Move
+                            </Button>
+                            <InputError :message="errors.domain" />
+                        </Form>
+
+                        <Form
+                            v-bind="
+                                AccountHouseholdController.destroy.form(
+                                    member.accountId,
+                                )
+                            "
+                            v-slot="{ processing }"
+                        >
+                            <Button
+                                type="submit"
+                                variant="outline"
+                                size="sm"
+                                :disabled="processing"
+                            >
+                                Unlink
+                            </Button>
+                        </Form>
                     </div>
 
                     <div

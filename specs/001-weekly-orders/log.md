@@ -188,6 +188,25 @@ Why: two naming schemes for the same kind of class.
 
 ## 2026-10-22 · Deviation
 
+T07: `plan.md` (Membership) now says that "last manager" counts active managers, adds the `LastActiveManager` and `AccountDeactivated` errors
+(a deactivated account cannot be moved or linked until reactivated), the `ListAccounts` use case for the accounts admin page, the shared
+`DeactivateEmptyHousehold` service, and the manager-row lock behind `RemoveManagerRole`/`DeactivateAccount`. HTTP & pages lists the account routes.
+Why: R36a/R36b are silent on deactivated managers (counting them would leave nobody able to manage), on linking a deactivated account, and on how the
+accounts page reads its data; the plan had to pick.
+
+## 2026-10-22 · Deviation
+
+T07: the passkey path noted in T06 is covered: `Passkeys::authorizeLoginUsing` asks `CanLogIn`. Also added the `LogOutDeactivatedAccount` web middleware,
+which ends the session of an account deactivated while logged in. `plan.md` (Membership, Infrastructure) records both.
+Why: R36b says a deactivated account cannot log in; a session it already held would otherwise keep working.
+
+## 2026-10-23 · Change
+
+R35, R36a, Roles (`spec.md`, `stock-wallet.md`), glossary Account: Member stops being a stored role. An account is a member of household H exactly when it is
+linked to H, and that link is what lets it order and see the wallet. An account with no household and no manager or producer role cannot log in until a manager links it.
+`plan.md` (Actor, Membership login rule) follows; a migration drops the stored `member` rows. No `S#` changed.
+Why: review of T07 asked whether linking a manager-only or producer account should make it a member. The user answered: "Tindria sentit treure el rol de membre i que el fet d'estar dins una llar sigui el què et permet fer comanda?"
+and, asked whether an unlinked account with no other role can still log in: "No cal, que no pugui entrar fins que el vinculin".
 T08: `plan.md` had no way to create a producer with its first cutoff, and Membership had no way to know a producer exists. `CreateProducer`
 now takes the name and the initial default cutoff (both required: R5 says every producer has one and the spec names no standard value), and
 Membership gets a `ProducerDirectory` port (`exists`) implemented over a new internal Catalog query `GetProducer`, so `InviteProducerAccount`

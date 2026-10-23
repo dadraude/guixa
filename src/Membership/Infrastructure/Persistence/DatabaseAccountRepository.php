@@ -8,7 +8,9 @@ use Guixa\Membership\Domain\Account;
 use Guixa\Membership\Domain\AccountRepository;
 use Guixa\Membership\Domain\ValueObject\Email;
 use Guixa\Shared\Domain\Role;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -45,6 +47,11 @@ final class DatabaseAccountRepository implements AccountRepository
         return DB::table('users')->whereRaw('lower(email) = ?', [$email->value])->exists();
     }
 
+    public function list(): array
+    {
+        return $this->hydrateAll(DB::table('users')->orderBy('name')->orderBy('id')->get());
+    }
+
     public function producerHasAccount(string $producerId): bool
     {
         return DB::table('users')->where('producer_id', $producerId)->exists();
@@ -64,9 +71,33 @@ final class DatabaseAccountRepository implements AccountRepository
 
     public function membersOf(string $householdId): array
     {
-        return array_values(DB::table('users')->where('household_id', $householdId)->orderBy('name')->orderBy('id')->get()
-            ->map($this->hydrate(...))
-            ->all());
+        return $this->hydrateAll(DB::table('users')->where('household_id', $householdId)->orderBy('name')->orderBy('id')->get());
+    }
+
+    public function hasOtherActiveManager(string $accountId): bool
+    {
+        return $this->managerRows()->whereNull('deactivated_at')->where('id', '<>', $accountId)->exists();
+    }
+
+    public function lockManagers(): void
+    {
+        // In id order, so two transactions locking the same managers cannot deadlock. The managers are read
+        // afterwards, in a new statement: it sees what the transaction that held the locks committed.
+        $this->managerRows()->orderBy('id')->lockForUpdate()->get(['id']);
+    }
+
+    private function managerRows(): Builder
+    {
+        return DB::table('users')->whereIn('id', DB::table('account_roles')->select('user_id')->where('role', Role::Manager->value));
+    }
+
+    /**
+     * @param  Collection<int, stdClass>  $rows
+     * @return list<Account>
+     */
+    private function hydrateAll(Collection $rows): array
+    {
+        return array_values($rows->map($this->hydrate(...))->all());
     }
 
     /** @return array<string, mixed> */

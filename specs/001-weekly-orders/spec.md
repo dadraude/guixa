@@ -20,7 +20,7 @@ wallet, and it can top up the wallet on the spot.
 | Member | Soci/sòcia | Person who belongs to at most one household; only with a household can they order. |
 | Manager | Gestor/a | Runs the cooperative: cycles, reception, pickup, stock, wallets, accounts. |
 | Producer | Productor/a | Supplies products and manages its own catalog. Has exactly one account. |
-| Account | Compte | One login (unique email) with one or more roles: member, manager, producer. |
+| Account | Compte | One login (unique email) with the manager and producer roles it holds, and a household link that makes it a member. |
 | Product | Producte | Sold by a producer, with a unit (kg, unit, bunch…) and a unit price (≥ 0). |
 | Variable product | Producte de pes variable | Quantity can be fractional (weight); delivered quantity may differ from ordered. |
 | Cycle | Cicle | One week of ordering, identified by its pickup date. *Closed* once every pickup is done (R24b). |
@@ -53,9 +53,11 @@ and defines a balance on a given day.
 
 ## Roles
 
-An account has one or more roles.
+An account holds the manager and producer roles it was given, and is a member of the household it is linked to.
+Member is not a role someone is given: an account is a member of household H exactly when it is linked to H (R35).
+An account with no household and no other role cannot log in until it is linked.
 
-- **Member**: orders for their household, sees their household's orders, pickups, balance and movements.
+- **Member** (linked to a household): orders for their household, sees their household's orders, pickups, balance and movements.
 - **Producer**: manages their own products and default cutoff, sees the sent totals of their products.
 - **Manager**: everything else — cycles, participation, cutoffs, sending, reception, pickup, stock,
   top-ups, households and accounts. A manager never edits a household's order lines.

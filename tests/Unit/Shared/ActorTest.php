@@ -24,7 +24,7 @@ it('lets one account hold several roles at once (R36a)', function () {
     $actor->assertManager();
     $actor->assertMemberOf('h7');
 
-    expect($actor->roles)->toBe([Role::Member, Role::Manager]);
+    expect($actor->roles)->toBe([Role::Manager, Role::Member]);
 });
 
 it('accepts a member only for their own household', function () {
@@ -55,10 +55,28 @@ it('drops duplicate roles', function () {
     expect($actor->roles)->toBe([Role::Manager]);
 });
 
-it('answers role checks by name, ignoring unknown names', function () {
+it('is a member of exactly the household it is linked to, whatever stored roles it holds (R35)', function () {
+    $manager = new Actor(accountId: 'a1', roles: [Role::Manager], householdId: 'h7');
+
+    $manager->assertMemberOf('h7');
+
+    expect($manager->hasRole(Role::Member))->toBeTrue()
+        ->and($manager->roleNames())->toBe(['manager', 'member'])
+        ->and(fn () => $manager->assertMemberOf('h8'))->toThrow(NotAllowed::class);
+});
+
+it('is not a member without a household, even if handed the member role (R35)', function () {
     $actor = new Actor(accountId: 'a1', roles: [Role::Member, Role::Manager]);
+
+    expect($actor->hasRole(Role::Member))->toBeFalse()
+        ->and($actor->roles)->toBe([Role::Manager])
+        ->and(fn () => $actor->assertMemberOf('h7'))->toThrow(NotAllowed::class);
+});
+
+it('answers role checks by name, ignoring unknown names', function () {
+    $actor = new Actor(accountId: 'a1', roles: [Role::Manager], householdId: 'h7');
 
     expect($actor->hasAnyRole('producer', 'manager'))->toBeTrue()
         ->and($actor->hasAnyRole('producer', 'nonsense'))->toBeFalse()
-        ->and($actor->roleNames())->toBe(['member', 'manager']);
+        ->and($actor->roleNames())->toBe(['manager', 'member']);
 });

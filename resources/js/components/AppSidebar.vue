@@ -4,6 +4,7 @@ import {
     BookOpen,
     FolderGit2,
     Home,
+    UserCog,
     LayoutGrid,
     Package,
     Timer,
@@ -12,6 +13,7 @@ import {
     Wheat,
 } from '@lucide/vue';
 import { computed } from 'vue';
+import AccountController from '@/actions/App/Http/Controllers/Manage/AccountController';
 import HouseholdController from '@/actions/App/Http/Controllers/Manage/HouseholdController';
 import ProducerController from '@/actions/App/Http/Controllers/Manage/ProducerController';
 import ReturnItemController from '@/actions/App/Http/Controllers/Manage/ReturnItemController';
@@ -43,6 +45,11 @@ const managerNavItems: NavItem[] = [
         title: 'Households',
         href: HouseholdController.index(),
         icon: Home,
+    },
+    {
+        title: 'Accounts',
+        href: AccountController.index(),
+        icon: UserCog,
     },
     {
         title: 'Producers',

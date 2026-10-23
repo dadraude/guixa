@@ -4,6 +4,7 @@ use App\Http\DomainErrorResponse;
 use App\Http\Middleware\EnsureRole;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
+use App\Http\Middleware\LogOutDeactivatedAccount;
 use App\Http\Middleware\ResolveActor;
 use Guixa\Shared\Domain\Error\NotAllowed;
 use Illuminate\Foundation\Application;
@@ -26,6 +27,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->web(append: [
             HandleAppearance::class,
+            LogOutDeactivatedAccount::class,
             ResolveActor::class,
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,

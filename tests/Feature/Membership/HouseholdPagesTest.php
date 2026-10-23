@@ -64,14 +64,14 @@ it('shows a domain error as a form error, e.g. an email already in use', functio
 
 it('answers 404 for an unknown household and 403 to everyone but managers (S56)', function () {
     $manager = accountWithRole(Role::Manager);
-    $member = accountWithRole(Role::Member);
+    $member = accountWith(Role::Member);
     $unknown = '00000000-0000-7000-8000-000000000099';
 
     $this->actingAs($manager)->get(route('manage.households.show', $unknown))->assertNotFound();
     $this->actingAs($member)->get(route('manage.households.index'))->assertForbidden();
     $this->actingAs($member)->post(route('manage.households.store'), ['name' => 'Sneaky'])->assertForbidden();
     $this->actingAs($member)->post(route('manage.households.members.store', $unknown), ['name' => 'B', 'email' => 'b@example.org'])->assertForbidden();
-    expect(DB::table('households')->count())->toBe(0);
+    expect(DB::table('households')->count())->toBe(1); // only the member's own
 });
 
 it('sends guests to the login page', function () {
