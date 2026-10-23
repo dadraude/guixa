@@ -45,6 +45,7 @@ abort the rebase and return conflict/paths. Missing evidence returns stopped. Ne
 sides or hand-merge generated files. The worker cannot publish or launch gates/reviewers.
 
 The coordinator routes the result:
+
 - Conflict: the implementer resolves semantically within admitted scope. A still-unresolved conflict
   stops rather than retrying delivery. Update the handoff base and inspect the resolution diff.
 - Changed HEAD/base or resolved conflict: run the full gate on the final candidate, including after

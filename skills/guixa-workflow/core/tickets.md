@@ -22,12 +22,12 @@ existing tickets is a separate request; do not migrate them as a side effect of 
 
 ## Decision Gates
 
-| Relationship | When to propose it |
-| --- | --- |
+| Relationship      | When to propose it                                                                                                                                                          |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Parent → children | A coherent deliverable needs multiple executable slices. Reuse an explicitly selected source issue as parent, or propose a new grouping parent for spec/conversation input. |
-| Blocking | One slice genuinely requires another's result before it can proceed. Keep these edges between executable tasks, with no cycles. |
-| Related | A decision, follow-up or adjacent task provides useful context without being a prerequisite. Do not relate everything just because it shares a parent. |
-| No parent | A standalone slice, or an approved project/milestone already supplies sufficient grouping. Do not create redundant containers. |
+| Blocking          | One slice genuinely requires another's result before it can proceed. Keep these edges between executable tasks, with no cycles.                                             |
+| Related           | A decision, follow-up or adjacent task provides useful context without being a prerequisite. Do not relate everything just because it shares a parent.                      |
+| No parent         | A standalone slice, or an approved project/milestone already supplies sufficient grouping. Do not create redundant containers.                                              |
 
 Grouping parents describe the outcome and completion criteria, have no executable `Tnn` prefix and
 receive no `ready-for-agent` label. Each executable child maps to a task row and uses `Tnn — Title`.

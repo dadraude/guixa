@@ -6,11 +6,11 @@ testing these files never authorizes Linear writes or implementation/publishing 
 
 ## Use
 
-| Task | Codex | Claude Code |
-| --- | --- | --- |
-| Coordinate implementation | `$guixa-implement-session` | `/implement-session` |
+| Task                        | Codex                          | Claude Code              |
+| --------------------------- | ------------------------------ | ------------------------ |
+| Coordinate implementation   | `$guixa-implement-session`     | `/implement-session`     |
 | Implement one admitted task | `$guixa-implement-task DRA-NN` | `/implement-task DRA-NN` |
-| Draft a ticket batch | `$guixa-to-tickets` | `/to-tickets` |
+| Draft a ticket batch        | `$guixa-to-tickets`            | `/to-tickets`            |
 
 Codex entrypoints live in `.agents/skills/guixa-*`; Claude entrypoints stay in `.claude/skills/`.
 Both link the same files. Codex names are prefixed to avoid collisions with personal/global skills.

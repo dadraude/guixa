@@ -1,6 +1,6 @@
 ---
 name: guixa-to-tickets
-description: "Draft Guixa ticket hierarchies, dependencies and contextual relations."
+description: 'Draft Guixa ticket hierarchies, dependencies and contextual relations.'
 ---
 
 # Guixa to-tickets

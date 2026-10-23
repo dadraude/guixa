@@ -1,6 +1,6 @@
 ---
 name: guixa-implement-task
-description: "Implement one admitted Guixa task with independent review."
+description: 'Implement one admitted Guixa task with independent review.'
 ---
 
 # Guixa implement-task

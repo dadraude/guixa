@@ -8,6 +8,7 @@ Read the task/phase acceptance, linked requirements/scenarios, affected design, 
 new deviation log entries specified by the [project profile](../project.md).
 
 Check the whole diff for:
+
 - Spec: public-use-case tests prove each linked rule/scenario; code and design/spec agree; authorized
   deviations are recorded; no out-of-scope product behavior.
 - Standards: project's architecture, layering, names, ports and readability conventions.

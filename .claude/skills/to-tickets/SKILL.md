@@ -1,6 +1,6 @@
 ---
 name: to-tickets
-description: "Draft Guixa ticket hierarchies, dependencies and contextual relations."
+description: 'Draft Guixa ticket hierarchies, dependencies and contextual relations.'
 disable-model-invocation: true
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: guixa-implement-session
-description: "Coordinate compatible Guixa implementation tasks."
+description: 'Coordinate compatible Guixa implementation tasks.'
 ---
 
 # Guixa implement-session

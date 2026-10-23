@@ -5,19 +5,19 @@ configuration, not permission to run the commands or access a remote service.
 
 ## Identities and paths
 
-| Setting | Value |
-| --- | --- |
-| Tracker | Linear; workspace URL slug `draude`, team `DRA`, project `Coop` |
-| Eligible statuses / dependency completion | `Backlog`, `Todo` / `Done` |
-| Active / stopped status | `In Progress` / `Todo` |
-| Executable task | `Tnn` title prefix matching a row in `specs/*/tasks.md` |
-| Ready label | `ready-for-agent`, executable mapped leaves only |
-| Remote / base | `origin` / `main` |
-| Task branch | `feature/dra-NN-<3-6 title words>`; `chore/` for tooling, test support or CI |
-| Worktree root | Sibling of the selected repository: `<repo-parent>/<repo-name>-worktrees` |
-| Task worktree | `<worktree-root>/dra-NN` |
-| Test database | `guixa_test_draNN`; parallel workers may add `_test_N` |
-| Limits | 3 task pipelines in flight; 3 review rounds; stop after 2 consecutive red gates |
+| Setting                                   | Value                                                                           |
+| ----------------------------------------- | ------------------------------------------------------------------------------- |
+| Tracker                                   | Linear; workspace URL slug `draude`, team `DRA`, project `Coop`                 |
+| Eligible statuses / dependency completion | `Backlog`, `Todo` / `Done`                                                      |
+| Active / stopped status                   | `In Progress` / `Todo`                                                          |
+| Executable task                           | `Tnn` title prefix matching a row in `specs/*/tasks.md`                         |
+| Ready label                               | `ready-for-agent`, executable mapped leaves only                                |
+| Remote / base                             | `origin` / `main`                                                               |
+| Task branch                               | `feature/dra-NN-<3-6 title words>`; `chore/` for tooling, test support or CI    |
+| Worktree root                             | Sibling of the selected repository: `<repo-parent>/<repo-name>-worktrees`       |
+| Task worktree                             | `<worktree-root>/dra-NN`                                                        |
+| Test database                             | `guixa_test_draNN`; parallel workers may add `_test_N`                          |
+| Limits                                    | 3 task pipelines in flight; 3 review rounds; stop after 2 consecutive red gates |
 
 Resolve `REPO_ROOT` with `git rev-parse --show-toplevel` in the coordinator's selected checkout;
 retain it across all workers instead of recomputing it from their working directory. Derive
@@ -43,12 +43,12 @@ with `TEST_DB`, and verify the replacement without logging credentials. Never ch
 All setup, tests and artisan commands use the worktree prefix above; the user's `guixa` database and
 shared `guixa_test` are not task databases. If isolated database configuration cannot be verified, stop.
 
-| Operation | Command in the task worktree |
-| --- | --- |
-| Setup | `composer install && pnpm install --frozen-lockfile && pnpm run build` |
-| Focused test | `php artisan test --filter=<test>` (run serially initially) |
+| Operation      | Command in the task worktree                                                             |
+| -------------- | ---------------------------------------------------------------------------------------- |
+| Setup          | `composer install && pnpm install --frozen-lockfile && pnpm run build`                   |
+| Focused test   | `php artisan test --filter=<test>` (run serially initially)                              |
 | Focused checks | `composer lint:check`, `composer types:check`, focused tests for every changed test file |
-| Full gate | `composer ci:check` |
+| Full gate      | `composer ci:check`                                                                      |
 
 The prefix's `PGTZ=UTC` matches CI; a local Europe/Madrid database session can hide timestamp failures.
 Discover affected generators from the repository scripts before regenerating; do not invent a command.
