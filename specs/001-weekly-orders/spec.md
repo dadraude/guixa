@@ -73,6 +73,8 @@ Requirements (`R#`) and acceptance scenarios (`S#`) live in one file per area; n
 | [pickup.md](pickup.md) | R19–R24 |
 | [stock-wallet.md](stock-wallet.md) | R25–R36 |
 
+[diagrams.md](diagrams.md) draws the contexts, the model relations and each role's path.
+
 ## Out of scope (for now)
 
 A cooperative fee on product prices, work shifts, selling stock outside a pickup, notifications other than
