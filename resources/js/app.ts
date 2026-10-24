@@ -4,6 +4,7 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import AuthLayout from '@/layouts/AuthLayout.vue';
 import SettingsLayout from '@/layouts/settings/Layout.vue';
 import { initializeFlashToast } from '@/lib/flashToast';
+import { installTranslations } from '@/lib/i18n';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -21,7 +22,8 @@ void createInertiaApp({
                 return AppLayout;
         }
     },
-    withApp: (app) => {
+    withApp: (app, { page }) => {
+        installTranslations(app, page.props.locale);
         app.directive('focus', {
             mounted: (el: HTMLElement, shouldFocus) => {
                 if (shouldFocus.value !== false) {

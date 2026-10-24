@@ -4,6 +4,7 @@
 /public/build
 /public/fonts-manifest.dev.json
 /public/hot
+/lang/php_*.json
 /public/storage
 /storage/*.key
 /storage/pail
