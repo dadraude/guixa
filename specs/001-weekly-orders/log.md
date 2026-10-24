@@ -583,3 +583,19 @@ Local implementation and the requested checks are complete: 17 frontend tests, 4
 tests/275 assertions, types/lint, affected PHPStan, client/SSR builds and responsive/keyboard/browser
 interaction checks passed. Hosted CI was not run; there was no push, PR or Linear update. T36 and
 the wider weekly-orders feature remain pending. Existing `.env` overrides were not changed.
+
+## 2026-10-24 · Request
+
+> Yes, rebase the three branches onto current main, fix the CI failure, and push with --force-with-lease only after the required checks pass. Preserve all three PRs and don’t merge anything.
+
+## 2026-10-24 · Change
+
+PRs #191/#192/#193 were rebased sequentially onto `ba2532b`, preserving both append-only log
+histories and their separate scopes. The hosted CI failure was reproduced under Catalan: the
+domain-error test registered its fixture only in English. A ca/en dataset first reproduced the
+failure, then passed when the fixture used the selected locale; production translations are unchanged.
+All 31 original implementation files remain byte-identical. The ODD logbook records the correction.
+
+Before leased updates: 55 affected PHP tests/340 assertions, the English locale regression, Pint,
+per-slice frontend tests (13/14/17), types, and foundation/final client+SSR builds passed. Hosted CI
+will rerun after publication; no success is claimed in advance and no PR merge is authorized.

@@ -12,11 +12,11 @@ S4. "Yes, commit only the approved translation foundation now, then complete nat
 S5. "Yes, commit the cycle-list/navigation slice without native review, then continue with native review of the editor slice before committing it. Don’t push or open PRs."
 Acceptance and scope: specs/001-weekly-orders/plan.md, Member ordering presentation and Translations;
 tasks T38 and T37. Preserve all existing save/remove requests, amounts, roles and ordering states.
-No new features, no app-wide migration, no publication or ticket mutations.
+No new features or app-wide migration. Three stacked PRs and checked leased updates are now authorized; no ticket mutations or PR merges.
 
 ## Tasks
 
-- U4 — CI/conflict correction; inline (bounded locale fixture and sequential stack maintenance); reproduce ca/en behavior, fix the fixture, rebase all three slices, verify before leased updates; pending.
+- U4 — CI/conflict correction; inline (bounded locale fixture and sequential stack maintenance); reproduce ca/en behavior, fix the fixture, rebase all three slices, verify before leased updates; local checks passed, hosted CI rerun pending.
 
 - U1 (S1,S2) — T38 translation foundation; inline (T37 depends on it); implemented, locally verified and native-reviewed; commit 0c56c738bed223e1e614e1385f6339061d63789e.
 - U2 (S1,S2,S5) — T37 member presentation and ordering shell; inline; cycle-list/navigation committed as 3f3b8e839e166199a9a41c4b79df4741937750fe (review declined, explicit commit authorization); editor locally verified and native-reviewed, committed as 9dec36dd9e67582ab1adf9e4239ff727c9e47d34.
@@ -67,3 +67,7 @@ User authorization verbatim: "Yes, rebase the three branches onto current main, 
 PRs #191/#192/#193 remain the delivery units. Main advanced to ba2532b; original slice tips are preserved under refs/backup/member-stack-20261024/. Foundation rebased first without changing production behavior. CI reported an English-only translation fixture mismatch; reproduce under explicit Catalan locale before changing it. Required local proof: locale matrix, affected PHP tests, frontend/types per slice, and static/build checks; full validation remains CI-owned after checked updates. No PR merges.
 
 Correction evidence: original focused test failed under ca/ca and passed with only APP_LOCALE=en. Explicit ca/en dataset reproduced ca failure before fixture repair. Registering the fixture in the selected locale fixes both paths without production changes. Catalan affected HTTP/translation/producer-summary checks: 45 tests, 320 assertions; Pint passed. Foundation client/SSR build, 13 frontend tests and types passed. Risk: none (test fixture and passive tracking only). Remaining branch replay and checks still pending; do not push yet.
+
+Correction completion: foundation b679ade (rebased foundation 3356bc5 plus locale regression fix), cycle b4f1a60 and editor d6aaf83 preserve PRs #191/#192/#193. All 31 original implementation files are byte-identical to the original stack; the only executable correction is the test fixture. Both append-only log histories and stack ancestry were verified. Native assessment of the bounded correction returned medium/under_budget, so no new review was due; earlier native reviews remain historical evidence for their original snapshots, not approvals of new tree identities.
+
+Pre-push verification: Catalan affected PHP checks passed 55 tests/340 assertions; the English locale regression passed 2 cases/6 assertions. Pint and diff checks passed. Each slice passed focused frontend tests/types (foundation 13, cycles 14, final editor 17); foundation and final client/SSR builds passed. Full CI will rerun after the explicitly authorized atomic push with leases pinned to the three original remote tips. No PR merge. Risk: none for the test-only correction and documentation; original shared/dependency risks remain documented above.
