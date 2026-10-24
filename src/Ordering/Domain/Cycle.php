@@ -12,6 +12,7 @@ use Guixa\Ordering\Domain\Error\PickupDateNotInFuture;
 use Guixa\Ordering\Domain\Error\ProducerClosed;
 use Guixa\Ordering\Domain\Error\ProducerNotInCycle;
 use Guixa\Ordering\Domain\Error\ProducerNotParticipating;
+use Guixa\Ordering\Domain\Error\ProducerOrderNotSent;
 use Guixa\Ordering\Domain\Error\ProducerOrderSent;
 use Guixa\Ordering\Domain\Error\ProducerStillOpen;
 use Guixa\Ordering\Domain\ValueObject\CutoffRule;
@@ -144,6 +145,14 @@ final class Cycle
     public function producersReadyToSend(DateTimeImmutable $now): array
     {
         return array_values(array_filter(array_keys($this->producerOrders), fn (string $producerId) => $this->isReadyToSend($producerId, $now)));
+    }
+
+    /** What a reception needs: the producer is in the cycle and its order is sent (R14). */
+    public function assertSent(string $producerId): void
+    {
+        if (! $this->producerOrderOf($producerId)->isSent()) {
+            throw ProducerOrderNotSent::withId($this->id, $producerId);
+        }
     }
 
     public function isSent(string $producerId): bool

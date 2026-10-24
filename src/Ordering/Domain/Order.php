@@ -7,8 +7,9 @@ use Guixa\Ordering\Domain\Error\FractionalQuantityNotAllowed;
 use Guixa\Ordering\Domain\Error\LineNotMarked;
 use Guixa\Ordering\Domain\ValueObject\OrderableProduct;
 use Guixa\Shared\Domain\Quantity;
+use LogicException;
 
-/** Everything one household has in one cycle (R7). Only the ordering part exists so far. */
+/** Everything one household has in one cycle (R7). The ordering and the reception parts exist so far. */
 final class Order
 {
     /** @param array<string, OrderLine> $lines by product id */
@@ -105,6 +106,61 @@ final class Order
         unset($this->lines[$productId]);
     }
 
+    /**
+     * Sets what the household receives of a product it already has a line for, by hand (R16). The line keeps its
+     * ordered quantity; whole units for a non-variable product (R9).
+     */
+    public function allocate(string $productId, Quantity $allocated): void
+    {
+        $line = $this->lines[$productId] ?? throw new LogicException("The order has no line of product {$productId} to allocate.");
+
+        $this->assertInStep($line->name, $line->variable, $allocated);
+
+        $this->lines[$productId] = $line->withAllocation($allocated, byHand: true);
+    }
+
+    /**
+     * Adds an allocation-only line for a product the household did not order, with the product as it is now (R10, R16, S39).
+     */
+    public function allocateNew(OrderableProduct $product, Quantity $allocated, string $lineId, string $addedBy, DateTimeImmutable $now): void
+    {
+        $this->assertInStep($product->name, $product->variable, $allocated);
+
+        $this->lines[$product->id] = (new OrderLine(
+            $lineId,
+            $product->id,
+            $product->producerId,
+            $product->name,
+            $product->unit,
+            $product->price,
+            $product->variable,
+            $product->containersPerUnit,
+            Quantity::ofThousandths(0),
+            $allocated,
+            $now,
+            $addedBy,
+        ))->withAllocation($allocated, byHand: true);
+    }
+
+    /** Sets the allocation the reception computed from the ordered quantities, clearing the manual mark (R15). */
+    public function reallocate(string $productId, Quantity $allocated): void
+    {
+        $line = $this->lines[$productId] ?? throw new LogicException("The order has no line of product {$productId} to allocate.");
+
+        $this->lines[$productId] = $line->withAllocation($allocated, byHand: false);
+    }
+
+    public function hasLine(string $productId): bool
+    {
+        return isset($this->lines[$productId]);
+    }
+
+    /** @return list<OrderLine> the lines the household ordered: allocation-only lines are not part of what it asked for (R16) */
+    public function orderedLines(): array
+    {
+        return array_values(array_filter($this->lines(), fn (OrderLine $line) => $line->isOrdered()));
+    }
+
     /** @return list<OrderLine> in the order they were added */
     public function lines(): array
     {
@@ -112,5 +168,12 @@ final class Order
         usort($lines, fn (OrderLine $a, OrderLine $b) => [$a->createdAt, $a->id] <=> [$b->createdAt, $b->id]);
 
         return $lines;
+    }
+
+    private function assertInStep(string $name, bool $variable, Quantity $quantity): void
+    {
+        if (! $variable && ! $quantity->isWhole()) {
+            throw FractionalQuantityNotAllowed::forUnit($name, $quantity->toString());
+        }
     }
 }

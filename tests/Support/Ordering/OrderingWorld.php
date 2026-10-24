@@ -4,6 +4,7 @@ namespace Tests\Support\Ordering;
 
 use DateTimeImmutable;
 use Guixa\Ordering\Application\AddParticipant;
+use Guixa\Ordering\Application\AddUnorderedProduct;
 use Guixa\Ordering\Application\CancelCycle;
 use Guixa\Ordering\Application\ClearCutoff;
 use Guixa\Ordering\Application\CloseProducerNow;
@@ -11,6 +12,7 @@ use Guixa\Ordering\Application\GetCycleSummary;
 use Guixa\Ordering\Application\GetHouseholdOrder;
 use Guixa\Ordering\Application\GetPickupWeekday;
 use Guixa\Ordering\Application\GetProducerCycleSummary;
+use Guixa\Ordering\Application\GetReception;
 use Guixa\Ordering\Application\HasUnsettledLines;
 use Guixa\Ordering\Application\ListCycles;
 use Guixa\Ordering\Application\ListMemberCycles;
@@ -19,13 +21,16 @@ use Guixa\Ordering\Application\ParticipateAgain;
 use Guixa\Ordering\Application\RemoveMarkedLine;
 use Guixa\Ordering\Application\SendEmptyProducerOrders;
 use Guixa\Ordering\Application\SendProducerOrder;
+use Guixa\Ordering\Application\SetAllocation;
 use Guixa\Ordering\Application\SetCutoff;
 use Guixa\Ordering\Application\SetOrderLine;
 use Guixa\Ordering\Application\SetPickupWeekday;
 use Guixa\Ordering\Application\SetProductAvailability;
+use Guixa\Ordering\Application\SetReceivedTotal;
 use Guixa\Ordering\Application\StopParticipating;
 use Guixa\Ordering\Application\StopParticipatingWhereNotSent;
 use Guixa\Ordering\Domain\ProducerNotifier;
+use Guixa\Ordering\Domain\ReceptionLoader;
 use Guixa\Ordering\Domain\ValueObject\PickupWeekday;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Role;
@@ -38,6 +43,7 @@ use Tests\Support\InMemory\InMemoryCooperativeSettings;
 use Tests\Support\InMemory\InMemoryCycleRepository;
 use Tests\Support\InMemory\InMemoryOrderRepository;
 use Tests\Support\InMemory\InMemoryProductAvailabilityRepository;
+use Tests\Support\InMemory\InMemoryReceivedTotalRepository;
 
 /** The Ordering use cases wired to in-memory adapters, for the Application tests. */
 final class OrderingWorld
@@ -59,6 +65,8 @@ final class OrderingWorld
     public readonly FakeProductCatalog $catalog;
 
     public readonly InMemoryProductAvailabilityRepository $availability;
+
+    public readonly InMemoryReceivedTotalRepository $receivedTotals;
 
     public readonly FakeHouseholds $households;
 
@@ -108,6 +116,14 @@ final class OrderingWorld
 
     public readonly GetProducerCycleSummary $getProducerCycleSummary;
 
+    public readonly GetReception $getReception;
+
+    public readonly AddUnorderedProduct $addUnorderedProduct;
+
+    public readonly SetReceivedTotal $setReceivedTotal;
+
+    public readonly SetAllocation $setAllocation;
+
     public readonly Actor $manager;
 
     /** @param  ?int  $pickupWeekday  the cooperative's weekday (ISO), or null while a manager has not chosen one (R4c) */
@@ -120,6 +136,7 @@ final class OrderingWorld
         $this->orders = new InMemoryOrderRepository;
         $this->catalog = new FakeProductCatalog;
         $this->availability = new InMemoryProductAvailabilityRepository;
+        $this->receivedTotals = new InMemoryReceivedTotalRepository;
         $this->households = new FakeHouseholds;
         $transactions = new ImmediateTransactionRunner;
         $this->notifier = new RecordingProducerNotifier;
@@ -150,6 +167,11 @@ final class OrderingWorld
         $this->hasUnsettledLines = new HasUnsettledLines($this->orders);
         $this->getCycleSummary = new GetCycleSummary($this->cycles, $this->orders, $this->households);
         $this->getProducerCycleSummary = new GetProducerCycleSummary($this->cycles, $this->orders, $this->catalog, $this->availability);
+        $receptions = new ReceptionLoader($this->orders, $this->catalog, $this->availability, $this->receivedTotals);
+        $this->getReception = new GetReception($this->cycles, $receptions, $this->households);
+        $this->addUnorderedProduct = new AddUnorderedProduct($this->cycles, $receptions, $this->receivedTotals, $transactions);
+        $this->setReceivedTotal = new SetReceivedTotal($this->cycles, $this->orders, $receptions, $this->receivedTotals, $transactions);
+        $this->setAllocation = new SetAllocation($this->cycles, $this->orders, $receptions, $this->households, $transactions, $this->clock);
 
         $this->manager = new Actor('00000000-0000-7000-8000-00000000000a', [Role::Manager]);
 

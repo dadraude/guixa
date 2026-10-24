@@ -32,7 +32,7 @@ final class GetCycleSummary
 
         $orders = array_values(array_filter(
             $this->orders->ofCycle($cycleId),
-            fn (Order $order) => $order->lines() !== [],
+            fn (Order $order) => $order->orderedLines() !== [],
         ));
         $names = $this->householdNames($orders);
 
@@ -67,7 +67,7 @@ final class GetCycleSummary
         $grouped = [];
 
         foreach ($orders as $order) {
-            foreach ($order->lines() as $line) {
+            foreach ($order->orderedLines() as $line) {
                 $grouped[$line->producerId][$line->productId][] = ['line' => $line, 'householdId' => $order->householdId];
             }
         }

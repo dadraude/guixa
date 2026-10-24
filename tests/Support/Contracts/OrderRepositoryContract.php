@@ -254,4 +254,46 @@ trait OrderRepositoryContract
         $this->assertNull($repository->ofHousehold(self::CYCLE, self::OTHER_HOUSEHOLD));
         $this->assertNotSame($other->id, $repository->lockFor(self::CYCLE, self::OTHER_HOUSEHOLD)->id);
     }
+
+    #[Test]
+    public function it_stores_an_allocation_set_by_hand_and_one_the_reception_computed(): void
+    {
+        $cycle = $this->openCycle();
+        $repository = $this->repository();
+        $now = $this->madrid('2026-10-22 10:00');
+        $order = $repository->lockFor(self::CYCLE, self::HOUSEHOLD);
+        $order->setLine($this->product(self::BREAD, 'Loaf', 350), Quantity::fromString('4'), $cycle, $repository->nextId(), self::ANNA, $now);
+        $order->setLine($this->product(self::APPLES, 'Apples', 280, variable: true), Quantity::fromString('2'), $cycle, $repository->nextId(), self::ANNA, $now);
+        $repository->add($order);
+
+        $stored = $repository->lockFor(self::CYCLE, self::HOUSEHOLD);
+        $stored->allocate(self::BREAD, Quantity::fromString('3'));
+        $stored->reallocate(self::APPLES, Quantity::fromString('1.500'));
+        $repository->add($stored);
+
+        $lines = [];
+        foreach ($repository->ofHousehold(self::CYCLE, self::HOUSEHOLD)?->lines() ?? [] as $line) {
+            $lines[$line->productId] = [$line->ordered->toString(), $line->allocated->toString(), $line->allocatedByHand];
+        }
+        $this->assertSame([
+            self::BREAD => ['4.000', '3.000', true],
+            self::APPLES => ['2.000', '1.500', false],
+        ], $lines);
+    }
+
+    #[Test]
+    public function it_stores_an_allocation_only_line_and_leaves_it_out_of_the_lines_a_household_ordered(): void
+    {
+        $this->openCycle();
+        $repository = $this->repository();
+        $order = $repository->lockFor(self::CYCLE, self::HOUSEHOLD);
+        $order->allocateNew($this->product(self::BREAD, 'Loaf', 350), Quantity::fromString('1'), $repository->nextId(), self::ANNA, $this->madrid('2026-10-22 10:00'));
+        $repository->add($order);
+
+        $line = $repository->ofHousehold(self::CYCLE, self::HOUSEHOLD)?->lines()[0];
+
+        $this->assertNotNull($line);
+        $this->assertSame(['0.000', '1.000', true, 350], [$line->ordered->toString(), $line->allocated->toString(), $line->allocatedByHand, $line->unitPrice->cents]);
+        $this->assertSame([], $repository->lineCountsOfHousehold(self::HOUSEHOLD));
+    }
 }

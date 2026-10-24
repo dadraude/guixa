@@ -52,7 +52,7 @@ final class GetHouseholdOrder
 
         $order = $this->orders->ofHousehold($cycleId, $householdId);
         $marked = $order === null ? [] : (new NotDeliveredMarks($this->catalog, $this->availability, $this->orders))->of($cycle, $order);
-        $lines = $order?->lines() ?? [];
+        $lines = $order?->orderedLines() ?? [];
 
         return new HouseholdOrderData(
             $cycle->id,

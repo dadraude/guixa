@@ -37,6 +37,10 @@ readonly pickupDate: string,
 readonly cancelled: boolean,
 readonly producers: App.Http.ProducerTotalsRow[],
 };
+export type HouseholdOptionRow = {
+readonly id: string,
+readonly name: string,
+};
 export type HouseholdQuantityRow = {
 readonly householdId: string,
 readonly householdName: string,
@@ -146,6 +150,41 @@ readonly name: string,
 readonly unit: string,
 readonly quantity: string,
 readonly households: App.Http.HouseholdQuantityRow[],
+};
+export type ReceptionAllocationRow = {
+readonly householdId: string,
+readonly householdName: string,
+readonly ordered: string,
+readonly allocated: string,
+readonly byHand: boolean,
+};
+export type ReceptionOptionRow = {
+readonly productId: string,
+readonly name: string,
+readonly unit: string,
+readonly variable: boolean,
+};
+export type ReceptionProductRow = {
+readonly productId: string,
+readonly name: string,
+readonly unit: string,
+readonly variable: boolean,
+readonly nobodyOrdered: boolean,
+readonly ordered: string,
+readonly received: string,
+readonly allocated: string,
+readonly difference: string,
+readonly balanced: boolean,
+readonly hasManualAllocations: boolean,
+readonly allocations: App.Http.ReceptionAllocationRow[],
+};
+export type ReceptionRow = {
+readonly cycleId: string,
+readonly producerId: string,
+readonly producerName: string,
+readonly pickupDate: string,
+readonly products: App.Http.ReceptionProductRow[],
+readonly unorderedOptions: App.Http.ReceptionOptionRow[],
 };
 export type ReturnItemRow = {
 readonly id: string,

@@ -90,3 +90,13 @@ it('returns the producer default cutoff rule and whether it is active (R5)', fun
 it('returns nothing for an unknown producer (R5)', function () {
     expect(($this->world->getProducerCutoffRule)('00000000-0000-7000-8000-000000000999'))->toBeNull();
 });
+
+// R14, R16 — once goods have arrived, being active no longer matters
+
+it('lists every product of a producer by name, deactivated ones included (R14)', function () {
+    ($this->world->createProduct)($this->bakerActor, $this->baker, 'Roll', 'roll', 100, false, null);
+    ($this->world->deactivateProduct)($this->bakerActor, ($this->world->createProduct)($this->bakerActor, $this->baker, 'Bread', 'loaf', 350, false, null));
+
+    expect(array_map(fn ($product) => $product->name, ($this->world->listProducerProductsForReception)($this->baker)))->toBe(['Bread', 'Roll'])
+        ->and(($this->world->listProducerProductsForReception)('00000000-0000-7000-8000-000000000999'))->toBe([]);
+});

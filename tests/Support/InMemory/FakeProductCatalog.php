@@ -61,4 +61,15 @@ final class FakeProductCatalog implements ProductCatalog
 
         return $products;
     }
+
+    public function allOf(string $producerId): array
+    {
+        $products = array_filter(
+            [...$this->orderable, ...$this->deactivated],
+            fn (OrderableProduct $product) => $product->producerId === $producerId,
+        );
+        usort($products, fn (OrderableProduct $a, OrderableProduct $b) => $a->name <=> $b->name);
+
+        return $products;
+    }
 }

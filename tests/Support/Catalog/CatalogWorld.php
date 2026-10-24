@@ -12,6 +12,7 @@ use Guixa\Catalog\Application\GetProducer;
 use Guixa\Catalog\Application\GetProducerCutoffRule;
 use Guixa\Catalog\Application\ListOrderableProducts;
 use Guixa\Catalog\Application\ListProducerProducts;
+use Guixa\Catalog\Application\ListProducerProductsForReception;
 use Guixa\Catalog\Application\ListProducers;
 use Guixa\Catalog\Application\ReactivateProducer;
 use Guixa\Catalog\Application\ReactivateProduct;
@@ -67,6 +68,8 @@ final class CatalogWorld
 
     public readonly ListOrderableProducts $listOrderableProducts;
 
+    public readonly ListProducerProductsForReception $listProducerProductsForReception;
+
     public readonly GetProducerCutoffRule $getProducerCutoffRule;
 
     public readonly Actor $manager;
@@ -95,6 +98,7 @@ final class CatalogWorld
         $this->listProducerProducts = new ListProducerProducts($this->products);
         $this->getOrderableProduct = new GetOrderableProduct($this->products, $this->producers);
         $this->listOrderableProducts = new ListOrderableProducts($this->products, $this->producers);
+        $this->listProducerProductsForReception = new ListProducerProductsForReception($this->products);
         $this->getProducerCutoffRule = new GetProducerCutoffRule($this->producers);
 
         $this->manager = new Actor('00000000-0000-7000-8000-00000000000a', [Role::Manager]);
