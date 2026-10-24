@@ -6,35 +6,35 @@
 **Scope**: The whole product (replacement for the cooperative's old ordering app)
 
 Sources: answers given by the project owner during discovery (2026-10-24), the cooperative's numbers, and
-`specs/001-weekly-orders`. No interviews or usage data yet; every claim is marked *stated*, *inferred* or
-*assumption*.
+`specs/001-weekly-orders`. No interviews or usage data yet; every claim is marked _stated_, _inferred_ or
+_assumption_.
 
 ## 1. Problem Brief
 
 - **Problem**: Ordering through the cooperative's old web app is a hassle.
 - **Affected users**: Households (primary), the volunteer managers, producers.
 - **Current alternative**: An old web application that "does not fit the new use".
-- **Why it fails** *(stated)*:
-  1. Not usable from a phone.
-  2. Built for one or two expert admins, while management is now shared by about 10 volunteers.
-  3. Producers cannot keep their own catalog and prices; a manager does it for them.
-  4. Inside the app, entering quantities is clunky and the order's state (saved? total? cutoff?) is unclear.
+- **Why it fails** _(stated)_:
+    1. Not usable from a phone.
+    2. Built for one or two expert admins, while management is now shared by about 10 volunteers.
+    3. Producers cannot keep their own catalog and prices; a manager does it for them.
+    4. Inside the app, entering quantities is clunky and the order's state (saved? total? cutoff?) is unclear.
 - **Scope**: New product replacing the old app. Feature 001 (Weekly orders) is its first slice.
 
-### The cooperative in numbers *(stated)*
+### The cooperative in numbers _(stated)_
 
-| | |
-| --- | --- |
-| Households | 20 in total, about 10 order each week |
-| Producers | 10 in total, about 7 take part each week |
-| Order size | About 20 lines, varies *(interpretation of "20, it depends")* |
-| Managers | 10 volunteers, about 2 h a week each (about 20 person-hours per cycle) |
-| Ordering time | Under 10 min per order in the old app |
-| Pickup | Every household that ordered comes; about 10 min each to collect, check and pay |
-| Stock | 6 stock products; several containers returned each week |
-| Growth | No waiting list; possibly in the future |
+|               |                                                                                 |
+| ------------- | ------------------------------------------------------------------------------- |
+| Households    | 20 in total, about 10 order each week                                           |
+| Producers     | 10 in total, about 7 take part each week                                        |
+| Order size    | About 20 lines, varies _(interpretation of "20, it depends")_                   |
+| Managers      | 10 volunteers, about 2 h a week each (about 20 person-hours per cycle)          |
+| Ordering time | Under 10 min per order in the old app                                           |
+| Pickup        | Every household that ordered comes; about 10 min each to collect, check and pay |
+| Stock         | 6 stock products; several containers returned each week                         |
+| Growth        | No waiting list; possibly in the future                                         |
 
-What the numbers say *(inferred)*: volume per producer is tiny (1–2 households a week), half the households
+What the numbers say _(inferred)_: volume per producer is tiny (1–2 households a week), half the households
 help run the coop, and pickup already works well.
 
 ## 2. Personas
@@ -45,24 +45,26 @@ help run the coop, and pickup already works well.
 chore next to meal planning.
 
 **Behavioral Pattern**: Sits down once a week at a computer when the coop announces the cycle is open, goes through
-the catalog and plans meals around it *(stated)*. Orders about 20 lines across several producers. Skips some weeks.
+the catalog and plans meals around it _(stated)_. Orders about 20 lines across several producers. Skips some weeks.
 
 **Primary Goal**: Get the week's food ordered right, from the producers they like, with little effort.
 **Emotional Goal**: In control — sure the order went in and what it costs.
 **Social Goal**: A reliable member who supports local producers.
 
 **Frustrations & Pain Points**:
-- Entering quantities is clunky; there is no way to start from last week *(stated / assumption)*.
-- Unclear whether the order is saved, what the total is and when it closes *(stated)*.
-- Can only order from a computer *(stated as a reason the app no longer fits; current habit is computer)*.
 
-**Current Tools & Workarounds**: The old web app on a computer; less digital members get help *(inferred)*.
+- Entering quantities is clunky; there is no way to start from last week _(stated / assumption)_.
+- Unclear whether the order is saved, what the total is and when it closes _(stated)_.
+- Can only order from a computer _(stated as a reason the app no longer fits; current habit is computer)_.
+
+**Current Tools & Workarounds**: The old web app on a computer; less digital members get help _(inferred)_.
 
 **Context of Use**:
-- **When**: Once a week, before the cutoff, triggered by a coop message *(stated)*.
+
+- **When**: Once a week, before the cutoff, triggered by a coop message _(stated)_.
 - **Where**: At home.
-- **Device/Platform**: Computer today; phone wanted *(assumption: mobile is hidden demand)*.
-- **Constraints**: Mixed digital skills *(stated)* — design for the least confident member.
+- **Device/Platform**: Computer today; phone wanted _(assumption: mobile is hidden demand)_.
+- **Constraints**: Mixed digital skills _(stated)_ — design for the least confident member.
 
 > "I don't mind planning the week's food. I mind fighting the website to do it."
 
@@ -80,11 +82,12 @@ not the whole system.
 **Social Goal**: Pulling their weight without being the person everyone asks.
 
 **Frustrations & Pain Points**:
-- The old app assumes one or two experts *(stated)*.
-- Infrequent tasks are easy to forget *(assumption)*.
+
+- The old app assumes one or two experts _(stated)_.
+- Infrequent tasks are easy to forget _(assumption)_.
 
 **Context of Use**: Short, infrequent sessions; sometimes at the premises during reception or pickup, possibly on a
-phone or tablet *(assumption)*.
+phone or tablet _(assumption)_.
 
 > "Just tell me what's left to do this week and let me do it."
 
@@ -92,16 +95,16 @@ phone or tablet *(assumption)*.
 
 **Role & Context**: A local farm or maker for whom the coop is one small channel among several.
 
-**Behavioral Pattern**: Takes part most weeks (7 of 10); gets a tiny order each time *(inferred from numbers)*.
+**Behavioral Pattern**: Takes part most weeks (7 of 10); gets a tiny order each time _(inferred from numbers)_.
 
 **Primary Goal**: Keep catalog and prices current and receive a clear order on time.
 **Emotional Goal**: The coop is low-effort, not one more admin chore.
 **Social Goal**: A dependable supplier.
 
-**Frustrations & Pain Points**: Cannot update their own catalog today *(stated)*; small volumes barely justify
-the effort *(inferred)*.
+**Frustrations & Pain Points**: Cannot update their own catalog today _(stated)_; small volumes barely justify
+the effort _(inferred)_.
 
-**Context of Use**: Quick updates from a phone between jobs *(assumption)*.
+**Context of Use**: Quick updates from a phone between jobs _(assumption)_.
 
 > "If updating my prices takes more than a couple of minutes, I won't do it."
 
@@ -121,13 +124,13 @@ what the producers offer, so I can plan our meals and support local producers wi
 
 ### Supporting jobs
 
-| Job | Persona | Statement | Imp. | Sat. | Opp. |
-| --- | --- | --- | --- | --- | --- |
-| A. Don't miss the week | Weekly Planner | When the cutoff is near and I haven't ordered, I want a timely reminder, so I don't lose a week by accident. | 7 | 2 | 12 |
-| B. Keep my catalog true | Small Producer | When my availability or prices change, I want to update my catalog myself in a couple of minutes, so households see what I really have. | 8 | 2 | 14 |
-| C. Run my part of the cycle | Manager on Duty | When it's my turn, I want to see what's left to do this cycle and do it without knowing the system by heart, so the cycle runs whoever is on duty. | 8 | 3 | 13 |
+| Job                         | Persona         | Statement                                                                                                                                          | Imp. | Sat. | Opp. |
+| --------------------------- | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | ---- | ---- | ---- |
+| A. Don't miss the week      | Weekly Planner  | When the cutoff is near and I haven't ordered, I want a timely reminder, so I don't lose a week by accident.                                       | 7    | 2    | 12   |
+| B. Keep my catalog true     | Small Producer  | When my availability or prices change, I want to update my catalog myself in a couple of minutes, so households see what I really have.            | 8    | 2    | 14   |
+| C. Run my part of the cycle | Manager on Duty | When it's my turn, I want to see what's left to do this cycle and do it without knowing the system by heart, so the cycle runs whoever is on duty. | 8    | 3    | 13   |
 
-### Why households skip a week *(stated)*
+### Why households skip a week _(stated)_
 
 Forgetting or missing the cutoff, not needing anything that week, and an unappealing catalog. **Not** the effort of
 ordering. The project owner chose to keep "ordering is a hassle" as the problem; the skip reasons are tracked as a
@@ -135,38 +138,38 @@ risk (section 7).
 
 ### Job map — primary job
 
-| Stage | Action | Pain today | Opportunity |
-| --- | --- | --- | --- |
-| Define | Learns the cycle is open | Depends on a manual coop message | The app announces opening and cutoffs |
-| Locate | Looks at this week's products | — | Show only this week's producers and available products |
-| Prepare | Recalls what they usually get | Starts from scratch *(assumption)* | Start from last week's order |
-| Execute | Enters about 20 lines | Clunky entry; computer only | Fast quantity entry, works on a phone |
-| Confirm | Checks total against wallet | Saved state, total and cutoff unclear | Always-visible saved state, total, balance, cutoffs |
-| Monitor | Edits until the cutoff | Per-producer cutoffs unclear | Each producer's cutoff shown on the order |
-| Conclude | Knows what to pick up and when | — | Confirmation with the pickup date |
+| Stage    | Action                         | Pain today                            | Opportunity                                            |
+| -------- | ------------------------------ | ------------------------------------- | ------------------------------------------------------ |
+| Define   | Learns the cycle is open       | Depends on a manual coop message      | The app announces opening and cutoffs                  |
+| Locate   | Looks at this week's products  | —                                     | Show only this week's producers and available products |
+| Prepare  | Recalls what they usually get  | Starts from scratch _(assumption)_    | Start from last week's order                           |
+| Execute  | Enters about 20 lines          | Clunky entry; computer only           | Fast quantity entry, works on a phone                  |
+| Confirm  | Checks total against wallet    | Saved state, total and cutoff unclear | Always-visible saved state, total, balance, cutoffs    |
+| Monitor  | Edits until the cutoff         | Per-producer cutoffs unclear          | Each producer's cutoff shown on the order              |
+| Conclude | Knows what to pick up and when | —                                     | Confirmation with the pickup date                      |
 
 ### Competing solutions
 
-| Solution | Strengths | Weaknesses | Switching cost |
-| --- | --- | --- | --- |
-| The old app | Known, has the history | Old, no phone, no producer self-serve, needs expert admins | Medium (data, relearning) |
-| Messaging a manager | No effort for the member | Shifts work onto volunteers; errors | Low |
-| Not ordering this week (supermarket, market) | No planning at all | Doesn't support the coop | None — the real competitor |
+| Solution                                     | Strengths                | Weaknesses                                                 | Switching cost             |
+| -------------------------------------------- | ------------------------ | ---------------------------------------------------------- | -------------------------- |
+| The old app                                  | Known, has the history   | Old, no phone, no producer self-serve, needs expert admins | Medium (data, relearning)  |
+| Messaging a manager                          | No effort for the member | Shifts work onto volunteers; errors                        | Low                        |
+| Not ordering this week (supermarket, market) | No planning at all       | Doesn't support the coop                                   | None — the real competitor |
 
 ## 4. User Journey Maps
 
 ### Current state — Weekly Planner, weekly order
 
-| Phase | Action | Touchpoint | Feeling | Pain points | Duration |
-| --- | --- | --- | --- | --- | --- |
-| Awareness | Sees the cycle is open | Coop message (WhatsApp / email) | Neutral | Depends on a volunteer posting it; easy to miss | — |
-| Getting in | Waits for computer time, opens the old app | Old web app, desktop | Neutral | No phone use | Hours to days of delay |
-| Choose | Browses products | Old app list | Neutral | Not the main pain | 2–3 min |
-| Enter | Enters about 20 quantities | Old app form | Frustrated | Clunky; no repeat of last week | 4–5 min |
-| Confirm | Checks it saved, the total, the cutoff | Old app | Anxious | All three unclear | 1–2 min |
-| Edge: missed | Remembers after the cutoff | Coop chat, or nothing | Frustrated | No reminder; the week is lost | — |
-| Pickup | Collects, checks, pays | Premises | Satisfied | Works well | 10 min |
-| Return | Waits for next week's message | Coop message | Neutral | The habit relies on someone else's post | — |
+| Phase        | Action                                     | Touchpoint                      | Feeling    | Pain points                                     | Duration               |
+| ------------ | ------------------------------------------ | ------------------------------- | ---------- | ----------------------------------------------- | ---------------------- |
+| Awareness    | Sees the cycle is open                     | Coop message (WhatsApp / email) | Neutral    | Depends on a volunteer posting it; easy to miss | —                      |
+| Getting in   | Waits for computer time, opens the old app | Old web app, desktop            | Neutral    | No phone use                                    | Hours to days of delay |
+| Choose       | Browses products                           | Old app list                    | Neutral    | Not the main pain                               | 2–3 min                |
+| Enter        | Enters about 20 quantities                 | Old app form                    | Frustrated | Clunky; no repeat of last week                  | 4–5 min                |
+| Confirm      | Checks it saved, the total, the cutoff     | Old app                         | Anxious    | All three unclear                               | 1–2 min                |
+| Edge: missed | Remembers after the cutoff                 | Coop chat, or nothing           | Frustrated | No reminder; the week is lost                   | —                      |
+| Pickup       | Collects, checks, pays                     | Premises                        | Satisfied  | Works well                                      | 10 min                 |
+| Return       | Waits for next week's message              | Coop message                    | Neutral    | The habit relies on someone else's post         | —                      |
 
 ### Moments of truth
 
@@ -176,26 +179,26 @@ risk (section 7).
 
 ### Desired state
 
-| Phase | Action | Feeling | Design opportunity | Metric |
-| --- | --- | --- | --- | --- |
-| Awareness | Told by the app that the cycle is open | Neutral | Cycle-open message (roadmap: Notifications) | Households opening the cycle |
-| Getting in | Opens the app wherever they are | Neutral | Same experience on phone and computer; stays signed in | Share of orders placed from a phone |
-| Choose | Sees only this week's producers and products | Confident | Per-cycle catalog kept by producers (001: R1–R3c) | — |
-| Enter | Starts from last week's order and adjusts | Relieved | "Repeat last order"; fast quantity steppers | Median active ordering time |
-| Confirm | Always sees saved, total, balance, cutoffs | In control | Saved indicator; running total next to the wallet balance; cutoff per producer | Manager edits to orders; "did it go in?" questions |
-| Edge: nearly missed | Gets a reminder before the cutoff | Relieved | Reminder to households without an order (job A) | Orders placed after a reminder |
-| Pickup | Same as today | Satisfied | Don't add steps | Pickup time ≤ 10 min |
+| Phase               | Action                                       | Feeling    | Design opportunity                                                             | Metric                                             |
+| ------------------- | -------------------------------------------- | ---------- | ------------------------------------------------------------------------------ | -------------------------------------------------- |
+| Awareness           | Told by the app that the cycle is open       | Neutral    | Cycle-open message (roadmap: Notifications)                                    | Households opening the cycle                       |
+| Getting in          | Opens the app wherever they are              | Neutral    | Same experience on phone and computer; stays signed in                         | Share of orders placed from a phone                |
+| Choose              | Sees only this week's producers and products | Confident  | Per-cycle catalog kept by producers (001: R1–R3c)                              | —                                                  |
+| Enter               | Starts from last week's order and adjusts    | Relieved   | "Repeat last order"; fast quantity steppers                                    | Median active ordering time                        |
+| Confirm             | Always sees saved, total, balance, cutoffs   | In control | Saved indicator; running total next to the wallet balance; cutoff per producer | Manager edits to orders; "did it go in?" questions |
+| Edge: nearly missed | Gets a reminder before the cutoff            | Relieved   | Reminder to households without an order (job A)                                | Orders placed after a reminder                     |
+| Pickup              | Same as today                                | Satisfied  | Don't add steps                                                                | Pickup time ≤ 10 min                               |
 
 ### Gap analysis
 
-| Phase | Current | Desired | Gap | Priority | In 001? |
-| --- | --- | --- | --- | --- | --- |
-| Enter | Clunky, from scratch | Repeat and adjust | Quick entry + repeat last order | High | No |
-| Confirm | Unclear state, total, cutoff | Always visible | Saved indicator, total vs balance, cutoffs | High | Partly (line-by-line save, running total) |
-| Getting in | Desktop only | Phone and computer | Phone-ready UI for low-skill members | High | Not a requirement |
-| Awareness / nearly missed | Manual coop message | App-sent opening and reminder | Notifications | Medium | No (roadmap) |
-| Choose | Catalog kept by managers | Producers keep it current | Producer self-serve | Medium | Yes (R1–R3c) |
-| Pickup | Works | Same | Don't regress | Guard | — |
+| Phase                     | Current                      | Desired                       | Gap                                        | Priority | In 001?                                   |
+| ------------------------- | ---------------------------- | ----------------------------- | ------------------------------------------ | -------- | ----------------------------------------- |
+| Enter                     | Clunky, from scratch         | Repeat and adjust             | Quick entry + repeat last order            | High     | No                                        |
+| Confirm                   | Unclear state, total, cutoff | Always visible                | Saved indicator, total vs balance, cutoffs | High     | Partly (line-by-line save, running total) |
+| Getting in                | Desktop only                 | Phone and computer            | Phone-ready UI for low-skill members       | High     | Not a requirement                         |
+| Awareness / nearly missed | Manual coop message          | App-sent opening and reminder | Notifications                              | Medium   | No (roadmap)                              |
+| Choose                    | Catalog kept by managers     | Producers keep it current     | Producer self-serve                        | Medium   | Yes (R1–R3c)                              |
+| Pickup                    | Works                        | Same                          | Don't regress                              | Guard    | —                                         |
 
 ## 5. Success Metrics & Telemetry
 
@@ -213,25 +216,26 @@ Everything is measured from Guixa's own database — no third-party analytics.
 
 ### Health metrics (guard rails)
 
-| Metric | Guards against | Target | Alert |
-| --- | --- | --- | --- |
-| Pickup time per household | Breaking what works | ≤ 10 min | > 12 min two cycles in a row |
-| Households ordering per cycle | Guixa pushing people away | ≥ 10 | < 8 two cycles in a row |
-| Manager edits to household orders | Hassle moved onto volunteers | ≤ 1 per cycle | ≥ 3 in a cycle |
-| "Did my order go in?" questions | Status pain returning | 0 | Any recurring question |
+| Metric                            | Guards against               | Target        | Alert                        |
+| --------------------------------- | ---------------------------- | ------------- | ---------------------------- |
+| Pickup time per household         | Breaking what works          | ≤ 10 min      | > 12 min two cycles in a row |
+| Households ordering per cycle     | Guixa pushing people away    | ≥ 10          | < 8 two cycles in a row      |
+| Manager edits to household orders | Hassle moved onto volunteers | ≤ 1 per cycle | ≥ 3 in a cycle               |
+| "Did my order go in?" questions   | Status pain returning        | 0             | Any recurring question       |
 
 ### Input metrics (leading indicators)
 
-| Metric | Predicts | Measurement |
-| --- | --- | --- |
-| Orders started from "repeat last order" | Faster entry | Flag on the order |
-| Orders placed or edited from a phone | Phone-ready is used | Device class (phone / desktop) on the edit, nothing finer |
-| Orders placed after a reminder | Fewer missed weeks | Order time after the reminder (once notifications exist) |
-| Products updated by their producer | Fresher catalog | Who last changed the product |
+| Metric                                  | Predicts            | Measurement                                               |
+| --------------------------------------- | ------------------- | --------------------------------------------------------- |
+| Orders started from "repeat last order" | Faster entry        | Flag on the order                                         |
+| Orders placed or edited from a phone    | Phone-ready is used | Device class (phone / desktop) on the edit, nothing finer |
+| Orders placed after a reminder          | Fewer missed weeks  | Order time after the reminder (once notifications exist)  |
+| Products updated by their producer      | Fresher catalog     | Who last changed the product                              |
 
 ### Telemetry events (stored in PostgreSQL)
 
 **`order_edited`**
+
 - **Trigger**: A household's order is changed.
 - **Properties**: `order_id`, `cycle_id`, `actor_role` (member / manager), `device_class` (phone / desktop),
   `started_from_repeat` (bool), `at`.
@@ -241,6 +245,7 @@ Everything is measured from Guixa's own database — no third-party analytics.
   then aggregated.
 
 **`reminder_sent`** (with Notifications)
+
 - **Trigger**: The system sends a cycle-open message or a pre-cutoff reminder.
 - **Properties**: `cycle_id`, `household_id`, `kind`, `at`.
 - **Purpose**: Do reminders lead to orders?
@@ -250,55 +255,56 @@ Everything is measured from Guixa's own database — no third-party analytics.
 
 ### Qualitative feedback
 
-| Signal | Method | Frequency | Owner |
-| --- | --- | --- | --- |
-| Ordering ease | One question after ordering ("How easy was this?" 1–5), at most once a month | Monthly | Managers' meeting |
-| Usability | Watch 2–3 members order on a phone, including a less digital one | Before launch, then quarterly | Whoever builds Guixa |
-| Issues | Coop assembly; a "something's wrong" link | Ongoing | Manager on duty |
+| Signal        | Method                                                                       | Frequency                     | Owner                |
+| ------------- | ---------------------------------------------------------------------------- | ----------------------------- | -------------------- |
+| Ordering ease | One question after ordering ("How easy was this?" 1–5), at most once a month | Monthly                       | Managers' meeting    |
+| Usability     | Watch 2–3 members order on a phone, including a less digital one             | Before launch, then quarterly | Whoever builds Guixa |
+| Issues        | Coop assembly; a "something's wrong" link                                    | Ongoing                       | Manager on duty      |
 
 ### Decision framework
 
-| Metric | Improving | Flat | Declining |
-| --- | --- | --- | --- |
-| Hassle-free orders | Move effort to Medium gaps (notifications) | Watch members order; find the slow step | Check entry and status UX first, then devices |
-| Households per cycle | Plan for growth | Expected (driven by need and catalog); look at reminders and producers | Ask the households who stopped |
-| Pickup time | — | Fine | Undo the change that slowed it |
-| Manager edits | — | Fine | Find the step that makes members ask for help |
+| Metric               | Improving                                  | Flat                                                                   | Declining                                     |
+| -------------------- | ------------------------------------------ | ---------------------------------------------------------------------- | --------------------------------------------- |
+| Hassle-free orders   | Move effort to Medium gaps (notifications) | Watch members order; find the slow step                                | Check entry and status UX first, then devices |
+| Households per cycle | Plan for growth                            | Expected (driven by need and catalog); look at reminders and producers | Ask the households who stopped                |
+| Pickup time          | —                                          | Fine                                                                   | Undo the change that slowed it                |
+| Manager edits        | —                                          | Fine                                                                   | Find the step that makes members ask for help |
 
 ## 6. Design Principles
 
 1. **Last week is the starting point**: An order should start from what the household usually gets, not from an
    empty list.
-   - *Because*: About 20 lines each week; quantity entry is the peak pain.
-   - *This means*: Repeat last order, fast steppers, sensible defaults.
-   - *This means NOT*: Recommendations, carts across weeks, or a shop-style product browsing experience.
+    - _Because_: About 20 lines each week; quantity entry is the peak pain.
+    - _This means_: Repeat last order, fast steppers, sensible defaults.
+    - _This means NOT_: Recommendations, carts across weeks, or a shop-style product browsing experience.
 
 2. **Never leave them guessing**: The order's state is always visible — saved, total, wallet balance, cutoffs.
-   - *Because*: "Unclear status" is a stated pain; the emotional goal is being in control.
-   - *This means*: A visible saved state on every change; total and balance side by side; each producer's cutoff
-     shown where you order from it.
-   - *This means NOT*: A "Submit order" step that can be forgotten, or confirmation that only arrives by email.
+    - _Because_: "Unclear status" is a stated pain; the emotional goal is being in control.
+    - _This means_: A visible saved state on every change; total and balance side by side; each producer's cutoff
+      shown where you order from it.
+    - _This means NOT_: A "Submit order" step that can be forgotten, or confirmation that only arrives by email.
 
 3. **Designed for the least confident member, on the smallest screen**: If it works for a less digital member on a
    phone, it works for everyone.
-   - *Because*: Mixed skills; the phone is a stated reason the old app no longer fits.
-   - *This means*: Large touch targets, plain language, few screens, Catalan-first copy, tested on a phone.
-   - *This means NOT*: Dense tables, hover-only actions, or desktop-first layouts that are "also responsive".
+    - _Because_: Mixed skills; the phone is a stated reason the old app no longer fits.
+    - _This means_: Large touch targets, plain language, few screens, Catalan-first copy, tested on a phone.
+    - _This means NOT_: Dense tables, hover-only actions, or desktop-first layouts that are "also responsive".
 
 4. **Any volunteer can do it**: Every manager task can be done by someone who does it once a month.
-   - *Because*: 10 volunteers share the work; the old app needed experts.
-   - *This means*: Each cycle shows what's left to do and by whom; actions explain their consequence before they're
-     irreversible.
-   - *This means NOT*: Hidden admin screens, or knowledge that lives in one person's head.
+    - _Because_: 10 volunteers share the work; the old app needed experts.
+    - _This means_: Each cycle shows what's left to do and by whom; actions explain their consequence before they're
+      irreversible.
+    - _This means NOT_: Hidden admin screens, or knowledge that lives in one person's head.
 
 5. **Small is a feature**: Built for 20 households and 10 producers, not for scale.
-   - *Because*: No waiting list; 20 person-hours of volunteer time is the scarce resource.
-   - *This means*: Simple choices, our own database for metrics, no extra infrastructure.
-   - *This means NOT*: Multi-coop setups, analytics platforms, or optimizing for thousands of users.
+    - _Because_: No waiting list; 20 person-hours of volunteer time is the scarce resource.
+    - _This means_: Simple choices, our own database for metrics, no extra infrastructure.
+    - _This means NOT_: Multi-coop setups, analytics platforms, or optimizing for thousands of users.
 
 ## 7. Assumptions & Risks
 
 ### Validated (stated by the project owner)
+
 - Members plan their order once a week on a computer, triggered by a coop message.
 - Digital skills are mixed.
 - The old app's pain inside ordering is quantity entry and unclear status; orders take under 10 min.
@@ -306,36 +312,42 @@ Everything is measured from Guixa's own database — no third-party analytics.
 - Pickup works well.
 
 ### Unvalidated
-| Assumption | How to validate | Risk if wrong |
-| --- | --- | --- |
-| Members would order from a phone if it worked | Ask at the assembly; measure device class in the first cycles | Over-investing in mobile; desktop still matters |
-| Most of an order repeats from week to week | Compare consecutive orders in the old app's data, if exportable | Repeat-last-order saves little |
-| Managers often forget how to do infrequent tasks | Watch a manager do reception for the first time | Guidance UI that nobody needs |
-| Producers will update their own catalog from a phone | Ask 2–3 producers | Catalog stays stale; managers keep doing it |
-| "20" means about 20 lines per order | Confirm with the owner | Order entry is sized wrong |
+
+| Assumption                                           | How to validate                                                 | Risk if wrong                                   |
+| ---------------------------------------------------- | --------------------------------------------------------------- | ----------------------------------------------- |
+| Members would order from a phone if it worked        | Ask at the assembly; measure device class in the first cycles   | Over-investing in mobile; desktop still matters |
+| Most of an order repeats from week to week           | Compare consecutive orders in the old app's data, if exportable | Repeat-last-order saves little                  |
+| Managers often forget how to do infrequent tasks     | Watch a manager do reception for the first time                 | Guidance UI that nobody needs                   |
+| Producers will update their own catalog from a phone | Ask 2–3 producers                                               | Catalog stays stale; managers keep doing it     |
+| "20" means about 20 lines per order                  | Confirm with the owner                                          | Order entry is sized wrong                      |
 
 ### Known risks
-| Risk | Likelihood | Impact | Mitigation |
-| --- | --- | --- | --- |
-| A smoother order form doesn't raise orders per cycle, because households skip for reasons other than effort | High | Medium | Track households per cycle separately from the North Star; prioritize Notifications next |
-| Switching from the old app loses history or confuses members | Medium | High | Migrate only what's needed (households, balances, products); run one cycle in parallel or with help at pickup |
-| Small numbers make metrics noisy | High | Low | Read 4-cycle trends; rely on observation as much as numbers |
-| Pickup slows down because of new steps | Low | High | Guard rail ≤ 10 min; test a full pickup before launch |
+
+| Risk                                                                                                        | Likelihood | Impact | Mitigation                                                                                                    |
+| ----------------------------------------------------------------------------------------------------------- | ---------- | ------ | ------------------------------------------------------------------------------------------------------------- |
+| A smoother order form doesn't raise orders per cycle, because households skip for reasons other than effort | High       | Medium | Track households per cycle separately from the North Star; prioritize Notifications next                      |
+| Switching from the old app loses history or confuses members                                                | Medium     | High   | Migrate only what's needed (households, balances, products); run one cycle in parallel or with help at pickup |
+| Small numbers make metrics noisy                                                                            | High       | Low    | Read 4-cycle trends; rely on observation as much as numbers                                                   |
+| Pickup slows down because of new steps                                                                      | Low        | High   | Guard rail ≤ 10 min; test a full pickup before launch                                                         |
 
 ## 8. Constraints & Boundaries
 
 ### Technical
+
 - Laravel 13, Inertia 3 + Vue 3, PostgreSQL (see `specs/constitution.md`). One installation per cooperative.
 - Web app, not native: phone support means a phone-first responsive UI.
 
 ### User
+
 - Mixed digital skills; Catalan-speaking members (glossary keeps Catalan terms).
 - Ordering at home; manager tasks sometimes at the premises.
 
 ### Business
+
 - Run and built on volunteer time; no budget for tooling or analytics.
 
 ### Scope
+
 - **In scope**: Ordering, reception and allocation, pickup, stock, wallet, producer self-serve catalog (001), plus the
   ordering-experience gaps above.
 - **Out of scope**: Multi-coop, payments online, native apps, analytics platforms.
