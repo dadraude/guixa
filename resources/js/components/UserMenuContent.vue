@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { trans } from 'laravel-vue-i18n';
 import { Link, router } from '@inertiajs/vue3';
 import { LogOut, Settings } from '@lucide/vue';
 import {
@@ -32,23 +33,27 @@ defineProps<Props>();
     <DropdownMenuSeparator />
     <DropdownMenuGroup>
         <DropdownMenuItem :as-child="true">
-            <Link class="block w-full cursor-pointer" :href="edit()" prefetch>
-                <Settings class="mr-2 h-4 w-4" />
-                Settings
+            <Link
+                class="flex min-h-11 w-full cursor-pointer items-center"
+                :href="edit()"
+                prefetch
+            >
+                <Settings class="mr-2 h-4 w-4" aria-hidden="true" />
+                {{ trans('Settings') }}
             </Link>
         </DropdownMenuItem>
     </DropdownMenuGroup>
     <DropdownMenuSeparator />
     <DropdownMenuItem :as-child="true">
         <Link
-            class="block w-full cursor-pointer"
+            class="flex min-h-11 w-full cursor-pointer items-center"
             :href="logout()"
             @click="handleLogout"
             as="button"
             data-test="logout-button"
         >
-            <LogOut class="mr-2 h-4 w-4" />
-            Log out
+            <LogOut class="mr-2 h-4 w-4" aria-hidden="true" />
+            {{ trans('Log out') }}
         </Link>
     </DropdownMenuItem>
 </template>

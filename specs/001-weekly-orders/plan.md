@@ -507,9 +507,63 @@ Inertia prop DTOs live in `App\Http` and are named `<Noun>Row` (e.g. `StockProdu
 
 Client-side logic (Vitest): order running total, pickup resulting balance, both display-only.
 
+### Member ordering presentation (T37)
+
+Behavior-preserving redesign of `Orders/Index` and `Orders/Edit`, following the constitution's UI
+rules and the [UX discovery](../../docs/ux-discovery/2026-10-24-guixa-discovery.md). No new requirements,
+routes, permissions, DTO fields or ordering rules. Implement after the shared translation foundation
+in T38 is available; do not hard-code Catalan or introduce a page-local translation mechanism.
+
+- **Cycle list:** a clear page heading and grouped, full-width cycle links. Keep the existing open,
+  closed-to-orders and cancelled grouping, pickup date, line count, destinations and empty state.
+- **Order editor:** producer sections with a visible open/closed label; product rows stack on phones
+  and align into columns when space permits. Each quantity field has a visible, associated label;
+  price/unit, line amount and the running total remain easy to scan. Keep the total in normal flow
+  so it cannot cover fields or keyboard focus. Do not add cutoff information absent from current props.
+- **Interaction:** preserve explicit per-line Save and Enter submission, draft-driven totals,
+  partial reloads, retained scroll position, disabled rules, existing errors and marked-line removal.
+  Cancelled orders keep their notice and hide producers/lines. Do not add autosave, checkout, a new
+  saved-state model, repeat-order, wallet information, notifications or telemetry.
+- **Presentation:** reuse the existing semantic theme tokens, font, icons and UI primitives. Use
+  consistent spacing, readable amounts, visible keyboard focus and text as well as colour for state.
+  Support light/dark/system appearance, 375 px without horizontal overflow and targets of at least
+  44 × 44 px. All visible and accessible copy uses T38's shared `lang/` translations and Catalan formatting;
+  formatting must not change quantity request values or monetary calculations.
+- **Shell boundary:** only ordering-relevant navigation/layout adjustments; preserve role visibility
+  and destinations. No global theme replacement, manager/producer screen redesign or unrelated
+  starter-kit cleanup in this slice.
+
+Component boundaries: the route pages retain Inertia orchestration and current draft/save state;
+presentational cycle links receive a cycle, producer sections receive their group, and product rows
+receive their row, draft, disabled/saving state and display amounts. Product rows emit draft updates,
+save and remove events; they do not call the router or duplicate `orderRows`/`orderTotal` logic.
+Extract only those presentation blocks needed by the redesign, under `components/orders/`.
+
+Verification: preserve the existing helper tests (`orderRows.spec.ts`, `orderTotal.spec.ts`) and the
+HTTP page contracts in `OrdersPagesTest.php`. Check the rendered pages at 375 px and desktop, in light
+and dark modes, with keyboard navigation and enlarged text: empty/open/closed/cancelled cycles,
+editable/closed producer rows, marked lines, errors and totals. These existing tests do not prove
+rendered layout; record browser evidence separately. Use focused local checks; full validation stays
+with CI under the project execution profile. No browser evidence or passing checks are claimed yet.
+
 ## Translations
 
 Constitution, UI (*Translatable*). `ca` is the default and fallback locale and the only one shipped.
+
+**Delivery split (2026-10-24):** T38 provides the shared Vue/Vite translation foundation, Laravel locale
+configuration, `lang/ca.json`, reusable `ca-ES` presentation formatters, and focused translation checks.
+T37 consumes that foundation for member ordering and the shell visible on those screens, including
+ordering error translations. T36 retains the remaining app-wide pages, emails, framework messages,
+domain errors and exhaustive translation coverage; it is not completed by T38 or T37. Existing local
+`.env` overrides are not changed; installations must set `APP_LOCALE=ca` and `APP_FALLBACK_LOCALE=ca`
+(or omit the overrides) to use the new defaults. The frontend uses the shared server locale, not a
+separate page-local translator. No language selector or second shipped locale is added.
+
+The foundation is checked through Laravel's public translator and the installed Vue plugin, including
+placeholder substitution and PHP/JSON parity. Ordering regression checks use the existing public
+HTTP and display-helper seams; rendered UI checks cover the presentation contract without adding
+business rules. The library compatibility build is a focused prerequisite check, not a replacement
+for CI's full validation.
 
 - `laravel-vue-i18n` (its Vite plugin and Vue plugin) loads `lang/` into Vue, so PHP `__()` and Vue `trans()` / `$t`
   read the same files. Its fit with Inertia 3 and Vite+ is checked first; if it does not fit, `vue-i18n` with

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { trans } from 'laravel-vue-i18n';
 import { Link } from '@inertiajs/vue3';
 import {
     SidebarGroup,
@@ -18,16 +19,17 @@ const { isCurrentUrl } = useCurrentUrl();
 
 <template>
     <SidebarGroup v-if="areas.length > 1" class="px-2 py-0">
-        <SidebarGroupLabel>Areas</SidebarGroupLabel>
+        <SidebarGroupLabel>{{ trans('Areas') }}</SidebarGroupLabel>
         <SidebarMenu>
             <SidebarMenuItem v-for="area in areas" :key="area.role">
                 <SidebarMenuButton
                     as-child
+                    class="min-h-11 group-data-[collapsible=icon]:min-h-11 group-data-[collapsible=icon]:min-w-11"
                     :is-active="isCurrentUrl(area.href)"
-                    :tooltip="area.label"
+                    :tooltip="trans(area.label)"
                 >
                     <Link :href="area.href">
-                        <span>{{ area.label }}</span>
+                        <span>{{ trans(area.label) }}</span>
                     </Link>
                 </SidebarMenuButton>
             </SidebarMenuItem>

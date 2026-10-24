@@ -2,7 +2,9 @@
 import { Head, Link } from '@inertiajs/vue3';
 import { computed } from 'vue';
 import OrderController from '@/actions/App/Http/Controllers/OrderController';
-import Heading from '@/components/Heading.vue';
+import { trans } from 'laravel-vue-i18n';
+import CycleCard from '@/components/orders/CycleCard.vue';
+import OrderPageHeader from '@/components/orders/OrderPageHeader.vue';
 
 const props = defineProps<{
     cycles: App.Http.MemberCycleRow[];
@@ -17,56 +19,49 @@ const cancelledCycles = computed(() =>
     props.cycles.filter((cycle) => cycle.cancelled),
 );
 
-const linesLabel = (count: number) =>
-    count === 0 ? 'No lines yet' : `${count} ${count === 1 ? 'line' : 'lines'}`;
+const sections = computed(() =>
+    [
+        { title: trans('Open for orders'), cycles: openCycles.value },
+        { title: trans('Closed to orders'), cycles: closedCycles.value },
+        { title: trans('Cancelled'), cycles: cancelledCycles.value },
+    ].filter((section) => section.cycles.length > 0),
+);
 </script>
 
 <template>
-    <Head title="Orders" />
-
-    <div class="flex flex-col gap-8 p-4">
-        <Heading
-            title="Orders"
-            description="The cycles your household can order in"
+    <Head :title="trans('Orders')" />
+    <div class="mx-auto flex w-full max-w-4xl flex-col gap-8 p-4 sm:p-8">
+        <OrderPageHeader
+            :title="trans('Orders')"
+            :description="trans('The cycles your household can order in')"
         />
-
         <p
             v-if="cycles.length === 0"
-            class="text-sm text-muted-foreground"
+            class="rounded-2xl border border-dashed bg-muted/40 p-8 text-center text-muted-foreground"
             data-test="no-cycles"
         >
-            There are no cycles yet.
+            {{ trans('There are no cycles yet.') }}
         </p>
-
         <section
-            v-for="section in [
-                { title: 'Open for orders', cycles: openCycles },
-                { title: 'Closed to orders', cycles: closedCycles },
-                { title: 'Cancelled', cycles: cancelledCycles },
-            ]"
-            v-show="section.cycles.length > 0"
+            v-for="section in sections"
             :key="section.title"
-            class="flex flex-col gap-3"
+            class="space-y-3"
         >
-            <h2 class="text-lg font-medium">{{ section.title }}</h2>
-            <ul class="flex flex-col divide-y">
+            <h2 class="text-lg font-semibold">{{ section.title }}</h2>
+            <ul class="grid gap-3">
                 <li
                     v-for="cycle in section.cycles"
                     :key="cycle.cycleId"
-                    class="flex items-center justify-between py-2"
                     :data-test="`cycle-${cycle.cycleId}`"
                 >
                     <Link
                         :href="
                             OrderController.edit.url({ cycle: cycle.cycleId })
                         "
-                        class="font-medium underline"
+                        class="block rounded-2xl border bg-card text-card-foreground shadow-xs transition-colors hover:bg-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring motion-reduce:transition-none"
                     >
-                        Pickup on {{ cycle.pickupDate }}
+                        <CycleCard :cycle="cycle" />
                     </Link>
-                    <span class="text-sm text-muted-foreground">
-                        {{ linesLabel(cycle.lineCount) }}
-                    </span>
                 </li>
             </ul>
         </section>

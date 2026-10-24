@@ -77,13 +77,15 @@ it('maps NotAllowed to 403', function () {
     $this->get('/probe/not-allowed')->assertForbidden();
 });
 
-it('maps a domain error to a 422 with its translated message', function () {
-    app('translator')->addLines(['errors.ProbeFailed' => 'The probe failed.'], 'en');
+it('maps a domain error to a 422 with its translated message', function (string $locale) {
+    app()->setLocale($locale);
+    app('translator')->addLines(['errors.ProbeFailed' => 'The probe failed.'], $locale);
 
     $this->postJson('/probe/domain-error')
         ->assertUnprocessable()
+        ->assertJsonPath('message', 'The probe failed.')
         ->assertJsonPath('errors.domain.0', 'The probe failed.');
-});
+})->with(['ca', 'en']);
 
 it('falls back to the error message when there is no translation', function () {
     $this->postJson('/probe/domain-error')

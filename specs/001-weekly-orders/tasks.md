@@ -22,7 +22,8 @@ How to work a task:
 | T03 | `Shared`: `Money` (half-up `multiply`), `Quantity` (thousandths, `ceilToWhole`), `Clock` with the cooperative's timezone (`SystemClock` from `COOP_TIMEZONE`, `FrozenClock`), `LocalTime`, `TransactionRunner` (with `afterCommit`) | R22 rounding, Time | T01 |
 | T04 | `Actor` with several roles from the authenticated account, `role:<role>` middleware, domain error → 422 and `NotAllowed` → 403 handler, shared Inertia layout with a switch between role areas | Roles, R36a | T01 |
 | T05 | Test support: in-memory repository base and contract-test pattern shared with Eloquent repositories | Plan · Testing | T03 |
-| T36 | Translations: check `laravel-vue-i18n` fits Inertia 3 and Vite+ (else `vue-i18n`, D18), `ca` locale and the `laravel-lang` Catalan files, `lang/en/errors.php` → `lang/ca/errors.php`, every existing page, layout, component and email text moved to translation keys with Catalan translations, `ca-ES` formatting, translation test | Constitution (UI, *Translatable*), Plan · Translations, D18 | T04 |
+| T36 | Remaining app-wide translation migration: pages, layouts and components not covered by T37, email subjects/bodies, Laravel framework Catalan messages, remaining domain errors, `ca-ES` formatting and exhaustive translation coverage | Constitution (UI, *Translatable*), Plan · Translations, D18 | T38 |
+| T38 | Shared translation foundation: validate `laravel-vue-i18n` with Inertia 3/Vite+ (D18 fallback if incompatible), shared `lang/ca.json` Vue/Vite loading, Laravel locale defaults and shared locale, `ca-ES` formatters, focused PHP/Vue translation tests | Constitution (UI, *Translatable*), Plan · Translations, D18 | T04 |
 
 **Done when** T01: app boots on Postgres, the starter tests pass, lint and Larastan are clean, and the
 CI workflow is green on the T01 pull request. T02: a deliberate violation in a
@@ -68,6 +69,27 @@ including the weeks when daylight saving time changes (S38).
 | T19 | `GetProducerCycleSummary`, `Producer/CycleSummary` page with availability per product | R12, S7, S8 | T18 |
 | T20 | `GetHouseholds` (Membership) behind Ordering's `Households` port, `GetCycleSummary` (totals per producer and product, per household), `Manage/Cycles/Show` page | R13, S52 | T13 |
 | T35 | `GetCycleSummary` carries `cancelled` and returns no totals for a cancelled cycle; `Manage/Cycles/Show` shows a "Cancelled" notice instead of totals | R13 (cancelled), S62 | T17, T20 |
+| T37 | Behavior-preserving member ordering redesign: `Orders/Index`, `Orders/Edit`, presentational ordering components and necessary ordering navigation/layout; Catalan translations, 375 px layout, labelled 44 px controls; preserve per-line save, totals and existing states | Constitution (UI), R4a, R4b (cancelled), R7–R11, R3b; existing T13–T15/T17 scenarios | T14, T15, T17, T38 |
+
+**T37 readiness:** implementation follows T38. The user approved splitting the shared foundation
+from T36 on 2026-10-24; the remaining app-wide migration stays in T36.
+
+**Done when** T38: Vue and PHP resolve the same Catalan source keys and placeholders; the
+Inertia/Vite+ compatibility build and focused translation tests pass. No new language-selection UI.
+
+**Done when** T37: the plan's Member ordering presentation checks pass, including actual 375 px and
+desktop inspection, light/dark appearance and keyboard use. Existing save/remove requests, drafts,
+totals, cancellation and disabled behavior remain unchanged; touched UI copy comes from `lang/`.
+Record focused regression results and browser evidence before completion; no new feature scenarios.
+
+**T38/T37 local implementation evidence (2026-10-24):** 17 focused frontend tests, 40 isolated
+PostgreSQL HTTP/role-access/translation tests (275 assertions), types/lint, affected PHPStan and
+client/SSR builds pass. Independent verification found no change-caused blocker. Synthetic browser
+fixtures passed 375 px light / 1280 px dark, keyboard/save/remove, empty/error and 200% text checks.
+Local commits: T38 `0c56c73` (native-reviewed), cycle list/navigation `3f3b8e8` (user-authorized review
+exception), editor `9dec36d` (native-reviewed). Both native reviews returned no findings and were
+acknowledged. Local implementation is complete; hosted CI and publication remain unrun/unauthorized.
+See `log.md` for limitations. T36 remains pending; this does not mark the whole feature complete.
 
 **Done when** T13: two concurrent `SetOrderLine` calls for a household with no order yet (integration test)
 create one order with both lines.
@@ -124,7 +146,7 @@ products, added in opposite order, both complete.
 
 | ID | Task | Covers | After |
 | --- | --- | --- | --- |
-| T33 | Traceability check: every `R#` and `S#` is named in at least one test (`->group('S14')` or test name); fill the gaps; set feature 001 to *Done* in `specs/README.md` | R1–R36b, S1–S62 | T14, T17, T19, T31, T32, T34, T35, T36 |
+| T33 | Traceability check: every `R#` and `S#` is named in at least one test (`->group('S14')` or test name); fill the gaps; set feature 001 to *Done* in `specs/README.md` | R1–R36b, S1–S62 | T14, T17, T19, T31, T32, T34, T35, T36, T37, T38 |
 
 ## Coverage
 

@@ -15,6 +15,7 @@ import {
     Wheat,
 } from '@lucide/vue';
 import { computed } from 'vue';
+import OrderController from '@/actions/App/Http/Controllers/OrderController';
 import AccountController from '@/actions/App/Http/Controllers/Manage/AccountController';
 import CycleController from '@/actions/App/Http/Controllers/Manage/CycleController';
 import HouseholdController from '@/actions/App/Http/Controllers/Manage/HouseholdController';
@@ -97,6 +98,7 @@ const producerNavItems: NavItem[] = [
 ];
 
 const memberNavItems: NavItem[] = [
+    { title: 'Orders', href: OrderController.index(), icon: CalendarDays },
     {
         title: 'Wallet',
         href: WalletController.show(),

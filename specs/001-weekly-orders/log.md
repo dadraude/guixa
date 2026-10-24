@@ -436,3 +436,166 @@ Why: the plan said `send` stores the mark so later catalog changes do not affect
 
 T19 (`plan.md`, Ordering use cases and HTTP & pages): `GetProducerCycleSummary` answers the producer's own orderable products with their availability in the cycle; before its order is sent the quantities are null (S8), and once sent they are the totals to deliver with the marked lines left out and no household names (S7, R12a). A cancelled cycle, or one the producer does not take part in, is `CycleNotFound` (404), and an actor with the producer role but no producer is `NotAllowed`. `GET /producer/cycles/{cycle}` renders `Producer/CycleSummary`, which carries the availability toggle (the `PUT` route T15 left without a page). No page links to it yet: the producer's list of cycles is not in T19's row.
 Why: R12 says a producer sees nothing before the order is sent but R3c needs the producer to mark availability before then, and the spec is silent on cancelled cycles and on a cycle without the producer.
+## 2026-10-24 · Request
+
+> Yes, start with the behavior-preserving member ordering redesign. Update the SDD plan, tasks and log first, keep the UI in Catalan, and leave new features for a separate spec.
+
+## 2026-10-24 · Change
+
+`plan.md` (Member ordering presentation): scoped the redesign to `Orders/Index`, `Orders/Edit`,
+presentational ordering components and necessary ordering navigation/layout. Preserve current
+requests, drafts, totals, permissions and states; use existing theme primitives and the accepted
+Catalan translation architecture. Added component boundaries and focused regression/browser checks.
+Why: the user approved a behavior-preserving redesign, so this follows the plan-only route; no `R#`
+or `S#` changes, new saved-state model, repeat-order or other new feature is included.
+
+`tasks.md`: added T37 after T14, T15, T17 and T36, with explicit readiness and completion checks;
+T33 now also waits for T37. T36 remains unchanged.
+Why: the shared translation system is accepted in the plan but absent from the current Vue bootstrap,
+Vite configuration and dependencies; the only tracked language file is `lang/en/errors.php`.
+Source implementation is pending the translation prerequisite or a user-approved split of T36's
+foundation from its app-wide migration. No source changes, test runs or browser checks performed.
+
+
+## 2026-10-24 · Q&A
+
+Question: "May I split out and implement T36’s shared translation foundation for this redesign, leaving the remaining app-wide migration in T36?"
+Answer: "Yes, split out and implement T36’s shared translation foundation, then continue the member ordering redesign. Update the SDD documents first and leave the remaining app-wide migration in T36."
+
+## 2026-10-24 · Change
+
+`plan.md` (Translations and Member ordering presentation), `tasks.md`: split T38's shared translation
+foundation from T36; T37 now follows T38, not the app-wide migration. T36 keeps the remaining pages,
+emails, framework messages, domain errors and exhaustive coverage. T33 also waits for T38.
+Why: the user explicitly approved this dependency split so the member redesign can proceed without
+silently expanding into translation of the entire application. Locale defaults and the shared server
+locale form one foundation; existing local environment overrides remain untouched.
+
+## 2026-10-24 · Change
+
+T38 (`plan.md`, Translations): implemented `laravel-vue-i18n` 2.9.0 with eager shared JSON
+loading and synchronous initial language activation, the Vite PHP dictionary plugin, shared
+Inertia locale, Catalan config/example defaults, display-only `ca-ES` formatters and focused
+PHP/Vue checks. Client and SSR production builds pass; D18's fallback is not needed.
+Existing `.env` overrides remain untouched; installations configured as `en` must explicitly
+set `APP_LOCALE=ca` and `APP_FALLBACK_LOCALE=ca` to receive Catalan server errors.
+
+T37 (`plan.md`, Member ordering presentation): implemented cycle cards, responsive labelled
+product rows, normal-flow totals and translated ordering navigation. The editor's draft,
+save/remove callbacks and arithmetic match the baseline; domain logic, routes and role filters
+are unchanged. T36 still owns the remaining application, framework and email migration.
+
+Verification: observed RED before the foundation/presentation changes, then 17 focused Vitest
+tests and the standalone PHP translation test (3 assertions) passed. Type checking, affected
+lint/format checks, diff whitespace checks and client/SSR builds passed. A fresh independent
+verifier reproduced 17 passing tests and type checking and found no change-caused blocker.
+Its scratch PHP runner and extra interaction harness were unavailable; the parent reran the
+real standalone PHP test successfully and exercised browser interactions separately.
+
+Production assets were inspected with synthetic Inertia fixtures in an isolated localhost
+server (no database or real account mutations), at 375 px light and 1280 px dark. No horizontal
+overflow was observed; ordering inputs/buttons measured 44 px high. Verified drafts/totals,
+Enter and keyboard-button save, marked removal, closed/cancelled states and mobile navigation.
+Observed requests retained PUT/DELETE endpoints, quantity payloads and `order,errors` partials.
+Screenshots are local session artifacts, not repository fixtures. The temporary server and
+verification scratch copies were removed. Database-backed HTTP checks and full CI were not run.
+
+`tasks.md`: recorded local implementation evidence for T38/T37 without claiming CI, native
+review or delivery completion. Native review is enabled; preflight needs an explicit untracked
+selection excluding the unrelated `.env.swp`. No review approval, commit, push, PR or Linear
+mutation has occurred. Delivery slicing remains the user's decision under `ask-on-risk`.
+
+## 2026-10-24 · Request
+
+> Use stacked review slices: translation foundation first, then the member ordering redesign. Complete the remaining checks and native review before committing, and don’t push or open PRs yet.
+
+## 2026-10-24 · Change
+
+Delivery uses stacked-to-main review slices, with T38 before T37. All applicable local checks and
+native review must precede commits. Hosted CI remains unavailable without the separately prohibited
+push/PR operations; no CI success will be inferred from local checks. An isolated PostgreSQL
+database is used for the remaining HTTP checks, never the app or shared test databases.
+
+Verification follow-up: isolated PostgreSQL ordering/role-access HTTP and translation tests passed
+(40 tests, 275 assertions); affected PHPStan analysis passed. The task-owned database was confirmed
+absent before creation and after deletion, with loopback/exact-database guards before migrations.
+
+First staged slice: 388 authored changed lines before this evidence entry (lockfile excluded).
+An isolated checkout of the index, without the redesign or `.env`, passed 13 frontend tests,
+type checking, and client/SSR builds. The optional `fontaine` warning is non-fatal; nothing installed.
+
+## 2026-10-24 · Change
+
+T38 native review: the user granted the candidate-specific review. Risk, readability and reliability
+returned no findings; the exact provider acknowledgement completed and consumed the review authority.
+The reviewed foundation remains staged unchanged; no commit or publication has occurred.
+
+T37 verification follow-up: checked empty cycle and producer lists, the existing domain-error alert,
+and 200% text at 375 px with actual production assets. The enlarged cycle heading/date initially
+clipped despite a zero page-overflow measurement. Added break opportunities to the heading and card
+text; visual and element-boundary rechecks pass. No ordering behavior changed. Client/SSR builds,
+types, affected lint and all 17 focused tests pass after this correction.
+
+Delivery slicing: separated the cycle-list and editor tests so each stays with its presentation.
+The best cohesive split is foundation, cycle list/shared navigation, then editor/product row. The
+editor alone is 408 authored source/test lines before verification notes; splitting its row away
+from the consuming page would leave an incomplete presentation change. A small size exception is
+recommended rather than removing tests or compressing code to satisfy the 400-line guide.
+
+Second-slice check: the cycle-list/navigation delta is 250 authored lines; an isolated index checkout
+passed 14 focused tests and type checking. Native review could not start with the uncommitted staged
+foundation as its base: it returned `staged_workspace_overlay_recovery_unavailable` and no new
+review authority. Work is preserved pending the user's sequencing decision; nothing is committed.
+
+## 2026-10-24 · Request
+
+> Yes, commit only the approved translation foundation now, then complete native review for each remaining slice before committing it. Don’t push or open PRs.
+
+## 2026-10-24 · Change
+
+T38 committed locally as `0c56c738bed223e1e614e1385f6339061d63789e`; its tree exactly matches the
+native-reviewed foundation. The user authorized this baseline commit, followed by native review
+before each subsequent slice's commit. T37 remains uncommitted; no push or PR is authorized.
+
+## 2026-10-24 · Request
+
+> Yes, commit the cycle-list/navigation slice without native review, then continue with native review of the editor slice before committing it. Don’t push or open PRs.
+
+## 2026-10-24 · Change
+
+The user declined native review only for the cycle-list/navigation candidate and explicitly
+authorized its local commit without review. Existing local verification passed; no native approval
+is claimed. The editor remains a separate slice requiring native review before its commit.
+
+Cycle-list/navigation committed as `3f3b8e839e166199a9a41c4b79df4741937750fe` under that exception.
+The remaining editor candidate contains the presentational product row, consuming page and its
+regression tests; previously observed local checks still apply because these source bytes are unchanged.
+
+## 2026-10-24 · Change
+
+T38/T37 local delivery evidence updated in `tasks.md` and the ODD logbook. The user granted editor
+review with "1"; readability and reliability returned no findings, and exact acknowledgement
+consumed the review authority. Editor commit `9dec36d` exactly matches the reviewed snapshot.
+Foundation `0c56c73` was also reviewed; cycle-list/navigation `3f3b8e8` used the explicit review
+exception. This documentation-only closeout leaves those source commits unchanged.
+
+Local implementation and the requested checks are complete: 17 frontend tests, 40 isolated PHP
+tests/275 assertions, types/lint, affected PHPStan, client/SSR builds and responsive/keyboard/browser
+interaction checks passed. Hosted CI was not run; there was no push, PR or Linear update. T36 and
+the wider weekly-orders feature remain pending. Existing `.env` overrides were not changed.
+
+## 2026-10-24 · Request
+
+> Yes, rebase the three branches onto current main, fix the CI failure, and push with --force-with-lease only after the required checks pass. Preserve all three PRs and don’t merge anything.
+
+## 2026-10-24 · Change
+
+PRs #191/#192/#193 were rebased sequentially onto `ba2532b`, preserving both append-only log
+histories and their separate scopes. The hosted CI failure was reproduced under Catalan: the
+domain-error test registered its fixture only in English. A ca/en dataset first reproduced the
+failure, then passed when the fixture used the selected locale; production translations are unchanged.
+All 31 original implementation files remain byte-identical. The ODD logbook records the correction.
+
+Before leased updates: 55 affected PHP tests/340 assertions, the English locale regression, Pint,
+per-slice frontend tests (13/14/17), types, and foundation/final client+SSR builds passed. Hosted CI
+will rerun after publication; no success is claimed in advance and no PR merge is authorized.
