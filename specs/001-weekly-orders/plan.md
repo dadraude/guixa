@@ -2,6 +2,12 @@
 
 Status: Accepted (2026-10-21) · Spec: [spec.md](spec.md) + areas (R1–R36b, S1–S61) · Rules: [constitution](../constitution.md)
 
+Accepted amendment (2026-10-24): **Application visual identity** below. The user approved the plan;
+the associated tasks were separately approved. Implementation is on hold at the user's request;
+Linear tickets have been created, but this does not authorize implementation.
+T37/T38 reconciliation is complete: T37 = DRA-195 and T38 = DRA-194, both Done with evidence.
+Their native prerequisite links to T39 / DRA-190 are recorded; T39 remains Backlog and on hold.
+
 ## Bootstrap
 
 - Laravel 13 **Vue starter kit** (Inertia 3 + Vue 3 + TS + Vite, Tailwind 4 + shadcn-vue, Fortify auth). Public registration disabled.
@@ -552,7 +558,110 @@ HTTP page contracts in `OrdersPagesTest.php`. Check the rendered pages at 375 px
 and dark modes, with keyboard navigation and enlarged text: empty/open/closed/cancelled cycles,
 editable/closed producer rows, marked lines, errors and totals. These existing tests do not prove
 rendered layout; record browser evidence separately. Use focused local checks; full validation stays
-with CI under the project execution profile. No browser evidence or passing checks are claimed yet.
+with CI under the project execution profile. Historical browser and delivery checks are recorded in
+`log.md`; current reconciliation evidence and its limits are summarized in `tasks.md`. T37 is complete
+as DRA-195, separately from the unstarted visual identity amendment below.
+
+## Application visual identity
+
+**Status: Accepted (2026-10-24).** Route: plan only, because this changes presentation without
+changing the spec's requirements or acceptance scenarios. The task amendment is also accepted;
+the user explicitly requested ticket creation first and no implementation yet.
+
+### Scope and invariants
+
+Apply a modern, agricultural-heritage identity to the existing management application: member,
+producer and manager screens, shared navigation, account settings and existing authentication
+screens. Keep the interface practical; the reference is vegetable gardens and local food production,
+not a promotional shop or a simulated antique interface.
+
+This is a new presentation slice, not an extension or reopening of T37. T37's font-reuse and
+no-global-theme-replacement boundaries describe that earlier slice and remain unchanged. This
+accepted amendment separately defines the shared theme and heading typography changes below.
+
+- Preserve routes, role visibility, permissions, Inertia props, validation, data and business rules.
+  Preserve navigation destinations, save/submit behavior, quantities, monetary calculations and
+  existing empty, loading, error, disabled, cancelled and settled states wherever applicable.
+- No public website, promotional landing page, new registration flow, checkout, autosave, repeat-order
+  feature or new domain information. Leave the guest `Welcome` page and its routing unchanged.
+- Preserve light/dark/system appearance and the saved appearance preference. Theme styling does not
+  change how that preference is stored or selected.
+- Follow the constitution's phone-first, touch-target, plain-language and translation rules. This
+  work neither completes T36's app-wide translation migration nor changes its scope; any copy
+  added or changed here uses the existing `lang/` mechanism.
+
+### Visual system
+
+Use the existing semantic variables in `resources/css/app.css` and existing Tailwind/shadcn-vue
+primitives; do not introduce another component library or scatter palette literals across pages.
+Scope the new token values and heading typography to an explicit management/auth layout theme
+boundary, not unconditional `:root` or body overrides that would restyle `Welcome`. During the
+pilot, attach that same theme only to the pilot screens; expand its application after visual approval.
+Keep one theme definition rather than copying page-specific palettes.
+
+| Role | Light-theme reference | Application |
+| --- | --- | --- |
+| Background | Cream `#F7F3E8` | Main canvas and quiet surfaces |
+| Primary | Olive `#3F5D3A` | Main actions, links and selected navigation |
+| Accent | Terracotta `#B85C38` | Sparse decorative highlights, not error or warning semantics |
+| Secondary surface | Pale sage `#E3EBDD` | Grouped content and supporting panels |
+| Foreground | Green charcoal `#283127` | Body text, labels and values |
+
+These are palette anchors, not permission to combine any two colors. Define and verify paired
+foreground/background values for buttons, cards, popovers, inputs and the sidebar, including hover,
+focus and disabled states. Keep destructive, warning and success states distinct from brand accents
+and accompany meaningful status colors with text or icons. Derive dark-theme counterparts rather
+than reusing light surface values; check the same states in both themes.
+
+- **Typography:** retain Instrument Sans for body text, navigation, forms, tables and amounts. Add a
+  shared heading token with `Georgia, serif` as the initial system-font proposal, reserved for page
+  titles and prominent section headings. Check Catalan diacritics, wrapping and hierarchy in the
+  visual pilot. No font package or external font service is required by this amendment.
+- **Layout:** use clear hierarchy, consistent spacing, restrained borders and modest corner rounding.
+  Avoid making operational lists or forms less useful merely to add whitespace or decoration.
+- **Agricultural references:** small botanical line illustrations or a subtle paper texture may appear
+  in non-interactive header areas, never behind data, controls, alerts or tables. Decorative images
+  are ignored by assistive technology. No full-screen photography, sepia filter or wood background.
+  Real photographs are optional, must have permission for use, and are not a dependency of this slice.
+- **Motion:** retain functional feedback and respect reduced motion; no new ornamental animation.
+
+### Delivery sequence
+
+1. Prepare a visual pilot of the existing member cycle list and order editor, including their shared
+   shell, at 375 px and desktop widths in light and dark modes. Use this to review the theme, serif
+   headings and readability before wider rollout. Do not change the guest homepage or ordering flow.
+2. After visual approval, apply the shared tokens and heading treatment consistently to the existing
+   member, producer, manager, settings and authentication screens. Inventory the screens and shared
+   components in the task-planning step so global-token effects are not mistaken for isolated changes.
+3. Complete the presentation and regression checks below, recording observed results per delivery.
+   Future screens inherit the approved system when their own tasks are implemented; this slice does
+   not bring unimplemented features forward.
+
+The pilot is a review checkpoint, not a second theme implementation. Reuse the same semantic tokens
+and presentation components throughout. Preserve existing page orchestration and the constitution's
+component boundaries; do not refactor business logic or shared interaction behavior for visual polish.
+
+### Verification and review gate
+
+- **Visual/accessibility:** check every affected page at 375 px and desktop widths, with 200% text,
+  keyboard navigation and visible focus; no clipped content or horizontal page scrolling. Preserve
+  at least 44 × 44 px touch targets and access without hover. Verify normal text contrast of at least
+  4.5:1, large text at least 3:1, and relevant control boundaries/focus indicators at least 3:1 against
+  adjacent colors. Test light, dark and system appearance, not only the default palette.
+- **States and roles:** exercise existing populated, empty, loading, error and disabled states where
+  applicable, plus ordering's closed/cancelled/marked-line cases. Check each role's existing navigation
+  and entry screens without changing authorization. Record browser evidence separately from tests.
+- **Regression:** retain existing scenario tests and run affected frontend and HTTP checks when
+  implementing. Add focused tests if markup changes affect labels, navigation or interaction; static
+  layout/color changes require rendered checks rather than invented domain scenarios. Follow the
+  project execution profile: focused local checks, full validation in CI, with unavailable checks
+  reported rather than treated as passed.
+- **Assets:** verify readable fallback typography, no layout shifts caused by decorative assets and
+  no new runtime dependency on externally hosted imagery or fonts.
+
+Approval of this section authorizes preparation of linked tasks only. Task approval and the visual
+pilot review remain separate checkpoints. No task IDs, completed checks or implementation are claimed
+by this amendment; `spec.md`, the area requirements and the constitution are unchanged.
 
 ## Translations
 

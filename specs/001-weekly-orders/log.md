@@ -629,3 +629,157 @@ Why: the user's rule above.
 
 T22 (`reception.md` R14, `plan.md`): the producer does not have to be active either. This is deduced from the user's rule and from the T18 entry, where deactivating a producer leaves a sent producer order participating (S50), so its reception already exists and its goods have arrived. The user did not say it in these words; the coordinator confirmed the deduction.
 Why: the same reasoning as for the product.
+
+## 2026-10-24 · Request
+
+> vull que la pàgina sigui moderna però que recordi al passat on tot eren horts
+
+## 2026-10-24 · Q&A
+
+Question:
+
+> Vols aplicar aquesta identitat només a l’aplicació de gestió existent, o també crear una web pública de presentació de la cooperativa?
+
+Answer:
+
+> De moment només a l’aplicació de gestió existent. Actualitzem el pla seguint l’SDD i revisem cada document abans de passar al següent.
+
+## 2026-10-24 · Change
+
+`plan.md`, **Application visual identity**: added a proposed, behavior-preserving management-app
+presentation amendment with the olive/cream/terracotta palette, typography, light/dark/system
+appearance, a member-ordering visual pilot, wider existing-screen rollout and verification criteria.
+Why: the user approved the modern agricultural-heritage direction and explicitly limited it to the
+existing management application, with document-by-document review.
+
+Route: **plan only** under `specs/README.md`. This amendment is pending approval and separate from
+T37, whose original no-global-theme-replacement boundary is preserved. No public website, new
+functional requirements, routes or domain changes are included. The accepted plan baseline remains
+in force. `tasks.md`, the spec/area documents, constitution and application code are unchanged.
+Next: review this plan amendment; only after approval, update and review `tasks.md` separately.
+
+## 2026-10-24 · Q&A
+
+Question:
+
+> Aproves aquesta ampliació del pla per passar a les tasques?
+
+Answer:
+
+> Aprovo l’ampliació del pla. Actualitza les tasques i presenta-me-les per revisar-les abans de començar a implementar.
+
+## 2026-10-24 · Change
+
+`plan.md`, **Application visual identity**: recorded the user's explicit approval of the amendment
+and updated its status to Accepted. Its scope and design are unchanged; task approval is still
+required before implementation.
+
+`tasks.md`: proposed T39–T42, linked to the accepted plan and existing rules/scenarios. T39 combines
+the scoped theme with the ordering pilot and stops for explicit visual approval. T40 covers existing
+dashboard/wallet/producer pages, T41 existing manager pages, and T42 settings/authentication plus
+the final cross-role check. Each task includes its own regression and rendered evidence. Added a
+tracked-page/shared-presentation inventory and a proposed T42 dependency for closure task T33.
+Why: the user requested the next SDD document for review, not implementation. T37/T38 history,
+T36 scope and existing scenario ownership remain unchanged. No new domain requirements or feature
+pages are introduced; `Welcome` remains excluded.
+
+All new tasks are pending approval and unstarted. No application code, tests, dependencies, Linear
+issues, commits or remote state changed. Next: review the task amendment before starting T39.
+
+## 2026-10-24 · Q&A
+
+Question:
+
+> Aproves aquestes quatre tasques?
+
+Answer:
+
+> Aprovo les tasques. No implementis res, primer hem de crear els linears corresponents
+
+## 2026-10-24 · Change
+
+`tasks.md`: recorded acceptance of T39–T42 and the T33 dependency. `plan.md`: synchronized the
+task-approval status. The user explicitly withheld implementation and requested Linear tickets
+first; all tasks remain unstarted and creation of tickets will not itself authorize implementation.
+Why: preserve the user's task approval and explicit execution boundary separately.
+
+The local execution profile identifies Linear workspace `draude`, team `DRA`, project `Coop`, but
+does not authorize remote access. No Linear connection has been queried or mutated in this step;
+confirmation of the destination and connected session is required before duplicate checks and
+creation. No application code changed.
+
+## 2026-10-24 · Q&A
+
+Question:
+
+> Aproves aquesta organització per crear el milestone i els quatre tiquets, mantenint pendent la reconciliació de T37/T38?
+
+Answer:
+
+> Sí, aprovo aquesta organització. Crea el milestone i els quatre tiquets amb les dependències, deixant pendent la reconciliació de T37/T38. No implementis res encara.
+
+## 2026-10-24 · Change
+
+Created the approved **Application visual identity** milestone
+(`cda681c9-a478-422a-9693-e45968fe4147`) in the authorized `draude` / `DRA` / `Coop` Linear project,
+using the current connected session. Created four root issues: T39 = DRA-190, T40 = DRA-191,
+T41 = DRA-192, T42 = DRA-193. No redundant parent or related links were added.
+
+Native blocking chain: DRA-190 → DRA-191 → DRA-192 → DRA-193 → DRA-183 (T33).
+The seven existing DRA-183 blockers were preserved. Readback verified project/team, milestone,
+root ownership, all requested relations, Backlog state, no assignee/delegate and no ready-for-agent
+label. A full project listing confirmed one issue per T39–T42, with no remaining pagination.
+
+`tasks.md`: added confirmed issue links, relationship mapping and execution gates. `plan.md`:
+recorded ticket creation without lifting the implementation hold. Why: make the approved SDD
+sequence actionable in the tracker while preserving the user's explicit no-implementation instruction.
+T37/T38 reconciliation remains pending; no historical issue or Done state was invented. T40 also
+requires explicit human visual-pilot approval, not merely completion of T39's code or tests.
+
+The approved documents remain local and uncommitted; issue descriptions disclose the pending
+repository publication rather than claiming their new sections are already on main. No application
+code, tests, dependencies, commits, pushes, PRs or implementation were performed.
+
+## 2026-10-24 · Request
+
+> Reconciliem ara T37 i T38: comprova què està implementat i com ho hem de reflectir a Linear per deixar ben resoltes les dependències de T39. No implementis res encara.
+
+## 2026-10-24 · Q&A
+
+Question:
+
+> Aproves aquesta reconciliació a Linear i l’actualització de les evidències SDD, mantenint aturada la implementació?
+
+Answer:
+
+> Sí, aprovo la reconciliació. Crea T37 i T38 com a Done amb les evidències, actualitza les dependències de T39 i l’SDD. Mantén T39 en Backlog i no implementis res encara.
+
+## 2026-10-24 · Change
+
+Created retrospective Done records in the authorized Draude / DRA / Coop Linear project:
+T38 = DRA-194 in Phase 0 — Foundation; T37 = DRA-195 in Phase 3 — Cycles and ordering.
+Their descriptions retain original scope and separate fresh checks from historical delivery evidence.
+Native prerequisites: DRA-153 → DRA-194; DRA-168, DRA-169, DRA-170 and DRA-194 → DRA-195;
+DRA-194 and DRA-195 → DRA-190 (T39). No parent-child or redundant related links were added.
+The existing DRA-190 → DRA-191 → DRA-192 → DRA-193 → DRA-183 rollout remains unchanged.
+T39 and the Application visual identity milestone now describe reconciliation as resolved, while
+preserving Backlog and the explicit implementation hold. T36 remains separate, not a T39 prerequisite.
+
+`plan.md`: replaced the stale no-evidence-yet statement with pointers to actual verification and
+recorded the completed prerequisite reconciliation without changing the approved design.
+`tasks.md`: added retrospective issue/milestone/dependency mappings, replaced stale pre-rebase
+completion evidence with current commit identities, and resolved the pending T39 tracker note.
+Why: the user approved reconciliation of delivered work, not reimplementation or starting T39.
+
+Observed during reconciliation: commits `3356bc5`, `b679ade`, `b4f1a60` and `0a9e26d` are ancestors
+of local merged HEAD `2553943b1de93bdd6eaf49bf44927649a0162b9a`; relevant source is unchanged since
+`0a9e26d`. Five focused frontend suites passed 17 tests, independently rerun by the parent. Command:
+`pnpm test resources/js/lib/i18n.spec.ts resources/js/lib/orderRows.spec.ts resources/js/lib/orderTotal.spec.ts resources/js/pages/Orders/Index.spec.ts resources/js/pages/Orders/Edit.spec.ts --no-cache --configLoader runner --fsModuleCachePath <external-scratch>/vitest-cache`.
+The external test scratch directory was removed after verification.
+
+Historical delivery verification recorded PRs #191/#192/#193 merged with passing CI. Earlier
+backend/browser/build checks and native-review results remain historical evidence, with original
+snapshot limitations; none was rerun or newly reviewed during this reconciliation. In particular,
+the original no-publication statements above describe their earlier point in time and are preserved.
+No application code, tests, dependencies, commits, pushes or PRs were changed or created. The SDD
+updates remain local and uncommitted; Linear descriptions explicitly disclose pending publication.
