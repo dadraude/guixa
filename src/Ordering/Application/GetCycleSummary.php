@@ -11,7 +11,7 @@ use Guixa\Ordering\Domain\OrderRepository;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Quantity;
 
-/** What the manager sees of a cycle: totals per producer and product, and the breakdown per household (R13). */
+/** What the manager sees of a cycle: totals per producer and product, and the breakdown per household; a cancelled cycle has none (R13, S62). */
 final class GetCycleSummary
 {
     public function __construct(
@@ -25,6 +25,11 @@ final class GetCycleSummary
         $actor->assertManager();
 
         $cycle = $this->cycles->get($cycleId) ?? throw CycleNotFound::withId($cycleId);
+
+        if ($cycle->isCancelled()) {
+            return new CycleSummaryData($cycle->id, $cycle->pickupDate()->format('Y-m-d'), [], cancelled: true);
+        }
+
         $orders = array_values(array_filter(
             $this->orders->ofCycle($cycleId),
             fn (Order $order) => $order->lines() !== [],
@@ -35,6 +40,7 @@ final class GetCycleSummary
             $cycle->id,
             $cycle->pickupDate()->format('Y-m-d'),
             $this->producerTotals($orders, $names),
+            cancelled: false,
         );
     }
 

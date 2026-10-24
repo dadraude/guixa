@@ -90,3 +90,20 @@ it('is for managers and an existing cycle (R13)', function () {
         ->and(fn () => ($this->world->getCycleSummary)($this->world->manager, '00000000-0000-7000-8000-0000000000ff'))
         ->toThrow(CycleNotFound::class);
 });
+
+it('is not cancelled while the cycle stands (R13)', function () {
+    expect(($this->summary)()->cancelled)->toBeFalse();
+});
+
+it('shows a cancelled cycle as cancelled, with no totals and no households (R4b, R13, S62)', function () {
+    ($this->set)($this->a, $this->bread, '2');
+    ($this->set)($this->b, $this->apples, '1.500');
+    ($this->world->cancelCycle)($this->world->manager, $this->cycleId);
+
+    $summary = ($this->summary)();
+
+    expect($summary->cancelled)->toBeTrue()
+        ->and($summary->cycleId)->toBe($this->cycleId)
+        ->and($summary->pickupDate)->toBe('2026-11-07')
+        ->and($summary->producers)->toBe([]);
+});

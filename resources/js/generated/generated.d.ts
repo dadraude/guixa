@@ -34,6 +34,7 @@ readonly participants: App.Http.CycleParticipantRow[],
 export type CycleSummaryRow = {
 readonly cycleId: string,
 readonly pickupDate: string,
+readonly cancelled: boolean,
 readonly producers: App.Http.ProducerTotalsRow[],
 };
 export type HouseholdQuantityRow = {
