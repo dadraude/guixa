@@ -417,3 +417,19 @@ Why: the plan did not say which verbs, which guards, or what happens to the cuto
 
 T16 (`plan.md`, Catalog `ProducerAccess` and Membership): the producer role is suspended by removing the `producer` row from `account_roles` and kept on `users.producer_id`, so restoring puts the same row back; `AccountRepository` gains `ofProducer(producerId)` to find the account, and `SuspendProducerRole` / `RestoreProducerRole` take only the producer id and ignore a producer without an account. The plan said Login counts a producer role "only while its producer is active" and left the storage open.
 Why: Login and the actor resolver already read `account_roles`, so no other query has to learn about producer state.
+
+## 2026-10-24 · Deviation
+
+T18 (`plan.md`, Ordering domain, ports and use cases): `Cycle::send` throws `ProducerOrderSent`, `ProducerNotParticipating` or `ProducerStillOpen`; once sent, `setCutoff`, `closeNow`, `clearCutoff`, `stopParticipating`, `participateAgain` and `cancel` throw `ProducerOrderSent`, and `StopParticipatingWhereNotSent` skips the sent order (R6b, R6c, R4b, S34, S37, S50). `ProducerNotifier` is `canNotify(producerId)` plus `notify(producerId, pickupDate, totals)`; its Membership adapter reads the email through `GetProducerAccountEmail` and mails the totals after commit. `OrderRepository` gains `markNotDelivered` and `notDeliveredProductIds`. `SendEmptyProducerOrders` is scheduled every minute and only sends (T23 adds validate and distribute).
+Why: the plan named the use cases and the port but not their shape.
+
+T18 (`plan.md`, `SendProducerOrder`): a producer with no account is refused with the new `ProducerHasNoAccount`, before anything is stored, so the order stays unsent until the manager invites the producer's account. A producer with no line to send needs no email, so the scheduler and the manager can still send it. User decision: option 1, fail when the producer has no account.
+Why: R12a says the producer is notified and the docs did not say what happens without an account.
+
+T18 (`plan.md`, HTTP & pages): the `POST …/producers/{producer}/send` route and its button are not part of T18 (the task row lists no page); they come with the later task that adds the send button. Coordinator decision.
+Why: the plan lists the route, but T18's allowed surfaces and row have no controller or page.
+
+## 2026-10-24 · Deviation
+
+T18 (`plan.md`, Ordering domain and use cases): `NotDeliveredMarks::of` reads the stored mark (`OrderRepository::notDeliveredProductIds`) for the lines of a sent producer order and derives it for the others, so `GetHouseholdOrder` and `RemoveMarkedLine` keep a sent line marked after its product is reactivated and leave a delivered line unmarked after its product is deactivated (D9). `derivedOf` is the derivation alone, which `SendProducerOrder` and `SendEmptyProducerOrders` use to decide what to store. `SetProductAvailability` is refused with `ProducerOrderSent` once the producer's order is sent, for marking unavailable and available (R3c), which the T15 entry handed to T18.
+Why: the plan said `send` stores the mark so later catalog changes do not affect it, which only holds if the stored mark is what is read; and R3c allows marking only while the order is not sent.

@@ -28,11 +28,13 @@ use Guixa\Ordering\Domain\CycleRepository;
 use Guixa\Ordering\Domain\Households;
 use Guixa\Ordering\Domain\OrderRepository;
 use Guixa\Ordering\Domain\ProducerCutoffRules;
+use Guixa\Ordering\Domain\ProducerNotifier;
 use Guixa\Ordering\Domain\ProductAvailabilityRepository;
 use Guixa\Ordering\Domain\ProductCatalog;
 use Guixa\Ordering\Infrastructure\Catalog\CatalogProducerCutoffRules;
 use Guixa\Ordering\Infrastructure\Catalog\CatalogProductCatalog;
 use Guixa\Ordering\Infrastructure\Membership\MembershipHouseholds;
+use Guixa\Ordering\Infrastructure\Membership\MembershipProducerNotifier;
 use Guixa\Ordering\Infrastructure\Persistence\EloquentCooperativeSettings;
 use Guixa\Ordering\Infrastructure\Persistence\EloquentCycleRepository;
 use Guixa\Ordering\Infrastructure\Persistence\EloquentOrderRepository;
@@ -91,6 +93,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(ProductCatalog::class, CatalogProductCatalog::class);
         $this->app->bind(ProductAvailabilityRepository::class, EloquentProductAvailabilityRepository::class);
         $this->app->bind(Households::class, MembershipHouseholds::class);
+        $this->app->bind(ProducerNotifier::class, MembershipProducerNotifier::class);
     }
 
     /**

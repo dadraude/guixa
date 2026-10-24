@@ -29,10 +29,11 @@ final class EloquentCycleRepository implements CycleRepository
             'producer_id' => $order->producerId,
             'participating' => $order->isParticipating(),
             'closes_at' => $order->cutoff()?->format(DATE_ATOM),
+            'sent_at' => $order->sentAt()?->format(DATE_ATOM),
         ], $cycle->producerOrders());
 
         if ($rows !== []) {
-            DB::table('cycle_producers')->upsert($rows, ['cycle_id', 'producer_id'], ['participating', 'closes_at']);
+            DB::table('cycle_producers')->upsert($rows, ['cycle_id', 'producer_id'], ['participating', 'closes_at', 'sent_at']);
         }
     }
 
@@ -87,6 +88,7 @@ final class EloquentCycleRepository implements CycleRepository
                 $row->producer_id,
                 (bool) $row->participating,
                 $row->closes_at === null ? null : new DateTimeImmutable($row->closes_at),
+                $row->sent_at === null ? null : new DateTimeImmutable($row->sent_at),
             ))
             ->all();
 

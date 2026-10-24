@@ -12,6 +12,17 @@ interface OrderRepository
     /** Discards every order of a cycle, lines included (R4b, D14). */
     public function deleteOfCycle(string $cycleId): void;
 
+    /**
+     * Stores the *will not be delivered* mark on these lines of the order, so later catalog changes do not affect
+     * them (D9). Products without a line are ignored.
+     *
+     * @param  list<string>  $productIds
+     */
+    public function markNotDelivered(string $orderId, array $productIds): void;
+
+    /** @return list<string> product ids of the order's lines stored as not delivered, sorted */
+    public function notDeliveredProductIds(string $orderId): array;
+
     public function ofHousehold(string $cycleId, string $householdId): ?Order;
 
     /** @return list<Order> every household's order in the cycle, in no particular order */
