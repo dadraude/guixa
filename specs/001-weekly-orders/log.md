@@ -570,3 +570,16 @@ is claimed. The editor remains a separate slice requiring native review before i
 Cycle-list/navigation committed as `3f3b8e839e166199a9a41c4b79df4741937750fe` under that exception.
 The remaining editor candidate contains the presentational product row, consuming page and its
 regression tests; previously observed local checks still apply because these source bytes are unchanged.
+
+## 2026-10-24 · Change
+
+T38/T37 local delivery evidence updated in `tasks.md` and the ODD logbook. The user granted editor
+review with "1"; readability and reliability returned no findings, and exact acknowledgement
+consumed the review authority. Editor commit `9dec36d` exactly matches the reviewed snapshot.
+Foundation `0c56c73` was also reviewed; cycle-list/navigation `3f3b8e8` used the explicit review
+exception. This documentation-only closeout leaves those source commits unchanged.
+
+Local implementation and the requested checks are complete: 17 frontend tests, 40 isolated PHP
+tests/275 assertions, types/lint, affected PHPStan, client/SSR builds and responsive/keyboard/browser
+interaction checks passed. Hosted CI was not run; there was no push, PR or Linear update. T36 and
+the wider weekly-orders feature remain pending. Existing `.env` overrides were not changed.

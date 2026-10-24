@@ -82,11 +82,14 @@ desktop inspection, light/dark appearance and keyboard use. Existing save/remove
 totals, cancellation and disabled behavior remain unchanged; touched UI copy comes from `lang/`.
 Record focused regression results and browser evidence before completion; no new feature scenarios.
 
-**T38/T37 local implementation evidence (2026-10-24):** 17 focused frontend tests, standalone PHP
-translation checks, types/lint and client/SSR builds pass. Independent source verification found
-no change-caused blocker; synthetic browser fixtures passed 375 px light / 1280 px dark checks
-and save/remove interactions. See `log.md` for limitations. Delivery/native review and full CI
-remain pending; T36 is not completed by this work.
+**T38/T37 local implementation evidence (2026-10-24):** 17 focused frontend tests, 40 isolated
+PostgreSQL HTTP/role-access/translation tests (275 assertions), types/lint, affected PHPStan and
+client/SSR builds pass. Independent verification found no change-caused blocker. Synthetic browser
+fixtures passed 375 px light / 1280 px dark, keyboard/save/remove, empty/error and 200% text checks.
+Local commits: T38 `0c56c73` (native-reviewed), cycle list/navigation `3f3b8e8` (user-authorized review
+exception), editor `9dec36d` (native-reviewed). Both native reviews returned no findings and were
+acknowledged. Local implementation is complete; hosted CI and publication remain unrun/unauthorized.
+See `log.md` for limitations. T36 remains pending; this does not mark the whole feature complete.
 
 **Done when** T13: two concurrent `SetOrderLine` calls for a household with no order yet (integration test)
 create one order with both lines.

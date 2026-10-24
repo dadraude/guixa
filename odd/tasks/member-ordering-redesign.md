@@ -19,8 +19,8 @@ No new features, no app-wide migration, no publication or ticket mutations.
 - U4 — CI/conflict correction; inline (bounded locale fixture and sequential stack maintenance); reproduce ca/en behavior, fix the fixture, rebase all three slices, verify before leased updates; pending.
 
 - U1 (S1,S2) — T38 translation foundation; inline (T37 depends on it); implemented, locally verified and native-reviewed; commit 0c56c738bed223e1e614e1385f6339061d63789e.
-- U2 (S1,S2,S5) — T37 member presentation and ordering shell; inline; cycle-list/navigation committed as 3f3b8e839e166199a9a41c4b79df4741937750fe (review declined, explicit commit authorization); editor implemented and locally verified, native review/commit pending.
-- U3 (S1,S2) — focused checks, visual checks and independent verifier; delegated verifier required by risk items 3/5 (shared shell/bootstrap and dependency); local verification complete; delivery/native review and full CI pending.
+- U2 (S1,S2,S5) — T37 member presentation and ordering shell; inline; cycle-list/navigation committed as 3f3b8e839e166199a9a41c4b79df4741937750fe (review declined, explicit commit authorization); editor locally verified and native-reviewed, committed as 9dec36dd9e67582ab1adf9e4239ff727c9e47d34.
+- U3 (S1,S2) — focused checks, visual checks and independent verifier; delegated verifier required by risk items 3/5 (shared shell/bootstrap and dependency); local verification complete; requested native reviews complete (cycle-list exception recorded); local commits complete; hosted CI unrun and publication not authorized.
 
 ## Log
 
@@ -56,6 +56,9 @@ L23. User authorization verbatim: "Yes, commit the cycle-list/navigation slice w
 L24. Cycle-list/navigation commit authorized without native review. Its isolated 14-test/type check and broader browser/HTTP verification remain valid; only documentation has changed since those checks. Risk: item 3 (shared navigation presentation). Independent verifier already completed; editor stays out of this commit.
 
 L25. Cycle-list/navigation committed as 3f3b8e839e166199a9a41c4b79df4741937750fe, 290 authored changed lines including evidence. Editor source remains unchanged from the verified implementation: 17 focused frontend tests, types, affected lint, client/SSR builds, HTTP checks and browser behavior checks passed. Editor rollback boundary is Edit.vue, OrderProductRow.vue and Edit.spec.ts; prior slices remain usable. Native editor review is required before commit; full hosted CI remains unrun.
+
+L26. User selected "1" for editor native review. Concurrent readability/reliability captures returned no findings; exact acknowledgement burned authority for target sha256:a3e94be28245c031132e26c88d4a414f894247d4ae2075c29a1f89dc417cc1eb. Committed 9dec36dd9e67582ab1adf9e4239ff727c9e47d34; its tree exactly matches reviewed d95d43121f2a10e32899f15d1aa5eaec49c070ba.
+L27. Informational post-commit editor assessment returned medium/under_budget; the completed explicit pre-commit review remains the approval evidence. Aggregate UI-range assessment also returned medium/under_budget, not a review approval for the declined cycle slice. Docs-only closeout records results without modifying reviewed source. Total implementation slices: 393 + 290 + 416 = 1099 authored changed lines (18 generated lockfile lines excluded), plus passive closeout documentation. No push, PR or Linear mutation; hosted CI and T36 remain pending.
 
 ## Publication correction (2026-10-24)
 
