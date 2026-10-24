@@ -51,7 +51,7 @@ final class GetHouseholdOrder
         ), $participating);
 
         $order = $this->orders->ofHousehold($cycleId, $householdId);
-        $marked = $order === null ? [] : (new NotDeliveredMarks($this->catalog, $this->availability))->of($cycle, $order);
+        $marked = $order === null ? [] : (new NotDeliveredMarks($this->catalog, $this->availability, $this->orders))->of($cycle, $order);
         $lines = $order?->lines() ?? [];
 
         return new HouseholdOrderData(

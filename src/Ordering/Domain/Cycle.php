@@ -12,9 +12,12 @@ use Guixa\Ordering\Domain\Error\PickupDateNotInFuture;
 use Guixa\Ordering\Domain\Error\ProducerClosed;
 use Guixa\Ordering\Domain\Error\ProducerNotInCycle;
 use Guixa\Ordering\Domain\Error\ProducerNotParticipating;
+use Guixa\Ordering\Domain\Error\ProducerOrderSent;
+use Guixa\Ordering\Domain\Error\ProducerStillOpen;
 use Guixa\Ordering\Domain\ValueObject\CutoffRule;
 use Guixa\Ordering\Domain\ValueObject\PickupWeekday;
 use Guixa\Shared\Domain\LocalTime;
+use Guixa\Shared\Domain\Quantity;
 
 /** One week's round of orders, picked up on one date (R4). */
 final class Cycle
@@ -72,20 +75,80 @@ final class Cycle
         $this->producerOrders[$producerId] = ProducerOrder::participate($producerId, $cutoff > $now ? $cutoff : null);
     }
 
-    /**
-     * Lines of the producer stay and show as *will not be delivered*. Refusing a sent producer order
-     * arrives with the sent state in T18 (R6c).
-     */
+    /** Lines of the producer stay and show as *will not be delivered*; a sent order is refused (R6c). */
     public function stopParticipating(string $producerId): void
     {
         $this->assertNotCancelled();
-        $this->producerOrderOf($producerId)->stopParticipating();
+        $this->unsentProducerOrderOf($producerId)->stopParticipating();
     }
 
     public function participateAgain(string $producerId): void
     {
         $this->assertNotCancelled();
-        $this->producerOrderOf($producerId)->participateAgain();
+        $this->unsentProducerOrderOf($producerId)->participateAgain();
+    }
+
+    /**
+     * Sends the producer's order: it participates, is closed and was not sent; from then on its cutoff is frozen
+     * (R6b, R12a, S36).
+     */
+    public function send(string $producerId, DateTimeImmutable $now): void
+    {
+        $this->assertNotCancelled();
+        $producerOrder = $this->unsentProducerOrderOf($producerId);
+
+        if (! $producerOrder->isParticipating()) {
+            throw ProducerNotParticipating::withId($producerId);
+        }
+
+        if ($this->isOpenFor($producerId, $now)) {
+            throw ProducerStillOpen::withId($producerId);
+        }
+
+        $producerOrder->markSent($now);
+    }
+
+    /** Whether the producer takes part, is closed and has not been sent: what the scheduler sends when it has no line (D10). */
+    public function isReadyToSend(string $producerId, DateTimeImmutable $now): bool
+    {
+        $producerOrder = $this->producerOrders[$producerId] ?? null;
+
+        return ! $this->isCancelled()
+            && $producerOrder !== null
+            && $producerOrder->isParticipating()
+            && ! $producerOrder->isSent()
+            && ! $this->isOpenFor($producerId, $now);
+    }
+
+    /**
+     * @param  list<Order>  $orders
+     * @param  array<string, array<string, true>>  $marksByOrder
+     * @return list<array{productId: string, name: string, unit: string, quantity: Quantity}>
+     */
+    public function totalsToSend(string $producerId, array $orders, array $marksByOrder): array
+    {
+        return $this->producerOrderOf($producerId)->totalsToSend($orders, $marksByOrder);
+    }
+
+    /**
+     * @param  list<Order>  $orders
+     * @param  array<string, array<string, true>>  $marksByOrder
+     * @return array<string, list<string>> marked product ids per order id
+     */
+    public function markedLines(string $producerId, array $orders, array $marksByOrder): array
+    {
+        return $this->producerOrderOf($producerId)->markedLines($orders, $marksByOrder);
+    }
+
+    /** @return list<string> producers that are participating, closed and not sent (D10) */
+    public function producersReadyToSend(DateTimeImmutable $now): array
+    {
+        return array_values(array_filter(array_keys($this->producerOrders), fn (string $producerId) => $this->isReadyToSend($producerId, $now)));
+    }
+
+    public function isSent(string $producerId): bool
+    {
+        return ($this->producerOrders[$producerId] ?? null)?->isSent() ?? false;
     }
 
     /**
@@ -95,7 +158,7 @@ final class Cycle
     public function setCutoff(string $producerId, DateTimeImmutable $at, DateTimeImmutable $now): void
     {
         $this->assertNotCancelled();
-        $producerOrder = $this->producerOrderOf($producerId);
+        $producerOrder = $this->unsentProducerOrderOf($producerId);
 
         if ($at <= $now) {
             throw CutoffNotInFuture::at($at->format('c'));
@@ -114,13 +177,13 @@ final class Cycle
     public function closeNow(string $producerId, DateTimeImmutable $now): void
     {
         $this->assertNotCancelled();
-        $this->producerOrderOf($producerId)->changeCutoff($now);
+        $this->unsentProducerOrderOf($producerId)->changeCutoff($now);
     }
 
     public function clearCutoff(string $producerId): void
     {
         $this->assertNotCancelled();
-        $this->producerOrderOf($producerId)->changeCutoff(null);
+        $this->unsentProducerOrderOf($producerId)->changeCutoff(null);
     }
 
     /** Open until its cutoff, or until the pickup date at 00:00 when it has none (R6a). */
@@ -128,7 +191,7 @@ final class Cycle
     {
         $producerOrder = $this->producerOrders[$producerId] ?? null;
 
-        if ($this->isCancelled() || $producerOrder === null || ! $producerOrder->isParticipating()) {
+        if ($this->isCancelled() || $producerOrder === null || ! $producerOrder->isParticipating() || $producerOrder->isSent()) {
             return false;
         }
 
@@ -171,13 +234,16 @@ final class Cycle
         }
     }
 
-    /**
-     * Cancels the cycle; its orders are discarded by the caller (R4b, D14). Rejecting a cycle with a
-     * producer order already sent arrives with the sent state in T18.
-     */
+    /** Cancels the cycle; its orders are discarded by the caller. Refused once any producer order is sent (R4b, D14, S37). */
     public function cancel(DateTimeImmutable $now): void
     {
         $this->assertNotCancelled();
+
+        foreach ($this->producerOrders as $producerId => $producerOrder) {
+            if ($producerOrder->isSent()) {
+                throw ProducerOrderSent::withId($this->id, $producerId);
+            }
+        }
 
         $this->cancelledAt = $now;
     }
@@ -213,6 +279,17 @@ final class Cycle
     private function producerOrderOf(string $producerId): ProducerOrder
     {
         return $this->producerOrders[$producerId] ?? throw ProducerNotInCycle::withId($this->id, $producerId);
+    }
+
+    private function unsentProducerOrderOf(string $producerId): ProducerOrder
+    {
+        $producerOrder = $this->producerOrderOf($producerId);
+
+        if ($producerOrder->isSent()) {
+            throw ProducerOrderSent::withId($this->id, $producerId);
+        }
+
+        return $producerOrder;
     }
 
     private function closesWithoutCutoff(DateTimeZone $timezone): DateTimeImmutable

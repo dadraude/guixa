@@ -29,9 +29,9 @@ final class StopParticipatingWhereNotSent
         }
     }
 
-    /** Cancelled cycles are left alone; a sent producer order will be too once T18 adds the sent state. */
+    /** Cancelled cycles and sent producer orders are left alone (R3a, S50). */
     private function takesPart(Cycle $cycle, string $producerId): bool
     {
-        return ! $cycle->isCancelled() && $cycle->isParticipating($producerId);
+        return ! $cycle->isCancelled() && $cycle->isParticipating($producerId) && ! $cycle->isSent($producerId);
     }
 }

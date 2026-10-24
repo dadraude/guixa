@@ -2,6 +2,7 @@
 
 namespace Tests\Support\Ordering;
 
+use DateTimeImmutable;
 use Guixa\Ordering\Application\AddParticipant;
 use Guixa\Ordering\Application\CancelCycle;
 use Guixa\Ordering\Application\ClearCutoff;
@@ -15,12 +16,15 @@ use Guixa\Ordering\Application\ListMemberCycles;
 use Guixa\Ordering\Application\OpenCycle;
 use Guixa\Ordering\Application\ParticipateAgain;
 use Guixa\Ordering\Application\RemoveMarkedLine;
+use Guixa\Ordering\Application\SendEmptyProducerOrders;
+use Guixa\Ordering\Application\SendProducerOrder;
 use Guixa\Ordering\Application\SetCutoff;
 use Guixa\Ordering\Application\SetOrderLine;
 use Guixa\Ordering\Application\SetPickupWeekday;
 use Guixa\Ordering\Application\SetProductAvailability;
 use Guixa\Ordering\Application\StopParticipating;
 use Guixa\Ordering\Application\StopParticipatingWhereNotSent;
+use Guixa\Ordering\Domain\ProducerNotifier;
 use Guixa\Ordering\Domain\ValueObject\PickupWeekday;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Role;
@@ -91,6 +95,12 @@ final class OrderingWorld
 
     public readonly SetProductAvailability $setProductAvailability;
 
+    public readonly SendProducerOrder $sendProducerOrder;
+
+    public readonly SendEmptyProducerOrders $sendEmptyProducerOrders;
+
+    public readonly RecordingProducerNotifier $notifier;
+
     public readonly HasUnsettledLines $hasUnsettledLines;
 
     public readonly GetCycleSummary $getCycleSummary;
@@ -109,6 +119,7 @@ final class OrderingWorld
         $this->availability = new InMemoryProductAvailabilityRepository;
         $this->households = new FakeHouseholds;
         $transactions = new ImmediateTransactionRunner;
+        $this->notifier = new RecordingProducerNotifier;
 
         if ($pickupWeekday !== null) {
             $this->settings->changePickupWeekday(PickupWeekday::of($pickupWeekday));
@@ -131,10 +142,15 @@ final class OrderingWorld
         $this->getHouseholdOrder = new GetHouseholdOrder($this->cycles, $this->orders, $this->catalog, $this->availability, $this->clock);
         $this->removeMarkedLine = new RemoveMarkedLine($this->cycles, $this->orders, $this->catalog, $this->availability, $transactions);
         $this->setProductAvailability = new SetProductAvailability($this->cycles, $this->catalog, $this->availability, $transactions);
+        $this->sendProducerOrder = new SendProducerOrder($this->cycles, $this->orders, $this->catalog, $this->availability, $this->notifier, $transactions, $this->clock);
+        $this->sendEmptyProducerOrders = new SendEmptyProducerOrders($this->cycles, $this->orders, $this->catalog, $this->availability, $transactions, $this->clock);
         $this->hasUnsettledLines = new HasUnsettledLines($this->orders);
         $this->getCycleSummary = new GetCycleSummary($this->cycles, $this->orders, $this->households);
 
         $this->manager = new Actor('00000000-0000-7000-8000-00000000000a', [Role::Manager]);
+
+        // Both producers have an account, so their orders can be sent.
+        $this->notifier->hasAccount(self::BAKER, self::GROWER);
 
         // The baker's default cutoff is 3 days before pickup at 20:00 (S6).
         $this->rules->activate(self::BAKER, 3, '20:00');
@@ -144,5 +160,41 @@ final class OrderingWorld
     public function member(): Actor
     {
         return new Actor('00000000-0000-7000-8000-0000000000cc', [Role::Member], '00000000-0000-7000-8000-0000000000dd');
+    }
+}
+
+/** What the producer notifier would have emailed, kept for the tests to read. */
+final class RecordingProducerNotifier implements ProducerNotifier
+{
+    /** @var list<array{producerId: string, pickupDate: string, totals: list<array{name: string, unit: string, quantity: string}>}> */
+    public array $notified = [];
+
+    /** @var array<string, true> */
+    private array $accounts = [];
+
+    public function hasAccount(string ...$producerIds): void
+    {
+        foreach ($producerIds as $producerId) {
+            $this->accounts[$producerId] = true;
+        }
+    }
+
+    public function withoutAccount(string $producerId): void
+    {
+        unset($this->accounts[$producerId]);
+    }
+
+    public function canNotify(string $producerId): bool
+    {
+        return isset($this->accounts[$producerId]);
+    }
+
+    public function notify(string $producerId, DateTimeImmutable $pickupDate, array $totals): void
+    {
+        $this->notified[] = [
+            'producerId' => $producerId,
+            'pickupDate' => $pickupDate->format('Y-m-d'),
+            'totals' => array_map(fn (array $total) => ['name' => $total['name'], 'unit' => $total['unit'], 'quantity' => $total['quantity']->toString()], $totals),
+        ];
     }
 }

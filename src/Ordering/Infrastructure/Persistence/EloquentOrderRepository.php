@@ -63,6 +63,26 @@ final class EloquentOrderRepository implements OrderRepository
         DB::table('orders')->where('cycle_id', $cycleId)->delete();
     }
 
+    public function markNotDelivered(string $orderId, array $productIds): void
+    {
+        DB::table('order_lines')
+            ->where('order_id', $orderId)
+            ->whereIn('product_id', $productIds)
+            ->update(['not_delivered' => true]);
+    }
+
+    public function notDeliveredProductIds(string $orderId): array
+    {
+        $rows = DB::table('order_lines')
+            ->where('order_id', $orderId)
+            ->where('not_delivered', true)
+            ->orderBy('product_id')
+            ->get(['product_id'])
+            ->all();
+
+        return array_map(fn (stdClass $row): string => $row->product_id, array_values($rows));
+    }
+
     public function ofHousehold(string $cycleId, string $householdId): ?Order
     {
         $row = DB::table('orders')->where('cycle_id', $cycleId)->where('household_id', $householdId)->first();

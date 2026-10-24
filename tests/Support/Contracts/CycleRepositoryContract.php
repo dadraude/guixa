@@ -180,6 +180,28 @@ trait CycleRepositoryContract
     }
 
     #[Test]
+    public function it_stores_when_a_producer_order_was_sent(): void
+    {
+        $repository = $this->repository();
+        $now = $this->madrid('2026-10-22 10:00');
+        $cycle = $this->cycle($repository);
+        $cycle->addParticipant(self::BAKER, CutoffRule::of(3, '20:00'), $now);
+        $cycle->addParticipant(self::GROWER, CutoffRule::of(2, '12:00'), $now);
+        $repository->add($cycle);
+
+        $stored = $repository->getForUpdate($cycle->id);
+        $stored->closeNow(self::BAKER, $this->madrid('2026-11-04 21:00'));
+        $stored->send(self::BAKER, $this->madrid('2026-11-04 21:00'));
+        $repository->add($stored);
+
+        $found = $repository->get($cycle->id);
+        $this->assertTrue($found->isSent(self::BAKER));
+        $this->assertFalse($found->isSent(self::GROWER));
+        $sentAt = collect($found->producerOrders())->firstWhere('producerId', self::BAKER)->sentAt();
+        $this->assertSame($this->madrid('2026-11-04 21:00')->getTimestamp(), $sentAt->getTimestamp());
+    }
+
+    #[Test]
     public function it_finds_a_cycle_to_read_under_a_shared_lock(): void
     {
         $repository = $this->repository();

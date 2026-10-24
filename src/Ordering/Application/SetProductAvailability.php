@@ -4,6 +4,7 @@ namespace Guixa\Ordering\Application;
 
 use Guixa\Ordering\Domain\CycleRepository;
 use Guixa\Ordering\Domain\Error\CycleNotFound;
+use Guixa\Ordering\Domain\Error\ProducerOrderSent;
 use Guixa\Ordering\Domain\Error\ProductNotOrderable;
 use Guixa\Ordering\Domain\ProductAvailabilityRepository;
 use Guixa\Ordering\Domain\ProductCatalog;
@@ -19,15 +20,19 @@ final class SetProductAvailability
         private readonly TransactionRunner $transactions,
     ) {}
 
-    /** The producer marks its own product unavailable in a cycle, or available again (R3c). */
+    /** The producer marks its own product unavailable in a cycle, or available again, while its order is not sent (R3c). */
     public function __invoke(Actor $actor, string $cycleId, string $productId, bool $available): void
     {
         $product = $this->catalog->orderable($productId) ?? throw ProductNotOrderable::withId($productId);
         $actor->assertProducerOf($product->producerId);
 
-        $this->transactions->run(function () use ($cycleId, $productId, $available) {
+        $this->transactions->run(function () use ($cycleId, $productId, $available, $product) {
             // Shared lock on the cycle: a send cannot slip in while the mark changes (R3c).
-            $this->cycles->getForShare($cycleId) ?? throw CycleNotFound::withId($cycleId);
+            $cycle = $this->cycles->getForShare($cycleId) ?? throw CycleNotFound::withId($cycleId);
+
+            if ($cycle->isSent($product->producerId)) {
+                throw ProducerOrderSent::withId($cycleId, $product->producerId);
+            }
 
             $available
                 ? $this->availability->markAvailable($cycleId, $productId)

@@ -23,7 +23,7 @@ final class RemoveMarkedLine
         ProductAvailabilityRepository $availability,
         private readonly TransactionRunner $transactions,
     ) {
-        $this->marks = new NotDeliveredMarks($catalog, $availability);
+        $this->marks = new NotDeliveredMarks($catalog, $availability, $orders);
     }
 
     /** A member removes a line marked *will not be delivered*, even after its producer's cutoff (R3b, R8). */

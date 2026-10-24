@@ -18,8 +18,30 @@ final class InMemoryOrderRepository extends InMemoryRepository implements OrderR
         foreach ($this->all() as $order) {
             if ($order->cycleId === $cycleId) {
                 $this->remove($order->id);
+                unset($this->notDelivered[$order->id]);
             }
         }
+    }
+
+    /** @var array<string, array<string, true>> stored marks, by order id then product id */
+    private array $notDelivered = [];
+
+    public function markNotDelivered(string $orderId, array $productIds): void
+    {
+        $order = $this->find($orderId);
+        $present = $order === null ? [] : array_map(fn ($line) => $line->productId, $order->lines());
+
+        foreach (array_intersect($productIds, $present) as $productId) {
+            $this->notDelivered[$orderId][$productId] = true;
+        }
+    }
+
+    public function notDeliveredProductIds(string $orderId): array
+    {
+        $ids = array_keys($this->notDelivered[$orderId] ?? []);
+        sort($ids);
+
+        return $ids;
     }
 
     public function ofHousehold(string $cycleId, string $householdId): ?Order

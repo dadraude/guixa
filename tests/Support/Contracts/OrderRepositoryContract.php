@@ -58,6 +58,24 @@ trait OrderRepositoryContract
     }
 
     #[Test]
+    public function it_stores_the_not_delivered_mark_of_lines_and_keeps_it_when_the_order_is_added_again(): void
+    {
+        $repository = $this->repository();
+        $cycle = $this->openCycle();
+        $order = $repository->lockFor(self::CYCLE, self::HOUSEHOLD);
+        foreach ([[self::BREAD, 'Loaf'], [self::APPLES, 'Apples']] as [$id, $name]) {
+            $order->setLine($this->product($id, $name, 350), Quantity::fromString('2'), $cycle, $repository->nextId(), self::ANNA, $this->madrid('2026-10-22 10:00'));
+        }
+        $repository->add($order);
+        $this->assertSame([], $repository->notDeliveredProductIds($order->id));
+
+        $repository->markNotDelivered($order->id, [self::APPLES, '00000000-0000-7000-8000-0000000000ff']);
+        $repository->add($repository->ofHousehold(self::CYCLE, self::HOUSEHOLD));
+
+        $this->assertSame([self::APPLES], $repository->notDeliveredProductIds($order->id));
+    }
+
+    #[Test]
     public function it_generates_distinct_uuid_v7_ids(): void
     {
         $repository = $this->repository();

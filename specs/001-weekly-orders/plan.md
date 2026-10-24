@@ -181,17 +181,17 @@ role only; participation is not restored.
   `?distributedAt`.
   - `open(id, pickupDate, weekday, today, participants)`: pickup date after today and on the weekday (R4, R4c).
   - `addParticipant(producerId, CutoffRule, now)`: until settled (the settled state arrives with T20+); the cutoff is computed once, and is null if
-    that moment already passed (R4a, R5). A producer already in the cycle is left as it is, so the call is idempotent and never recomputes. `stopParticipating` / `participateAgain`: only while not sent (R6c).
-  - `setCutoff(producerId, at, now)`: not sent (R6b; the sent state arrives with T18, so T12 does not check it), `at > now`, and
+    that moment already passed (R4a, R5). A producer already in the cycle is left as it is, so the call is idempotent and never recomputes. `stopParticipating` / `participateAgain`: only while not sent (R6c); a sent order is refused with `ProducerOrderSent`.
+  - `setCutoff(producerId, at, now)`: not sent (R6b; a sent order is refused with `ProducerOrderSent`, also for `closeNow` and `clearCutoff`), `at > now`, and
     `pickupDate − 6 days 00:00 ≤ at < pickupDate 00:00` (R6). `closeNow(producerId, now)`, `clearCutoff(producerId)`.
   - `isOpenFor(producerId, now)`: participating, not sent and `now < (cutoff ?? pickupDate 00:00)` (R6a, R8).
     `isOpenForMembers(now)`: any participating producer open (R4a).
-  - `send(producerId, now)`: participating, closed, not sent (R12a, S36).
+  - `send(producerId, now)`: not sent (`ProducerOrderSent`), participating (`ProducerNotParticipating`) and closed (`ProducerStillOpen`); stores `sentAt`, which freezes the cutoff and the participation (R6b, R6c, R12a, S36). `producersReadyToSend(now)` lists the participating, closed, unsent producers (D10); `totalsToSend(producerId, orders, marks)` is the ordered quantity per product over the unmarked lines, and `markedLines(...)` the marked ones per order (D9).
   - `validate(producerId)`; `clearValidation(producerId)` when a received total changes (R17a).
   - `markDistributed(producerId, balanced, now)`: sent, validated and balanced; settles the cycle the first
     time every participating producer is distributed and returns whether it did (R18).
   - `reopen(producerId)`: rejected once the cycle is closed (R18, R24b).
-  - `cancel(now)`: rejected once any producer order is sent (R4b; the sent state arrives in T18) and once already cancelled. A cancelled cycle refuses `addParticipant`, `setCutoff`, `closeNow`, `clearCutoff` and `assertOpenFor` with `CycleCancelled`, and `isOpenFor` is false.
+  - `cancel(now)`: rejected with `ProducerOrderSent` once any producer order is sent (R4b, S37) and with `CycleCancelled` once already cancelled. A cancelled cycle refuses `addParticipant`, `setCutoff`, `closeNow`, `clearCutoff` and `assertOpenFor` with `CycleCancelled`, and `isOpenFor` is false.
   - `close(now, everyPickupDone)`: settled, every participating producer distributed and every pickup done (R24b).
 
 - **`Order`** aggregate — everything a household has in one cycle. Created on the first ordered line, on an
@@ -235,7 +235,7 @@ role only; participation is not restored.
 
 - **`ProductAvailability`**: `(cycleId, productId)` rows for products marked unavailable in a cycle; only while
   the producer order is not sent (R3c). `ProductAvailabilityRepository`: `markUnavailable`, `markAvailable`, `unavailableIn(cycleId)`.
-- **`NotDeliveredMarks`** domain service (`ProductCatalog` + `ProductAvailabilityRepository`): `of(cycle, order)` returns the product ids of the marked lines: the cycle does not have the producer participating, the product is unavailable in the cycle, or `ProductCatalog::orderable` is null (R3b, R6c). Until T18 adds the sent state, every producer order counts as not sent.
+- **`NotDeliveredMarks`** domain service (`ProductCatalog` + `ProductAvailabilityRepository`): `of(cycle, order)` returns the product ids of the marked lines: the cycle does not have the producer participating, the product is unavailable in the cycle, or `ProductCatalog::orderable` is null (R3b, R6c). `of` derives the mark while the producer order is not sent and reads the stored one (`OrderRepository::notDeliveredProductIds`) once it is, so a later reactivation does not lift it and a later deactivation does not add one; `derivedOf` is the derivation alone, which `send` uses to decide what to store with `OrderRepository::markNotDelivered` (D9).
 
 - **`ReceivedTotal`** (cycleId, producerId, productId, `Quantity`): absent means "equal to the ordered total";
   a manager adds one with 0 for a product nobody ordered (R14).
@@ -264,7 +264,7 @@ role only; participation is not restored.
 - Errors (`Ordering\Domain\Error`): `NotOnPickupWeekday`, `PickupDateNotInFuture`, `CycleAlreadyExists`,
   `InvalidPickupWeekday`, `InvalidPickupDate`, `CycleNotFound`, `ProducerNotActive` (unknown or deactivated producer, S50),
   `CycleCancelled`, `CycleAlreadySettled`, `CycleClosed`, `ProducerNotParticipating`, `ProducerClosed`,
-  `ProducerOrderSent`, `ProducerOrderNotSent`, `ProducerStillOpen`, `CutoffOutOfRange`, `ProductNotOrderable`, `LineNotMarked`,
+  `ProducerOrderSent`, `ProducerOrderNotSent`, `ProducerStillOpen`, `ProducerHasNoAccount`, `CutoffOutOfRange`, `ProductNotOrderable`, `LineNotMarked`,
   `FractionalQuantityNotAllowed`, `NoHousehold`, `ReceptionNotValidated`, `ReceptionUnbalanced`,
   `ManualAllocationsWouldBeLost`, `NobodyOrderedProduct`, `CycleNotSettled`, `NotEnoughStock`,
   `PickupNotPending`, `HouseholdInactive`.
@@ -279,6 +279,8 @@ role only; participation is not restored.
 - Ports: `CooperativeSettings`, `CycleRepository`, `OrderRepository`, `ProductAvailabilityRepository`,
   `ReceivedTotalRepository`, `ProductCatalog`, `ProducerCutoffRules`, `StockCatalog`, `ReturnItemCatalog`,
   `StockSeller`, `WalletLedger`, `ProducerNotifier`, `Households`.
+- `ProducerNotifier` (Ordering port): `canNotify(producerId)` (the producer has an account) and `notify(producerId, pickupDate, totals)`, with the totals as name, unit and `Quantity`; its Membership adapter reads the account email through `GetProducerAccountEmail` and sends a mail with the totals and no household names.
+- `OrderRepository` adds `markNotDelivered(orderId, productIds)` and `notDeliveredProductIds(orderId)` (the `not_delivered` column); `CycleRepository` stores `sentAt` in `cycle_producers.sent_at`.
 - `Households` (Ordering port): `find(householdIds): array<id, HouseholdInfo>`, unknown ids left out; its Membership adapter calls `GetHouseholds`, which reads
   them with one `HouseholdRepository::getMany(ids)` query.
 
@@ -290,17 +292,17 @@ role only; participation is not restored.
 | `OpenCycle` (with participants and an optional `weekday` + `permanent` flag; the date is `YYYY-MM-DD`; returns the cycle id. While the cooperative has no weekday, a `weekday` must be given: permanent also saves it, in the same transaction, and provisional saves nothing. A `weekday` given when the cooperative has one is refused), `ListCycles` (`CycleData`: pickup date and participants with ISO 8601 cutoff in the cooperative's timezone) | manager | R4, R4a, R5, S6, S38, S51 |
 | `AddParticipant`, `StopParticipating`, `ParticipateAgain` (a producer not in the cycle is refused with `ProducerNotInCycle`, a cancelled cycle with `CycleCancelled`, and a deactivated producer cannot participate again: `ProducerNotActive`; the cutoff it had is kept; both are idempotent) | manager | R4a, R6c, S50, S51 |
 | `SetCutoff` (`at` is ISO 8601; without an offset it is read in the cooperative's timezone), `CloseProducerNow`, `ClearCutoff` (a producer not in the cycle is refused with `ProducerNotInCycle`; `ListCycles` participants carry `open`, from `isOpenFor`) | manager | R6, R6a, R6b, S6, S34, S35 |
-| `CancelCycle` (deletes the cycle's orders in the same transaction; `ListCycles` cycles carry `cancelled`; a cancelled cycle refuses line changes, new participants and cutoff changes with `CycleCancelled`, and cancelling twice too; the sent check arrives with `send` in T18) | manager | R4b, S37 |
-| `SetProductAvailability` (`cycleId`, `productId`, `available`; the product must be orderable, so an unknown or deactivated one is refused with `ProductNotOrderable`, and its producer must be the actor; `SetOrderLine` refuses an unavailable product with `ProductNotOrderable` and `GetHouseholdOrder` stops offering it) | producer (own) | R3c, S48 |
+| `CancelCycle` (deletes the cycle's orders in the same transaction; `ListCycles` cycles carry `cancelled`; a cancelled cycle refuses line changes, new participants and cutoff changes with `CycleCancelled`, and cancelling twice too; cancelling once any producer order is sent is refused with `ProducerOrderSent`) | manager | R4b, S37 |
+| `SetProductAvailability` (`cycleId`, `productId`, `available`; refused with `ProducerOrderSent` once the producer's order is sent (R3c); the product must be orderable, so an unknown or deactivated one is refused with `ProductNotOrderable`, and its producer must be the actor; `SetOrderLine` refuses an unavailable product with `ProductNotOrderable` and `GetHouseholdOrder` stops offering it) | producer (own) | R3c, S48 |
 | `SetOrderLine` (the household is the actor's, so an account without one is refused with `NoHousehold`; `quantity` is a string of at most 3 decimals, 0 removes) | member of household | R3, R7–R11, S1–S5, S33, S49, S51 |
 | `RemoveMarkedLine` (`cycleId`, `productId`; a line that is not marked is refused with `LineNotMarked`) | member of household | R3b, R8, S32 |
 | `GetHouseholdOrder` (the lines with their snapshot, and the participating producers with whether each is open and the products it offers; each line carries `notDelivered`, the derived *will not be delivered* mark (R3b); the pickup, once settled, arrives with the pickup tasks) | member of household | R3b, R7, R23a, S4 |
 | `ListMemberCycles` (`MemberCycleData`: pickup date, whether it is open for members, and how many lines the household has in it; the pending, cancelled and closed states arrive with their tasks: T17 cancelled, the pickup tasks pending and closed) | member | R4a, R23a |
-| `SendProducerOrder` → notifies the producer | manager | R12a, R6b, S34, S36 |
-| `SendEmptyProducerOrders` (scheduled) | — (scheduler) | R12a, D10 |
+| `SendProducerOrder` (the cycle `FOR UPDATE`; `Cycle::send`, then the marked lines are stored as not delivered, then the producer is emailed the totals after commit; a producer with no account is refused with `ProducerHasNoAccount` before anything is stored, unless it has no line to send; the `POST …/producers/{producer}/send` route and its button come with the later task that adds the send button, not T18) | manager | R12a, R6b, R6c, S34, S36 |
+| `SendEmptyProducerOrders` (scheduled every minute in `routes/console.php`; T18 only sends: per cycle `FOR UPDATE`, each participating, closed, unsent producer with no line to send is sent and its marked lines stored, nobody is notified; `validate` and `markDistributed` come with T23) | — (scheduler) | R12a, D10 |
 | `GetProducerCycleSummary` | producer (own) | R12, S7, S8 |
 | `GetCycleSummary` (ordered quantity per product under its producer, per household; households Membership does not know show their id; carries `cancelled`, and a cancelled cycle has no totals) | manager | R13, S52, S62 |
-| `HasUnsettledLines(productId): bool`, `StopParticipatingWhereNotSent(producerId)` (T16: stops the producer in every cycle that is not cancelled and where it participates; skipping sent orders arrives with T18) | — (called by Catalog) | R1, R3a |
+| `HasUnsettledLines(productId): bool`, `StopParticipatingWhereNotSent(producerId)` (T16: stops the producer in every cycle that is not cancelled and where it participates; a sent order is skipped, so its participation stays, S50) | — (called by Catalog) | R1, R3a |
 | `ListPendingPickups` | — (called by Membership) | R35a |
 | `GetReception` | manager | R14, R17 |
 | `AddUnorderedProduct` | manager | R14, S40 |
