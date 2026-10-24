@@ -24,7 +24,15 @@ defineOptions({
         />
 
         <p
-            v-if="summary.producers.length === 0"
+            v-if="summary.cancelled"
+            class="text-sm text-muted-foreground"
+            data-test="cancelled-notice"
+        >
+            Cancelled. This cycle has no totals.
+        </p>
+
+        <p
+            v-else-if="summary.producers.length === 0"
             class="text-sm text-muted-foreground"
             data-test="no-orders"
         >

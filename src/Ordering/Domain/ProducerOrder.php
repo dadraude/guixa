@@ -29,6 +29,17 @@ final class ProducerOrder
         return $this->participating;
     }
 
+    public function stopParticipating(): void
+    {
+        $this->participating = false;
+    }
+
+    /** The cutoff is kept as it was: the producer does not get a new one (R5). */
+    public function participateAgain(): void
+    {
+        $this->participating = true;
+    }
+
     public function changeCutoff(?DateTimeImmutable $cutoff): void
     {
         $this->cutoff = $cutoff;

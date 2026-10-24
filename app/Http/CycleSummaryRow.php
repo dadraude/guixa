@@ -13,6 +13,7 @@ final readonly class CycleSummaryRow
     public function __construct(
         public string $cycleId,
         public string $pickupDate,
+        public bool $cancelled,
         public array $producers,
     ) {}
 
@@ -25,6 +26,6 @@ final readonly class CycleSummaryRow
         );
         usort($producers, fn (ProducerTotalsRow $a, ProducerTotalsRow $b) => mb_strtolower($a->producerName) <=> mb_strtolower($b->producerName));
 
-        return new self($summary->cycleId, $summary->pickupDate, $producers);
+        return new self($summary->cycleId, $summary->pickupDate, $summary->cancelled, $producers);
     }
 }

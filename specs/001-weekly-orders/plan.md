@@ -161,6 +161,11 @@ Use cases
 and `ProducerCycles::stopParticipatingWhereNotSent(producerId)` (R3a, R6c, D13). Reactivating restores the
 role only; participation is not restored.
 
+`ProducerAccess` (`suspend`, `restore`; adapter `MembershipProducerAccess` calls Membership's `SuspendProducerRole` and
+`RestoreProducerRole` by producer id). Suspending takes the `producer` row out of the account's `account_roles` and keeps
+`users.producer_id`, so restoring puts it back; a producer with no account yet is left alone. `ProducerCycles` gains
+`stopParticipatingWhereNotSent(producerId)`, whose adapter calls Ordering's use case of the same name.
+
 ## Ordering
 
 ### Domain
@@ -283,7 +288,7 @@ role only; participation is not restored.
 | --- | --- | --- |
 | `SetPickupWeekday`, `GetPickupWeekday` (null while unset) | manager | R4c, S37 |
 | `OpenCycle` (with participants and an optional `weekday` + `permanent` flag; the date is `YYYY-MM-DD`; returns the cycle id. While the cooperative has no weekday, a `weekday` must be given: permanent also saves it, in the same transaction, and provisional saves nothing. A `weekday` given when the cooperative has one is refused), `ListCycles` (`CycleData`: pickup date and participants with ISO 8601 cutoff in the cooperative's timezone) | manager | R4, R4a, R5, S6, S38, S51 |
-| `AddParticipant`, `StopParticipating`, `ParticipateAgain` | manager | R4a, R6c, S50, S51 |
+| `AddParticipant`, `StopParticipating`, `ParticipateAgain` (a producer not in the cycle is refused with `ProducerNotInCycle`, a cancelled cycle with `CycleCancelled`, and a deactivated producer cannot participate again: `ProducerNotActive`; the cutoff it had is kept; both are idempotent) | manager | R4a, R6c, S50, S51 |
 | `SetCutoff` (`at` is ISO 8601; without an offset it is read in the cooperative's timezone), `CloseProducerNow`, `ClearCutoff` (a producer not in the cycle is refused with `ProducerNotInCycle`; `ListCycles` participants carry `open`, from `isOpenFor`) | manager | R6, R6a, R6b, S6, S34, S35 |
 | `CancelCycle` (deletes the cycle's orders in the same transaction; `ListCycles` cycles carry `cancelled`; a cancelled cycle refuses line changes, new participants and cutoff changes with `CycleCancelled`, and cancelling twice too; the sent check arrives with `send` in T18) | manager | R4b, S37 |
 | `SetProductAvailability` (`cycleId`, `productId`, `available`; the product must be orderable, so an unknown or deactivated one is refused with `ProductNotOrderable`, and its producer must be the actor; `SetOrderLine` refuses an unavailable product with `ProductNotOrderable` and `GetHouseholdOrder` stops offering it) | producer (own) | R3c, S48 |
@@ -295,7 +300,7 @@ role only; participation is not restored.
 | `SendEmptyProducerOrders` (scheduled) | — (scheduler) | R12a, D10 |
 | `GetProducerCycleSummary` | producer (own) | R12, S7, S8 |
 | `GetCycleSummary` (ordered quantity per product under its producer, per household; households Membership does not know show their id; carries `cancelled`, and a cancelled cycle has no totals) | manager | R13, S52, S62 |
-| `HasUnsettledLines(productId): bool`, `StopParticipatingWhereNotSent` (T16) | — (called by Catalog) | R1, R3a |
+| `HasUnsettledLines(productId): bool`, `StopParticipatingWhereNotSent(producerId)` (T16: stops the producer in every cycle that is not cancelled and where it participates; skipping sent orders arrives with T18) | — (called by Catalog) | R1, R3a |
 | `ListPendingPickups` | — (called by Membership) | R35a |
 | `GetReception` | manager | R14, R17 |
 | `AddUnorderedProduct` | manager | R14, S40 |
@@ -464,7 +469,8 @@ role areas (R36a); the layout shows a switch between them.
 | `GET/POST /manage/cycles` | `Manage/Cycles/Index` (cycles with named participants, active producers to pick, the pickup weekday or null; while it is null the open form also shows a weekday picker and a permanent/provisional choice, sent as `pickup_weekday` and `permanent`) | `ListCycles`, `OpenCycle` |
 | `GET /manage/cycles/{cycle}` | `Manage/Cycles/Show` (totals, producers, containers; a "Cancelled" notice instead of totals when the cycle is cancelled) | `GetCycleSummary`, `GetContainerCount` |
 | `POST /manage/cycles/{cycle}/cancel` | — (the cycles page shows a cancel button that opens a confirmation dialog warning that every household's orders are discarded and it cannot be undone, and a cancelled cycle with its producer controls hidden) | `CancelCycle` |
-| `POST/DELETE /manage/cycles/{cycle}/producers/{producer}` | — | `AddParticipant`, `ParticipateAgain`, `StopParticipating` |
+| `POST/PUT/DELETE /manage/cycles/{cycle}/producers/{producer}` | — | `AddParticipant`, `ParticipateAgain`, `StopParticipating` |
+| `POST/DELETE /manage/producers/{producer}/deactivation` | redirect back | `DeactivateProducer`, `ReactivateProducer` |
 | `PUT/DELETE …/producers/{producer}/cutoff`, `POST …/close` | — | `SetCutoff`, `ClearCutoff`, `CloseProducerNow` |
 | `POST …/producers/{producer}/send` | — | `SendProducerOrder` |
 | `GET /manage/cycles/{cycle}/receptions/{producer}` | `Manage/Reception` | `GetReception` |

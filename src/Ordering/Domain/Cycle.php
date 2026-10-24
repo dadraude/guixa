@@ -73,6 +73,22 @@ final class Cycle
     }
 
     /**
+     * Lines of the producer stay and show as *will not be delivered*. Refusing a sent producer order
+     * arrives with the sent state in T18 (R6c).
+     */
+    public function stopParticipating(string $producerId): void
+    {
+        $this->assertNotCancelled();
+        $this->producerOrderOf($producerId)->stopParticipating();
+    }
+
+    public function participateAgain(string $producerId): void
+    {
+        $this->assertNotCancelled();
+        $this->producerOrderOf($producerId)->participateAgain();
+    }
+
+    /**
      * Moves the cutoff to a future moment from 6 days before the pickup date at 00:00 up to, not including,
      * the pickup date at 00:00; it works even if the current cutoff has passed (R6).
      */
@@ -117,6 +133,11 @@ final class Cycle
         }
 
         return $now < ($producerOrder->cutoff() ?? $this->closesWithoutCutoff($now->getTimezone()));
+    }
+
+    public function hasProducer(string $producerId): bool
+    {
+        return isset($this->producerOrders[$producerId]);
     }
 
     public function isParticipating(string $producerId): bool

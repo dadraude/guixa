@@ -52,6 +52,13 @@ final class DatabaseAccountRepository implements AccountRepository
         return $this->hydrateAll(DB::table('users')->orderBy('name')->orderBy('id')->get());
     }
 
+    public function ofProducer(string $producerId): ?Account
+    {
+        $row = DB::table('users')->where('producer_id', $producerId)->first();
+
+        return $row === null ? null : $this->hydrate($row);
+    }
+
     public function producerHasAccount(string $producerId): bool
     {
         return DB::table('users')->where('producer_id', $producerId)->exists();

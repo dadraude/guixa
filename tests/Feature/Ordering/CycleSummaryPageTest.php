@@ -43,3 +43,21 @@ it('shows the totals per producer and product with the breakdown per household (
 it('answers 404 for the summary of an unknown cycle (R13)', function () {
     $this->actingAs(accountWith(Role::Manager))->get('/manage/cycles/'.Str::uuid7())->assertNotFound();
 });
+
+it('flags a cancelled cycle and shows no totals (R4b, R13, S62)', function () {
+    [$cycleId, , $loaf] = cycleWithBaker();
+    $anna = memberOf(householdNamed('Household A'), 'Anna');
+    $manager = accountWith(Role::Manager);
+    $this->actingAs($anna)->put("/cycles/{$cycleId}/order/lines/{$loaf}", ['quantity' => '2'])->assertRedirect();
+
+    $this->actingAs($manager)->get("/manage/cycles/{$cycleId}")
+        ->assertInertia(fn (Assert $page) => $page->where('summary.cancelled', false)->has('summary.producers', 1));
+
+    $this->actingAs($manager)->post("/manage/cycles/{$cycleId}/cancel")->assertRedirect();
+
+    $this->actingAs($manager)->get("/manage/cycles/{$cycleId}")->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('Manage/Cycles/Show')
+            ->where('summary.cancelled', true)
+            ->has('summary.producers', 0));
+});

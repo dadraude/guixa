@@ -20,6 +20,14 @@ final class FakeProducerCycles implements ProducerCycles
         unset($this->withUnsettledLines[$productId]);
     }
 
+    /** @var list<string> producers stopped, in order */
+    public array $stopped = [];
+
+    public function stopParticipatingWhereNotSent(string $producerId): void
+    {
+        $this->stopped[] = $producerId;
+    }
+
     public function hasUnsettledLines(string $productId): bool
     {
         return isset($this->withUnsettledLines[$productId]);
