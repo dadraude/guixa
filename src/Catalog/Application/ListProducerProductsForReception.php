@@ -12,6 +12,6 @@ final class ListProducerProductsForReception
     /** @return list<OrderableProductData> */
     public function __invoke(string $producerId): array
     {
-        return array_values(array_map(OrderableProductData::of(...), $this->products->listByProducer($producerId)));
+        return array_map(OrderableProductData::of(...), $this->products->listByProducer($producerId));
     }
 }
