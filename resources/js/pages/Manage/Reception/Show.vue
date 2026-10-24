@@ -90,7 +90,9 @@ const reopen = computed(() =>
 const canDistribute = computed(
     () =>
         props.distribution.validated &&
-        props.reception.products.every((product) => product.balanced),
+        props.reception.products.every(
+            (product) => product.balancedForDistribution,
+        ),
 );
 
 const addProduct = computed(() =>
@@ -206,9 +208,16 @@ const addProduct = computed(() =>
                 <Badge v-else variant="destructive" data-test="unbalanced">
                     Unbalanced by {{ product.difference }} {{ product.unit }}
                 </Badge>
+                <Badge
+                    v-if="product.hasAdjustments"
+                    variant="outline"
+                    data-test="adjusted"
+                >
+                    Adjusted at pickup: this blocks nothing
+                </Badge>
             </div>
 
-            <dl class="grid grid-cols-3 gap-2 text-sm">
+            <dl class="grid grid-cols-2 gap-2 text-sm sm:grid-cols-4">
                 <div>
                     <dt class="text-muted-foreground">Ordered</dt>
                     <dd data-test="ordered">
@@ -225,6 +234,12 @@ const addProduct = computed(() =>
                     <dt class="text-muted-foreground">Allocated</dt>
                     <dd data-test="allocated">
                         {{ product.allocated }} {{ product.unit }}
+                    </dd>
+                </div>
+                <div v-if="product.hasAdjustments">
+                    <dt class="text-muted-foreground">Delivered</dt>
+                    <dd data-test="delivered">
+                        {{ product.delivered }} {{ product.unit }}
                     </dd>
                 </div>
             </dl>

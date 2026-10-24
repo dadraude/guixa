@@ -34,15 +34,33 @@ final readonly class ReceptionProduct
         return $this->ordered()->isZero();
     }
 
-    /** Received minus allocated, in thousandths: positive when goods are left unallocated (R17). */
-    public function differenceThousandths(): int
+    /** What the households take home: the allocations, as adjusted at pickup (R19, D16). */
+    public function delivered(): Quantity
     {
-        return $this->received->thousandths - $this->allocatedThousandths();
+        return Quantity::ofThousandths(array_sum(array_map(fn (ReceptionLine $line) => $line->delivered->thousandths, $this->lines)));
     }
 
+    public function hasAdjustments(): bool
+    {
+        return array_filter($this->lines, fn (ReceptionLine $line) => $line->isAdjusted()) !== [];
+    }
+
+    /** Received minus delivered, in thousandths: positive when goods are left over, negative after a pickup took more (R17, R19). */
+    public function differenceThousandths(): int
+    {
+        return $this->received->thousandths - $this->delivered()->thousandths;
+    }
+
+    /** Shown and flagged, but it blocks nothing (R19). */
     public function isBalanced(): bool
     {
         return $this->differenceThousandths() === 0;
+    }
+
+    /** Received minus allocated is 0: pickup adjustments do not count when distributing again (R18, S61). */
+    public function balancedForDistribution(): bool
+    {
+        return $this->received->thousandths === $this->allocatedThousandths();
     }
 
     /** 1 unit for a non-variable product, 0.001 for a variable one (R15). */

@@ -260,6 +260,28 @@ trait OrderRepositoryContract
     }
 
     #[Test]
+    public function it_stores_a_delivered_quantity_apart_from_the_allocation_and_an_opened_empty_pickup(): void
+    {
+        $cycle = $this->openCycle();
+        $repository = $this->repository();
+        $now = $this->madrid('2026-10-22 10:00');
+        $order = $repository->lockFor(self::CYCLE, self::HOUSEHOLD);
+        $order->setLine($this->product(self::APPLES, 'Apples', 280, variable: true), Quantity::fromString('1'), $cycle, $repository->nextId(), self::ANNA, $now);
+        $order->drop([]);
+        $order->adjustDelivered(self::APPLES, Quantity::fromString('1.120'));
+        $repository->add($order);
+        $empty = $repository->lockFor(self::CYCLE, self::OTHER_HOUSEHOLD);
+        $empty->openPickup();
+        $repository->add($empty);
+
+        $line = $repository->ofHousehold(self::CYCLE, self::HOUSEHOLD)?->lines()[0];
+        $this->assertSame('1.120', $line?->delivered()->toString());
+        $this->assertSame('1.000', $line?->allocated->toString());
+        $this->assertTrue($line?->isAdjusted());
+        $this->assertSame(PickupStatus::Pending, $repository->ofHousehold(self::CYCLE, self::OTHER_HOUSEHOLD)?->pickup());
+    }
+
+    #[Test]
     public function it_stores_nothing_to_collect_when_every_allocation_is_zero_or_dropped(): void
     {
         $cycle = $this->openCycle();

@@ -48,11 +48,11 @@ final readonly class Reception
         return new self($products);
     }
 
-    /** Every product received exactly what it was allocated: what a producer needs to be distributed (R17, R18). */
+    /** Every product received exactly what it was allocated, ignoring what pickups adjusted: what a producer needs to be distributed (R17, R18, R19). */
     public function balancedForDistribution(): bool
     {
         foreach ($this->products as $product) {
-            if (! $product->isBalanced()) {
+            if (! $product->balancedForDistribution()) {
                 return false;
             }
         }
@@ -83,6 +83,7 @@ final readonly class Reception
             $entry['line']->id,
             $entry['line']->ordered,
             $entry['line']->allocated,
+            $entry['line']->delivered(),
             $entry['line']->allocatedByHand,
             $entry['line']->createdAt,
         ), $entries);

@@ -22,6 +22,8 @@ const domainError = computed(
 
 const groups = computed(() => orderRows(props.order));
 
+const cents = (amount: number) => formatMoney((amount / 100).toFixed(2));
+
 // What each box holds, saved or not; the total follows it.
 const drafts = reactive<Record<string, string>>({});
 const draftOf = (row: OrderRow) =>
@@ -113,6 +115,58 @@ const lineTotal = (price: string, quantity: string) =>
         >
             {{ trans('No producer takes part in this cycle yet.') }}
         </p>
+        <section
+            v-if="order.pickup"
+            class="min-w-0 overflow-hidden rounded-2xl border bg-card text-card-foreground shadow-xs"
+            data-test="pickup"
+        >
+            <h2 class="border-b bg-muted/40 p-4 text-lg font-semibold sm:px-5">
+                {{ trans('Your pickup') }}
+            </h2>
+            <p
+                v-if="order.pickup.status === 'nothing_to_collect'"
+                class="p-4 text-muted-foreground sm:px-5"
+                data-test="pickup-nothing"
+            >
+                {{ trans('There is nothing to collect in this pickup.') }}
+            </p>
+            <ul v-else class="divide-y">
+                <li
+                    v-for="line in order.pickup.lines"
+                    :key="line.productId"
+                    class="flex flex-wrap items-center justify-between gap-2 p-4 sm:px-5"
+                    :data-test="`pickup-line-${line.productId}`"
+                >
+                    <div class="flex min-w-0 flex-col">
+                        <span class="font-medium wrap-anywhere">{{
+                            line.name
+                        }}</span>
+                        <span class="text-sm text-muted-foreground">
+                            {{
+                                trans(
+                                    'Ordered :ordered, delivered :delivered',
+                                    {
+                                        ordered: line.ordered,
+                                        delivered: line.delivered,
+                                    },
+                                )
+                            }}
+                            {{ line.unit }} ·
+                            {{ cents(line.unitPriceCents) }}
+                        </span>
+                    </div>
+                    <span data-test="pickup-line-amount">{{
+                        cents(line.amountCents)
+                    }}</span>
+                </li>
+            </ul>
+            <p class="flex justify-between border-t p-4 font-semibold sm:px-5">
+                <span>{{ trans('Pickup total') }}</span>
+                <span data-test="pickup-total">{{
+                    cents(order.pickup.totalCents)
+                }}</span>
+            </p>
+        </section>
         <template v-if="!order.cancelled">
             <p
                 v-if="

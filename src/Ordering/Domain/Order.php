@@ -5,11 +5,15 @@ namespace Guixa\Ordering\Domain;
 use DateTimeImmutable;
 use Guixa\Ordering\Domain\Error\FractionalQuantityNotAllowed;
 use Guixa\Ordering\Domain\Error\LineNotMarked;
+use Guixa\Ordering\Domain\Error\PickupAlreadyOpen;
+use Guixa\Ordering\Domain\Error\PickupNotPending;
+use Guixa\Ordering\Domain\Error\ProductNotInPickup;
 use Guixa\Ordering\Domain\ValueObject\OrderableProduct;
+use Guixa\Shared\Domain\Money;
 use Guixa\Shared\Domain\Quantity;
 use LogicException;
 
-/** Everything one household has in one cycle (R7). The ordering and the reception parts exist so far. */
+/** Everything one household has in one cycle (R7). The ordering, reception and pickup-adjustment parts exist so far. */
 final class Order
 {
     /** @param array<string, OrderLine> $lines by product id */
@@ -176,6 +180,53 @@ final class Order
     public function pickup(): PickupStatus
     {
         return $this->pickup;
+    }
+
+    /** A manager opens the pickup of a household that has no allocation to collect, such as a stock-only one (R19, S18). */
+    public function openPickup(): void
+    {
+        if ($this->pickup !== PickupStatus::None) {
+            throw PickupAlreadyOpen::forOrder($this->id);
+        }
+
+        $this->pickup = PickupStatus::Pending;
+    }
+
+    /**
+     * Records what the household takes home of a product, in the product's step; the allocation stays as the
+     * reception left it (R19, D16).
+     */
+    public function adjustDelivered(string $productId, Quantity $delivered): void
+    {
+        if ($this->pickup !== PickupStatus::Pending) {
+            throw PickupNotPending::forOrder($this->id);
+        }
+
+        $line = $this->lines[$productId] ?? null;
+
+        if ($line === null || $line->dropped) {
+            throw ProductNotInPickup::withId($productId);
+        }
+
+        $this->assertInStep($line->name, $line->variable, $delivered);
+
+        $this->lines[$productId] = $line->withDelivered($delivered);
+    }
+
+    /** @return list<OrderLine> the lines the household collects: dropped lines are never delivered nor charged (R18) */
+    public function pickupLines(): array
+    {
+        return array_values(array_filter($this->lines(), fn (OrderLine $line) => ! $line->dropped));
+    }
+
+    /** What the pickup costs so far: the sum of its lines, each rounded half up (R22). */
+    public function total(): Money
+    {
+        return array_reduce(
+            $this->pickupLines(),
+            fn (Money $total, OrderLine $line) => $total->add($line->amount()),
+            Money::ofCents(0),
+        );
     }
 
     public function hasLine(string $productId): bool

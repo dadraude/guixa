@@ -34,6 +34,8 @@ const allocation = (
     ordered,
     allocated: ordered,
     byHand,
+    delivered: ordered,
+    adjusted: false,
 });
 
 const reception = {
@@ -51,9 +53,12 @@ const reception = {
             ordered: '20.000',
             received: '15.000',
             allocated: '14.000',
+            delivered: '14.000',
             difference: '1.000',
             balanced: false,
+            balancedForDistribution: false,
             hasManualAllocations: true,
+            hasAdjustments: false,
             allocations: [
                 allocation('a', 'Household A', '4.000'),
                 allocation('c', 'Household C', '10.000', true),
@@ -68,9 +73,12 @@ const reception = {
             ordered: '0.000',
             received: '3.000',
             allocated: '3.000',
+            delivered: '3.000',
             difference: '0.000',
             balanced: true,
+            balancedForDistribution: true,
             hasManualAllocations: false,
+            hasAdjustments: false,
             allocations: [],
         },
     ],
@@ -95,6 +103,37 @@ describe('reception page', () => {
         expect(html).toContain('Set by hand');
         expect(html).toContain('Household D');
         expect(html).toContain('Nope');
+    });
+
+    it('flags a pickup adjustment but still lets the producer be distributed', async () => {
+        const adjusted = {
+            ...reception,
+            products: [
+                {
+                    ...reception.products[1],
+                    delivered: '3.120',
+                    difference: '-0.120',
+                    balanced: false,
+                    hasAdjustments: true,
+                },
+            ],
+        };
+
+        const html = await renderToString(
+            createSSRApp(Show, {
+                reception: adjusted,
+                distribution: {
+                    validated: true,
+                    distributed: false,
+                    settled: false,
+                },
+                households: [],
+            }),
+        );
+
+        expect(html).toContain('data-test="adjusted"');
+        expect(html).toContain('3.120 loaf');
+        expect(html).not.toContain('data-test="distribute-hint"');
     });
 
     it('lets a manager correct the total of a product nobody ordered instead of the proportional form', async () => {

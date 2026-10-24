@@ -15,10 +15,12 @@ final readonly class ReceptionAllocationRow
         public string $ordered,
         public string $allocated,
         public bool $byHand,
+        public string $delivered,
+        public bool $adjusted,
     ) {}
 
     public static function from(ReceptionAllocationData $allocation): self
     {
-        return new self($allocation->householdId, $allocation->householdName, $allocation->ordered, $allocation->allocated, $allocation->byHand);
+        return new self($allocation->householdId, $allocation->householdName, $allocation->ordered, $allocation->allocated, $allocation->byHand, $allocation->delivered, $allocation->adjusted);
     }
 }

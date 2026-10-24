@@ -97,4 +97,48 @@ describe('member order editor presentation', () => {
         );
         expect(html).toContain('0,00');
     });
+
+    it('shows the pickup once the cycle is settled, with the delivered quantities and the total', async () => {
+        const html = await render(Edit, {
+            order: {
+                ...order,
+                pickup: {
+                    cycleId: 'cycle',
+                    pickupDate: '2026-10-30',
+                    householdId: 'home',
+                    householdName: '',
+                    status: 'pending',
+                    totalCents: 1050,
+                    balanceCents: null,
+                    resultingBalanceCents: null,
+                    lines: [
+                        {
+                            productId: 'bread',
+                            name: 'Pa de pagès',
+                            unit: 'unitat',
+                            variable: false,
+                            unitPriceCents: 350,
+                            ordered: '4.000',
+                            allocated: '4.000',
+                            delivered: '3.000',
+                            adjusted: true,
+                            amountCents: 1050,
+                        },
+                    ],
+                },
+            },
+        });
+
+        expect(html).toContain('data-test="pickup"');
+        expect(html).toContain('La teva recollida');
+        expect(html).toContain('Demanat 4.000, lliurat 3.000');
+        expect(html).toContain('data-test="pickup-total"');
+        expect(html).toContain('10,50');
+    });
+
+    it('shows no pickup before the cycle is settled', async () => {
+        const html = await render(Edit, { order });
+
+        expect(html).not.toContain('data-test="pickup"');
+    });
 });

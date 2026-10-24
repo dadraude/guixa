@@ -54,11 +54,12 @@ final class EloquentOrderRepository implements OrderRepository
                 'allocated_quantity' => $line->allocated->toString(),
                 'allocated_by_hand' => $line->allocatedByHand,
                 'dropped' => $line->dropped,
+                'delivered_quantity' => $line->delivered?->toString(),
                 'created_at' => $line->createdAt->format('Y-m-d\TH:i:s.uP'),
                 'added_by' => $line->addedBy,
             ], $lines),
             ['id'],
-            ['product_name', 'unit', 'unit_price_cents', 'variable', 'containers_per_unit', 'ordered_quantity', 'allocated_quantity', 'allocated_by_hand', 'dropped'],
+            ['product_name', 'unit', 'unit_price_cents', 'variable', 'containers_per_unit', 'ordered_quantity', 'allocated_quantity', 'allocated_by_hand', 'dropped', 'delivered_quantity'],
         );
     }
 
@@ -172,6 +173,7 @@ final class EloquentOrderRepository implements OrderRepository
                 $line->added_by,
                 (bool) $line->allocated_by_hand,
                 (bool) $line->dropped,
+                $line->delivered_quantity === null ? null : Quantity::fromString($line->delivered_quantity),
             ))
             ->all();
 

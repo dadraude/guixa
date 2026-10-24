@@ -19,9 +19,12 @@ final readonly class ReceptionProductRow
         public string $ordered,
         public string $received,
         public string $allocated,
+        public string $delivered,
         public string $difference,
         public bool $balanced,
+        public bool $balancedForDistribution,
         public bool $hasManualAllocations,
+        public bool $hasAdjustments,
         public array $allocations,
     ) {}
 
@@ -36,9 +39,12 @@ final readonly class ReceptionProductRow
             $product->ordered,
             $product->received,
             $product->allocated,
+            $product->delivered,
             $product->difference,
             $product->balanced,
+            $product->balancedForDistribution,
             $product->hasManualAllocations,
+            $product->hasAdjustments,
             array_map(ReceptionAllocationRow::from(...), $product->allocations),
         );
     }
