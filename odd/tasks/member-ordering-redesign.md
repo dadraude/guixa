@@ -14,6 +14,8 @@ No new features, no app-wide migration, no publication or ticket mutations.
 
 ## Tasks
 
+- U4 — CI/conflict correction; inline (bounded locale fixture and sequential stack maintenance); reproduce ca/en behavior, fix the fixture, rebase all three slices, verify before leased updates; pending.
+
 - U1 (S1,S2) — T38 translation foundation; inline (T37 depends on it); implemented and locally verified; no commit yet.
 - U2 (S1,S2) — T37 member presentation and ordering shell; inline; implemented and locally verified; no commit yet.
 - U3 (S1,S2) — focused checks, visual checks and independent verifier; delegated verifier required by risk items 3/5 (shared shell/bootstrap and dependency); local verification complete; delivery/native review and full CI pending.
@@ -36,3 +38,11 @@ L11. Stacked-to-main selected. All checks and native review precede commits. Fou
 
 L12. Isolated PostgreSQL HTTP/role-access/translation checks: 40 tests, 275 assertions passed; affected PHPStan 0 errors. Database creation guards and cleanup verified. Full hosted CI still unrun.
 L13. Foundation staged-only snapshot passed 13 frontend tests, types and client/SSR builds independently of T37. Native review uses the staged projection and excludes all unrelated untracked files.
+
+## Publication correction (2026-10-24)
+
+User authorization verbatim: "Yes, rebase the three branches onto current main, fix the CI failure, and push with --force-with-lease only after the required checks pass. Preserve all three PRs and don’t merge anything."
+
+PRs #191/#192/#193 remain the delivery units. Main advanced to ba2532b; original slice tips are preserved under refs/backup/member-stack-20261024/. Foundation rebased first without changing production behavior. CI reported an English-only translation fixture mismatch; reproduce under explicit Catalan locale before changing it. Required local proof: locale matrix, affected PHP tests, frontend/types per slice, and static/build checks; full validation remains CI-owned after checked updates. No PR merges.
+
+Correction evidence: original focused test failed under ca/ca and passed with only APP_LOCALE=en. Explicit ca/en dataset reproduced ca failure before fixture repair. Registering the fixture in the selected locale fixes both paths without production changes. Catalan affected HTTP/translation/producer-summary checks: 45 tests, 320 assertions; Pint passed. Foundation client/SSR build, 13 frontend tests and types passed. Risk: none (test fixture and passive tracking only). Remaining branch replay and checks still pending; do not push yet.
