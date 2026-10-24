@@ -1,0 +1,106 @@
+import { describe, expect, it, vi } from 'vite-plus/test';
+import { createSSRApp } from 'vue';
+import { renderToString } from 'vue/server-renderer';
+import Show from './Show.vue';
+
+vi.mock('@inertiajs/vue3', async () => {
+    const { defineComponent, h } = await import('vue');
+
+    return {
+        Head: () => null,
+        Form: defineComponent({
+            setup:
+                (_, { attrs, slots }) =>
+                () =>
+                    h(
+                        'form',
+                        attrs,
+                        slots.default?.({ errors: {}, processing: false }),
+                    ),
+        }),
+        usePage: () => ({ props: { errors: { domain: 'Nope' } } }),
+        router: { put: vi.fn() },
+    };
+});
+
+const allocation = (
+    id: string,
+    name: string,
+    ordered: string,
+    byHand = false,
+) => ({
+    householdId: id,
+    householdName: name,
+    ordered,
+    allocated: ordered,
+    byHand,
+});
+
+const reception = {
+    cycleId: 'cycle',
+    producerId: 'baker',
+    producerName: 'Baker',
+    pickupDate: '2026-11-07',
+    products: [
+        {
+            productId: 'bread',
+            name: 'Bread',
+            unit: 'loaf',
+            variable: false,
+            nobodyOrdered: false,
+            ordered: '20.000',
+            received: '15.000',
+            allocated: '14.000',
+            difference: '1.000',
+            balanced: false,
+            hasManualAllocations: true,
+            allocations: [
+                allocation('a', 'Household A', '4.000'),
+                allocation('c', 'Household C', '10.000', true),
+            ],
+        },
+        {
+            productId: 'rye',
+            name: 'Rye',
+            unit: 'loaf',
+            variable: false,
+            nobodyOrdered: true,
+            ordered: '0.000',
+            received: '3.000',
+            allocated: '3.000',
+            difference: '0.000',
+            balanced: true,
+            hasManualAllocations: false,
+            allocations: [],
+        },
+    ],
+    unorderedOptions: [],
+};
+
+describe('reception page', () => {
+    it('shows each product with its totals and flags the unbalanced ones', async () => {
+        const html = await renderToString(
+            createSSRApp(Show, {
+                reception,
+                households: [{ id: 'd', name: 'Household D' }],
+            }),
+        );
+
+        expect(html).toContain('Reception: Baker');
+        expect(html).toContain('Unbalanced by 1.000 loaf');
+        expect(html).toContain('data-test="balanced"');
+        expect(html).toContain('Set by hand');
+        expect(html).toContain('Household D');
+        expect(html).toContain('Nope');
+    });
+
+    it('lets a manager correct the total of a product nobody ordered instead of the proportional form', async () => {
+        const html = await renderToString(
+            createSSRApp(Show, { reception, households: [] }),
+        );
+
+        expect(html).toContain('data-test="unordered-total-rye"');
+        expect(html).not.toContain('data-test="received-form-rye"');
+        expect(html).toContain('data-test="received-form-bread"');
+    });
+});

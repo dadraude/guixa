@@ -11,8 +11,9 @@ Checking each producer's delivery against the orders, allocating it to household
 - **R14** Once a producer order is sent, a manager opens that producer's reception for the cycle. For each
   product sent it shows the ordered total, the received total (initially equal to the ordered total) and
   the allocation of every household that ordered it (initially equal to its ordered quantity).
-  A manager can also add any active product of that producer that nobody ordered, with its received total
-  (initially 0) and no allocations.
+  A manager can also add any product of that producer that nobody ordered, active or not, with its received
+  total (initially 0) and no allocations. A product only has to be active, and so does its producer, when a
+  household orders it: once the goods have arrived their state no longer matters here.
 - **R15** **Way A — change the received total.** Setting a product's received total re-allocates it among
   all the households that ordered it, proportionally to their ordered quantity.
   The allocations always add up exactly to the received total: nothing is left over and nothing is invented.
@@ -31,7 +32,7 @@ Checking each producer's delivery against the orders, allocating it to household
   (≥ 0, in the product's step: whole units, or multiples of 0.001 for variable products), including a
   household that did not order the product. This does not change the received total.
   An allocation to a household without a line for that product takes a snapshot of the product (R10)
-  when it is set.
+  when it is set, even if the product has been deactivated since.
 - **R17** For each product, the reception shows the difference between the received total and the sum of
   allocations. A product is *balanced* when the difference is 0. Unbalanced products are flagged.
 - **R17a** **Validating.** After checking what arrived, a manager marks a producer's reception as

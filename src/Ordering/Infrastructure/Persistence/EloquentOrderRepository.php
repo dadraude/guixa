@@ -50,11 +50,12 @@ final class EloquentOrderRepository implements OrderRepository
                 'containers_per_unit' => $line->containersPerUnit?->toString(),
                 'ordered_quantity' => $line->ordered->toString(),
                 'allocated_quantity' => $line->allocated->toString(),
+                'allocated_by_hand' => $line->allocatedByHand,
                 'created_at' => $line->createdAt->format('Y-m-d\TH:i:s.uP'),
                 'added_by' => $line->addedBy,
             ], $lines),
             ['id'],
-            ['product_name', 'unit', 'unit_price_cents', 'variable', 'containers_per_unit', 'ordered_quantity', 'allocated_quantity'],
+            ['product_name', 'unit', 'unit_price_cents', 'variable', 'containers_per_unit', 'ordered_quantity', 'allocated_quantity', 'allocated_by_hand'],
         );
     }
 
@@ -114,6 +115,7 @@ final class EloquentOrderRepository implements OrderRepository
         return DB::table('orders')
             ->join('order_lines', 'order_lines.order_id', '=', 'orders.id')
             ->where('orders.household_id', $householdId)
+            ->where('order_lines.ordered_quantity', '>', 0)
             ->groupBy('orders.cycle_id')
             ->selectRaw('orders.cycle_id, count(*) as line_count')
             ->pluck('line_count', 'cycle_id')
@@ -165,6 +167,7 @@ final class EloquentOrderRepository implements OrderRepository
                 Quantity::fromString($line->allocated_quantity),
                 new DateTimeImmutable($line->created_at),
                 $line->added_by,
+                (bool) $line->allocated_by_hand,
             ))
             ->all();
 

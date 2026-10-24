@@ -65,8 +65,8 @@ final class InMemoryOrderRepository extends InMemoryRepository implements OrderR
         $counts = [];
 
         foreach ($this->all() as $order) {
-            if ($order->householdId === $householdId && $order->lines() !== []) {
-                $counts[$order->cycleId] = count($order->lines());
+            if ($order->householdId === $householdId && $order->orderedLines() !== []) {
+                $counts[$order->cycleId] = count($order->orderedLines());
             }
         }
 

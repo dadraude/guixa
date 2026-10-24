@@ -15,6 +15,10 @@ use App\Http\Controllers\Manage\InvitationController;
 use App\Http\Controllers\Manage\ManagerRoleController;
 use App\Http\Controllers\Manage\ProducerAccountController;
 use App\Http\Controllers\Manage\ProducerController;
+use App\Http\Controllers\Manage\ReceptionAllocationController;
+use App\Http\Controllers\Manage\ReceptionController;
+use App\Http\Controllers\Manage\ReceptionProductController;
+use App\Http\Controllers\Manage\ReceptionReceivedController;
 use App\Http\Controllers\Manage\ReturnItemController;
 use App\Http\Controllers\Manage\SettingsController;
 use App\Http\Controllers\Manage\StockMovementController;
@@ -86,6 +90,13 @@ Route::middleware(['auth', 'verified', 'role:manager'])->prefix('manage')->name(
         Route::put('/', [CycleCutoffController::class, 'update'])->name('cycles.producers.cutoff.update');
         Route::post('close', [CycleCutoffController::class, 'close'])->name('cycles.producers.cutoff.close');
         Route::delete('/', [CycleCutoffController::class, 'destroy'])->name('cycles.producers.cutoff.destroy');
+    });
+
+    Route::prefix('cycles/{cycle}/receptions/{producer}')->whereUuid(['cycle', 'producer', 'product', 'household'])->group(function () {
+        Route::get('/', [ReceptionController::class, 'show'])->name('cycles.receptions.show');
+        Route::post('products', [ReceptionProductController::class, 'store'])->name('cycles.receptions.products.store');
+        Route::put('products/{product}/received', [ReceptionReceivedController::class, 'update'])->name('cycles.receptions.received.update');
+        Route::put('products/{product}/allocations/{household}', [ReceptionAllocationController::class, 'update'])->name('cycles.receptions.allocations.update');
     });
 
     Route::get('settings', [SettingsController::class, 'show'])->name('settings.show');

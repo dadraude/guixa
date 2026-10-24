@@ -102,7 +102,7 @@ final class ProducerOrder
         $totals = [];
 
         foreach ($orders as $order) {
-            foreach ($order->lines() as $line) {
+            foreach ($order->orderedLines() as $line) {
                 if ($line->producerId !== $this->producerId || isset($marksByOrder[$order->id][$line->productId])) {
                     continue;
                 }

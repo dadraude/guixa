@@ -4,6 +4,7 @@ namespace Guixa\Ordering\Infrastructure\Catalog;
 
 use Guixa\Catalog\Application\GetOrderableProduct;
 use Guixa\Catalog\Application\ListOrderableProducts;
+use Guixa\Catalog\Application\ListProducerProductsForReception;
 use Guixa\Catalog\Application\OrderableProductData;
 use Guixa\Ordering\Domain\ProductCatalog;
 use Guixa\Ordering\Domain\ValueObject\OrderableProduct;
@@ -16,6 +17,7 @@ final class CatalogProductCatalog implements ProductCatalog
     public function __construct(
         private readonly GetOrderableProduct $getOrderableProduct,
         private readonly ListOrderableProducts $listOrderableProducts,
+        private readonly ListProducerProductsForReception $listProducerProductsForReception,
     ) {}
 
     public function orderable(string $productId): ?OrderableProduct
@@ -28,6 +30,11 @@ final class CatalogProductCatalog implements ProductCatalog
     public function orderableOf(string $producerId): array
     {
         return array_map($this->translate(...), ($this->listOrderableProducts)($producerId));
+    }
+
+    public function allOf(string $producerId): array
+    {
+        return array_map($this->translate(...), ($this->listProducerProductsForReception)($producerId));
     }
 
     private function translate(OrderableProductData $product): OrderableProduct

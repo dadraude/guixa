@@ -599,3 +599,33 @@ All 31 original implementation files remain byte-identical. The ODD logbook reco
 Before leased updates: 55 affected PHP tests/340 assertions, the English locale regression, Pint,
 per-slice frontend tests (13/14/17), types, and foundation/final client+SSR builds passed. Hosted CI
 will rerun after publication; no success is claimed in advance and no PR merge is authorized.
+
+## 2026-10-24 · Deviation
+
+T22 (`plan.md`, reception use cases and Ordering domain): `AddUnorderedProduct` takes the received total (default 0), and adding a product nobody ordered again replaces its total, because R15 says a product nobody ordered cannot use way A and R14 says its total is only "initially" 0, so otherwise a typo in S40's total could never be corrected. A product somebody ordered is left as it is by `AddUnorderedProduct`. The reception shows a product when it has a line that is not marked or a recorded total; lines marked *will not be delivered* are left out, and `SetAllocation` refuses such a line with the new `LineMarkedNotDelivered`. New errors: `ProductNotInReception`, `HouseholdNotFound` (an unknown household; `HouseholdInactive` stays for a deactivated one) and `ProducerOrderNotSent`. `OrderLine` gains `allocatedByHand`, and allocation-only lines (`ordered` 0) are kept out of the member's order page, `GetCycleSummary`, the totals to send and `lineCountsOfHousehold` through `Order::orderedLines()`.
+Why: the plan named the use cases but not these cases; an allocation-only line is not something a household ordered (R16), so R7, R12 and R13 must not show it.
+
+T22 (`plan.md`, `SetReceivedTotal` and `Cycle`): clearing the validation (R17a) and the read-only distributed reception arrive with T23, which owns `validatedAt` and `distributedAt`; T22 only requires the producer order to be sent. The orders are not locked one by one: the cycle `FOR UPDATE` already serialises every reception change against `SetOrderLine`'s `FOR SHARE`. The received-total claims ignore done pickups (D12) because no pickup can be done before the pickup tasks.
+Why: those states and pickups do not exist yet.
+
+T22 (`plan.md`, HTTP & pages): the page component is `Manage/Reception/Show`, not `Manage/Reception`, to stay inside the task's allowed `resources/js/pages/Manage/Reception/**`; the `received_totals` table is created by T22's migration, since the earlier migrations only created the columns the ordering tasks used.
+Why: the paths the task was allowed to write, and the table was not there.
+
+## 2026-10-24 · Deviation
+
+T22 review (`plan.md`, `AddUnorderedProduct`): a product somebody ordered is refused with the new `ProductAlreadyOrdered` instead of being left as it is, since R14 only lets a manager add a product nobody ordered. This replaces the "left as it is" wording of the T22 entry above.
+Why: a call that silently does nothing hides the mistake.
+
+## 2026-10-24 · Request
+
+> Quan es reparteixen els productes, aquests ja han arribat.
+>
+> si, i a més a més els productes només han d'estar actius en el moment de fer la comanda.
+
+## 2026-10-24 · Change
+
+T22 (`reception.md` R14 and R16, `plan.md`): a product only has to be active when a household orders it. From the reception on, `AddUnorderedProduct` accepts any product of the producer that nobody ordered, `GetReception` offers deactivated products too, and `SetAllocation` snapshots a deactivated product as it is now (R10). Catalog gets one internal query, `ListProducerProductsForReception`, behind `ProductCatalog::allOf`, which the reception reads every product through; ordering keeps `GetOrderableProduct` and `ListOrderableProducts` unchanged. A product shows in the reception once it has a line or a recorded total.
+Why: the user's rule above.
+
+T22 (`reception.md` R14, `plan.md`): the producer does not have to be active either. This is deduced from the user's rule and from the T18 entry, where deactivating a producer leaves a sent producer order participating (S50), so its reception already exists and its goods have arrived. The user did not say it in these words; the coordinator confirmed the deduction.
+Why: the same reasoning as for the product.

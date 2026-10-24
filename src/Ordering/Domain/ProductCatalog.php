@@ -12,4 +12,7 @@ interface ProductCatalog
 
     /** @return list<OrderableProduct> a producer's orderable products by name; empty when the producer is unknown or deactivated */
     public function orderableOf(string $producerId): array;
+
+    /** @return list<OrderableProduct> every product of the producer by name, deactivated ones included (R14) */
+    public function allOf(string $producerId): array;
 }
