@@ -387,3 +387,8 @@ Why: the plan did not say which verb or which guards, and the sent state does no
 
 T17 (`plan.md`, HTTP & pages): cancelling a cycle asks the manager to confirm first, in a dialog that says every household's orders are discarded and it cannot be undone. User decision: "sí, que demani confirmació abans de cancel·lar".
 Why: the cancel discards every household's orders irreversibly (R4b).
+
+## 2026-10-24 · Change
+
+`constitution.md` (new UI section): pages are phone first (375 px wide, no horizontal scroll), touch targets are at least 44 × 44 px with nothing depending on hover, labels use plain language with one main action per screen, and a task with a page is not done until the page has been checked at 375 px wide. Applies to the 001 tasks still open; `plan.md` and `tasks.md` are unchanged.
+Why: the UX discovery (`docs/ux-discovery/2026-10-24-guixa-discovery.md`, principle 3) found that members' digital skills are mixed and that the old app's lack of phone use is one reason it no longer fits. The user decided: "Yes, add the phone-first UI rule to specs/constitution.md through spec-flow, and link the discovery doc from specs/README.md."

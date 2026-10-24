@@ -42,6 +42,12 @@ When in doubt, ask: "would a reader of `spec.md` notice?" If yes, use the spec f
 
 Agents follow these rules through `.claude/skills/spec-flow/SKILL.md`.
 
+## Research
+
+[UX discovery (2026-10-24)](../docs/ux-discovery/2026-10-24-guixa-discovery.md): personas, jobs, journeys, design
+principles and success metrics for the whole product. Before starting a spec, check its requirements against the
+design principles and the gap analysis there.
+
 ## Features
 
 | ID  | Feature                         | Status |
