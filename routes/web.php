@@ -21,6 +21,7 @@ use App\Http\Controllers\Manage\StockMovementController;
 use App\Http\Controllers\Manage\StockProductController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\Producer\CutoffController;
+use App\Http\Controllers\Producer\CycleController as ProducerCycleController;
 use App\Http\Controllers\Producer\ProductAvailabilityController;
 use App\Http\Controllers\Producer\ProductController;
 use App\Http\Controllers\WalletController;
@@ -158,6 +159,9 @@ Route::middleware(['auth', 'verified', 'role:producer'])->prefix('producer')->na
     Route::put('products/{product}/reactivation', [ProductController::class, 'reactivate'])
         ->whereUuid('product')
         ->name('products.reactivate');
+    Route::get('cycles/{cycle}', [ProducerCycleController::class, 'show'])
+        ->whereUuid('cycle')
+        ->name('cycles.show');
     Route::put('cycles/{cycle}/products/{product}/availability', [ProductAvailabilityController::class, 'update'])
         ->whereUuid(['cycle', 'product'])
         ->name('products.availability');

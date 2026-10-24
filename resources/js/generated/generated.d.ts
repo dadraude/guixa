@@ -100,9 +100,22 @@ readonly cancelled: boolean,
 readonly producers: App.Http.OrderProducerRow[],
 readonly lines: App.Http.OrderLineRow[],
 };
+export type ProducerCycleSummaryRow = {
+readonly cycleId: string,
+readonly pickupDate: string,
+readonly sent: boolean,
+readonly products: App.Http.ProducerProductTotalRow[],
+};
 export type ProducerOptionRow = {
 readonly id: string,
 readonly name: string,
+};
+export type ProducerProductTotalRow = {
+readonly productId: string,
+readonly name: string,
+readonly unit: string,
+readonly available: boolean,
+readonly quantity: string | null,
 };
 export type ProducerRow = {
 readonly id: string,

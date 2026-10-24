@@ -10,6 +10,7 @@ use Guixa\Ordering\Application\CloseProducerNow;
 use Guixa\Ordering\Application\GetCycleSummary;
 use Guixa\Ordering\Application\GetHouseholdOrder;
 use Guixa\Ordering\Application\GetPickupWeekday;
+use Guixa\Ordering\Application\GetProducerCycleSummary;
 use Guixa\Ordering\Application\HasUnsettledLines;
 use Guixa\Ordering\Application\ListCycles;
 use Guixa\Ordering\Application\ListMemberCycles;
@@ -105,6 +106,8 @@ final class OrderingWorld
 
     public readonly GetCycleSummary $getCycleSummary;
 
+    public readonly GetProducerCycleSummary $getProducerCycleSummary;
+
     public readonly Actor $manager;
 
     /** @param  ?int  $pickupWeekday  the cooperative's weekday (ISO), or null while a manager has not chosen one (R4c) */
@@ -146,6 +149,7 @@ final class OrderingWorld
         $this->sendEmptyProducerOrders = new SendEmptyProducerOrders($this->cycles, $this->orders, $this->catalog, $this->availability, $transactions, $this->clock);
         $this->hasUnsettledLines = new HasUnsettledLines($this->orders);
         $this->getCycleSummary = new GetCycleSummary($this->cycles, $this->orders, $this->households);
+        $this->getProducerCycleSummary = new GetProducerCycleSummary($this->cycles, $this->orders, $this->catalog, $this->availability);
 
         $this->manager = new Actor('00000000-0000-7000-8000-00000000000a', [Role::Manager]);
 

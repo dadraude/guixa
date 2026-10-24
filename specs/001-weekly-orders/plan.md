@@ -300,7 +300,7 @@ role only; participation is not restored.
 | `ListMemberCycles` (`MemberCycleData`: pickup date, whether it is open for members, and how many lines the household has in it; the pending, cancelled and closed states arrive with their tasks: T17 cancelled, the pickup tasks pending and closed) | member | R4a, R23a |
 | `SendProducerOrder` (the cycle `FOR UPDATE`; `Cycle::send`, then the marked lines are stored as not delivered, then the producer is emailed the totals after commit; a producer with no account is refused with `ProducerHasNoAccount` before anything is stored, unless it has no line to send; the `POST …/producers/{producer}/send` route and its button come with the later task that adds the send button, not T18) | manager | R12a, R6b, R6c, S34, S36 |
 | `SendEmptyProducerOrders` (scheduled every minute in `routes/console.php`; T18 only sends: per cycle `FOR UPDATE`, each participating, closed, unsent producer with no line to send is sent and its marked lines stored, nobody is notified; `validate` and `markDistributed` come with T23) | — (scheduler) | R12a, D10 |
-| `GetProducerCycleSummary` | producer (own) | R12, S7, S8 |
+| `GetProducerCycleSummary` (the producer's orderable products by name with whether each is available in the cycle; `sent` and, once its order is sent, the total to deliver per product with the marked lines left out, never household names; null quantities before; a cancelled cycle or one without the producer is `CycleNotFound`) | producer (own) | R12, S7, S8 |
 | `GetCycleSummary` (ordered quantity per product under its producer, per household; households Membership does not know show their id; carries `cancelled`, and a cancelled cycle has no totals) | manager | R13, S52, S62 |
 | `HasUnsettledLines(productId): bool`, `StopParticipatingWhereNotSent(producerId)` (T16: stops the producer in every cycle that is not cancelled and where it participates; a sent order is skipped, so its participation stays, S50) | — (called by Catalog) | R1, R3a |
 | `ListPendingPickups` | — (called by Membership) | R35a |
@@ -465,8 +465,8 @@ role areas (R36a); the layout shows a switch between them.
 | `POST /producer/products`, `PUT /producer/products/{product}` | redirect to the list | `CreateProduct`, `UpdateProduct` |
 | `DELETE /producer/products/{product}`, `PUT /producer/products/{product}/reactivation` | redirect to the list | `DeactivateProduct`, `ReactivateProduct` |
 | `GET/PUT /producer/cutoff` | `Producer/Cutoff` | `GetDefaultCutoff`, `SetDefaultCutoff` |
-| `GET /producer/cycles/{cycle}` | `Producer/CycleSummary` | `GetProducerCycleSummary` |
-| `PUT /producer/cycles/{cycle}/products/{product}/availability` (`available`: boolean; no page uses it until T19) | partial reload | `SetProductAvailability` |
+| `GET /producer/cycles/{cycle}` | `Producer/CycleSummary` (products with availability and a toggle while not sent; the totals once sent) | `GetProducerCycleSummary` |
+| `PUT /producer/cycles/{cycle}/products/{product}/availability` (`available`: boolean; the `Producer/CycleSummary` page uses it) | partial reload | `SetProductAvailability` |
 | `GET /manage/settings`, `PUT /manage/settings/pickup-weekday` | `Manage/Settings` | `GetPickupWeekday`, `SetPickupWeekday` |
 | `GET/POST /manage/cycles` | `Manage/Cycles/Index` (cycles with named participants, active producers to pick, the pickup weekday or null; while it is null the open form also shows a weekday picker and a permanent/provisional choice, sent as `pickup_weekday` and `permanent`) | `ListCycles`, `OpenCycle` |
 | `GET /manage/cycles/{cycle}` | `Manage/Cycles/Show` (totals, producers, containers; a "Cancelled" notice instead of totals when the cycle is cancelled) | `GetCycleSummary`, `GetContainerCount` |
