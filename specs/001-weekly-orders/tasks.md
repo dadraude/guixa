@@ -8,7 +8,8 @@ How to work a task:
   whatever the task needs. Each task ends in one commit.
 - Test first: write the listed scenarios as failing Application tests, then make them pass.
 - **Done when**: its scenarios and rules pass at the level stated, architecture tests (T02) stay green,
-  and the whole suite passes.
+  and the whole suite passes. Once T36 is done, every text a task adds has a `ca` translation (the translation
+  test stays green), and every page it adds or changes is checked at 375 px wide (constitution, UI).
 - A task depends on the tasks listed in *After*; anything else can go in any order.
 - A scenario split across tasks lists its part, e.g. "S5 (snapshot)"; the last task finishes it.
 
@@ -21,11 +22,14 @@ How to work a task:
 | T03 | `Shared`: `Money` (half-up `multiply`), `Quantity` (thousandths, `ceilToWhole`), `Clock` with the cooperative's timezone (`SystemClock` from `COOP_TIMEZONE`, `FrozenClock`), `LocalTime`, `TransactionRunner` (with `afterCommit`) | R22 rounding, Time | T01 |
 | T04 | `Actor` with several roles from the authenticated account, `role:<role>` middleware, domain error → 422 and `NotAllowed` → 403 handler, shared Inertia layout with a switch between role areas | Roles, R36a | T01 |
 | T05 | Test support: in-memory repository base and contract-test pattern shared with Eloquent repositories | Plan · Testing | T03 |
+| T36 | Translations: check `laravel-vue-i18n` fits Inertia 3 and Vite+ (else `vue-i18n`, D18), `ca` locale and the `laravel-lang` Catalan files, `lang/en/errors.php` → `lang/ca/errors.php`, every existing page, layout, component and email text moved to translation keys with Catalan translations, `ca-ES` formatting, translation test | Constitution (UI, *Translatable*), Plan · Translations, D18 | T04 |
 
 **Done when** T01: app boots on Postgres, the starter tests pass, lint and Larastan are clean, and the
 CI workflow is green on the T01 pull request. T02: a deliberate violation in a
 scratch class makes each rule fail, then is removed. T03: unit tests for rounding (e.g. 1.120 × €20.00 = €22.40),
 negative quantity rejected, string ↔ thousandths mapping, and `LocalTime` on both daylight-saving days.
+T36: every existing page, email and error message shows Catalan, each page also checked at 375 px wide; the
+translation test fails on a deliberately untranslated text, which is then removed.
 
 ## Phase 1 — Membership
 
@@ -119,7 +123,7 @@ products, added in opposite order, both complete.
 
 | ID | Task | Covers | After |
 | --- | --- | --- | --- |
-| T33 | Traceability check: every `R#` and `S#` is named in at least one test (`->group('S14')` or test name); fill the gaps; set feature 001 to *Done* in `specs/README.md` | R1–R36b, S1–S62 | T14, T17, T19, T31, T32, T34, T35 |
+| T33 | Traceability check: every `R#` and `S#` is named in at least one test (`->group('S14')` or test name); fill the gaps; set feature 001 to *Done* in `specs/README.md` | R1–R36b, S1–S62 | T14, T17, T19, T31, T32, T34, T35, T36 |
 
 ## Coverage
 

@@ -97,4 +97,7 @@ confident member on a phone works for everyone.
 - **Touch, not hover.** Touch targets are at least 44 × 44 px. No action or information depends on hover.
 - **Plain language.** Labels say what happens in the member's words, not the domain's internals; one main action
   per screen.
+- **Translatable.** Every text a person reads (pages, emails, validation and domain error messages) comes from a
+  translation in `lang/`, never a literal in PHP or Vue. Catalan (`ca`) is the default and fallback locale, and the
+  only one shipped for now; another language is added as more `lang/` files, without code changes.
 - A task with a page is not done until that page has been checked at 375 px wide.

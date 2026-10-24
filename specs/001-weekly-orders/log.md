@@ -392,3 +392,18 @@ Why: the cancel discards every household's orders irreversibly (R4b).
 
 `constitution.md` (new UI section): pages are phone first (375 px wide, no horizontal scroll), touch targets are at least 44 × 44 px with nothing depending on hover, labels use plain language with one main action per screen, and a task with a page is not done until the page has been checked at 375 px wide. Applies to the 001 tasks still open; `plan.md` and `tasks.md` are unchanged.
 Why: the UX discovery (`docs/ux-discovery/2026-10-24-guixa-discovery.md`, principle 3) found that members' digital skills are mixed and that the old app's lack of phone use is one reason it no longer fits. The user decided: "Yes, add the phone-first UI rule to specs/constitution.md through spec-flow, and link the discovery doc from specs/README.md."
+
+## 2026-10-24 · Change
+
+`constitution.md` (UI section): every text a person reads (pages, emails, validation and domain error messages) comes from a translation in `lang/`, never a literal in PHP or Vue. Catalan (`ca`) is the default and fallback locale and the only one shipped for now; another language is added as more `lang/` files. The existing pages, which have hardcoded English, are brought in line by a new task once `plan.md` says how.
+Why: the user decided: "all the application must be translatable, and catalan be the main language for now".
+
+## 2026-10-24 · Change
+
+`plan.md` (Bootstrap, HTTP & pages, new Translations section, Testing, D18): translations use `laravel-vue-i18n`, so PHP `__()` and Vue `trans()` share `lang/`; keys are English source strings in `lang/ca.json`, domain errors move to `lang/ca/errors.php`, Laravel's own messages come from the `laravel-lang` Catalan files, emails go through `__()`, and dates and money are formatted with `ca-ES`. `APP_LOCALE` and `APP_FALLBACK_LOCALE` become `ca`. A new test checks that every key used in PHP and Vue, and every domain error class, has a `ca` translation. If `laravel-vue-i18n` does not fit Inertia 3 and Vite+, `vue-i18n` with messages generated from `lang/` replaces it.
+Why: follows the constitution's *Translatable* rule above. The user decided: "Yes, write the translation approach into 001's plan.md as proposed, log it, then propose the task."
+
+## 2026-10-24 · Change
+
+`tasks.md`: new task T36 (Phase 0, after T04) sets up translations as `plan.md` (Translations, D18) says and moves every existing page, layout, component, email and error text to Catalan translations; its Done when asks for Catalan everywhere, each page checked at 375 px wide, and a translation test that fails on an untranslated text. "How to work a task" now says that, once T36 is done, every text a task adds has a `ca` translation and every page it adds or changes is checked at 375 px wide. T33 now waits for T36. Not yet tracked in Linear.
+Why: follows the constitution (UI) and `plan.md` (Translations) changes above. The user decided: "Yes, add T36 to tasks.md as proposed, with the general Done-when rule and T33 waiting for it, and log it."
