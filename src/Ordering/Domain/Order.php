@@ -18,6 +18,7 @@ final class Order
         public readonly string $cycleId,
         public readonly string $householdId,
         private array $lines,
+        private PickupStatus $pickup = PickupStatus::None,
     ) {}
 
     public static function start(string $id, string $cycleId, string $householdId): self
@@ -26,7 +27,7 @@ final class Order
     }
 
     /** @param list<OrderLine> $lines */
-    public static function restore(string $id, string $cycleId, string $householdId, array $lines): self
+    public static function restore(string $id, string $cycleId, string $householdId, array $lines, PickupStatus $pickup = PickupStatus::None): self
     {
         $byProduct = [];
 
@@ -34,7 +35,7 @@ final class Order
             $byProduct[$line->productId] = $line;
         }
 
-        return new self($id, $cycleId, $householdId, $byProduct);
+        return new self($id, $cycleId, $householdId, $byProduct, $pickup);
     }
 
     /**
@@ -150,6 +151,33 @@ final class Order
         $this->lines[$productId] = $line->withAllocation($allocated, byHand: false);
     }
 
+    /**
+     * Settlement: drops the lines marked *will not be delivered*, which include those of producers that do not
+     * participate, and opens the pickup: pending when anything is allocated, nothing to collect when every allocation
+     * is 0 (R18, R24). An order without any line has no pickup.
+     *
+     * @param  array<string, true>  $marked  product ids of the marked lines (`NotDeliveredMarks::of`)
+     */
+    public function drop(array $marked): void
+    {
+        if ($this->lines === []) {
+            return;
+        }
+
+        foreach ($this->lines as $productId => $line) {
+            if (isset($marked[$productId])) {
+                $this->lines[$productId] = $line->asDropped();
+            }
+        }
+
+        $this->pickup = $this->hasAllocation() ? PickupStatus::Pending : PickupStatus::NothingToCollect;
+    }
+
+    public function pickup(): PickupStatus
+    {
+        return $this->pickup;
+    }
+
     public function hasLine(string $productId): bool
     {
         return isset($this->lines[$productId]);
@@ -168,6 +196,17 @@ final class Order
         usort($lines, fn (OrderLine $a, OrderLine $b) => [$a->createdAt, $a->id] <=> [$b->createdAt, $b->id]);
 
         return $lines;
+    }
+
+    private function hasAllocation(): bool
+    {
+        foreach ($this->lines as $line) {
+            if (! $line->dropped && ! $line->allocated->isZero()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private function assertInStep(string $name, bool $variable, Quantity $quantity): void

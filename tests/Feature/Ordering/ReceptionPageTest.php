@@ -1,5 +1,6 @@
 <?php
 
+use Guixa\Catalog\Infrastructure\Persistence\ProducerModel;
 use Guixa\Shared\Domain\Role;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -138,4 +139,74 @@ it('keeps the quantities the manager types to valid fields (R15, R16)', function
     $this->actingAs($manager)->put("/manage/cycles/{$cycleId}/receptions/{$producerId}/products/{$loaf}/allocations/{$households['A']}", ['quantity' => '-1'])
         ->assertSessionHasErrors('domain');
     $this->actingAs($manager)->post("/manage/cycles/{$cycleId}/receptions/{$producerId}/products", [])->assertSessionHasErrors('product_id');
+});
+
+// R17a, R18 — validating, distributing and reopening
+
+it('validates, distributes and settles through the routes, and shows the state (R17a, R18, S27, S47)', function () {
+    [$cycleId, $producerId, , , $households, $manager] = receptionFixture();
+    $reception = "/manage/cycles/{$cycleId}/receptions/{$producerId}";
+
+    $this->actingAs($manager)->post("{$reception}/distribution")->assertSessionHasErrors('domain');
+
+    $this->actingAs($manager)->post("{$reception}/validate")->assertRedirect();
+    $this->actingAs($manager)->get($reception)->assertInertia(fn (Assert $page) => $page
+        ->where('distribution', ['validated' => true, 'distributed' => false, 'settled' => false]));
+
+    $this->actingAs($manager)->post("{$reception}/distribution")->assertRedirect();
+
+    $this->actingAs($manager)->get($reception)->assertInertia(fn (Assert $page) => $page
+        ->where('distribution', ['validated' => true, 'distributed' => true, 'settled' => true]));
+    $this->assertDatabaseHas('cycle_producers', ['cycle_id' => $cycleId, 'producer_id' => $producerId]);
+    expect(DB::table('cycles')->where('id', $cycleId)->value('settled_at'))->not->toBeNull()
+        ->and(DB::table('orders')->where('household_id', $households['A'])->value('pickup_status'))->toBe('pending');
+});
+
+it('rejects distributing an unbalanced reception and a changed total clears the validation (R17, R17a, S13, S47)', function () {
+    [$cycleId, $producerId, $loaf, , $households, $manager] = receptionFixture();
+    $reception = "/manage/cycles/{$cycleId}/receptions/{$producerId}";
+    $this->actingAs($manager)->put("{$reception}/products/{$loaf}/allocations/{$households['B']}", ['quantity' => '5'])->assertRedirect();
+    $this->actingAs($manager)->post("{$reception}/validate")->assertRedirect();
+
+    $this->actingAs($manager)->post("{$reception}/distribution")->assertSessionHasErrors('domain');
+
+    $this->actingAs($manager)->put("{$reception}/products/{$loaf}/received", ['received' => '9', 'overwrite_manual' => true])->assertRedirect();
+    $this->actingAs($manager)->get($reception)->assertInertia(fn (Assert $page) => $page->where('distribution.validated', false));
+});
+
+it('makes a distributed reception read-only until it is reopened before settlement (R18, S29)', function () {
+    [$cycleId, $producerId, $loaf, , , $manager] = receptionFixture();
+    $other = ProducerModel::query()->create(['name' => 'Grower', 'active' => true, 'cutoff_days_before' => 3, 'cutoff_time' => '20:00']);
+    DB::table('cycle_producers')->insert(['cycle_id' => $cycleId, 'producer_id' => $other->id, 'participating' => true]);
+    $reception = "/manage/cycles/{$cycleId}/receptions/{$producerId}";
+    $this->actingAs($manager)->post("{$reception}/validate")->assertRedirect();
+    $this->actingAs($manager)->post("{$reception}/distribution")->assertRedirect();
+
+    $this->actingAs($manager)->put("{$reception}/products/{$loaf}/received", ['received' => '5'])->assertSessionHasErrors('domain');
+    $this->actingAs($manager)->delete("{$reception}/distribution")->assertRedirect();
+    $this->actingAs($manager)->put("{$reception}/products/{$loaf}/received", ['received' => '5'])->assertRedirect();
+
+    $this->actingAs($manager)->get($reception)->assertInertia(fn (Assert $page) => $page
+        ->where('distribution', ['validated' => false, 'distributed' => false, 'settled' => false])
+        ->where('reception.products.0.received', '5.000'));
+});
+
+it('does not reopen a producer once the cycle is settled (R18)', function () {
+    [$cycleId, $producerId, , , , $manager] = receptionFixture();
+    $reception = "/manage/cycles/{$cycleId}/receptions/{$producerId}";
+    $this->actingAs($manager)->post("{$reception}/validate")->assertRedirect();
+    $this->actingAs($manager)->post("{$reception}/distribution")->assertRedirect();
+
+    $this->actingAs($manager)->delete("{$reception}/distribution")->assertSessionHasErrors('domain');
+});
+
+it('keeps validating, distributing and reopening to managers (R17a, R18)', function () {
+    [$cycleId, $producerId] = receptionFixture();
+    $reception = "/manage/cycles/{$cycleId}/receptions/{$producerId}";
+    $member = accountWith(Role::Member, Role::Producer);
+
+    $this->post("{$reception}/validate")->assertRedirect(route('login'));
+    $this->actingAs($member)->post("{$reception}/validate")->assertForbidden();
+    $this->actingAs($member)->post("{$reception}/distribution")->assertForbidden();
+    $this->actingAs($member)->delete("{$reception}/distribution")->assertForbidden();
 });

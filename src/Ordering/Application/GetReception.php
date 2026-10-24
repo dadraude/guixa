@@ -39,6 +39,9 @@ final class GetReception
                 fn (OrderableProduct $product) => new ReceptionOptionData($product->id, $product->name, $product->unit, $product->variable),
                 array_filter($loaded->catalog, fn (OrderableProduct $product) => ! isset($shown[$product->id])),
             )),
+            $cycle->isValidated($producerId),
+            $cycle->isDistributed($producerId),
+            $cycle->isSettled(),
         );
     }
 

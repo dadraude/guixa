@@ -8,6 +8,7 @@ const props = defineProps<{
     unit: string;
     allocation: App.Http.ReceptionAllocationRow;
     processing: boolean;
+    readonly?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -34,7 +35,11 @@ watch(
                 <template v-if="allocation.byHand"> · Set by hand</template>
             </span>
         </div>
+        <span v-if="readonly" data-test="allocated-value">
+            {{ allocation.allocated }} {{ unit }}
+        </span>
         <form
+            v-else
             class="flex items-center gap-2"
             @submit.prevent="emit('save', allocation.householdId, quantity)"
         >

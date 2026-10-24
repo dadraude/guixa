@@ -6,6 +6,7 @@ use DateTimeImmutable;
 use Guixa\Ordering\Domain\Order;
 use Guixa\Ordering\Domain\OrderLine;
 use Guixa\Ordering\Domain\OrderRepository;
+use Guixa\Ordering\Domain\PickupStatus;
 use Guixa\Shared\Domain\Money;
 use Guixa\Shared\Domain\Quantity;
 use Illuminate\Support\Facades\DB;
@@ -26,6 +27,7 @@ final class EloquentOrderRepository implements OrderRepository
             'cycle_id' => $order->cycleId,
             'household_id' => $order->householdId,
         ]);
+        DB::table('orders')->where('id', $order->id)->update(['pickup_status' => $order->pickup()->value]);
 
         $lines = $order->lines();
         DB::table('order_lines')
@@ -51,11 +53,12 @@ final class EloquentOrderRepository implements OrderRepository
                 'ordered_quantity' => $line->ordered->toString(),
                 'allocated_quantity' => $line->allocated->toString(),
                 'allocated_by_hand' => $line->allocatedByHand,
+                'dropped' => $line->dropped,
                 'created_at' => $line->createdAt->format('Y-m-d\TH:i:s.uP'),
                 'added_by' => $line->addedBy,
             ], $lines),
             ['id'],
-            ['product_name', 'unit', 'unit_price_cents', 'variable', 'containers_per_unit', 'ordered_quantity', 'allocated_quantity', 'allocated_by_hand'],
+            ['product_name', 'unit', 'unit_price_cents', 'variable', 'containers_per_unit', 'ordered_quantity', 'allocated_quantity', 'allocated_by_hand', 'dropped'],
         );
     }
 
@@ -168,9 +171,10 @@ final class EloquentOrderRepository implements OrderRepository
                 new DateTimeImmutable($line->created_at),
                 $line->added_by,
                 (bool) $line->allocated_by_hand,
+                (bool) $line->dropped,
             ))
             ->all();
 
-        return Order::restore($row->id, $row->cycle_id, $row->household_id, array_values($lines));
+        return Order::restore($row->id, $row->cycle_id, $row->household_id, array_values($lines), PickupStatus::from($row->pickup_status));
     }
 }

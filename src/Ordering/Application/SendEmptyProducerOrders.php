@@ -16,6 +16,8 @@ final class SendEmptyProducerOrders
 {
     private readonly NotDeliveredMarks $marks;
 
+    private readonly CycleSettlement $settlement;
+
     public function __construct(
         private readonly CycleRepository $cycles,
         private readonly OrderRepository $orders,
@@ -25,11 +27,12 @@ final class SendEmptyProducerOrders
         private readonly Clock $clock,
     ) {
         $this->marks = new NotDeliveredMarks($catalog, $availability, $orders);
+        $this->settlement = new CycleSettlement($orders, $this->marks);
     }
 
     /**
-     * Sends every participating, closed producer order with no line to send; nobody is notified (R12a). Validating and
-     * distributing them belongs to the reception tasks.
+     * Sends every participating, closed producer order with no line to send, then validates and distributes it, settling
+     * the cycle through `CycleSettlement` like `MarkProducerDistributed`; nobody is notified (R12a, D10).
      */
     public function __invoke(): void
     {
@@ -70,8 +73,12 @@ final class SendEmptyProducerOrders
             foreach ($cycle->markedLines($producerId, $orders, $marked) as $orderId => $productIds) {
                 $this->orders->markNotDelivered($orderId, $productIds);
             }
-        }
 
-        $this->cycles->add($cycle);
+            // With no line to send nothing was received, so the reception is balanced.
+            $cycle->validate($producerId, $now);
+            $settledNow = $cycle->markDistributed($producerId, true, $now);
+            $this->cycles->add($cycle);
+            ($this->settlement)($cycle, $settledNow);
+        }
     }
 }

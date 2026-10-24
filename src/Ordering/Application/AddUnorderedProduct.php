@@ -36,6 +36,7 @@ final class AddUnorderedProduct
 
         $this->transactions->run(function () use ($cycleId, $producerId, $productId, $total) {
             $cycle = $this->cycles->getForUpdate($cycleId) ?? throw CycleNotFound::withId($cycleId);
+            $cycle->assertReceptionEditable($producerId);
             $loaded = $this->loader->load($cycle, $producerId);
 
             $product = $loaded->catalog[$productId] ?? throw ProductNotOrderable::withId($productId);
@@ -52,6 +53,8 @@ final class AddUnorderedProduct
             }
 
             $this->receivedTotals->set(new ReceivedTotal($cycleId, $producerId, $productId, $total));
+            $cycle->clearValidation($producerId);
+            $this->cycles->add($cycle);
         });
     }
 }

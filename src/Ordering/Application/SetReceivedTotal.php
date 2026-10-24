@@ -43,6 +43,7 @@ final class SetReceivedTotal
         // The cycle lock serialises every reception change, so the orders read here cannot change before they are saved.
         $this->transactions->run(function () use ($cycleId, $producerId, $productId, $total, $overwriteManual) {
             $cycle = $this->cycles->getForUpdate($cycleId) ?? throw CycleNotFound::withId($cycleId);
+            $cycle->assertReceptionEditable($producerId);
             $loaded = $this->loader->load($cycle, $producerId);
 
             $product = $loaded->reception->product($productId) ?? throw ProductNotInReception::withId($productId);
@@ -66,6 +67,8 @@ final class SetReceivedTotal
             }
 
             $this->receivedTotals->set(new ReceivedTotal($cycleId, $producerId, $productId, $total));
+            $cycle->clearValidation($producerId);
+            $this->cycles->add($cycle);
         });
     }
 }
