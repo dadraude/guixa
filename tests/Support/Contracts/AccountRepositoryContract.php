@@ -171,6 +171,31 @@ trait AccountRepositoryContract
     }
 
     #[Test]
+    public function it_finds_the_account_of_a_producer(): void
+    {
+        $repository = $this->repository();
+        $this->assertNull($repository->ofProducer($this->producerId()));
+
+        $account = Account::inviteProducer($repository->nextId(), 'Baker', Email::from('baker@example.org'), $this->producerId());
+        $repository->save($account);
+
+        $this->assertSame($account->id, $repository->ofProducer($this->producerId())?->id);
+    }
+
+    #[Test]
+    public function it_stores_a_suspended_producer_role_as_no_role(): void
+    {
+        $repository = $this->repository();
+        $account = Account::inviteProducer($repository->nextId(), 'Baker', Email::from('baker@example.org'), $this->producerId());
+        $account->suspendProducerRole();
+        $repository->save($account);
+
+        $found = $repository->get($account->id);
+        $this->assertSame([], $found?->roles);
+        $this->assertSame($this->producerId(), $found->producerId);
+    }
+
+    #[Test]
     public function it_tells_whether_a_producer_has_an_account(): void
     {
         $repository = $this->repository();

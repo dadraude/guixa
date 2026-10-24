@@ -75,6 +75,12 @@ Route::middleware(['auth', 'verified', 'role:manager'])->prefix('manage')->name(
     Route::post('cycles/{cycle}/producers/{producer}', [CycleParticipantController::class, 'store'])
         ->whereUuid(['cycle', 'producer'])
         ->name('cycles.producers.store');
+    Route::put('cycles/{cycle}/producers/{producer}', [CycleParticipantController::class, 'update'])
+        ->whereUuid(['cycle', 'producer'])
+        ->name('cycles.producers.update');
+    Route::delete('cycles/{cycle}/producers/{producer}', [CycleParticipantController::class, 'destroy'])
+        ->whereUuid(['cycle', 'producer'])
+        ->name('cycles.producers.destroy');
     Route::prefix('cycles/{cycle}/producers/{producer}/cutoff')->whereUuid(['cycle', 'producer'])->group(function () {
         Route::put('/', [CycleCutoffController::class, 'update'])->name('cycles.producers.cutoff.update');
         Route::post('close', [CycleCutoffController::class, 'close'])->name('cycles.producers.cutoff.close');
@@ -106,6 +112,12 @@ Route::middleware(['auth', 'verified', 'role:manager'])->prefix('manage')->name(
     Route::post('producers/{producer}/account', [ProducerAccountController::class, 'store'])
         ->whereUuid('producer')
         ->name('producers.account.store');
+    Route::post('producers/{producer}/deactivation', [ProducerController::class, 'deactivate'])
+        ->whereUuid('producer')
+        ->name('producers.deactivation.store');
+    Route::delete('producers/{producer}/deactivation', [ProducerController::class, 'reactivate'])
+        ->whereUuid('producer')
+        ->name('producers.deactivation.destroy');
 
     Route::get('accounts', [AccountController::class, 'index'])->name('accounts.index');
     Route::put('accounts/{account}/household', [AccountHouseholdController::class, 'update'])

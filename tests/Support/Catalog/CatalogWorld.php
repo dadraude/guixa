@@ -4,6 +4,7 @@ namespace Tests\Support\Catalog;
 
 use Guixa\Catalog\Application\CreateProducer;
 use Guixa\Catalog\Application\CreateProduct;
+use Guixa\Catalog\Application\DeactivateProducer;
 use Guixa\Catalog\Application\DeactivateProduct;
 use Guixa\Catalog\Application\GetDefaultCutoff;
 use Guixa\Catalog\Application\GetOrderableProduct;
@@ -12,13 +13,16 @@ use Guixa\Catalog\Application\GetProducerCutoffRule;
 use Guixa\Catalog\Application\ListOrderableProducts;
 use Guixa\Catalog\Application\ListProducerProducts;
 use Guixa\Catalog\Application\ListProducers;
+use Guixa\Catalog\Application\ReactivateProducer;
 use Guixa\Catalog\Application\ReactivateProduct;
 use Guixa\Catalog\Application\SetDefaultCutoff;
 use Guixa\Catalog\Application\UpdateProduct;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Role;
 use Tests\Support\FrozenClock;
+use Tests\Support\InMemory\FakeProducerAccess;
 use Tests\Support\InMemory\FakeProducerCycles;
+use Tests\Support\InMemory\ImmediateTransactionRunner;
 use Tests\Support\InMemory\InMemoryProducerRepository;
 use Tests\Support\InMemory\InMemoryProductRepository;
 
@@ -33,7 +37,13 @@ final class CatalogWorld
 
     public readonly FakeProducerCycles $cycles;
 
+    public readonly FakeProducerAccess $access;
+
     public readonly CreateProducer $createProducer;
+
+    public readonly DeactivateProducer $deactivateProducer;
+
+    public readonly ReactivateProducer $reactivateProducer;
 
     public readonly ListProducers $listProducers;
 
@@ -67,8 +77,12 @@ final class CatalogWorld
         $this->producers = new InMemoryProducerRepository;
         $this->products = new InMemoryProductRepository;
         $this->cycles = new FakeProducerCycles;
+        $this->access = new FakeProducerAccess;
+        $transactions = new ImmediateTransactionRunner;
 
         $this->createProducer = new CreateProducer($this->producers);
+        $this->deactivateProducer = new DeactivateProducer($this->producers, $this->access, $this->cycles, $transactions);
+        $this->reactivateProducer = new ReactivateProducer($this->producers, $this->access, $transactions);
         $this->listProducers = new ListProducers($this->producers);
         $this->getProducer = new GetProducer($this->producers);
         $this->setDefaultCutoff = new SetDefaultCutoff($this->producers);

@@ -387,3 +387,13 @@ Why: the plan did not say which verb or which guards, and the sent state does no
 
 T17 (`plan.md`, HTTP & pages): cancelling a cycle asks the manager to confirm first, in a dialog that says every household's orders are discarded and it cannot be undone. User decision: "sí, que demani confirmació abans de cancel·lar".
 Why: the cancel discards every household's orders irreversibly (R4b).
+
+## 2026-10-24 · Deviation
+
+T16 (`plan.md`, Ordering use cases and HTTP & pages): stopping participation is `DELETE /manage/cycles/{cycle}/producers/{producer}` and participating again is `PUT` on the same URL, because `POST` there already is `AddParticipant` and the plan listed `ParticipateAgain` under it without saying how the two differ. Deactivating and reactivating a producer are `POST` and `DELETE /manage/producers/{producer}/deactivation`, like the accounts. `ParticipateAgain` refuses a deactivated producer with `ProducerNotActive` (R3a) and keeps the cutoff the producer had. `Cycle::stopParticipating` does not check "order not sent" (R6c) yet: the sent state arrives with `send` in T18, which adds the check, as T12 and T17 did for R6b and R4b. `StopParticipatingWhereNotSent` skips cancelled cycles.
+Why: the plan did not say which verbs, which guards, or what happens to the cutoff, and the sent state does not exist before T18. No Vue controls were added for these routes in T16: the task's allowed surfaces had no `resources/js/pages`; the stop, participate-again and (de)activate buttons wait for a coordinator decision.
+
+## 2026-10-24 · Deviation
+
+T16 (`plan.md`, Catalog `ProducerAccess` and Membership): the producer role is suspended by removing the `producer` row from `account_roles` and kept on `users.producer_id`, so restoring puts the same row back; `AccountRepository` gains `ofProducer(producerId)` to find the account, and `SuspendProducerRole` / `RestoreProducerRole` take only the producer id and ignore a producer without an account. The plan said Login counts a producer role "only while its producer is active" and left the storage open.
+Why: Login and the actor resolver already read `account_roles`, so no other query has to learn about producer state.

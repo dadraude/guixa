@@ -13,11 +13,14 @@ use Guixa\Ordering\Application\HasUnsettledLines;
 use Guixa\Ordering\Application\ListCycles;
 use Guixa\Ordering\Application\ListMemberCycles;
 use Guixa\Ordering\Application\OpenCycle;
+use Guixa\Ordering\Application\ParticipateAgain;
 use Guixa\Ordering\Application\RemoveMarkedLine;
 use Guixa\Ordering\Application\SetCutoff;
 use Guixa\Ordering\Application\SetOrderLine;
 use Guixa\Ordering\Application\SetPickupWeekday;
 use Guixa\Ordering\Application\SetProductAvailability;
+use Guixa\Ordering\Application\StopParticipating;
+use Guixa\Ordering\Application\StopParticipatingWhereNotSent;
 use Guixa\Ordering\Domain\ValueObject\PickupWeekday;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Role;
@@ -61,6 +64,12 @@ final class OrderingWorld
     public readonly OpenCycle $openCycle;
 
     public readonly AddParticipant $addParticipant;
+
+    public readonly StopParticipating $stopParticipating;
+
+    public readonly ParticipateAgain $participateAgain;
+
+    public readonly StopParticipatingWhereNotSent $stopParticipatingWhereNotSent;
 
     public readonly SetCutoff $setCutoff;
 
@@ -109,6 +118,9 @@ final class OrderingWorld
         $this->getPickupWeekday = new GetPickupWeekday($this->settings);
         $this->openCycle = new OpenCycle($this->cycles, $this->settings, $this->rules, $transactions, $this->clock);
         $this->addParticipant = new AddParticipant($this->cycles, $this->rules, $transactions, $this->clock);
+        $this->stopParticipating = new StopParticipating($this->cycles, $transactions);
+        $this->participateAgain = new ParticipateAgain($this->cycles, $this->rules, $transactions);
+        $this->stopParticipatingWhereNotSent = new StopParticipatingWhereNotSent($this->cycles);
         $this->setCutoff = new SetCutoff($this->cycles, $transactions, $this->clock);
         $this->cancelCycle = new CancelCycle($this->cycles, $this->orders, $transactions, $this->clock);
         $this->closeProducerNow = new CloseProducerNow($this->cycles, $transactions, $this->clock);

@@ -17,6 +17,9 @@ interface AccountRepository
     /** @return list<Account> every account, by name */
     public function list(): array;
 
+    /** The one account of the producer, if it has one. */
+    public function ofProducer(string $producerId): ?Account;
+
     public function producerHasAccount(string $producerId): bool;
 
     /** @return list<Account> accounts that belong to a producer */

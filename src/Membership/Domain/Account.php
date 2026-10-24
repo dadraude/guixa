@@ -120,6 +120,21 @@ final class Account
         $this->roles = array_values(array_filter($this->roles, fn (Role $role) => $role !== Role::Manager));
     }
 
+    /** The producer is deactivated: the account keeps its other roles (R3a). */
+    public function suspendProducerRole(): void
+    {
+        $this->roles = array_values(array_filter($this->roles, fn (Role $role) => $role !== Role::Producer));
+    }
+
+    public function restoreProducerRole(): void
+    {
+        if (in_array(Role::Producer, $this->roles, true)) {
+            return;
+        }
+
+        $this->roles = [...$this->roles, Role::Producer];
+    }
+
     /** Deactivating unlinks the account from its household and keeps the rest of its history (R36b). */
     public function deactivate(DateTimeImmutable $now): void
     {
