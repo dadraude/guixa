@@ -523,3 +523,46 @@ absent before creation and after deletion, with loopback/exact-database guards b
 First staged slice: 388 authored changed lines before this evidence entry (lockfile excluded).
 An isolated checkout of the index, without the redesign or `.env`, passed 13 frontend tests,
 type checking, and client/SSR builds. The optional `fontaine` warning is non-fatal; nothing installed.
+
+## 2026-10-24 · Change
+
+T38 native review: the user granted the candidate-specific review. Risk, readability and reliability
+returned no findings; the exact provider acknowledgement completed and consumed the review authority.
+The reviewed foundation remains staged unchanged; no commit or publication has occurred.
+
+T37 verification follow-up: checked empty cycle and producer lists, the existing domain-error alert,
+and 200% text at 375 px with actual production assets. The enlarged cycle heading/date initially
+clipped despite a zero page-overflow measurement. Added break opportunities to the heading and card
+text; visual and element-boundary rechecks pass. No ordering behavior changed. Client/SSR builds,
+types, affected lint and all 17 focused tests pass after this correction.
+
+Delivery slicing: separated the cycle-list and editor tests so each stays with its presentation.
+The best cohesive split is foundation, cycle list/shared navigation, then editor/product row. The
+editor alone is 408 authored source/test lines before verification notes; splitting its row away
+from the consuming page would leave an incomplete presentation change. A small size exception is
+recommended rather than removing tests or compressing code to satisfy the 400-line guide.
+
+Second-slice check: the cycle-list/navigation delta is 250 authored lines; an isolated index checkout
+passed 14 focused tests and type checking. Native review could not start with the uncommitted staged
+foundation as its base: it returned `staged_workspace_overlay_recovery_unavailable` and no new
+review authority. Work is preserved pending the user's sequencing decision; nothing is committed.
+
+## 2026-10-24 · Request
+
+> Yes, commit only the approved translation foundation now, then complete native review for each remaining slice before committing it. Don’t push or open PRs.
+
+## 2026-10-24 · Change
+
+T38 committed locally as `0c56c738bed223e1e614e1385f6339061d63789e`; its tree exactly matches the
+native-reviewed foundation. The user authorized this baseline commit, followed by native review
+before each subsequent slice's commit. T37 remains uncommitted; no push or PR is authorized.
+
+## 2026-10-24 · Request
+
+> Yes, commit the cycle-list/navigation slice without native review, then continue with native review of the editor slice before committing it. Don’t push or open PRs.
+
+## 2026-10-24 · Change
+
+The user declined native review only for the cycle-list/navigation candidate and explicitly
+authorized its local commit without review. Existing local verification passed; no native approval
+is claimed. The editor remains a separate slice requiring native review before its commit.

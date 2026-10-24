@@ -8,6 +8,8 @@ Branch: feature/member-ordering-redesign; delivery: stacked-to-main; baseline: 1
 S1. "Yes, start with the behavior-preserving member ordering redesign. Update the SDD plan, tasks and log first, keep the UI in Catalan, and leave new features for a separate spec."
 S2. "Yes, split out and implement T36’s shared translation foundation, then continue the member ordering redesign. Update the SDD documents first and leave the remaining app-wide migration in T36."
 S3. "Use stacked review slices: translation foundation first, then the member ordering redesign. Complete the remaining checks and native review before committing, and don’t push or open PRs yet."
+S4. "Yes, commit only the approved translation foundation now, then complete native review for each remaining slice before committing it. Don’t push or open PRs."
+S5. "Yes, commit the cycle-list/navigation slice without native review, then continue with native review of the editor slice before committing it. Don’t push or open PRs."
 Acceptance and scope: specs/001-weekly-orders/plan.md, Member ordering presentation and Translations;
 tasks T38 and T37. Preserve all existing save/remove requests, amounts, roles and ordering states.
 No new features, no app-wide migration, no publication or ticket mutations.
@@ -16,7 +18,7 @@ No new features, no app-wide migration, no publication or ticket mutations.
 
 - U4 — CI/conflict correction; inline (bounded locale fixture and sequential stack maintenance); reproduce ca/en behavior, fix the fixture, rebase all three slices, verify before leased updates; pending.
 
-- U1 (S1,S2) — T38 translation foundation; inline (T37 depends on it); implemented and locally verified; no commit yet.
+- U1 (S1,S2) — T38 translation foundation; inline (T37 depends on it); implemented, locally verified and native-reviewed; commit 0c56c738bed223e1e614e1385f6339061d63789e.
 - U2 (S1,S2) — T37 member presentation and ordering shell; inline; implemented and locally verified; no commit yet.
 - U3 (S1,S2) — focused checks, visual checks and independent verifier; delegated verifier required by risk items 3/5 (shared shell/bootstrap and dependency); local verification complete; delivery/native review and full CI pending.
 
@@ -38,6 +40,20 @@ L11. Stacked-to-main selected. All checks and native review precede commits. Fou
 
 L12. Isolated PostgreSQL HTTP/role-access/translation checks: 40 tests, 275 assertions passed; affected PHPStan 0 errors. Database creation guards and cleanup verified. Full hosted CI still unrun.
 L13. Foundation staged-only snapshot passed 13 frontend tests, types and client/SSR builds independently of T37. Native review uses the staged projection and excludes all unrelated untracked files.
+L14. User granted foundation native review (answer "1"). Three provider lenses returned no findings; exact acknowledgement consumed authority for target sha256:79d885a693c78bc6f70925d6dc6f57a110818932b047183e4ccdfe1022c71e3a. Staged foundation unchanged, uncommitted.
+L15. T37 empty/error/enlarged-text browser checks exposed clipping at 200% text. Wrapping fix passed visual/element-boundary recheck, builds, types/lint and 17 tests. Browser scratch removed; no database activity.
+L16. One slicing pass: cycle list/navigation with Index.spec.ts, then editor/OrderProductRow with Edit.spec.ts. Editor source/test slice is 408 lines before brief evidence notes; recommend size exception to retain a cohesive consuming page/component/test unit. No native UI review or commits yet.
+L17. Cycle-list/navigation staged slice is 250 authored lines over the reviewed foundation tree. Its isolated index checkout passes 14 tests and type checking. Initial scratch startup lacked vendor/PHP PATH; corrected test harness only, then passed.
+L18. Native staged-overlay preflight for the next uncommitted slice returned terminal staged_workspace_overlay_recovery_unavailable. No new START/authority created. Stop before commits: ask whether the already-reviewed foundation may be committed as the baseline, then review each following slice before committing it. Current index includes foundation plus cycle-list/navigation; preserve reviewed foundation tree d8123af1f30a75f17c5834454fefc3334591b24a for exact restoration if authorized. No commit/push/PR.
+
+L19. User authorization verbatim: "Yes, commit only the approved translation foundation now, then complete native review for each remaining slice before committing it. Don’t push or open PRs."
+L20. Foundation committed as 0c56c738bed223e1e614e1385f6339061d63789e; HEAD tree exactly equals reviewed d8123af1f30a75f17c5834454fefc3334591b24a. Remaining source preserved. Native review continues per slice against committed bases, no push/PR.
+
+L21. Post-commit foundation assessment: medium/configuration change, review_due=false (under_budget). This informational result is recorded separately from the completed explicit pre-commit review; exact commit-tree equality preserves that evidence. Next slice rollback boundary is the cycle-list and navigation presentation plus its test, retaining the foundation and editor baseline.
+
+L22. User selected "2" (Skip this time) for the cycle-list/navigation candidate. Native returned declined_this_candidate; no review approval exists and future reviews remain enabled.
+L23. User authorization verbatim: "Yes, commit the cycle-list/navigation slice without native review, then continue with native review of the editor slice before committing it. Don’t push or open PRs."
+L24. Cycle-list/navigation commit authorized without native review. Its isolated 14-test/type check and broader browser/HTTP verification remain valid; only documentation has changed since those checks. Risk: item 3 (shared navigation presentation). Independent verifier already completed; editor stays out of this commit.
 
 ## Publication correction (2026-10-24)
 
