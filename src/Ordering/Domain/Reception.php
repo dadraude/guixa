@@ -48,6 +48,18 @@ final readonly class Reception
         return new self($products);
     }
 
+    /** Every product received exactly what it was allocated: what a producer needs to be distributed (R17, R18). */
+    public function balancedForDistribution(): bool
+    {
+        foreach ($this->products as $product) {
+            if (! $product->isBalanced()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public function product(string $productId): ?ReceptionProduct
     {
         foreach ($this->products as $product) {

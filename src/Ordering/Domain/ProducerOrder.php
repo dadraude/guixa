@@ -13,6 +13,8 @@ final class ProducerOrder
         private bool $participating,
         private ?DateTimeImmutable $cutoff,
         private ?DateTimeImmutable $sentAt = null,
+        private ?DateTimeImmutable $validatedAt = null,
+        private ?DateTimeImmutable $distributedAt = null,
     ) {}
 
     /** A producer that starts participating; a null cutoff means its moment had already passed (R5). */
@@ -21,9 +23,15 @@ final class ProducerOrder
         return new self($producerId, true, $cutoff);
     }
 
-    public static function restore(string $producerId, bool $participating, ?DateTimeImmutable $cutoff, ?DateTimeImmutable $sentAt = null): self
-    {
-        return new self($producerId, $participating, $cutoff, $sentAt);
+    public static function restore(
+        string $producerId,
+        bool $participating,
+        ?DateTimeImmutable $cutoff,
+        ?DateTimeImmutable $sentAt = null,
+        ?DateTimeImmutable $validatedAt = null,
+        ?DateTimeImmutable $distributedAt = null,
+    ): self {
+        return new self($producerId, $participating, $cutoff, $sentAt, $validatedAt, $distributedAt);
     }
 
     public function isParticipating(): bool
@@ -65,6 +73,47 @@ final class ProducerOrder
     public function markSent(DateTimeImmutable $now): void
     {
         $this->sentAt = $now;
+    }
+
+    public function isValidated(): bool
+    {
+        return $this->validatedAt !== null;
+    }
+
+    public function validatedAt(): ?DateTimeImmutable
+    {
+        return $this->validatedAt;
+    }
+
+    public function validate(DateTimeImmutable $now): void
+    {
+        $this->validatedAt = $now;
+    }
+
+    public function clearValidation(): void
+    {
+        $this->validatedAt = null;
+    }
+
+    public function isDistributed(): bool
+    {
+        return $this->distributedAt !== null;
+    }
+
+    public function distributedAt(): ?DateTimeImmutable
+    {
+        return $this->distributedAt;
+    }
+
+    public function distribute(DateTimeImmutable $now): void
+    {
+        $this->distributedAt = $now;
+    }
+
+    /** The validation stays: only changing a received total clears it (R17a). */
+    public function reopen(): void
+    {
+        $this->distributedAt = null;
     }
 
     /**

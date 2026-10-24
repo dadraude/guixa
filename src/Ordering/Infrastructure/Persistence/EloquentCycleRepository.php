@@ -22,6 +22,7 @@ final class EloquentCycleRepository implements CycleRepository
         CycleModel::query()->updateOrCreate(['id' => $cycle->id], [
             'pickup_date' => $cycle->pickupDate()->format('Y-m-d'),
             'cancelled_at' => $cycle->cancelledAt()?->format(DATE_ATOM),
+            'settled_at' => $cycle->settledAt()?->format(DATE_ATOM),
         ]);
 
         $rows = array_map(fn (ProducerOrder $order) => [
@@ -30,10 +31,12 @@ final class EloquentCycleRepository implements CycleRepository
             'participating' => $order->isParticipating(),
             'closes_at' => $order->cutoff()?->format(DATE_ATOM),
             'sent_at' => $order->sentAt()?->format(DATE_ATOM),
+            'validated_at' => $order->validatedAt()?->format(DATE_ATOM),
+            'distributed_at' => $order->distributedAt()?->format(DATE_ATOM),
         ], $cycle->producerOrders());
 
         if ($rows !== []) {
-            DB::table('cycle_producers')->upsert($rows, ['cycle_id', 'producer_id'], ['participating', 'closes_at', 'sent_at']);
+            DB::table('cycle_producers')->upsert($rows, ['cycle_id', 'producer_id'], ['participating', 'closes_at', 'sent_at', 'validated_at', 'distributed_at']);
         }
     }
 
@@ -89,6 +92,8 @@ final class EloquentCycleRepository implements CycleRepository
                 (bool) $row->participating,
                 $row->closes_at === null ? null : new DateTimeImmutable($row->closes_at),
                 $row->sent_at === null ? null : new DateTimeImmutable($row->sent_at),
+                $row->validated_at === null ? null : new DateTimeImmutable($row->validated_at),
+                $row->distributed_at === null ? null : new DateTimeImmutable($row->distributed_at),
             ))
             ->all();
 
@@ -97,6 +102,7 @@ final class EloquentCycleRepository implements CycleRepository
             new DateTimeImmutable($model->pickup_date),
             array_values($orders),
             $model->cancelled_at === null ? null : new DateTimeImmutable($model->cancelled_at),
+            $model->settled_at === null ? null : new DateTimeImmutable($model->settled_at),
         );
     }
 }

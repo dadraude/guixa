@@ -17,8 +17,10 @@ use App\Http\Controllers\Manage\ProducerAccountController;
 use App\Http\Controllers\Manage\ProducerController;
 use App\Http\Controllers\Manage\ReceptionAllocationController;
 use App\Http\Controllers\Manage\ReceptionController;
+use App\Http\Controllers\Manage\ReceptionDistributionController;
 use App\Http\Controllers\Manage\ReceptionProductController;
 use App\Http\Controllers\Manage\ReceptionReceivedController;
+use App\Http\Controllers\Manage\ReceptionValidationController;
 use App\Http\Controllers\Manage\ReturnItemController;
 use App\Http\Controllers\Manage\SettingsController;
 use App\Http\Controllers\Manage\StockMovementController;
@@ -97,6 +99,9 @@ Route::middleware(['auth', 'verified', 'role:manager'])->prefix('manage')->name(
         Route::post('products', [ReceptionProductController::class, 'store'])->name('cycles.receptions.products.store');
         Route::put('products/{product}/received', [ReceptionReceivedController::class, 'update'])->name('cycles.receptions.received.update');
         Route::put('products/{product}/allocations/{household}', [ReceptionAllocationController::class, 'update'])->name('cycles.receptions.allocations.update');
+        Route::post('validate', [ReceptionValidationController::class, 'store'])->name('cycles.receptions.validate');
+        Route::post('distribution', [ReceptionDistributionController::class, 'store'])->name('cycles.receptions.distribution.store');
+        Route::delete('distribution', [ReceptionDistributionController::class, 'destroy'])->name('cycles.receptions.distribution.destroy');
     });
 
     Route::get('settings', [SettingsController::class, 'show'])->name('settings.show');

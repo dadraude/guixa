@@ -6,15 +6,20 @@ use DateTimeImmutable;
 use DateTimeZone;
 use Guixa\Ordering\Domain\Error\CutoffNotInFuture;
 use Guixa\Ordering\Domain\Error\CutoffOutsideWindow;
+use Guixa\Ordering\Domain\Error\CycleAlreadySettled;
 use Guixa\Ordering\Domain\Error\CycleCancelled;
 use Guixa\Ordering\Domain\Error\NotOnPickupWeekday;
 use Guixa\Ordering\Domain\Error\PickupDateNotInFuture;
 use Guixa\Ordering\Domain\Error\ProducerClosed;
+use Guixa\Ordering\Domain\Error\ProducerDistributed;
+use Guixa\Ordering\Domain\Error\ProducerNotDistributed;
 use Guixa\Ordering\Domain\Error\ProducerNotInCycle;
 use Guixa\Ordering\Domain\Error\ProducerNotParticipating;
 use Guixa\Ordering\Domain\Error\ProducerOrderNotSent;
 use Guixa\Ordering\Domain\Error\ProducerOrderSent;
 use Guixa\Ordering\Domain\Error\ProducerStillOpen;
+use Guixa\Ordering\Domain\Error\ReceptionNotValidated;
+use Guixa\Ordering\Domain\Error\ReceptionUnbalanced;
 use Guixa\Ordering\Domain\ValueObject\CutoffRule;
 use Guixa\Ordering\Domain\ValueObject\PickupWeekday;
 use Guixa\Shared\Domain\LocalTime;
@@ -29,6 +34,7 @@ final class Cycle
         private readonly DateTimeImmutable $pickupDate,
         private array $producerOrders,
         private ?DateTimeImmutable $cancelledAt = null,
+        private ?DateTimeImmutable $settledAt = null,
     ) {}
 
     /** `$now` is read in the cooperative's timezone: "after today" is a local calendar date (R4, R4c). */
@@ -48,7 +54,7 @@ final class Cycle
     }
 
     /** @param list<ProducerOrder> $producerOrders */
-    public static function restore(string $id, DateTimeImmutable $pickupDate, array $producerOrders, ?DateTimeImmutable $cancelledAt = null): self
+    public static function restore(string $id, DateTimeImmutable $pickupDate, array $producerOrders, ?DateTimeImmutable $cancelledAt = null, ?DateTimeImmutable $settledAt = null): self
     {
         $byProducer = [];
 
@@ -56,7 +62,7 @@ final class Cycle
             $byProducer[$producerOrder->producerId] = $producerOrder;
         }
 
-        return new self($id, $pickupDate, $byProducer, $cancelledAt);
+        return new self($id, $pickupDate, $byProducer, $cancelledAt, $settledAt);
     }
 
     /**
@@ -158,6 +164,95 @@ final class Cycle
     public function isSent(string $producerId): bool
     {
         return ($this->producerOrders[$producerId] ?? null)?->isSent() ?? false;
+    }
+
+    /** What changing a reception needs: the order is sent and not distributed, since a distributed reception is read-only (R14, R18). */
+    public function assertReceptionEditable(string $producerId): void
+    {
+        $this->assertSent($producerId);
+
+        if ($this->producerOrderOf($producerId)->isDistributed()) {
+            throw ProducerDistributed::withId($this->id, $producerId);
+        }
+    }
+
+    /** Marks the reception as checked; changing a received total clears it again (R17a). */
+    public function validate(string $producerId, DateTimeImmutable $now): void
+    {
+        $this->assertReceptionEditable($producerId);
+        $this->producerOrderOf($producerId)->validate($now);
+    }
+
+    public function clearValidation(string $producerId): void
+    {
+        $this->producerOrderOf($producerId)->clearValidation();
+    }
+
+    public function isValidated(string $producerId): bool
+    {
+        return ($this->producerOrders[$producerId] ?? null)?->isValidated() ?? false;
+    }
+
+    public function isDistributed(string $producerId): bool
+    {
+        return ($this->producerOrders[$producerId] ?? null)?->isDistributed() ?? false;
+    }
+
+    /**
+     * Distributes a validated, balanced reception, which makes it read-only. The cycle is settled the first time every
+     * participating producer is distributed; that is the return value (R18, S13, S47).
+     */
+    public function markDistributed(string $producerId, bool $balanced, DateTimeImmutable $now): bool
+    {
+        $this->assertReceptionEditable($producerId);
+        $producerOrder = $this->producerOrderOf($producerId);
+
+        if (! $producerOrder->isValidated()) {
+            throw ReceptionNotValidated::withId($this->id, $producerId);
+        }
+
+        if (! $balanced) {
+            throw ReceptionUnbalanced::withId($this->id, $producerId);
+        }
+
+        $producerOrder->distribute($now);
+
+        if ($this->isSettled() || ! $this->everyParticipatingProducerIsDistributed()) {
+            return false;
+        }
+
+        $this->settledAt = $now;
+
+        return true;
+    }
+
+    /**
+     * Takes a producer back to its reception. Only before settlement: reopening a settled cycle, which keeps the done
+     * pickups, belongs to a later task (R18).
+     */
+    public function reopen(string $producerId): void
+    {
+        $producerOrder = $this->producerOrderOf($producerId);
+
+        if ($this->isSettled()) {
+            throw CycleAlreadySettled::withId($this->id, $producerId);
+        }
+
+        if (! $producerOrder->isDistributed()) {
+            throw ProducerNotDistributed::withId($this->id, $producerId);
+        }
+
+        $producerOrder->reopen();
+    }
+
+    public function isSettled(): bool
+    {
+        return $this->settledAt !== null;
+    }
+
+    public function settledAt(): ?DateTimeImmutable
+    {
+        return $this->settledAt;
     }
 
     /**
@@ -276,6 +371,13 @@ final class Cycle
     public function producerOrders(): array
     {
         return array_values($this->producerOrders);
+    }
+
+    private function everyParticipatingProducerIsDistributed(): bool
+    {
+        $participating = array_filter($this->producerOrders, fn (ProducerOrder $order) => $order->isParticipating());
+
+        return $participating !== [] && array_filter($participating, fn (ProducerOrder $order) => ! $order->isDistributed()) === [];
     }
 
     private function assertNotCancelled(): void

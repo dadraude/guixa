@@ -6,6 +6,7 @@ use DateTimeImmutable;
 use DateTimeZone;
 use Guixa\Ordering\Domain\Cycle;
 use Guixa\Ordering\Domain\OrderRepository;
+use Guixa\Ordering\Domain\PickupStatus;
 use Guixa\Ordering\Domain\ValueObject\CutoffRule;
 use Guixa\Ordering\Domain\ValueObject\OrderableProduct;
 use Guixa\Ordering\Domain\ValueObject\PickupWeekday;
@@ -233,6 +234,63 @@ trait OrderRepositoryContract
 
         $this->assertTrue($repository->hasUnsettledLinesOf(self::BREAD));
         $this->assertFalse($repository->hasUnsettledLinesOf(self::APPLES));
+    }
+
+    #[Test]
+    public function it_stores_dropped_lines_and_a_pending_pickup_when_something_is_still_allocated(): void
+    {
+        $cycle = $this->openCycle();
+        $repository = $this->repository();
+        $now = $this->madrid('2026-10-22 10:00');
+        $order = $repository->lockFor(self::CYCLE, self::HOUSEHOLD);
+        $order->setLine($this->product(self::BREAD, 'Loaf', 350), Quantity::fromString('2'), $cycle, $repository->nextId(), self::ANNA, $now);
+        $order->setLine($this->product(self::APPLES, 'Apples', 280, variable: true), Quantity::fromString('1'), $cycle, $repository->nextId(), self::ANNA, $now);
+        $this->assertSame(PickupStatus::None, $repository->ofHousehold(self::CYCLE, self::HOUSEHOLD)?->pickup());
+
+        $order->drop([self::APPLES => true]);
+        $repository->add($order);
+
+        $stored = $repository->ofHousehold(self::CYCLE, self::HOUSEHOLD);
+        $this->assertSame(PickupStatus::Pending, $stored?->pickup());
+        $dropped = [];
+        foreach ($stored?->lines() ?? [] as $line) {
+            $dropped[$line->productId] = $line->dropped;
+        }
+        $this->assertSame([self::BREAD => false, self::APPLES => true], $dropped);
+    }
+
+    #[Test]
+    public function it_stores_nothing_to_collect_when_every_allocation_is_zero_or_dropped(): void
+    {
+        $cycle = $this->openCycle();
+        $repository = $this->repository();
+        $now = $this->madrid('2026-10-22 10:00');
+        $order = $repository->lockFor(self::CYCLE, self::HOUSEHOLD);
+        $order->setLine($this->product(self::BREAD, 'Loaf', 350), Quantity::fromString('2'), $cycle, $repository->nextId(), self::ANNA, $now);
+        $order->reallocate(self::BREAD, Quantity::fromString('0'));
+        $other = $repository->lockFor(self::CYCLE, self::OTHER_HOUSEHOLD);
+        $other->setLine($this->product(self::APPLES, 'Apples', 280, variable: true), Quantity::fromString('1'), $cycle, $repository->nextId(), self::ANNA, $now);
+
+        $order->drop([]);
+        $other->drop([self::APPLES => true]);
+        $repository->add($order);
+        $repository->add($other);
+
+        $this->assertSame(PickupStatus::NothingToCollect, $repository->ofHousehold(self::CYCLE, self::HOUSEHOLD)?->pickup());
+        $this->assertSame(PickupStatus::NothingToCollect, $repository->ofHousehold(self::CYCLE, self::OTHER_HOUSEHOLD)?->pickup());
+    }
+
+    #[Test]
+    public function it_gives_an_order_without_lines_no_pickup_when_settling(): void
+    {
+        $this->openCycle();
+        $repository = $this->repository();
+        $order = $repository->lockFor(self::CYCLE, self::HOUSEHOLD);
+
+        $order->drop([]);
+        $repository->add($order);
+
+        $this->assertSame(PickupStatus::None, $repository->ofHousehold(self::CYCLE, self::HOUSEHOLD)?->pickup());
     }
 
     #[Test]

@@ -39,6 +39,7 @@ final class SetAllocation
 
         $this->transactions->run(function () use ($actor, $cycleId, $producerId, $productId, $householdId, $allocated, $now) {
             $cycle = $this->cycles->getForUpdate($cycleId) ?? throw CycleNotFound::withId($cycleId);
+            $cycle->assertReceptionEditable($producerId);
             $loaded = $this->loader->load($cycle, $producerId);
 
             $product = $loaded->reception->product($productId) ?? throw ProductNotInReception::withId($productId);

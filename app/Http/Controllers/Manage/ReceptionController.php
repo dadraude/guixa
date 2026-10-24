@@ -31,6 +31,7 @@ class ReceptionController extends Controller
 
         return Inertia::render('Manage/Reception/Show', [
             'reception' => ReceptionRow::from($reception, $names[$producer] ?? $producer),
+            'distribution' => ['validated' => $reception->validated, 'distributed' => $reception->distributed, 'settled' => $reception->settled],
             'households' => array_map(HouseholdOptionRow::from(...), array_values($active)),
         ]);
     }

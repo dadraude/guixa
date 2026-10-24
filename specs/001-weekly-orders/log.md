@@ -783,3 +783,17 @@ snapshot limitations; none was rerun or newly reviewed during this reconciliatio
 the original no-publication statements above describe their earlier point in time and are preserved.
 No application code, tests, dependencies, commits, pushes or PRs were changed or created. The SDD
 updates remain local and uncommitted; Linear descriptions explicitly disclose pending publication.
+
+## 2026-10-25 · Deviation
+
+T23 (`plan.md`, `CycleSettlement`): the plan called it an Application service with `afterDistributed(cycle, settledNow)`, but architecture test A6 allows an Application class one public method, `__invoke`, so it is invoked as `CycleSettlement($cycle, $settledNow)`. `SendEmptyProducerOrders` builds it from the repositories it already receives, so its constructor is unchanged. `Order::drop(marked)` takes the marks `NotDeliveredMarks::of` returns instead of `drop(producerIds not participating)` plus the stored ones: a producer that does not participate is never sent, so its lines are already marked by derivation, and one set covers both (S28).
+Why: the architecture rule, and one source of truth for what is dropped.
+
+T23 (`plan.md`, `Cycle`, `ReopenProducerOrder`): the task says reopening before settlement only, and T30 owns it afterwards (S30, `reopenIfAllocated`, D12). Until then `Cycle::reopen` refuses a settled cycle with the planned `CycleAlreadySettled`, and a producer that is not distributed with the new `ProducerNotDistributed`. New `ProducerDistributed` makes a distributed reception read-only for `SetReceivedTotal`, `AddUnorderedProduct`, `SetAllocation`, `ValidateReception` and `MarkProducerDistributed` (R18). Reopening keeps the validation, since R17a clears it only when a received total changes; `AddUnorderedProduct` sets a received total, so it clears it too, while `SetAllocation` does not. Distributing checks, in order: sent, not distributed, validated (`ReceptionNotValidated`), balanced (`ReceptionUnbalanced`).
+Why: the plan listed the errors for validate and balance but not these cases, and R17a/R18 are silent on their order and on reopening.
+
+T23 (`plan.md`, `Order` pickup): `PickupStatus` has only `none`, `pending` and `nothingToCollect`; the done states arrive with the pickup tasks. At settlement an order with a line left whose allocation is above 0 is `pending`; an order whose lines are all 0 or all dropped is `nothingToCollect` (R24: nothing to hand over, so it must not wait for a manager); an order with no line at all stays `none`. Closing the cycle when every pickup is nothing to collect (R24b) is T30's.
+Why: R19 gives a pending pickup to households with an allocation and R24 closes the others; the plan did not say what an order with no line or only dropped lines becomes.
+
+T23 (`plan.md`, HTTP & pages): the reception page gets the validation state as a separate `distribution` prop (`validated`, `distributed`, `settled`) instead of new fields on `ReceptionRow`, to leave the generated `resources/js/generated/generated.d.ts` untouched. Manager-side error messages (`ReceptionNotValidated`, `ReceptionUnbalanced`, `ProducerDistributed`...) show the exception text, as the other reception errors do until T36 translates them; the page text is English like the rest of the reception page.
+Why: the generated types were outside the task's allowed paths, and the reception page and its errors are not translated yet.

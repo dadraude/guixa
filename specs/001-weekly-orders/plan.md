@@ -194,10 +194,10 @@ role only; participation is not restored.
     `isOpenForMembers(now)`: any participating producer open (R4a).
   - `send(producerId, now)`: not sent (`ProducerOrderSent`), participating (`ProducerNotParticipating`) and closed (`ProducerStillOpen`); stores `sentAt`, which freezes the cutoff and the participation (R6b, R6c, R12a, S36). `producersReadyToSend(now)` lists the participating, closed, unsent producers (D10); `totalsToSend(producerId, orders, marks)` is the ordered quantity per product over the unmarked lines, and `markedLines(...)` the marked ones per order (D9).
   - `assertSent(producerId)`: the producer is in the cycle (`ProducerNotInCycle`) and its order is sent (`ProducerOrderNotSent`), which a reception needs (R14).
-  - `validate(producerId)`; `clearValidation(producerId)` when a received total changes (R17a); both arrive with T23, which owns the validated state, so T22's `SetReceivedTotal` has nothing to clear yet.
-  - `markDistributed(producerId, balanced, now)`: sent, validated and balanced; settles the cycle the first
-    time every participating producer is distributed and returns whether it did (R18).
-  - `reopen(producerId)`: rejected once the cycle is closed (R18, R24b).
+  - `validate(producerId, now)`; `clearValidation(producerId)` when a received total changes (R17a, T23). `assertReceptionEditable(producerId)`: sent (`ProducerOrderNotSent`) and not distributed (`ProducerDistributed`), which `validate`, `markDistributed` and the three reception writers (`SetReceivedTotal`, `AddUnorderedProduct`, `SetAllocation`) call, so a distributed reception is read-only (R18).
+  - `markDistributed(producerId, balanced, now)`: sent, not yet distributed, validated (`ReceptionNotValidated`) and balanced (`ReceptionUnbalanced`); settles the cycle the first
+    time every participating producer is distributed and returns whether it did (R18). The cycle stores `settledAt`; the producer order stores `validatedAt` and `distributedAt`.
+  - `reopen(producerId)`: T23 reopens only before settlement and only a distributed producer (`ProducerNotDistributed`; a settled cycle is refused with `CycleAlreadySettled`); T30 allows it after settlement and rejects it once the cycle is closed (R18, R24b). Reopening keeps the validation, which only a changed received total clears (R17a).
   - `cancel(now)`: rejected with `ProducerOrderSent` once any producer order is sent (R4b, S37) and with `CycleCancelled` once already cancelled. A cancelled cycle refuses `addParticipant`, `setCutoff`, `closeNow`, `clearCutoff` and `assertOpenFor` with `CycleCancelled`, and `isOpenFor` is false.
   - `close(now, everyPickupDone)`: settled, every participating producer distributed and every pickup done (R24b).
 
@@ -226,8 +226,8 @@ role only; participation is not restored.
     `OrderLine` gains `allocatedByHand` (default false) and `withAllocation(Quantity, byHand)`. `orderedLines()` are the lines with `ordered` > 0: the member's order page, `GetCycleSummary`, the totals to send and
     `lineCountsOfHousehold` use them, so an allocation-only line never shows as something a household ordered (R7, R12, R13).
     All three clear `delivered` once pickups exist: a new allocation replaces a pending pickup's adjustment (R18).
-  - Settlement: `drop(producerIds not participating)` drops those lines and the `notDelivered` ones, then the
-    pickup becomes `pending`, or `nothingToCollect` if every allocation is 0 (R18, R24).
+  - Settlement: `drop(marked)` takes the product ids `NotDeliveredMarks::of` marks (stored for a sent producer; derived for one that does not participate, so these lines are dropped too) and flags those lines `dropped`, then the
+    pickup becomes `pending`, or `nothingToCollect` if every allocation of the lines left is 0 (R18, R24). An order with no line at all keeps pickup `none`. T23 knows `PickupStatus` `none`, `pending` and `nothingToCollect`; the done states arrive with the pickup tasks.
     `reopenIfAllocated()` turns `nothingToCollect` back into `pending` (R24).
   - Pickup: `adjustDelivered(productId, Quantity)` sets `delivered`, in the product's step; `allocated`
     stays as the reception left it (R19, D16);
@@ -264,7 +264,7 @@ role only; participation is not restored.
 - **`Reception`** read model (not an aggregate; T22 builds it in `Domain` with `Reception::of(producerId, orders, marksByOrder, receivedTotals, catalog)` from `ReceptionProduct` and `ReceptionLine`, and `ReceptionLoader` reads it once the producer order is sent): per product of a producer in a cycle, `ordered total`,
   `received total`, every household's `allocated`, `delivered()` and `allocatedByHand`,
   `difference = received − Σ delivered()` and `balanced` (shown and flagged, R17, R19), and
-  `balancedForDistribution`: `received − Σ allocated` is 0, so pickup adjustments do not count (R18, S61);
+  `balancedForDistribution`: `received − Σ allocated` is 0, so pickup adjustments do not count (R18, S61); `Reception::balancedForDistribution()` is true when every product is;
   plus the producer order's validated and distributed flags (R17a, R18; they arrive with T23).
   T22 shows a product when it has a line that is not marked or a recorded `ReceivedTotal`; lines marked *will not be delivered* are left out, and a product with neither a line nor a recorded total is not shown, whether or not it is active.
   Until pickups exist (T26 onwards) `delivered()` is `allocated`, so `difference` and `balancedForDistribution` agree.
@@ -274,7 +274,7 @@ role only; participation is not restored.
 
 - Errors (`Ordering\Domain\Error`): `NotOnPickupWeekday`, `PickupDateNotInFuture`, `CycleAlreadyExists`,
   `InvalidPickupWeekday`, `InvalidPickupDate`, `CycleNotFound`, `ProducerNotActive` (unknown or deactivated producer, S50),
-  `CycleCancelled`, `CycleAlreadySettled`, `CycleClosed`, `ProducerNotParticipating`, `ProducerClosed`,
+  `CycleCancelled`, `CycleAlreadySettled`, `CycleClosed`, `ProducerDistributed`, `ProducerNotDistributed`, `ProducerNotParticipating`, `ProducerClosed`,
   `ProducerOrderSent`, `ProducerOrderNotSent`, `ProducerStillOpen`, `ProducerHasNoAccount`, `ProductNotInReception`, `ProductAlreadyOrdered`, `HouseholdNotFound`, `LineMarkedNotDelivered`, `CutoffOutOfRange`, `ProductNotOrderable`, `LineNotMarked`,
   `FractionalQuantityNotAllowed`, `NoHousehold`, `ReceptionNotValidated`, `ReceptionUnbalanced`,
   `ManualAllocationsWouldBeLost`, `NobodyOrderedProduct`, `CycleNotSettled`, `NotEnoughStock`,
@@ -311,7 +311,7 @@ role only; participation is not restored.
 | `GetHouseholdOrder` (the lines with their snapshot, and the participating producers with whether each is open and the products it offers; each line carries `notDelivered`, the derived *will not be delivered* mark (R3b); the pickup, once settled, arrives with the pickup tasks) | member of household | R3b, R7, R23a, S4 |
 | `ListMemberCycles` (`MemberCycleData`: pickup date, whether it is open for members, and how many lines the household has in it; the pending, cancelled and closed states arrive with their tasks: T17 cancelled, the pickup tasks pending and closed) | member | R4a, R23a |
 | `SendProducerOrder` (the cycle `FOR UPDATE`; `Cycle::send`, then the marked lines are stored as not delivered, then the producer is emailed the totals after commit; a producer with no account is refused with `ProducerHasNoAccount` before anything is stored, unless it has no line to send; the `POST …/producers/{producer}/send` route and its button come with the later task that adds the send button, not T18) | manager | R12a, R6b, R6c, S34, S36 |
-| `SendEmptyProducerOrders` (scheduled every minute in `routes/console.php`; T18 only sends: per cycle `FOR UPDATE`, each participating, closed, unsent producer with no line to send is sent and its marked lines stored, nobody is notified; `validate` and `markDistributed` come with T23) | — (scheduler) | R12a, D10 |
+| `SendEmptyProducerOrders` (scheduled every minute in `routes/console.php`; T18 only sends: per cycle `FOR UPDATE`, each participating, closed, unsent producer with no line to send is sent and its marked lines stored, nobody is notified; from T23 it then validates and distributes it, and settles the cycle through `CycleSettlement`) | — (scheduler) | R12a, D10 |
 | `GetProducerCycleSummary` (the producer's orderable products by name with whether each is available in the cycle; `sent` and, once its order is sent, the total to deliver per product with the marked lines left out, never household names; null quantities before; a cancelled cycle or one without the producer is `CycleNotFound`) | producer (own) | R12, S7, S8 |
 | `GetCycleSummary` (ordered quantity per product under its producer, per household; households Membership does not know show their id; carries `cancelled`, and a cancelled cycle has no totals) | manager | R13, S52, S62 |
 | `HasUnsettledLines(productId): bool`, `StopParticipatingWhereNotSent(producerId)` (T16: stops the producer in every cycle that is not cancelled and where it participates; a sent order is skipped, so its participation stays, S50) | — (called by Catalog) | R1, R3a |
@@ -322,7 +322,7 @@ role only; participation is not restored.
 | `SetAllocation` (a household Membership does not know is refused with `HouseholdNotFound`, a deactivated one with `HouseholdInactive`; a line marked *will not be delivered* with `LineMarkedNotDelivered`) | manager | R16, R17, S13, S39, S40 |
 | `ValidateReception` | manager | R17a, S47 |
 | `MarkProducerDistributed` (settles the cycle when it is the last) | manager | R18, R24, S13, S20, S27–S29, S47, S61 |
-| `ReopenProducerOrder` | manager | R18, S29, S30, S46 |
+| `ReopenProducerOrder` (T23: before settlement only) | manager | R18, S29, S30, S46 |
 | `GetContainerCount` | manager | R18a, S60 |
 | `OpenPickup` (household without an order) | manager | R19, S18 |
 | `GetPickup` (lines, stock and return lines, balance, total, resulting balance) | manager | R19, R21, S27 |
@@ -352,14 +352,14 @@ with no order in it (R19, R24b).
 
 `MarkProducerDistributed(cycle, producer)`, in one transaction with the cycle `FOR UPDATE`:
 1. Build the `Reception`; `cycle.markDistributed(producerId, reception.balancedForDistribution, now)`.
-2. `CycleSettlement::afterDistributed(cycle, settledNow)`, an Application service:
-   - if this settled the cycle: every order `drop(nonParticipating)` (R18, R24);
-   - if the cycle was already settled (a reopen): every `nothingToCollect` order `reopenIfAllocated()` (R24, S30);
-   - `cycle.close(...)` if every pickup is done (R24b).
+2. `CycleSettlement(cycle, settledNow)`, an Application class with the single `__invoke` the architecture tests require (A6):
+   - if this settled the cycle: every order `drop(marks)` (R18, R24);
+   - if the cycle was already settled (a reopen): every `nothingToCollect` order `reopenIfAllocated()` (R24, S30); T30;
+   - `cycle.close(...)` if every pickup is done (R24b); T30.
 
 `SendEmptyProducerOrders` (D10), per producer order whose cutoff passed with no line, in one transaction
 with the cycle `FOR UPDATE`: `send`, `validate`, `markDistributed(producerId, true, now)`, then the same
-`CycleSettlement::afterDistributed`, so a cycle settled by the scheduler drops lines and closes like any other.
+`CycleSettlement`, so a cycle settled by the scheduler drops lines and closes like any other.
 
 `CompletePickup(cycle, household, topUp?)`, in one transaction:
 1. Load the cycle `FOR SHARE` and assert it is settled and not closed; load the order `FOR UPDATE`;
@@ -489,7 +489,7 @@ role areas (R36a); the layout shows a switch between them.
 | `POST/DELETE /manage/producers/{producer}/deactivation` | redirect back | `DeactivateProducer`, `ReactivateProducer` |
 | `PUT/DELETE …/producers/{producer}/cutoff`, `POST …/close` | — | `SetCutoff`, `ClearCutoff`, `CloseProducerNow` |
 | `POST …/producers/{producer}/send` | — | `SendProducerOrder` |
-| `GET /manage/cycles/{cycle}/receptions/{producer}` | `Manage/Reception/Show` (per product the totals, a balanced or unbalanced flag, the received-total form, the households' allocations with a box to allocate to another household, and a form to add a product nobody ordered; setting a received total when an allocation was set by hand opens a dialog that warns they will be lost and either confirms, sending `overwrite_manual`, or cancels without a request, R15, S31; an unknown cycle, a producer not in it or an order that is not sent is a 404) | `GetReception` |
+| `GET /manage/cycles/{cycle}/receptions/{producer}` | `Manage/Reception/Show` (per product the totals, a balanced or unbalanced flag, the received-total form, the households' allocations with a box to allocate to another household, and a form to add a product nobody ordered; setting a received total when an allocation was set by hand opens a dialog that warns they will be lost and either confirms, sending `overwrite_manual`, or cancels without a request, R15, S31; an unknown cycle, a producer not in it or an order that is not sent is a 404; from T23 an extra `distribution` prop (`validated`, `distributed`, `settled`) drives the Validate, Mark as distributed and Reopen buttons, and a distributed reception shows no edit forms) | `GetReception` |
 | `POST …/receptions/{producer}/products` (`product_id`, `received`) | partial reload | `AddUnorderedProduct` |
 | `PUT …/receptions/{producer}/products/{product}/received` (`received`, `overwrite_manual`) | partial reload | `SetReceivedTotal` |
 | `PUT …/receptions/{producer}/products/{product}/allocations/{household}` (`quantity`) | partial reload | `SetAllocation` |

@@ -77,11 +77,14 @@ const reception = {
     unorderedOptions: [],
 };
 
+const open = { validated: false, distributed: false, settled: false };
+
 describe('reception page', () => {
     it('shows each product with its totals and flags the unbalanced ones', async () => {
         const html = await renderToString(
             createSSRApp(Show, {
                 reception,
+                distribution: open,
                 households: [{ id: 'd', name: 'Household D' }],
             }),
         );
@@ -96,11 +99,57 @@ describe('reception page', () => {
 
     it('lets a manager correct the total of a product nobody ordered instead of the proportional form', async () => {
         const html = await renderToString(
-            createSSRApp(Show, { reception, households: [] }),
+            createSSRApp(Show, {
+                reception,
+                distribution: open,
+                households: [],
+            }),
         );
 
         expect(html).toContain('data-test="unordered-total-rye"');
         expect(html).not.toContain('data-test="received-form-rye"');
         expect(html).toContain('data-test="received-form-bread"');
+    });
+
+    it('offers to validate, and keeps distributing disabled while a product is unbalanced', async () => {
+        const html = await renderToString(
+            createSSRApp(Show, {
+                reception,
+                distribution: open,
+                households: [],
+            }),
+        );
+
+        expect(html).toContain('data-test="validate-form"');
+        expect(html).toContain('Mark as distributed');
+        expect(html).toContain('data-test="distribute-hint"');
+        expect(html).not.toContain('data-test="reopen-form"');
+    });
+
+    it('shows a distributed reception read-only with a reopen button until the cycle settles', async () => {
+        const render = (settled: boolean) =>
+            renderToString(
+                createSSRApp(Show, {
+                    reception,
+                    distribution: {
+                        validated: true,
+                        distributed: true,
+                        settled,
+                    },
+                    households: [{ id: 'd', name: 'Household D' }],
+                }),
+            );
+
+        const html = await render(false);
+
+        expect(html).toContain('data-test="distributed"');
+        expect(html).toContain('data-test="reopen-form"');
+        expect(html).not.toContain('data-test="validate-form"');
+        expect(html).not.toContain('data-test="distribute-form"');
+        expect(html).not.toContain('data-test="received-form-bread"');
+        expect(html).not.toContain('data-test="unordered-total-rye"');
+        expect(html).not.toContain('Household D');
+        expect(html).toContain('data-test="allocated-value"');
+        expect(await render(true)).not.toContain('data-test="reopen-form"');
     });
 });

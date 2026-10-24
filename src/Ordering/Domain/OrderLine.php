@@ -26,6 +26,7 @@ final readonly class OrderLine
         public DateTimeImmutable $createdAt,
         public string $addedBy,
         public bool $allocatedByHand = false,
+        public bool $dropped = false,
     ) {}
 
     public function isOrdered(): bool
@@ -50,6 +51,28 @@ final readonly class OrderLine
             $this->createdAt,
             $this->addedBy,
             $byHand,
+            $this->dropped,
+        );
+    }
+
+    /** The same line, left out of the pickup for good: never received and never charged (R18). */
+    public function asDropped(): self
+    {
+        return new self(
+            $this->id,
+            $this->productId,
+            $this->producerId,
+            $this->name,
+            $this->unit,
+            $this->unitPrice,
+            $this->variable,
+            $this->containersPerUnit,
+            $this->ordered,
+            $this->allocated,
+            $this->createdAt,
+            $this->addedBy,
+            $this->allocatedByHand,
+            true,
         );
     }
 }
