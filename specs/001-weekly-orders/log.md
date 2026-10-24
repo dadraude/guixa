@@ -566,3 +566,7 @@ before each subsequent slice's commit. T37 remains uncommitted; no push or PR is
 The user declined native review only for the cycle-list/navigation candidate and explicitly
 authorized its local commit without review. Existing local verification passed; no native approval
 is claimed. The editor remains a separate slice requiring native review before its commit.
+
+Cycle-list/navigation committed as `3f3b8e839e166199a9a41c4b79df4741937750fe` under that exception.
+The remaining editor candidate contains the presentational product row, consuming page and its
+regression tests; previously observed local checks still apply because these source bytes are unchanged.

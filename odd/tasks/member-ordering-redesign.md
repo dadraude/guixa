@@ -19,7 +19,7 @@ No new features, no app-wide migration, no publication or ticket mutations.
 - U4 — CI/conflict correction; inline (bounded locale fixture and sequential stack maintenance); reproduce ca/en behavior, fix the fixture, rebase all three slices, verify before leased updates; pending.
 
 - U1 (S1,S2) — T38 translation foundation; inline (T37 depends on it); implemented, locally verified and native-reviewed; commit 0c56c738bed223e1e614e1385f6339061d63789e.
-- U2 (S1,S2) — T37 member presentation and ordering shell; inline; implemented and locally verified; no commit yet.
+- U2 (S1,S2,S5) — T37 member presentation and ordering shell; inline; cycle-list/navigation committed as 3f3b8e839e166199a9a41c4b79df4741937750fe (review declined, explicit commit authorization); editor implemented and locally verified, native review/commit pending.
 - U3 (S1,S2) — focused checks, visual checks and independent verifier; delegated verifier required by risk items 3/5 (shared shell/bootstrap and dependency); local verification complete; delivery/native review and full CI pending.
 
 ## Log
@@ -54,6 +54,8 @@ L21. Post-commit foundation assessment: medium/configuration change, review_due=
 L22. User selected "2" (Skip this time) for the cycle-list/navigation candidate. Native returned declined_this_candidate; no review approval exists and future reviews remain enabled.
 L23. User authorization verbatim: "Yes, commit the cycle-list/navigation slice without native review, then continue with native review of the editor slice before committing it. Don’t push or open PRs."
 L24. Cycle-list/navigation commit authorized without native review. Its isolated 14-test/type check and broader browser/HTTP verification remain valid; only documentation has changed since those checks. Risk: item 3 (shared navigation presentation). Independent verifier already completed; editor stays out of this commit.
+
+L25. Cycle-list/navigation committed as 3f3b8e839e166199a9a41c4b79df4741937750fe, 290 authored changed lines including evidence. Editor source remains unchanged from the verified implementation: 17 focused frontend tests, types, affected lint, client/SSR builds, HTTP checks and browser behavior checks passed. Editor rollback boundary is Edit.vue, OrderProductRow.vue and Edit.spec.ts; prior slices remain usable. Native editor review is required before commit; full hosted CI remains unrun.
 
 ## Publication correction (2026-10-24)
 

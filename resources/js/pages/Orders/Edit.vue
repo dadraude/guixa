@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { Head, router, usePage } from '@inertiajs/vue3';
+import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import { computed, reactive, ref } from 'vue';
 import OrderController from '@/actions/App/Http/Controllers/OrderController';
-import Heading from '@/components/Heading.vue';
+import { ArrowLeft } from '@lucide/vue';
+import { trans } from 'laravel-vue-i18n';
+import OrderPageHeader from '@/components/orders/OrderPageHeader.vue';
+import OrderProductRow from '@/components/orders/OrderProductRow.vue';
+import { formatMoney, formatPickupDate } from '@/lib/locale';
 import InputError from '@/components/InputError.vue';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { orderRows, type OrderRow } from '@/lib/orderRows';
 import { lineCents, orderTotal } from '@/lib/orderTotal';
 
@@ -75,142 +77,108 @@ const lineTotal = (price: string, quantity: string) =>
 </script>
 
 <template>
-    <Head title="Order" />
-
-    <div class="flex flex-col gap-8 p-4">
-        <Heading
-            title="Your order"
-            :description="`Pickup on ${order.pickupDate}`"
+    <Head :title="trans('Order')" />
+    <div class="mx-auto flex w-full max-w-5xl flex-col gap-6 p-4 sm:p-8">
+        <Link
+            :href="OrderController.index.url()"
+            class="inline-flex min-h-11 w-fit items-center gap-2 rounded-md px-2 text-sm font-medium hover:bg-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+        >
+            <ArrowLeft class="size-4" aria-hidden="true" />{{
+                trans('Back to orders')
+            }}
+        </Link>
+        <OrderPageHeader
+            :title="trans('Your order')"
+            :description="
+                trans('Pickup on :date', {
+                    date: formatPickupDate(order.pickupDate),
+                })
+            "
         />
-
-        <InputError :message="domainError" />
-
+        <InputError :message="domainError" role="alert" />
         <p
             v-if="order.cancelled"
-            class="text-sm font-medium"
+            class="rounded-2xl border border-dashed bg-muted/50 p-6 font-medium"
             data-test="order-cancelled"
         >
-            This cycle was cancelled. Your orders in it were discarded.
+            {{
+                trans(
+                    'This cycle was cancelled. Your orders in it were discarded.',
+                )
+            }}
         </p>
-
         <p
             v-else-if="order.producers.length === 0"
-            class="text-sm text-muted-foreground"
+            class="rounded-2xl border border-dashed p-6 text-muted-foreground"
         >
-            No producer takes part in this cycle yet.
+            {{ trans('No producer takes part in this cycle yet.') }}
         </p>
-
-        <section
-            v-for="group in order.cancelled ? [] : groups"
-            :key="group.producerId"
-            class="flex flex-col gap-3"
-        >
-            <div class="flex items-center gap-3">
-                <h2 class="text-lg font-medium">
-                    {{ group.producerName }}
-                </h2>
-                <span
-                    class="text-sm"
-                    :class="
-                        group.open ? 'text-green-700' : 'text-muted-foreground'
-                    "
-                >
-                    {{ group.open ? 'Open' : 'Closed' }}
-                </span>
-            </div>
-
+        <template v-if="!order.cancelled">
             <p
-                v-if="group.rows.length === 0"
+                v-if="
+                    groups.some((group) => group.open && group.rows.length > 0)
+                "
                 class="text-sm text-muted-foreground"
             >
-                Nothing to order from this producer.
+                {{ trans('Save each product after changing its quantity.') }}
             </p>
-
-            <table v-else class="w-full text-sm">
-                <thead>
-                    <tr class="border-b text-left">
-                        <th class="py-2">Product</th>
-                        <th class="py-2">Price</th>
-                        <th class="py-2">Quantity</th>
-                        <th class="py-2 text-right">Amount</th>
-                        <th class="py-2" />
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr
+            <section
+                v-for="group in groups"
+                :key="group.producerId"
+                class="min-w-0 overflow-hidden rounded-2xl border bg-card text-card-foreground shadow-xs"
+            >
+                <div
+                    class="flex flex-wrap items-center justify-between gap-3 border-b bg-muted/40 p-4 sm:px-5"
+                >
+                    <h2 class="min-w-0 text-lg font-semibold wrap-anywhere">
+                        {{ group.producerName }}
+                    </h2>
+                    <span
+                        class="rounded-full border px-3 py-1 text-sm font-medium"
+                        :class="
+                            group.open
+                                ? 'bg-primary text-primary-foreground'
+                                : 'bg-background text-muted-foreground'
+                        "
+                    >
+                        {{ group.open ? trans('Open') : trans('Closed') }}
+                    </span>
+                </div>
+                <p
+                    v-if="group.rows.length === 0"
+                    class="p-5 text-muted-foreground"
+                >
+                    {{ trans('Nothing to order from this producer.') }}
+                </p>
+                <ul v-else class="divide-y">
+                    <OrderProductRow
                         v-for="row in group.rows"
                         :key="row.productId"
-                        class="border-b"
-                    >
-                        <td class="py-2">
-                            {{ row.name }}
-                            <span
-                                v-if="row.notDelivered"
-                                class="ml-2 text-xs text-destructive"
-                                :data-test="`not-delivered-${row.productId}`"
-                            >
-                                Will not be delivered
-                            </span>
-                        </td>
-                        <td class="py-2">
-                            {{ row.price }} EUR / {{ row.unit }}
-                        </td>
-                        <td class="py-2">
-                            <Input
-                                :model-value="draftOf(row)"
-                                :disabled="!group.open || row.notDelivered"
-                                :inputmode="
-                                    row.variable ? 'decimal' : 'numeric'
-                                "
-                                class="w-28"
-                                :data-test="`quantity-${row.productId}`"
-                                @update:model-value="
-                                    drafts[row.productId] = String($event)
-                                "
-                                @keydown.enter="save(row.productId)"
-                            />
-                        </td>
-                        <td class="py-2 text-right">
-                            {{
-                                row.notDelivered
-                                    ? '0.00'
-                                    : lineTotal(row.price, draftOf(row))
-                            }}
-                            EUR
-                        </td>
-                        <td class="flex justify-end py-2">
-                            <Button
-                                v-if="row.notDelivered"
-                                size="sm"
-                                variant="outline"
-                                :disabled="saving === row.productId"
-                                :data-test="`remove-${row.productId}`"
-                                @click="remove(row.productId)"
-                            >
-                                Remove
-                            </Button>
-                            <Button
-                                v-else
-                                size="sm"
-                                variant="outline"
-                                :disabled="
-                                    !group.open ||
-                                    saving === row.productId ||
-                                    !(row.productId in drafts)
-                                "
-                                :data-test="`save-${row.productId}`"
-                                @click="save(row.productId)"
-                            >
-                                Save
-                            </Button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </section>
-
-        <p class="text-lg font-medium" data-test="order-total">
-            Total: {{ total }} EUR
-        </p>
+                        :row="row"
+                        :quantity="draftOf(row)"
+                        :amount="
+                            row.notDelivered
+                                ? '0.00'
+                                : lineTotal(row.price, draftOf(row))
+                        "
+                        :open="group.open"
+                        :saving="saving === row.productId"
+                        :dirty="row.productId in drafts"
+                        @quantity="drafts[row.productId] = $event"
+                        @save="save(row.productId)"
+                        @remove="remove(row.productId)"
+                    />
+                </ul>
+            </section>
+        </template>
+        <div
+            class="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-primary p-5 text-primary-foreground sm:p-6"
+            data-test="order-total"
+        >
+            <span class="text-lg font-medium">{{ trans('Total') }}</span>
+            <span class="text-2xl font-semibold tabular-nums">{{
+                formatMoney(total)
+            }}</span>
+        </div>
     </div>
 </template>
