@@ -3,9 +3,11 @@
 namespace App\Providers;
 
 use Carbon\CarbonImmutable;
+use Guixa\Catalog\Domain\ProducerAccess;
 use Guixa\Catalog\Domain\ProducerCycles;
 use Guixa\Catalog\Domain\ProducerRepository;
 use Guixa\Catalog\Domain\ProductRepository;
+use Guixa\Catalog\Infrastructure\Membership\MembershipProducerAccess;
 use Guixa\Catalog\Infrastructure\Ordering\OrderingProducerCycles;
 use Guixa\Catalog\Infrastructure\Persistence\EloquentProducerRepository;
 use Guixa\Catalog\Infrastructure\Persistence\EloquentProductRepository;
@@ -80,6 +82,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(ProducerRepository::class, EloquentProducerRepository::class);
         $this->app->bind(ProductRepository::class, EloquentProductRepository::class);
         $this->app->bind(ProducerCycles::class, OrderingProducerCycles::class);
+        $this->app->bind(ProducerAccess::class, MembershipProducerAccess::class);
 
         $this->app->bind(CooperativeSettings::class, EloquentCooperativeSettings::class);
         $this->app->bind(CycleRepository::class, EloquentCycleRepository::class);

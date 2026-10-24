@@ -40,6 +40,17 @@ final class InMemoryAccountRepository extends InMemoryRepository implements Acco
         return $accounts;
     }
 
+    public function ofProducer(string $producerId): ?Account
+    {
+        foreach ($this->all() as $account) {
+            if ($account->producerId === $producerId) {
+                return $account;
+            }
+        }
+
+        return null;
+    }
+
     public function producerHasAccount(string $producerId): bool
     {
         foreach ($this->all() as $account) {

@@ -95,3 +95,56 @@ it('ignores member accounts and keeps the list to managers', function () {
     expect(($this->world->listProducerAccounts)($this->world->manager))->toBe([])
         ->and(fn () => ($this->world->listProducerAccounts)(new Actor('a', [Role::Producer])))->toThrow(NotAllowed::class);
 });
+
+// R3a, S50 — suspending and restoring the producer role
+
+function activeProducerAccount(object $test): string
+{
+    $accountId = ($test->world->inviteProducerAccount)($test->world->manager, BAKER, 'Baker', 'baker@example.org');
+    ($test->world->acceptInvitation)($test->world->sender->lastToken(), 'a-new-password');
+
+    return $accountId;
+}
+
+it('removes the producer role, so an account with no other role cannot log in, and restores it (R3a, S50)', function () {
+    $accountId = activeProducerAccount($this);
+
+    ($this->world->suspendProducerRole)(BAKER);
+
+    expect($this->world->accounts->get($accountId)->roles)->toBe([])
+        ->and(($this->world->canLogIn)($accountId))->toBeFalse();
+
+    ($this->world->restoreProducerRole)(BAKER);
+
+    expect($this->world->accounts->get($accountId)->roles)->toBe([Role::Producer])
+        ->and(($this->world->canLogIn)($accountId))->toBeTrue();
+});
+
+it('keeps the other roles of the account and lets it log in (R3a)', function () {
+    $accountId = activeProducerAccount($this);
+    ($this->world->grantManagerRole)($this->world->manager, $accountId);
+
+    ($this->world->suspendProducerRole)(BAKER);
+
+    expect($this->world->accounts->get($accountId)->roles)->toBe([Role::Manager])
+        ->and(($this->world->canLogIn)($accountId))->toBeTrue();
+
+    ($this->world->restoreProducerRole)(BAKER);
+
+    expect($this->world->accounts->get($accountId)->roles)->toContain(Role::Manager, Role::Producer);
+});
+
+it('is idempotent and ignores a producer with no account (R3a)', function () {
+    $accountId = activeProducerAccount($this);
+
+    ($this->world->suspendProducerRole)(BAKER);
+    ($this->world->suspendProducerRole)(BAKER);
+    expect($this->world->accounts->get($accountId)->roles)->toBe([]);
+
+    ($this->world->restoreProducerRole)(BAKER);
+    ($this->world->restoreProducerRole)(BAKER);
+    expect($this->world->accounts->get($accountId)->roles)->toBe([Role::Producer]);
+
+    ($this->world->suspendProducerRole)('00000000-0000-7000-8000-0000000000fe');
+    ($this->world->restoreProducerRole)('00000000-0000-7000-8000-0000000000fe');
+});

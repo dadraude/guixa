@@ -22,7 +22,9 @@ use Guixa\Membership\Application\ReactivateAccount;
 use Guixa\Membership\Application\RemoveManagerRole;
 use Guixa\Membership\Application\RenameHousehold;
 use Guixa\Membership\Application\ResendInvitation;
+use Guixa\Membership\Application\RestoreProducerRole;
 use Guixa\Membership\Application\SendInvitation;
+use Guixa\Membership\Application\SuspendProducerRole;
 use Guixa\Membership\Application\UnlinkMember;
 use Guixa\Membership\Domain\Account;
 use Guixa\Membership\Domain\ValueObject\Email;
@@ -96,6 +98,10 @@ final class MembershipWorld
 
     public readonly ListProducerAccounts $listProducerAccounts;
 
+    public readonly SuspendProducerRole $suspendProducerRole;
+
+    public readonly RestoreProducerRole $restoreProducerRole;
+
     public readonly Actor $manager;
 
     public readonly Actor $member;
@@ -147,6 +153,8 @@ final class MembershipWorld
         $this->deactivateAccount = new DeactivateAccount($this->accounts, $deactivateEmptyHousehold, $this->transactions, $this->clock);
         $this->reactivateAccount = new ReactivateAccount($this->accounts);
         $this->listAccounts = new ListAccounts($this->accounts, $this->households);
+        $this->suspendProducerRole = new SuspendProducerRole($this->accounts);
+        $this->restoreProducerRole = new RestoreProducerRole($this->accounts);
 
         $this->manager = new Actor('00000000-0000-7000-8000-00000000000a', [Role::Manager]);
         $this->member = new Actor('00000000-0000-7000-8000-00000000000b', [Role::Member], '00000000-0000-7000-8000-00000000000c');

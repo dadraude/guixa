@@ -60,7 +60,7 @@ including the weeks when daylight saving time changes (S38).
 | T15 | `SetProductAvailability`, *will not be delivered* derived on read, `RemoveMarkedLine`, product deactivation; unit and variable flag locked while the product has unsettled lines (`HasUnsettledLines`) | R1 (lock), R3, R3b, R3c, S5 (lock), S32, S48 | T13 |
 | T16 | `StopParticipating`, `ParticipateAgain`, `DeactivateProducer`, `ReactivateProducer` (producer role, participation where not sent) | R3a, R6c, S50 | T15 |
 | T17 | `CancelCycle` (orders deleted, cycle shown as cancelled) | R4b (cancel before sending), S37 (cancel) | T13 |
-| T18 | `SendProducerOrder` + producer email, cutoff frozen once sent, marked lines stored as not delivered, `SendEmptyProducerOrders` scheduled command (sends only) | R6b, R12a (sending), R4b (rejected once sent), S34 (frozen), S36, S37 (sent) | T16 |
+| T18 | `SendProducerOrder` + producer email, cutoff frozen once sent, marked lines stored as not delivered, `SendEmptyProducerOrders` scheduled command (sends only) | R6b, R12a (sending), R4b (rejected once sent), S34 (frozen), S36, S37 (sent), R6c (refused once sent), R3a/S50 (sent order unchanged on deactivation) | T16 |
 | T19 | `GetProducerCycleSummary`, `Producer/CycleSummary` page with availability per product | R12, S7, S8 | T18 |
 | T20 | `GetHouseholds` (Membership) behind Ordering's `Households` port, `GetCycleSummary` (totals per producer and product, per household), `Manage/Cycles/Show` page | R13, S52 | T13 |
 | T35 | `GetCycleSummary` carries `cancelled` and returns no totals for a cancelled cycle; `Manage/Cycles/Show` shows a "Cancelled" notice instead of totals | R13 (cancelled), S62 | T17, T20 |
@@ -68,6 +68,7 @@ including the weeks when daylight saving time changes (S38).
 **Done when** T13: two concurrent `SetOrderLine` calls for a household with no order yet (integration test)
 create one order with both lines.
 T18: a `SetOrderLine` racing a `SendProducerOrder` either lands before the send or is rejected.
+T18: S50's clause "cycle B (order sent) ... B is unchanged": deactivating a producer leaves a sent producer order participating, and stopping it by hand is refused.
 
 ## Phase 4 — Reception and distribution
 
@@ -132,7 +133,7 @@ products, added in opposite order, both complete.
 | S9 | T29 | S27 | T23, T27 | S47 | T23 |
 | S10–S12 | T21, T22 | S28, S29 | T23 | S48 | T15 |
 | S13 | T22, T23 | S30 | T30 | S49 | T13 |
-| S14–S16 | T29 | S31 | T21, T22 | S50 | T16 |
+| S14–S16 | T29 | S31 | T21, T22 | S50 | T16, T18 |
 | S17 | T28 | S32 | T15 | S51 | T13 |
 | S18, S19 | T29 | S33 | T13 | S52 | T20 |
 | S20 | T23 | S34 | T12, T18 | S53 | T29 |

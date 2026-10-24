@@ -37,6 +37,16 @@ final class Producer
         $this->cutoffRule = $cutoffRule;
     }
 
+    public function deactivate(): void
+    {
+        $this->active = false;
+    }
+
+    public function reactivate(): void
+    {
+        $this->active = true;
+    }
+
     public function name(): string
     {
         return $this->name;

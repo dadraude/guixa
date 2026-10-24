@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Manage;
 use App\Http\Controllers\Controller;
 use App\Http\ProducerRow;
 use Guixa\Catalog\Application\CreateProducer;
+use Guixa\Catalog\Application\DeactivateProducer;
 use Guixa\Catalog\Application\ListProducers;
+use Guixa\Catalog\Application\ReactivateProducer;
 use Guixa\Membership\Application\ListProducerAccounts;
 use Guixa\Shared\Application\Actor;
 use Illuminate\Http\RedirectResponse;
@@ -38,5 +40,19 @@ class ProducerController extends Controller
         $createProducer($actor, $data['name'], (int) $data['cutoff_days_before'], $data['cutoff_time']);
 
         return to_route('manage.producers.index');
+    }
+
+    public function deactivate(string $producer, Actor $actor, DeactivateProducer $deactivateProducer): RedirectResponse
+    {
+        $deactivateProducer($actor, $producer);
+
+        return back();
+    }
+
+    public function reactivate(string $producer, Actor $actor, ReactivateProducer $reactivateProducer): RedirectResponse
+    {
+        $reactivateProducer($actor, $producer);
+
+        return back();
     }
 }
