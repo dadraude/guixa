@@ -229,7 +229,7 @@ role only; participation is not restored.
   - Settlement: `drop(marked)` takes the product ids `NotDeliveredMarks::of` marks (stored for a sent producer; derived for one that does not participate, so these lines are dropped too) and flags those lines `dropped`, then the
     pickup becomes `pending`, or `nothingToCollect` if every allocation of the lines left is 0 (R18, R24). An order with no line at all keeps pickup `none`. T23 knows `PickupStatus` `none`, `pending` and `nothingToCollect`; the done states arrive with the pickup tasks.
     `reopenIfAllocated()` turns `nothingToCollect` back into `pending` (R24).
-  - Pickup: `adjustDelivered(productId, Quantity)` sets `delivered`, in the product's step; `allocated`
+  - Pickup: `openPickup()` (`none` to `pending`, `PickupAlreadyOpen` otherwise); `adjustDelivered(productId, Quantity)` sets `delivered` on a pending pickup (`PickupNotPending`, `ProductNotInPickup`), in the product's step; `allocated`
     stays as the reception left it (R19, D16);
     `addStock(StockOffer, Quantity)` checks `quantity ≤ available` (R20); `addReturn(ReturnItem, int)`;
     their removals.
@@ -267,7 +267,7 @@ role only; participation is not restored.
   `balancedForDistribution`: `received − Σ allocated` is 0, so pickup adjustments do not count (R18, S61); `Reception::balancedForDistribution()` is true when every product is;
   plus the producer order's validated and distributed flags (R17a, R18; they arrive with T23).
   T22 shows a product when it has a line that is not marked or a recorded `ReceivedTotal`; lines marked *will not be delivered* are left out, and a product with neither a line nor a recorded total is not shown, whether or not it is active.
-  Until pickups exist (T26 onwards) `delivered()` is `allocated`, so `difference` and `balancedForDistribution` agree.
+  Until a pickup adjusts a line `delivered()` is `allocated`, so `difference` and `balancedForDistribution` agree; from T27 `ReceptionLine` carries `delivered`, and the reception page flags an adjusted product (`hasAdjustments`) and distributes by `balancedForDistribution`.
 
 - **`ContainerCount`** read model: per household, Σ ceil(delivered() × containersPerUnit) over order lines plus
   Σ ceil(quantity × containersPerUnit) over stock lines; and the cycle total (R18a, S60).
@@ -324,8 +324,8 @@ role only; participation is not restored.
 | `MarkProducerDistributed` (settles the cycle when it is the last) | manager | R18, R24, S13, S20, S27–S29, S47, S61 |
 | `ReopenProducerOrder` (T23: before settlement only) | manager | R18, S29, S30, S46 |
 | `GetContainerCount` | manager | R18a, S60 |
-| `OpenPickup` (household without an order) | manager | R19, S18 |
-| `GetPickup` (lines, stock and return lines, balance, total, resulting balance) | manager | R19, R21, S27 |
+| `OpenPickup` (household without a pickup, active, in a settled cycle: `CycleNotSettled`, `HouseholdNotFound`, `HouseholdInactive`, `PickupAlreadyOpen`; the closed-cycle check arrives with T30) | manager | R19, S18 |
+| `GetPickup` (lines with ordered, allocated and delivered, and the total; stock and return lines arrive with T28; the household's balance and the resulting balance are read by the controller with Wallet's `GetBalance`, see the 2026-10-25 Deviation in `log.md`), `ListPickups` (`PickupSummaryData` per household with a pickup: status and total; settled cycles only, `CycleNotSettled` otherwise) | manager | R19, R21, S27 |
 | `AdjustDeliveredQuantity` | manager | R19, S14 |
 | `AddStockToPickup`, `RemoveStockFromPickup` | manager | R20, S17, S55 |
 | `AddReturnToPickup`, `RemoveReturnFromPickup` | manager | R20a, S41 |
@@ -495,8 +495,8 @@ role areas (R36a); the layout shows a switch between them.
 | `PUT …/receptions/{producer}/products/{product}/allocations/{household}` (`quantity`) | partial reload | `SetAllocation` |
 | `POST …/receptions/{producer}/validate` | partial reload | `ValidateReception` |
 | `POST/DELETE …/receptions/{producer}/distribution` | — | `MarkProducerDistributed`, `ReopenProducerOrder` |
-| `GET /manage/cycles/{cycle}/pickups` | `Manage/Pickups/Index` (pending / done) | `GetCycleSummary` |
-| `GET/POST /manage/cycles/{cycle}/pickups/{household}` | `Manage/Pickups/Show` | `GetPickup`, `OpenPickup` |
+| `GET /manage/cycles/{cycle}/pickups` | `Manage/Pickups/Index` (the pickups with status and total, and the active households that have none, to open one) | `ListPickups`, `ListHouseholds` |
+| `GET/POST /manage/cycles/{cycle}/pickups/{household}` | `Manage/Pickups/Show` (`PickupRow`: lines, total, and the balance and resulting balance from Wallet's `GetBalance`) | `GetPickup`, `GetBalance`, `OpenPickup` |
 | `PUT …/pickups/{household}/lines/{product}` | partial reload | `AdjustDeliveredQuantity` |
 | `POST/DELETE …/pickups/{household}/stock-lines[/{stockProduct}]` | partial reload | `AddStockToPickup`, `RemoveStockFromPickup` |
 | `POST/DELETE …/pickups/{household}/return-lines[/{returnItem}]` | partial reload | `AddReturnToPickup`, `RemoveReturnFromPickup` |

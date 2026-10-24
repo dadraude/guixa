@@ -1,5 +1,9 @@
 {
     "Your order": "La teva comanda",
+    "Your pickup": "La teva recollida",
+    "There is nothing to collect in this pickup.": "En aquesta recollida no hi ha res per recollir.",
+    "Ordered :ordered, delivered :delivered": "Demanat :ordered, lliurat :delivered",
+    "Pickup total": "Total de la recollida",
     "Pickup on :date": "Recollida el :date",
     "Orders": "Comandes",
     "Order": "Comanda",

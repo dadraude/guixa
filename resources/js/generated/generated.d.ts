@@ -103,6 +103,36 @@ readonly pickupDate: string,
 readonly cancelled: boolean,
 readonly producers: App.Http.OrderProducerRow[],
 readonly lines: App.Http.OrderLineRow[],
+readonly pickup: App.Http.PickupRow | null,
+};
+export type PickupLineRow = {
+readonly productId: string,
+readonly name: string,
+readonly unit: string,
+readonly variable: boolean,
+readonly unitPriceCents: number,
+readonly ordered: string,
+readonly allocated: string,
+readonly delivered: string,
+readonly adjusted: boolean,
+readonly amountCents: number,
+};
+export type PickupRow = {
+readonly cycleId: string,
+readonly pickupDate: string,
+readonly householdId: string,
+readonly householdName: string,
+readonly status: string,
+readonly lines: App.Http.PickupLineRow[],
+readonly totalCents: number,
+readonly balanceCents: number | null,
+readonly resultingBalanceCents: number | null,
+};
+export type PickupSummaryRow = {
+readonly householdId: string,
+readonly householdName: string,
+readonly status: string,
+readonly totalCents: number,
 };
 export type ProducerCycleSummaryRow = {
 readonly cycleId: string,
@@ -157,6 +187,8 @@ readonly householdName: string,
 readonly ordered: string,
 readonly allocated: string,
 readonly byHand: boolean,
+readonly delivered: string,
+readonly adjusted: boolean,
 };
 export type ReceptionOptionRow = {
 readonly productId: string,
@@ -173,9 +205,12 @@ readonly nobodyOrdered: boolean,
 readonly ordered: string,
 readonly received: string,
 readonly allocated: string,
+readonly delivered: string,
 readonly difference: string,
 readonly balanced: boolean,
+readonly balancedForDistribution: boolean,
 readonly hasManualAllocations: boolean,
+readonly hasAdjustments: boolean,
 readonly allocations: App.Http.ReceptionAllocationRow[],
 };
 export type ReceptionRow = {
@@ -235,6 +270,11 @@ readonly movements: App.Http.WalletMovementRow[],
 }
 }
 declare namespace Guixa {
+namespace Ordering {
+namespace Domain {
+export type PickupStatus = 'none' | 'pending' | 'nothing_to_collect';
+}
+}
 namespace Shared {
 namespace Domain {
 export type Role = 'manager' | 'member' | 'producer';

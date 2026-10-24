@@ -5,18 +5,22 @@ namespace Tests\Support\Ordering;
 use DateTimeImmutable;
 use Guixa\Ordering\Application\AddParticipant;
 use Guixa\Ordering\Application\AddUnorderedProduct;
+use Guixa\Ordering\Application\AdjustDeliveredQuantity;
 use Guixa\Ordering\Application\CancelCycle;
 use Guixa\Ordering\Application\ClearCutoff;
 use Guixa\Ordering\Application\CloseProducerNow;
 use Guixa\Ordering\Application\GetCycleSummary;
 use Guixa\Ordering\Application\GetHouseholdOrder;
+use Guixa\Ordering\Application\GetPickup;
 use Guixa\Ordering\Application\GetPickupWeekday;
 use Guixa\Ordering\Application\GetProducerCycleSummary;
 use Guixa\Ordering\Application\GetReception;
 use Guixa\Ordering\Application\HasUnsettledLines;
 use Guixa\Ordering\Application\ListCycles;
 use Guixa\Ordering\Application\ListMemberCycles;
+use Guixa\Ordering\Application\ListPickups;
 use Guixa\Ordering\Application\OpenCycle;
+use Guixa\Ordering\Application\OpenPickup;
 use Guixa\Ordering\Application\ParticipateAgain;
 use Guixa\Ordering\Application\RemoveMarkedLine;
 use Guixa\Ordering\Application\SendEmptyProducerOrders;
@@ -124,6 +128,14 @@ final class OrderingWorld
 
     public readonly SetAllocation $setAllocation;
 
+    public readonly GetPickup $getPickup;
+
+    public readonly OpenPickup $openPickup;
+
+    public readonly ListPickups $listPickups;
+
+    public readonly AdjustDeliveredQuantity $adjustDeliveredQuantity;
+
     public readonly Actor $manager;
 
     /** @param  ?int  $pickupWeekday  the cooperative's weekday (ISO), or null while a manager has not chosen one (R4c) */
@@ -172,6 +184,11 @@ final class OrderingWorld
         $this->addUnorderedProduct = new AddUnorderedProduct($this->cycles, $receptions, $this->receivedTotals, $transactions);
         $this->setReceivedTotal = new SetReceivedTotal($this->cycles, $this->orders, $receptions, $this->receivedTotals, $transactions);
         $this->setAllocation = new SetAllocation($this->cycles, $this->orders, $receptions, $this->households, $transactions, $this->clock);
+
+        $this->getPickup = new GetPickup($this->cycles, $this->orders, $this->households);
+        $this->listPickups = new ListPickups($this->cycles, $this->orders, $this->households);
+        $this->openPickup = new OpenPickup($this->cycles, $this->orders, $this->households, $transactions);
+        $this->adjustDeliveredQuantity = new AdjustDeliveredQuantity($this->cycles, $this->orders, $transactions);
 
         $this->manager = new Actor('00000000-0000-7000-8000-00000000000a', [Role::Manager]);
 

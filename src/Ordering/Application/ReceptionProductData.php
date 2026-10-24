@@ -5,7 +5,9 @@ namespace Guixa\Ordering\Application;
 final readonly class ReceptionProductData
 {
     /**
-     * @param  string  $difference  received minus allocated, signed when negative (R17)
+     * @param  string  $delivered  the allocations as adjusted at pickup (R19)
+     * @param  string  $difference  received minus delivered, signed when negative (R17)
+     * @param  bool  $balancedForDistribution  received equals allocated, ignoring pickup adjustments (R18)
      * @param  list<ReceptionAllocationData>  $allocations  by household name
      */
     public function __construct(
@@ -17,9 +19,12 @@ final readonly class ReceptionProductData
         public string $ordered,
         public string $received,
         public string $allocated,
+        public string $delivered,
         public string $difference,
         public bool $balanced,
+        public bool $balancedForDistribution,
         public bool $hasManualAllocations,
+        public bool $hasAdjustments,
         public array $allocations,
     ) {}
 }

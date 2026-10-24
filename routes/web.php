@@ -13,6 +13,8 @@ use App\Http\Controllers\Manage\HouseholdMemberController;
 use App\Http\Controllers\Manage\HouseholdWalletController;
 use App\Http\Controllers\Manage\InvitationController;
 use App\Http\Controllers\Manage\ManagerRoleController;
+use App\Http\Controllers\Manage\PickupController;
+use App\Http\Controllers\Manage\PickupLineController;
 use App\Http\Controllers\Manage\ProducerAccountController;
 use App\Http\Controllers\Manage\ProducerController;
 use App\Http\Controllers\Manage\ReceptionAllocationController;
@@ -102,6 +104,13 @@ Route::middleware(['auth', 'verified', 'role:manager'])->prefix('manage')->name(
         Route::post('validate', [ReceptionValidationController::class, 'store'])->name('cycles.receptions.validate');
         Route::post('distribution', [ReceptionDistributionController::class, 'store'])->name('cycles.receptions.distribution.store');
         Route::delete('distribution', [ReceptionDistributionController::class, 'destroy'])->name('cycles.receptions.distribution.destroy');
+    });
+
+    Route::prefix('cycles/{cycle}/pickups')->whereUuid(['cycle', 'household', 'product'])->group(function () {
+        Route::get('/', [PickupController::class, 'index'])->name('cycles.pickups.index');
+        Route::get('{household}', [PickupController::class, 'show'])->name('cycles.pickups.show');
+        Route::post('{household}', [PickupController::class, 'store'])->name('cycles.pickups.store');
+        Route::put('{household}/lines/{product}', [PickupLineController::class, 'update'])->name('cycles.pickups.lines.update');
     });
 
     Route::get('settings', [SettingsController::class, 'show'])->name('settings.show');

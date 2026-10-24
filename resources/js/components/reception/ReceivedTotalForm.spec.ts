@@ -10,6 +10,8 @@ const allocation = (id: string, name: string, byHand: boolean) => ({
     ordered: '4.000',
     allocated: '3.000',
     byHand,
+    delivered: '3.000',
+    adjusted: false,
 });
 
 const product = (hasManualAllocations: boolean) => ({
@@ -21,9 +23,12 @@ const product = (hasManualAllocations: boolean) => ({
     ordered: '20.000',
     received: '15.000',
     allocated: '14.000',
+    delivered: '14.000',
     difference: '1.000',
     balanced: false,
+    balancedForDistribution: false,
     hasManualAllocations,
+    hasAdjustments: false,
     allocations: [
         allocation('a', 'Household A', false),
         allocation('c', 'Household C', hasManualAllocations),

@@ -2,12 +2,15 @@
 
 namespace Guixa\Ordering\Application;
 
+use Guixa\Ordering\Domain\Cycle;
 use Guixa\Ordering\Domain\CycleRepository;
 use Guixa\Ordering\Domain\Error\CycleNotFound;
 use Guixa\Ordering\Domain\Error\NoHousehold;
 use Guixa\Ordering\Domain\NotDeliveredMarks;
+use Guixa\Ordering\Domain\Order;
 use Guixa\Ordering\Domain\OrderLine;
 use Guixa\Ordering\Domain\OrderRepository;
+use Guixa\Ordering\Domain\PickupStatus;
 use Guixa\Ordering\Domain\ProducerOrder;
 use Guixa\Ordering\Domain\ProductAvailabilityRepository;
 use Guixa\Ordering\Domain\ProductCatalog;
@@ -60,6 +63,17 @@ final class GetHouseholdOrder
             $cycle->isCancelled(),
             $producers,
             array_map(fn (OrderLine $line) => OrderLineData::of($line, isset($marked[$line->productId])), $lines),
+            $this->pickupOf($cycle, $order),
         );
+    }
+
+    /** Members see the pickup once the cycle is settled (R23a). */
+    private function pickupOf(Cycle $cycle, ?Order $order): ?PickupData
+    {
+        if ($order === null || ! $cycle->isSettled() || $order->pickup() === PickupStatus::None) {
+            return null;
+        }
+
+        return PickupData::of($order, $cycle->pickupDate()->format('Y-m-d'), null);
     }
 }

@@ -797,3 +797,20 @@ Why: R19 gives a pending pickup to households with an allocation and R24 closes 
 
 T23 (`plan.md`, HTTP & pages): the reception page gets the validation state as a separate `distribution` prop (`validated`, `distributed`, `settled`) instead of new fields on `ReceptionRow`, to leave the generated `resources/js/generated/generated.d.ts` untouched. Manager-side error messages (`ReceptionNotValidated`, `ReceptionUnbalanced`, `ProducerDistributed`...) show the exception text, as the other reception errors do until T36 translates them; the page text is English like the rest of the reception page.
 Why: the generated types were outside the task's allowed paths, and the reception page and its errors are not translated yet.
+
+## 2026-10-25 · Deviation
+
+T27 (`plan.md`, HTTP & pages): `Manage/Pickups/Index` lists pickups through the new `ListPickups` (`PickupSummaryData`: household, status, total) instead of `GetCycleSummary`, which only returns ordered totals per producer and has no pickup status. The page also lists the active households without a pickup, so a manager can open one (R19, S18).
+Why: the plan named a use case that cannot supply the list the page needs.
+
+T27 (`plan.md`, `GetPickup`, R21): `GetPickup` returns the lines and the total; the household's balance is not an Ordering port. `PickupController::show` reads it with Wallet's `GetBalance` (an Application query meant for Ordering and Membership, so architecture test A5 allows it) and `PickupRow::from` derives the resulting balance as balance − total. Stock and return lines in the pickup arrive with T28, and the Ordering `WalletLedger` port with T29.
+Why: R21 asks the pickup to show the balance, `HouseholdBalances` belongs to the Membership to-settle list (T32), and inventing an Ordering port for a read was avoidable.
+
+T27 (`plan.md`, `OpenPickup`): no `Cycle::closed` or `CycleClosed` exists until T30 closes cycles, so `OpenPickup` requires a settled cycle (`CycleNotSettled`) and nothing more about closing. `OpenPickup` also rejects a household whose order already has a pickup with `PickupAlreadyOpen`; an existing empty order (pickup `none`) becomes pending. `AdjustDeliveredQuantity` on an order that does not have a pickup throws `PickupNotPending`; on a household with no order, `PickupNotFound`.
+Why: the task row names a closed cycle that cannot exist yet, and R19 is silent on a second open.
+
+T27 (`plan.md`, `PickupData`): `PickupData` embeds `OrderLineData` with the optional pickup fields (`allocated`, `delivered`, `adjusted`, `amountCents`) and is shared by `GetPickup` and the member's `HouseholdOrderData::pickup` (R23a), whose `householdName` is null. `OrderLine::withAllocation` keeps `delivered` for now; clearing it when a new allocation arrives (D16) is T30's, with the reopen after settlement.
+Why: one shape serves the manager and the member, and no allocation can change after settlement until T30.
+
+T27 (`plan.md`, reception): the reception read model carries `delivered` per line and product, `difference = received − Σ delivered()` and `balanced` follow it, and `Reception::balancedForDistribution` ignores pickup adjustments; `ReceptionProductData` and `ReceptionProductRow` add `delivered`, `balancedForDistribution` and `hasAdjustments`, and the allocation data add `delivered` and `adjusted`. The reception page flags an adjusted product and enables Distribute by `balancedForDistribution`.
+Why: R19 and D16 ask the adjustment to show and flag in the reception while blocking nothing.

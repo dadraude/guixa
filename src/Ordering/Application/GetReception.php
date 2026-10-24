@@ -73,6 +73,8 @@ final class GetReception
             $line->ordered->toString(),
             $line->allocated->toString(),
             $line->allocatedByHand,
+            $line->delivered->toString(),
+            $line->isAdjusted(),
         ), $product->lines);
         usort($allocations, fn (ReceptionAllocationData $a, ReceptionAllocationData $b) => [$a->householdName, $a->householdId] <=> [$b->householdName, $b->householdId]);
 
@@ -85,9 +87,12 @@ final class GetReception
             $product->ordered()->toString(),
             $product->received->toString(),
             $product->allocated()->toString(),
+            $product->delivered()->toString(),
             $this->signed($product->differenceThousandths()),
             $product->isBalanced(),
+            $product->balancedForDistribution(),
             $product->manuallyAllocatedHouseholds() !== [],
+            $product->hasAdjustments(),
             $allocations,
         );
     }
