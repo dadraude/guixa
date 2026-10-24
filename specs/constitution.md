@@ -83,6 +83,9 @@ iterating over every context. A rule change edits this list first.
   timezone, a setting (`COOP_TIMEZONE`, e.g. `Europe/Madrid`), never hard-coded. Stored in UTC.
 - Every acceptance scenario in a spec has a test at the Application layer (use case level).
   HTTP tests only cover authorization, wiring and Inertia props (`assertInertia`).
+- Always TDD: write the failing test first and watch it fail for the right reason, then the minimum code
+  to pass, then refactor while green. No production code without a failing test that demands it. The only
+  exceptions are changes with no executable behavior (docs, config), and each one states why.
 - Early returns, small classes with one responsibility, explicit names. Comments only for *why*.
 - Code, tests and specs are written in English. Domain glossary keeps the Catalan term for reference.
 
