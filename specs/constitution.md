@@ -85,3 +85,19 @@ iterating over every context. A rule change edits this list first.
   HTTP tests only cover authorization, wiring and Inertia props (`assertInertia`).
 - Early returns, small classes with one responsibility, explicit names. Comments only for *why*.
 - Code, tests and specs are written in English. Domain glossary keeps the Catalan term for reference.
+
+## UI
+
+Members order from phones as well as computers, and their digital skills are mixed
+([UX discovery](../docs/ux-discovery/2026-10-24-guixa-discovery.md), principle 3). A page that works for the least
+confident member on a phone works for everyone.
+
+- **Phone first.** Every page is laid out for a 375 px wide screen first and widened from there. No horizontal
+  scroll, and nothing reachable only on a wide screen.
+- **Touch, not hover.** Touch targets are at least 44 × 44 px. No action or information depends on hover.
+- **Plain language.** Labels say what happens in the member's words, not the domain's internals; one main action
+  per screen.
+- **Translatable.** Every text a person reads (pages, emails, validation and domain error messages) comes from a
+  translation in `lang/`, never a literal in PHP or Vue. Catalan (`ca`) is the default and fallback locale, and the
+  only one shipped for now; another language is added as more `lang/` files, without code changes.
+- A task with a page is not done until that page has been checked at 375 px wide.

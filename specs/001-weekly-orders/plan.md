@@ -12,6 +12,8 @@ Status: Accepted (2026-10-21) · Spec: [spec.md](spec.md) + areas (R1–R36b, S1
 - GitHub Actions workflow on pull requests: Pint `--test`, Larastan, `vp check` (Oxlint + Oxfmt), vue-tsc,
   Pest against a Postgres service, Vitest.
 - `MAIL_MAILER=log` in `phpunit.xml`; Mailpit for local mail (invitations, D15).
+- Translations: `laravel-vue-i18n` and the `laravel-lang` Catalan files (dev dependency); `APP_LOCALE=ca` and
+  `APP_FALLBACK_LOCALE=ca` (Translations, D18).
 - Laravel scheduler running every minute (`schedule:work` in dev, cron in production) for D10.
 - `php artisan guixa:create-manager {name} {email}` creates the first manager at installation (R36a, D17).
 
@@ -494,13 +496,31 @@ reception), adjust what is needed, add stock and returns, enter a top-up if they
 not collected. Each step before completion is saved on the server, so a pickup can be left and resumed.
 
 Controllers map domain errors in one place: an exception handler turns `Guixa\*\Domain\Error\*`
-into a 422 with a translated message (`errors.<ClassName>` in `lang/`, else the exception message), so Vue
+into a 422 with a translated message (`errors.<ClassName>` in `lang/ca/errors.php`; a missing key falls back to
+the exception message, and the translation test fails on it), so Vue
 shows it as a form error: JSON requests get the 422, Inertia requests a redirect back with a `domain` error. `Shared\Domain\Error\NotAllowed`
 becomes a 403 instead.
 
 Inertia prop DTOs live in `App\Http` and are named `<Noun>Row` (e.g. `StockProductRow`, `HouseholdRow`); their TypeScript types are generated.
 
 Client-side logic (Vitest): order running total, pickup resulting balance, both display-only.
+
+## Translations
+
+Constitution, UI (*Translatable*). `ca` is the default and fallback locale and the only one shipped.
+
+- `laravel-vue-i18n` (its Vite plugin and Vue plugin) loads `lang/` into Vue, so PHP `__()` and Vue `trans()` / `$t`
+  read the same files. Its fit with Inertia 3 and Vite+ is checked first; if it does not fit, `vue-i18n` with
+  messages generated from `lang/` at build time (D18).
+- Keys are the English source strings, in `lang/ca.json` (`"Save order": "Desa la comanda"`); placeholders use
+  Laravel's `:name` form. Domain errors keep their own file, `lang/ca/errors.php`, keyed by error class short name
+  (`lang/en/errors.php` moves there).
+- Laravel's own messages (validation, auth, passwords, pagination) come from the `laravel-lang` Catalan files in
+  `lang/ca/*.php`.
+- Emails (invitations, sent producer orders): subject and body through `__()`.
+- Dates, numbers and money: Vue formats with `Intl` and `ca-ES`; PHP uses the same locale where it formats (emails).
+- Starter-kit and shadcn-vue components' own texts (e.g. screen-reader labels) go through `trans()` too.
+- Every key used in PHP and Vue has a `ca` translation; a test fails otherwise (Testing).
 
 ## Testing
 
@@ -511,6 +531,7 @@ Client-side logic (Vitest): order running total, pickup resulting balance, both 
 | Infrastructure | Each Eloquent repository against `guixa_test` (constraints, locks, numeric mapping) | `tests/Integration` |
 | HTTP | Role gates, wiring, `assertInertia` props, error → 422 and `NotAllowed` → 403 mapping | `tests/Feature` |
 | Architecture | A1–A8 | `tests/Architecture` |
+| Translations | Every key used in PHP (`__()`, `trans()`) and Vue (`trans()`, `$t`), and every domain error class, has a `ca` translation | `tests/Architecture` |
 | Frontend | Display totals, A9 via Oxlint | `resources/js/**/*.spec.ts` |
 
 In-memory repositories live in `tests/Support/InMemory` and must pass the same contract tests
@@ -548,6 +569,9 @@ Eloquent test (`Tests\TestCase` with `RefreshDatabase`) both use it and only imp
   A new allocation (way A or B, after a reopen) clears a pending pickup's adjustment.
 - **D17** The first manager is created by an Artisan command calling `CreateFirstManager`, which sends the
   usual invitation and is rejected once any manager exists (R36a: "outside the app").
+- **D18** Translations use `laravel-vue-i18n`, so PHP and Vue share the files in `lang/` (constitution, UI), with
+  English source strings as keys: code stays in English as the constitution requires, and a missing Catalan
+  translation shows English, which the translation test catches before merge.
 
 Dropped: D1 (pickup is a sequence of saved steps, R19–R22). D2 and D3 became spec rules (R4a, R6). D4 was
 replaced by R35 and R36b (unlinking keeps the account; deactivation is separate). D5, D6 and D8 became spec
