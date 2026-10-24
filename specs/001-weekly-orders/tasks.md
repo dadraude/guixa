@@ -2,6 +2,10 @@
 
 Status: Accepted (2026-10-21) · Spec: [spec.md](spec.md) + areas · Plan: [plan.md](plan.md)
 
+Accepted amendment (2026-10-24): **Application visual identity — T39–T42** and the added T33
+dependency. Corresponding Linear tickets have been created; all four tasks remain unstarted.
+The user has explicitly withheld implementation authorization.
+
 How to work a task:
 
 - One task = one vertical slice: domain → use case → repository (in-memory + Eloquent) → HTTP → Vue page,
@@ -71,8 +75,13 @@ including the weeks when daylight saving time changes (S38).
 | T35 | `GetCycleSummary` carries `cancelled` and returns no totals for a cancelled cycle; `Manage/Cycles/Show` shows a "Cancelled" notice instead of totals | R13 (cancelled), S62 | T17, T20 |
 | T37 | Behavior-preserving member ordering redesign: `Orders/Index`, `Orders/Edit`, presentational ordering components and necessary ordering navigation/layout; Catalan translations, 375 px layout, labelled 44 px controls; preserve per-line save, totals and existing states | Constitution (UI), R4a, R4b (cancelled), R7–R11, R3b; existing T13–T15/T17 scenarios | T14, T15, T17, T38 |
 
-**T37 readiness:** implementation follows T38. The user approved splitting the shared foundation
-from T36 on 2026-10-24; the remaining app-wide migration stays in T36.
+**T37/T38 status (2026-10-24):** both are Done after approved retrospective reconciliation.
+T38 = [DRA-194](https://linear.app/draude/issue/DRA-194/t38-shared-catalan-translation-foundation)
+in **Phase 0 — Foundation**, after T04 / DRA-153.
+T37 = [DRA-195](https://linear.app/draude/issue/DRA-195/t37-behavior-preserving-member-ordering-redesign)
+in **Phase 3 — Cycles and ordering**, after T14 / DRA-168, T15 / DRA-169, T17 / DRA-170 and T38 / DRA-194.
+These are independent root issues with native dependencies, not children of T39. Their original
+scopes remain unchanged; the remaining app-wide translation migration stays in T36.
 
 **Done when** T38: Vue and PHP resolve the same Catalan source keys and placeholders; the
 Inertia/Vite+ compatibility build and focused translation tests pass. No new language-selection UI.
@@ -82,14 +91,23 @@ desktop inspection, light/dark appearance and keyboard use. Existing save/remove
 totals, cancellation and disabled behavior remain unchanged; touched UI copy comes from `lang/`.
 Record focused regression results and browser evidence before completion; no new feature scenarios.
 
-**T38/T37 local implementation evidence (2026-10-24):** 17 focused frontend tests, 40 isolated
-PostgreSQL HTTP/role-access/translation tests (275 assertions), types/lint, affected PHPStan and
-client/SSR builds pass. Independent verification found no change-caused blocker. Synthetic browser
-fixtures passed 375 px light / 1280 px dark, keyboard/save/remove, empty/error and 200% text checks.
-Local commits: T38 `0c56c73` (native-reviewed), cycle list/navigation `3f3b8e8` (user-authorized review
-exception), editor `9dec36d` (native-reviewed). Both native reviews returned no findings and were
-acknowledged. Local implementation is complete; hosted CI and publication remain unrun/unauthorized.
-See `log.md` for limitations. T36 remains pending; this does not mark the whole feature complete.
+**T38/T37 reconciled implementation evidence (2026-10-24):** current commits are T38 `3356bc5`
+plus locale regression correction `b679ade`, T37 cycle list/navigation `b4f1a60` and editor `0a9e26d`.
+All are ancestors of local merged HEAD `2553943b1de93bdd6eaf49bf44927649a0162b9a` (PR #193).
+Relevant application/test/build-config source is unchanged between `0a9e26d` and that HEAD.
+
+Fresh reconciliation checks: five frontend suites (`i18n`, `orderRows`, `orderTotal`, `Orders/Index`,
+`Orders/Edit`), **17 tests passed**, independently repeated by the parent with the same result.
+Historical evidence, not rerun during reconciliation: 40 isolated PostgreSQL HTTP/role-access/
+translation tests (275 assertions), types/lint, affected PHPStan, client/SSR builds, and synthetic
+browser fixtures at 375 px light / 1280 px dark with keyboard/save/remove, empty/error and 200% text.
+The subsequent stack correction passed 55 affected PHP tests / 340 assertions and locale regression.
+The prior delivery verification recorded PRs #191–#193 merged with passing CI; this reconciliation
+did not re-query remote CI or rerun backend, builds or browser inspection. Frontend tests alone do
+not prove browser layout or interaction. Original native-review evidence belongs to the original
+pre-rebase snapshots retained in `log.md`, not a new review of these rebased commits.
+T36 remains pending; neither these Done records nor their prerequisite links authorize T39 or close
+the whole feature. Reconciliation documentation is local and pending repository publication.
 
 **Done when** T13: two concurrent `SetOrderLine` calls for a household with no order yet (integration test)
 create one order with both lines.
@@ -142,11 +160,116 @@ products, added in opposite order, both complete.
 | --- | --- | --- | --- |
 | T32 | `DeactivateHousehold` (warning first), `ReactivateHousehold`, automatic deactivation when the last member leaves, reactivation when `AddMember` or `MoveMember` links someone to an inactive household, `ListHouseholdsToSettle` (balances from Wallet, pending pickups from Ordering) | R35a, S43, S58 | T07, T30 |
 
+## Application visual identity — T39–T42
+
+**Status: Accepted — implementation on hold (2026-10-24).** Implements the accepted
+[Application visual identity](plan.md#application-visual-identity) amendment through the **plan only**
+route. No new `R#` or `S#`: the references below identify existing behavior to preserve, not new
+domain work. T37/T38 and their original scopes are unchanged; T36 remains separate.
+
+### Linear tracking (2026-10-24)
+
+Workspace `draude`, team `DRA`, project [Coop](https://linear.app/draude/project/coop-f80f57e1496d).
+Milestone: **Application visual identity** (`cda681c9-a478-422a-9693-e45968fe4147`). The milestone
+groups four root issues: no parent issue or redundant contextual relations were created.
+
+| Task | Linear issue | Native blocked-by relation | Additional gate |
+| --- | --- | --- | --- |
+| T39 | [DRA-190](https://linear.app/draude/issue/DRA-190/t39-scoped-visual-theme-and-ordering-pilot) | DRA-195 (T37, Done), DRA-194 (T38, Done) | Reconciliation resolved; Backlog and explicit implementation hold remain |
+| T40 | [DRA-191](https://linear.app/draude/issue/DRA-191/t40-visual-identity-for-dashboard-wallet-and-producer-screens) | DRA-190 | Explicit human approval of the T39 visual pilot; task status alone is insufficient |
+| T41 | [DRA-192](https://linear.app/draude/issue/DRA-192/t41-visual-identity-for-existing-manager-screens) | DRA-191 | Preserve the approved rollout sequence |
+| T42 | [DRA-193](https://linear.app/draude/issue/DRA-193/t42-visual-identity-for-settings-and-authentication-with-final) | DRA-192 | Final cross-role checks |
+
+DRA-193 also blocks [DRA-183 / T33](https://linear.app/draude/issue/DRA-183/t33-traceability-check-and-close-feature-001).
+Its original blockers DRA-187, DRA-182, DRA-174, DRA-181, DRA-168, DRA-170 and DRA-158 were preserved.
+Readback confirmed the milestone, native dependencies and absence of duplicate T39–T42 issues.
+
+At creation, all four issues are **Backlog**, unassigned, undelegated and without `ready-for-agent`.
+This snapshot is not permission to execute: the user's no-implementation instruction still applies.
+T37/T38 reconciliation is resolved through their evidenced Done records and native prerequisite
+links. T36 is not a prerequisite for T39. Completed prerequisites do not lift the execution hold.
+Issue descriptions flag that the approved SDD amendment is local and pending repository publication;
+their repository-file links do not imply that this amendment has already been pushed to `main`.
+
+### Existing-screen inventory
+
+Paths below are relative to `resources/js/pages/`, based on tracked Vue pages on 2026-10-24.
+This is a file inventory, not a claim that every flow has been exercised or every feature completed.
+Before implementing each task, confirm the existing routes and reachable states without adding
+missing functionality. Future screens inherit the visual system through their original feature tasks.
+
+| Task | Existing pages to style and verify |
+| --- | --- |
+| T39 | `Orders/Index.vue`, `Orders/Edit.vue` and their shared shell (pilot only) |
+| T40 | `Dashboard.vue`, `Wallet/Statement.vue`; `Producer/Cutoff.vue`, `Producer/CycleSummary.vue`, `Producer/Products/{Index,Create,Edit}.vue` |
+| T41 | `Manage/Accounts/Index.vue`, `Manage/Households/{Index,Show}.vue`, `Manage/Producers/Index.vue`, `Manage/Cycles/{Index,Show}.vue`, `Manage/Settings.vue`, `Manage/Stock/{Index,Create,Edit,Movements}.vue`, `Manage/ReturnItems/{Index,Create,Edit}.vue` |
+| T42 | `settings/{Appearance,Profile,Security}.vue`; `auth/{AcceptInvitation,ConfirmPassword,ForgotPassword,Login,ResetPassword,TwoFactorChallenge,VerifyEmail}.vue` |
+| Excluded | `Welcome.vue`: no visual or routing change; verify it stays unchanged |
+
+`Wallet/Statement.vue` is shared: T40 covers both its member view and existing manager controls;
+T41 checks the manager navigation into it without duplicating its implementation.
+
+Shared presentation candidates are `resources/css/app.css`, `layouts/AppLayout.vue`,
+`layouts/app/{AppSidebarLayout,AppHeaderLayout}.vue`, `layouts/AuthLayout.vue`, `layouts/auth/*.vue`,
+`layouts/settings/Layout.vue`, and the existing `AppShell`, `AppContent`, `AppSidebar`,
+`AppSidebarHeader`, `AppHeader`, `Heading`, `AppearanceTabs`, navigation and UI primitives under
+`resources/js/components/`. These are inspection targets, not a mandate to edit every file. Preserve
+logo content, navigation destinations, role selection, authentication and all component behavior.
+
+### Ordered tasks
+
+| ID | Task | Covers | After |
+| --- | --- | --- | --- |
+| T39 | Implement the scoped theme and ordering pilot together: palette pairs, light/dark variants, heading typography, shell and existing order pages; include focused regressions and rendered evidence | [Plan · Visual system](plan.md#visual-system), [Delivery sequence](plan.md#delivery-sequence), Constitution (UI); R4a/R4b, R7–R11, R3b and existing T37 scenario coverage | T37, T38; task approval |
+| T40 | Extend the approved theme to the existing dashboard, wallet and producer pages; verify both wallet roles, product forms, availability and cutoff presentation without changing their behavior | [Plan · Scope and invariants](plan.md#scope-and-invariants); existing T08, T09, T15, T19, T26 rules/scenarios (including S7, S8, S24, S57) and existing dashboard role access | T39 **and explicit visual pilot approval** |
+| T41 | Extend the same theme to the existing manager pages, preserving data-entry forms, lists, confirmations and navigation; include their presentation and regression checks | [Plan · Scope and invariants](plan.md#scope-and-invariants); existing T06–T08, T11, T17, T20, T24–T25, T35 rules/scenarios, including cancelled-cycle S62 | T40 |
+| T42 | Extend the theme to existing settings/authentication screens; preserve entry flows and appearance selection; finish the cross-role visual consistency and regression review | [Plan · Verification and review gate](plan.md#verification-and-review-gate), Constitution (UI); existing T06/T07/T34 membership and role rules/scenarios, plus existing authentication/settings checks | T41 |
+
+Each task owns its presentation changes, applicable tests and browser evidence together. No new
+domain/use-case tests are invented for colors. For a meaningful testable markup or interaction
+contract, observe the focused failing test before changing it, then verify the existing behavior
+still holds. Pure styling is verified by rendered checks; retain existing functional scenarios.
+Use focused local checks and full CI validation as the plan specifies. A task is not complete while
+applicable verification is failed, missing or pending; unavailable CI is reported, never assumed.
+
+### Completion evidence and checkpoints
+
+- **T39:** one reusable theme definition, attached only to pilot layouts; other screens and `Welcome`
+  stay unchanged. Verify the five palette anchors, semantic state colors, readable foreground pairs,
+  Instrument Sans body text and the initial Georgia heading proposal. Inspect 375 px/desktop,
+  light/dark/system, 200% text, keyboard/focus, 44 px targets, and existing empty/error/closed/cancelled/
+  marked-line states. Preserve save/remove/Enter requests, drafts, totals and preference persistence.
+  Include menus, dialogs, popovers and toasts rendered outside the layout subtree: scoped tokens must
+  reach in-scope overlays without leaking into excluded pages. Present screenshots and observed
+  checks to the user; **stop before T40 until the visual pilot is explicitly approved**.
+- **T40:** reuse the same theme rather than a second palette; check every inventoried T40 page in
+  both themes and at both widths, including wallet amounts, member/manager controls, producer forms,
+  empty/error/disabled states and navigation. No price, quantity, balance or availability logic changes.
+- **T41:** check every inventoried manager page with the same visual/accessibility matrix; preserve
+  existing field labels, validation, confirmation dialogs, cancelled states, permissions and action
+  destinations. Recheck manager access to the shared wallet. Do not add reception/pickup pages or
+  any other not-yet-implemented feature to satisfy the rollout.
+- **T42:** check every inventoried settings/authentication page with the same matrix, including
+  validation, keyboard submission, password/2FA controls, invitation and verification states as
+  already supported. Exercise light/dark/system selection and its existing persistence. Revisit the
+  pilot and one existing page per role for shared-theme regressions, and verify `Welcome` remains
+  unchanged. Record any inaccessible state or unavailable proof as pending, not passed.
+
+For every task, apply all checks in the plan's verification section, including contrast, asset and
+reduced-motion checks; record actual results per affected page and relevant focused test command.
+Any added/changed copy uses `lang/`; these tasks do not absorb T36 or claim its completion. Optional
+botanical decoration must stay within the accepted plan and must not delay a usable pilot.
+
+**Execution gate:** all four tasks are accepted and unstarted. The user explicitly requested Linear
+ticket creation first and no implementation. Do not start T39 without a subsequent instruction to
+implement. Ticket creation does not grant the later visual pilot approval, commits, publication or
+feature completion. T33 now includes T42 as a completion dependency.
+
 ## Closure
 
 | ID | Task | Covers | After |
 | --- | --- | --- | --- |
-| T33 | Traceability check: every `R#` and `S#` is named in at least one test (`->group('S14')` or test name); fill the gaps; set feature 001 to *Done* in `specs/README.md` | R1–R36b, S1–S62 | T14, T17, T19, T31, T32, T34, T35, T36, T37, T38 |
+| T33 | Traceability check: every `R#` and `S#` is named in at least one test (`->group('S14')` or test name); fill the gaps; set feature 001 to *Done* in `specs/README.md` | R1–R36b, S1–S62 | T14, T17, T19, T31, T32, T34, T35, T36, T37, T38, T42 |
 
 ## Coverage
 
