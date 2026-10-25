@@ -65,3 +65,6 @@ yarn-error.log
 .vitest/
 # Local AI runtime state
 .atl/
+
+# Retained implementation identity; local to each task worktree.
+/.agent-workflow/implementation-owner.json
