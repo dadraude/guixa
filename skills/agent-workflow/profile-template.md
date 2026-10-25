@@ -19,22 +19,22 @@ Ask first:
 
 ## Identities and paths
 
-| Setting                                   | Value                                                   |
-| ----------------------------------------- | ------------------------------------------------------- |
-| Tracker                                   | <tool; workspace, team, project>                        |
-| Eligible statuses / dependency completion | <statuses> / <status>                                   |
-| Active / stopped status                   | <status> / <status>                                     |
-| Issue key                                 | <e.g. `ABC-NN`>                                         |
+| Setting                                   | Value                                                    |
+| ----------------------------------------- | -------------------------------------------------------- |
+| Tracker                                   | <tool; workspace, team, project>                         |
+| Eligible statuses / dependency completion | <statuses> / <status>                                    |
+| Active / stopped status                   | <status> / <status>                                      |
+| Issue key                                 | <e.g. `ABC-NN`>                                          |
 | Executable task                           | <task ID pattern and where task rows live; title format> |
-| Ready label                               | <label>, executable mapped leaves only                  |
-| Relation fields                           | <native parent, blocking and related fields>            |
-| Codex entrypoint prefix                   | <prefix>                                                |
-| Remote / base                             | <remote> / <branch>                                     |
-| Task branch                               | <pattern>                                               |
-| Worktree root                             | <path>                                                  |
-| Task worktree                             | <path>                                                  |
-| Test database                             | <name pattern, or none>                                 |
-| Limits                                    | <pipelines in flight; review rounds; failed attempts>   |
+| Ready label                               | <label>, executable mapped leaves only                   |
+| Relation fields                           | <native parent, blocking and related fields>             |
+| Codex entrypoint prefix                   | <prefix>                                                 |
+| Remote / base                             | <remote> / <branch>                                      |
+| Task branch                               | <pattern>                                                |
+| Worktree root                             | <path>                                                   |
+| Task worktree                             | <path>                                                   |
+| Test database                             | <name pattern, or none>                                  |
+| Limits                                    | <pipelines in flight; review rounds; failed attempts>    |
 
 <How to resolve paths and the runtime environment for workers.>
 

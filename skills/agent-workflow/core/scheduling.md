@@ -24,13 +24,13 @@ Do not claim that this in-session table is a cross-session lock.
 
 ## Admission rules
 
-| Evidence                                                                | Action                                                    |
-| ----------------------------------------------------------------------- | --------------------------------------------------------- |
-| A real prerequisite is unfinished                                       | `blocked-dependency`; do not dispatch.                    |
-| Prerequisite code is not verified in the base, even if the tracker says done | `waiting-integration`.                              |
-| Files are disjoint and no changing shared contract couples the tasks    | Run concurrently, within the session limit.               |
-| Expected writes overlap, or a shared contract is being changed          | Queue the later task until the predecessor is integrated. |
-| Edit surface or ownership is unknown                                    | `needs-scope`; inspect before dispatch.                   |
+| Evidence                                                                     | Action                                                    |
+| ---------------------------------------------------------------------------- | --------------------------------------------------------- |
+| A real prerequisite is unfinished                                            | `blocked-dependency`; do not dispatch.                    |
+| Prerequisite code is not verified in the base, even if the tracker says done | `waiting-integration`.                                    |
+| Files are disjoint and no changing shared contract couples the tasks         | Run concurrently, within the session limit.               |
+| Expected writes overlap, or a shared contract is being changed               | Queue the later task until the predecessor is integrated. |
+| Edit surface or ownership is unknown                                         | `needs-scope`; inspect before dispatch.                   |
 
 Keep each task's code, tests and required spec updates together. A shared artifact has one active owner;
 serialize its writers through integration instead of splitting code and documentation into independent

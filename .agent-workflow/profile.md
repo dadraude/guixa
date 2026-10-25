@@ -28,22 +28,22 @@ Ask first:
 
 ## Identities and paths
 
-| Setting                                   | Value                                                                                                      |
-| ----------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| Tracker                                   | Linear; workspace URL slug `draude`, team `DRA`, project `Coop`                                            |
-| Eligible statuses / dependency completion | `Backlog`, `Todo` / `Done`                                                                                 |
-| Active / stopped status                   | `In Progress` / `Todo`                                                                                     |
-| Issue key                                 | `DRA-NN`                                                                                                   |
-| Executable task                           | `Tnn` title prefix matching a row in `specs/*/tasks.md`; title format `Tnn — Title`                        |
-| Ready label                               | `ready-for-agent`, executable mapped leaves only                                                           |
-| Relation fields                           | `parentId`, `blockedBy`/`blocks`, `relatedTo` on `save_issue`, where exposed                               |
+| Setting                                   | Value                                                                                                                         |
+| ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| Tracker                                   | Linear; workspace URL slug `draude`, team `DRA`, project `Coop`                                                               |
+| Eligible statuses / dependency completion | `Backlog`, `Todo` / `Done`                                                                                                    |
+| Active / stopped status                   | `In Progress` / `Todo`                                                                                                        |
+| Issue key                                 | `DRA-NN`                                                                                                                      |
+| Executable task                           | `Tnn` title prefix matching a row in `specs/*/tasks.md`; title format `Tnn — Title`                                           |
+| Ready label                               | `ready-for-agent`, executable mapped leaves only                                                                              |
+| Relation fields                           | `parentId`, `blockedBy`/`blocks`, `relatedTo` on `save_issue`, where exposed                                                  |
 | Codex entrypoint prefix                   | `agent-workflow` (`$agent-workflow-implement-session`, `$agent-workflow-implement-task DRA-NN`, `$agent-workflow-to-tickets`) |
-| Remote / base                             | `origin` / `main`                                                                                          |
-| Task branch                               | `feature/dra-NN-<3-6 title words>`; `chore/` for tooling, test support or CI                               |
-| Worktree root                             | Sibling of the selected repository: `<repo-parent>/<repo-name>-worktrees`                                  |
-| Task worktree                             | `<worktree-root>/dra-NN`                                                                                   |
-| Test database                             | `guixa_test_draNN`; parallel workers may add `_test_N`                                                     |
-| Limits                                    | 3 task pipelines in flight; 3 review rounds; stop after 2 consecutive failed attempts per validation stage |
+| Remote / base                             | `origin` / `main`                                                                                                             |
+| Task branch                               | `feature/dra-NN-<3-6 title words>`; `chore/` for tooling, test support or CI                                                  |
+| Worktree root                             | Sibling of the selected repository: `<repo-parent>/<repo-name>-worktrees`                                                     |
+| Task worktree                             | `<worktree-root>/dra-NN`                                                                                                      |
+| Test database                             | `guixa_test_draNN`; parallel workers may add `_test_N`                                                                        |
+| Limits                                    | 3 task pipelines in flight; 3 review rounds; stop after 2 consecutive failed attempts per validation stage                    |
 
 Resolve `REPO_ROOT` with `git rev-parse --show-toplevel` in the coordinator's selected checkout;
 retain it across all workers instead of recomputing it from their working directory. Derive

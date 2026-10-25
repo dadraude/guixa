@@ -12,11 +12,11 @@ profile's standing authorization.
 2. Copy [profile-template.md](profile-template.md) to `.agent-workflow/profile.md` and fill it in.
 3. Add the thin entrypoints, each linking its adapter, the profile and its core process:
 
-| Task                        | Codex (`.agents/skills/`)           | Claude Code (`.claude/skills/`) |
-| --------------------------- | ----------------------------------- | ------------------------------- |
-| Coordinate implementation   | `$<prefix>-implement-session`       | `/implement-session`            |
-| Implement one admitted task | `$<prefix>-implement-task <issue>`  | `/implement-task <issue>`       |
-| Draft a ticket batch        | `$<prefix>-to-tickets`              | `/to-tickets`                   |
+| Task                        | Codex (`.agents/skills/`)          | Claude Code (`.claude/skills/`) |
+| --------------------------- | ---------------------------------- | ------------------------------- |
+| Coordinate implementation   | `$<prefix>-implement-session`      | `/implement-session`            |
+| Implement one admitted task | `$<prefix>-implement-task <issue>` | `/implement-task <issue>`       |
+| Draft a ticket batch        | `$<prefix>-to-tickets`             | `/to-tickets`                   |
 
 Codex names take the profile's prefix to avoid collisions with personal/global skills. Keep
 explicit-only invocation in each entrypoint's metadata. No global installation or symlink is required. If a running client does not discover new skills,
