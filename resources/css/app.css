@@ -202,39 +202,40 @@
 }
 
 .dark .pilot-theme {
-    --background: #1c271d;
-    --foreground: #edf1e8;
-    --card: #263226;
-    --card-foreground: #edf1e8;
-    --popover: #2b382a;
-    --popover-foreground: #edf1e8;
+    --background: #181b1d;
+    --foreground: #f2f0e9;
+    --card: #303537;
+    --card-foreground: #f2f0e9;
+    --popover: #3b4245;
+    --popover-foreground: #f2f0e9;
     --primary: #bdd5a8;
-    --primary-foreground: #1c271d;
-    --secondary: #354936;
-    --secondary-foreground: #edf1e8;
-    --muted: #30402f;
-    --muted-foreground: #bbcbb5;
-    --accent: #563c32;
-    --accent-foreground: #fff0e8;
-    --destructive: #f19a8f;
-    --destructive-foreground: #231e1c;
-    --border: #81957c;
-    --input: #93a58c;
+    --primary-foreground: #1b211c;
+    --secondary: #3c4346;
+    --secondary-foreground: #f2f0e9;
+    --muted: #3a4144;
+    --muted-foreground: #c7cdcf;
+    --accent: #454c4f;
+    --accent-foreground: #f2f0e9;
+    --destructive: #f5a39b;
+    --destructive-foreground: #241c1c;
+    --border: #919da2;
+    --input: #a5b1b5;
     --ring: #bdd5a8;
-    --sidebar-background: #243324;
-    --sidebar-foreground: #edf1e8;
+    --sidebar-background: #252a2c;
+    --sidebar-foreground: #f2f0e9;
     --sidebar-primary: #bdd5a8;
-    --sidebar-primary-foreground: #1c271d;
-    --sidebar-accent: #354936;
-    --sidebar-accent-foreground: #edf1e8;
-    --sidebar-border: #81957c;
+    --sidebar-primary-foreground: #1b211c;
+    --sidebar-accent: #3f4a41;
+    --sidebar-accent-foreground: #f2f0e9;
+    --sidebar-border: #919da2;
     --sidebar-ring: #bdd5a8;
-    --sidebar: #243324;
-    --pilot-terracotta: #d98b6d;
-    --pilot-success: #9addb4;
-    --pilot-success-foreground: #1c271d;
-    --pilot-warning: #f0c578;
-    --pilot-warning-foreground: #1c271d;
+    --sidebar: #252a2c;
+    --pilot-terracotta: #e79a79;
+    --pilot-success: #a1dbb2;
+    --pilot-success-foreground: #19231d;
+    --pilot-warning: #f3ce85;
+    --pilot-warning-foreground: #2a2113;
+    --pilot-input-fill: #202527;
 }
 
 .pilot-theme .order-page-header {
@@ -251,6 +252,14 @@
 
 .pilot-theme [data-test^='quantity-'] {
     background-color: var(--card);
+}
+
+.dark .pilot-theme [data-test^='quantity-'] {
+    background-color: var(--pilot-input-fill);
+}
+
+.dark .pilot-theme[data-slot='dialog-content'] {
+    background-color: var(--popover);
 }
 
 .pilot-theme .order-page-header > div:last-child {

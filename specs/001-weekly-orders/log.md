@@ -969,3 +969,14 @@ dialog and sheet backdrops now carry the same reactive pilot boundary as their c
 reduced-motion handling. A true 375 px CDP viewport replaced cropped command-line Chrome mobile
 captures; Welcome and both ordering appearances showed no horizontal page overflow. The task-local
 visual evidence was refreshed with computed colors, focus and motion measurements.
+
+
+## 2026-10-25 · Deviation
+
+T39 post-publication visual feedback: “Comprovant el mode dark, veig que és molt verd tot i costa
+diferenciar més els elements.” The dark-only pilot tokens now use stepped neutral charcoal/slate
+canvas, cards, sidebar and popover surfaces with warm off-white text; olive stays on primary,
+selected and focus states. The quantity input has a darker neutral inset, and the dialog panel
+uses the popover surface to separate it from the canvas. The light token block, scope and ordering
+behavior are unchanged. This adjusts the accepted pilot's dark presentation before visual
+approval of any wider rollout.

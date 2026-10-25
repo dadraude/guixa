@@ -78,6 +78,38 @@ try {
     ] of [
         ['index', 'light', false, 375, 'dra190-index-light-375-chrome.png'],
         ['index', 'dark', false, 375, 'dra190-index-dark-375-chrome.png'],
+        ['index', 'dark', false, 1280, 'dra190-index-dark-1280-cdp.png'],
+        ['edit', 'dark', false, 375, 'dra190-edit-dark-375-cdp.png'],
+        [
+            'index',
+            'dark',
+            false,
+            1280,
+            'dra190-dialog-dark-1280.png',
+            null,
+            false,
+            'dialog',
+        ],
+        [
+            'index',
+            'dark',
+            false,
+            375,
+            'dra190-sheet-dark-375-cdp.png',
+            null,
+            false,
+            'sheet',
+        ],
+        [
+            'index',
+            'dark',
+            false,
+            1280,
+            'dra190-menu-dark-1280-cdp.png',
+            null,
+            false,
+            'menu',
+        ],
         ['error', 'light', false, 375, 'dra190-error-light-375.png'],
         ['error', 'dark', false, 375, 'dra190-error-dark-375-cdp.png'],
         ['welcome', 'light', false, 375, 'dra190-welcome-light-375-chrome.png'],
@@ -127,7 +159,11 @@ try {
             100,
             true,
         ],
-    ]) {
+    ].filter(
+        (row) =>
+            !process.argv.includes('--dark-only') ||
+            ['dark', 'system'].includes(row[1]),
+    )) {
         await send('Emulation.setDeviceMetricsOverride', {
             width,
             height: 812,
@@ -156,7 +192,8 @@ try {
                 (textSize ? '&text=' + textSize : '') +
                 (fallback ? '&fallback=1' : '') +
                 (scenario === 'saving' ? '&hold=1' : '') +
-                (reduced && overlayKind !== 'sheet'
+                ((reduced && overlayKind !== 'sheet') ||
+                overlayKind === 'dialog'
                     ? '&overlay=1&open=dialog'
                     : ''),
         });
@@ -175,6 +212,12 @@ try {
             await evaluate(
                 "document.querySelector('[data-slot=sidebar-trigger]').click()",
             );
+            await new Promise((resolve) => setTimeout(resolve, 650));
+        }
+        if (overlayKind === 'menu') {
+            await evaluate(
+                "document.querySelector('[data-test=sidebar-menu-button]').click()",
+            );
             await new Promise((resolve) => setTimeout(resolve, 100));
         }
         const result = await evaluate(`(() => {
@@ -191,6 +234,11 @@ try {
         scroll: document.documentElement.scrollWidth,
         fonts: [...document.fonts].map(face => ({ family: face.family, status: face.status })),
         header: describe('.order-page-header'), card: describe('a[href="/cycles/open/order"]'),
+        canvas: describe('[data-slot="sidebar-inset"]'),
+        sidebar: describe('[data-sidebar="sidebar"]'),
+        popover: describe('[data-slot="dropdown-menu-content"]'),
+        mutedText: describe('.text-muted-foreground'),
+        saveButton: describe('[data-test="save-bread"]'),
         input: describe('input'), error: describe('[role="alert"] p'),
         dialog: describe('[data-slot="dialog-content"]'), overlay: describe('[data-slot="dialog-overlay"]'),
         sheet: describe('[data-mobile="true"][data-sidebar="sidebar"]'), sheetOverlay: describe('[data-slot="sheet-overlay"]'),

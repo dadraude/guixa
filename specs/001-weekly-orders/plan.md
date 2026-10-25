@@ -626,6 +626,12 @@ focus and disabled states. Keep destructive, warning and success states distinct
 and accompany meaningful status colors with text or icons. Derive dark-theme counterparts rather
 than reusing light surface values; check the same states in both themes.
 
+The 2026-10-25 T39 visual review refined the dark counterpart after the user found the first
+render too uniformly green. Its canvas, cards, sidebar and popovers use stepped neutral charcoal
+surfaces with warm off-white text and neutral muted text. Olive remains on primary actions,
+selected navigation and focus; quantity inputs sit on a darker neutral inset. The light palette
+anchors above and all ordering behavior remain unchanged.
+
 - **Typography:** retain Instrument Sans for body text, navigation, forms, tables and amounts. Add a
   shared heading token with `Georgia, serif` as the initial system-font proposal, reserved for page
   titles and prominent section headings. Check Catalan diacritics, wrapping and hierarchy in the
