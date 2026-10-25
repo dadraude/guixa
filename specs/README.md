@@ -73,3 +73,5 @@ An entry gets an `NNN` ID and moves to *Features* when its spec starts. The orde
 | Minimum order per producer | A producer order below its minimum is not sent. | Producer order, Cutoff, Participating producer |
 | Producer invoicing and payments | The cooperative records what it owes each producer and pays it. | Producer, Reception |
 | Container returns to producers | Containers taken back at pickup are tracked until the cooperative hands them back to their producer. | Container, Return item, Producer |
+| Admin rename | Manager becomes Admin (Administrador/a) in specs, code and screens, with no change in behaviour. Comes before Commissions. | Manager, Account |
+| Commissions | An Admin groups accounts into commissions and gives each permissions by area, such as producers and their products. [Decisions](../docs/commissions/2026-10-25-commission-decisions.md). | Account, Producer, Product, Admin |

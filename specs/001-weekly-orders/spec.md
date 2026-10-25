@@ -19,7 +19,7 @@ wallet, and it can top up the wallet on the spot.
 | Household | Unitat de convivència | Ordering and paying unit. Has members; inactive once it leaves or loses its last member. |
 | Member | Soci/sòcia | Person who belongs to at most one household; only with a household can they order. |
 | Manager | Gestor/a | Runs the cooperative: cycles, reception, pickup, stock, wallets, accounts. |
-| Producer | Productor/a | Supplies products and manages its own catalog. Has exactly one account. |
+| Producer | Productor/a | Grows, gathers or makes the products it supplies, and manages its own catalog. Has at most one account. |
 | Account | Compte | One login (unique email) with the manager and producer roles it holds, and a household link that makes it a member. |
 | Product | Producte | Sold by a producer, with a unit (kg, unit, bunch…) and a unit price (≥ 0). |
 | Variable product | Producte de pes variable | Quantity can be fractional (weight); delivered quantity may differ from ordered. |
