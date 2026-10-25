@@ -7,6 +7,7 @@ import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { trans } from 'laravel-vue-i18n';
 
 defineProps<{
     wallet: App.Http.WalletStatementRow;
@@ -24,129 +25,176 @@ const typeLabels: Record<string, string> = {
 <template>
     <Head title="Wallet" />
 
-    <div class="flex flex-col gap-8 p-4">
+    <div class="pilot-page">
         <Heading
             :title="household ? `${household.name} wallet` : 'Wallet'"
             :description="`Balance: ${wallet.balance} EUR`"
         />
 
-        <div v-if="household" class="grid gap-8 md:grid-cols-2">
-            <section class="flex flex-col gap-3">
-                <h2 class="text-lg font-medium">Record a top-up</h2>
-                <Form
-                    v-bind="HouseholdWalletController.topUp.form(household.id)"
-                    :reset-on-success="['amount', 'note']"
-                    class="flex flex-col gap-3"
-                    v-slot="{ errors, processing }"
-                >
-                    <div class="grid gap-2">
-                        <Label for="top-up-amount">Amount (EUR)</Label>
-                        <Input
-                            id="top-up-amount"
-                            name="amount"
-                            inputmode="decimal"
-                            required
-                        />
-                        <InputError :message="errors.amount || errors.domain" />
-                    </div>
-                    <div class="grid gap-2">
-                        <Label for="top-up-note">Note (optional)</Label>
-                        <Input id="top-up-note" name="note" />
-                        <InputError :message="errors.note" />
-                    </div>
-                    <Button
-                        type="submit"
-                        :disabled="processing"
-                        data-test="record-top-up"
+        <div v-if="household" class="pilot-wallet-forms">
+            <div
+                class="pilot-wallet-form-grid grid min-w-0 grid-cols-[minmax(0,1fr)] gap-4"
+            >
+                <section class="pilot-panel flex flex-col gap-4 p-5 sm:p-6">
+                    <h2 class="pilot-heading text-xl font-medium">
+                        Record a top-up
+                    </h2>
+                    <Form
+                        v-bind="
+                            HouseholdWalletController.topUp.form(household.id)
+                        "
+                        :reset-on-success="['amount', 'note']"
+                        class="flex flex-col gap-3"
+                        v-slot="{ errors, processing }"
                     >
-                        Record top-up
-                    </Button>
-                </Form>
-            </section>
+                        <div class="grid gap-2">
+                            <Label for="top-up-amount">Amount (EUR)</Label>
+                            <Input
+                                id="top-up-amount"
+                                name="amount"
+                                inputmode="decimal"
+                                required
+                            />
+                            <InputError
+                                :message="errors.amount || errors.domain"
+                            />
+                        </div>
+                        <div class="grid gap-2">
+                            <Label for="top-up-note">Note (optional)</Label>
+                            <Input id="top-up-note" name="note" />
+                            <InputError :message="errors.note" />
+                        </div>
+                        <Button
+                            type="submit"
+                            :disabled="processing"
+                            data-test="record-top-up"
+                        >
+                            Record top-up
+                        </Button>
+                    </Form>
+                </section>
 
-            <section class="flex flex-col gap-3">
-                <h2 class="text-lg font-medium">Record a correction</h2>
-                <Form
-                    v-bind="
-                        HouseholdWalletController.correct.form(household.id)
-                    "
-                    :reset-on-success="['amount', 'note']"
-                    class="flex flex-col gap-3"
-                    v-slot="{ errors, processing }"
-                >
-                    <div class="grid gap-2">
-                        <Label for="correction-amount">
-                            Amount (EUR, negative to subtract)
-                        </Label>
-                        <Input
-                            id="correction-amount"
-                            name="amount"
-                            inputmode="decimal"
-                            required
-                        />
-                        <InputError :message="errors.amount || errors.domain" />
-                    </div>
-                    <div class="grid gap-2">
-                        <Label for="correction-note">Note</Label>
-                        <Input id="correction-note" name="note" required />
-                        <InputError :message="errors.note" />
-                    </div>
-                    <Button
-                        type="submit"
-                        variant="secondary"
-                        :disabled="processing"
-                        data-test="record-correction"
+                <section class="pilot-panel flex flex-col gap-4 p-5 sm:p-6">
+                    <h2 class="pilot-heading text-xl font-medium">
+                        Record a correction
+                    </h2>
+                    <Form
+                        v-bind="
+                            HouseholdWalletController.correct.form(household.id)
+                        "
+                        :reset-on-success="['amount', 'note']"
+                        class="flex flex-col gap-3"
+                        v-slot="{ errors, processing }"
                     >
-                        Record correction
-                    </Button>
-                </Form>
-            </section>
+                        <div class="grid gap-2">
+                            <Label for="correction-amount">
+                                Amount (EUR, negative to subtract)
+                            </Label>
+                            <Input
+                                id="correction-amount"
+                                name="amount"
+                                inputmode="decimal"
+                                required
+                            />
+                            <InputError
+                                :message="errors.amount || errors.domain"
+                            />
+                        </div>
+                        <div class="grid gap-2">
+                            <Label for="correction-note">Note</Label>
+                            <Input id="correction-note" name="note" required />
+                            <InputError :message="errors.note" />
+                        </div>
+                        <Button
+                            type="submit"
+                            variant="secondary"
+                            :disabled="processing"
+                            data-test="record-correction"
+                        >
+                            Record correction
+                        </Button>
+                    </Form>
+                </section>
+            </div>
         </div>
 
-        <section class="flex flex-col gap-3">
-            <h2 class="text-lg font-medium">Movements</h2>
+        <section class="pilot-panel flex flex-col gap-4 p-5 sm:p-6">
+            <h2 class="pilot-heading text-xl font-medium">Movements</h2>
 
             <p
                 v-if="wallet.movements.length === 0"
-                class="text-sm text-muted-foreground"
+                class="pilot-empty-state text-sm text-muted-foreground"
             >
                 No movements yet.
             </p>
 
-            <table v-else class="w-full text-sm">
-                <thead>
-                    <tr class="border-b text-left">
-                        <th class="py-2">Date</th>
-                        <th class="py-2">Type</th>
-                        <th class="py-2">Note</th>
-                        <th class="py-2 text-right">Amount</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr
-                        v-for="movement in wallet.movements"
-                        :key="movement.id"
-                        class="border-b"
-                    >
-                        <td class="py-2">
-                            {{ movement.occurredAt }}
-                        </td>
-                        <td class="py-2">
-                            {{ typeLabels[movement.type] ?? movement.type }}
-                        </td>
-                        <td class="py-2">{{ movement.note }}</td>
-                        <td class="py-2 text-right">
-                            {{ movement.amount }} EUR
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            <div v-else class="pilot-wallet-movements">
+                <table
+                    class="pilot-data-table pilot-wallet-table w-full text-sm"
+                >
+                    <thead>
+                        <tr class="border-b text-left">
+                            <th scope="col" class="py-2">
+                                {{ trans('Date') }}
+                            </th>
+                            <th scope="col" class="py-2">
+                                {{ trans('Type') }}
+                            </th>
+                            <th scope="col" class="py-2">
+                                {{ trans('Note') }}
+                            </th>
+                            <th scope="col" class="py-2 text-right">
+                                {{ trans('Amount') }}
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr
+                            v-for="movement in wallet.movements"
+                            :key="movement.id"
+                            class="border-b"
+                        >
+                            <td class="py-2">
+                                <span
+                                    class="pilot-cell-label"
+                                    aria-hidden="true"
+                                    >{{ trans('Date') }}</span
+                                >
+                                {{ movement.occurredAt }}
+                            </td>
+                            <td class="py-2">
+                                <span
+                                    class="pilot-cell-label"
+                                    aria-hidden="true"
+                                    >{{ trans('Type') }}</span
+                                >
+                                {{ typeLabels[movement.type] ?? movement.type }}
+                            </td>
+                            <td class="py-2">
+                                <span
+                                    class="pilot-cell-label"
+                                    aria-hidden="true"
+                                    >{{ trans('Note') }}</span
+                                >{{ movement.note }}
+                            </td>
+                            <td class="py-2 text-right">
+                                <span
+                                    class="pilot-cell-label"
+                                    aria-hidden="true"
+                                    >{{ trans('Amount') }}</span
+                                >
+                                {{ movement.amount }} EUR
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </section>
 
         <Link
             v-if="household"
             :href="HouseholdController.show(household.id)"
-            class="text-sm text-muted-foreground underline-offset-4 hover:underline"
+            class="pilot-back-link text-sm underline-offset-4 hover:underline"
         >
             Back to {{ household.name }}
         </Link>

@@ -4,7 +4,8 @@ Status: Accepted (2026-10-21) · Spec: [spec.md](spec.md) + areas (R1–R36b, S1
 
 Accepted amendment (2026-10-24): **Application visual identity** below. The user approved the plan;
 the associated tasks were separately approved. The user subsequently authorized T39 implementation
-on 2026-10-25. T40 still requires explicit approval of the T39 visual pilot.
+on 2026-10-25. The T39 visual pilot was explicitly approved on DRA-191 on 2026-10-25;
+T40 is implemented for review with [rendered evidence](../../docs/visual-checks/dra-191.md).
 T37/T38 reconciliation is complete: T37 = DRA-195 and T38 = DRA-194, both Done with evidence.
 Their native prerequisite links to T39 / DRA-190 are recorded.
 
@@ -573,13 +574,13 @@ editable/closed producer rows, marked lines, errors and totals. These existing t
 rendered layout; record browser evidence separately. Use focused local checks; full validation stays
 with CI under the project execution profile. Historical browser and delivery checks are recorded in
 `log.md`; current reconciliation evidence and its limits are summarized in `tasks.md`. T37 is complete
-as DRA-195, separately from the unstarted visual identity amendment below.
+as DRA-195, separately from the staged visual identity amendment below.
 
 ## Application visual identity
 
-**Status: Accepted (2026-10-24); T39 implementation authorized 2026-10-25.** Route: plan only,
+**Status: Accepted (2026-10-24); T39 approved for rollout and T40 implemented for review (2026-10-25); T41–T42 unstarted.** Route: plan only,
 because this changes presentation without changing the spec's requirements or acceptance scenarios.
-The task amendment is accepted; wider rollout still waits for the T39 visual review.
+The task amendment is accepted; the T39 visual review was approved on DRA-191 before T40 began.
 
 ### Scope and invariants
 
@@ -668,6 +669,28 @@ records the observed browser matrix and its mocked-transport limit.
 The pilot is a review checkpoint, not a second theme implementation. Reuse the same semantic tokens
 and presentation components throughout. Preserve existing page orchestration and the constitution's
 component boundaries; do not refactor business logic or shared interaction behavior for visual polish.
+
+T40 extends the same reactive opt-in to Dashboard, Wallet/Statement and the five existing producer
+pages. Their current page components retain their props, actions and form contracts. Shared page,
+panel, empty-state and mobile table presentation classes live under the pilot theme, so the two
+wallet roles and producer lists use the approved token pairs without a second palette. The
+scoped destructive token also colors their existing form errors, and newly visible phone row labels
+reuse the desktop header translations. The
+[T40 visual check](../../docs/visual-checks/dra-191.md) records rendered states and focused
+regressions, including an unbroken long product name that must wrap within the cycle summary;
+the manager wallet's phone grid also uses a zero-minimum column so enlarged text cannot push its
+cards beyond the viewport. Product rows reflow inside a container query when enlarged text no
+longer fits six table columns. Wallet movement rows likewise reflow by available panel width at
+enlarged text, while normal desktop widths retain tables. The fixture verifies wallet cells within
+their panel and clipping ancestors in both roles. Its transport is mocked
+and does not prove persistence.
+Manager wallet forms reflow by available content width when enlarged text cannot fit two cards;
+their button text wraps within each card. At normal desktop width the two-column form remains.
+The rendered fixture checks form headings, labels, inputs, and button text within their panels.
+Producer cycle-summary names and availability controls also stack by available list width at
+enlarged text, leaving usable name space while retaining ordinary desktop rows and requests.
+The T40 visual sweep includes every affected view at 1024 px and 200% text in both themes,
+checking keyboard focus and relevant text/container bounds alongside 375 and 1280 px.
 
 ### Verification and review gate
 

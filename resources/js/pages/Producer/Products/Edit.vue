@@ -22,12 +22,12 @@ defineProps<{
 <template>
     <Head title="Edit product" />
 
-    <div class="max-w-xl p-4">
+    <div class="pilot-page max-w-3xl">
         <Heading :title="`Edit ${product.name}`" />
 
         <Form
             v-bind="ProductController.update.form(product.id)"
-            class="space-y-6"
+            class="pilot-panel max-w-xl space-y-6 p-5 sm:p-6"
             v-slot="{ errors, processing }"
         >
             <StockProductFields :product="product" :errors="errors" />

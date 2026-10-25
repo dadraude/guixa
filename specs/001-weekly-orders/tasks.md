@@ -4,7 +4,8 @@ Status: Accepted (2026-10-21) · Spec: [spec.md](spec.md) + areas · Plan: [plan
 
 Accepted amendment (2026-10-24): **Application visual identity — T39–T42** and the added T33
 dependency. Corresponding Linear tickets have been created. On 2026-10-25 the user authorized T39
-implementation only; its visual pilot awaits human review before T40 can start.
+implementation only. The T39 visual pilot was explicitly approved on DRA-191 on 2026-10-25;
+T40 is implemented for review with focused and rendered evidence. T41 remains after T40.
 
 How to work a task:
 
@@ -162,7 +163,7 @@ products, added in opposite order, both complete.
 
 ## Application visual identity — T39–T42
 
-**Status: Accepted — T39 implemented for visual review (2026-10-25); T40–T42 unstarted.** Implements the accepted
+**Status: Accepted — T39 approved for rollout; T40 implemented for review (2026-10-25); T41–T42 unstarted.** Implements the accepted
 [Application visual identity](plan.md#application-visual-identity) amendment through the **plan only**
 route. No new `R#` or `S#`: the references below identify existing behavior to preserve, not new
 domain work. T37/T38 and their original scopes are unchanged; T36 remains separate.
@@ -175,7 +176,7 @@ groups four root issues: no parent issue or redundant contextual relations were 
 
 | Task | Linear issue | Native blocked-by relation | Additional gate |
 | --- | --- | --- | --- |
-| T39 | [DRA-190](https://linear.app/draude/issue/DRA-190/t39-scoped-visual-theme-and-ordering-pilot) | DRA-195 (T37, Done), DRA-194 (T38, Done) | Implementation authorized 2026-10-25; visual review pending |
+| T39 | [DRA-190](https://linear.app/draude/issue/DRA-190/t39-scoped-visual-theme-and-ordering-pilot) | DRA-195 (T37, Done), DRA-194 (T38, Done) | Visual pilot approved on DRA-191, 2026-10-25 |
 | T40 | [DRA-191](https://linear.app/draude/issue/DRA-191/t40-visual-identity-for-dashboard-wallet-and-producer-screens) | DRA-190 | Explicit human approval of the T39 visual pilot; task status alone is insufficient |
 | T41 | [DRA-192](https://linear.app/draude/issue/DRA-192/t41-visual-identity-for-existing-manager-screens) | DRA-191 | Preserve the approved rollout sequence |
 | T42 | [DRA-193](https://linear.app/draude/issue/DRA-193/t42-visual-identity-for-settings-and-authentication-with-final) | DRA-192 | Final cross-role checks |
@@ -245,10 +246,26 @@ applicable verification is failed, missing or pending; unavailable CI is reporte
 
 T39 implementation evidence (2026-10-25): [rendered pilot matrix](../../docs/visual-checks/dra-190.md),
 focused frontend/HTTP regressions, scoped light/dark tokens and portal checks. The pilot is ready
-for human visual review; this record does not approve T40 or assert CI completion.
+for human visual review; approval was subsequently recorded on DRA-191. CI completion is separate.
 - **T40:** reuse the same theme rather than a second palette; check every inventoried T40 page in
   both themes and at both widths, including wallet amounts, member/manager controls, producer forms,
   empty/error/disabled states and navigation. No price, quantity, balance or availability logic changes.
+
+T40 implementation evidence (2026-10-25): [rendered page and state matrix](../../docs/visual-checks/dra-191.md),
+test-first route opt-in, existing focused HTTP regressions for dashboard, both wallet roles, producer
+cutoff/products (including CRUD), cycle totals and availability. The rendered matrix includes
+every T40 view at 200% text and keyboard focus, both wallet roles, and a long product name.
+It checks wallet cells against panel and clipping-ancestor edges, product cells against viewport
+edges, and focused actions for horizontal visibility at enlarged text. Wallet and product rows
+reflow by available container width when their columns cannot fit, preserving normal desktop tables.
+Manager wallet forms also stack when their content width cannot fit both cards; rendered checks
+cover card content, button text, and neighboring cutoff/product forms at enlarged desktop text.
+The cycle summary stacks names above availability controls when its list width is constrained;
+the rendered matrix covers all eight T40 views at 1024 px/200% in both themes with focus and
+text/container bounds checks.
+No new domain scenario was introduced. Full CI and
+independent review are pending. The newly visible mobile row labels share Catalan translations with
+their desktop headers; existing wallet amounts and producer prices remain unchanged.
 - **T41:** check every inventoried manager page with the same visual/accessibility matrix; preserve
   existing field labels, validation, confirmation dialogs, cancelled states, permissions and action
   destinations. Recheck manager access to the shared wallet. Do not add reception/pickup pages or
@@ -264,10 +281,10 @@ reduced-motion checks; record actual results per affected page and relevant focu
 Any added/changed copy uses `lang/`; these tasks do not absorb T36 or claim its completion. Optional
 botanical decoration must stay within the accepted plan and must not delay a usable pilot.
 
-**Execution gate:** the user supplied the subsequent T39 implementation instruction on 2026-10-25.
-The pilot remains a human visual review checkpoint; T40–T42 have not started. Ticket creation and
-T39 implementation do not grant visual approval, publication or feature completion. T33 includes
-T42 as a completion dependency.
+**Execution gate:** the user supplied the T39 implementation instruction and then explicitly
+approved its visual pilot on DRA-191 on 2026-10-25. T40 is implemented for independent review;
+T41–T42 have not started. Pilot approval does not grant publication or feature completion. T33
+includes T42 as a completion dependency.
 
 ## Closure
 

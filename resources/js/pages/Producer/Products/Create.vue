@@ -18,12 +18,12 @@ defineOptions({
 <template>
     <Head title="New product" />
 
-    <div class="max-w-xl p-4">
+    <div class="pilot-page max-w-3xl">
         <Heading title="New product" />
 
         <Form
             v-bind="ProductController.store.form()"
-            class="space-y-6"
+            class="pilot-panel max-w-xl space-y-6 p-5 sm:p-6"
             v-slot="{ errors, processing }"
         >
             <StockProductFields :errors="errors" />
