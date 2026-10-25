@@ -6,8 +6,8 @@ use DateTimeImmutable;
 use DateTimeZone;
 use Guixa\Ordering\Domain\Error\CutoffNotInFuture;
 use Guixa\Ordering\Domain\Error\CutoffOutsideWindow;
-use Guixa\Ordering\Domain\Error\CycleAlreadySettled;
 use Guixa\Ordering\Domain\Error\CycleCancelled;
+use Guixa\Ordering\Domain\Error\CycleClosed;
 use Guixa\Ordering\Domain\Error\NotOnPickupWeekday;
 use Guixa\Ordering\Domain\Error\PickupDateNotInFuture;
 use Guixa\Ordering\Domain\Error\ProducerClosed;
@@ -35,6 +35,7 @@ final class Cycle
         private array $producerOrders,
         private ?DateTimeImmutable $cancelledAt = null,
         private ?DateTimeImmutable $settledAt = null,
+        private ?DateTimeImmutable $closedAt = null,
     ) {}
 
     /** `$now` is read in the cooperative's timezone: "after today" is a local calendar date (R4, R4c). */
@@ -54,7 +55,7 @@ final class Cycle
     }
 
     /** @param list<ProducerOrder> $producerOrders */
-    public static function restore(string $id, DateTimeImmutable $pickupDate, array $producerOrders, ?DateTimeImmutable $cancelledAt = null, ?DateTimeImmutable $settledAt = null): self
+    public static function restore(string $id, DateTimeImmutable $pickupDate, array $producerOrders, ?DateTimeImmutable $cancelledAt = null, ?DateTimeImmutable $settledAt = null, ?DateTimeImmutable $closedAt = null): self
     {
         $byProducer = [];
 
@@ -62,7 +63,7 @@ final class Cycle
             $byProducer[$producerOrder->producerId] = $producerOrder;
         }
 
-        return new self($id, $pickupDate, $byProducer, $cancelledAt, $settledAt);
+        return new self($id, $pickupDate, $byProducer, $cancelledAt, $settledAt, $closedAt);
     }
 
     /**
@@ -227,22 +228,44 @@ final class Cycle
     }
 
     /**
-     * Takes a producer back to its reception. Only before settlement: reopening a settled cycle, which keeps the done
-     * pickups, belongs to a later task (R18).
+     * Reopens a producer until cycle closure, without stopping settled pickups (R18).
      */
     public function reopen(string $producerId): void
     {
+        $this->assertNotClosed();
         $producerOrder = $this->producerOrderOf($producerId);
-
-        if ($this->isSettled()) {
-            throw CycleAlreadySettled::withId($this->id, $producerId);
-        }
 
         if (! $producerOrder->isDistributed()) {
             throw ProducerNotDistributed::withId($this->id, $producerId);
         }
 
         $producerOrder->reopen();
+    }
+
+    public function close(DateTimeImmutable $now, bool $everyPickupDone): void
+    {
+        if ($this->isClosed() || ! $this->isSettled() || ! $everyPickupDone || ! $this->everyParticipatingProducerIsDistributed()) {
+            return;
+        }
+
+        $this->closedAt = $now;
+    }
+
+    public function isClosed(): bool
+    {
+        return $this->closedAt !== null;
+    }
+
+    public function closedAt(): ?DateTimeImmutable
+    {
+        return $this->closedAt;
+    }
+
+    public function assertNotClosed(): void
+    {
+        if ($this->isClosed()) {
+            throw CycleClosed::withId($this->id);
+        }
     }
 
     public function isSettled(): bool
@@ -382,6 +405,8 @@ final class Cycle
 
     private function assertNotCancelled(): void
     {
+        $this->assertNotClosed();
+
         if ($this->isCancelled()) {
             throw CycleCancelled::withId($this->id);
         }

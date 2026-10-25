@@ -118,6 +118,7 @@ Route::middleware(['auth', 'verified', 'role:manager'])->prefix('manage')->name(
         Route::delete('{household}/stock-lines/{stockProduct}', [PickupStockController::class, 'destroy'])->name('cycles.pickups.stock-lines.destroy');
         Route::post('{household}/return-lines', [PickupReturnController::class, 'store'])->name('cycles.pickups.return-lines.store');
         Route::delete('{household}/return-lines/{returnItem}', [PickupReturnController::class, 'destroy'])->name('cycles.pickups.return-lines.destroy');
+        Route::post('{household}/not-collected', [PickupCompleteController::class, 'notCollected'])->name('cycles.pickups.not-collected');
         Route::post('{household}/complete', [PickupCompleteController::class, 'store'])->name('cycles.pickups.complete');
     });
 

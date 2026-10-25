@@ -165,15 +165,16 @@ describe('reception page', () => {
         expect(html).not.toContain('data-test="reopen-form"');
     });
 
-    it('shows a distributed reception read-only with a reopen button until the cycle settles', async () => {
-        const render = (settled: boolean) =>
+    it('shows a distributed reception read-only with a reopen button until the cycle closes', async () => {
+        const render = (closed: boolean) =>
             renderToString(
                 createSSRApp(Show, {
                     reception,
                     distribution: {
                         validated: true,
                         distributed: true,
-                        settled,
+                        settled: true,
+                        closed,
                     },
                     households: [{ id: 'd', name: 'Household D' }],
                 }),

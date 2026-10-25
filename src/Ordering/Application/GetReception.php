@@ -42,6 +42,7 @@ final class GetReception
             $cycle->isValidated($producerId),
             $cycle->isDistributed($producerId),
             $cycle->isSettled(),
+            $cycle->isClosed(),
         );
     }
 
@@ -94,6 +95,7 @@ final class GetReception
             $product->manuallyAllocatedHouseholds() !== [],
             $product->hasAdjustments(),
             $allocations,
+            array_filter($product->lines, fn (ReceptionLine $line) => $line->done) !== [],
         );
     }
 

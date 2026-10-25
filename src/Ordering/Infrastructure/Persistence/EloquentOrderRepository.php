@@ -6,6 +6,7 @@ use DateTimeImmutable;
 use Guixa\Ordering\Domain\Order;
 use Guixa\Ordering\Domain\OrderLine;
 use Guixa\Ordering\Domain\OrderRepository;
+use Guixa\Ordering\Domain\PickupAdjustment;
 use Guixa\Ordering\Domain\PickupStatus;
 use Guixa\Ordering\Domain\ReturnLine;
 use Guixa\Ordering\Domain\StockLine;
@@ -35,6 +36,7 @@ final class EloquentOrderRepository implements OrderRepository
             'charged_cents' => $order->charged()?->cents,
         ]);
 
+        $this->storeAdjustments($order);
         $this->storeStockLines($order);
         $this->storeReturnLines($order);
 
@@ -70,6 +72,26 @@ final class EloquentOrderRepository implements OrderRepository
             ['id'],
             ['product_name', 'unit', 'unit_price_cents', 'variable', 'containers_per_unit', 'ordered_quantity', 'allocated_quantity', 'allocated_by_hand', 'dropped', 'delivered_quantity'],
         );
+    }
+
+    private function storeAdjustments(Order $order): void
+    {
+        foreach ($order->adjustments() as $adjustment) {
+            // Existing history is immutable: only newly assigned ids are inserted, never updated or deleted.
+            DB::table('order_pickup_adjustments')->insertOrIgnore([
+                'id' => $adjustment->id,
+                'order_id' => $order->id,
+                'product_id' => $adjustment->productId,
+                'name' => $adjustment->name,
+                'unit' => $adjustment->unit,
+                'unit_price_cents' => $adjustment->unitPrice->cents,
+                'quantity_delta_thousandths' => $adjustment->quantityDeltaThousandths,
+                'amount_cents' => $adjustment->amount->cents,
+                'target_quantity' => $adjustment->target->toString(),
+                'recorded_at' => $adjustment->recordedAt->format('Y-m-d\TH:i:s.uP'),
+                'recorded_by' => $adjustment->recordedBy,
+            ]);
+        }
     }
 
     private function storeStockLines(Order $order): void
@@ -177,12 +199,14 @@ final class EloquentOrderRepository implements OrderRepository
         $orderIds = array_map(fn (stdClass $row) => $row->id, $rows);
         $stockByOrder = DB::table('order_stock_lines')->whereIn('order_id', $orderIds)->orderBy('id')->get()->groupBy('order_id');
         $returnsByOrder = DB::table('order_return_lines')->whereIn('order_id', $orderIds)->orderBy('id')->get()->groupBy('order_id');
+        $adjustmentsByOrder = DB::table('order_pickup_adjustments')->whereIn('order_id', $orderIds)->orderBy('recorded_at')->orderBy('id')->get()->groupBy('order_id');
 
         return array_map(fn (stdClass $row) => $this->toDomain(
             $row,
             array_values($linesByOrder->get($row->id, collect())->all()),
             array_values($stockByOrder->get($row->id, collect())->all()),
             array_values($returnsByOrder->get($row->id, collect())->all()),
+            array_values($adjustmentsByOrder->get($row->id, collect())->all()),
         ), $rows);
     }
 
@@ -224,8 +248,9 @@ final class EloquentOrderRepository implements OrderRepository
      * @param  list<stdClass>|null  $lineRows  the order's lines when already loaded
      * @param  list<stdClass>|null  $stockRows  the order's stock lines when already loaded
      * @param  list<stdClass>|null  $returnRows  the order's return lines when already loaded
+     * @param  list<stdClass>|null  $adjustmentRows  append-only adjustment history when already loaded
      */
-    private function toDomain(stdClass $row, ?array $lineRows = null, ?array $stockRows = null, ?array $returnRows = null): Order
+    private function toDomain(stdClass $row, ?array $lineRows = null, ?array $stockRows = null, ?array $returnRows = null, ?array $adjustmentRows = null): Order
     {
         $lineRows ??= DB::table('order_lines')
             ->where('order_id', $row->id)
@@ -264,7 +289,21 @@ final class EloquentOrderRepository implements OrderRepository
             $this->returnLines($returnRows ?? $this->rowsOf('order_return_lines', $row->id)),
             $row->pickup_done_at === null ? null : new DateTimeImmutable($row->pickup_done_at),
             $row->charged_cents === null ? null : Money::ofCents($row->charged_cents),
+            $this->adjustments($adjustmentRows ?? array_values(DB::table('order_pickup_adjustments')->where('order_id', $row->id)->orderBy('recorded_at')->orderBy('id')->get()->all())),
         );
+    }
+
+    /**
+     * @param  list<stdClass>  $rows
+     * @return list<PickupAdjustment>
+     */
+    private function adjustments(array $rows): array
+    {
+        return array_map(fn (stdClass $row) => new PickupAdjustment(
+            $row->id, $row->product_id, $row->name, $row->unit, Money::ofCents($row->unit_price_cents),
+            (int) $row->quantity_delta_thousandths, Money::ofCents($row->amount_cents),
+            Quantity::fromString($row->target_quantity), new DateTimeImmutable($row->recorded_at), $row->recorded_by,
+        ), $rows);
     }
 
     /** @return list<stdClass> */

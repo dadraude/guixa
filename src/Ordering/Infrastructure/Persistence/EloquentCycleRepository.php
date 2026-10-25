@@ -23,6 +23,7 @@ final class EloquentCycleRepository implements CycleRepository
             'pickup_date' => $cycle->pickupDate()->format('Y-m-d'),
             'cancelled_at' => $cycle->cancelledAt()?->format(DATE_ATOM),
             'settled_at' => $cycle->settledAt()?->format(DATE_ATOM),
+            'closed_at' => $cycle->closedAt()?->format(DATE_ATOM),
         ]);
 
         $rows = array_map(fn (ProducerOrder $order) => [
@@ -103,6 +104,7 @@ final class EloquentCycleRepository implements CycleRepository
             array_values($orders),
             $model->cancelled_at === null ? null : new DateTimeImmutable($model->cancelled_at),
             $model->settled_at === null ? null : new DateTimeImmutable($model->settled_at),
+            $model->closed_at === null ? null : new DateTimeImmutable($model->closed_at),
         );
     }
 }

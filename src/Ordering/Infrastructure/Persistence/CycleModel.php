@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $id
  * @property string $pickup_date
  * @property ?string $cancelled_at
+ * @property ?string $closed_at
  * @property ?string $settled_at
  */
 final class CycleModel extends Model

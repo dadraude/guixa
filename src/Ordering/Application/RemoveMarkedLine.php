@@ -34,6 +34,7 @@ final class RemoveMarkedLine
 
         $this->transactions->run(function () use ($householdId, $cycleId, $productId) {
             $cycle = $this->cycles->getForShare($cycleId) ?? throw CycleNotFound::withId($cycleId);
+            $cycle->assertNotClosed();
             $order = $this->orders->lockFor($cycleId, $householdId);
 
             $order->removeMarkedLine($productId, $this->marks->of($cycle, $order));

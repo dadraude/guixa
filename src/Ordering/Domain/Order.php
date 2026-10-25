@@ -27,6 +27,7 @@ final class Order
      * @param  array<string, OrderLine>  $lines  by product id
      * @param  array<string, StockLine>  $stockLines  by stock product id
      * @param  array<string, ReturnLine>  $returnLines  by return item id
+     * @param  list<PickupAdjustment>  $adjustments
      */
     private function __construct(
         public readonly string $id,
@@ -38,6 +39,7 @@ final class Order
         private array $returnLines = [],
         private ?DateTimeImmutable $pickupDoneAt = null,
         private ?Money $charged = null,
+        private array $adjustments = [],
     ) {}
 
     public static function start(string $id, string $cycleId, string $householdId): self
@@ -49,8 +51,9 @@ final class Order
      * @param  list<OrderLine>  $lines
      * @param  list<StockLine>  $stockLines
      * @param  list<ReturnLine>  $returnLines
+     * @param  list<PickupAdjustment>  $adjustments
      */
-    public static function restore(string $id, string $cycleId, string $householdId, array $lines, PickupStatus $pickup = PickupStatus::None, array $stockLines = [], array $returnLines = [], ?DateTimeImmutable $pickupDoneAt = null, ?Money $charged = null): self
+    public static function restore(string $id, string $cycleId, string $householdId, array $lines, PickupStatus $pickup = PickupStatus::None, array $stockLines = [], array $returnLines = [], ?DateTimeImmutable $pickupDoneAt = null, ?Money $charged = null, array $adjustments = []): self
     {
         $byProduct = [];
 
@@ -70,7 +73,7 @@ final class Order
             $byReturnItem[$line->returnItemId] = $line;
         }
 
-        return new self($id, $cycleId, $householdId, $byProduct, $pickup, $byStockProduct, $byReturnItem, $pickupDoneAt, $charged);
+        return new self($id, $cycleId, $householdId, $byProduct, $pickup, $byStockProduct, $byReturnItem, $pickupDoneAt, $charged, $adjustments);
     }
 
     /**
@@ -131,6 +134,7 @@ final class Order
      */
     public function removeMarkedLine(string $productId, array $marked): void
     {
+        $this->assertNotFrozen();
         if (! isset($this->lines[$productId])) {
             return;
         }
@@ -148,6 +152,7 @@ final class Order
      */
     public function allocate(string $productId, Quantity $allocated): void
     {
+        $this->assertNotFrozen();
         $line = $this->lines[$productId] ?? throw new LogicException("The order has no line of product {$productId} to allocate.");
 
         $this->assertInStep($line->name, $line->variable, $allocated);
@@ -160,6 +165,7 @@ final class Order
      */
     public function allocateNew(OrderableProduct $product, Quantity $allocated, string $lineId, string $addedBy, DateTimeImmutable $now): void
     {
+        $this->assertNotFrozen();
         $this->assertInStep($product->name, $product->variable, $allocated);
 
         $this->lines[$product->id] = (new OrderLine(
@@ -181,6 +187,7 @@ final class Order
     /** Sets the allocation the reception computed from the ordered quantities, clearing the manual mark (R15). */
     public function reallocate(string $productId, Quantity $allocated): void
     {
+        $this->assertNotFrozen();
         $line = $this->lines[$productId] ?? throw new LogicException("The order has no line of product {$productId} to allocate.");
 
         $this->lines[$productId] = $line->withAllocation($allocated, byHand: false);
@@ -208,6 +215,71 @@ final class Order
         $this->pickup = $this->hasAllocation() ? PickupStatus::Pending : PickupStatus::NothingToCollect;
     }
 
+    /** @return list<PickupAdjustment> in recording order */
+    public function adjustments(): array
+    {
+        return $this->adjustments;
+    }
+
+    public function effectiveAllocated(OrderLine $line): Quantity
+    {
+        return $this->latestTarget($line->productId) ?? $line->allocated;
+    }
+
+    public function effectiveDelivered(OrderLine $line): Quantity
+    {
+        return $this->latestTarget($line->productId) ?? $line->delivered();
+    }
+
+    /** Only reception redistribution may append corrections; the original pickup remains historical. */
+    public function appendAdjustment(string $productId, Quantity $target, string $id, DateTimeImmutable $now, string $actorId): ?PickupAdjustment
+    {
+        if (! $this->isFrozen()) {
+            throw new LogicException('Pickup adjustments require a done pickup.');
+        }
+
+        $line = $this->lines[$productId] ?? throw new LogicException('The pickup has no product to adjust.');
+        $previous = $this->effectiveDelivered($line);
+
+        if ($previous->equals($target) && $this->effectiveAllocated($line)->equals($target)) {
+            return null;
+        }
+
+        $this->assertInStep($line->name, $line->variable, $target);
+        $adjustment = new PickupAdjustment(
+            $id, $productId, $line->name, $line->unit, $line->unitPrice,
+            $target->thousandths - $previous->thousandths,
+            $line->unitPrice->multiply($target)->subtract($line->unitPrice->multiply($previous)),
+            $target, $now, $actorId,
+        );
+        $this->adjustments[] = $adjustment;
+
+        return $adjustment;
+    }
+
+    private function latestTarget(string $productId): ?Quantity
+    {
+        foreach (array_reverse($this->adjustments) as $adjustment) {
+            if ($adjustment->productId === $productId) {
+                return $adjustment->target;
+            }
+        }
+
+        return null;
+    }
+
+    public function isFrozen(): bool
+    {
+        return in_array($this->pickup, [PickupStatus::Completed, PickupStatus::NotCollected], true);
+    }
+
+    public function reopenIfAllocated(): void
+    {
+        if (in_array($this->pickup, [PickupStatus::NothingToCollect, PickupStatus::None], true) && $this->hasAllocation()) {
+            $this->pickup = PickupStatus::Pending;
+        }
+    }
+
     public function pickup(): PickupStatus
     {
         return $this->pickup;
@@ -232,6 +304,18 @@ final class Order
         $this->assertPending();
 
         $this->pickup = PickupStatus::Completed;
+        $this->pickupDoneAt = $now;
+        $this->charged = $this->total();
+
+        return $this->charged;
+    }
+
+    public function markNotCollected(DateTimeImmutable $now): Money
+    {
+        $this->assertPending();
+        $this->stockLines = [];
+        $this->returnLines = [];
+        $this->pickup = PickupStatus::NotCollected;
         $this->pickupDoneAt = $now;
         $this->charged = $this->total();
 
@@ -383,6 +467,10 @@ final class Order
             $total = $total->subtract($line->credit());
         }
 
+        foreach ($this->adjustments as $adjustment) {
+            $total = $total->add($adjustment->amount);
+        }
+
         return $total;
     }
 
@@ -415,6 +503,13 @@ final class Order
         }
 
         return false;
+    }
+
+    private function assertNotFrozen(): void
+    {
+        if ($this->isFrozen()) {
+            throw PickupNotPending::forOrder($this->id);
+        }
     }
 
     private function assertPending(): void

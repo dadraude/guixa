@@ -26,5 +26,6 @@ final readonly class ReceptionProductData
         public bool $hasManualAllocations,
         public bool $hasAdjustments,
         public array $allocations,
+        public bool $hasDonePickups = false,
     ) {}
 }

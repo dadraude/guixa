@@ -26,6 +26,7 @@ final readonly class ReceptionProductRow
         public bool $hasManualAllocations,
         public bool $hasAdjustments,
         public array $allocations,
+        public bool $hasDonePickups = false,
     ) {}
 
     public static function from(ReceptionProductData $product): self
@@ -46,6 +47,7 @@ final readonly class ReceptionProductRow
             $product->hasManualAllocations,
             $product->hasAdjustments,
             array_map(ReceptionAllocationRow::from(...), $product->allocations),
+            $product->hasDonePickups,
         );
     }
 }

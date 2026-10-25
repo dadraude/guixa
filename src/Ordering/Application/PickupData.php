@@ -14,6 +14,7 @@ final readonly class PickupData
      * @param  list<OrderLineData>  $lines  in the order they were added; dropped lines are left out
      * @param  list<PickupStockLineData>  $stockLines  in the order they were added (R20)
      * @param  list<PickupReturnLineData>  $returnLines  in the order they were added (R20a)
+     * @param  list<PickupAdjustmentData>  $adjustments
      * @param  ?string  $householdName  null when the household reads its own pickup
      */
     public function __construct(
@@ -26,6 +27,8 @@ final readonly class PickupData
         public int $totalCents,
         public array $stockLines = [],
         public array $returnLines = [],
+        public array $adjustments = [],
+        public ?int $originalChargeCents = null,
     ) {}
 
     public static function of(Order $order, string $pickupDate, ?string $householdName): self
@@ -40,6 +43,8 @@ final readonly class PickupData
             $order->total()->cents,
             array_map(fn (StockLine $line) => PickupStockLineData::of($line), $order->stockLines()),
             array_map(fn (ReturnLine $line) => PickupReturnLineData::of($line), $order->returnLines()),
+            array_map(PickupAdjustmentData::of(...), $order->adjustments()),
+            $order->charged()?->cents,
         );
     }
 }

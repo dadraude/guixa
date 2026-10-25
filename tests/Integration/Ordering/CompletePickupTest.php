@@ -5,6 +5,11 @@ namespace Tests\Integration\Ordering;
 use App\Models\User;
 use DomainException;
 use Guixa\Ordering\Application\CompletePickup;
+use Guixa\Ordering\Application\GetPickup;
+use Guixa\Ordering\Application\ReopenProducerOrder;
+use Guixa\Ordering\Application\SetReceivedTotal;
+use Guixa\Ordering\Application\WalletLedger;
+use Guixa\Ordering\Domain\CycleRepository;
 use Guixa\Ordering\Domain\Error\NotEnoughStock;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Role;
@@ -26,7 +31,7 @@ final class CompletePickupTest extends TestCase
 
     protected function tearDown(): void
     {
-        foreach (['wallet_movements', 'stock_movements', 'order_stock_lines', 'order_lines', 'orders', 'cycle_producers', 'cycles', 'stock_products', 'households', 'users', 'products', 'producers'] as $table) {
+        foreach (['received_totals', 'order_pickup_adjustments', 'wallet_movements', 'stock_movements', 'order_stock_lines', 'order_lines', 'orders', 'cycle_producers', 'cycles', 'stock_products', 'households', 'users', 'products', 'producers'] as $table) {
             DB::table($table)->delete();
         }
 
@@ -113,6 +118,98 @@ final class CompletePickupTest extends TestCase
         $this->assertSame('completed', $this->finish($pipes));
         $this->assertSame(['completed', 'completed'], DB::table('orders')->orderBy('id')->pluck('pickup_status')->all());
         $this->assertSame(4, DB::table('stock_movements')->where('type', 'sale')->count());
+        $this->assertNotNull(DB::table('cycles')->where('id', $cycle)->value('closed_at'));
+        $this->assertTrue(app(CycleRepository::class)->get($cycle)->isClosed());
+    }
+
+    #[Test]
+    public function redistribution_persists_append_only_adjustments_and_keeps_original_completed_rows(): void
+    {
+        [$manager, $cycle, $household, $order] = $this->pickup();
+        $this->secondPickup($cycle);
+        app(CompletePickup::class)($manager, $cycle, $household);
+        $originalOrder = DB::table('orders')->where('id', $order)->first();
+        $originalLine = DB::table('order_lines')->where('order_id', $order)->first();
+        app(ReopenProducerOrder::class)($manager, $cycle, $originalLine->producer_id);
+        $redistribute = app(SetReceivedTotal::class);
+        $redistribute($manager, $cycle, $originalLine->producer_id, $originalLine->product_id, '10', includeCompleted: true);
+        $first = app(GetPickup::class)($manager, $cycle, $household);
+        $this->assertCount(1, $first->adjustments);
+        $redistribute($manager, $cycle, $originalLine->producer_id, $originalLine->product_id, '10', includeCompleted: true);
+        $redistribute($manager, $cycle, $originalLine->producer_id, $originalLine->product_id, '12', includeCompleted: true);
+        $pickup = app(GetPickup::class)($manager, $cycle, $household);
+
+        $this->assertCount(2, $pickup->adjustments);
+        $this->assertEquals($first->adjustments[0], $pickup->adjustments[0]);
+        $this->assertSame(2100, $pickup->totalCents);
+        $this->assertSame(1400, $pickup->originalChargeCents);
+        $this->assertEquals($originalOrder, DB::table('orders')->where('id', $order)->first());
+        $this->assertEquals($originalLine, DB::table('order_lines')->where('order_id', $order)->first());
+        $this->assertSame(-2100, (int) DB::table('wallet_movements')->where('household_id', $household)->sum('amount_cents'));
+        $this->assertSame(3, DB::table('wallet_movements')->where('household_id', $household)->count());
+    }
+
+    #[Test]
+    public function failed_wallet_correction_rolls_back_every_pickup_adjustment_and_received_total(): void
+    {
+        [$manager, $cycle, $household, $order] = $this->pickup();
+        $this->secondPickup($cycle);
+        app(CompletePickup::class)($manager, $cycle, $household);
+        $line = DB::table('order_lines')->where('order_id', $order)->first();
+        app(ReopenProducerOrder::class)($manager, $cycle, $line->producer_id);
+        $wallet = app(WalletLedger::class);
+        app()->instance(WalletLedger::class, new class($wallet) implements WalletLedger
+        {
+            public function __construct(private WalletLedger $inner) {}
+
+            public function topUp(Actor $actor, string $householdId, int $amountCents): void
+            {
+                $this->inner->topUp($actor, $householdId, $amountCents);
+            }
+
+            public function charge(Actor $actor, string $householdId, string $cycleId, int $totalCents): void
+            {
+                $this->inner->charge($actor, $householdId, $cycleId, $totalCents);
+            }
+
+            public function correct(Actor $actor, string $householdId, string $cycleId, int $amountCents, string $productName): void
+            {
+                $this->inner->correct($actor, $householdId, $cycleId, $amountCents, $productName);
+                throw new \RuntimeException('Wallet correction failed after recording.');
+            }
+        });
+        try {
+            app(SetReceivedTotal::class)($manager, $cycle, $line->producer_id, $line->product_id, '10', includeCompleted: true);
+            $this->fail('The wallet failure must reject redistribution.');
+        } catch (\RuntimeException $error) {
+            $this->assertSame('Wallet correction failed after recording.', $error->getMessage());
+        }
+        $this->assertSame(0, DB::table('order_pickup_adjustments')->count());
+        $this->assertSame(0, DB::table('received_totals')->count());
+        $this->assertSame(1, DB::table('wallet_movements')->count());
+        $this->assertSame(['4.000'], DB::table('order_lines')->pluck('allocated_quantity')->unique()->all());
+    }
+
+    #[Test]
+    public function concurrent_identical_redistributions_append_one_adjustment_and_one_correction(): void
+    {
+        [$manager, $cycle, $household, $order] = $this->pickup();
+        $this->secondPickup($cycle);
+        app(CompletePickup::class)($manager, $cycle, $household);
+        $line = DB::table('order_lines')->where('order_id', $order)->first();
+        app(ReopenProducerOrder::class)($manager, $cycle, $line->producer_id);
+        DB::beginTransaction();
+        app(SetReceivedTotal::class)($manager, $cycle, $line->producer_id, $line->product_id, '10', includeCompleted: true);
+        $this->other = proc_open(
+            [PHP_BINARY, dirname(__DIR__, 2).'/Support/Scripts/redistribute_pickup.php', $manager->accountId, $cycle, $line->producer_id, $line->product_id, '10'],
+            [1 => ['pipe', 'w'], 2 => ['pipe', 'w']], $pipes, null,
+            [...getenv(), 'DB_DATABASE' => DB::connection()->getDatabaseName()],
+        );
+        $this->waitUntilAnotherSessionWaitsForALock();
+        DB::commit();
+        $this->assertSame('redistributed', $this->finish($pipes));
+        $this->assertSame(1, DB::table('order_pickup_adjustments')->count());
+        $this->assertSame(2, DB::table('wallet_movements')->count());
     }
 
     /** @return array{Actor, string, string, string} manager, settled cycle, household and the household's pending pickup of 4 loaves at 3.50 */
@@ -126,6 +223,7 @@ final class CompletePickupTest extends TestCase
         DB::table('products')->insert(['id' => $product, 'producer_id' => $producer, 'name' => 'Loaf', 'unit' => 'loaf', 'price_cents' => 350, 'variable' => false, 'active' => true]);
         $cycle = (string) Str::uuid7();
         DB::table('cycles')->insert(['id' => $cycle, 'pickup_date' => now()->addDays(2)->toDateString(), 'settled_at' => now()]);
+        DB::table('cycle_producers')->insert(['cycle_id' => $cycle, 'producer_id' => $producer, 'participating' => true, 'sent_at' => now(), 'validated_at' => now(), 'distributed_at' => now()]);
         $order = $this->order($cycle, $household, $manager, $producer, $product);
 
         return [new Actor($manager, [Role::Manager]), $cycle, $household, $order];

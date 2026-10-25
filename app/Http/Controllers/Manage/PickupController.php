@@ -10,6 +10,7 @@ use App\Http\ReturnItemRow;
 use App\Http\StockLevelRow;
 use Guixa\Membership\Application\HouseholdSummary;
 use Guixa\Membership\Application\ListHouseholds;
+use Guixa\Ordering\Application\GetCycle;
 use Guixa\Ordering\Application\GetPickup;
 use Guixa\Ordering\Application\ListPickups;
 use Guixa\Ordering\Application\OpenPickup;
@@ -29,10 +30,11 @@ use Inertia\Response;
 class PickupController extends Controller
 {
     /** The pickups of a settled cycle, and the active households that have none, for a stock-only pickup (R19). */
-    public function index(string $cycle, Actor $actor, ListPickups $listPickups, ListHouseholds $listHouseholds): Response
+    public function index(string $cycle, Actor $actor, ListPickups $listPickups, ListHouseholds $listHouseholds, GetCycle $getCycle): Response
     {
         try {
             $pickups = $listPickups($actor, $cycle);
+            $closed = $getCycle($actor, $cycle)->closed;
         } catch (CycleNotFound|CycleNotSettled) {
             abort(404);
         }
@@ -42,8 +44,9 @@ class PickupController extends Controller
 
         return Inertia::render('Manage/Pickups/Index', [
             'cycleId' => $cycle,
+            'closed' => $closed,
             'pickups' => array_map(PickupSummaryRow::from(...), $pickups),
-            'households' => array_map(HouseholdOptionRow::from(...), array_values($without)),
+            'households' => $closed ? [] : array_map(HouseholdOptionRow::from(...), array_values($without)),
         ]);
     }
 

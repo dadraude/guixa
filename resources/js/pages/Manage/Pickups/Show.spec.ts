@@ -78,6 +78,58 @@ describe('pickup page', () => {
         shared.errors = { domain: 'Nope' };
     });
 
+    it('offers not collected only for pending pickups and explains the charge', async () => {
+        const render = (status: string) =>
+            renderToString(
+                createSSRApp(Show, {
+                    pickup: { ...pickup(false), status },
+                    stockProducts,
+                    returnItems,
+                }),
+            );
+        expect(await render('pending')).toContain(
+            'data-test="not-collected-form"',
+        );
+        expect(await render('not_collected')).not.toContain(
+            'data-test="not-collected-form"',
+        );
+        expect(await render('not_collected')).toContain(
+            'data-test="not-collected"',
+        );
+    });
+
+    it('shows adjustment history separately from the original charge and current total', async () => {
+        const html = await renderToString(
+            createSSRApp(Show, {
+                pickup: {
+                    ...pickup(false),
+                    status: 'completed',
+                    originalChargeCents: 2240,
+                    totalCents: 3000,
+                    adjustments: [
+                        {
+                            id: 'adjustment',
+                            productId: 'beef',
+                            name: 'Beef',
+                            unit: 'kg',
+                            quantityDelta: '-0.120',
+                            amountCents: -240,
+                            recordedAt: '2026-11-07T10:00:00Z',
+                        },
+                    ],
+                },
+                stockProducts,
+                returnItems,
+            }),
+        );
+        expect(html).toContain('data-test="pickup-adjustment-adjustment"');
+        expect(html).toContain('Original charge');
+        expect(html).toContain('22,40 €');
+        expect(html).toContain('-0.120 kg');
+        expect(html).toContain('Current pickup total');
+        expect(html).not.toContain('data-test="resulting-balance"');
+    });
+
     it('shows the lines, the balance, the total and the resulting balance', async () => {
         const html = await renderToString(
             createSSRApp(Show, {

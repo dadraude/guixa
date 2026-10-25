@@ -31,8 +31,8 @@ final class MarkProducerDistributed
             $balanced = $this->loader->load($cycle, $producerId)->reception->balancedForDistribution();
 
             $settledNow = $cycle->markDistributed($producerId, $balanced, $now);
+            ($this->settlement)($cycle, $settledNow, $now);
             $this->cycles->add($cycle);
-            ($this->settlement)($cycle, $settledNow);
         });
     }
 }

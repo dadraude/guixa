@@ -44,8 +44,15 @@ Checking each producer's delivery against the orders, allocating it to household
   The cycle becomes *settled* the first time every participating producer is distributed; at that moment
   lines of producers that do not participate, and lines marked *will not be delivered*, are dropped: never
   received and never charged. Reopening a producer afterwards does not stop pickups. Its new
-  allocations apply to pending pickups; completed and not collected pickups keep theirs (R23), and any
-  difference is fixed with a wallet correction and a stock adjustment.
+  allocations apply to pending pickups. When proportional redistribution affects completed or not collected
+  pickups, the manager must explicitly choose unfinished pickups only or all pickups. Unfinished-only keeps
+  done pickups' effective quantities; a received total below those quantities, or with no eligible recipient,
+  is rejected with an explanation and the choice to include all or cancel. All includes done households in
+  proportional shares: their original pickup lines, charge and completion time remain unchanged, and each
+  changed quantity appends a separate signed adjustment line and wallet correction. Stock and return lines
+  remain unchanged and stock is never sold again. Reception quantities include those adjustments. Repeating
+  an unchanged target records nothing; each later change uses the latest effective quantity and amount.
+  Direct editing of a done pickup remains forbidden (R23).
 - **R18a** **Containers distributed.** A manager sees, per cycle, how many containers each household takes
   and the cycle total. Each allocation (R10) and each stock line of the household's pickup (R20) counts its
   quantity × the containers per unit of its snapshot, rounded up to a whole number; a product without
@@ -136,3 +143,20 @@ And H is allocated 1.300 kg of yoghurt and 3 jars of honey, and K 0.500 kg of yo
 And K's pickup has a stock line of 2 jars of stock honey, with 1 container per unit
 When the producer changes yoghurt to 4 containers per kg and the manager opens the cycle
 Then they see H 6 containers (1.300 × 2 = 2.6 → 3, plus 3), K 3 (1 + 2), and 9 for the cycle.
+
+
+**S63 — Explicit redistribution across done pickups** (R18, R23)
+Given A completed a pickup of 1 kg at €20/kg and B has a pending pickup of 1 kg
+When the manager reopens the producer and changes the received total to 3 kg
+Then the manager must choose unfinished pickups only or all pickups before anything changes
+And unfinished-only keeps A at 1 kg and updates B to 2 kg
+And all gives both households an effective 1.5 kg: B's existing line changes, while A's original line stays
+at 1 kg and gains a +0.5 kg, +€10 adjustment line and a new €10 wallet charge correction.
+
+**S64 — Successive pickup adjustments retain history** (R18, R23)
+Given A's original completed line was delivered as 1.120 kg at €20/kg
+When an explicit all-pickups redistribution sets A to 1 kg
+Then A's original line and €22.40 charge remain, and a −0.120 kg, −€2.40 adjustment and wallet credit are appended
+And repeating the same target adds nothing
+And a later target of 1.5 kg appends +0.500 kg and +€10, without changing either earlier line
+And these adjustments and their wallet corrections are atomic, manager-only and unavailable after cycle closure.

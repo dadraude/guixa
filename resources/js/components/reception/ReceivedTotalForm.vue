@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
+import { trans } from 'laravel-vue-i18n';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -19,11 +20,17 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-    save: [received: string, overwriteManual: boolean];
+    save: [
+        received: string,
+        overwriteManual: boolean,
+        includeCompleted?: boolean,
+    ];
 }>();
 
 const received = ref(props.product.received);
 const warning = ref(false);
+const choosingScope = ref(false);
+const includeCompleted = ref<boolean | undefined>(undefined);
 
 watch(
     () => props.product.received,
@@ -43,24 +50,45 @@ const onOpenChange = (open: boolean) => {
 
     if (!open) {
         received.value = props.product.received;
+        includeCompleted.value = undefined;
+        choosingScope.value = false;
     }
 };
 
-// Way A would replace the allocations set by hand, so the manager confirms first (R15, S31).
-const submit = () => {
-    if (props.product.hasManualAllocations) {
-        warning.value = true;
-
+const save = (overwriteManual: boolean) => {
+    warning.value = false;
+    if (includeCompleted.value === undefined) {
+        emit('save', received.value, overwriteManual);
         return;
     }
-
-    emit('save', received.value, false);
+    emit('save', received.value, overwriteManual, includeCompleted.value);
 };
 
-const confirm = () => {
-    warning.value = false;
-    emit('save', received.value, true);
+const confirmManualOrSave = () => {
+    choosingScope.value = false;
+    if (props.product.hasManualAllocations) {
+        warning.value = true;
+        return;
+    }
+    save(false);
 };
+
+const submit = () => {
+    includeCompleted.value = undefined;
+    if (props.product.hasDonePickups) {
+        choosingScope.value = true;
+        warning.value = true;
+        return;
+    }
+    confirmManualOrSave();
+};
+
+const chooseScope = (includeDone: boolean) => {
+    includeCompleted.value = includeDone;
+    confirmManualOrSave();
+};
+
+const confirm = () => save(true);
 </script>
 
 <template>
@@ -91,35 +119,67 @@ const confirm = () => {
     </form>
 
     <Dialog :open="warning" @update:open="onOpenChange">
-        <DialogContent>
-            <DialogHeader class="space-y-3">
-                <DialogTitle>Replace the manual allocations?</DialogTitle>
-                <DialogDescription>
-                    The allocations of {{ manualHouseholds }} for
-                    {{ product.name }} were set by hand. Setting the received
-                    total to {{ received }} re-allocates everything from the
-                    ordered quantities and those manual allocations will be
-                    lost.
-                </DialogDescription>
-            </DialogHeader>
-            <DialogFooter class="gap-2">
-                <DialogClose as-child>
+        <DialogContent :show-close-button="false">
+            <template v-if="choosingScope">
+                <DialogHeader>
+                    <DialogTitle>{{
+                        trans('Which pickups should change?')
+                    }}</DialogTitle>
+                    <DialogDescription>{{
+                        trans(
+                            'Unfinished pickups are updated. Including done pickups adds separate adjustment lines and wallet charges or credits; original lines stay unchanged.',
+                        )
+                    }}</DialogDescription>
+                </DialogHeader>
+                <DialogFooter class="flex-col gap-2 sm:flex-col">
                     <Button
-                        variant="secondary"
-                        :data-test="`cancel-overwrite-${product.productId}`"
+                        class="min-h-11 whitespace-normal"
+                        @click="chooseScope(false)"
+                        >{{ trans('Unfinished pickups only') }}</Button
                     >
-                        Cancel
+                    <Button
+                        variant="outline"
+                        class="min-h-11 whitespace-normal"
+                        @click="chooseScope(true)"
+                        >{{ trans('All pickups') }}</Button
+                    >
+                    <DialogClose as-child
+                        ><Button variant="secondary" class="min-h-11">{{
+                            trans('Cancel')
+                        }}</Button></DialogClose
+                    >
+                </DialogFooter>
+            </template>
+            <template v-else>
+                <DialogHeader class="space-y-3">
+                    <DialogTitle>Replace the manual allocations?</DialogTitle>
+                    <DialogDescription>
+                        The allocations of {{ manualHouseholds }} for
+                        {{ product.name }} were set by hand. Setting the
+                        received total to {{ received }} re-allocates everything
+                        from the ordered quantities and those manual allocations
+                        will be lost.
+                    </DialogDescription>
+                </DialogHeader>
+                <DialogFooter class="gap-2">
+                    <DialogClose as-child>
+                        <Button
+                            variant="secondary"
+                            :data-test="`cancel-overwrite-${product.productId}`"
+                        >
+                            Cancel
+                        </Button>
+                    </DialogClose>
+                    <Button
+                        variant="destructive"
+                        :disabled="processing"
+                        :data-test="`confirm-overwrite-${product.productId}`"
+                        @click="confirm"
+                    >
+                        Replace them
                     </Button>
-                </DialogClose>
-                <Button
-                    variant="destructive"
-                    :disabled="processing"
-                    :data-test="`confirm-overwrite-${product.productId}`"
-                    @click="confirm"
-                >
-                    Replace them
-                </Button>
-            </DialogFooter>
+                </DialogFooter>
+            </template>
         </DialogContent>
     </Dialog>
 </template>

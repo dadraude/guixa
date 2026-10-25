@@ -24,6 +24,27 @@ vi.mock('@inertiajs/vue3', async () => {
 });
 
 describe('pickups index', () => {
+    it('shows a closed cycle without offering another pickup', async () => {
+        const html = await renderToString(
+            createSSRApp(Index, {
+                cycleId: 'cycle',
+                closed: true,
+                pickups: [
+                    {
+                        householdId: 'a',
+                        householdName: 'A',
+                        status: 'not_collected',
+                        totalCents: 600,
+                    },
+                ],
+                households: [{ id: 'k', name: 'K' }],
+            }),
+        );
+        expect(html).toContain('data-test="cycle-closed"');
+        expect(html).not.toContain('data-test="open-k"');
+        expect(html).toContain('Not collected');
+    });
+
     it('lists the pickups and offers to open one for a household without', async () => {
         const html = await renderToString(
             createSSRApp(Index, {
