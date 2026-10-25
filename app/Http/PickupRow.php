@@ -9,7 +9,11 @@ use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 #[TypeScript]
 final readonly class PickupRow
 {
-    /** @param  list<PickupLineRow>  $lines */
+    /**
+     * @param  list<PickupLineRow>  $lines
+     * @param  list<PickupStockLineRow>  $stockLines
+     * @param  list<PickupReturnLineRow>  $returnLines
+     */
     public function __construct(
         public string $cycleId,
         public string $pickupDate,
@@ -20,6 +24,8 @@ final readonly class PickupRow
         public int $totalCents,
         public ?int $balanceCents,
         public ?int $resultingBalanceCents,
+        public array $stockLines = [],
+        public array $returnLines = [],
     ) {}
 
     public static function from(PickupData $pickup, int $balanceCents): self
@@ -34,6 +40,8 @@ final readonly class PickupRow
             $pickup->totalCents,
             $balanceCents,
             $balanceCents - $pickup->totalCents,
+            array_map(PickupStockLineRow::from(...), $pickup->stockLines),
+            array_map(PickupReturnLineRow::from(...), $pickup->returnLines),
         );
     }
 
@@ -50,6 +58,8 @@ final readonly class PickupRow
             $pickup->totalCents,
             null,
             null,
+            array_map(PickupStockLineRow::from(...), $pickup->stockLines),
+            array_map(PickupReturnLineRow::from(...), $pickup->returnLines),
         );
     }
 }

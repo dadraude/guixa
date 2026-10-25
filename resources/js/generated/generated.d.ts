@@ -117,6 +117,13 @@ readonly delivered: string,
 readonly adjusted: boolean,
 readonly amountCents: number,
 };
+export type PickupReturnLineRow = {
+readonly returnItemId: string,
+readonly name: string,
+readonly amountCents: number,
+readonly quantity: number,
+readonly creditCents: number,
+};
 export type PickupRow = {
 readonly cycleId: string,
 readonly pickupDate: string,
@@ -127,6 +134,17 @@ readonly lines: App.Http.PickupLineRow[],
 readonly totalCents: number,
 readonly balanceCents: number | null,
 readonly resultingBalanceCents: number | null,
+readonly stockLines: App.Http.PickupStockLineRow[],
+readonly returnLines: App.Http.PickupReturnLineRow[],
+};
+export type PickupStockLineRow = {
+readonly stockProductId: string,
+readonly name: string,
+readonly unit: string,
+readonly variable: boolean,
+readonly unitPriceCents: number,
+readonly quantity: string,
+readonly amountCents: number,
 };
 export type PickupSummaryRow = {
 readonly householdId: string,
@@ -226,6 +244,7 @@ readonly id: string,
 readonly name: string,
 readonly amount: string,
 readonly active: boolean,
+readonly amountCents: number,
 };
 export type RoleArea = {
 readonly role: Guixa.Shared.Domain.Role,

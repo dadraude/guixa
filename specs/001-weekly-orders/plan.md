@@ -231,8 +231,10 @@ role only; participation is not restored.
     `reopenIfAllocated()` turns `nothingToCollect` back into `pending` (R24).
   - Pickup: `openPickup()` (`none` to `pending`, `PickupAlreadyOpen` otherwise); `adjustDelivered(productId, Quantity)` sets `delivered` on a pending pickup (`PickupNotPending`, `ProductNotInPickup`), in the product's step; `allocated`
     stays as the reception left it (R19, D16);
-    `addStock(StockOffer, Quantity)` checks `quantity ≤ available` (R20); `addReturn(ReturnItem, int)`;
-    their removals.
+    `addStock(StockOffer, Quantity, lineId)` checks `quantity ≤ available` (R20), refuses a deactivated product (`StockProductInactive`) and adds to a line
+    already on the pickup, checking the combined quantity and keeping the line's snapshot; `addReturn(ReturnItemOffer, int, lineId)` does the same without a stock
+    check and accepts a deactivated item; `removeStock(stockProductId)` and `removeReturn(returnItemId)` remove the whole line (`StockLineNotInPickup`,
+    `ReturnLineNotInPickup`). All four need a pending pickup (`PickupNotPending`) and a quantity above zero (`InvalidLineQuantity`); see the 2026-10-25 Deviation in `log.md`.
   - `total(): Money` = Σ round(delivered() × unitPrice) + Σ round(quantity × unitPrice) − Σ quantity × amount,
     each line half up (R22). Negative is a credit.
   - `complete(now)` and `markNotCollected(now)` (drops stock and return lines, R24a) throw

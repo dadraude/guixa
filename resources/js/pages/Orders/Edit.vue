@@ -4,6 +4,8 @@ import { computed, reactive, ref } from 'vue';
 import OrderController from '@/actions/App/Http/Controllers/OrderController';
 import { ArrowLeft } from '@lucide/vue';
 import { trans } from 'laravel-vue-i18n';
+import ReturnLines from '@/components/pickup/ReturnLines.vue';
+import StockLines from '@/components/pickup/StockLines.vue';
 import OrderPageHeader from '@/components/orders/OrderPageHeader.vue';
 import OrderProductRow from '@/components/orders/OrderProductRow.vue';
 import { formatMoney, formatPickupDate } from '@/lib/locale';
@@ -160,6 +162,28 @@ const lineTotal = (price: string, quantity: string) =>
                     }}</span>
                 </li>
             </ul>
+            <div
+                v-if="order.pickup.stockLines.length > 0"
+                class="border-t p-4 sm:px-5"
+            >
+                <StockLines
+                    :lines="order.pickup.stockLines"
+                    :options="[]"
+                    :editable="false"
+                    :processing="false"
+                />
+            </div>
+            <div
+                v-if="order.pickup.returnLines.length > 0"
+                class="border-t p-4 sm:px-5"
+            >
+                <ReturnLines
+                    :lines="order.pickup.returnLines"
+                    :options="[]"
+                    :editable="false"
+                    :processing="false"
+                />
+            </div>
             <p class="flex justify-between border-t p-4 font-semibold sm:px-5">
                 <span>{{ trans('Pickup total') }}</span>
                 <span data-test="pickup-total">{{

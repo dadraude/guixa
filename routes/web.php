@@ -15,6 +15,8 @@ use App\Http\Controllers\Manage\InvitationController;
 use App\Http\Controllers\Manage\ManagerRoleController;
 use App\Http\Controllers\Manage\PickupController;
 use App\Http\Controllers\Manage\PickupLineController;
+use App\Http\Controllers\Manage\PickupReturnController;
+use App\Http\Controllers\Manage\PickupStockController;
 use App\Http\Controllers\Manage\ProducerAccountController;
 use App\Http\Controllers\Manage\ProducerController;
 use App\Http\Controllers\Manage\ReceptionAllocationController;
@@ -106,11 +108,15 @@ Route::middleware(['auth', 'verified', 'role:manager'])->prefix('manage')->name(
         Route::delete('distribution', [ReceptionDistributionController::class, 'destroy'])->name('cycles.receptions.distribution.destroy');
     });
 
-    Route::prefix('cycles/{cycle}/pickups')->whereUuid(['cycle', 'household', 'product'])->group(function () {
+    Route::prefix('cycles/{cycle}/pickups')->whereUuid(['cycle', 'household', 'product', 'stockProduct', 'returnItem'])->group(function () {
         Route::get('/', [PickupController::class, 'index'])->name('cycles.pickups.index');
         Route::get('{household}', [PickupController::class, 'show'])->name('cycles.pickups.show');
         Route::post('{household}', [PickupController::class, 'store'])->name('cycles.pickups.store');
         Route::put('{household}/lines/{product}', [PickupLineController::class, 'update'])->name('cycles.pickups.lines.update');
+        Route::post('{household}/stock-lines', [PickupStockController::class, 'store'])->name('cycles.pickups.stock-lines.store');
+        Route::delete('{household}/stock-lines/{stockProduct}', [PickupStockController::class, 'destroy'])->name('cycles.pickups.stock-lines.destroy');
+        Route::post('{household}/return-lines', [PickupReturnController::class, 'store'])->name('cycles.pickups.return-lines.store');
+        Route::delete('{household}/return-lines/{returnItem}', [PickupReturnController::class, 'destroy'])->name('cycles.pickups.return-lines.destroy');
     });
 
     Route::get('settings', [SettingsController::class, 'show'])->name('settings.show');

@@ -7,6 +7,8 @@ use Guixa\Ordering\Domain\Order;
 use Guixa\Ordering\Domain\OrderLine;
 use Guixa\Ordering\Domain\OrderRepository;
 use Guixa\Ordering\Domain\PickupStatus;
+use Guixa\Ordering\Domain\ReturnLine;
+use Guixa\Ordering\Domain\StockLine;
 use Guixa\Shared\Domain\Money;
 use Guixa\Shared\Domain\Quantity;
 use Illuminate\Support\Facades\DB;
@@ -28,6 +30,9 @@ final class EloquentOrderRepository implements OrderRepository
             'household_id' => $order->householdId,
         ]);
         DB::table('orders')->where('id', $order->id)->update(['pickup_status' => $order->pickup()->value]);
+
+        $this->storeStockLines($order);
+        $this->storeReturnLines($order);
 
         $lines = $order->lines();
         DB::table('order_lines')
@@ -60,6 +65,61 @@ final class EloquentOrderRepository implements OrderRepository
             ], $lines),
             ['id'],
             ['product_name', 'unit', 'unit_price_cents', 'variable', 'containers_per_unit', 'ordered_quantity', 'allocated_quantity', 'allocated_by_hand', 'dropped', 'delivered_quantity'],
+        );
+    }
+
+    private function storeStockLines(Order $order): void
+    {
+        $lines = $order->stockLines();
+        DB::table('order_stock_lines')
+            ->where('order_id', $order->id)
+            ->whereNotIn('id', array_map(fn (StockLine $line) => $line->id, $lines))
+            ->delete();
+
+        if ($lines === []) {
+            return;
+        }
+
+        DB::table('order_stock_lines')->upsert(
+            array_map(fn (StockLine $line) => [
+                'id' => $line->id,
+                'order_id' => $order->id,
+                'stock_product_id' => $line->stockProductId,
+                'name' => $line->name,
+                'unit' => $line->unit,
+                'unit_price_cents' => $line->unitPrice->cents,
+                'variable' => $line->variable,
+                'containers_per_unit' => $line->containersPerUnit?->toString(),
+                'quantity' => $line->quantity->toString(),
+            ], $lines),
+            ['id'],
+            ['quantity'],
+        );
+    }
+
+    private function storeReturnLines(Order $order): void
+    {
+        $lines = $order->returnLines();
+        DB::table('order_return_lines')
+            ->where('order_id', $order->id)
+            ->whereNotIn('id', array_map(fn (ReturnLine $line) => $line->id, $lines))
+            ->delete();
+
+        if ($lines === []) {
+            return;
+        }
+
+        DB::table('order_return_lines')->upsert(
+            array_map(fn (ReturnLine $line) => [
+                'id' => $line->id,
+                'order_id' => $order->id,
+                'return_item_id' => $line->returnItemId,
+                'name' => $line->name,
+                'amount_cents' => $line->amount->cents,
+                'quantity' => $line->quantity,
+            ], $lines),
+            ['id'],
+            ['quantity'],
         );
     }
 
@@ -110,7 +170,16 @@ final class EloquentOrderRepository implements OrderRepository
             ->get()
             ->groupBy('order_id');
 
-        return array_map(fn (stdClass $row) => $this->toDomain($row, array_values($linesByOrder->get($row->id, collect())->all())), $rows);
+        $orderIds = array_map(fn (stdClass $row) => $row->id, $rows);
+        $stockByOrder = DB::table('order_stock_lines')->whereIn('order_id', $orderIds)->orderBy('id')->get()->groupBy('order_id');
+        $returnsByOrder = DB::table('order_return_lines')->whereIn('order_id', $orderIds)->orderBy('id')->get()->groupBy('order_id');
+
+        return array_map(fn (stdClass $row) => $this->toDomain(
+            $row,
+            array_values($linesByOrder->get($row->id, collect())->all()),
+            array_values($stockByOrder->get($row->id, collect())->all()),
+            array_values($returnsByOrder->get($row->id, collect())->all()),
+        ), $rows);
     }
 
     /** @return array<string, int> */
@@ -147,8 +216,12 @@ final class EloquentOrderRepository implements OrderRepository
             ->exists();
     }
 
-    /** @param  list<stdClass>|null  $lineRows  the order's lines when already loaded */
-    private function toDomain(stdClass $row, ?array $lineRows = null): Order
+    /**
+     * @param  list<stdClass>|null  $lineRows  the order's lines when already loaded
+     * @param  list<stdClass>|null  $stockRows  the order's stock lines when already loaded
+     * @param  list<stdClass>|null  $returnRows  the order's return lines when already loaded
+     */
+    private function toDomain(stdClass $row, ?array $lineRows = null, ?array $stockRows = null, ?array $returnRows = null): Order
     {
         $lineRows ??= DB::table('order_lines')
             ->where('order_id', $row->id)
@@ -177,6 +250,50 @@ final class EloquentOrderRepository implements OrderRepository
             ))
             ->all();
 
-        return Order::restore($row->id, $row->cycle_id, $row->household_id, array_values($lines), PickupStatus::from($row->pickup_status));
+        return Order::restore(
+            $row->id,
+            $row->cycle_id,
+            $row->household_id,
+            array_values($lines),
+            PickupStatus::from($row->pickup_status),
+            $this->stockLines($stockRows ?? $this->rowsOf('order_stock_lines', $row->id)),
+            $this->returnLines($returnRows ?? $this->rowsOf('order_return_lines', $row->id)),
+        );
+    }
+
+    /** @return list<stdClass> */
+    private function rowsOf(string $table, string $orderId): array
+    {
+        return array_values(DB::table($table)->where('order_id', $orderId)->orderBy('id')->get()->all());
+    }
+
+    /**
+     * @param  list<stdClass>  $rows
+     * @return list<StockLine>
+     */
+    private function stockLines(array $rows): array
+    {
+        return array_map(fn (stdClass $line) => new StockLine(
+            $line->id,
+            $line->stock_product_id,
+            $line->name,
+            $line->unit,
+            Money::ofCents($line->unit_price_cents),
+            (bool) $line->variable,
+            $line->containers_per_unit === null ? null : Quantity::fromString($line->containers_per_unit),
+            Quantity::fromString($line->quantity),
+        ), $rows);
+    }
+
+    /**
+     * @param  list<stdClass>  $rows
+     * @return list<ReturnLine>
+     */
+    private function returnLines(array $rows): array
+    {
+        return array_map(
+            fn (stdClass $line) => new ReturnLine($line->id, $line->return_item_id, $line->name, Money::ofCents($line->amount_cents), (int) $line->quantity),
+            $rows,
+        );
     }
 }

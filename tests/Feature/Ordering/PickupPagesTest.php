@@ -129,3 +129,132 @@ it('shows a member the pickup of their household once the cycle is settled, with
     DB::table('cycles')->where('id', $cycleId)->update(['settled_at' => null]);
     $this->actingAs($member)->get("/cycles/{$cycleId}/order")->assertInertia(fn (Assert $page) => $page->where('order.pickup', null));
 });
+
+/** A stock product with `$available` on hand, and a return item of €0.50. @return array{string, string} */
+function stockAndReturnFixture(string $available = '5'): array
+{
+    $honey = (string) Str::uuid7();
+    DB::table('stock_products')->insert(['id' => $honey, 'name' => 'Honey', 'unit' => 'jar', 'price_cents' => 600, 'variable' => false, 'active' => true]);
+    DB::table('stock_movements')->insert([
+        'id' => (string) Str::uuid7(), 'stock_product_id' => $honey, 'type' => 'entry', 'quantity' => $available,
+        'occurred_at' => now(), 'recorded_by' => (string) Str::uuid7(),
+    ]);
+    $jar = (string) Str::uuid7();
+    DB::table('return_items')->insert(['id' => $jar, 'name' => 'Glass jar', 'amount_cents' => 50, 'active' => true]);
+
+    return [$honey, $jar];
+}
+
+it('adds stock to a pickup, and the total includes it (R20, S16)', function () {
+    [$cycleId, , $households, $manager] = pickupFixture();
+    [$honey] = stockAndReturnFixture();
+
+    $this->actingAs($manager)->post("/manage/cycles/{$cycleId}/pickups/{$households['A']}/stock-lines", ['stock_product_id' => $honey, 'stock_quantity' => '2'])->assertRedirect();
+
+    $this->actingAs($manager)->get("/manage/cycles/{$cycleId}/pickups/{$households['A']}")
+        ->assertInertia(fn (Assert $page) => $page->where('pickup.totalCents', 1400 + 1200));
+    expect(DB::table('order_stock_lines')->where('stock_product_id', $honey)->value('quantity'))->toBe('2.000');
+});
+
+it('rejects stock above what is available with a form error and stores nothing (R20, S17)', function () {
+    [$cycleId, , $households, $manager] = pickupFixture();
+    [$honey] = stockAndReturnFixture('1');
+
+    $this->actingAs($manager)->post("/manage/cycles/{$cycleId}/pickups/{$households['A']}/stock-lines", ['stock_product_id' => $honey, 'stock_quantity' => '2'])
+        ->assertSessionHasErrors('domain');
+
+    expect(DB::table('order_stock_lines')->count())->toBe(0);
+});
+
+it('removes a stock line (R20)', function () {
+    [$cycleId, , $households, $manager] = pickupFixture();
+    [$honey] = stockAndReturnFixture();
+    $this->actingAs($manager)->post("/manage/cycles/{$cycleId}/pickups/{$households['A']}/stock-lines", ['stock_product_id' => $honey, 'stock_quantity' => '2']);
+
+    $this->actingAs($manager)->delete("/manage/cycles/{$cycleId}/pickups/{$households['A']}/stock-lines/{$honey}")->assertRedirect();
+
+    expect(DB::table('order_stock_lines')->count())->toBe(0);
+});
+
+it('adds and removes returned items, crediting them in the total (R20a, S41)', function () {
+    [$cycleId, , $households, $manager] = pickupFixture();
+    [, $jar] = stockAndReturnFixture();
+
+    $this->actingAs($manager)->post("/manage/cycles/{$cycleId}/pickups/{$households['A']}/return-lines", ['return_item_id' => $jar, 'return_quantity' => '4'])->assertRedirect();
+
+    $this->actingAs($manager)->get("/manage/cycles/{$cycleId}/pickups/{$households['A']}")
+        ->assertInertia(fn (Assert $page) => $page->where('pickup.totalCents', 1400 - 200));
+
+    $this->actingAs($manager)->delete("/manage/cycles/{$cycleId}/pickups/{$households['A']}/return-lines/{$jar}")->assertRedirect();
+
+    expect(DB::table('order_return_lines')->count())->toBe(0);
+});
+
+it('keeps stock and return line changes to managers (R20, R20a)', function () {
+    [$cycleId, , $households] = pickupFixture();
+    [$honey, $jar] = stockAndReturnFixture();
+    $base = "/manage/cycles/{$cycleId}/pickups/{$households['A']}";
+
+    $this->actingAs(accountWith(Role::Member))->post("{$base}/stock-lines", ['stock_product_id' => $honey, 'stock_quantity' => '1'])->assertForbidden();
+    $this->actingAs(accountWith(Role::Member))->post("{$base}/return-lines", ['return_item_id' => $jar, 'return_quantity' => '1'])->assertForbidden();
+});
+
+it('shows the stock and return lines with the products and items a manager can add (R20, R20a)', function () {
+    [$cycleId, , $households, $manager] = pickupFixture();
+    [$honey, $jar] = stockAndReturnFixture();
+    DB::table('stock_products')->insert(['id' => (string) Str::uuid7(), 'name' => 'Old honey', 'unit' => 'jar', 'price_cents' => 100, 'variable' => false, 'active' => false]);
+    $base = "/manage/cycles/{$cycleId}/pickups/{$households['A']}";
+    $this->actingAs($manager)->post("{$base}/stock-lines", ['stock_product_id' => $honey, 'stock_quantity' => '2']);
+    $this->actingAs($manager)->post("{$base}/return-lines", ['return_item_id' => $jar, 'return_quantity' => '4']);
+
+    $this->actingAs($manager)->get($base)
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('pickup.stockLines.0.stockProductId', $honey)
+            ->where('pickup.stockLines.0.quantity', '2.000')
+            ->where('pickup.stockLines.0.amountCents', 1200)
+            ->where('pickup.returnLines.0.returnItemId', $jar)
+            ->where('pickup.returnLines.0.creditCents', 200)
+            ->has('stockProducts', 1)
+            ->where('stockProducts.0.id', $honey)
+            ->where('stockProducts.0.available', '5.000')
+            ->where('returnItems.0.id', $jar)
+            ->where('returnItems.0.amountCents', 50));
+});
+
+it('shows a member the stock and return lines of their pickup, which the total includes (R22, R23a)', function () {
+    [$cycleId, , $households, $manager] = pickupFixture();
+    [$honey, $jar] = stockAndReturnFixture();
+    $base = "/manage/cycles/{$cycleId}/pickups/{$households['A']}";
+    $this->actingAs($manager)->post("{$base}/stock-lines", ['stock_product_id' => $honey, 'stock_quantity' => '2']);
+    $this->actingAs($manager)->post("{$base}/return-lines", ['return_item_id' => $jar, 'return_quantity' => '4']);
+    app('auth')->forgetGuards();
+
+    $this->actingAs(memberOf($households['A']))->get("/cycles/{$cycleId}/order")
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('order.pickup.stockLines.0.name', 'Honey')
+            ->where('order.pickup.stockLines.0.amountCents', 1200)
+            ->where('order.pickup.returnLines.0.creditCents', 200)
+            ->where('order.pickup.totalCents', 1400 + 1200 - 200));
+});
+
+it('answers a return quantity that is not a whole number with a visible quantity error, not a 500 (R20a)', function (string $quantity) {
+    [$cycleId, , $households, $manager] = pickupFixture();
+    [, $jar] = stockAndReturnFixture();
+
+    $this->actingAs($manager)->post("/manage/cycles/{$cycleId}/pickups/{$households['A']}/return-lines", ['return_item_id' => $jar, 'return_quantity' => $quantity])
+        ->assertSessionHasErrors('return_quantity')
+        ->assertSessionDoesntHaveErrors(['quantity', 'stock_quantity']);
+
+    expect(DB::table('order_return_lines')->count())->toBe(0);
+})->with(['1.5', '1,5', 'abc', '0', '-2', '99999999999', '100001']);
+
+it('answers a stock quantity that is out of range with a visible error, not a 500 (R20)', function (string $quantity) {
+    [$cycleId, , $households, $manager] = pickupFixture();
+    [$honey] = stockAndReturnFixture();
+
+    $this->actingAs($manager)->post("/manage/cycles/{$cycleId}/pickups/{$households['A']}/stock-lines", ['stock_product_id' => $honey, 'stock_quantity' => $quantity])
+        ->assertSessionHasErrors()
+        ->assertSessionDoesntHaveErrors(['quantity', 'return_quantity']);
+
+    expect(DB::table('order_stock_lines')->count())->toBe(0);
+})->with(['99999999999', 'abc', '1,5', '12345678']);

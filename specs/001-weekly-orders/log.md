@@ -814,3 +814,23 @@ Why: one shape serves the manager and the member, and no allocation can change a
 
 T27 (`plan.md`, reception): the reception read model carries `delivered` per line and product, `difference = received − Σ delivered()` and `balanced` follow it, and `Reception::balancedForDistribution` ignores pickup adjustments; `ReceptionProductData` and `ReceptionProductRow` add `delivered`, `balancedForDistribution` and `hasAdjustments`, and the allocation data add `delivered` and `adjusted`. The reception page flags an adjusted product and enables Distribute by `balancedForDistribution`.
 Why: R19 and D16 ask the adjustment to show and flag in the reception while blocking nothing.
+
+## 2026-10-25 · Deviation
+
+T28 (`pickup.md` R20, R20a, `plan.md` `Order`): the user decided the three points the spec left open.
+1. A deactivated stock product cannot be added to a pickup (`StockProductInactive`); a deactivated return item can. A line that already exists survives the deactivation (S55) and can still be removed, but adding more of a deactivated stock product is also refused.
+2. Adding a stock product or return item that is already on the pickup adds to the line's quantity. The stock check (R20) applies to the combined quantity, and the line keeps the price or amount it snapshotted when it was first added.
+3. Stock and return lines change only while the pickup is `pending` (`PickupNotPending`). The available stock is the quantity on hand: stock is not reserved by other pending pickups, and the contention between them is checked again when the pickup is completed (R22, S45, T29). Quantities must be above zero (`InvalidLineQuantity`): whole units for a non-variable stock product, up to 3 decimals for a variable one, whole units for a return item. Removing a line removes it whole, and removing one the pickup does not have throws `StockLineNotInPickup` or `ReturnLineNotInPickup`.
+Why: R20 and R20a are silent on all of this, and `log.md` (T25) deferred the deactivated product to T28.
+
+T28 (`plan.md`, ports): Ordering gets `StockCatalog::offer` (a `StockOffer`: the snapshot fields, `active` and the available quantity) and `ReturnItemCatalog::find` (a `ReturnItemOffer`), both returning null for an unknown id; their adapters `StockModuleStockCatalog` and `StockModuleReturnItemCatalog` sit in `Ordering/Infrastructure/Stock` and call `GetStockOffer` and `GetReturnItem`. `Order::addStock` and `addReturn` take the line id as a last argument, as `setLine` does, and `PickupLocker` finds and locks the pickup for the four use cases. `PickupData` gains `stockLines` and `returnLines` and its `totalCents` includes them (`Order::total`). The tables are `order_stock_lines` and `order_return_lines`; routes are `POST …/pickups/{household}/stock-lines`, `DELETE …/stock-lines/{stockProduct}` and the same for `return-lines`.
+Why: the plan named the aggregate methods and the ports without their shapes.
+
+T28 (`plan.md`, page): `Manage/Pickups/Show` gets a stock section and a return section (`components/pickup/StockLines.vue`, `ReturnLines.vue`) with a labelled select, a quantity field and a remove button per line, all 44 px high. They are editable only while the pickup is pending. `PickupController::show` passes `stockProducts` (active only, with the available quantity) and `returnItems` (all, since a deactivated one can be added), and `PickupRow` carries `stockLines` and `returnLines`. Errors show through the page's existing `domain` error.
+Why: the page is where a manager adds and removes the lines (R20, R20a), and the product decisions above set which options it offers.
+
+T28 (`plan.md`, review fixes): the member's order page lists the pickup's stock and return lines read-only, since the pickup total includes them (R22, R23a). The quantity fields accept at most 100000 for a return line and 11 characters for a stock line, and their validation errors show next to the fields. `ReturnItemRow` gains `amountCents` so the page formats amounts as euros. The seven new domain errors have Catalan messages in `lang/ca/errors.php`; `lang/en/errors.php` stays empty by convention. `EloquentOrderRepository::ofCycle` loads the stock and return lines of all its orders with one query each.
+Why: an independent review found the member page, the error messages, the unbounded integer, the extra queries, the money format and the snapshot test gaps.
+
+T28 (`plan.md`, review fixes): the add forms post `stock_quantity` and `return_quantity` instead of `quantity`, so a rejected quantity shows only in its own section and never mixes with the delivered-quantity form's `quantity` error.
+Why: all three forms shared one error key, so one rejection appeared under both the Stock and Returns sections.
