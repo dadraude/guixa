@@ -1,5 +1,10 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
+import { spawnSync } from 'node:child_process';
+import { mkdtempSync, writeFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { expandMatrix, checkCoverage } from '../../scripts/visual/coverage.mjs';
 
 const manifest = {
@@ -46,6 +51,80 @@ void test('enumerates every view/state and matrix combination', () => {
     copy.views[0].states.push({ id: 'long-name', query: { long: 1 } });
     assert.equal(expandMatrix(copy).length, 24);
     assert.deepEqual(checkCoverage(manifest, passing(), candidate), []);
+});
+void test('explicit cases select only declared combinations', () => {
+    const selected = structuredClone(manifest);
+    selected.views[0].states[0].cases = [
+        { width: 375, mode: 'light', text: 100 },
+        { width: 1280, mode: 'dark', text: 200 },
+    ];
+    assert.deepEqual(
+        expandMatrix(selected).map((item) => item.id),
+        [
+            'wallet-manager--populated--375--light--100',
+            'wallet-manager--populated--1280--dark--200',
+        ],
+    );
+    const report = {
+        ...candidate,
+        cases: passing().cases.filter((record) =>
+            expandMatrix(selected).some((item) => item.id === record.id),
+        ),
+    };
+    assert.deepEqual(checkCoverage(selected, report, candidate), []);
+    assert.match(
+        checkCoverage(selected, passing(), candidate).join('\n'),
+        /Unexpected case/,
+    );
+    report.cases.pop();
+    assert.match(
+        checkCoverage(selected, report, candidate).join('\n'),
+        /Missing or failed case/,
+    );
+});
+void test('plan reports the case count without a browser or committed fixture', () => {
+    const directory = mkdtempSync(join(tmpdir(), 'visual-plan-test-'));
+    try {
+        const path = join(directory, 'visual.json');
+        const selected = structuredClone(manifest);
+        selected.views[0].states[0].cases = [
+            { width: 375, mode: 'light', text: 100 },
+        ];
+        writeFileSync(path, JSON.stringify(selected));
+        const result = spawnSync(
+            process.execPath,
+            [
+                fileURLToPath(new URL('../../scripts/visual/run.mjs', import.meta.url)),
+                'plan',
+                path,
+            ],
+            { encoding: 'utf8' },
+        );
+        assert.equal(result.status, 0, result.stderr);
+        assert.match(result.stdout, /wallet-manager: 1 cases/);
+        assert.match(result.stdout, /Total: 1 cases/);
+    } finally {
+        rmSync(directory, { recursive: true, force: true });
+    }
+});
+void test('rejects invalid or duplicate explicit cases', () => {
+    for (const cases of [
+        [],
+        null,
+        [
+            { width: 375, mode: 'light', text: 100 },
+            { width: 375, mode: 'light', text: 100 },
+        ],
+        [{ width: 400, mode: 'light', text: 100 }],
+        [{ width: 375, mode: 'system-dark', text: 100 }],
+        [{ width: 375, mode: 'light', text: 150 }],
+        [{ width: 375, mode: 'light' }],
+        [{ width: 375, mode: 'light', text: 100, typo: true }],
+    ]) {
+        const selected = structuredClone(manifest);
+        selected.views[0].states[0].cases = cases;
+        assert.throws(() => expandMatrix(selected));
+    }
 });
 void test('rejects empty or duplicate coverage definitions', () => {
     for (const edit of [

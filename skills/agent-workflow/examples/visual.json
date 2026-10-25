@@ -17,11 +17,29 @@
             "fonts": ["16px \"Instrument Sans\""],
             "focus": ["a[data-back]", "button[data-submit]"],
             "states": [
-                { "id": "populated" },
-                { "id": "long-name", "query": { "long": 1 } },
+                {
+                    "id": "populated",
+                    "cases": [
+                        { "width": 375, "mode": "light", "text": 100 },
+                        { "width": 375, "mode": "dark", "text": 100 },
+                        { "width": 1280, "mode": "light", "text": 100 },
+                        { "width": 1280, "mode": "dark", "text": 100 },
+                        { "width": 1024, "mode": "light", "text": 200 }
+                    ]
+                },
+                {
+                    "id": "long-name",
+                    "query": { "long": 1 },
+                    "cases": [
+                        { "width": 375, "mode": "light", "text": 200 }
+                    ]
+                },
                 {
                     "id": "processing",
                     "query": { "processing": 1 },
+                    "cases": [
+                        { "width": 375, "mode": "light", "text": 100 }
+                    ],
                     "checks": { "focus": ["a[data-back]"] }
                 }
             ]

@@ -19,6 +19,9 @@ SHA, predecessor evidence, shared owners and allowed edit surfaces to the [imple
 Use the adapter's implementer role once, then preserve and resume that owner through the whole task
 under [implementation ownership](handoff.md#implementation-ownership). Recover its recorded identity
 before any continuation; routine fixes or a new session never require a new implementer.
+For visual tasks, check the implementer's route/state inventory, component plan, selected case count
+and rationale against acceptance before broad UI implementation. Return missing coverage or reuse
+decisions to that implementer without consuming an independent review round.
 
 Accept `committed` only after comparing actual paths with admitted scope. A scope request pauses writes
 until the coordinator readmits it; a product question goes to the user. `stopped` goes to Stop.
@@ -41,13 +44,16 @@ green covers only that HEAD/base and never means full validation has passed.
 For rendered UI changes, apply the [visual pre-review gate](../references/visual.md#pre-review-gate):
 check the [component reuse plan](../references/visual.md#reuse-components-before-building-screens)
 against the diff, compare the manifest to acceptance and the affected page/role/state inventory, require a successful
-shared verifier on the current HEAD/base, and require capture inspection plus acceptance-specific checks.
+shared verifier on the current HEAD/base, and require inspection of distinct layouts/states, changed
+patterns and failures plus focused acceptance checks.
 Missing coverage returns to implementation before launching a reviewer; it is not a review round.
 
 ## 4. Independent review
 
 Launch a fresh read-only reviewer using [the reviewer brief](reviewer.md), fixed base and scheduling
-handoff. At most three rounds, including post-integration reviews; never reset the counter on rebase.
+handoff. Aim for one complete review of the prepared candidate. Additional rounds address concrete
+findings or behavioral changes, up to three rounds total including post-integration reviews; never
+reset the counter on rebase.
 Clean proceeds to preparation for publication. Product questions stop. Fixes in rounds 1/2 return to
 the implementer for the [whole-pattern correction](../references/visual.md#correct-a-defect-pattern)
 when visual findings apply, then focused verification, then a fresh reviewer. Require the instance

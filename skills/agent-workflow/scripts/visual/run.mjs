@@ -218,19 +218,26 @@ async function runCase(browser, manifest, item, output) {
 async function main() {
     const [command, manifestName, outputName, base] = process.argv.slice(2);
     if (
-        !['run', 'verify'].includes(command) ||
+        !['plan', 'run', 'verify'].includes(command) ||
         !manifestName ||
-        !outputName ||
-        !base
+        (command !== 'plan' && (!outputName || !base))
     )
         throw new Error(
-            'Usage: node run.mjs run|verify <manifest.json> <output-directory> <fixed-base-sha>',
+            'Usage: node run.mjs plan <manifest.json> | run|verify <manifest.json> <output-directory> <fixed-base-sha>',
         );
     const manifestPath = resolve(manifestName);
-    const output = resolve(outputName);
     const raw = await readFile(manifestPath);
     const manifest = JSON.parse(raw);
     const cases = expandMatrix(manifest);
+    if (command === 'plan') {
+        for (const view of manifest.views) {
+            const count = cases.filter((item) => item.view.id === view.id).length;
+            console.log(`${view.id}: ${count} cases`);
+        }
+        console.log(`Total: ${cases.length} cases`);
+        return;
+    }
+    const output = resolve(outputName);
     const candidate = await identity(manifestPath, raw, base);
     if (command === 'verify') {
         const errors = await checkArtifacts(

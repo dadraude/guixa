@@ -31,12 +31,25 @@ a passing screenshot matrix does not waive it.
 
 ## Declare coverage before implementation
 
-Commit a task manifest based on the [example](../examples/visual.json). Enumerate every affected
-page/role as a view and the applicable populated, empty, error, disabled, long-content and domain
-states. Inventory affected shared layouts, overlays and excluded routes too. Record in the handoff
-why a state does not apply. The runner expands every declared view/state across the entire matrix;
-do not use representative pages as proof for unchecked pages. Resolve the matrix against acceptance
-before work starts; do not shrink it to make a failed or missing case disappear.
+Before changing UI code, derive the route/role and state inventory from acceptance and the existing
+UI. Name the shared layout, form, table and overlay patterns, their owning views, and excluded routes.
+Compare this inventory with acceptance and the component plan before implementation. This is the place to
+correct missing screens, states or reuse decisions, before they become review findings.
+
+Create a task manifest based on the [example](../examples/visual.json). Every affected page/role is a
+view. Declare applicable populated, empty, error, disabled, long-content and domain states; explain
+omissions in the handoff. The project profile defines the minimum cases. Use each state's optional
+`cases` array to select explicit `{ "width": 375, "mode": "light", "text": 100 }` combinations from
+the top-level `matrix`. Without `cases`, the runner keeps the legacy full Cartesian expansion. A
+case list must be nonempty, unique and within the declared matrix. Run
+`node skills/agent-workflow/scripts/visual/run.mjs plan path/to/visual.json` before implementation:
+it validates the manifest and prints per-view and total case counts without launching a browser.
+
+Record why the selected cases cover each distinct layout/state risk. Representative cases can cover a
+shared pattern, but never substitute for the baseline on an affected page or for a unique state on
+its owning page. Add combinations when acceptance, a changed breakpoint/theme, or a concrete defect
+requires them. Do not remove a failing case or reduce coverage to make a result pass. The coordinator
+checks the inventory, selected cases and count before broad implementation and again before review.
 
 Use the [shared runner](../scripts/visual/run.mjs), not a copied ticket-specific browser client.
 It uses Node 22+ and an installed Chrome/Chromium (`CHROME_BIN`); no package install is needed.
@@ -72,7 +85,14 @@ The shared probes detect document overflow, panel/content escape, zero-width con
 clipping ancestors and covered/offscreen keyboard targets. A focus target must expose `:focus-visible`
 and an outline or shadow; an alternative valid focus treatment needs a reviewed harness adaptation.
 Contrast, touch-target size, semantic correctness, motion behavior and aesthetic hierarchy still need
-the acceptance-specific checks and human inspection; this runner does not claim a complete accessibility audit.
+focused acceptance checks and human inspection; this runner does not claim a complete accessibility
+audit.
+
+During implementation, probe the changed pattern at its riskiest combinations as soon as it renders:
+mobile with enlarged text for forms/tables, both themes for new color pairs, and open overlays for
+portal changes. Fix the pattern before adding more screens. Reuse the shared harness for final
+coverage; a second broad screenshot suite is not a default gate. Keep separate probes only for
+acceptance requirements the harness does not measure, such as contrast or target size.
 
 ## Pre-review gate
 
@@ -95,7 +115,9 @@ Neither command proves the manifest includes all acceptance requirements: the co
 its views/states/matrix to the declared inventory before accepting the machine result.
 
 Before launching a reviewer, require the successful verifier command, exact HEAD/base, manifest,
-report/gallery paths, acceptance-specific results and implementer inspection of every capture.
+report/gallery paths, focused acceptance results and implementer inspection of failures, unique
+layouts/states and changed-pattern captures. The machine report checks every declared case; identical
+captures need not each receive a separate manual review. Record which case groups were inspected.
 Record unavailable checks as blockers. A screenshot count or a green application test suite is not
 coverage. Complete missing evidence inside implementation; do not spend an independent review round
 asking the reviewer to build it. Preserve final artifacts for reviewer access and the delivery record.
@@ -114,15 +136,18 @@ regression check. Do not restrict the correction to the selector named by the re
 Return `pattern`, `instances_checked`, `fix_or_evidence_per_instance`, and `remaining_gaps` along with
 the original finding's result. New edit surfaces still require coordinator admission; product decisions
 still go to the user. A preexisting instance outside task scope is recorded with evidence, not silently
-fixed or used to waive task acceptance. Regenerate affected evidence and run the complete task matrix
-when the changed pattern is shared; reuse unrelated application checks only where the lifecycle permits.
+fixed or used to waive task acceptance. Regenerate affected evidence and run every declared case for
+the shared changed pattern; broaden the manifest if the pattern inventory exposed a missing risk.
+Reuse unrelated application checks only where the lifecycle permits.
 
 ## Review handoff
 
 Give the reviewer the component plan and reuse decisions, declared inventory, successful coverage
 result, gallery, specific accessibility
-checks, prior finding ledger and pattern-sweep results. Inspect the whole declared matrix and report
-all actionable findings together; identify any uninspected area instead of implying completion.
+checks, prior finding ledger and pattern-sweep results. Verify the manifest against acceptance, inspect
+the code diff and the distinct rendered layouts/states, and review failures and changed-pattern captures.
+The verifier covers every declared case; do not manually reopen equivalent captures without a specific
+risk. Report all actionable findings together and identify any uninspected area.
 On later rounds, use the prior ledger and artifact hashes to focus fresh inspection on changed outputs
 and affected patterns. Do not reopen identical images merely to repeat work; still establish sufficient
 coverage for the full current candidate. Record newly found defects separately from failed fixes.
