@@ -290,6 +290,25 @@ trait OrderRepositoryContract
     }
 
     #[Test]
+    public function it_stores_a_completed_pickup_with_its_moment_and_the_amount_charged(): void
+    {
+        $cycle = $this->openCycle();
+        $repository = $this->repository();
+        $now = $this->madrid('2026-10-22 10:00');
+        $order = $repository->lockFor(self::CYCLE, self::HOUSEHOLD);
+        $order->setLine($this->product(self::BREAD, 'Bread', 300, variable: false), Quantity::fromString('4'), $cycle, $repository->nextId(), self::ANNA, $now);
+        $order->drop([]);
+        $order->complete($this->madrid('2026-11-07 11:30'));
+        $repository->add($order);
+
+        $stored = $repository->ofHousehold(self::CYCLE, self::HOUSEHOLD);
+        $this->assertSame(PickupStatus::Completed, $stored?->pickup());
+        $this->assertSame(1200, $stored?->charged()?->cents);
+        $this->assertEquals($this->madrid('2026-11-07 11:30')->getTimestamp(), $stored?->pickupDoneAt()?->getTimestamp());
+        $this->assertNull($repository->lockFor(self::CYCLE, self::OTHER_HOUSEHOLD)->charged());
+    }
+
+    #[Test]
     public function it_stores_nothing_to_collect_when_every_allocation_is_zero_or_dropped(): void
     {
         $cycle = $this->openCycle();

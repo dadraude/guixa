@@ -36,6 +36,8 @@ final class Order
         private PickupStatus $pickup = PickupStatus::None,
         private array $stockLines = [],
         private array $returnLines = [],
+        private ?DateTimeImmutable $pickupDoneAt = null,
+        private ?Money $charged = null,
     ) {}
 
     public static function start(string $id, string $cycleId, string $householdId): self
@@ -48,7 +50,7 @@ final class Order
      * @param  list<StockLine>  $stockLines
      * @param  list<ReturnLine>  $returnLines
      */
-    public static function restore(string $id, string $cycleId, string $householdId, array $lines, PickupStatus $pickup = PickupStatus::None, array $stockLines = [], array $returnLines = []): self
+    public static function restore(string $id, string $cycleId, string $householdId, array $lines, PickupStatus $pickup = PickupStatus::None, array $stockLines = [], array $returnLines = [], ?DateTimeImmutable $pickupDoneAt = null, ?Money $charged = null): self
     {
         $byProduct = [];
 
@@ -68,7 +70,7 @@ final class Order
             $byReturnItem[$line->returnItemId] = $line;
         }
 
-        return new self($id, $cycleId, $householdId, $byProduct, $pickup, $byStockProduct, $byReturnItem);
+        return new self($id, $cycleId, $householdId, $byProduct, $pickup, $byStockProduct, $byReturnItem, $pickupDoneAt, $charged);
     }
 
     /**
@@ -219,6 +221,32 @@ final class Order
         }
 
         $this->pickup = PickupStatus::Pending;
+    }
+
+    /**
+     * Freezes the pickup and returns what the household is charged: a negative total is a credit (R22, R23). The caller sells the
+     * stock lines and records the movement in the same transaction.
+     */
+    public function complete(DateTimeImmutable $now): Money
+    {
+        $this->assertPending();
+
+        $this->pickup = PickupStatus::Completed;
+        $this->pickupDoneAt = $now;
+        $this->charged = $this->total();
+
+        return $this->charged;
+    }
+
+    public function pickupDoneAt(): ?DateTimeImmutable
+    {
+        return $this->pickupDoneAt;
+    }
+
+    /** What the completed pickup charged, or null while it has not been completed. */
+    public function charged(): ?Money
+    {
+        return $this->charged;
     }
 
     /**

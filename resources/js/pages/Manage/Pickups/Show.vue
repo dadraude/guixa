@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
+import { trans } from 'laravel-vue-i18n';
 import { computed, ref } from 'vue';
 import CycleController from '@/actions/App/Http/Controllers/Manage/CycleController';
+import PickupCompleteController from '@/actions/App/Http/Controllers/Manage/PickupCompleteController';
 import PickupController from '@/actions/App/Http/Controllers/Manage/PickupController';
 import PickupLineController from '@/actions/App/Http/Controllers/Manage/PickupLineController';
 import PickupReturnController from '@/actions/App/Http/Controllers/Manage/PickupReturnController';
 import PickupStockController from '@/actions/App/Http/Controllers/Manage/PickupStockController';
+import CompleteForm from '@/components/pickup/CompleteForm.vue';
 import DeliveredForm from '@/components/pickup/DeliveredForm.vue';
 import { euros } from '@/components/pickup/euros';
 import ReturnLines from '@/components/pickup/ReturnLines.vue';
@@ -73,6 +76,13 @@ const removeReturn = (returnItemId: string) =>
             ...target(),
             returnItem: returnItemId,
         }),
+        options,
+    );
+
+const complete = (topUp: string | null) =>
+    router.post(
+        PickupCompleteController.store.url(target()),
+        { top_up: topUp },
         options,
     );
 
@@ -195,5 +205,20 @@ const adjust = (productId: string, quantity: string) =>
                 </dd>
             </div>
         </dl>
+
+        <CompleteForm
+            v-if="pickup.status === 'pending'"
+            :processing="processing"
+            :error="errors.top_up"
+            @complete="complete"
+        />
+
+        <p
+            v-else-if="pickup.status === 'completed'"
+            class="text-sm text-muted-foreground"
+            data-test="completed"
+        >
+            {{ trans('This pickup is completed.') }}
+        </p>
     </div>
 </template>

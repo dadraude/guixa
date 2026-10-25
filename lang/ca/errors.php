@@ -9,6 +9,8 @@ return [
     'LineNotMarked' => 'Aquest producte no està marcat com a no lliurable.',
     'InvalidLineQuantity' => 'La quantitat que afegeixes a la recollida ha de ser superior a zero.',
     'NoHousehold' => 'El teu compte no està vinculat a cap unitat de convivència.',
+    'InvalidTopUpAmount' => 'L’ingrés ha de ser un import superior a zero.',
+    'PickupNotPending' => 'Aquesta recollida ja no està pendent: no es pot modificar ni tornar a completar.',
     'ProducerClosed' => 'El termini d’aquest productor ja s’ha tancat.',
     'ProducerNotParticipating' => 'Aquest productor no participa en aquest cicle.',
     'ProducerOrderSent' => 'La comanda d’aquest productor ja s’ha enviat i no es pot modificar.',

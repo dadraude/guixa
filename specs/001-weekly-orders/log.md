@@ -834,3 +834,14 @@ Why: an independent review found the member page, the error messages, the unboun
 
 T28 (`plan.md`, review fixes): the add forms post `stock_quantity` and `return_quantity` instead of `quantity`, so a rejected quantity shows only in its own section and never mixes with the delivered-quantity form's `quantity` error.
 Why: all three forms shared one error key, so one rejection appeared under both the Stock and Returns sections.
+
+## 2026-10-25 · Deviation
+
+T29 (`plan.md`, `CompletePickup`): the `StockSeller` and `WalletLedger` ports live in Ordering's Application layer, not in its Domain, because both take the `Actor` (Stock's `SellStock` and Wallet's `RecordTopUp` and `ChargeForPickup` record who acted) and architecture rule A1 keeps `Shared\Application` out of Domain. `StockSeller::sell` takes the `StockLine` and raises Ordering's `NotEnoughStock` when the stock is short, since A4 keeps Stock's own error out of Ordering; `StockModuleStockSeller` re-reads the stock to tell a shortage from any other refusal. `Order::complete` returns the total and stores `pickup_done_at` and `charged_cents`, columns that already existed.
+Why: the plan named the ports without their layer or shape, and the domain must stay free of application types.
+
+T29 (`plan.md`, `CompletePickup` step 4): the use case does not close the cycle and does not assert that it is not closed. `Cycle` has no closed state until T30 (`log.md`, T27), and a closed cycle has no pending pickup anyway.
+Why: the task row for T29 does not list R24b, and closing belongs to T30.
+
+T29 (`plan.md`, HTTP & pages): `POST …/pickups/{household}/complete` takes an optional `top_up` in euros (the same format as the wallet top-up) and redirects to the pickups index. `Manage/Pickups/Show` gets `components/pickup/CompleteForm.vue` while the pickup is pending. `PickupNotPending` and `InvalidTopUpAmount` get Catalan messages in `lang/ca/errors.php`; the translation test's list is not extended because `tests/Unit` was outside this task's surfaces.
+Why: R21 asks for the top-up at the same time as the completion, and a double completion (S22) shows as a form error.

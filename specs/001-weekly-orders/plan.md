@@ -372,6 +372,7 @@ with the cycle `FOR UPDATE`: `send`, `validate`, `markDistributed(producerId, tr
    is a credit, 0 records nothing (R21, R22).
 4. `cycle.close(...)` if this was the last pickup (R24b).
 Any failure rolls everything back. `MarkPickupNotCollected` follows steps 1, 3 (no top-up) and 4.
+`StockSeller` and `WalletLedger` are Ordering Application ports (they take the `Actor`) with the adapters `StockModuleStockSeller` and `WalletModuleLedger`; the pickup stores `pickup_done_at` and `charged_cents`. Closing the cycle (step 4) arrives with T30.
 
 ## Stock
 
