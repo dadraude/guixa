@@ -14,10 +14,11 @@ final readonly class ReturnItemRow
         public string $name,
         public string $amount,
         public bool $active,
+        public int $amountCents,
     ) {}
 
     public static function from(ReturnItemData $item): self
     {
-        return new self($item->id, $item->name, EuroAmount::format($item->amountCents), $item->active);
+        return new self($item->id, $item->name, EuroAmount::format($item->amountCents), $item->active, $item->amountCents);
     }
 }

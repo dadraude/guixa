@@ -4,11 +4,18 @@ namespace Guixa\Ordering\Domain;
 
 use DateTimeImmutable;
 use Guixa\Ordering\Domain\Error\FractionalQuantityNotAllowed;
+use Guixa\Ordering\Domain\Error\InvalidLineQuantity;
 use Guixa\Ordering\Domain\Error\LineNotMarked;
+use Guixa\Ordering\Domain\Error\NotEnoughStock;
 use Guixa\Ordering\Domain\Error\PickupAlreadyOpen;
 use Guixa\Ordering\Domain\Error\PickupNotPending;
 use Guixa\Ordering\Domain\Error\ProductNotInPickup;
+use Guixa\Ordering\Domain\Error\ReturnLineNotInPickup;
+use Guixa\Ordering\Domain\Error\StockLineNotInPickup;
+use Guixa\Ordering\Domain\Error\StockProductInactive;
 use Guixa\Ordering\Domain\ValueObject\OrderableProduct;
+use Guixa\Ordering\Domain\ValueObject\ReturnItemOffer;
+use Guixa\Ordering\Domain\ValueObject\StockOffer;
 use Guixa\Shared\Domain\Money;
 use Guixa\Shared\Domain\Quantity;
 use LogicException;
@@ -16,13 +23,19 @@ use LogicException;
 /** Everything one household has in one cycle (R7). The ordering, reception and pickup-adjustment parts exist so far. */
 final class Order
 {
-    /** @param array<string, OrderLine> $lines by product id */
+    /**
+     * @param  array<string, OrderLine>  $lines  by product id
+     * @param  array<string, StockLine>  $stockLines  by stock product id
+     * @param  array<string, ReturnLine>  $returnLines  by return item id
+     */
     private function __construct(
         public readonly string $id,
         public readonly string $cycleId,
         public readonly string $householdId,
         private array $lines,
         private PickupStatus $pickup = PickupStatus::None,
+        private array $stockLines = [],
+        private array $returnLines = [],
     ) {}
 
     public static function start(string $id, string $cycleId, string $householdId): self
@@ -30,8 +43,12 @@ final class Order
         return new self($id, $cycleId, $householdId, []);
     }
 
-    /** @param list<OrderLine> $lines */
-    public static function restore(string $id, string $cycleId, string $householdId, array $lines, PickupStatus $pickup = PickupStatus::None): self
+    /**
+     * @param  list<OrderLine>  $lines
+     * @param  list<StockLine>  $stockLines
+     * @param  list<ReturnLine>  $returnLines
+     */
+    public static function restore(string $id, string $cycleId, string $householdId, array $lines, PickupStatus $pickup = PickupStatus::None, array $stockLines = [], array $returnLines = []): self
     {
         $byProduct = [];
 
@@ -39,7 +56,19 @@ final class Order
             $byProduct[$line->productId] = $line;
         }
 
-        return new self($id, $cycleId, $householdId, $byProduct, $pickup);
+        $byStockProduct = [];
+
+        foreach ($stockLines as $line) {
+            $byStockProduct[$line->stockProductId] = $line;
+        }
+
+        $byReturnItem = [];
+
+        foreach ($returnLines as $line) {
+            $byReturnItem[$line->returnItemId] = $line;
+        }
+
+        return new self($id, $cycleId, $householdId, $byProduct, $pickup, $byStockProduct, $byReturnItem);
     }
 
     /**
@@ -198,9 +227,7 @@ final class Order
      */
     public function adjustDelivered(string $productId, Quantity $delivered): void
     {
-        if ($this->pickup !== PickupStatus::Pending) {
-            throw PickupNotPending::forOrder($this->id);
-        }
+        $this->assertPending();
 
         $line = $this->lines[$productId] ?? null;
 
@@ -213,20 +240,122 @@ final class Order
         $this->lines[$productId] = $line->withDelivered($delivered);
     }
 
+    /**
+     * Adds stock to the pickup, taking a snapshot of the product as it is now (R20). Adding a product that is already on the pickup
+     * adds to its quantity and keeps the line's snapshot; the combined quantity cannot exceed what is on hand. A deactivated product cannot be added.
+     * What other pickups took is checked again at completion (R22, S45).
+     */
+    public function addStock(StockOffer $offer, Quantity $quantity, string $lineId): void
+    {
+        $this->assertPending();
+
+        if ($quantity->isZero()) {
+            throw InvalidLineQuantity::mustBePositive();
+        }
+
+        $this->assertInStep($offer->name, $offer->variable, $quantity);
+
+        if (! $offer->active) {
+            throw StockProductInactive::named($offer->name);
+        }
+
+        $existing = $this->stockLines[$offer->id] ?? null;
+        $combined = Quantity::ofThousandths($quantity->thousandths + ($existing->quantity->thousandths ?? 0));
+
+        if ($combined->thousandths > $offer->available->thousandths) {
+            throw NotEnoughStock::forProduct($offer->name, $offer->available->toString(), $combined->toString());
+        }
+
+        $this->stockLines[$offer->id] = $existing?->withQuantity($combined) ?? new StockLine(
+            $lineId,
+            $offer->id,
+            $offer->name,
+            $offer->unit,
+            $offer->price,
+            $offer->variable,
+            $offer->containersPerUnit,
+            $combined,
+        );
+    }
+
+    /** Removes the whole stock line, even if its product was deactivated since (R20, S55). */
+    public function removeStock(string $stockProductId): void
+    {
+        $this->assertPending();
+
+        if (! isset($this->stockLines[$stockProductId])) {
+            throw StockLineNotInPickup::withId($stockProductId);
+        }
+
+        unset($this->stockLines[$stockProductId]);
+    }
+
+    /**
+     * Adds returned items to the pickup, taking a snapshot of the item's amount as it is now (R20a). Adding an item that is already on
+     * the pickup adds to its quantity and keeps the line's amount. A deactivated item can still be added.
+     */
+    public function addReturn(ReturnItemOffer $offer, int $quantity, string $lineId): void
+    {
+        $this->assertPending();
+
+        if ($quantity <= 0) {
+            throw InvalidLineQuantity::mustBePositive();
+        }
+
+        $existing = $this->returnLines[$offer->id] ?? null;
+        $combined = $quantity + ($existing->quantity ?? 0);
+
+        $this->returnLines[$offer->id] = $existing?->withQuantity($combined) ?? new ReturnLine($lineId, $offer->id, $offer->name, $offer->amount, $combined);
+    }
+
+    /** Removes the whole return line. */
+    public function removeReturn(string $returnItemId): void
+    {
+        $this->assertPending();
+
+        if (! isset($this->returnLines[$returnItemId])) {
+            throw ReturnLineNotInPickup::withId($returnItemId);
+        }
+
+        unset($this->returnLines[$returnItemId]);
+    }
+
+    /** @return list<StockLine> in the order they were added */
+    public function stockLines(): array
+    {
+        return array_values($this->stockLines);
+    }
+
+    /** @return list<ReturnLine> in the order they were added */
+    public function returnLines(): array
+    {
+        return array_values($this->returnLines);
+    }
+
     /** @return list<OrderLine> the lines the household collects: dropped lines are never delivered nor charged (R18) */
     public function pickupLines(): array
     {
         return array_values(array_filter($this->lines(), fn (OrderLine $line) => ! $line->dropped));
     }
 
-    /** What the pickup costs so far: the sum of its lines, each rounded half up (R22). */
+    /** What the pickup costs so far: its lines plus the stock lines, minus the return lines, each rounded half up (R22). */
     public function total(): Money
     {
-        return array_reduce(
+        $total = array_reduce(
             $this->pickupLines(),
             fn (Money $total, OrderLine $line) => $total->add($line->amount()),
             Money::ofCents(0),
         );
+
+        foreach ($this->stockLines as $line) {
+            $total = $total->add($line->amount());
+        }
+
+        foreach ($this->returnLines as $line) {
+            $total = $total->subtract($line->credit());
+        }
+
+        return $total;
     }
 
     public function hasLine(string $productId): bool
@@ -258,6 +387,13 @@ final class Order
         }
 
         return false;
+    }
+
+    private function assertPending(): void
+    {
+        if ($this->pickup !== PickupStatus::Pending) {
+            throw PickupNotPending::forOrder($this->id);
+        }
     }
 
     private function assertInStep(string $name, bool $variable, Quantity $quantity): void

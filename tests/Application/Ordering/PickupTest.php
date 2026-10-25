@@ -8,15 +8,24 @@ use Guixa\Ordering\Domain\Error\CycleNotSettled;
 use Guixa\Ordering\Domain\Error\FractionalQuantityNotAllowed;
 use Guixa\Ordering\Domain\Error\HouseholdInactive;
 use Guixa\Ordering\Domain\Error\HouseholdNotFound;
+use Guixa\Ordering\Domain\Error\InvalidLineQuantity;
+use Guixa\Ordering\Domain\Error\NotEnoughStock;
 use Guixa\Ordering\Domain\Error\PickupAlreadyOpen;
+use Guixa\Ordering\Domain\Error\PickupNotFound;
 use Guixa\Ordering\Domain\Error\PickupNotPending;
 use Guixa\Ordering\Domain\Error\ProductNotInPickup;
+use Guixa\Ordering\Domain\Error\ReturnItemNotFound;
+use Guixa\Ordering\Domain\Error\ReturnLineNotInPickup;
+use Guixa\Ordering\Domain\Error\StockLineNotInPickup;
+use Guixa\Ordering\Domain\Error\StockProductInactive;
+use Guixa\Ordering\Domain\Error\StockProductNotFound;
 use Guixa\Ordering\Domain\NotDeliveredMarks;
 use Guixa\Ordering\Domain\PickupStatus;
 use Guixa\Ordering\Domain\ReceptionLoader;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Error\InvalidQuantity;
 use Guixa\Shared\Domain\Error\NotAllowed;
+use Guixa\Shared\Domain\Money;
 use Guixa\Shared\Domain\Role;
 use Tests\Support\InMemory\ImmediateTransactionRunner;
 use Tests\Support\Ordering\OrderingWorld;
@@ -252,3 +261,261 @@ it('does not flag a line as adjusted when the delivered quantity is typed back t
         ->and($reception->allocations[0]->adjusted)->toBeFalse()
         ->and($reception->balanced)->toBeTrue();
 })->group('R19');
+
+// R20, S17 — stock lines
+
+it('adds stock to a pickup with a snapshot of the product, and the total includes it (R20, S16)', function () {
+    ($this->settle)();
+    $honey = $this->world->stockProduct('Honey', 600, '5');
+
+    ($this->world->addStockToPickup)($this->world->manager, $this->cycleId, PICKUP_A, $honey, '2');
+    $pickup = ($this->pickup)();
+
+    expect($pickup->stockLines)->toHaveCount(1)
+        ->and($pickup->stockLines[0])->toMatchArray(['stockProductId' => $honey, 'name' => 'Honey', 'unitPriceCents' => 600, 'quantity' => '2.000', 'amountCents' => 1200])
+        ->and($pickup->totalCents)->toBe(3200 + 1200);
+})->group('R20', 'S16');
+
+it('rejects stock above what is available and leaves the stock and the pickup as they were (R20, S17)', function () {
+    ($this->settle)();
+    $honey = $this->world->stockProduct('Honey', 600, '1');
+
+    expect(fn () => ($this->world->addStockToPickup)($this->world->manager, $this->cycleId, PICKUP_A, $honey, '2'))->toThrow(NotEnoughStock::class)
+        ->and(($this->pickup)()->stockLines)->toBe([])
+        ->and($this->world->stockMovements->available($honey)->toString())->toBe('1.000');
+
+    ($this->world->addStockToPickup)($this->world->manager, $this->cycleId, PICKUP_A, $honey, '1');
+
+    expect(($this->pickup)()->stockLines[0]->quantity)->toBe('1.000');
+})->group('R20', 'S17');
+
+it('does not reserve stock when it is added: the stock stays until the pickup is completed (R20, D7)', function () {
+    ($this->settle)();
+    $honey = $this->world->stockProduct('Honey', 600, '5');
+
+    ($this->world->addStockToPickup)($this->world->manager, $this->cycleId, PICKUP_A, $honey, '3');
+
+    expect($this->world->stockMovements->available($honey)->toString())->toBe('5.000');
+})->group('R20');
+
+it('adds to the quantity of a stock product already on the pickup, checks the combined quantity and keeps the first price (R20, decision 2)', function () {
+    ($this->settle)();
+    $honey = $this->world->stockProduct('Honey', 600, '5');
+    $add = fn (string $quantity) => ($this->world->addStockToPickup)($this->world->manager, $this->cycleId, PICKUP_A, $honey, $quantity);
+
+    $add('2');
+    $this->world->stockProducts->get($honey)->change('Honey', 'jar', Money::ofCents(900), false, null);
+    $add('2');
+    $line = ($this->pickup)()->stockLines;
+
+    expect($line)->toHaveCount(1)
+        ->and($line[0])->toMatchArray(['quantity' => '4.000', 'unitPriceCents' => 600, 'amountCents' => 2400])
+        ->and(fn () => $add('2'))->toThrow(NotEnoughStock::class)
+        ->and(($this->pickup)()->stockLines[0]->quantity)->toBe('4.000');
+})->group('R20');
+
+it('sells non-variable stock in whole units and variable stock in thousandths, and rejects zero (R20)', function () {
+    ($this->settle)();
+    $honey = $this->world->stockProduct('Honey', 600, '5');
+    $cheese = $this->world->stockProduct('Cheese', 2000, '5', variable: true, unit: 'kg');
+    $add = fn (string $product, string $quantity) => ($this->world->addStockToPickup)($this->world->manager, $this->cycleId, PICKUP_A, $product, $quantity);
+
+    expect(fn () => $add($honey, '1.5'))->toThrow(FractionalQuantityNotAllowed::class)
+        ->and(fn () => $add($honey, '0'))->toThrow(InvalidLineQuantity::class)
+        ->and(fn () => $add($cheese, '0.0001'))->toThrow(InvalidQuantity::class)
+        ->and(fn () => $add($cheese, '-1'))->toThrow(InvalidQuantity::class);
+
+    $add($cheese, '0.250');
+
+    expect(($this->pickup)()->stockLines[0])->toMatchArray(['quantity' => '0.250', 'amountCents' => 500]);
+})->group('R20', 'R9');
+
+it('rejects adding a deactivated stock product and an unknown one (decision 1, R20)', function () {
+    ($this->settle)();
+    $honey = $this->world->stockProduct('Honey', 600, '5');
+    $this->world->deactivateStockProduct($honey);
+
+    expect(fn () => ($this->world->addStockToPickup)($this->world->manager, $this->cycleId, PICKUP_A, $honey, '1'))->toThrow(StockProductInactive::class)
+        ->and(fn () => ($this->world->addStockToPickup)($this->world->manager, $this->cycleId, PICKUP_A, '00000000-0000-7000-8000-0000000000ff', '1'))->toThrow(StockProductNotFound::class)
+        ->and(($this->pickup)()->stockLines)->toBe([]);
+})->group('R20');
+
+it('keeps a stock line when its product is deactivated, and still removes it (R20, S55)', function () {
+    ($this->settle)();
+    $honey = $this->world->stockProduct('Honey', 600, '5');
+    ($this->world->addStockToPickup)($this->world->manager, $this->cycleId, PICKUP_A, $honey, '1');
+
+    $this->world->deactivateStockProduct($honey);
+
+    expect(($this->pickup)()->stockLines[0])->toMatchArray(['name' => 'Honey', 'amountCents' => 600])
+        ->and(($this->pickup)()->totalCents)->toBe(3200 + 600)
+        ->and(fn () => ($this->world->addStockToPickup)($this->world->manager, $this->cycleId, PICKUP_A, $honey, '1'))->toThrow(StockProductInactive::class);
+
+    ($this->world->removeStockFromPickup)($this->world->manager, $this->cycleId, PICKUP_A, $honey);
+
+    expect(($this->pickup)()->stockLines)->toBe([])
+        ->and(($this->pickup)()->totalCents)->toBe(3200);
+})->group('R20', 'S55');
+
+it('removes the whole stock line and rejects a product that is not on the pickup (R20)', function () {
+    ($this->settle)();
+    $honey = $this->world->stockProduct('Honey', 600, '5');
+    ($this->world->addStockToPickup)($this->world->manager, $this->cycleId, PICKUP_A, $honey, '3');
+
+    ($this->world->removeStockFromPickup)($this->world->manager, $this->cycleId, PICKUP_A, $honey);
+
+    expect(($this->pickup)()->stockLines)->toBe([])
+        ->and(fn () => ($this->world->removeStockFromPickup)($this->world->manager, $this->cycleId, PICKUP_A, $honey))->toThrow(StockLineNotInPickup::class);
+})->group('R20');
+
+it('puts stock on a stock-only pickup (R19, S18)', function () {
+    ($this->settle)();
+    ($this->open)(PICKUP_K);
+    $oil = $this->world->stockProduct('Oil', 1200, '3', unit: 'bottle');
+
+    ($this->world->addStockToPickup)($this->world->manager, $this->cycleId, PICKUP_K, $oil, '1');
+
+    expect(($this->pickup)(PICKUP_K)->totalCents)->toBe(1200);
+})->group('R20', 'S18');
+
+// R20a — return lines
+
+it('adds returned items, crediting quantity times the amount, and the total includes the credit (R20a, S41)', function () {
+    ($this->settle)();
+    $jar = $this->world->returnItem('Glass jar', 50);
+
+    ($this->world->addReturnToPickup)($this->world->manager, $this->cycleId, PICKUP_A, $jar, 4);
+    $pickup = ($this->pickup)();
+
+    expect($pickup->returnLines)->toHaveCount(1)
+        ->and($pickup->returnLines[0])->toMatchArray(['returnItemId' => $jar, 'name' => 'Glass jar', 'amountCents' => 50, 'quantity' => 4, 'creditCents' => 200])
+        ->and($pickup->totalCents)->toBe(3200 - 200);
+})->group('R20a', 'S41');
+
+it('lets the total go negative when the returns exceed the lines (R20a, R22)', function () {
+    ($this->settle)();
+    ($this->open)(PICKUP_K);
+    $jar = $this->world->returnItem('Glass jar', 50);
+
+    ($this->world->addReturnToPickup)($this->world->manager, $this->cycleId, PICKUP_K, $jar, 2);
+
+    expect(($this->pickup)(PICKUP_K)->totalCents)->toBe(-100);
+})->group('R20a');
+
+it('adds to the quantity of a return item already on the pickup and keeps its first amount (R20a, decision 2)', function () {
+    ($this->settle)();
+    $jar = $this->world->returnItem('Glass jar', 50);
+    $add = fn (int $quantity) => ($this->world->addReturnToPickup)($this->world->manager, $this->cycleId, PICKUP_A, $jar, $quantity);
+
+    $add(2);
+    $this->world->returnItems->get($jar)->change('Glass jar', Money::ofCents(80));
+    $add(3);
+
+    expect(($this->pickup)()->returnLines)->toHaveCount(1)
+        ->and(($this->pickup)()->returnLines[0])->toMatchArray(['quantity' => 5, 'amountCents' => 50, 'creditCents' => 250]);
+})->group('R20a');
+
+it('rejects a return quantity that is not a whole number of units above zero, and an unknown item (R20a)', function () {
+    ($this->settle)();
+    $jar = $this->world->returnItem('Glass jar', 50);
+    $add = fn (string $item, int $quantity) => ($this->world->addReturnToPickup)($this->world->manager, $this->cycleId, PICKUP_A, $item, $quantity);
+
+    expect(fn () => $add($jar, 0))->toThrow(InvalidLineQuantity::class)
+        ->and(fn () => $add($jar, -1))->toThrow(InvalidLineQuantity::class)
+        ->and(fn () => $add('00000000-0000-7000-8000-0000000000ff', 1))->toThrow(ReturnItemNotFound::class)
+        ->and(($this->pickup)()->returnLines)->toBe([]);
+})->group('R20a');
+
+it('accepts a deactivated return item, keeps the line and removes it whole (R20a, decision 1)', function () {
+    ($this->settle)();
+    $jar = $this->world->returnItem('Glass jar', 50);
+    $this->world->deactivateReturnItem($jar);
+
+    ($this->world->addReturnToPickup)($this->world->manager, $this->cycleId, PICKUP_A, $jar, 2);
+
+    expect(($this->pickup)()->returnLines[0]->quantity)->toBe(2);
+
+    ($this->world->removeReturnFromPickup)($this->world->manager, $this->cycleId, PICKUP_A, $jar);
+
+    expect(($this->pickup)()->returnLines)->toBe([])
+        ->and(fn () => ($this->world->removeReturnFromPickup)($this->world->manager, $this->cycleId, PICKUP_A, $jar))->toThrow(ReturnLineNotInPickup::class);
+})->group('R20a');
+
+// Shared rules of the four use cases
+
+it('lets only a manager change stock and return lines, and answers CycleNotFound or PickupNotFound for an unknown cycle or pickup (R20, R20a)', function () {
+    ($this->settle)();
+    $honey = $this->world->stockProduct('Honey', 600, '5');
+    $jar = $this->world->returnItem('Glass jar', 50);
+    ($this->world->addStockToPickup)($this->world->manager, $this->cycleId, PICKUP_A, $honey, '1');
+    ($this->world->addReturnToPickup)($this->world->manager, $this->cycleId, PICKUP_A, $jar, 1);
+    $manager = $this->world->manager;
+
+    expect(fn () => ($this->world->addStockToPickup)($this->memberA, $this->cycleId, PICKUP_A, $honey, '1'))->toThrow(NotAllowed::class)
+        ->and(fn () => ($this->world->removeStockFromPickup)($this->memberA, $this->cycleId, PICKUP_A, $honey))->toThrow(NotAllowed::class)
+        ->and(fn () => ($this->world->addReturnToPickup)($this->memberA, $this->cycleId, PICKUP_A, $jar, 1))->toThrow(NotAllowed::class)
+        ->and(fn () => ($this->world->removeReturnFromPickup)($this->memberA, $this->cycleId, PICKUP_A, $jar))->toThrow(NotAllowed::class)
+        ->and(fn () => ($this->world->addStockToPickup)($manager, '00000000-0000-7000-8000-0000000000ff', PICKUP_A, $honey, '1'))->toThrow(CycleNotFound::class)
+        ->and(fn () => ($this->world->addReturnToPickup)($manager, $this->cycleId, '00000000-0000-7000-8000-0000000000ff', $jar, 1))->toThrow(PickupNotFound::class);
+})->group('R20', 'R20a');
+
+it('rejects stock and return changes once the pickup is not pending (R20, R20a, R23, R24)', function () {
+    $honey = $this->world->stockProduct('Honey', 600, '5');
+    $jar = $this->world->returnItem('Glass jar', 50);
+    ($this->world->setOrderLine)($this->memberA, $this->cycleId, $this->beef, '1');
+    ($this->world->closeProducerNow)($this->world->manager, $this->cycleId, OrderingWorld::BAKER);
+    ($this->world->sendProducerOrder)($this->world->manager, $this->cycleId, OrderingWorld::BAKER);
+    ($this->world->setReceivedTotal)($this->world->manager, $this->cycleId, OrderingWorld::BAKER, $this->beef, '0');
+    $loader = new ReceptionLoader($this->world->orders, $this->world->catalog, $this->world->availability, $this->world->receivedTotals);
+    $transactions = new ImmediateTransactionRunner;
+    (new ValidateReception($this->world->cycles, $transactions, $this->world->clock))($this->world->manager, $this->cycleId, OrderingWorld::BAKER);
+    (new MarkProducerDistributed(
+        $this->world->cycles, $loader,
+        new CycleSettlement($this->world->orders, new NotDeliveredMarks($this->world->catalog, $this->world->availability, $this->world->orders)),
+        $transactions, $this->world->clock,
+    ))($this->world->manager, $this->cycleId, OrderingWorld::BAKER);
+    $manager = $this->world->manager;
+
+    expect(($this->pickup)()->status)->toBe(PickupStatus::NothingToCollect->value)
+        ->and(fn () => ($this->world->addStockToPickup)($manager, $this->cycleId, PICKUP_A, $honey, '1'))->toThrow(PickupNotPending::class)
+        ->and(fn () => ($this->world->removeStockFromPickup)($manager, $this->cycleId, PICKUP_A, $honey))->toThrow(PickupNotPending::class)
+        ->and(fn () => ($this->world->addReturnToPickup)($manager, $this->cycleId, PICKUP_A, $jar, 1))->toThrow(PickupNotPending::class)
+        ->and(fn () => ($this->world->removeReturnFromPickup)($manager, $this->cycleId, PICKUP_A, $jar))->toThrow(PickupNotPending::class);
+})->group('R20', 'R20a');
+
+it('answers CycleNotSettled before settlement for the four changes (R19, R20, R20a)', function () {
+    $honey = $this->world->stockProduct('Honey', 600, '5');
+    $jar = $this->world->returnItem('Glass jar', 50);
+    $manager = $this->world->manager;
+
+    expect(fn () => ($this->world->addStockToPickup)($manager, $this->cycleId, PICKUP_A, $honey, '1'))->toThrow(CycleNotSettled::class)
+        ->and(fn () => ($this->world->removeStockFromPickup)($manager, $this->cycleId, PICKUP_A, $honey))->toThrow(CycleNotSettled::class)
+        ->and(fn () => ($this->world->addReturnToPickup)($manager, $this->cycleId, PICKUP_A, $jar, 1))->toThrow(CycleNotSettled::class)
+        ->and(fn () => ($this->world->removeReturnFromPickup)($manager, $this->cycleId, PICKUP_A, $jar))->toThrow(CycleNotSettled::class);
+})->group('R20', 'R20a');
+
+it('keeps the containers per unit and the price of a stock line after the product changes (R20)', function () {
+    ($this->settle)();
+    $cheese = $this->world->stockProduct('Cheese', 204, '5', variable: true, unit: 'kg', containersPerUnit: '2');
+
+    ($this->world->addStockToPickup)($this->world->manager, $this->cycleId, PICKUP_A, $cheese, '0.125');
+    $this->world->stockProducts->get($cheese)->change('Cheese', 'kg', Money::ofCents(999), true, '5');
+    ($this->world->addStockToPickup)($this->world->manager, $this->cycleId, PICKUP_A, $cheese, '0.125');
+
+    $stored = $this->world->orders->ofHousehold($this->cycleId, PICKUP_A)->stockLines()[0];
+
+    expect($stored->containersPerUnit->toString())->toBe('2.000')
+        ->and($stored->unitPrice->cents)->toBe(204)
+        ->and($stored->quantity->toString())->toBe('0.250');
+})->group('R20');
+
+it('rounds each stock line half up to the cent in the total (R20, R22)', function () {
+    ($this->settle)();
+    $cheese = $this->world->stockProduct('Cheese', 204, '5', variable: true, unit: 'kg');
+
+    ($this->world->addStockToPickup)($this->world->manager, $this->cycleId, PICKUP_A, $cheese, '0.125');
+
+    // 0.125 kg x 2,04 € = 25,5 cents, which rounds up to 26.
+    expect(($this->pickup)()->stockLines[0]->amountCents)->toBe(26)
+        ->and(($this->pickup)()->totalCents)->toBe(3200 + 26);
+})->group('R20', 'R22');

@@ -4,13 +4,20 @@ import { computed, ref } from 'vue';
 import CycleController from '@/actions/App/Http/Controllers/Manage/CycleController';
 import PickupController from '@/actions/App/Http/Controllers/Manage/PickupController';
 import PickupLineController from '@/actions/App/Http/Controllers/Manage/PickupLineController';
+import PickupReturnController from '@/actions/App/Http/Controllers/Manage/PickupReturnController';
+import PickupStockController from '@/actions/App/Http/Controllers/Manage/PickupStockController';
 import DeliveredForm from '@/components/pickup/DeliveredForm.vue';
+import { euros } from '@/components/pickup/euros';
+import ReturnLines from '@/components/pickup/ReturnLines.vue';
+import StockLines from '@/components/pickup/StockLines.vue';
 import Heading from '@/components/Heading.vue';
 import InputError from '@/components/InputError.vue';
 import { Badge } from '@/components/ui/badge';
 
 const props = defineProps<{
     pickup: App.Http.PickupRow;
+    stockProducts: App.Http.StockLevelRow[];
+    returnItems: App.Http.ReturnItemRow[];
 }>();
 
 defineOptions({
@@ -23,10 +30,51 @@ const page = usePage();
 const domainError = computed(
     () => (page.props.errors as Record<string, string>).domain,
 );
+const errors = computed(() => page.props.errors as Record<string, string>);
 const processing = ref(false);
 
-const euros = (cents: number) =>
-    `${(cents / 100).toFixed(2).replace('.', ',')} €`;
+const options = {
+    preserveScroll: true,
+    onStart: () => (processing.value = true),
+    onFinish: () => (processing.value = false),
+};
+
+const target = () => ({
+    cycle: props.pickup.cycleId,
+    household: props.pickup.householdId,
+});
+
+const addStock = (stockProductId: string, quantity: string) =>
+    router.post(
+        PickupStockController.store.url(target()),
+        { stock_product_id: stockProductId, stock_quantity: quantity },
+        options,
+    );
+
+const removeStock = (stockProductId: string) =>
+    router.delete(
+        PickupStockController.destroy.url({
+            ...target(),
+            stockProduct: stockProductId,
+        }),
+        options,
+    );
+
+const addReturn = (returnItemId: string, quantity: string) =>
+    router.post(
+        PickupReturnController.store.url(target()),
+        { return_item_id: returnItemId, return_quantity: quantity },
+        options,
+    );
+
+const removeReturn = (returnItemId: string) =>
+    router.delete(
+        PickupReturnController.destroy.url({
+            ...target(),
+            returnItem: returnItemId,
+        }),
+        options,
+    );
 
 const adjust = (productId: string, quantity: string) =>
     router.put(
@@ -104,6 +152,26 @@ const adjust = (productId: string, quantity: string) =>
                 <span data-test="amount">{{ euros(line.amountCents) }}</span>
             </li>
         </ul>
+
+        <StockLines
+            :lines="pickup.stockLines"
+            :options="stockProducts"
+            :editable="pickup.status === 'pending'"
+            :processing="processing"
+            :errors="errors"
+            @add="addStock"
+            @remove="removeStock"
+        />
+
+        <ReturnLines
+            :lines="pickup.returnLines"
+            :options="returnItems"
+            :editable="pickup.status === 'pending'"
+            :processing="processing"
+            :errors="errors"
+            @add="addReturn"
+            @remove="removeReturn"
+        />
 
         <dl
             v-if="

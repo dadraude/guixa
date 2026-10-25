@@ -48,5 +48,17 @@
     "Toggle sidebar": "Mostra o amaga el menú",
     "Sidebar": "Menú de navegació",
     "Displays the mobile sidebar.": "Navegació de l’aplicació.",
-    "Close": "Tanca"
+    "Close": "Tanca",
+    "No stock has been added to this pickup.": "No s’ha afegit cap producte d’estoc a aquesta recollida.",
+    "Remove :name": "Elimina :name",
+    "Stock product": "Producte d’estoc",
+    "Choose a product": "Tria un producte",
+    "Quantity of stock to add": "Quantitat d’estoc per afegir",
+    "Add stock": "Afegeix estoc",
+    "Returns": "Retorns",
+    "No returns have been added to this pickup.": "No s’ha afegit cap retorn a aquesta recollida.",
+    "Return item": "Article retornable",
+    "Choose an item": "Tria un article",
+    "Number of returned items to add": "Nombre d’articles retornats per afegir",
+    "Add return": "Afegeix retorn"
 }

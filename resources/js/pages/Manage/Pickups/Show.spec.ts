@@ -1,7 +1,11 @@
-import { describe, expect, it, vi } from 'vite-plus/test';
+import { beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 import { createSSRApp } from 'vue';
 import { renderToString } from 'vue/server-renderer';
 import Show from './Show.vue';
+
+const shared = vi.hoisted(() => ({
+    errors: {} as Record<string, string>,
+}));
 
 vi.mock('@inertiajs/vue3', async () => {
     const { defineComponent, h } = await import('vue');
@@ -14,8 +18,8 @@ vi.mock('@inertiajs/vue3', async () => {
                 () =>
                     h('a', slots.default?.()),
         }),
-        usePage: () => ({ props: { errors: { domain: 'Nope' } } }),
-        router: { put: vi.fn() },
+        usePage: () => ({ props: { errors: shared.errors } }),
+        router: { put: vi.fn(), post: vi.fn(), delete: vi.fn() },
     };
 });
 
@@ -42,12 +46,45 @@ const pickup = (adjusted: boolean) => ({
     totalCents: adjusted ? 2240 : 2000,
     balanceCents: 5000,
     resultingBalanceCents: adjusted ? 2760 : 3000,
+    stockLines: [] as unknown[],
+    returnLines: [] as unknown[],
 });
 
+const stockProducts = [
+    {
+        id: 'honey',
+        name: 'Honey',
+        unit: 'jar',
+        price: '6.00',
+        variable: false,
+        containersPerUnit: null,
+        active: true,
+        available: '5.000',
+    },
+];
+
+const returnItems = [
+    {
+        id: 'jar',
+        name: 'Glass jar',
+        amount: '0.50',
+        amountCents: 50,
+        active: true,
+    },
+];
+
 describe('pickup page', () => {
+    beforeEach(() => {
+        shared.errors = { domain: 'Nope' };
+    });
+
     it('shows the lines, the balance, the total and the resulting balance', async () => {
         const html = await renderToString(
-            createSSRApp(Show, { pickup: pickup(false) }),
+            createSSRApp(Show, {
+                pickup: pickup(false),
+                stockProducts,
+                returnItems,
+            }),
         );
 
         expect(html).toContain('Pickup: Household A');
@@ -79,5 +116,96 @@ describe('pickup page', () => {
         expect(html).not.toContain('data-test="delivered-form-beef"');
         expect(html).toContain('data-test="delivered"');
         expect(html).toContain('1.000 kg');
+    });
+
+    it('shows the stock and return lines and the forms to add more', async () => {
+        const html = await renderToString(
+            createSSRApp(Show, {
+                pickup: {
+                    ...pickup(false),
+                    stockLines: [
+                        {
+                            stockProductId: 'honey',
+                            name: 'Honey',
+                            unit: 'jar',
+                            variable: false,
+                            unitPriceCents: 600,
+                            quantity: '2.000',
+                            amountCents: 1200,
+                        },
+                    ],
+                    returnLines: [
+                        {
+                            returnItemId: 'jar',
+                            name: 'Glass jar',
+                            amountCents: 50,
+                            quantity: 4,
+                            creditCents: 200,
+                        },
+                    ],
+                },
+                stockProducts,
+                returnItems,
+            }),
+        );
+
+        expect(html).toContain('data-test="stock-line-honey"');
+        expect(html).toContain('data-test="return-line-jar"');
+        expect(html).toContain('data-test="add-stock-form"');
+        expect(html).toContain('data-test="add-return-form"');
+    });
+
+    it('keeps the stock and return lines read-only when the pickup is not pending', async () => {
+        const html = await renderToString(
+            createSSRApp(Show, {
+                pickup: { ...pickup(false), status: 'nothing_to_collect' },
+                stockProducts,
+                returnItems,
+            }),
+        );
+
+        expect(html).not.toContain('data-test="add-stock-form"');
+        expect(html).not.toContain('data-test="add-return-form"');
+    });
+
+    const sections = async () => {
+        const html = await renderToString(
+            createSSRApp(Show, {
+                pickup: pickup(false),
+                stockProducts,
+                returnItems,
+            }),
+        );
+        const [beforeReturns, returns] = html.split('data-test="return-lines"');
+        const [beforeStock, stock] = beforeReturns.split(
+            'data-test="stock-lines"',
+        );
+
+        return { beforeStock, stock, returns };
+    };
+
+    it('shows a rejected return quantity only in the returns section', async () => {
+        shared.errors = { return_quantity: 'Bad return quantity' };
+        const { beforeStock, stock, returns } = await sections();
+
+        expect(returns).toContain('Bad return quantity');
+        expect(stock).not.toContain('Bad return quantity');
+        expect(beforeStock).not.toContain('Bad return quantity');
+    });
+
+    it('shows a rejected stock quantity only in the stock section', async () => {
+        shared.errors = { stock_quantity: 'Bad stock quantity' };
+        const { stock, returns } = await sections();
+
+        expect(stock).toContain('Bad stock quantity');
+        expect(returns).not.toContain('Bad stock quantity');
+    });
+
+    it('does not show the delivered-quantity field error in either section', async () => {
+        shared.errors = { quantity: 'Bad delivered quantity' };
+        const { stock, returns } = await sections();
+
+        expect(stock).not.toContain('Bad delivered quantity');
+        expect(returns).not.toContain('Bad delivered quantity');
     });
 });

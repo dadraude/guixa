@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\HouseholdOptionRow;
 use App\Http\PickupRow;
 use App\Http\PickupSummaryRow;
+use App\Http\ReturnItemRow;
+use App\Http\StockLevelRow;
 use Guixa\Membership\Application\HouseholdSummary;
 use Guixa\Membership\Application\ListHouseholds;
 use Guixa\Ordering\Application\GetPickup;
@@ -16,6 +18,9 @@ use Guixa\Ordering\Domain\Error\CycleNotFound;
 use Guixa\Ordering\Domain\Error\CycleNotSettled;
 use Guixa\Ordering\Domain\Error\PickupNotFound;
 use Guixa\Shared\Application\Actor;
+use Guixa\Stock\Application\ListReturnItems;
+use Guixa\Stock\Application\ListStock;
+use Guixa\Stock\Application\StockLevelData;
 use Guixa\Wallet\Application\GetBalance;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
@@ -42,7 +47,7 @@ class PickupController extends Controller
         ]);
     }
 
-    public function show(string $cycle, string $household, Actor $actor, GetPickup $getPickup, GetBalance $getBalance): Response
+    public function show(string $cycle, string $household, Actor $actor, GetPickup $getPickup, GetBalance $getBalance, ListStock $listStock, ListReturnItems $listReturnItems): Response
     {
         try {
             $pickup = $getPickup($actor, $cycle, $household);
@@ -50,7 +55,12 @@ class PickupController extends Controller
             abort(404);
         }
 
-        return Inertia::render('Manage/Pickups/Show', ['pickup' => PickupRow::from($pickup, $getBalance($actor, $household))]);
+        return Inertia::render('Manage/Pickups/Show', [
+            'pickup' => PickupRow::from($pickup, $getBalance($actor, $household)),
+            // A deactivated stock product cannot be added (R20); a deactivated return item can (R20a).
+            'stockProducts' => array_map(StockLevelRow::from(...), array_values(array_filter($listStock($actor), fn (StockLevelData $level) => $level->active))),
+            'returnItems' => array_map(ReturnItemRow::from(...), $listReturnItems($actor)),
+        ]);
     }
 
     public function store(string $cycle, string $household, Actor $actor, OpenPickup $openPickup): RedirectResponse

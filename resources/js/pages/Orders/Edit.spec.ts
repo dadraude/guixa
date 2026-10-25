@@ -111,6 +111,8 @@ describe('member order editor presentation', () => {
                     totalCents: 1050,
                     balanceCents: null,
                     resultingBalanceCents: null,
+                    stockLines: [],
+                    returnLines: [],
                     lines: [
                         {
                             productId: 'bread',
@@ -134,6 +136,75 @@ describe('member order editor presentation', () => {
         expect(html).toContain('Demanat 4.000, lliurat 3.000');
         expect(html).toContain('data-test="pickup-total"');
         expect(html).toContain('10,50');
+    });
+
+    it('shows the stock and return lines of the pickup read-only, since the total includes them (R22, R23a)', async () => {
+        const html = await render(Edit, {
+            order: {
+                ...order,
+                pickup: {
+                    cycleId: 'cycle',
+                    pickupDate: '2026-10-30',
+                    householdId: 'home',
+                    householdName: '',
+                    status: 'pending',
+                    totalCents: 1000,
+                    balanceCents: null,
+                    resultingBalanceCents: null,
+                    lines: [],
+                    stockLines: [
+                        {
+                            stockProductId: 'honey',
+                            name: 'Mel',
+                            unit: 'pot',
+                            variable: false,
+                            unitPriceCents: 600,
+                            quantity: '2.000',
+                            amountCents: 1200,
+                        },
+                    ],
+                    returnLines: [
+                        {
+                            returnItemId: 'jar',
+                            name: 'Pot de vidre',
+                            amountCents: 50,
+                            quantity: 4,
+                            creditCents: 200,
+                        },
+                    ],
+                },
+            },
+        });
+
+        expect(html).toContain('data-test="stock-line-honey"');
+        expect(html).toContain('data-test="return-line-jar"');
+        expect(html).not.toContain('data-test="add-stock-form"');
+        expect(html).not.toContain('data-test="add-return-form"');
+        expect(html).not.toContain('data-test="remove-stock-honey"');
+    });
+
+    it('shows no stock or return section when the pickup has none', async () => {
+        const html = await render(Edit, {
+            order: {
+                ...order,
+                pickup: {
+                    cycleId: 'cycle',
+                    pickupDate: '2026-10-30',
+                    householdId: 'home',
+                    householdName: '',
+                    status: 'pending',
+                    totalCents: 0,
+                    balanceCents: null,
+                    resultingBalanceCents: null,
+                    lines: [],
+                    stockLines: [],
+                    returnLines: [],
+                },
+            },
+        });
+
+        expect(html).not.toContain('data-test="stock-lines"');
+        expect(html).not.toContain('data-test="return-lines"');
     });
 
     it('shows no pickup before the cycle is settled', async () => {

@@ -42,6 +42,12 @@ final class EloquentOrderRepositoryTest extends TestCase
             ]);
         }
 
+        foreach ([self::HONEY, self::CHEESE] as $id) {
+            DB::table('stock_products')->insertOrIgnore(['id' => $id, 'name' => "Stock {$id}", 'unit' => 'unit', 'price_cents' => 100, 'variable' => false, 'active' => true]);
+        }
+
+        DB::table('return_items')->insertOrIgnore(['id' => self::JAR, 'name' => 'Glass jar', 'amount_cents' => 50, 'active' => true]);
+
         if (! User::query()->whereKey(self::ANNA)->exists()) {
             User::factory()->create(['id' => self::ANNA]);
         }
@@ -82,5 +88,21 @@ final class EloquentOrderRepositoryTest extends TestCase
         DB::table('cycles')->where('id', self::CYCLE)->update(['settled_at' => now()]);
 
         $this->assertFalse($repository->hasUnsettledLinesOf(self::BREAD));
+    }
+
+    #[Test]
+    public function the_database_refuses_a_stock_or_return_line_of_zero(): void
+    {
+        $this->referencedRowsExist();
+        $order = $this->repository()->lockFor(self::CYCLE, self::HOUSEHOLD);
+
+        $this->assertThrows(fn () => DB::table('order_stock_lines')->insert([
+            'id' => $this->repository()->nextId(), 'order_id' => $order->id, 'stock_product_id' => self::HONEY, 'name' => 'Honey',
+            'unit' => 'jar', 'unit_price_cents' => 650, 'variable' => false, 'quantity' => '0',
+        ]), QueryException::class);
+        $this->assertThrows(fn () => DB::table('order_return_lines')->insert([
+            'id' => $this->repository()->nextId(), 'order_id' => $order->id, 'return_item_id' => self::JAR, 'name' => 'Glass jar',
+            'amount_cents' => 50, 'quantity' => 0,
+        ]), QueryException::class);
     }
 }

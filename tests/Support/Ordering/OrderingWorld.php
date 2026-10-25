@@ -4,6 +4,8 @@ namespace Tests\Support\Ordering;
 
 use DateTimeImmutable;
 use Guixa\Ordering\Application\AddParticipant;
+use Guixa\Ordering\Application\AddReturnToPickup;
+use Guixa\Ordering\Application\AddStockToPickup;
 use Guixa\Ordering\Application\AddUnorderedProduct;
 use Guixa\Ordering\Application\AdjustDeliveredQuantity;
 use Guixa\Ordering\Application\CancelCycle;
@@ -22,7 +24,10 @@ use Guixa\Ordering\Application\ListPickups;
 use Guixa\Ordering\Application\OpenCycle;
 use Guixa\Ordering\Application\OpenPickup;
 use Guixa\Ordering\Application\ParticipateAgain;
+use Guixa\Ordering\Application\PickupLocker;
 use Guixa\Ordering\Application\RemoveMarkedLine;
+use Guixa\Ordering\Application\RemoveReturnFromPickup;
+use Guixa\Ordering\Application\RemoveStockFromPickup;
 use Guixa\Ordering\Application\SendEmptyProducerOrders;
 use Guixa\Ordering\Application\SendProducerOrder;
 use Guixa\Ordering\Application\SetAllocation;
@@ -36,8 +41,17 @@ use Guixa\Ordering\Application\StopParticipatingWhereNotSent;
 use Guixa\Ordering\Domain\ProducerNotifier;
 use Guixa\Ordering\Domain\ReceptionLoader;
 use Guixa\Ordering\Domain\ValueObject\PickupWeekday;
+use Guixa\Ordering\Infrastructure\Stock\StockModuleReturnItemCatalog;
+use Guixa\Ordering\Infrastructure\Stock\StockModuleStockCatalog;
 use Guixa\Shared\Application\Actor;
+use Guixa\Shared\Domain\Money;
 use Guixa\Shared\Domain\Role;
+use Guixa\Stock\Application\GetReturnItem;
+use Guixa\Stock\Application\GetStockOffer;
+use Guixa\Stock\Application\RecordStockEntry;
+use Guixa\Stock\Domain\ReturnItem;
+use Guixa\Stock\Domain\StockLedger;
+use Guixa\Stock\Domain\StockProduct;
 use Tests\Support\FrozenClock;
 use Tests\Support\InMemory\FakeHouseholds;
 use Tests\Support\InMemory\FakeProducerCutoffRules;
@@ -48,6 +62,9 @@ use Tests\Support\InMemory\InMemoryCycleRepository;
 use Tests\Support\InMemory\InMemoryOrderRepository;
 use Tests\Support\InMemory\InMemoryProductAvailabilityRepository;
 use Tests\Support\InMemory\InMemoryReceivedTotalRepository;
+use Tests\Support\InMemory\InMemoryReturnItemRepository;
+use Tests\Support\InMemory\InMemoryStockMovementRepository;
+use Tests\Support\InMemory\InMemoryStockProductRepository;
 
 /** The Ordering use cases wired to in-memory adapters, for the Application tests. */
 final class OrderingWorld
@@ -136,6 +153,22 @@ final class OrderingWorld
 
     public readonly AdjustDeliveredQuantity $adjustDeliveredQuantity;
 
+    public readonly InMemoryStockProductRepository $stockProducts;
+
+    public readonly InMemoryStockMovementRepository $stockMovements;
+
+    public readonly InMemoryReturnItemRepository $returnItems;
+
+    public readonly RecordStockEntry $recordStockEntry;
+
+    public readonly AddStockToPickup $addStockToPickup;
+
+    public readonly RemoveStockFromPickup $removeStockFromPickup;
+
+    public readonly AddReturnToPickup $addReturnToPickup;
+
+    public readonly RemoveReturnFromPickup $removeReturnFromPickup;
+
     public readonly Actor $manager;
 
     /** @param  ?int  $pickupWeekday  the cooperative's weekday (ISO), or null while a manager has not chosen one (R4c) */
@@ -192,12 +225,58 @@ final class OrderingWorld
 
         $this->manager = new Actor('00000000-0000-7000-8000-00000000000a', [Role::Manager]);
 
+        // Stock is the real Stock module over in-memory repositories, reached through Ordering's adapters.
+        $this->stockProducts = new InMemoryStockProductRepository;
+        $this->stockMovements = new InMemoryStockMovementRepository;
+        $this->returnItems = new InMemoryReturnItemRepository;
+        $stockCatalog = new StockModuleStockCatalog(new GetStockOffer($this->stockProducts, $this->stockMovements));
+        $returnItemCatalog = new StockModuleReturnItemCatalog(new GetReturnItem($this->returnItems));
+        $this->recordStockEntry = new RecordStockEntry($this->stockProducts, $this->stockMovements, new StockLedger($this->stockMovements), $transactions, $this->clock);
+        $pickups = new PickupLocker($this->cycles, $this->orders);
+        $this->addStockToPickup = new AddStockToPickup($pickups, $this->orders, $stockCatalog, $transactions);
+        $this->removeStockFromPickup = new RemoveStockFromPickup($pickups, $this->orders, $transactions);
+        $this->addReturnToPickup = new AddReturnToPickup($pickups, $this->orders, $returnItemCatalog, $transactions);
+        $this->removeReturnFromPickup = new RemoveReturnFromPickup($pickups, $this->orders, $transactions);
+
         // Both producers have an account, so their orders can be sent.
         $this->notifier->hasAccount(self::BAKER, self::GROWER);
 
         // The baker's default cutoff is 3 days before pickup at 20:00 (S6).
         $this->rules->activate(self::BAKER, 3, '20:00');
         $this->rules->activate(self::GROWER, 2, '12:00');
+    }
+
+    /** @return string the new stock product's id, with `$available` on hand */
+    public function stockProduct(string $name, int $priceCents, string $available, bool $variable = false, string $unit = 'jar', ?string $containersPerUnit = null): string
+    {
+        $product = StockProduct::create($this->stockProducts->nextId(), $name, $unit, Money::ofCents($priceCents), $variable, $containersPerUnit);
+        $this->stockProducts->add($product);
+        ($this->recordStockEntry)($this->manager, $product->id, $available, null);
+
+        return $product->id;
+    }
+
+    public function deactivateStockProduct(string $id): void
+    {
+        $product = $this->stockProducts->get($id);
+        $product->deactivate();
+        $this->stockProducts->add($product);
+    }
+
+    /** @return string the new return item's id */
+    public function returnItem(string $name, int $amountCents): string
+    {
+        $item = ReturnItem::create($this->returnItems->nextId(), $name, Money::ofCents($amountCents));
+        $this->returnItems->add($item);
+
+        return $item->id;
+    }
+
+    public function deactivateReturnItem(string $id): void
+    {
+        $item = $this->returnItems->get($id);
+        $item->deactivate();
+        $this->returnItems->add($item);
     }
 
     public function member(): Actor

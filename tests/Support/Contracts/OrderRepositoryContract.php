@@ -10,6 +10,8 @@ use Guixa\Ordering\Domain\PickupStatus;
 use Guixa\Ordering\Domain\ValueObject\CutoffRule;
 use Guixa\Ordering\Domain\ValueObject\OrderableProduct;
 use Guixa\Ordering\Domain\ValueObject\PickupWeekday;
+use Guixa\Ordering\Domain\ValueObject\ReturnItemOffer;
+use Guixa\Ordering\Domain\ValueObject\StockOffer;
 use Guixa\Shared\Domain\Money;
 use Guixa\Shared\Domain\Quantity;
 use PHPUnit\Framework\Attributes\Test;
@@ -30,6 +32,12 @@ trait OrderRepositoryContract
     private const BREAD = '00000000-0000-7000-8000-0000000000f1';
 
     private const APPLES = '00000000-0000-7000-8000-0000000000f2';
+
+    private const HONEY = '00000000-0000-7000-8000-0000000000f3';
+
+    private const CHEESE = '00000000-0000-7000-8000-0000000000f5';
+
+    private const JAR = '00000000-0000-7000-8000-0000000000f4';
 
     private const ANNA = '00000000-0000-7000-8000-0000000000a1';
 
@@ -375,5 +383,68 @@ trait OrderRepositoryContract
         $this->assertNotNull($line);
         $this->assertSame(['0.000', '1.000', true, 350], [$line->ordered->toString(), $line->allocated->toString(), $line->allocatedByHand, $line->unitPrice->cents]);
         $this->assertSame([], $repository->lineCountsOfHousehold(self::HOUSEHOLD));
+    }
+
+    #[Test]
+    public function it_stores_stock_and_return_lines_with_their_snapshots_and_removes_them_whole(): void
+    {
+        $this->openCycle();
+        $repository = $this->repository();
+        $order = $repository->lockFor(self::CYCLE, self::HOUSEHOLD);
+        $order->openPickup();
+        $honey = new StockOffer(self::HONEY, 'Honey', 'jar', Money::ofCents(650), false, Quantity::fromString('2'), true, Quantity::fromString('9'));
+        $cheese = new StockOffer(self::CHEESE, 'Cheese', 'kg', Money::ofCents(2000), true, null, true, Quantity::fromString('9'));
+        $order->addStock($honey, Quantity::fromString('2'), $repository->nextId());
+        $order->addStock($cheese, Quantity::fromString('0.250'), $repository->nextId());
+        $order->addReturn(new ReturnItemOffer(self::JAR, 'Glass jar', Money::ofCents(50)), 4, $repository->nextId());
+        $repository->add($order);
+
+        $stored = $repository->ofHousehold(self::CYCLE, self::HOUSEHOLD);
+        [$storedHoney, $storedCheese] = $stored->stockLines();
+
+        $this->assertSame([self::HONEY, 'Honey', 'jar', 650, false, '2.000', '2.000'], [$storedHoney->stockProductId, $storedHoney->name, $storedHoney->unit, $storedHoney->unitPrice->cents, $storedHoney->variable, $storedHoney->containersPerUnit?->toString(), $storedHoney->quantity->toString()]);
+        $this->assertSame([self::CHEESE, true, null, '0.250'], [$storedCheese->stockProductId, $storedCheese->variable, $storedCheese->containersPerUnit, $storedCheese->quantity->toString()]);
+        $this->assertCount(1, $stored->returnLines());
+        $this->assertSame([self::JAR, 'Glass jar', 50, 4], [$stored->returnLines()[0]->returnItemId, $stored->returnLines()[0]->name, $stored->returnLines()[0]->amount->cents, $stored->returnLines()[0]->quantity]);
+
+        $stored->addStock($honey, Quantity::fromString('1'), $repository->nextId());
+        $stored->removeStock(self::CHEESE);
+        $stored->removeReturn(self::JAR);
+        $repository->add($stored);
+
+        $again = $repository->ofHousehold(self::CYCLE, self::HOUSEHOLD);
+        $this->assertSame(['3.000'], array_map(fn ($line) => $line->quantity->toString(), $again->stockLines()));
+        $this->assertSame([], $again->returnLines());
+    }
+
+    #[Test]
+    public function it_returns_the_stock_and_return_lines_of_every_order_of_a_cycle(): void
+    {
+        $this->openCycle();
+        $repository = $this->repository();
+        $honey = new StockOffer(self::HONEY, 'Honey', 'jar', Money::ofCents(650), false, null, true, Quantity::fromString('9'));
+        $jar = new ReturnItemOffer(self::JAR, 'Glass jar', Money::ofCents(50));
+
+        foreach ([[self::HOUSEHOLD, 2, 3], [self::OTHER_HOUSEHOLD, 1, 0]] as [$household, $stock, $returned]) {
+            $order = $repository->lockFor(self::CYCLE, $household);
+            $order->openPickup();
+            $order->addStock($honey, Quantity::fromString((string) $stock), $repository->nextId());
+
+            if ($returned > 0) {
+                $order->addReturn($jar, $returned, $repository->nextId());
+            }
+
+            $repository->add($order);
+        }
+
+        $byHousehold = [];
+        foreach ($repository->ofCycle(self::CYCLE) as $order) {
+            $byHousehold[$order->householdId] = [
+                array_map(fn ($line) => $line->quantity->toString(), $order->stockLines()),
+                array_map(fn ($line) => $line->quantity, $order->returnLines()),
+            ];
+        }
+
+        $this->assertSame([self::HOUSEHOLD => [['2.000'], [3]], self::OTHER_HOUSEHOLD => [['1.000'], []]], $byHousehold);
     }
 }
