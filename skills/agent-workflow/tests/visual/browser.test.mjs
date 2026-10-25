@@ -28,7 +28,8 @@ async function render(css, markup) {
         `(${measureLayout.toString()})(${JSON.stringify(options)})`,
     );
 }
-test('detects table cells clipped while document width passes; accepts reflow', async () => {
+// The Node test runner owns completion and failure reporting; register the whole suite synchronously.
+void test('detects table cells clipped while document width passes; accepts reflow', async () => {
     const markup = '<table><tr><td>Product</td><td>100.00</td></tr></table>';
     const broken = await render(
         'main{overflow:hidden}table{width:700px}',
@@ -39,7 +40,7 @@ test('detects table cells clipped while document width passes; accepts reflow', 
     const fixed = await render('td{display:block}', markup);
     assert.deepEqual(fixed.failures, []);
 });
-test('detects long text and zero-width names; accepts wrapping', async () => {
+void test('detects long text and zero-width names; accepts wrapping', async () => {
     const markup =
         '<div class="row"><span data-visual-text>ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFG</span><button>Available</button></div>';
     assert.ok(
@@ -60,7 +61,7 @@ test('detects long text and zero-width names; accepts wrapping', async () => {
         [],
     );
 });
-test('detects button labels outside their box and panel', async () => {
+void test('detects button labels outside their box and panel', async () => {
     const markup = '<button>Correct balance</button>';
     assert.ok(
         (
@@ -73,7 +74,7 @@ test('detects button labels outside their box and panel', async () => {
         [],
     );
 });
-test('detects focused controls hidden by clipping or an overlay', async () => {
+void test('detects focused controls hidden by clipping or an overlay', async () => {
     await render(
         '#cover{position:fixed;inset:0;background:white;z-index:10}',
         '<button id="action">Save</button><div id="cover"></div>',

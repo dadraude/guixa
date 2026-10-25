@@ -10,7 +10,8 @@ const runner = fileURLToPath(
     new URL('../../scripts/visual/run.mjs', import.meta.url),
 );
 
-test('CLI captures settled UI, verifies coverage, and rejects changed or missing evidence', async () => {
+// The Node test runner owns completion and failure reporting; register the whole suite synchronously.
+void test('CLI captures settled UI, verifies coverage, and rejects changed or missing evidence', async () => {
     const cwd = await mkdtemp(join(tmpdir(), 'visual-runner-test-'));
     const server = createServer(async (_req, res) => {
         res.setHeader('Content-Type', 'text/html');

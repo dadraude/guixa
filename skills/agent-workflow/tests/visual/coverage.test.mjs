@@ -39,14 +39,15 @@ const passing = () => ({
     })),
 });
 
-test('enumerates every view/state and matrix combination', () => {
+// The Node test runner owns completion and failure reporting; register the whole suite synchronously.
+void test('enumerates every view/state and matrix combination', () => {
     assert.equal(expandMatrix(manifest).length, 12);
     const copy = structuredClone(manifest);
     copy.views[0].states.push({ id: 'long-name', query: { long: 1 } });
     assert.equal(expandMatrix(copy).length, 24);
     assert.deepEqual(checkCoverage(manifest, passing(), candidate), []);
 });
-test('rejects empty or duplicate coverage definitions', () => {
+void test('rejects empty or duplicate coverage definitions', () => {
     for (const edit of [
         (m) => (m.views = []),
         (m) => (m.matrix.widths = []),
@@ -61,7 +62,7 @@ test('rejects empty or duplicate coverage definitions', () => {
         assert.throws(() => expandMatrix(m));
     }
 });
-test('missing, duplicate, failed and unknown cases block review', () => {
+void test('missing, duplicate, failed and unknown cases block review', () => {
     for (const edit of [
         (r) => r.cases.pop(),
         (r) => r.cases.push(r.cases[0]),
@@ -73,7 +74,7 @@ test('missing, duplicate, failed and unknown cases block review', () => {
         assert.ok(checkCoverage(manifest, report, candidate).length);
     }
 });
-test('stale candidate, fixture configuration or harness blocks review', () => {
+void test('stale candidate, fixture configuration or harness blocks review', () => {
     for (const key of Object.keys(candidate)) {
         assert.ok(
             checkCoverage(manifest, passing(), {
@@ -83,7 +84,7 @@ test('stale candidate, fixture configuration or harness blocks review', () => {
         );
     }
 });
-test('missing captures, measured coverage or keyboard evidence blocks review', () => {
+void test('missing captures, measured coverage or keyboard evidence blocks review', () => {
     for (const edit of [
         (r) => delete r.cases[0].sha256,
         (r) => (r.cases[0].screenshot = '../escape.png'),
