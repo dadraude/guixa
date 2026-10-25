@@ -1,6 +1,6 @@
 # Coordinate compatible tasks
 
-Use the selected runtime adapter and [project profile](../project.md). Read [scheduling](scheduling.md)
+Use the selected runtime adapter and [project profile](../../../.agent-workflow/profile.md). Read [scheduling](scheduling.md)
 before selecting work. These rules are shared by every runtime; one coordinator owns a feature across
 all sessions and runtimes. An in-session table is not a cross-process lock.
 
@@ -11,7 +11,7 @@ Paginate the eligible issues and their dependency and parent/child relations. On
 with a matching task row are candidates: exclude grouping parents even if their title resembles a task;
 include eligible children regardless of parent status. Report unmapped leaves rather than guessing.
 
-Dependency-ready means every blocker is Done, or no blockers exist. Inspect current source, worktrees
+Dependency-ready means every blocker has the profile's completion status, or no blockers exist. Inspect current source, worktrees
 and authorized open PR evidence to establish edit surfaces and actual prerequisite integration. Classify
 each candidate as eligible, waiting-integration, needs-scope or blocked-dependency. Done alone is not
 proof that prerequisite code exists in the base. Missing tooling/evidence keeps affected tasks waiting.

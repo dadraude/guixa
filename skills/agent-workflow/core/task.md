@@ -1,6 +1,6 @@
 # Run one task
 
-The coordinator owns every transition using the selected adapter and [project profile](../project.md).
+The coordinator owns every transition using the selected adapter and [project profile](../../../.agent-workflow/profile.md).
 Workers never launch other workers. This also applies to standalone task requests.
 Dispatch with [role-scoped context](handoff.md); process and adapter documents stay with the coordinator.
 
@@ -94,7 +94,7 @@ CI evidence. A green badge or an unrelated/stale run is insufficient.
 
 Do not mark the task validated, clean up its environment or release its reservation while CI is pending
 or failed. Missing CI capability remains missing proof, not permission to skip full validation. If the
-PR conflicts with a moved base, merge `origin/main` into the task branch as a new commit, rerun focused
+PR conflicts with a moved base, merge the configured base into the task branch as a new commit, rerun focused
 checks, get an independent review for behavioral/contract changes, then push. Do not reset correction/review counters after publishing or restarting a session.
 
 After `ci-passed`, keep the worktree, database and reservation while the PR is open: review feedback,
@@ -103,7 +103,7 @@ only after verified integration, at the start of a later session ([Clean up merg
 
 ## Stop
 
-Preserve the worktree and changes. Post the exact blocker/question on the issue and return it to
-Todo. A failed
+Preserve the worktree and changes. Post the exact blocker/question on the issue and return it to the
+profile's stopped status. A failed
 status update is pending, not a reason to retry publication. Keep the task reservation and report status,
 HEAD/base, checks/review rounds, remote outcomes and the exact decision or missing capability needed.

@@ -1,20 +1,25 @@
 # One workflow, two runtimes
 
-The process lives in [core](core/session.md), runtime operations in [adapters](adapters/codex.md), and
-project identities/commands in [project.md](project.md). Update each rule in one place. Permission for
-remote and implementation actions comes only from the profile's [standing authorization](project.md#standing-authorization).
+The process lives in [core](core/session.md) and runtime operations in [adapters](adapters/codex.md);
+both are project-independent. Each project supplies `.agent-workflow/profile.md` (identities, tracker,
+commands, conventions and the standing authorization) plus any cleanup scripts in `.agent-workflow/scripts/`.
+Update each rule in one place. Permission for remote and implementation actions comes only from the
+profile's standing authorization.
 
-## Use
+## Install in a project
 
-| Task                        | Codex                          | Claude Code              |
-| --------------------------- | ------------------------------ | ------------------------ |
-| Coordinate implementation   | `$guixa-implement-session`     | `/implement-session`     |
-| Implement one admitted task | `$guixa-implement-task DRA-NN` | `/implement-task DRA-NN` |
-| Draft a ticket batch        | `$guixa-to-tickets`            | `/to-tickets`            |
+1. Copy `skills/agent-workflow/` unchanged.
+2. Copy [profile-template.md](profile-template.md) to `.agent-workflow/profile.md` and fill it in.
+3. Add the thin entrypoints, each linking its adapter, the profile and its core process:
 
-Codex entrypoints live in `.agents/skills/guixa-*`; Claude entrypoints stay in `.claude/skills/`.
-Both link the same files. Codex names are prefixed to avoid collisions with personal/global skills.
-No global installation or symlink is required. If a running client does not discover new skills,
+| Task                        | Codex (`.agents/skills/`)           | Claude Code (`.claude/skills/`) |
+| --------------------------- | ----------------------------------- | ------------------------------- |
+| Coordinate implementation   | `$<prefix>-implement-session`       | `/implement-session`            |
+| Implement one admitted task | `$<prefix>-implement-task <issue>`  | `/implement-task <issue>`       |
+| Draft a ticket batch        | `$<prefix>-to-tickets`              | `/to-tickets`                   |
+
+Codex names take the profile's prefix to avoid collisions with personal/global skills. Keep
+explicit-only invocation in each entrypoint's metadata. No global installation or symlink is required. If a running client does not discover new skills,
 reload its skills or start a fresh session; do not claim discovery from the registry alone.
 
 ## Guarantees
@@ -47,19 +52,17 @@ This reduces duplicated work/context, not the checks required for a validated de
 ## Verify without side effects
 
 ```sh
-PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s skills/guixa-workflow/tests
+PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s skills/agent-workflow/tests
 ```
 
-For an isolated copy not registered with Herd, resolve `herd which-php` in the primary checkout first
-and pass that absolute interpreter path as `GUIXA_WORKFLOW_PHP` to the test command in the copy.
-The helper test uses only an invalid ticket (rejected before database access); it skips when no PHP
-runtime is available. An explicitly supplied invalid interpreter is a failure, not a skip.
+Project-specific checks (such as a cleanup script) live in `.agent-workflow/tests/` and run the same way.
 
-These structural checks validate shared references, entrypoints and separation, not live agent behavior.
+These structural checks validate shared references, entrypoints, the profile's required sections and
+that the core stays project-independent, not live agent behavior.
 Also dry-run the same scenarios for both adapters: overlapping vs disjoint tasks, PR-open reservation,
 squash integration, scope expansion, clean rebase, exhausted review, unavailable capabilities, grouping
 parents and partial ticket publication. Never run a live implementation or create a ticket as a smoke test.
 Also exercise focused-only local verification, CI failure/fix, pending/skipped/stale CI, changed PR head
 or base, merge-ref identity, missing publication/update permission, and each role's minimum handoff.
 Instruction-only changes have no executable application behavior for RED/GREEN; structural tests
-and independent scenario walkthroughs are the proportional checks, not `composer ci:check` locally.
+and independent scenario walkthroughs are the proportional checks, not the full CI suite locally.

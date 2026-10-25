@@ -33,8 +33,11 @@ Ask first:
 | Tracker                                   | Linear; workspace URL slug `draude`, team `DRA`, project `Coop`                                            |
 | Eligible statuses / dependency completion | `Backlog`, `Todo` / `Done`                                                                                 |
 | Active / stopped status                   | `In Progress` / `Todo`                                                                                     |
-| Executable task                           | `Tnn` title prefix matching a row in `specs/*/tasks.md`                                                    |
+| Issue key                                 | `DRA-NN`                                                                                                   |
+| Executable task                           | `Tnn` title prefix matching a row in `specs/*/tasks.md`; title format `Tnn — Title`                        |
 | Ready label                               | `ready-for-agent`, executable mapped leaves only                                                           |
+| Relation fields                           | `parentId`, `blockedBy`/`blocks`, `relatedTo` on `save_issue`, where exposed                               |
+| Codex entrypoint prefix                   | `agent-workflow` (`$agent-workflow-implement-session`, `$agent-workflow-implement-task DRA-NN`, `$agent-workflow-to-tickets`) |
 | Remote / base                             | `origin` / `main`                                                                                          |
 | Task branch                               | `feature/dra-NN-<3-6 title words>`; `chore/` for tooling, test support or CI                               |
 | Worktree root                             | Sibling of the selected repository: `<repo-parent>/<repo-name>-worktrees`                                  |
@@ -52,6 +55,17 @@ Use the project's configured PHP 8.5 environment. The existing local option is
 `$WORKTREE_ROOT/.bin` prepended to `PATH`; verify it exists and `php -v` reports the required version.
 If unavailable, ask for an approved runtime path; do not install or change machine configuration.
 Do not assume the coordinator's Herd isolation applies to sibling worktrees.
+
+## Tracker constraints
+
+Linear rules the ticket gates rely on:
+
+- A sub-issue has exactly one parent. If a slice seems to belong to two deliverables, it is a separate
+  issue linked by blocking or related, not a shared child.
+- Sub-issues inherit project, cycle, priority and team from the parent. Pick a parent only when those
+  should match; work needing its own owner, cycle or team is a separate top-level issue with blocking.
+- A team may auto-close the parent when all sub-issues are done, so a parent must hold only the slices
+  that complete its deliverable.
 
 ## Commands
 
@@ -80,7 +94,8 @@ and run relevant structural checks. Never report an omitted check as passed.
 The current CI triggers on PRs and pushes to `main`, not a feature-branch push alone. Resolve expected
 checks from the current workflow (currently `ci` in `tests`) plus branch requirements before accepting
 results. This application pipeline does not automatically cover workflow-skill structural tests; run
-the README's offline checks locally when these instruction documents change.
+the offline checks in `skills/agent-workflow/tests` and `.agent-workflow/tests` locally when these
+instruction documents change.
 
 The prefix's `PGTZ=UTC` matches CI; a local Europe/Madrid database session can hide timestamp failures.
 Discover affected generators from the repository scripts before regenerating; do not invent a command.
@@ -90,7 +105,7 @@ Create worktrees with `git worktree add "$WORKTREE" -b "$BRANCH" "$BASE_REF"`.
 After the task's PR is merged and its merged commit is contained in `origin/main`, remove only the
 clean, task-owned worktree (never `--force`) and run the existing guarded cleanup helper from the
 coordinator with the verified PHP runtime:
-`php skills/guixa-workflow/scripts/drop-test-databases.php NN`.
+`php .agent-workflow/scripts/drop-test-databases.php NN`.
 Its allowed namespace is `guixa_test_draNN` and its suffixed worker databases. A cleanup failure is
 reported, not retried destructively.
 

@@ -35,7 +35,7 @@ Resume from the coordinator's findings. For conflicts, rebase onto the configure
 source semantics; regenerate derived files. Request admission before expanding scope. Only before
 publication, fold fixes into the task commit, rerun focused checks and document reconciliation.
 Report changed base/behavior/contracts: they invalidate earlier validation evidence and may need review.
-For a post-publication fix or conflict, create new commits (merge `origin/main` for a conflict), rerun
+For a post-publication fix or conflict, create new commits (merge the configured base for a conflict), rerun
 focused checks and return them for independent review and publication. Do not amend or rewrite a published branch.
 
 ## Report

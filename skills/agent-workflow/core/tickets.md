@@ -2,7 +2,7 @@
 
 ## Activation Contract
 
-Use the selected adapter and [project profile](../project.md) for future ticket batches. Auditing or drafting does not authorize publishing. Reorganizing
+Use the selected adapter and [project profile](../../../.agent-workflow/profile.md) for future ticket batches. Auditing or drafting does not authorize publishing. Reorganizing
 existing tickets is a separate request; do not migrate them as a side effect of creating new work.
 If a reader is needed, use [role-scoped context](handoff.md); ticket drafting does not load worker
 execution/setup instructions or authorize implementation.
@@ -13,11 +13,12 @@ execution/setup instructions or authorize implementation.
   identities/URLs before any write. If unavailable or mismatched, stop; do not
   switch to another workspace, credential or session.
 - Read the source spec/plan or issue and its relevant context. Keep the spec authoritative; link its
-  task row instead of duplicating a long mutable specification. Preserve existing `Tnn` identifiers.
+  task row instead of duplicating a long mutable specification. Preserve existing task IDs.
 - Make executable slices independently verifiable, with their code, tests and docs together. Do not
   split one behavior into separate layer-only tickets. For a cross-cutting mechanical refactor, use
   expand, migrate, contract with real prerequisite edges rather than pretending each layer stands alone.
-- Use native `parentId`, `blockedBy`/`blocks` and `relatedTo`, not only mentions in descriptions.
+- Use the tracker's native parent, blocking and related fields (named in the profile), not only
+  mentions in descriptions.
 - Never use blocking links to encode temporary shared-file contention. The implementation scheduler
   handles that separately. A leaf with no blockers is dependency-ready, not automatically parallel-safe.
 - Do not change team status automations, close parents or reparent existing work without authorization.
@@ -31,17 +32,10 @@ execution/setup instructions or authorize implementation.
 | Related           | A decision, follow-up or adjacent task provides useful context without being a prerequisite. Do not relate everything just because it shares a parent.                                                                                  |
 | No parent         | A standalone slice, or an approved project/milestone already supplies sufficient grouping. Do not create redundant containers.                                                                                                          |
 
-Linear constraints behind these gates:
+Apply the profile's tracker constraints (parent cardinality, inherited fields, automations) to these gates.
 
-- A sub-issue has exactly one parent. If a slice seems to belong to two deliverables, it is a separate
-  issue linked by blocking or related, not a shared child.
-- Sub-issues inherit project, cycle, priority and team from the parent. Pick a parent only when those
-  should match; work needing its own owner, cycle or team is a separate top-level issue with blocking.
-- A team may auto-close the parent when all sub-issues are done, so a parent must hold only the slices
-  that complete its deliverable.
-
-Grouping parents describe the outcome and completion criteria, have no executable `Tnn` prefix and
-receive no `ready-for-agent` label. Each executable child maps to a task row and uses `Tnn — Title`.
+Grouping parents describe the outcome and completion criteria, have no executable task ID and receive
+no ready label. Each executable child maps to a task row and uses the profile's executable title format.
 If that mapping is missing, report it before publishing agent-ready work; do not invent task numbers.
 Parent status does not gate its children. Do not make a child blocked by its own grouping parent.
 
@@ -53,7 +47,7 @@ Parent status does not gate its children. Do not make a child blocked by its own
    task link, blockers and contextual relations with a short reason. Include any proposed new parent.
    Ask one approval question and wait. Do not silently turn existing issues into children.
 3. On approval to publish, create approved new parents first, then leaves in dependency order; use
-   returned IDs. Create contextual links after both endpoints exist. Apply `ready-for-agent` only to
+   returned IDs. Create contextual links after both endpoints exist. Apply the profile's ready label only to
    executable mapped leaves and only if that label exists or its creation was explicitly approved.
 4. Preserve existing relationships on touched issues. Read current values before updates; do not
    assume array updates append. Read back parent IDs and all requested relations after publishing.
@@ -71,4 +65,4 @@ Existing ticket reorganization remains untouched unless separately requested.
 ## References
 
 - [Implementation discovery](session.md) excludes grouping parents.
-- [Scheduling](scheduling.md) handles edit surfaces independently of Linear relations.
+- [Scheduling](scheduling.md) handles edit surfaces independently of tracker relations.

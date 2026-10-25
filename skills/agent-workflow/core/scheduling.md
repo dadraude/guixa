@@ -3,7 +3,7 @@
 ## Before dispatch
 
 Build a transient coordinator table from the task/spec, current source, existing worktrees and open PR
-diffs. Reconstruct it on resume. Do not write scheduling dependencies into Linear `blockedBy`.
+diffs. Reconstruct it on resume. Do not write scheduling dependencies into tracker blocking relations.
 
 For each candidate record:
 
@@ -13,7 +13,7 @@ For each candidate record:
 - Shared contracts it changes or consumes, and expected writes to shared artifacts with their owner.
 - Lifecycle: queued, running, pending-ci, ci-failed, ci-passed, stopped, or integrated; PR and wait reason.
 
-Inspect the shared hotspots listed in the [project profile](../project.md), including source contracts,
+Inspect the shared hotspots listed in the [project profile](../../../.agent-workflow/profile.md), including source contracts,
 generated outputs and feature documents. Reading a file is not a write reservation. Reserve document
 writes when expected, rather than assuming every task edits every spec; an unexpected write uses the
 scope-expansion rule below. Different files can still conflict through a changing interface.
@@ -27,7 +27,7 @@ Do not claim that this in-session table is a cross-session lock.
 | Evidence                                                                | Action                                                    |
 | ----------------------------------------------------------------------- | --------------------------------------------------------- |
 | A real prerequisite is unfinished                                       | `blocked-dependency`; do not dispatch.                    |
-| Prerequisite code is not verified in the base, even if Linear says Done | `waiting-integration`.                                    |
+| Prerequisite code is not verified in the base, even if the tracker says done | `waiting-integration`.                              |
 | Files are disjoint and no changing shared contract couples the tasks    | Run concurrently, within the session limit.               |
 | Expected writes overlap, or a shared contract is being changed          | Queue the later task until the predecessor is integrated. |
 | Edit surface or ownership is unknown                                    | `needs-scope`; inspect before dispatch.                   |
