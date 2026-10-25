@@ -845,3 +845,8 @@ Why: the task row for T29 does not list R24b, and closing belongs to T30.
 
 T29 (`plan.md`, HTTP & pages): `POST …/pickups/{household}/complete` takes an optional `top_up` in euros (the same format as the wallet top-up) and redirects to the pickups index. `Manage/Pickups/Show` gets `components/pickup/CompleteForm.vue` while the pickup is pending. `PickupNotPending` and `InvalidTopUpAmount` get Catalan messages in `lang/ca/errors.php`; the translation test's list is not extended because `tests/Unit` was outside this task's surfaces.
 Why: R21 asks for the top-up at the same time as the completion, and a double completion (S22) shows as a form error.
+
+## 2026-10-25 · Change
+
+Glossary (`spec.md`, Producer): a producer grows, gathers or makes the products it supplies, and has at most one account instead of exactly one.
+Why: a producer exists without an account until its invitation is accepted, as the code already allows; and the Commissions grilling (`docs/commissions/2026-10-25-commission-decisions.md`) excluded resellers from the term.
