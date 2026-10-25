@@ -1,5 +1,14 @@
+// @vitest-environment jsdom
 import { describe, expect, it, vi } from 'vite-plus/test';
-import { createSSRApp, defineComponent, h, type Component } from 'vue';
+import {
+    createApp,
+    createSSRApp,
+    defineComponent,
+    h,
+    nextTick,
+    type Component,
+} from 'vue';
+import { router } from '@inertiajs/vue3';
 import { renderToString } from 'vue/server-renderer';
 import { installTranslations } from '@/lib/i18n';
 import Edit from './Edit.vue';
@@ -46,6 +55,38 @@ async function render(component: Component, props: Record<string, unknown>) {
 }
 
 describe('member order editor presentation', () => {
+    it('keeps the explicit Enter save request and its partial reload', async () => {
+        const put = vi.spyOn(router, 'put');
+        const element = document.createElement('div');
+        document.body.append(element);
+        const app = createApp(Edit, { order });
+        installTranslations(app);
+        app.mount(element);
+
+        const quantity =
+            element.querySelector<HTMLInputElement>('#quantity-bread')!;
+        quantity.value = '2';
+        quantity.dispatchEvent(new Event('input', { bubbles: true }));
+        await nextTick();
+        expect(
+            element.querySelector('[data-test="order-total"]')?.textContent,
+        ).toContain('7,00');
+        quantity.dispatchEvent(
+            new KeyboardEvent('keydown', { bubbles: true, key: 'Enter' }),
+        );
+
+        expect(put).toHaveBeenCalledWith(
+            '/cycles/cycle/order/lines/bread',
+            { quantity: '2' },
+            expect.objectContaining({
+                only: ['order', 'errors'],
+                preserveScroll: true,
+            }),
+        );
+        app.unmount();
+        element.remove();
+    });
+
     it('labels quantity inputs and keeps explicit save and the running total', async () => {
         const html = await render(Edit, { order });
 

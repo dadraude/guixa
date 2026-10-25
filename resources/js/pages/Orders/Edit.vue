@@ -100,7 +100,7 @@ const lineTotal = (price: string, quantity: string) =>
                 })
             "
         />
-        <InputError :message="domainError" role="alert" />
+        <InputError :message="domainError" role="alert" class="pilot-error" />
         <p
             v-if="order.cancelled"
             class="rounded-2xl border border-dashed bg-muted/50 p-6 font-medium"
@@ -123,7 +123,9 @@ const lineTotal = (price: string, quantity: string) =>
             class="min-w-0 overflow-hidden rounded-2xl border bg-card text-card-foreground shadow-xs"
             data-test="pickup"
         >
-            <h2 class="border-b bg-muted/40 p-4 text-lg font-semibold sm:px-5">
+            <h2
+                class="pilot-heading border-b bg-muted/40 p-4 text-xl font-semibold sm:px-5"
+            >
                 {{ trans('Your pickup') }}
             </h2>
             <p
@@ -218,7 +220,9 @@ const lineTotal = (price: string, quantity: string) =>
                 <div
                     class="flex flex-wrap items-center justify-between gap-3 border-b bg-muted/40 p-4 sm:px-5"
                 >
-                    <h2 class="min-w-0 text-lg font-semibold wrap-anywhere">
+                    <h2
+                        class="pilot-heading min-w-0 text-xl font-semibold wrap-anywhere"
+                    >
                         {{ group.producerName }}
                     </h2>
                     <span
