@@ -913,3 +913,9 @@ Inertia props, not authenticated end-to-end coverage. Artifacts and harness are 
 `.vitest/dra180-visual/` (check.mjs, evidence.json and *-375.png). An initial harness CSS scan issue and
 an animation-time measurement failed browser checks; after stopping, the user explicitly authorized
 one corrected run, which passed. The final scoped close-icon fix was then validated successfully.
+
+
+## 2026-10-25 · Change
+
+Glossary (`spec.md`, Producer): a producer grows, gathers or makes the products it supplies, and has at most one account instead of exactly one.
+Why: a producer exists without an account until its invitation is accepted, as the code already allows; and the Commissions grilling (`docs/commissions/2026-10-25-commission-decisions.md`) excluded resellers from the term.
