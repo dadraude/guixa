@@ -16,8 +16,9 @@ On a wait or missing scope/capability, report it before any mutation. Then set t
 The coordinator fetches the approved remote and creates the configured task worktree from the verified
 base, serializing shared Git operations. Pass issue/task IDs, branch, root/worktree/database, fixed base
 SHA, predecessor evidence, shared owners and allowed edit surfaces to the [implementer](implementer.md).
-Use the adapter's implementer role. Keep its identity for fixes; if it cannot resume, pass its full
-handoff and current diff to a replacement, never pretend it retained context.
+Use the adapter's implementer role once, then preserve and resume that owner through the whole task
+under [implementation ownership](handoff.md#implementation-ownership). Recover its recorded identity
+before any continuation; routine fixes or a new session never require a new implementer.
 
 Accept `committed` only after comparing actual paths with admitted scope. A scope request pauses writes
 until the coordinator readmits it; a product question goes to the user. `stopped` goes to Stop.
@@ -25,7 +26,8 @@ until the coordinator readmits it; a product question goes to the user. `stopped
 ## 3. Focused local verification
 
 Validate the implementer's focused evidence against the actual HEAD/base, covered requirements and
-changed test files. Reuse complete matching evidence; do not rerun it in a check worker by default.
+changed test files, existing tests of changed contracts, and formatting for all changed supported
+source/document files. Reuse complete matching evidence; do not rerun it in a check worker by default.
 Run missing focused checks in the isolated task environment. Full build, lint, type analysis and test
 suites belong to CI, not an additional local gate. Run a local build only when a focused test needs it
 or the change specifically needs a build reproduction; record the reason.
@@ -36,12 +38,20 @@ either stage (local verification or CI) stop the task; local success never reset
 Pending/unavailable evidence is not a passing attempt. Focused
 green covers only that HEAD/base and never means full validation has passed.
 
+For rendered UI changes, apply the [visual pre-review gate](../references/visual.md#pre-review-gate):
+check the [component reuse plan](../references/visual.md#reuse-components-before-building-screens)
+against the diff, compare the manifest to acceptance and the affected page/role/state inventory, require a successful
+shared verifier on the current HEAD/base, and require capture inspection plus acceptance-specific checks.
+Missing coverage returns to implementation before launching a reviewer; it is not a review round.
+
 ## 4. Independent review
 
 Launch a fresh read-only reviewer using [the reviewer brief](reviewer.md), fixed base and scheduling
 handoff. At most three rounds, including post-integration reviews; never reset the counter on rebase.
 Clean proceeds to preparation for publication. Product questions stop. Fixes in rounds 1/2 return to
-the implementer, then focused verification, then a fresh reviewer. Any unresolved finding after round 3 stops.
+the implementer for the [whole-pattern correction](../references/visual.md#correct-a-defect-pattern)
+when visual findings apply, then focused verification, then a fresh reviewer. Require the instance
+sweep and remaining-gap report before relaunching review. Any unresolved finding after round 3 stops.
 This task-level review does not replace any applicable repository-native review/consent requirement.
 
 ## 5. Prepare publication (no push)

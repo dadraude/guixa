@@ -12,6 +12,8 @@ For each candidate record:
   authorized new-file directories. Unknown surfaces mean `needs-scope`, not permission to edit anywhere.
 - Shared contracts it changes or consumes, and expected writes to shared artifacts with their owner.
 - Lifecycle: queued, running, pending-ci, ci-failed, ci-passed, stopped, or integrated; PR and wait reason.
+- Implementation owner: runtime/host, worker ID and retained owner-record/handoff paths, recovered on resume
+  under [implementation ownership](handoff.md#implementation-ownership).
 
 Inspect the shared hotspots listed in the [project profile](../../../.agent-workflow/profile.md), including source contracts,
 generated outputs and feature documents. Reading a file is not a write reservation. Reserve document

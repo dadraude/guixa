@@ -25,7 +25,37 @@ weaken those rules. A reviewer needing an extra probe requests its environment/a
 coordinator rather than inheriting write or remote permissions. Task-specific test prerequisites are
 passed only to roles that execute those tests.
 
-Reuse an implementer's identity for fixes with only the new findings, current diff and changed
-configuration. A replacement gets the full role-scoped handoff. Every independent review is fresh.
+Follow [implementation ownership](#implementation-ownership) for every implementation continuation.
+Every independent review is fresh; this freshness rule never applies to the implementer.
 Report command/status, candidate identity and failures; successful logs stay out of handoffs. Read
 bounded, sanitized failure excerpts only when diagnosing a failure; retain log/run references.
+
+For UI work, include the [visual contract](../references/visual.md) only for the implementer, reviewer
+and any visual check runner. Pass the declared matrix/inventory, manifest, current report/gallery and
+acceptance-specific results. Fix handoffs carry the accumulated finding ledger and pattern sweep, not
+just the most recent defect. Keep the actual total review count through publication and CI corrections.
+
+## Implementation ownership
+
+Assign one implementer per admitted task. Preserve its runtime/host and worker ID in the profile's
+ignored, task-local implementation owner record immediately after first dispatch. Retain the record
+and a durable handoff through review, publication, CI corrections and integration follow-ups. Record:
+
+```text
+task, worktree, branch, runtime/host, implementer_id, current_head, fixed_base,
+handoff_path, component_plan_path (for UI), replacement_history
+```
+
+For every correction or continuation, read that record and resume/message the same implementer using
+the adapter's supported mechanism. Idle or completed worker turns, failed checks, review findings,
+publication, session resumption and context compaction are not reasons to spawn a new implementer.
+Do not replace it to get a different design, reset its context or work around correction budgets.
+Only the assigned implementer changes task implementation; reviewers remain read-only, and the
+preparation role retains only its existing integration duties.
+
+If the recorded worker cannot be resumed, verify the runtime limitation first and ensure the previous
+worker cannot continue writing. Only genuine unavailability permits a replacement. Record the reason,
+old/new identities and full handoff before the replacement writes. Carry over the component decisions,
+actual diff, scope, HEAD/base, evidence, findings and all counters. If identity or write ownership cannot
+be established safely, stop the affected task. Never silently create a replacement after a timeout.
+The owner record is recovery evidence, not a cross-process lock or permission to bypass admission.

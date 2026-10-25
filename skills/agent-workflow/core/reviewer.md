@@ -9,6 +9,14 @@ not a clean result. Request missing inputs; do not infer remote or execution aut
 Read the task/phase acceptance, linked requirements/scenarios, affected design, project standards and
 new deviation log entries at the exact paths/sections in the handoff.
 
+For UI changes, load the [visual review handoff](../references/visual.md#review-handoff). Require the
+component plan with reuse/extension paths and reasons for new components, manifest/inventory,
+coverage result and gallery, acceptance-specific checks, and prior finding/pattern
+ledger. Missing component decisions or matrix coverage is a blocker. Flag duplicated components,
+page-specific reimplementations of existing patterns, or bypassed semantic tokens as reuse-contract findings. Return the complete finding batch and any uninspected
+areas; do not end a visual sweep after its first defect. Reuse verified unchanged evidence on follow-up
+rounds while checking the impact of the correction across the whole affected pattern.
+
 Check the whole diff for:
 
 - Spec: public-use-case tests prove each linked rule/scenario; code and design/spec agree; authorized
@@ -34,6 +42,9 @@ findings:
     what: <problem>
     why: <violated requirement, scenario, standard or invariant>
     fix: <concrete change, for fix only>
+    pattern: <failure mechanism and other instances to inspect, when visual>
+coverage: <areas inspected and remaining gaps>
+new_findings: <new defects vs unresolved prior findings, for follow-up rounds>
 ```
 
 A question is a product decision the documents leave open; preserve its wording for the user.

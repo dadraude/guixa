@@ -28,7 +28,8 @@ reload its skills or start a fresh session; do not claim discovery from the regi
 
 - One coordinator per feature across all runtimes; worktree isolation is not a distributed lock.
 - Shared-file/contract reservations last through verified integration, including after PR opening.
-- Fresh independent review, isolated task databases and focused rechecking after a base change remain required.
+- One retained implementer owns each task through corrections and CI; independent reviewers are fresh.
+- Isolated task databases and focused rechecking after a base change remain required.
 - Local checks cover the changed behavior; full build/lint/types/tests run in CI after publication.
 - An opened PR is `pending-ci`, not validated. Cleanup waits until the PR is merged and contained in `main`.
 - Grouping parents are not executable; hierarchy, prerequisites and contextual relations stay distinct.
@@ -51,6 +52,13 @@ for workers: exact relevant briefs, source sections, resolved settings and candi
 whole conversation. Keep passing logs out of prompts; request bounded failure output when needed.
 This reduces duplicated work/context, not the checks required for a validated delivery.
 
+## Visual tasks
+
+Use the [visual workflow](references/visual.md) for rendered UI changes: declare coverage before
+implementation, require an explicit existing-component reuse plan, reuse the [shared browser harness](scripts/visual/run.mjs), and require the coverage
+gate before independent review. Corrections check the same defect pattern across the admitted scope.
+The project profile supplies matrix dimensions and acceptance thresholds; the shared core stays portable.
+
 ## Verify without side effects
 
 ```sh
@@ -68,3 +76,13 @@ Also exercise focused-only local verification, CI failure/fix, pending/skipped/s
 or base, merge-ref identity, missing publication/update permission, and each role's minimum handoff.
 Instruction-only changes have no executable application behavior for RED/GREEN; structural tests
 and independent scenario walkthroughs are the proportional checks, not the full CI suite locally.
+
+The shared visual harness has dependency-free Node tests and real-browser regression fixtures:
+
+```sh
+node --test skills/agent-workflow/tests/visual/coverage.test.mjs
+CHROME_BIN="/path/to/installed/chrome" node --test skills/agent-workflow/tests/visual/*.test.mjs
+```
+
+Browser fixtures run in temporary directories with an isolated browser profile; they do not use the
+application or its database. A missing browser is a failed prerequisite, not a silently skipped check.

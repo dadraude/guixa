@@ -1,0 +1,30 @@
+{
+    "baseUrl": "http://127.0.0.1:5180",
+    "rootFontPx": 16,
+    "darkSelector": "html.dark",
+    "matrix": {
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark"],
+        "text": [100, 200]
+    },
+    "views": [
+        {
+            "id": "member-statement",
+            "path": "/visual-fixture.html",
+            "query": { "scenario": "statement", "role": "member" },
+            "root": "main",
+            "panels": ".panel",
+            "fonts": ["16px \"Instrument Sans\""],
+            "focus": ["a[data-back]", "button[data-submit]"],
+            "states": [
+                { "id": "populated" },
+                { "id": "long-name", "query": { "long": 1 } },
+                {
+                    "id": "processing",
+                    "query": { "processing": 1 },
+                    "checks": { "focus": ["a[data-back]"] }
+                }
+            ]
+        }
+    ]
+}

@@ -42,6 +42,7 @@ Ask first:
 | Task branch                               | `feature/dra-NN-<3-6 title words>`; `chore/` for tooling, test support or CI; `docs/` for documents only                      |
 | Worktree root                             | Sibling of the selected repository: `<repo-parent>/<repo-name>-worktrees`                                                     |
 | Task worktree                             | `<worktree-root>/dra-NN`                                                                                                      |
+| Implementation owner record               | `<worktree>/.agent-workflow/implementation-owner.json` (ignored runtime state; retain until integration)                      |
 | Test database                             | `guixa_test_draNN`; parallel workers may add `_test_N`                                                                        |
 | Limits                                    | 3 task pipelines in flight; 3 review rounds; stop after 2 consecutive failed attempts per validation stage                    |
 
@@ -93,12 +94,20 @@ with `TEST_DB`, and verify the replacement without logging credentials. Never ch
 All setup, tests and artisan commands use the worktree prefix above; the user's `guixa` database and
 shared `guixa_test` are not task databases. If isolated database configuration cannot be verified, stop.
 
-| Operation                 | Command in the task worktree                                                                                                                                                             |
-| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Setup                     | `composer install && pnpm install --frozen-lockfile`; build only for a focused-test prerequisite or build reproduction                                                                   |
-| Focused test              | `php artisan test --filter=<test>` (run serially initially)                                                                                                                              |
-| Focused checks            | Tests for affected behavior and every changed test file; select frontend files/tests using the installed runner's supported selectors; affected-file format/type checks only when needed |
-| Full validation (CI only) | `.github/workflows/tests.yml`: `composer setup`, then `composer ci:check`; resolve their current definitions from `composer.json` and `package.json`                                     |
+| Operation                 | Command in the task worktree                                                                                                                                                                           |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Setup                     | `composer install && pnpm install --frozen-lockfile`; build only for a focused-test prerequisite or build reproduction                                                                                 |
+| Focused test              | `php artisan test --filter=<test>` (run serially initially)                                                                                                                                            |
+| Focused checks            | Tests for affected behavior and every changed test file; select frontend files/tests using the installed runner's supported selectors; format all changed supported code/docs; type checks when needed |
+| Full validation (CI only) | `.github/workflows/tests.yml`: `composer setup`, then `composer ci:check`; resolve their current definitions from `composer.json` and `package.json`                                                   |
+
+For visual tasks, use the [shared visual workflow](../skills/agent-workflow/references/visual.md).
+The default matrix is every affected page/role and applicable state at 375, 1024 and 1280 px,
+light/dark, and 100%/200% root text. Include long valid content and controls below the first viewport.
+Add system appearance, overlays, reduced motion and fallback-font cases where applicable; preserve
+the plan/constitution contrast, 44 px target and no-clipping requirements. Store the task manifest
+with its committed fixture; keep generated reports/gallery in an untracked task artifact directory.
+Select existing tests of changed contracts even when their test files were not edited.
 
 Verify selector syntax from the installed runner before execution; do not guess a command or silently
 expand it to a full local suite. For changes without executable behavior, record the test-first exception
@@ -133,6 +142,10 @@ reported, not retried destructively.
   passing slice. Follow repository TDD instructions when available; do not require a global skill install.
 - Keep early returns, explicit names, short functions and comments for the why. Verify architecture,
   types and format with the configured checks rather than inventing additional conventions.
+- UI reuse: compose pages from `resources/js/components/`, the existing shadcn-vue primitives in
+  `resources/js/components/ui/`, and shared layouts/tokens. Record exact component paths before
+  implementation; extend existing variants before adding components. Repeated patterns need a shared
+  component, and a new component needs the concrete gap and inspected alternatives in its task handoff.
 - Shared hotspots: route/provider registration, repository interfaces/implementations, test contracts
   and fixtures, dependency manifests/locks, `resources/js/generated/`, feature plan/tasks/log.
 - Task commits: one line, no body or attribution, `<type>(<scope>): <description> (DRA-NN)`; preserve
