@@ -226,11 +226,12 @@ final class EloquentOrderRepository implements OrderRepository
 
     public function pendingPickupCycleIdsOfHousehold(string $householdId): array
     {
-        return DB::table('orders')
+        return array_values(DB::table('orders')
             ->where('household_id', $householdId)
             ->where('pickup_status', PickupStatus::Pending->value)
             ->pluck('cycle_id')
-            ->all();
+            ->map(fn ($cycleId): string => (string) $cycleId)
+            ->all());
     }
 
     public function lockFor(string $cycleId, string $householdId): Order
