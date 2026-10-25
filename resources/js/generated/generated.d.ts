@@ -291,7 +291,7 @@ readonly movements: App.Http.WalletMovementRow[],
 declare namespace Guixa {
 namespace Ordering {
 namespace Domain {
-export type PickupStatus = 'none' | 'pending' | 'nothing_to_collect';
+export type PickupStatus = 'none' | 'pending' | 'nothing_to_collect' | 'completed';
 }
 }
 namespace Shared {

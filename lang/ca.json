@@ -60,5 +60,8 @@
     "Return item": "Article retornable",
     "Choose an item": "Tria un article",
     "Number of returned items to add": "Nombre d’articles retornats per afegir",
-    "Add return": "Afegeix retorn"
+    "Add return": "Afegeix retorn",
+    "Top-up (EUR)": "Ingrés (EUR)",
+    "Complete pickup": "Completa la recollida",
+    "This pickup is completed.": "Aquesta recollida ja està completada."
 }

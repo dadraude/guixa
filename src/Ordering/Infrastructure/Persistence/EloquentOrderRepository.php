@@ -29,7 +29,11 @@ final class EloquentOrderRepository implements OrderRepository
             'cycle_id' => $order->cycleId,
             'household_id' => $order->householdId,
         ]);
-        DB::table('orders')->where('id', $order->id)->update(['pickup_status' => $order->pickup()->value]);
+        DB::table('orders')->where('id', $order->id)->update([
+            'pickup_status' => $order->pickup()->value,
+            'pickup_done_at' => $order->pickupDoneAt()?->format('Y-m-d\TH:i:s.uP'),
+            'charged_cents' => $order->charged()?->cents,
+        ]);
 
         $this->storeStockLines($order);
         $this->storeReturnLines($order);
@@ -258,6 +262,8 @@ final class EloquentOrderRepository implements OrderRepository
             PickupStatus::from($row->pickup_status),
             $this->stockLines($stockRows ?? $this->rowsOf('order_stock_lines', $row->id)),
             $this->returnLines($returnRows ?? $this->rowsOf('order_return_lines', $row->id)),
+            $row->pickup_done_at === null ? null : new DateTimeImmutable($row->pickup_done_at),
+            $row->charged_cents === null ? null : Money::ofCents($row->charged_cents),
         );
     }
 

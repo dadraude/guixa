@@ -13,6 +13,7 @@ use App\Http\Controllers\Manage\HouseholdMemberController;
 use App\Http\Controllers\Manage\HouseholdWalletController;
 use App\Http\Controllers\Manage\InvitationController;
 use App\Http\Controllers\Manage\ManagerRoleController;
+use App\Http\Controllers\Manage\PickupCompleteController;
 use App\Http\Controllers\Manage\PickupController;
 use App\Http\Controllers\Manage\PickupLineController;
 use App\Http\Controllers\Manage\PickupReturnController;
@@ -117,6 +118,7 @@ Route::middleware(['auth', 'verified', 'role:manager'])->prefix('manage')->name(
         Route::delete('{household}/stock-lines/{stockProduct}', [PickupStockController::class, 'destroy'])->name('cycles.pickups.stock-lines.destroy');
         Route::post('{household}/return-lines', [PickupReturnController::class, 'store'])->name('cycles.pickups.return-lines.store');
         Route::delete('{household}/return-lines/{returnItem}', [PickupReturnController::class, 'destroy'])->name('cycles.pickups.return-lines.destroy');
+        Route::post('{household}/complete', [PickupCompleteController::class, 'store'])->name('cycles.pickups.complete');
     });
 
     Route::get('settings', [SettingsController::class, 'show'])->name('settings.show');

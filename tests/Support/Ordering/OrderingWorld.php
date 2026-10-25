@@ -11,6 +11,7 @@ use Guixa\Ordering\Application\AdjustDeliveredQuantity;
 use Guixa\Ordering\Application\CancelCycle;
 use Guixa\Ordering\Application\ClearCutoff;
 use Guixa\Ordering\Application\CloseProducerNow;
+use Guixa\Ordering\Application\CompletePickup;
 use Guixa\Ordering\Application\GetCycleSummary;
 use Guixa\Ordering\Application\GetHouseholdOrder;
 use Guixa\Ordering\Application\GetPickup;
@@ -43,15 +44,20 @@ use Guixa\Ordering\Domain\ReceptionLoader;
 use Guixa\Ordering\Domain\ValueObject\PickupWeekday;
 use Guixa\Ordering\Infrastructure\Stock\StockModuleReturnItemCatalog;
 use Guixa\Ordering\Infrastructure\Stock\StockModuleStockCatalog;
+use Guixa\Ordering\Infrastructure\Stock\StockModuleStockSeller;
+use Guixa\Ordering\Infrastructure\Wallet\WalletModuleLedger;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Money;
 use Guixa\Shared\Domain\Role;
 use Guixa\Stock\Application\GetReturnItem;
 use Guixa\Stock\Application\GetStockOffer;
 use Guixa\Stock\Application\RecordStockEntry;
+use Guixa\Stock\Application\SellStock;
 use Guixa\Stock\Domain\ReturnItem;
 use Guixa\Stock\Domain\StockLedger;
 use Guixa\Stock\Domain\StockProduct;
+use Guixa\Wallet\Application\ChargeForPickup;
+use Guixa\Wallet\Application\RecordTopUp;
 use Tests\Support\FrozenClock;
 use Tests\Support\InMemory\FakeHouseholds;
 use Tests\Support\InMemory\FakeProducerCutoffRules;
@@ -59,6 +65,7 @@ use Tests\Support\InMemory\FakeProductCatalog;
 use Tests\Support\InMemory\ImmediateTransactionRunner;
 use Tests\Support\InMemory\InMemoryCooperativeSettings;
 use Tests\Support\InMemory\InMemoryCycleRepository;
+use Tests\Support\InMemory\InMemoryMovementRepository;
 use Tests\Support\InMemory\InMemoryOrderRepository;
 use Tests\Support\InMemory\InMemoryProductAvailabilityRepository;
 use Tests\Support\InMemory\InMemoryReceivedTotalRepository;
@@ -169,6 +176,12 @@ final class OrderingWorld
 
     public readonly RemoveReturnFromPickup $removeReturnFromPickup;
 
+    public readonly InMemoryMovementRepository $movements;
+
+    public readonly RecordTopUp $recordTopUp;
+
+    public readonly CompletePickup $completePickup;
+
     public readonly Actor $manager;
 
     /** @param  ?int  $pickupWeekday  the cooperative's weekday (ISO), or null while a manager has not chosen one (R4c) */
@@ -237,6 +250,16 @@ final class OrderingWorld
         $this->removeStockFromPickup = new RemoveStockFromPickup($pickups, $this->orders, $transactions);
         $this->addReturnToPickup = new AddReturnToPickup($pickups, $this->orders, $returnItemCatalog, $transactions);
         $this->removeReturnFromPickup = new RemoveReturnFromPickup($pickups, $this->orders, $transactions);
+
+        // Wallet is the real Wallet module over an in-memory repository, reached through Ordering's adapters.
+        $this->movements = new InMemoryMovementRepository;
+        $this->recordTopUp = new RecordTopUp($this->movements, $this->clock);
+        $stockSeller = new StockModuleStockSeller(
+            new SellStock($this->stockProducts, $this->stockMovements, new StockLedger($this->stockMovements), $transactions, $this->clock),
+            new GetStockOffer($this->stockProducts, $this->stockMovements),
+        );
+        $walletLedger = new WalletModuleLedger($this->recordTopUp, new ChargeForPickup($this->movements, $this->clock));
+        $this->completePickup = new CompletePickup($pickups, $this->orders, $stockSeller, $walletLedger, $transactions, $this->clock);
 
         // Both producers have an account, so their orders can be sent.
         $this->notifier->hasAccount(self::BAKER, self::GROWER);

@@ -258,3 +258,85 @@ it('answers a stock quantity that is out of range with a visible error, not a 50
 
     expect(DB::table('order_stock_lines')->count())->toBe(0);
 })->with(['99999999999', 'abc', '1,5', '12345678']);
+
+it('completes a pickup, charging the household, and redirects to the pickups index (R22, S15)', function () {
+    [$cycleId, , $households, $manager] = pickupFixture();
+
+    $this->actingAs($manager)->post("/manage/cycles/{$cycleId}/pickups/{$households['A']}/complete")
+        ->assertRedirect(route('manage.cycles.pickups.index', ['cycle' => $cycleId]));
+
+    expect(DB::table('orders')->where('household_id', $households['A'])->value('pickup_status'))->toBe('completed')
+        ->and(DB::table('orders')->where('household_id', $households['A'])->value('charged_cents'))->toBe(1400)
+        ->and(DB::table('wallet_movements')->where('household_id', $households['A'])->pluck('amount_cents')->all())->toBe([-1400]);
+});
+
+it('records the top-up typed at the pickup before the charge and sells the stock lines (R21, R22, S16, S19)', function () {
+    [$cycleId, , $households, $manager] = pickupFixture();
+    [$honey] = stockAndReturnFixture();
+    $this->actingAs($manager)->post("/manage/cycles/{$cycleId}/pickups/{$households['A']}/stock-lines", ['stock_product_id' => $honey, 'stock_quantity' => '2'])->assertRedirect();
+
+    $this->actingAs($manager)->post("/manage/cycles/{$cycleId}/pickups/{$households['A']}/complete", ['top_up' => '40,00'])->assertRedirect();
+
+    expect(DB::table('wallet_movements')->where('household_id', $households['A'])->orderBy('amount_cents')->get(['type', 'amount_cents', 'cycle_id'])->map(fn ($m) => [$m->type, $m->amount_cents, $m->cycle_id])->all())
+        ->toBe([['charge', -2600, $cycleId], ['top_up', 4000, null]])
+        ->and(DB::table('stock_movements')->where('stock_product_id', $honey)->where('type', 'sale')->value('quantity'))->toBe('-2.000');
+});
+
+it('rejects a second completion with a form error and charges once (R23, S22)', function () {
+    [$cycleId, , $households, $manager] = pickupFixture();
+    $url = "/manage/cycles/{$cycleId}/pickups/{$households['A']}/complete";
+    $this->actingAs($manager)->post($url)->assertRedirect();
+
+    $this->actingAs($manager)->post($url, ['top_up' => '10.00'])
+        ->assertSessionHasErrors(['domain' => 'Aquesta recollida ja no està pendent: no es pot modificar ni tornar a completar.']);
+
+    expect(DB::table('wallet_movements')->count())->toBe(1);
+});
+
+it('rejects a stock line that exceeds the stock at completion and records nothing (R22, S45)', function () {
+    [$cycleId, , $households, $manager] = pickupFixture();
+    [$honey] = stockAndReturnFixture('2');
+    $this->actingAs($manager)->post("/manage/cycles/{$cycleId}/pickups/{$households['A']}/stock-lines", ['stock_product_id' => $honey, 'stock_quantity' => '2'])->assertRedirect();
+    DB::table('stock_movements')->insert([
+        'id' => (string) Str::uuid7(), 'stock_product_id' => $honey, 'type' => 'adjustment', 'quantity' => '-1', 'note' => 'broken jar',
+        'occurred_at' => now(), 'recorded_by' => $manager->id,
+    ]);
+
+    $this->actingAs($manager)->post("/manage/cycles/{$cycleId}/pickups/{$households['A']}/complete", ['top_up' => '10.00'])->assertSessionHasErrors('domain');
+
+    expect(DB::table('wallet_movements')->count())->toBe(0)
+        ->and(DB::table('orders')->where('household_id', $households['A'])->value('pickup_status'))->toBe('pending');
+});
+
+it('rejects a top-up of zero with the Catalan message and completes nothing (R29)', function () {
+    [$cycleId, , $households, $manager] = pickupFixture();
+
+    $this->actingAs($manager)->post("/manage/cycles/{$cycleId}/pickups/{$households['A']}/complete", ['top_up' => '0'])
+        ->assertSessionHasErrors(['domain' => 'L’ingrés ha de ser un import superior a zero.']);
+
+    expect(DB::table('wallet_movements')->count())->toBe(0)
+        ->and(DB::table('orders')->where('household_id', $households['A'])->value('pickup_status'))->toBe('pending');
+});
+
+it('rejects a top-up that is not an amount (R29)', function (string $topUp) {
+    [$cycleId, , $households, $manager] = pickupFixture();
+
+    $this->actingAs($manager)->post("/manage/cycles/{$cycleId}/pickups/{$households['A']}/complete", ['top_up' => $topUp])->assertSessionHasErrors();
+
+    expect(DB::table('wallet_movements')->count())->toBe(0);
+})->with(['abc', '1.234']);
+
+it('keeps completing a pickup to managers (R22)', function () {
+    [$cycleId, , $households] = pickupFixture();
+
+    $this->post("/manage/cycles/{$cycleId}/pickups/{$households['A']}/complete")->assertRedirect(route('login'));
+    $this->actingAs(accountWith(Role::Member))->post("/manage/cycles/{$cycleId}/pickups/{$households['A']}/complete")->assertForbidden();
+});
+
+it('shows a completed pickup as completed with its frozen lines read-only (R23)', function () {
+    [$cycleId, , $households, $manager] = pickupFixture();
+    $this->actingAs($manager)->post("/manage/cycles/{$cycleId}/pickups/{$households['A']}/complete")->assertRedirect();
+
+    $this->actingAs($manager)->get("/manage/cycles/{$cycleId}/pickups/{$households['A']}")
+        ->assertInertia(fn (Assert $page) => $page->where('pickup.status', 'completed')->where('pickup.totalCents', 1400));
+});

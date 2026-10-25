@@ -96,6 +96,28 @@ describe('pickup page', () => {
         expect(html).toContain('Nope');
     });
 
+    it('offers to complete a pending pickup with an optional top-up', async () => {
+        const html = await renderToString(
+            createSSRApp(Show, { pickup: pickup(false) }),
+        );
+
+        expect(html).toContain('data-test="complete-form"');
+        expect(html).toContain('data-test="top-up"');
+        expect(html).not.toContain('data-test="completed"');
+    });
+
+    it('shows a completed pickup read-only, with nothing left to complete', async () => {
+        const html = await renderToString(
+            createSSRApp(Show, {
+                pickup: { ...pickup(false), status: 'completed' },
+            }),
+        );
+
+        expect(html).toContain('data-test="completed"');
+        expect(html).not.toContain('data-test="complete-form"');
+        expect(html).not.toContain('data-test="delivered-form-beef"');
+    });
+
     it('flags an adjusted line', async () => {
         const html = await renderToString(
             createSSRApp(Show, { pickup: pickup(true) }),
