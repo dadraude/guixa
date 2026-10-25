@@ -24,7 +24,7 @@ means pause and request coordinator admission before writing it. Do not omit req
    editing requirements; design deviations still require admitted document surfaces.
 5. Inspect the diff, commit only the task's authorized code/tests/docs with the configured message,
    and return committed only with green focused evidence bound to HEAD/base. Full validation awaits CI
-   after independently reviewed, explicitly authorized publication.
+   after independent review and publication.
 
 Stop on silent/contradictory behavior requirements, a missing prerequisite, or failures you cannot fix
 within the task's correction budget. Leave unfinished work uncommitted and describe the blocker.
@@ -35,8 +35,8 @@ Resume from the coordinator's findings. For conflicts, rebase onto the configure
 source semantics; regenerate derived files. Request admission before expanding scope. Only before
 publication, fold fixes into the task commit, rerun focused checks and document reconciliation.
 Report changed base/behavior/contracts: they invalidate earlier validation evidence and may need review.
-For an authorized post-publication fix, create a new commit, rerun focused checks and return it for
-independent review and authorized publication. Do not amend or rewrite a published branch.
+For a post-publication fix or conflict, create new commits (merge the configured base for a conflict), rerun
+focused checks and return them for independent review and publication. Do not amend or rewrite a published branch.
 
 ## Report
 

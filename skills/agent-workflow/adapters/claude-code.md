@@ -1,8 +1,8 @@
 # Claude Code adapter
 
-Entrypoints remain `/implement-session`, `/implement-task DRA-NN`, `/to-tickets`.
+Entrypoints: `/implement-session`, `/implement-task <issue>`, `/to-tickets` in `.claude/skills/`.
 Their `disable-model-invocation: true` preserves explicit-only invocation. The wrappers load this
-adapter, the [project profile](../project.md) and the shared process, not a separate Claude workflow.
+adapter, the [project profile](../../../.agent-workflow/profile.md) and the shared process, not a separate Claude workflow.
 
 ## Capabilities and dispatch
 
@@ -24,16 +24,16 @@ is not an independent reviewer. Missing required delegation/reviewer capability 
 implementation before mutation; ticket drafting alone does not require delegation.
 
 Use `Bash`, `Read` and `Edit` only if exposed, with explicit worktree cwd/paths and the configured
-environment. Respect permission denials, native approvals and remote authorization separately; never
+environment. Respect permission denials, native approvals and the profile's standing authorization; never
 change permission modes, reuse ambient credentials or invoke another tool to bypass a refusal.
 
 ## Tracker and questions
 
-Use the authorized connected Linear tools after verifying the profile's identities and current schemas.
+Use the connected tools for the profile's tracker after verifying the profile's identities and current schemas.
 Map semantic parent/blocking/related operations to the supported native fields; preserve existing
 relations and read back results. Missing native relation support stops that operation, never substitutes
 plain text links or a different workspace/session. Tool discovery is conditional on host capabilities.
 
 Ask one focused question with the available question tool or chat and wait for the answer. Preserve
 native review's candidate-specific consent and exact continuations where applicable; task-level review
-does not replace it. Do not turn publishing approval into merge or force-push approval.
+does not replace it.

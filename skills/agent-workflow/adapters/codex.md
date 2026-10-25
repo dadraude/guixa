@@ -1,8 +1,8 @@
 # Codex adapter
 
-Entrypoints: `$guixa-implement-session`, `$guixa-implement-task DRA-NN`, `$guixa-to-tickets`.
-Their `agents/openai.yaml` preserves explicit-only invocation. The wrappers load this adapter,
-the [project profile](../project.md) and the requested shared process; do not copy process rules here.
+Entrypoints: `.agents/skills/<prefix>-implement-session`, `<prefix>-implement-task`, `<prefix>-to-tickets`,
+with the profile's Codex prefix. Their `agents/openai.yaml` preserves explicit-only invocation. The wrappers load this adapter,
+the [project profile](../../../.agent-workflow/profile.md) and the requested shared process; do not copy process rules here.
 
 ## Capabilities and dispatch
 
@@ -24,13 +24,13 @@ mutation. A read-only ticket draft does not require a subagent merely to compens
 
 Use shell/file tools with explicit cwd/absolute paths. Honor sandbox refusals and the host approval
 mechanism; never weaken permissions or reroute through another tool to bypass a denial. Runtime approval
-does not replace the user's authorization for a destination, operation and connected session.
+covers the host; the profile's standing authorization covers destinations and operations.
 
 ## Tracker and questions
 
-Discover connected Linear tools and read their current schemas. Verify the profile's workspace URL,
-team and project before writes. Map shared relation semantics to native parent, blocking and related
-fields (currently `parentId`, `blockedBy`/`blocks`, `relatedTo` on `save_issue` where exposed).
+Discover the connected tools for the profile's tracker and read their current schemas. Verify the
+profile's tracker identities before writes. Map shared relation semantics to the native parent,
+blocking and related fields the profile names.
 Read existing relations before updates; preserve them and verify results. No tool/field support means
 stop that operation, not substitute a text-only relation or a different workspace.
 

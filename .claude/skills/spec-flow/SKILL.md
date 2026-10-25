@@ -10,8 +10,9 @@ order of work.
 ## 1. Route
 
 For a bug or change request, pick one route (direct fix, spec flow, plan only) and tell the user which
-and why in one line, before editing anything. A spec flow then moves one document at a time, each
-waiting for the user's OK.
+and why in one line, before editing anything. A spec flow then moves one document at a time:
+`spec.md` waits for the user's OK; `plan.md` and `tasks.md` follow without waiting, and the user
+reviews them afterwards.
 
 Done when the user has seen the route.
 

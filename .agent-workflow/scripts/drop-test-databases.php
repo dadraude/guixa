@@ -13,7 +13,7 @@ if (! preg_match('/^\d+$/', $ticket)) {
 }
 
 $env = [];
-foreach (file(__DIR__.'/../../../.env', FILE_IGNORE_NEW_LINES) ?: [] as $line) {
+foreach (file(__DIR__.'/../../.env', FILE_IGNORE_NEW_LINES) ?: [] as $line) {
     if (preg_match('/^(DB_[A-Z_]+)=(.*)$/', $line, $match)) {
         $env[$match[1]] = trim($match[2], '"\'');
     }
