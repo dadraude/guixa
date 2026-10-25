@@ -80,18 +80,41 @@ export function expandMatrix(manifest) {
                             checkedView.noFocusReason.trim())),
                 `${view.id}/${state.id}: keyboard coverage required`,
             );
-            for (const width of matrix.widths)
-                for (const mode of matrix.modes)
-                    for (const text of matrix.text) {
-                        cases.push({
-                            id: `${view.id}--${state.id}--${width}--${mode}--${text}`,
-                            view: checkedView,
-                            state,
-                            width,
-                            mode,
-                            text,
-                        });
-                    }
+            const selected = Object.hasOwn(state, 'cases')
+                ? state.cases
+                : matrix.widths.flatMap((width) =>
+                      matrix.modes.flatMap((mode) =>
+                          matrix.text.map((text) => ({ width, mode, text })),
+                      ),
+                  );
+            requireValue(
+                Array.isArray(selected),
+                `${view.id}/${state.id}: cases must be an array`,
+            );
+            unique(
+                selected.map((item) => {
+                    requireValue(
+                        item &&
+                            Object.keys(item).sort().join(',') ===
+                                'mode,text,width' &&
+                            matrix.widths.includes(item.width) &&
+                            matrix.modes.includes(item.mode) &&
+                            matrix.text.includes(item.text),
+                        `${view.id}/${state.id}: invalid case`,
+                    );
+                    return `${item.width}--${item.mode}--${item.text}`;
+                }),
+                `${view.id}/${state.id} cases`,
+            );
+            for (const { width, mode, text } of selected)
+                cases.push({
+                    id: `${view.id}--${state.id}--${width}--${mode}--${text}`,
+                    view: checkedView,
+                    state,
+                    width,
+                    mode,
+                    text,
+                });
         }
     }
     return cases;

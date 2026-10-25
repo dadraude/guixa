@@ -14,7 +14,8 @@ means pause and request coordinator admission before writing it. Do not omit req
 2. Read the task row, phase acceptance, linked requirements/scenarios, design and project standards.
    Name the test for every linked requirement/scenario before implementation. For rendered UI changes,
    follow [visual verification](../references/visual.md): inspect and map existing components before
-   building screens, declare the page/role/state matrix, and use the shared harness.
+   building screens, declare the page/role/state inventory and selected cases, run the manifest plan
+   command, and share the count/rationale with the coordinator before broad implementation.
 3. Observe a failing public-interface test per requested rule/scenario, implement its passing slice,
    then refactor while green. Follow the profile's focused runner and code conventions. For genuinely
    non-executable changes, state the test-first exception and perform proportionate structural checks.
@@ -28,8 +29,9 @@ means pause and request coordinator admission before writing it. Do not omit req
 5. Inspect the diff, commit only the task's authorized code/tests/docs with the configured message,
    and return committed only with green focused evidence bound to HEAD/base. Full validation awaits CI
    after independent review and publication.
-6. For UI changes, generate final evidence on that commit, inspect every capture and satisfy the visual
-   coverage gate before returning it. Include acceptance-specific checks beyond the shared harness.
+6. For UI changes, generate final evidence on that commit, inspect failures, distinct layouts/states
+   and changed-pattern captures, and satisfy the visual coverage gate before returning it. Include
+   focused acceptance checks for requirements beyond the shared harness.
 
 Stop on silent/contradictory behavior requirements, a missing prerequisite, or failures you cannot fix
 within the task's correction budget. Leave unfinished work uncommitted and describe the blocker.

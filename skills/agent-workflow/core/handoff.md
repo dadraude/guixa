@@ -32,8 +32,9 @@ bounded, sanitized failure excerpts only when diagnosing a failure; retain log/r
 
 For UI work, include the [visual contract](../references/visual.md) only for the implementer, reviewer
 and any visual check runner. Pass the declared matrix/inventory, manifest, current report/gallery and
-acceptance-specific results. Fix handoffs carry the accumulated finding ledger and pattern sweep, not
-just the most recent defect. Keep the actual total review count through publication and CI corrections.
+selected case count/rationale plus focused acceptance results. Fix handoffs carry the accumulated
+finding ledger and pattern sweep, not just the most recent defect. Keep the actual total review count
+through publication and CI corrections.
 
 ## Implementation ownership
 

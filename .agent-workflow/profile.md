@@ -102,11 +102,18 @@ shared `guixa_test` are not task databases. If isolated database configuration c
 | Full validation (CI only) | `.github/workflows/tests.yml`: `composer setup`, then `composer ci:check`; resolve their current definitions from `composer.json` and `package.json`                                                   |
 
 For visual tasks, use the [shared visual workflow](../skills/agent-workflow/references/visual.md).
-The default matrix is every affected page/role and applicable state at 375, 1024 and 1280 px,
-light/dark, and 100%/200% root text. Include long valid content and controls below the first viewport.
-Add system appearance, overlays, reduced motion and fallback-font cases where applicable; preserve
-the plan/constitution contrast, 44 px target and no-clipping requirements. Store the task manifest
-with its committed fixture; keep generated reports/gallery in an untracked task artifact directory.
+The available visual dimensions are 375, 1024 and 1280 px, light/dark, and 100%/200% root text.
+Select cases by risk instead of multiplying every state by every dimension. The minimum is each
+affected page/role in its populated state at 375 and 1280 px, light and dark, 100% text. Check each
+distinct layout/form/table pattern at 1024 px and 200% text where reflow can change; include both
+themes when color or contrast is affected. Check each unique empty, error, disabled, long-content,
+domain or overlay state on its owning page at its riskiest width/text/theme, expanding after a defect.
+Include controls below the first viewport. Add system appearance, reduced motion and fallback-font
+cases where applicable. Preserve the plan/constitution contrast, 44 px target and no-clipping
+requirements. Record the selected combinations and rationale before implementation. Store the task
+manifest with its committed fixture; keep generated reports/gallery in an untracked task artifact
+directory. Use one shared coverage run per candidate entering review; reuse evidence while HEAD/base
+remain unchanged and run focused probes while implementing.
 Select existing tests of changed contracts even when their test files were not edited.
 
 Verify selector syntax from the installed runner before execution; do not guess a command or silently

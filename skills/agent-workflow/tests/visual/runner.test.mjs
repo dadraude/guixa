@@ -52,7 +52,15 @@ void test('CLI captures settled UI, verifies coverage, and rejects changed or mi
                     fonts: ['16px Arial'],
                     systemFonts: true,
                     focus: ['#save'],
-                    states: [{ id: 'populated' }],
+                    states: [
+                        {
+                            id: 'populated',
+                            cases: [
+                                { width: 375, mode: 'light', text: 100 },
+                                { width: 375, mode: 'system-dark', text: 200 },
+                            ],
+                        },
+                    ],
                 },
             ],
         };
@@ -79,7 +87,7 @@ void test('CLI captures settled UI, verifies coverage, and rejects changed or mi
         const report = JSON.parse(
             await readFile(join(cwd, 'artifacts/report.json')),
         );
-        assert.equal(report.cases.length, 4);
+        assert.equal(report.cases.length, 2);
         assert.equal((await cli('verify')).code, 0);
         const gallery = await readFile(
             join(cwd, 'artifacts/index.html'),
