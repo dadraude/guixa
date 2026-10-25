@@ -12,4 +12,7 @@ interface WalletLedger
 
     /** Charges the household for the cycle; a negative total is a credit and zero records nothing (R22, R23). */
     public function charge(Actor $actor, string $householdId, string $cycleId, int $totalCents): void;
+
+    /** Appends a signed wallet correction; positive credits the household, zero is omitted. */
+    public function correct(Actor $actor, string $householdId, string $cycleId, int $amountCents, string $productName): void;
 }

@@ -8,6 +8,8 @@ import PickupController from '@/actions/App/Http/Controllers/Manage/PickupContro
 import PickupLineController from '@/actions/App/Http/Controllers/Manage/PickupLineController';
 import PickupReturnController from '@/actions/App/Http/Controllers/Manage/PickupReturnController';
 import PickupStockController from '@/actions/App/Http/Controllers/Manage/PickupStockController';
+import Adjustments from '@/components/pickup/Adjustments.vue';
+import NotCollectedForm from '@/components/pickup/NotCollectedForm.vue';
 import CompleteForm from '@/components/pickup/CompleteForm.vue';
 import DeliveredForm from '@/components/pickup/DeliveredForm.vue';
 import { euros } from '@/components/pickup/euros';
@@ -83,6 +85,13 @@ const complete = (topUp: string | null) =>
     router.post(
         PickupCompleteController.store.url(target()),
         { top_up: topUp },
+        options,
+    );
+
+const markNotCollected = () =>
+    router.post(
+        PickupCompleteController.notCollected.url(target()),
+        {},
         options,
     );
 
@@ -183,22 +192,36 @@ const adjust = (productId: string, quantity: string) =>
             @remove="removeReturn"
         />
 
+        <Adjustments
+            v-if="pickup.originalChargeCents != null"
+            :lines="pickup.adjustments ?? []"
+            :original-charge-cents="pickup.originalChargeCents"
+        />
+
         <dl
             v-if="
                 pickup.balanceCents !== null &&
                 pickup.resultingBalanceCents !== null
             "
-            class="grid grid-cols-3 gap-2 text-sm"
+            class="grid grid-cols-2 gap-2 text-sm sm:grid-cols-3"
         >
             <div>
                 <dt class="text-muted-foreground">Current balance</dt>
                 <dd data-test="balance">{{ euros(pickup.balanceCents) }}</dd>
             </div>
             <div>
-                <dt class="text-muted-foreground">Total to charge</dt>
+                <dt class="text-muted-foreground">
+                    {{
+                        trans(
+                            pickup.status === 'pending'
+                                ? 'Total to charge'
+                                : 'Current pickup total',
+                        )
+                    }}
+                </dt>
                 <dd data-test="total">{{ euros(pickup.totalCents) }}</dd>
             </div>
-            <div>
+            <div v-if="pickup.status === 'pending'">
                 <dt class="text-muted-foreground">Resulting balance</dt>
                 <dd data-test="resulting-balance">
                     {{ euros(pickup.resultingBalanceCents) }}
@@ -213,8 +236,21 @@ const adjust = (productId: string, quantity: string) =>
             @complete="complete"
         />
 
+        <NotCollectedForm
+            v-if="pickup.status === 'pending'"
+            :processing="processing"
+            @submit="markNotCollected"
+        />
         <p
-            v-else-if="pickup.status === 'completed'"
+            v-if="pickup.status === 'not_collected'"
+            class="text-sm text-muted-foreground"
+            data-test="not-collected"
+        >
+            {{ trans('This pickup was not collected and has been charged.') }}
+        </p>
+
+        <p
+            v-if="pickup.status === 'completed'"
             class="text-sm text-muted-foreground"
             data-test="completed"
         >

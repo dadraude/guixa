@@ -82,10 +82,11 @@ final readonly class Reception
             $entry['order']->householdId,
             $entry['line']->id,
             $entry['line']->ordered,
-            $entry['line']->allocated,
-            $entry['line']->delivered(),
+            $entry['order']->effectiveAllocated($entry['line']),
+            $entry['order']->effectiveDelivered($entry['line']),
             $entry['line']->allocatedByHand,
             $entry['line']->createdAt,
+            $entry['order']->isFrozen(),
         ), $entries);
 
         $snapshot = $entries[0]['line'] ?? null;

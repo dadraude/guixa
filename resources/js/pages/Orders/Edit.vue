@@ -4,6 +4,7 @@ import { computed, reactive, ref } from 'vue';
 import OrderController from '@/actions/App/Http/Controllers/OrderController';
 import { ArrowLeft } from '@lucide/vue';
 import { trans } from 'laravel-vue-i18n';
+import Adjustments from '@/components/pickup/Adjustments.vue';
 import ReturnLines from '@/components/pickup/ReturnLines.vue';
 import StockLines from '@/components/pickup/StockLines.vue';
 import OrderPageHeader from '@/components/orders/OrderPageHeader.vue';
@@ -182,6 +183,15 @@ const lineTotal = (price: string, quantity: string) =>
                     :options="[]"
                     :editable="false"
                     :processing="false"
+                />
+            </div>
+            <div
+                v-if="order.pickup.originalChargeCents != null"
+                class="border-t p-4 sm:px-5"
+            >
+                <Adjustments
+                    :lines="order.pickup.adjustments ?? []"
+                    :original-charge-cents="order.pickup.originalChargeCents"
                 />
             </div>
             <p class="flex justify-between border-t p-4 font-semibold sm:px-5">

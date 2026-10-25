@@ -2,10 +2,13 @@
 
 use Guixa\Ordering\Application\CompletePickup;
 use Guixa\Ordering\Application\CycleSettlement;
+use Guixa\Ordering\Application\MarkPickupNotCollected;
 use Guixa\Ordering\Application\MarkProducerDistributed;
 use Guixa\Ordering\Application\PickupLocker;
+use Guixa\Ordering\Application\ReopenProducerOrder;
 use Guixa\Ordering\Application\StockSeller;
 use Guixa\Ordering\Application\ValidateReception;
+use Guixa\Ordering\Domain\Error\CycleClosed;
 use Guixa\Ordering\Domain\Error\CycleNotFound;
 use Guixa\Ordering\Domain\Error\CycleNotSettled;
 use Guixa\Ordering\Domain\Error\NotEnoughStock;
@@ -15,11 +18,9 @@ use Guixa\Ordering\Domain\NotDeliveredMarks;
 use Guixa\Ordering\Domain\PickupStatus;
 use Guixa\Ordering\Domain\ReceptionLoader;
 use Guixa\Ordering\Domain\StockLine;
-use Guixa\Ordering\Infrastructure\Wallet\WalletModuleLedger;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Error\NotAllowed;
 use Guixa\Shared\Domain\Role;
-use Guixa\Wallet\Application\ChargeForPickup;
 use Guixa\Wallet\Domain\Error\InvalidTopUpAmount;
 use Tests\Support\InMemory\ImmediateTransactionRunner;
 use Tests\Support\Ordering\OrderingWorld;
@@ -306,10 +307,7 @@ it('sells the stock lines in ascending stock product id order, whatever order th
         new PickupLocker($this->world->cycles, $this->world->orders),
         $this->world->orders,
         $sold,
-        new WalletModuleLedger(
-            $this->world->recordTopUp,
-            new ChargeForPickup($this->world->movements, $this->world->clock),
-        ),
+        $this->world->walletLedger,
         new ImmediateTransactionRunner,
         $this->world->clock,
     );
@@ -346,3 +344,47 @@ it('charges only the settled cycle and leaves the household order in an overlapp
         ->and($lineInB->ordered->toString())->toBe('3.000')
         ->and($this->world->orders->ofHousehold($cycleB, COMPLETE_A)->pickup())->toBe(PickupStatus::None);
 })->group('R4', 'S9');
+
+it('marks an absent household not collected, charges adjusted quantities and drops stock and returns (R24a, S42)', function () {
+    ($this->settle)();
+    $honey = $this->world->stockProduct('Honey', 600, '5');
+    $jar = $this->world->returnItem('Glass jar', 50);
+    ($this->world->addStockToPickup)($this->world->manager, $this->cycleId, COMPLETE_A, $honey, '2');
+    ($this->world->addReturnToPickup)($this->world->manager, $this->cycleId, COMPLETE_A, $jar, 4);
+    ($this->world->adjustDeliveredQuantity)($this->world->manager, $this->cycleId, COMPLETE_A, $this->beef, '1.120');
+    $mark = new MarkPickupNotCollected(
+        new PickupLocker($this->world->cycles, $this->world->orders),
+        $this->world->orders,
+        $this->world->walletLedger,
+        new ImmediateTransactionRunner,
+        $this->world->clock,
+    );
+
+    $mark($this->world->manager, $this->cycleId, COMPLETE_A);
+
+    expect(($this->movementsOf)())->toBe([['charge', -3440, $this->cycleId]])
+        ->and(($this->pickupOf)()->status)->toBe('not_collected')
+        ->and(($this->pickupOf)()->stockLines)->toBe([])
+        ->and(($this->pickupOf)()->returnLines)->toBe([])
+        ->and($this->world->stockMovements->available($honey)->toString())->toBe('5.000')
+        ->and(fn () => $mark($this->world->manager, $this->cycleId, COMPLETE_A))->toThrow(PickupNotPending::class)
+        ->and(($this->balance)())->toBe(-3440);
+})->group('R24a', 'S42');
+
+it('closes the cycle after its last pickup and refuses reopening or opening another pickup (R24b, S46, S54)', function () {
+    ($this->settle)();
+    ($this->complete)();
+    $reopen = new ReopenProducerOrder($this->world->cycles, new ImmediateTransactionRunner);
+
+    expect(fn () => $reopen($this->world->manager, $this->cycleId, OrderingWorld::BAKER))
+        ->toThrow(CycleClosed::class)
+        ->and(fn () => ($this->openPickup)(COMPLETE_K))->toThrow(CycleClosed::class);
+})->group('R24b', 'S46', 'S54');
+
+it('keeps closed cycle participation and member order changes final (R24b)', function () {
+    ($this->settle)();
+    ($this->complete)();
+
+    expect(fn () => ($this->world->addParticipant)($this->world->manager, $this->cycleId, OrderingWorld::GROWER))->toThrow(CycleClosed::class)
+        ->and(fn () => ($this->world->removeMarkedLine)($this->memberA, $this->cycleId, $this->bread))->toThrow(CycleClosed::class);
+})->group('R24b');

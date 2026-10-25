@@ -26,7 +26,7 @@ final class CompletePickup
         $actor->assertManager();
 
         $this->transactions->run(function () use ($actor, $cycleId, $householdId, $topUpCents) {
-            $order = $this->pickups->lock($cycleId, $householdId);
+            $order = $this->pickups->lock($cycleId, $householdId, completing: true);
             $total = $order->complete($this->clock->now());
 
             foreach ($this->inStockProductOrder($order->stockLines()) as $line) {
@@ -39,6 +39,7 @@ final class CompletePickup
 
             $this->wallet->charge($actor, $householdId, $cycleId, $total->cents);
             $this->orders->add($order);
+            $this->pickups->closeCycleIfDone($cycleId, $this->clock->now());
         });
     }
 

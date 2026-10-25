@@ -13,6 +13,7 @@ final readonly class PickupRow
      * @param  list<PickupLineRow>  $lines
      * @param  list<PickupStockLineRow>  $stockLines
      * @param  list<PickupReturnLineRow>  $returnLines
+     * @param  list<PickupAdjustmentRow>  $adjustments
      */
     public function __construct(
         public string $cycleId,
@@ -26,6 +27,8 @@ final readonly class PickupRow
         public ?int $resultingBalanceCents,
         public array $stockLines = [],
         public array $returnLines = [],
+        public array $adjustments = [],
+        public ?int $originalChargeCents = null,
     ) {}
 
     public static function from(PickupData $pickup, int $balanceCents): self
@@ -39,9 +42,11 @@ final readonly class PickupRow
             array_map(PickupLineRow::from(...), $pickup->lines),
             $pickup->totalCents,
             $balanceCents,
-            $balanceCents - $pickup->totalCents,
+            $pickup->status === 'pending' ? $balanceCents - $pickup->totalCents : $balanceCents,
             array_map(PickupStockLineRow::from(...), $pickup->stockLines),
             array_map(PickupReturnLineRow::from(...), $pickup->returnLines),
+            array_map(PickupAdjustmentRow::from(...), $pickup->adjustments),
+            $pickup->originalChargeCents,
         );
     }
 
@@ -60,6 +65,8 @@ final readonly class PickupRow
             null,
             array_map(PickupStockLineRow::from(...), $pickup->stockLines),
             array_map(PickupReturnLineRow::from(...), $pickup->returnLines),
+            array_map(PickupAdjustmentRow::from(...), $pickup->adjustments),
+            $pickup->originalChargeCents,
         );
     }
 }

@@ -340,3 +340,30 @@ it('shows a completed pickup as completed with its frozen lines read-only (R23)'
     $this->actingAs($manager)->get("/manage/cycles/{$cycleId}/pickups/{$households['A']}")
         ->assertInertia(fn (Assert $page) => $page->where('pickup.status', 'completed')->where('pickup.totalCents', 1400));
 });
+
+it('marks a pickup not collected through a manager-only endpoint and exposes closed read-only pages (R24a, R24b)', function () {
+    [$cycleId, , $households, $manager] = pickupFixture();
+    DB::table('cycle_producers')->where('cycle_id', $cycleId)->update(['sent_at' => now(), 'validated_at' => now(), 'distributed_at' => now()]);
+    $url = "/manage/cycles/{$cycleId}/pickups/{$households['A']}/not-collected";
+    $this->actingAs(accountWith(Role::Member))->post($url)->assertForbidden();
+    $this->actingAs($manager)->post($url)->assertRedirect(route('manage.cycles.pickups.index', $cycleId));
+    $this->get("/manage/cycles/{$cycleId}/pickups/{$households['A']}")->assertInertia(fn (Assert $page) => $page->where('pickup.status', 'not_collected'));
+    $this->get("/manage/cycles/{$cycleId}/pickups")->assertInertia(fn (Assert $page) => $page->where('closed', true)->has('households', 0));
+})->group('R24a', 'R24b');
+
+it('shows original charges and separate redistribution adjustment lines to managers and members (S64)', function () {
+    [$cycleId, $product, $households, $manager] = pickupFixture();
+    DB::table('cycle_producers')->where('cycle_id', $cycleId)->update(['sent_at' => now(), 'validated_at' => now(), 'distributed_at' => now()]);
+    $producer = DB::table('cycle_producers')->where('cycle_id', $cycleId)->value('producer_id');
+    $base = "/manage/cycles/{$cycleId}";
+    $this->actingAs($manager)->post("{$base}/pickups/{$households['K']}")->assertRedirect();
+    $this->post("{$base}/pickups/{$households['A']}/complete")->assertRedirect();
+    $this->delete("{$base}/receptions/{$producer}/distribution")->assertRedirect();
+    $this->put("{$base}/receptions/{$producer}/products/{$product}/received", ['received' => '6', 'include_completed' => true])->assertRedirect();
+    $this->get("{$base}/pickups/{$households['A']}")->assertInertia(fn (Assert $page) => $page
+        ->where('pickup.lines.0.delivered', '4.000')->where('pickup.originalChargeCents', 1400)
+        ->where('pickup.totalCents', 2100)->where('pickup.adjustments.0.quantityDelta', '2.000')
+        ->where('pickup.adjustments.0.amountCents', 700)->where('pickup.resultingBalanceCents', -2100));
+    $this->actingAs(memberOf($households['A']))->get("/cycles/{$cycleId}/order")->assertInertia(fn (Assert $page) => $page
+        ->where('order.pickup.originalChargeCents', 1400)->where('order.pickup.adjustments.0.amountCents', 700));
+})->group('S64');

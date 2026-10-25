@@ -22,6 +22,7 @@ const props = defineProps<{
         validated: boolean;
         distributed: boolean;
         settled: boolean;
+        closed?: boolean;
     };
     households: App.Http.HouseholdOptionRow[];
 }>();
@@ -49,6 +50,7 @@ const setReceived = (
     productId: string,
     received: string,
     overwriteManual: boolean,
+    includeCompleted?: boolean,
 ) =>
     send(
         ReceptionReceivedController.update.url({
@@ -56,7 +58,13 @@ const setReceived = (
             producer: props.reception.producerId,
             product: productId,
         }),
-        overwriteManual ? { received, overwrite_manual: true } : { received },
+        {
+            received,
+            overwrite_manual: overwriteManual,
+            ...(includeCompleted === undefined
+                ? {}
+                : { include_completed: includeCompleted }),
+        },
     );
 
 const setAllocation = (
@@ -170,7 +178,7 @@ const addProduct = computed(() =>
                 </p>
             </template>
             <Form
-                v-else-if="!distribution.settled"
+                v-else-if="!distribution.closed"
                 v-bind="reopen"
                 :options="{ preserveScroll: true }"
                 v-slot="{ processing: reopening }"
@@ -282,11 +290,12 @@ const addProduct = computed(() =>
                 :product="product"
                 :processing="processing"
                 @save="
-                    (received, overwriteManual) =>
+                    (received, overwriteManual, includeCompleted) =>
                         setReceived(
                             product.productId,
                             received,
                             overwriteManual,
+                            includeCompleted,
                         )
                 "
             />

@@ -2,7 +2,7 @@
 
 namespace Guixa\Ordering\Domain;
 
-/** Where a household's pickup stands (R19, R24); the not collected state arrives with T30. */
+/** Where a household's pickup stands (R19, R24). */
 enum PickupStatus: string
 {
     /** The cycle is not settled yet, or the order has no line. */
@@ -15,4 +15,6 @@ enum PickupStatus: string
 
     /** The manager completed it: charged, stock sold and frozen (R22, R23). */
     case Completed = 'completed';
+
+    case NotCollected = 'not_collected';
 }

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Form, Head, Link } from '@inertiajs/vue3';
+import { trans } from 'laravel-vue-i18n';
 import CycleCancellationController from '@/actions/App/Http/Controllers/Manage/CycleCancellationController';
 import CycleController from '@/actions/App/Http/Controllers/Manage/CycleController';
 import CycleCutoffController from '@/actions/App/Http/Controllers/Manage/CycleCutoffController';
@@ -195,6 +196,11 @@ const missingProducers = (cycle: App.Http.CycleRow) =>
                     >
                         Cancelled
                     </span>
+                    <span
+                        v-else-if="cycle.closed"
+                        class="text-sm text-muted-foreground"
+                        >{{ trans('Cycle closed') }}</span
+                    >
                     <Dialog v-else>
                         <DialogTrigger as-child>
                             <Button
@@ -270,7 +276,11 @@ const missingProducers = (cycle: App.Http.CycleRow) =>
                         </div>
 
                         <div
-                            v-if="participant.participating && !cycle.cancelled"
+                            v-if="
+                                participant.participating &&
+                                !cycle.cancelled &&
+                                !cycle.closed
+                            "
                             class="flex flex-wrap items-center gap-2"
                         >
                             <Form
@@ -347,7 +357,7 @@ const missingProducers = (cycle: App.Http.CycleRow) =>
                 </ul>
 
                 <Form
-                    v-for="producer in cycle.cancelled
+                    v-for="producer in cycle.cancelled || cycle.closed
                         ? []
                         : missingProducers(cycle)"
                     :key="producer.id"

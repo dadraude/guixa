@@ -30,6 +30,7 @@ readonly id: string,
 readonly pickupDate: string,
 readonly cancelled: boolean,
 readonly participants: App.Http.CycleParticipantRow[],
+readonly closed: boolean,
 };
 export type CycleSummaryRow = {
 readonly cycleId: string,
@@ -105,6 +106,15 @@ readonly producers: App.Http.OrderProducerRow[],
 readonly lines: App.Http.OrderLineRow[],
 readonly pickup: App.Http.PickupRow | null,
 };
+export type PickupAdjustmentRow = {
+readonly id: string,
+readonly productId: string,
+readonly name: string,
+readonly unit: string,
+readonly quantityDelta: string,
+readonly amountCents: number,
+readonly recordedAt: string,
+};
 export type PickupLineRow = {
 readonly productId: string,
 readonly name: string,
@@ -136,6 +146,8 @@ readonly balanceCents: number | null,
 readonly resultingBalanceCents: number | null,
 readonly stockLines: App.Http.PickupStockLineRow[],
 readonly returnLines: App.Http.PickupReturnLineRow[],
+readonly adjustments: App.Http.PickupAdjustmentRow[],
+readonly originalChargeCents: number | null,
 };
 export type PickupStockLineRow = {
 readonly stockProductId: string,
@@ -230,6 +242,7 @@ readonly balancedForDistribution: boolean,
 readonly hasManualAllocations: boolean,
 readonly hasAdjustments: boolean,
 readonly allocations: App.Http.ReceptionAllocationRow[],
+readonly hasDonePickups: boolean,
 };
 export type ReceptionRow = {
 readonly cycleId: string,
@@ -291,7 +304,7 @@ readonly movements: App.Http.WalletMovementRow[],
 declare namespace Guixa {
 namespace Ordering {
 namespace Domain {
-export type PickupStatus = 'none' | 'pending' | 'nothing_to_collect' | 'completed';
+export type PickupStatus = 'none' | 'pending' | 'nothing_to_collect' | 'completed' | 'not_collected';
 }
 }
 namespace Shared {

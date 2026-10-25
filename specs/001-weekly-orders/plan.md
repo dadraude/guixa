@@ -197,7 +197,7 @@ role only; participation is not restored.
   - `validate(producerId, now)`; `clearValidation(producerId)` when a received total changes (R17a, T23). `assertReceptionEditable(producerId)`: sent (`ProducerOrderNotSent`) and not distributed (`ProducerDistributed`), which `validate`, `markDistributed` and the three reception writers (`SetReceivedTotal`, `AddUnorderedProduct`, `SetAllocation`) call, so a distributed reception is read-only (R18).
   - `markDistributed(producerId, balanced, now)`: sent, not yet distributed, validated (`ReceptionNotValidated`) and balanced (`ReceptionUnbalanced`); settles the cycle the first
     time every participating producer is distributed and returns whether it did (R18). The cycle stores `settledAt`; the producer order stores `validatedAt` and `distributedAt`.
-  - `reopen(producerId)`: T23 reopens only before settlement and only a distributed producer (`ProducerNotDistributed`; a settled cycle is refused with `CycleAlreadySettled`); T30 allows it after settlement and rejects it once the cycle is closed (R18, R24b). Reopening keeps the validation, which only a changed received total clears (R17a).
+  - `reopen(producerId)`: only a distributed producer (`ProducerNotDistributed`), before or after settlement; a closed cycle is refused with `CycleClosed` (R18, R24b). Reopening keeps the validation, which only a changed received total clears (R17a).
   - `cancel(now)`: rejected with `ProducerOrderSent` once any producer order is sent (R4b, S37) and with `CycleCancelled` once already cancelled. A cancelled cycle refuses `addParticipant`, `setCutoff`, `closeNow`, `clearCutoff` and `assertOpenFor` with `CycleCancelled`, and `isOpenFor` is false.
   - `close(now, everyPickupDone)`: settled, every participating producer distributed and every pickup done (R24b).
 
@@ -276,7 +276,7 @@ role only; participation is not restored.
 
 - Errors (`Ordering\Domain\Error`): `NotOnPickupWeekday`, `PickupDateNotInFuture`, `CycleAlreadyExists`,
   `InvalidPickupWeekday`, `InvalidPickupDate`, `CycleNotFound`, `ProducerNotActive` (unknown or deactivated producer, S50),
-  `CycleCancelled`, `CycleAlreadySettled`, `CycleClosed`, `ProducerDistributed`, `ProducerNotDistributed`, `ProducerNotParticipating`, `ProducerClosed`,
+  `CycleCancelled`, `CycleClosed`, `ProducerDistributed`, `ProducerNotDistributed`, `ProducerNotParticipating`, `ProducerClosed`,
   `ProducerOrderSent`, `ProducerOrderNotSent`, `ProducerStillOpen`, `ProducerHasNoAccount`, `ProductNotInReception`, `ProductAlreadyOrdered`, `HouseholdNotFound`, `LineMarkedNotDelivered`, `CutoffOutOfRange`, `ProductNotOrderable`, `LineNotMarked`,
   `FractionalQuantityNotAllowed`, `NoHousehold`, `ReceptionNotValidated`, `ReceptionUnbalanced`,
   `ManualAllocationsWouldBeLost`, `NobodyOrderedProduct`, `CycleNotSettled`, `NotEnoughStock`,
@@ -326,7 +326,7 @@ role only; participation is not restored.
 | `MarkProducerDistributed` (settles the cycle when it is the last) | manager | R18, R24, S13, S20, S27–S29, S47, S61 |
 | `ReopenProducerOrder` (T23: before settlement only) | manager | R18, S29, S30, S46 |
 | `GetContainerCount` | manager | R18a, S60 |
-| `OpenPickup` (household without a pickup, active, in a settled cycle: `CycleNotSettled`, `HouseholdNotFound`, `HouseholdInactive`, `PickupAlreadyOpen`; the closed-cycle check arrives with T30) | manager | R19, S18 |
+| `OpenPickup` (household without a pickup, active, in a settled cycle: `CycleNotSettled`, `HouseholdNotFound`, `HouseholdInactive`, `PickupAlreadyOpen`; closed cycles are refused with `CycleClosed`) | manager | R19, S18 |
 | `GetPickup` (lines with ordered, allocated and delivered, and the total; stock and return lines arrive with T28; the household's balance and the resulting balance are read by the controller with Wallet's `GetBalance`, see the 2026-10-25 Deviation in `log.md`), `ListPickups` (`PickupSummaryData` per household with a pickup: status and total; settled cycles only, `CycleNotSettled` otherwise) | manager | R19, R21, S27 |
 | `AdjustDeliveredQuantity` | manager | R19, S14 |
 | `AddStockToPickup`, `RemoveStockFromPickup` | manager | R20, S17, S55 |
@@ -339,11 +339,16 @@ role only; participation is not restored.
 2. If any line of the product is `allocatedByHand` and `overwriteManual` is not true, throw
    `ManualAllocationsWouldBeLost` listing those households; nothing is stored. The page shows the
    warning and resubmits with `overwriteManual=true` on confirm, or does nothing on cancel (R15, S31).
-3. Claims = every household that ordered the product and whose pickup is not done, with its `ordered`
-   quantity; `target = received − Σ allocated of done pickups` (D12), so the reception stays balanced for
-   distribution whatever done pickups delivered (D16). Before settlement no pickup is done, so T22 splits the whole received total.
-   A product nobody ordered has no claims and is refused with `NobodyOrderedProduct` (R15).
-4. `reallocate` each line with the result (a line that is not a claim, such as an allocation-only one, goes to 0), store the `ReceivedTotal` and clear the validation (R17a, from T23).
+3. When done pickups have this product, require `includeCompleted` explicitly (`RedistributionChoiceRequired`).
+   Unfinished-only claims exclude done households and subtract their effective allocations from the total.
+   A negative remainder or no eligible claims raises `RedistributionCannotExcludeCompleted`, offering all or cancel.
+   All claims include done households; pending lines reallocate, done lines append `PickupAdjustment` and a signed
+   Wallet correction, in the same transaction. A product nobody ordered remains `NobodyOrderedProduct` (R15).
+4. Store the received total and clear validation. Allocation-only lines not in claims go to zero. A done line's
+   first baseline is its original delivered quantity; subsequent changes use its latest target. An unchanged
+   effective allocation and delivered target appends nothing. A first target equal to already charged delivered
+   weight but different from original allocation records a zero-charge reconciliation to balance reception;
+   the wallet omits zero and the UI labels that record as reconciliation.
    The cycle `FOR UPDATE` already serialises every reception change and `SetOrderLine` needs it `FOR SHARE`, so T22 does not lock the orders one by one.
 
 `SetAllocation` also requires a sent, not distributed producer order and an active household (`Households`,
@@ -364,7 +369,8 @@ with the cycle `FOR UPDATE`: `send`, `validate`, `markDistributed(producerId, tr
 `CycleSettlement`, so a cycle settled by the scheduler drops lines and closes like any other.
 
 `CompletePickup(cycle, household, topUp?)`, in one transaction:
-1. Load the cycle `FOR SHARE` and assert it is settled and not closed; load the order `FOR UPDATE`;
+1. Load the cycle `FOR UPDATE` and require settlement; load the order `FOR UPDATE`; a done pickup remains
+   `PickupNotPending` on duplicate finalization. A closed cycle has no pending pickups;
    `order.complete(now)`.
 2. For each stock line, in stock product id order, `StockSeller::sell(stockProductId, quantity, orderId)` — locks the stock product
    and fails with `NotEnoughStock` if it went below the quantity since it was added (R22, R27, S45).
@@ -372,7 +378,7 @@ with the cycle `FOR UPDATE`: `send`, `validate`, `markDistributed(producerId, tr
    is a credit, 0 records nothing (R21, R22).
 4. `cycle.close(...)` if this was the last pickup (R24b).
 Any failure rolls everything back. `MarkPickupNotCollected` follows steps 1, 3 (no top-up) and 4.
-`StockSeller` and `WalletLedger` are Ordering Application ports (they take the `Actor`) with the adapters `StockModuleStockSeller` and `WalletModuleLedger`; the pickup stores `pickup_done_at` and `charged_cents`. Closing the cycle (step 4) arrives with T30.
+`StockSeller` and `WalletLedger` are Ordering Application ports (they take the `Actor`) with the adapters `StockModuleStockSeller` and `WalletModuleLedger`; the pickup stores `pickup_done_at` and `charged_cents`. `PickupLocker` takes an exclusive cycle lock for finalization and closes after the order is saved.
 
 ## Stock
 
@@ -438,6 +444,7 @@ All ids are UUID v7 generated by repositories (`nextId()`); timestamps are `time
 | `invitations` | account_id, token_hash, sent_at | `PK (account_id)` (one live invitation per account); token_hash unique |
 | `producers` | id, name, active, cutoff_days_before, cutoff_time (`time`) | `CHECK (cutoff_days_before BETWEEN 1 AND 6)`; `users.producer_id` references it |
 | `products` | id, producer_id, name, unit, price_cents, variable, containers_per_unit?, active | `CHECK (price_cents >= 0)`; `CHECK (containers_per_unit > 0)` |
+| `order_pickup_adjustments` | id, order_id, product_id, name, unit, unit_price_cents, quantity_delta_thousandths, amount_cents, target_quantity, recorded_at, recorded_by | append-only inserts; ordered by recorded_at then id; target ≥ 0 |
 | `cycles` | id, pickup_date, cancelled_at?, settled_at?, closed_at? | partial `UNIQUE (pickup_date) WHERE cancelled_at IS NULL` |
 | `cycle_producers` | cycle_id, producer_id, participating, closes_at?, sent_at?, validated_at?, distributed_at? | `PK (cycle_id, producer_id)` |
 | `product_unavailabilities` | cycle_id, product_id | `PK (cycle_id, product_id)`; both reference their tables |
@@ -455,8 +462,9 @@ Concurrency:
 - Every `Cycle` mutation loads the cycle `FOR UPDATE`. `SetOrderLine` loads it `FOR SHARE` and the order
   `FOR UPDATE`, so a cutoff change or a send cannot slip in while a line is being saved (R6b, R8).
 - `SetReceivedTotal` and settlement lock every affected order of the cycle, in id order (no deadlocks).
-- `ReopenProducerOrder` locks the cycle `FOR UPDATE` and `CompletePickup` `FOR SHARE`, so a cycle cannot
-  close and reopen at once (R18, R24b).
+- `ReopenProducerOrder`, `CompletePickup` and `MarkPickupNotCollected` lock the cycle `FOR UPDATE` before
+  order locks. Finalization can close the cycle; using `FOR SHARE` then upgrading would deadlock concurrent
+  final pickups. This also serializes all redistribution adjustments and wallet corrections against completion.
 - An order is created with `INSERT … ON CONFLICT (cycle_id, household_id) DO NOTHING` and then loaded
   `FOR UPDATE`, so two members adding a household's first lines at once share one order.
 - `SellStock` and stock adjustments lock the `stock_products` row, so availability is checked under the lock.
@@ -729,8 +737,14 @@ Eloquent test (`Tests\TestCase` with `RefreshDatabase`) both use it and only imp
 - **D11** The pickup weekday is a single-row `cooperative_settings` table, not configuration: R4c lets a
   manager change it. It is still one value per installation, as the constitution allows for settings a
   manager changes in the app. Its value is null until a manager sets it, directly or when opening a cycle as permanent (R4c).
-- **D12** Re-allocating after settlement (a reopened producer) leaves completed and not collected pickups
-  as they were: their allocations are subtracted from the received total before splitting the rest (R18).
+- **D12** Re-allocating after settlement requires an explicit unfinished-only/all choice whenever the product
+  has completed or not-collected pickups. Unfinished-only subtracts their effective allocations before splitting
+  the remainder. All includes their original ordered claims, retaining original pickup lines and appending
+  immutable `PickupAdjustment` records (product snapshot, signed quantity/charge delta, resulting target,
+  actor/time) plus matching Wallet corrections in the same transaction. The first money/quantity baseline is
+  the original delivered line, then the latest adjustment target. Repeated identical targets append nothing.
+  `order_pickup_adjustments` persists those records; reception reads effective quantities, pickup displays
+  original lines plus all adjustments. Original charged amount/time and stock/return lines never change.
 - **D13** Producer deactivation is a Catalog use case that calls Membership (producer role) and Ordering
   (participation) through ports, in one transaction (R3a).
 - **D14** Cancelling a cycle deletes its orders and lines and keeps the cycle with `cancelled_at`, so members
@@ -742,7 +756,9 @@ Eloquent test (`Tests\TestCase` with `RefreshDatabase`) both use it and only imp
 - **D16** An order line keeps the reception's `allocated` and, apart, the `delivered` quantity a pickup
   adjustment sets. The charge, what members see and the container count use `delivered()`; the reception
   shows and flags the difference it makes, but distributing checks `allocated` only (R18, R19, S61).
-  A new allocation (way A or B, after a reopen) clears a pending pickup's adjustment.
+  A new allocation (way A or B, after a reopen) clears a pending pickup's adjustment. Explicit all-pickups
+  redistribution replaces a done line's effective reception quantity through a separate adjustment record,
+  preserving its original delivered quantity; signed wallet corrections use separately rounded old/new amounts.
 - **D17** The first manager is created by an Artisan command calling `CreateFirstManager`, which sends the
   usual invitation and is rejected once any manager exists (R36a: "outside the app").
 - **D18** Translations use `laravel-vue-i18n`, so PHP and Vue share the files in `lang/` (constitution, UI), with

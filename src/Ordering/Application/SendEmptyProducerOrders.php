@@ -77,8 +77,8 @@ final class SendEmptyProducerOrders
             // With no line to send nothing was received, so the reception is balanced.
             $cycle->validate($producerId, $now);
             $settledNow = $cycle->markDistributed($producerId, true, $now);
+            ($this->settlement)($cycle, $settledNow, $now);
             $this->cycles->add($cycle);
-            ($this->settlement)($cycle, $settledNow);
         }
     }
 }

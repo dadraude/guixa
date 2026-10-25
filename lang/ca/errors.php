@@ -2,6 +2,9 @@
 
 /** Member ordering errors; the remaining domain messages belong to T36. */
 return [
+    'RedistributionChoiceRequired' => 'Tria si vols redistribuir només les recollides pendents o totes les recollides.',
+    'RedistributionCannotExcludeCompleted' => 'No es pot repartir aquest total només entre les recollides pendents. Inclou totes les recollides o cancel·la el canvi.',
+    'CycleClosed' => 'Aquest cicle està tancat i no es pot modificar.',
     'CycleCancelled' => 'Aquest cicle s’ha cancel·lat. No se’n pot modificar la comanda.',
     'CycleNotFound' => 'No s’ha trobat aquest cicle de comanda.',
     'FractionalQuantityNotAllowed' => 'Aquest producte s’ha de demanar en unitats senceres.',

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Form, Head, Link } from '@inertiajs/vue3';
+import { trans } from 'laravel-vue-i18n';
 import CycleController from '@/actions/App/Http/Controllers/Manage/CycleController';
 import PickupController from '@/actions/App/Http/Controllers/Manage/PickupController';
 import Heading from '@/components/Heading.vue';
@@ -8,6 +9,7 @@ import { Button } from '@/components/ui/button';
 
 const props = defineProps<{
     cycleId: string;
+    closed?: boolean;
     pickups: App.Http.PickupSummaryRow[];
     households: App.Http.HouseholdOptionRow[];
 }>();
@@ -20,6 +22,8 @@ defineOptions({
 
 const statusLabels: Record<string, string> = {
     pending: 'Pending',
+    completed: 'Completed',
+    not_collected: 'Not collected',
     nothing_to_collect: 'Nothing to collect',
 };
 
@@ -41,6 +45,14 @@ const openForm = (householdId: string) =>
             title="Pickups"
             description="Households collect their allocation and stock products."
         />
+
+        <p
+            v-if="closed"
+            class="text-sm text-muted-foreground"
+            data-test="cycle-closed"
+        >
+            {{ trans('This cycle is closed. Pickups cannot be changed.') }}
+        </p>
 
         <p
             v-if="pickups.length === 0"
@@ -69,13 +81,16 @@ const openForm = (householdId: string) =>
                     {{ pickup.householdName }}
                 </Link>
                 <Badge variant="secondary">
-                    {{ statusLabels[pickup.status] ?? pickup.status }}
+                    {{ trans(statusLabels[pickup.status] ?? pickup.status) }}
                 </Badge>
                 <span>{{ euros(pickup.totalCents) }}</span>
             </li>
         </ul>
 
-        <section v-if="households.length > 0" class="flex flex-col gap-2">
+        <section
+            v-if="!closed && households.length > 0"
+            class="flex flex-col gap-2"
+        >
             <h2 class="text-lg font-medium">Open a pickup</h2>
             <p class="text-sm text-muted-foreground">
                 For a household without an order, for example to sell it stock.

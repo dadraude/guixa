@@ -57,7 +57,11 @@ use Guixa\Stock\Domain\ReturnItem;
 use Guixa\Stock\Domain\StockLedger;
 use Guixa\Stock\Domain\StockProduct;
 use Guixa\Wallet\Application\ChargeForPickup;
+use Guixa\Wallet\Application\RecordCorrection;
 use Guixa\Wallet\Application\RecordTopUp;
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Translation\FileLoader;
+use Illuminate\Translation\Translator;
 use Tests\Support\FrozenClock;
 use Tests\Support\InMemory\FakeHouseholds;
 use Tests\Support\InMemory\FakeProducerCutoffRules;
@@ -182,6 +186,8 @@ final class OrderingWorld
 
     public readonly CompletePickup $completePickup;
 
+    public readonly WalletModuleLedger $walletLedger;
+
     public readonly Actor $manager;
 
     /** @param  ?int  $pickupWeekday  the cooperative's weekday (ISO), or null while a manager has not chosen one (R4c) */
@@ -228,7 +234,6 @@ final class OrderingWorld
         $receptions = new ReceptionLoader($this->orders, $this->catalog, $this->availability, $this->receivedTotals);
         $this->getReception = new GetReception($this->cycles, $receptions, $this->households);
         $this->addUnorderedProduct = new AddUnorderedProduct($this->cycles, $receptions, $this->receivedTotals, $transactions);
-        $this->setReceivedTotal = new SetReceivedTotal($this->cycles, $this->orders, $receptions, $this->receivedTotals, $transactions);
         $this->setAllocation = new SetAllocation($this->cycles, $this->orders, $receptions, $this->households, $transactions, $this->clock);
 
         $this->getPickup = new GetPickup($this->cycles, $this->orders, $this->households);
@@ -258,7 +263,11 @@ final class OrderingWorld
             new SellStock($this->stockProducts, $this->stockMovements, new StockLedger($this->stockMovements), $transactions, $this->clock),
             new GetStockOffer($this->stockProducts, $this->stockMovements),
         );
-        $walletLedger = new WalletModuleLedger($this->recordTopUp, new ChargeForPickup($this->movements, $this->clock));
+        $walletLedger = new WalletModuleLedger($this->recordTopUp, new ChargeForPickup($this->movements, $this->clock),
+            new RecordCorrection($this->movements, $this->clock),
+            new Translator(new FileLoader(new Filesystem, dirname(__DIR__, 3).'/lang'), 'ca'));
+        $this->walletLedger = $walletLedger;
+        $this->setReceivedTotal = new SetReceivedTotal($this->cycles, $this->orders, $receptions, $this->receivedTotals, $transactions, $walletLedger, $this->clock);
         $this->completePickup = new CompletePickup($pickups, $this->orders, $stockSeller, $walletLedger, $transactions, $this->clock);
 
         // Both producers have an account, so their orders can be sent.

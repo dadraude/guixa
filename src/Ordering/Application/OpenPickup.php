@@ -33,6 +33,8 @@ final class OpenPickup
                 throw CycleNotSettled::withId($cycleId);
             }
 
+            $cycle->assertNotClosed();
+
             $household = $this->households->find([$householdId])[$householdId] ?? throw HouseholdNotFound::withId($householdId);
 
             if (! $household->active) {

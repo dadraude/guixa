@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Manage;
 use App\Http\Controllers\Controller;
 use App\Http\EuroAmount;
 use Guixa\Ordering\Application\CompletePickup;
+use Guixa\Ordering\Application\MarkPickupNotCollected;
 use Guixa\Shared\Application\Actor;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -20,6 +21,13 @@ class PickupCompleteController extends Controller
         $topUp = $data['top_up'] ?? null;
 
         $completePickup($actor, $cycle, $household, $topUp === null ? null : EuroAmount::toCents($topUp));
+
+        return to_route('manage.cycles.pickups.index', ['cycle' => $cycle]);
+    }
+
+    public function notCollected(string $cycle, string $household, Actor $actor, MarkPickupNotCollected $markNotCollected): RedirectResponse
+    {
+        $markNotCollected($actor, $cycle, $household);
 
         return to_route('manage.cycles.pickups.index', ['cycle' => $cycle]);
     }

@@ -53,7 +53,7 @@ final readonly class OrderLine
             $this->addedBy,
             $byHand,
             $this->dropped,
-            $this->delivered,
+            null,
         );
     }
 

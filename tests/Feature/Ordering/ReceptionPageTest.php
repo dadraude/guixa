@@ -151,12 +151,12 @@ it('validates, distributes and settles through the routes, and shows the state (
 
     $this->actingAs($manager)->post("{$reception}/validate")->assertRedirect();
     $this->actingAs($manager)->get($reception)->assertInertia(fn (Assert $page) => $page
-        ->where('distribution', ['validated' => true, 'distributed' => false, 'settled' => false]));
+        ->where('distribution', ['validated' => true, 'distributed' => false, 'settled' => false, 'closed' => false]));
 
     $this->actingAs($manager)->post("{$reception}/distribution")->assertRedirect();
 
     $this->actingAs($manager)->get($reception)->assertInertia(fn (Assert $page) => $page
-        ->where('distribution', ['validated' => true, 'distributed' => true, 'settled' => true]));
+        ->where('distribution', ['validated' => true, 'distributed' => true, 'settled' => true, 'closed' => false]));
     $this->assertDatabaseHas('cycle_producers', ['cycle_id' => $cycleId, 'producer_id' => $producerId]);
     expect(DB::table('cycles')->where('id', $cycleId)->value('settled_at'))->not->toBeNull()
         ->and(DB::table('orders')->where('household_id', $households['A'])->value('pickup_status'))->toBe('pending');
@@ -187,16 +187,17 @@ it('makes a distributed reception read-only until it is reopened before settleme
     $this->actingAs($manager)->put("{$reception}/products/{$loaf}/received", ['received' => '5'])->assertRedirect();
 
     $this->actingAs($manager)->get($reception)->assertInertia(fn (Assert $page) => $page
-        ->where('distribution', ['validated' => false, 'distributed' => false, 'settled' => false])
+        ->where('distribution', ['validated' => false, 'distributed' => false, 'settled' => false, 'closed' => false])
         ->where('reception.products.0.received', '5.000'));
 });
 
-it('does not reopen a producer once the cycle is settled (R18)', function () {
+it('does not reopen a producer once the cycle is closed (R18)', function () {
     [$cycleId, $producerId, , , , $manager] = receptionFixture();
     $reception = "/manage/cycles/{$cycleId}/receptions/{$producerId}";
     $this->actingAs($manager)->post("{$reception}/validate")->assertRedirect();
     $this->actingAs($manager)->post("{$reception}/distribution")->assertRedirect();
 
+    DB::table('cycles')->where('id', $cycleId)->update(['closed_at' => now()]);
     $this->actingAs($manager)->delete("{$reception}/distribution")->assertSessionHasErrors('domain');
 });
 

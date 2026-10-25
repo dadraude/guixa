@@ -846,6 +846,75 @@ Why: the task row for T29 does not list R24b, and closing belongs to T30.
 T29 (`plan.md`, HTTP & pages): `POST …/pickups/{household}/complete` takes an optional `top_up` in euros (the same format as the wallet top-up) and redirects to the pickups index. `Manage/Pickups/Show` gets `components/pickup/CompleteForm.vue` while the pickup is pending. `PickupNotPending` and `InvalidTopUpAmount` get Catalan messages in `lang/ca/errors.php`; the translation test's list is not extended because `tests/Unit` was outside this task's surfaces.
 Why: R21 asks for the top-up at the same time as the completion, and a double completion (S22) shows as a form error.
 
+
+## 2026-10-25 · Q&A
+
+Q: "For T30, if a pickup was allocated 1 kg but adjusted to 1.120 kg before being marked ‘not collected’, which quantity should be charged? R24a says allocations, while plan D16 says charges use the adjusted quantity."
+A: "Charge the adjusted 1.120 kg"
+
+## 2026-10-25 · Change
+
+T30 (DRA-180): R24a now explicitly charges delivered quantities including pickup adjustments when marked not collected, matching the decision above and D16. Stock and return lines are still dropped.
+
+
+## 2026-10-25 · Q&A
+
+Q: "When redistributing after completed pickups, should we preserve the existing validation rejections if the remaining quantity would be negative or there are no eligible households to receive it?"
+A: "when this happens, ask what to do. sometimes we want to do it only on not completed or all"
+
+Q: "If the manager chooses ‘all pickups’, should completed pickups remain frozen with differences handled through corrections, or should the app change their quantities and automatically adjust their wallet charges?"
+A: "Change quantities and adjust charges automatically"
+Correction: "sorry, for the last one we should choose first option so we se the change as a new line for each new adjustmen"
+
+Q: "should ‘all pickups’ update their quantities while adding new wallet correction lines, or leave completed quantities unchanged and let the manager enter corrections separately? Both preserve the original charge."
+A: "the compelted ones should have new lines added and charged, but the not completed can be updated"
+
+## 2026-10-25 · Change
+
+T30 (DRA-180), R18/R23, S63/S64 and D12/D16: the latest answer above is authoritative. Redistribution
+requires an explicit unfinished-only/all choice when done pickups are affected. Pending lines update;
+done pickups retain original lines and append signed adjustment lines with atomic wallet corrections.
+Subsequent changes use the latest effective quantity/amount, so identical repeated requests record nothing.
+Stock/returns and original completion/charge history remain unchanged; closed cycles remain final.
+
+## 2026-10-25 · Deviation
+
+T30 locking: finalization now takes the cycle FOR UPDATE before the pickup order lock. The planned shared
+cycle lock would require an upgrade when closing and can deadlock two final pickups. Ordinary pickup edits
+retain FOR SHARE. The concurrent final-pickup integration test verifies persisted closure and both completions.
+The focused Inertia HTTP test needed a Vite manifest, so a local asset build was run as its prerequisite.
+The copied task-local environment used English locales; only that ignored task environment was corrected to
+Catalan before testing translations. The source environment was not modified.
+
+
+## 2026-10-25 · Deviation
+
+T30/S64: when an explicit all-pickups target equals the original delivered weight but differs from the
+original allocation, reception still needs a stored target. A zero-quantity/zero-charge reconciliation line
+records that change; the wallet records no zero movement. Once both effective quantities equal the target,
+repeating it appends nothing. The UI distinguishes the original charge from the current total and labels
+zero-charge reconciliation explicitly. Final pickups show their current wallet balance without subtracting
+the already-recorded pickup charge a second time.
+
+## 2026-10-25 · Verification
+
+T30 focused backend validation: 289 tests / 1467 assertions passed across the affected application,
+integration and HTTP files. Final lifecycle guards (new household allocations after settlement and
+removal of a dropped line from a frozen pickup) then passed with 112 tests / 366 assertions in the
+four affected application files. Six frontend files passed 34 tests; the final dialog touch-target
+change passed its six component tests again. Affected PHPStan and frontend lint passed; Pint applied.
+Full suites and build/lint gates remain CI responsibilities.
+
+At 375px, task-local Vite fixtures rendered the actual manager pickup, pending pickup, pickup index,
+reception, member pickup and cycle pages without horizontal overflow. The redistribution dialog kept
+focus inside, supported Escape cancellation and sent the explicit all-pickups choice; all three buttons
+measured 44px. Its redundant small icon close control is hidden. This is fixture rendering with mocked
+Inertia props, not authenticated end-to-end coverage. Artifacts and harness are ignored under
+`.vitest/dra180-visual/` (check.mjs, evidence.json and *-375.png). An initial harness CSS scan issue and
+an animation-time measurement failed browser checks; after stopping, the user explicitly authorized
+one corrected run, which passed. The final scoped close-icon fix was then validated successfully.
+
+
 ## 2026-10-25 · Change
 
 Glossary (`spec.md`, Producer): a producer grows, gathers or makes the products it supplies, and has at most one account instead of exactly one.

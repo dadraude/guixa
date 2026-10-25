@@ -33,8 +33,11 @@ A household collects its allocation and stock products and is charged; optional 
   shown add up to the charge; decreases stock by the stock lines; and freezes the pickup.
   A negative total is recorded as a credit; a total of 0 records no wallet movement.
 - **R23** A pickup can be completed only once. A completed pickup and its order cannot be edited.
-  Mistakes are fixed with a wallet correction (R32) and a stock adjustment (R27), which can reference
-  the cycle; the pickup itself stays as it was.
+  Original lines, the original charge and completion time remain immutable. Before cycle closure, an explicit
+  all-pickups redistribution (R18) may append signed quantity and amount adjustment lines with matching new
+  wallet corrections; it never rewrites original lines or resells stock. The pickup shows every adjustment
+  separately and its current total includes them. Other mistakes are fixed with a wallet correction (R32)
+  and a stock adjustment (R27), which can reference the cycle.
 - **R23a** **What members see.** Before the cycle is settled, a member sees the order their household
   placed, with the *will not be delivered* marks. Once settled, they also see the pickup: per order line
   the ordered quantity, the delivered quantity, the price and the amount; the stock and return lines; and
@@ -43,7 +46,7 @@ A household collects its allocation and stock products and is charged; optional 
   automatically as *nothing to collect* when the cycle is settled; nothing is recorded. If a later
   distribution gives that household an allocation > 0, its pickup becomes pending again.
 - **R24a** When a household does not come, a manager marks its pickup as *not collected*: the household is
-  charged its allocations as in R22 (stock and return lines are dropped), and the pickup is frozen.
+  charged its delivered quantities, including pickup adjustments, as in R22 (stock and return lines are dropped), and the pickup is frozen.
 - **R24b** A cycle is *closed* once it is settled and every pickup of it is completed, not collected or
   closed as nothing to collect, and every participating producer is distributed. Nothing in a closed cycle
   can change: its orders, receptions and pickups are final, and later wallet corrections or stock
