@@ -27,7 +27,7 @@ const isManager = (account: App.Http.AccountRow) =>
 <template>
     <Head title="Accounts" />
 
-    <div class="flex flex-col gap-6 p-4">
+    <div class="pilot-page pilot-manager-page">
         <Heading
             title="Accounts"
             description="Grant roles, link members to households and deactivate accounts"
@@ -82,13 +82,13 @@ const isManager = (account: App.Http.AccountRow) =>
                                 account.accountId,
                             )
                         "
-                        class="flex items-center gap-2"
+                        class="flex max-w-full min-w-0 flex-wrap items-center gap-2"
                         v-slot="{ errors, processing }"
                     >
                         <select
                             name="household_id"
                             required
-                            class="h-8 rounded-md border bg-background px-2 text-sm"
+                            class="h-8 max-w-full min-w-0 flex-1 rounded-md border bg-background px-2 text-sm"
                             :aria-label="`Household for ${account.name}`"
                         >
                             <option

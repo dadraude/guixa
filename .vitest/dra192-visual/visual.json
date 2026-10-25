@@ -1,0 +1,571 @@
+{
+    "baseUrl": "http://127.0.0.1:5181",
+    "height": 900,
+    "rootFontPx": 16,
+    "darkSelector": "html.dark",
+    "matrix": {
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark"],
+        "text": [100, 200]
+    },
+    "views": [
+        {
+            "id": "accounts",
+            "path": "/.vitest/dra192-visual/index.html",
+            "query": {
+                "scenario": "accounts",
+                "role": "manager"
+            },
+            "root": "html[data-visual-ready=\"true\"] .pilot-page",
+            "panels": ".pilot-page",
+            "fonts": ["16px \"Instrument Sans\""],
+            "focus": ["[data-visual-focus-last=\"true\"]"],
+            "states": [
+                {
+                    "id": "populated"
+                },
+                {
+                    "id": "empty",
+                    "query": {
+                        "empty": 1
+                    },
+                    "checks": {
+                        "focus": [],
+                        "noFocusReason": "Empty Accounts has no page control; the shared manager shell is covered by populated manager views."
+                    }
+                },
+                {
+                    "id": "long-content",
+                    "query": {
+                        "long": 1
+                    }
+                },
+                {
+                    "id": "validation-processing",
+                    "query": {
+                        "error": 1,
+                        "processing": 1
+                    }
+                },
+                {
+                    "id": "system-appearance",
+                    "query": {
+                        "appearance": "system"
+                    }
+                },
+                {
+                    "id": "reduced-motion",
+                    "reducedMotion": true
+                },
+                {
+                    "id": "font-fallback",
+                    "query": {
+                        "fallback": 1
+                    },
+                    "checks": {
+                        "fonts": ["16px sans-serif"],
+                        "systemFonts": true
+                    }
+                }
+            ],
+            "content": "h1,h2,h3,label,input,select,textarea,button,a,td,th,p,span,[data-visual-text]"
+        },
+        {
+            "id": "households",
+            "path": "/.vitest/dra192-visual/index.html",
+            "query": {
+                "scenario": "households",
+                "role": "manager"
+            },
+            "root": "html[data-visual-ready=\"true\"] .pilot-page",
+            "panels": ".pilot-page",
+            "fonts": ["16px \"Instrument Sans\""],
+            "focus": ["[data-visual-focus-last=\"true\"]"],
+            "states": [
+                {
+                    "id": "populated"
+                },
+                {
+                    "id": "empty",
+                    "query": {
+                        "empty": 1
+                    }
+                },
+                {
+                    "id": "long-content",
+                    "query": {
+                        "long": 1
+                    }
+                },
+                {
+                    "id": "validation-processing",
+                    "query": {
+                        "error": 1,
+                        "processing": 1
+                    }
+                }
+            ],
+            "content": "h1,h2,h3,label,input,select,textarea,button,a,td,th,p,span,[data-visual-text]"
+        },
+        {
+            "id": "household-detail",
+            "path": "/.vitest/dra192-visual/index.html",
+            "query": {
+                "scenario": "household",
+                "role": "manager"
+            },
+            "root": "html[data-visual-ready=\"true\"] .pilot-page",
+            "panels": ".pilot-page",
+            "fonts": ["16px \"Instrument Sans\""],
+            "focus": ["[data-visual-focus-last=\"true\"]"],
+            "states": [
+                {
+                    "id": "populated"
+                },
+                {
+                    "id": "inactive",
+                    "query": {
+                        "inactive": 1
+                    }
+                },
+                {
+                    "id": "long-content",
+                    "query": {
+                        "long": 1
+                    }
+                },
+                {
+                    "id": "validation-processing",
+                    "query": {
+                        "error": 1,
+                        "processing": 1
+                    }
+                }
+            ],
+            "content": "h1,h2,h3,label,input,select,textarea,button,a,td,th,p,span,[data-visual-text]"
+        },
+        {
+            "id": "producers",
+            "path": "/.vitest/dra192-visual/index.html",
+            "query": {
+                "scenario": "producers",
+                "role": "manager"
+            },
+            "root": "html[data-visual-ready=\"true\"] .pilot-page",
+            "panels": ".pilot-page",
+            "fonts": ["16px \"Instrument Sans\""],
+            "focus": ["[data-visual-focus-last=\"true\"]"],
+            "states": [
+                {
+                    "id": "populated"
+                },
+                {
+                    "id": "empty",
+                    "query": {
+                        "empty": 1
+                    }
+                },
+                {
+                    "id": "inactive",
+                    "query": {
+                        "inactive": 1
+                    }
+                },
+                {
+                    "id": "validation-processing",
+                    "query": {
+                        "error": 1,
+                        "processing": 1
+                    }
+                }
+            ],
+            "content": "h1,h2,h3,label,input,select,textarea,button,a,td,th,p,span,[data-visual-text]"
+        },
+        {
+            "id": "cycles",
+            "path": "/.vitest/dra192-visual/index.html",
+            "query": {
+                "scenario": "cycles",
+                "role": "manager"
+            },
+            "root": "html[data-visual-ready=\"true\"] .pilot-page",
+            "panels": ".pilot-page",
+            "fonts": ["16px \"Instrument Sans\""],
+            "focus": ["[data-visual-focus-last=\"true\"]"],
+            "states": [
+                {
+                    "id": "populated"
+                },
+                {
+                    "id": "empty",
+                    "query": {
+                        "empty": 1
+                    }
+                },
+                {
+                    "id": "cancelled",
+                    "query": {
+                        "cancelled": 1
+                    }
+                },
+                {
+                    "id": "cancellation-dialog",
+                    "query": {
+                        "dialog": 1
+                    },
+                    "ready": "[data-slot=\"dialog-content\"]",
+                    "settled": ["[data-slot=\"dialog-content\"]"],
+                    "checks": {
+                        "root": "[data-slot=\"dialog-content\"]",
+                        "panels": "form",
+                        "content": "h1,h2,h3,label,input,select,textarea,[data-slot=\"dialog-footer\"] button,a,p,span:not(.sr-only),[data-visual-text]",
+                        "focus": [
+                            "[data-slot=\"dialog-close\"]",
+                            "[data-test=\"confirm-cancel-cycle\"]",
+                            "[data-slot=\"dialog-footer\"] button"
+                        ]
+                    }
+                },
+                {
+                    "id": "populated-cutoff",
+                    "query": {
+                        "filled": 1
+                    }
+                },
+                {
+                    "id": "validation-processing",
+                    "query": {
+                        "error": 1,
+                        "processing": 1
+                    }
+                }
+            ],
+            "content": "h1,h2,h3,label,input,select,textarea,button,a,td,th,p,span,[data-visual-text]"
+        },
+        {
+            "id": "cycle-totals",
+            "path": "/.vitest/dra192-visual/index.html",
+            "query": {
+                "scenario": "cycle",
+                "role": "manager"
+            },
+            "root": "html[data-visual-ready=\"true\"] .pilot-page",
+            "panels": ".pilot-page",
+            "fonts": ["16px \"Instrument Sans\""],
+            "focus": [],
+            "noFocusReason": "Cycle totals is read-only; manager navigation lives in the shared shell and is exercised by the other manager views.",
+            "states": [
+                {
+                    "id": "populated"
+                },
+                {
+                    "id": "empty",
+                    "query": {
+                        "empty": 1
+                    }
+                },
+                {
+                    "id": "cancelled",
+                    "query": {
+                        "cancelled": 1
+                    }
+                },
+                {
+                    "id": "long-content",
+                    "query": {
+                        "long": 1
+                    }
+                }
+            ],
+            "content": "h1,h2,h3,label,input,select,textarea,button,a,td,th,p,span,[data-visual-text]"
+        },
+        {
+            "id": "manager-settings",
+            "path": "/.vitest/dra192-visual/index.html",
+            "query": {
+                "scenario": "settings",
+                "role": "manager"
+            },
+            "root": "html[data-visual-ready=\"true\"] .pilot-page",
+            "panels": ".pilot-page",
+            "fonts": ["16px \"Instrument Sans\""],
+            "focus": ["[data-visual-focus-last=\"true\"]"],
+            "states": [
+                {
+                    "id": "populated"
+                },
+                {
+                    "id": "empty",
+                    "query": {
+                        "empty": 1
+                    }
+                },
+                {
+                    "id": "validation-processing",
+                    "query": {
+                        "error": 1,
+                        "processing": 1
+                    }
+                }
+            ],
+            "content": "h1,h2,h3,label,input,select,textarea,button,a,td,th,p,span,[data-visual-text]"
+        },
+        {
+            "id": "stock",
+            "path": "/.vitest/dra192-visual/index.html",
+            "query": {
+                "scenario": "stock",
+                "role": "manager"
+            },
+            "root": "html[data-visual-ready=\"true\"] .pilot-page",
+            "panels": "tbody",
+            "fonts": ["16px \"Instrument Sans\""],
+            "focus": ["[data-visual-focus-last=\"true\"]"],
+            "states": [
+                {
+                    "id": "populated"
+                },
+                {
+                    "id": "empty",
+                    "query": {
+                        "empty": 1
+                    },
+                    "checks": {
+                        "panels": ".pilot-empty-state"
+                    }
+                },
+                {
+                    "id": "inactive",
+                    "query": {
+                        "inactive": 1
+                    }
+                },
+                {
+                    "id": "long-content",
+                    "query": {
+                        "long": 1
+                    }
+                }
+            ],
+            "content": "h1,h2,h3,label,input,select,textarea,button,a,td,p,span,[data-visual-text]"
+        },
+        {
+            "id": "stock-create",
+            "path": "/.vitest/dra192-visual/index.html",
+            "query": {
+                "scenario": "stock-create",
+                "role": "manager"
+            },
+            "root": "html[data-visual-ready=\"true\"] .pilot-page",
+            "panels": ".pilot-page",
+            "fonts": ["16px \"Instrument Sans\""],
+            "focus": ["[data-visual-focus-last=\"true\"]"],
+            "states": [
+                {
+                    "id": "blank"
+                },
+                {
+                    "id": "validation-processing",
+                    "query": {
+                        "error": 1,
+                        "processing": 1
+                    }
+                }
+            ],
+            "content": "h1,h2,h3,label,input,select,textarea,button,a,td,th,p,span,[data-visual-text]"
+        },
+        {
+            "id": "stock-edit",
+            "path": "/.vitest/dra192-visual/index.html",
+            "query": {
+                "scenario": "stock-edit",
+                "role": "manager"
+            },
+            "root": "html[data-visual-ready=\"true\"] .pilot-page",
+            "panels": ".pilot-page",
+            "fonts": ["16px \"Instrument Sans\""],
+            "focus": ["[data-visual-focus-last=\"true\"]"],
+            "states": [
+                {
+                    "id": "populated"
+                },
+                {
+                    "id": "inactive",
+                    "query": {
+                        "inactive": 1
+                    }
+                },
+                {
+                    "id": "long-content",
+                    "query": {
+                        "long": 1
+                    }
+                },
+                {
+                    "id": "validation-processing",
+                    "query": {
+                        "error": 1,
+                        "processing": 1
+                    }
+                }
+            ],
+            "content": "h1,h2,h3,label,input,select,textarea,button,a,td,th,p,span,[data-visual-text]"
+        },
+        {
+            "id": "stock-movements",
+            "path": "/.vitest/dra192-visual/index.html",
+            "query": {
+                "scenario": "movements",
+                "role": "manager"
+            },
+            "root": "html[data-visual-ready=\"true\"] .pilot-page",
+            "panels": ".pilot-page",
+            "fonts": ["16px \"Instrument Sans\""],
+            "focus": ["[data-visual-focus-last=\"true\"]"],
+            "states": [
+                {
+                    "id": "populated"
+                },
+                {
+                    "id": "selected-cycle",
+                    "query": {
+                        "selected": 1
+                    }
+                },
+                {
+                    "id": "long-content",
+                    "query": {
+                        "long": 1
+                    }
+                },
+                {
+                    "id": "validation-processing",
+                    "query": {
+                        "error": 1,
+                        "processing": 1
+                    }
+                }
+            ],
+            "content": "h1,h2,h3,label,input,select,textarea,button,a,td,th,p,span,[data-visual-text]"
+        },
+        {
+            "id": "return-items",
+            "path": "/.vitest/dra192-visual/index.html",
+            "query": {
+                "scenario": "returns",
+                "role": "manager"
+            },
+            "root": "html[data-visual-ready=\"true\"] .pilot-page",
+            "panels": "tbody",
+            "fonts": ["16px \"Instrument Sans\""],
+            "focus": ["[data-visual-focus-last=\"true\"]"],
+            "states": [
+                {
+                    "id": "populated"
+                },
+                {
+                    "id": "empty",
+                    "query": {
+                        "empty": 1
+                    },
+                    "checks": {
+                        "panels": ".pilot-empty-state"
+                    }
+                },
+                {
+                    "id": "inactive",
+                    "query": {
+                        "inactive": 1
+                    }
+                },
+                {
+                    "id": "long-content",
+                    "query": {
+                        "long": 1
+                    }
+                }
+            ],
+            "content": "h1,h2,h3,label,input,select,textarea,button,a,td,p,span,[data-visual-text]"
+        },
+        {
+            "id": "return-create",
+            "path": "/.vitest/dra192-visual/index.html",
+            "query": {
+                "scenario": "return-create",
+                "role": "manager"
+            },
+            "root": "html[data-visual-ready=\"true\"] .pilot-page",
+            "panels": ".pilot-page",
+            "fonts": ["16px \"Instrument Sans\""],
+            "focus": ["[data-visual-focus-last=\"true\"]"],
+            "states": [
+                {
+                    "id": "blank"
+                },
+                {
+                    "id": "validation-processing",
+                    "query": {
+                        "error": 1,
+                        "processing": 1
+                    }
+                }
+            ],
+            "content": "h1,h2,h3,label,input,select,textarea,button,a,td,th,p,span,[data-visual-text]"
+        },
+        {
+            "id": "return-edit",
+            "path": "/.vitest/dra192-visual/index.html",
+            "query": {
+                "scenario": "return-edit",
+                "role": "manager"
+            },
+            "root": "html[data-visual-ready=\"true\"] .pilot-page",
+            "panels": ".pilot-page",
+            "fonts": ["16px \"Instrument Sans\""],
+            "focus": ["[data-visual-focus-last=\"true\"]"],
+            "states": [
+                {
+                    "id": "populated"
+                },
+                {
+                    "id": "inactive",
+                    "query": {
+                        "inactive": 1
+                    }
+                },
+                {
+                    "id": "long-content",
+                    "query": {
+                        "long": 1
+                    }
+                },
+                {
+                    "id": "validation-processing",
+                    "query": {
+                        "error": 1,
+                        "processing": 1
+                    }
+                }
+            ],
+            "content": "h1,h2,h3,label,input,select,textarea,button,a,td,th,p,span,[data-visual-text]"
+        },
+        {
+            "id": "wallet-boundary",
+            "path": "/.vitest/dra192-visual/index.html",
+            "query": {
+                "scenario": "wallet",
+                "role": "manager"
+            },
+            "root": "html[data-visual-ready=\"true\"] .pilot-page",
+            "panels": "tbody",
+            "fonts": ["16px \"Instrument Sans\""],
+            "focus": ["[data-visual-focus-last=\"true\"]"],
+            "states": [
+                {
+                    "id": "manager-navigation"
+                }
+            ],
+            "content": "h1,h2,h3,label,input,select,textarea,button,a,td,p,span,[data-visual-text]"
+        }
+    ]
+}

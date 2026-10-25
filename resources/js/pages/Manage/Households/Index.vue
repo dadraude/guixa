@@ -27,7 +27,7 @@ defineProps<{
 <template>
     <Head title="Households" />
 
-    <div class="flex flex-col gap-6 p-4">
+    <div class="pilot-page pilot-manager-page">
         <Heading
             title="Households"
             description="Create households and invite their members"

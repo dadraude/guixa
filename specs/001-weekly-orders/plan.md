@@ -5,7 +5,8 @@ Status: Accepted (2026-10-21) · Spec: [spec.md](spec.md) + areas (R1–R36b, S1
 Accepted amendment (2026-10-24): **Application visual identity** below. The user approved the plan;
 the associated tasks were separately approved. The user subsequently authorized T39 implementation
 on 2026-10-25. The T39 visual pilot was explicitly approved on DRA-191 on 2026-10-25;
-T40 is implemented for review with [rendered evidence](../../docs/visual-checks/dra-191.md).
+T40 is implemented with [rendered evidence](../../docs/visual-checks/dra-191.md).
+T41 is implemented for independent review with [rendered manager evidence](../../docs/visual-checks/dra-192.md).
 T37/T38 reconciliation is complete: T37 = DRA-195 and T38 = DRA-194, both Done with evidence.
 Their native prerequisite links to T39 / DRA-190 are recorded.
 
@@ -578,7 +579,7 @@ as DRA-195, separately from the staged visual identity amendment below.
 
 ## Application visual identity
 
-**Status: Accepted (2026-10-24); T39 approved for rollout and T40 implemented for review (2026-10-25); T41–T42 unstarted.** Route: plan only,
+**Status: Accepted (2026-10-24); T39 approved for rollout, T40 implemented and T41 implemented for review (2026-10-25); T42 unstarted.** Route: plan only,
 because this changes presentation without changing the spec's requirements or acceptance scenarios.
 The task amendment is accepted; the T39 visual review was approved on DRA-191 before T40 began.
 
@@ -691,6 +692,28 @@ Producer cycle-summary names and availability controls also stack by available l
 enlarged text, leaving usable name space while retaining ordinary desktop rows and requests.
 The T40 visual sweep includes every affected view at 1024 px and 200% text in both themes,
 checking keyboard focus and relevant text/container bounds alongside 375 and 1280 px.
+
+T41 adds the fourteen existing manager route names to the same reactive opt-in. Their route
+components retain existing props, form actions, validation and destinations; shared page and
+card rules present their operational content on the approved surfaces. Stock and return-item
+tables retain desktop columns and become labeled rows when the available width cannot hold
+them. Their phone labels reuse the desktop translations. Manager forms and list headers stack
+at narrow widths, including 200% text, while ordinary desktop rows keep their existing
+structure. The [T41 visual check](../../docs/visual-checks/dra-192.md) records the rendered
+matrix and its mocked-transport limit; the household detail's wallet link still enters the
+shared T40 Wallet/Statement view. At enlarged phone text, cycle cutoff entry uses separate
+required date and time controls plus a visible full-value preview; a single hidden `cutoff`
+field retains the existing local `YYYY-MM-DDTHH:mm` request value and action. The stock
+adjustment cycle select and its full selected-label preview stay inside the form card. No
+manager request or permission rule changes. The cancellation portal uses the theme's solid
+destructive background and matching foreground on its confirmation button so normal and
+hover text both meet the 4.5:1 contrast gate in light and dark. At phone widths the
+cancellation portal gives Close a separate top row and both footer actions 44 px or larger
+targets; its enlarged layout keeps the title clear of Close and the footer visible.
+The T41 shared visual manifest exercises every manager view and applicable state across the
+full width, theme and text matrix. Its long-content sweep also constrains the Accounts
+household select and Move control inside their card at 1024 px, and long stock/return names
+inside desktop table columns at 1280 px.
 
 ### Verification and review gate
 

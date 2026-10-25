@@ -19,7 +19,7 @@ defineOptions({
 <template>
     <Head :title="`Cycle ${summary.pickupDate}`" />
 
-    <div class="flex flex-col gap-8 p-4">
+    <div class="pilot-page pilot-manager-page">
         <Heading
             :title="`Pickup ${summary.pickupDate}`"
             description="What was ordered, per producer and product"

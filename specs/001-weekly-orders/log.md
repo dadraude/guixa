@@ -1077,3 +1077,67 @@ and “Mel de muntanya” to 26.625 px. A browser probe failed before the fix. T
 available list width; both names have 286 px boxes and their text and controls fit within the row.
 The visual fixture covers all eight T40 views at 1024 px/200% in both themes with keyboard focus
 and relevant text/container bounds. Availability requests and sent quantities are unchanged.
+
+
+## 2026-10-25 · Deviation
+
+T41 (`plan.md`, Application visual identity): the approved shared theme reached the existing
+manager routes, but the stock and return-item tables could not retain their desktop columns on
+phones or at 200% text without obscuring labels and actions. Their rows now reflow by available
+container width and repeat translated column names visually inside each cell; the desktop table
+semantics and action destinations remain. The initial 156-case rendered sweep also found six
+controls outside the viewport in Accounts, Household Show and Cycles at 375 px/200% text.
+Manager-page-width form/list stacking brought those controls inside the viewport and gave
+account names, emails and household forms usable space at 1024 px/200% text. The final visual
+matrix checks the affected cases in light and dark. No data, request, validation or role rule
+changed.
+
+
+## 2026-10-25 · Deviation
+
+T41 (`plan.md`, Verification and review gate): independent review filled a cycle cutoff at
+375 px/200% and found the native datetime-local control clipped after `06/11/202`, hiding
+the remaining year digit and time. The reviewer also measured the stock adjustment cycle
+select at x65–352 beyond its form content edge x311 and card edge x343, although document
+scroll width stayed 375. The cycle form now gives date and time separate required controls
+with a readable full-value preview, while its one submitted `cutoff` field and update action
+remain unchanged. The movement select uses a shrinkable grid track and repeats the full
+selected option below the control; the existing `cycle_id` and reset behavior remain.
+Populated-field browser checks and focused form-serialization tests failed before the fixes
+and passed after them in both themes. No domain, validation or permission rule changed.
+
+
+## 2026-10-25 · Deviation
+
+T41 (`plan.md`, Visual system): the shared destructive Button variant applied white text and
+a translucent destructive background in the dark cancellation portal, yielding 3.58:1
+contrast on the rendered dialog. A portal-scoped rule now pairs the theme's destructive
+foreground with its solid destructive background for this confirmation button. Normal and
+hover states measure at least 6.86:1 across light and dark. The shared Button primitive,
+other dialog controls, cancellation action, and processing state remain unchanged.
+
+
+## 2026-10-26 · Deviation
+
+T41 (`plan.md`, Visual system): a third independent review found the pilot-themed cycle
+cancellation title overlapping the portaled Close target at 375 px/200% text, while the
+two footer actions measured 293 × 36 px at 375 px/100%. The scoped cancellation portal
+now reserves vertical space for Close, fits within the viewport, and gives the footer
+actions at least 44 px height. It uses tighter phone spacing so the enlarged title and
+both footer actions remain fully visible without smaller text. Red/green rendered checks
+cover overlap, target geometry, hover contrast, and focus in both themes. No cancellation
+request, control destination, or processing behavior changed.
+
+
+## 2026-10-26 · Deviation
+
+T41 (`plan.md`, Verification and review gate): the shared visual harness checked the full
+declared state matrix and found that a long household name made the Accounts Move control
+escape its form at 1024 px/100% text. The existing household form now allows its select
+to shrink and its controls to wrap inside the account card. The same request field,
+button, and action remain. The shared manifest includes this long-content case and
+comparable manager rows at 1024 px in both themes; no account behavior changed.
+The same sweep found an unbroken long stock name expanding the desktop table at 1280 px
+and pushing row actions beyond the viewport. The shared stock/return table style now uses
+fixed columns and wraps the name cell; both desktop tables keep their semantics and all
+row actions remain visible. The four light/dark long-name desktop captures are retained.
