@@ -81,5 +81,7 @@
     "These adjustments are already recorded in the wallet. Original pickup lines stay unchanged.": "Aquests ajustos ja consten al moneder. Les línies originals de la recollida es conserven.",
     "Allocation reconciled; no extra charge": "Assignació conciliada; sense càrrec addicional",
     "Total to charge": "Total a cobrar",
-    "Completed": "Completada"
+    "Completed": "Completada",
+    "Containers to collect": "Envasos per recollir",
+    "Cycle total": "Total del cicle"
 }

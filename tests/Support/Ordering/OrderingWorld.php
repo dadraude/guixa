@@ -12,6 +12,7 @@ use Guixa\Ordering\Application\CancelCycle;
 use Guixa\Ordering\Application\ClearCutoff;
 use Guixa\Ordering\Application\CloseProducerNow;
 use Guixa\Ordering\Application\CompletePickup;
+use Guixa\Ordering\Application\GetContainerCount;
 use Guixa\Ordering\Application\GetCycleSummary;
 use Guixa\Ordering\Application\GetHouseholdOrder;
 use Guixa\Ordering\Application\GetPickup;
@@ -146,6 +147,8 @@ final class OrderingWorld
 
     public readonly GetCycleSummary $getCycleSummary;
 
+    public readonly GetContainerCount $getContainerCount;
+
     public readonly GetProducerCycleSummary $getProducerCycleSummary;
 
     public readonly GetReception $getReception;
@@ -230,6 +233,7 @@ final class OrderingWorld
         $this->sendEmptyProducerOrders = new SendEmptyProducerOrders($this->cycles, $this->orders, $this->catalog, $this->availability, $transactions, $this->clock);
         $this->hasUnsettledLines = new HasUnsettledLines($this->orders);
         $this->getCycleSummary = new GetCycleSummary($this->cycles, $this->orders, $this->households);
+        $this->getContainerCount = new GetContainerCount($this->cycles, $this->orders, $this->households, $this->catalog, $this->availability);
         $this->getProducerCycleSummary = new GetProducerCycleSummary($this->cycles, $this->orders, $this->catalog, $this->availability);
         $receptions = new ReceptionLoader($this->orders, $this->catalog, $this->availability, $this->receivedTotals);
         $this->getReception = new GetReception($this->cycles, $receptions, $this->households);

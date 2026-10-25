@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { Head } from '@inertiajs/vue3';
+import { trans } from 'laravel-vue-i18n';
 import CycleController from '@/actions/App/Http/Controllers/Manage/CycleController';
 import Heading from '@/components/Heading.vue';
 
 defineProps<{
     summary: App.Http.CycleSummaryRow;
+    containers: App.Http.ContainerCountRow;
 }>();
 
 defineOptions({
@@ -38,6 +40,32 @@ defineOptions({
         >
             Nobody has ordered yet.
         </p>
+
+        <section
+            v-if="!summary.cancelled"
+            class="flex flex-col gap-3"
+            data-test="container-counts"
+        >
+            <h2 class="text-lg font-medium">
+                {{ trans('Containers to collect') }}
+            </h2>
+            <p data-test="container-total">
+                {{ trans('Cycle total') }}: {{ containers.total }}
+            </p>
+            <ul class="divide-y rounded-lg border">
+                <li
+                    v-for="household in containers.households"
+                    :key="household.householdId"
+                    class="flex items-center justify-between gap-3 p-3"
+                    :data-test="`container-household-${household.householdId}`"
+                >
+                    <span class="min-w-0 break-words">{{
+                        household.householdName
+                    }}</span>
+                    <span class="shrink-0">{{ household.count }}</span>
+                </li>
+            </ul>
+        </section>
 
         <section
             v-for="producer in summary.producers"
