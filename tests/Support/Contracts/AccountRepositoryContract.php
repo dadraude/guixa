@@ -90,6 +90,7 @@ trait AccountRepositoryContract
         $account->grantManager();
         $account->deactivate(new DateTimeImmutable('2026-10-22 10:00:00+00:00'));
         $repository->save($account);
+        $repository->saveHouseholdLink($account);
 
         $found = $repository->get($account->id);
         $this->assertSame([Role::Manager], $found->roles);
@@ -106,6 +107,25 @@ trait AccountRepositoryContract
     }
 
     #[Test]
+    public function ordinary_account_saves_preserve_the_stored_household_link(): void
+    {
+        $repository = $this->repository();
+        $account = Account::inviteMember($repository->nextId(), 'Anna', Email::from('anna@example.org'), $this->householdId());
+        $repository->save($account);
+        $stale = $repository->get($account->id);
+        $linked = $repository->get($account->id);
+        $linked->unlink();
+        $repository->saveHouseholdLink($linked);
+
+        $stale->grantManager();
+        $repository->save($stale);
+
+        $stored = $repository->get($account->id);
+        $this->assertNull($stored->householdId);
+        $this->assertSame([Role::Manager], $stored->roles);
+    }
+
+    #[Test]
     public function it_unlinks_an_account_from_its_household(): void
     {
         $repository = $this->repository();
@@ -113,7 +133,7 @@ trait AccountRepositoryContract
         $repository->save($account);
 
         $account->unlink();
-        $repository->save($account);
+        $repository->saveHouseholdLink($account);
 
         $this->assertNull($repository->get($account->id)->householdId);
         $this->assertSame([], $repository->membersOf($this->householdId()));

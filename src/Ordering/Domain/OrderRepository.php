@@ -35,6 +35,9 @@ interface OrderRepository
      */
     public function lineCountsOfHousehold(string $householdId): array;
 
+    /** @return list<string> cycle ids with a pending pickup for this household */
+    public function pendingPickupCycleIdsOfHousehold(string $householdId): array;
+
     /**
      * The household's order in the cycle, created empty if it has none, and locked until the surrounding
      * transaction ends, so two members adding the first lines at once share one order.

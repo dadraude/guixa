@@ -919,3 +919,21 @@ one corrected run, which passed. The final scoped close-icon fix was then valida
 
 Glossary (`spec.md`, Producer): a producer grows, gathers or makes the products it supplies, and has at most one account instead of exactly one.
 Why: a producer exists without an account until its invitation is accepted, as the code already allows; and the Commissions grilling (`docs/commissions/2026-10-25-commission-decisions.md`) excluded resellers from the term.
+
+
+## 2026-10-25 · Deviation
+
+T32 (`plan.md`, Membership use cases): `GetHouseholdDeactivationWarning` is a separate read query that returns the balance and pending pickups before the manager submits `DeactivateHousehold`; the command then unlinks members and deactivates the household in one transaction. The warning is rendered on the household page.
+Why: a read query lets the manager review current settlement data without making the deactivation command two-phase or storing warning state. R35a and S58 behavior are unchanged.
+
+
+## 2026-10-25 · Deviation
+
+T32 (`plan.md`, Membership): concurrent deactivation and member linking need one transaction-scoped Membership lock before the use cases read household or account state. Account deactivation takes it before the manager-row lock, avoiding an inverted lock order.
+Why: a member added or moved while a manager deactivates the target must see its committed inactive state and reactivate it; pre-lock snapshots could leave a linked member in an inactive household.
+
+
+## 2026-10-25 · Deviation
+
+T32 (`plan.md`, Membership persistence): existing-account detail saves retain the stored household link; `saveHouseholdLink` persists only an explicit link change made by a serialized Membership command. Creating a new account still stores its initial link.
+Why: a role, invitation or other account-detail save made from an earlier snapshot could otherwise restore a link after deactivation or a move. The user approved this bounded persistence change; invitation and password transaction flow is unchanged.

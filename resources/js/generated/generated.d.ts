@@ -62,6 +62,12 @@ readonly name: string,
 readonly active: boolean,
 readonly members: App.Http.MemberRow[],
 };
+export type HouseholdSettlementRow = {
+readonly householdId: string,
+readonly householdName: string,
+readonly balanceCents: number,
+readonly pendingPickups: App.Http.PendingPickupRow[],
+};
 export type HouseholdSummaryRow = {
 readonly id: string,
 readonly name: string,
@@ -114,6 +120,10 @@ readonly cancelled: boolean,
 readonly producers: App.Http.OrderProducerRow[],
 readonly lines: App.Http.OrderLineRow[],
 readonly pickup: App.Http.PickupRow | null,
+};
+export type PendingPickupRow = {
+readonly cycleId: string,
+readonly pickupDate: string,
 };
 export type PickupAdjustmentRow = {
 readonly id: string,

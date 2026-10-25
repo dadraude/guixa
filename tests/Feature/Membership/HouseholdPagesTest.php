@@ -4,6 +4,7 @@ use App\Models\User;
 use Guixa\Shared\Domain\Role;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Inertia\Testing\AssertableInertia as Assert;
 
 function accountWithRole(Role $role): User
@@ -76,4 +77,56 @@ it('answers 404 for an unknown household and 403 to everyone but managers (S56)'
 
 it('sends guests to the login page', function () {
     $this->get(route('manage.households.index'))->assertRedirect(route('login'));
+});
+
+it('shows the settlement warning, deactivates with a separate action, and lists outstanding households (R35a, S58)', function () {
+    $manager = accountWithRole(Role::Manager);
+    $this->actingAs($manager)->post(route('manage.households.store'), ['name' => 'Household H']);
+    $householdId = DB::table('households')->value('id');
+    $this->actingAs($manager)->post(route('manage.households.wallet.top-ups.store', $householdId), ['amount' => '5.00']);
+
+    $this->actingAs($manager)->get(route('manage.households.show', $householdId))
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('deactivationWarning.balanceCents', 500)
+            ->where('deactivationWarning.pendingPickups', []));
+
+    $this->actingAs($manager)->post(route('manage.households.deactivate', $householdId))->assertRedirect();
+
+    $this->actingAs($manager)->get(route('manage.households.index'))
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('toSettle.0.householdId', $householdId)
+            ->where('toSettle.0.balanceCents', 500));
+
+    $this->actingAs($manager)->post(route('manage.households.reactivate', $householdId))->assertRedirect();
+    $this->actingAs($manager)->get(route('manage.households.show', $householdId))
+        ->assertInertia(fn (Assert $page) => $page->where('household.active', true));
+});
+
+it('keeps pending pickups and wallet adjustments available after deactivation (R35a, S58)', function () {
+    $manager = accountWithRole(Role::Manager);
+    $this->actingAs($manager)->post(route('manage.households.store'), ['name' => 'Household H']);
+    $householdId = DB::table('households')->value('id');
+    $cycleId = (string) Str::uuid7();
+    $orderId = (string) Str::uuid7();
+    DB::table('cycles')->insert(['id' => $cycleId, 'pickup_date' => '2026-10-28', 'settled_at' => now()]);
+    DB::table('orders')->insert(['id' => $orderId, 'cycle_id' => $cycleId, 'household_id' => $householdId, 'pickup_status' => 'pending']);
+
+    $this->actingAs($manager)->get(route('manage.households.show', $householdId))
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('deactivationWarning.pendingPickups.0.cycleId', $cycleId)
+            ->where('deactivationWarning.pendingPickups.0.pickupDate', '2026-10-28'));
+
+    $this->actingAs($manager)->post(route('manage.households.deactivate', $householdId))->assertRedirect();
+    expect(DB::table('orders')->where('id', $orderId)->value('pickup_status'))->toBe('pending');
+    $this->actingAs($manager)->post(route('manage.households.wallet.top-ups.store', $householdId), ['amount' => '5.00'])->assertRedirect();
+    $this->actingAs($manager)->post(route('manage.households.wallet.corrections.store', $householdId), ['amount' => '-5.00', 'note' => 'settled'])->assertRedirect();
+
+    $this->actingAs($manager)->get(route('manage.households.index'))
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('toSettle.0.balanceCents', 0)
+            ->where('toSettle.0.pendingPickups.0.cycleId', $cycleId));
+
+    DB::table('orders')->where('id', $orderId)->update(['pickup_status' => 'not_collected']);
+    $this->actingAs($manager)->get(route('manage.households.index'))
+        ->assertInertia(fn (Assert $page) => $page->where('toSettle', []));
 });

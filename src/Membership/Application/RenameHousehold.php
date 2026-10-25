@@ -5,17 +5,24 @@ namespace Guixa\Membership\Application;
 use Guixa\Membership\Domain\Error\HouseholdNotFound;
 use Guixa\Membership\Domain\HouseholdRepository;
 use Guixa\Shared\Application\Actor;
+use Guixa\Shared\Application\TransactionRunner;
 
 final class RenameHousehold
 {
-    public function __construct(private readonly HouseholdRepository $households) {}
+    public function __construct(
+        private readonly HouseholdRepository $households,
+        private readonly TransactionRunner $transactions,
+    ) {}
 
     public function __invoke(Actor $actor, string $householdId, string $name): void
     {
         $actor->assertManager();
 
-        $household = $this->households->get($householdId) ?? throw HouseholdNotFound::withId($householdId);
-        $household->rename($name);
-        $this->households->save($household);
+        $this->transactions->run(function () use ($householdId, $name): void {
+            $this->households->lockMembershipChanges();
+            $household = $this->households->get($householdId) ?? throw HouseholdNotFound::withId($householdId);
+            $household->rename($name);
+            $this->households->save($household);
+        });
     }
 }

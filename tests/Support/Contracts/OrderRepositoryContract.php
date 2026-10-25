@@ -5,6 +5,7 @@ namespace Tests\Support\Contracts;
 use DateTimeImmutable;
 use DateTimeZone;
 use Guixa\Ordering\Domain\Cycle;
+use Guixa\Ordering\Domain\Order;
 use Guixa\Ordering\Domain\OrderRepository;
 use Guixa\Ordering\Domain\PickupStatus;
 use Guixa\Ordering\Domain\ValueObject\CutoffRule;
@@ -157,6 +158,29 @@ trait OrderRepositoryContract
         $this->openCycle();
 
         $this->assertSame([], $this->repository()->ofCycle(self::CYCLE));
+    }
+
+    #[Test]
+    public function it_lists_only_pending_pickup_cycles_of_the_requested_household(): void
+    {
+        $this->openCycle();
+        $repository = $this->repository();
+        $orderId = $repository->nextId();
+        $otherId = $repository->nextId();
+        $repository->add(Order::restore($orderId, self::CYCLE, self::HOUSEHOLD, [], PickupStatus::Pending));
+        $repository->add(Order::restore($otherId, self::CYCLE, self::OTHER_HOUSEHOLD, [], PickupStatus::Pending));
+
+        $this->assertSame([self::CYCLE], $repository->pendingPickupCycleIdsOfHousehold(self::HOUSEHOLD));
+        $this->assertSame([self::CYCLE], $repository->pendingPickupCycleIdsOfHousehold(self::OTHER_HOUSEHOLD));
+
+        foreach ([PickupStatus::None, PickupStatus::Completed, PickupStatus::NotCollected, PickupStatus::NothingToCollect] as $status) {
+            $repository->add(Order::restore($orderId, self::CYCLE, self::HOUSEHOLD, [], $status));
+            $this->assertSame([], $repository->pendingPickupCycleIdsOfHousehold(self::HOUSEHOLD), $status->value);
+            $this->assertSame([self::CYCLE], $repository->pendingPickupCycleIdsOfHousehold(self::OTHER_HOUSEHOLD));
+        }
+
+        $repository->add(Order::restore($orderId, self::CYCLE, self::HOUSEHOLD, [], PickupStatus::Pending));
+        $this->assertSame([self::CYCLE], $repository->pendingPickupCycleIdsOfHousehold(self::HOUSEHOLD));
     }
 
     #[Test]

@@ -26,22 +26,22 @@ final class AddMember
     {
         $actor->assertManager();
 
-        $household = $this->households->get($householdId) ?? throw HouseholdNotFound::withId($householdId);
-        $email = Email::from($email);
+        return $this->transactions->run(function () use ($householdId, $name, $email): string {
+            $this->households->lockMembershipChanges();
+            $household = $this->households->get($householdId) ?? throw HouseholdNotFound::withId($householdId);
+            $address = Email::from($email);
 
-        if ($this->accounts->emailIsTaken($email)) {
-            throw EmailAlreadyInUse::for($email->value);
-        }
+            if ($this->accounts->emailIsTaken($address)) {
+                throw EmailAlreadyInUse::for($address->value);
+            }
 
-        $account = Account::inviteMember($this->accounts->nextId(), $name, $email, $household->id);
-
-        $this->transactions->run(function () use ($household, $account): void {
+            $account = Account::inviteMember($this->accounts->nextId(), $name, $address, $household->id);
             $this->accounts->save($account);
             $this->reactivate($household);
             ($this->sendInvitation)($account);
-        });
 
-        return $account->id;
+            return $account->id;
+        });
     }
 
     private function reactivate(Household $household): void

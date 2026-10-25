@@ -108,7 +108,7 @@ Use cases
 | `ResendInvitation`, `ChangeInvitationEmail` | manager | R34, S25 |
 | `AcceptInvitation` (sets password, activates) | invitee | R34, S25 |
 | `MoveMember` (an inactive target household is reactivated; it also links an unlinked account; moving to the current household does nothing), `UnlinkMember` | manager | R35, R35a, S43 |
-| `DeactivateHousehold` (returns the warning first), `ReactivateHousehold` | manager | R35a, S58 |
+| `GetHouseholdDeactivationWarning` (reads balance and pending pickups before the action), `DeactivateHousehold` (unlinks members and deactivates atomically), `ReactivateHousehold` | manager | R35a, S58 |
 | `ListHouseholdsToSettle` | manager | R35a, S43, S58 |
 | `ListHouseholds`, `GetHousehold` (members with pending invitation and its expiry) | manager | R33, R34 (admin pages) |
 | `CanLogIn` (accepted invitation and not deactivated; the Fortify login adapter calls it after the password check) | — (login) | R34, R36b, S25 |
@@ -125,6 +125,8 @@ Use cases
 
 A household is deactivated automatically when `MoveMember`, `UnlinkMember` or `DeactivateAccount` leaves it
 without members (R35a), through the shared `DeactivateEmptyHousehold` service. Deactivating it unlinks its members; its orders and pickups stay in Ordering.
+Membership-link changes and household-state writes take one transaction-scoped Membership lock before reading accounts or households; account deactivation takes that lock before manager-row locks. A command re-reads its inputs after locking, so manual deactivation, add/move/unlink and reactivation serialize with current membership state.
+`AccountRepository::save` keeps an existing account's stored household link while saving account details and roles; new accounts keep their initial link. Membership-changing commands persist the link separately through `saveHouseholdLink` under that lock, so a stale account-detail save cannot restore an old link.
 
 Infrastructure: accounts are the `users` table through `App\Models\User` (A6 exception).
 Households live in `households`; invitations in `invitations` (one row per account, `token_hash`, `sent_at`);

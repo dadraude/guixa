@@ -5,6 +5,7 @@ namespace Guixa\Membership\Application;
 use Guixa\Membership\Domain\AccountRepository;
 use Guixa\Membership\Domain\Error\AccountNotFound;
 use Guixa\Membership\Domain\Error\LastManager;
+use Guixa\Membership\Domain\HouseholdRepository;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Application\TransactionRunner;
 
@@ -12,6 +13,7 @@ final class RemoveManagerRole
 {
     public function __construct(
         private readonly AccountRepository $accounts,
+        private readonly HouseholdRepository $households,
         private readonly TransactionRunner $transactions,
     ) {}
 
@@ -20,7 +22,8 @@ final class RemoveManagerRole
         $actor->assertManager();
 
         $this->transactions->run(function () use ($accountId): void {
-            // Locked first, so two removals cannot each see the other manager still there (R36a).
+            // Take membership first; deactivation can save a manager account while holding it.
+            $this->households->lockMembershipChanges();
             $this->accounts->lockManagers();
 
             $account = $this->accounts->get($accountId) ?? throw AccountNotFound::withId($accountId);

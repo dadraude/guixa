@@ -14,6 +14,8 @@ final class InMemoryHouseholdRepository extends InMemoryRepository implements Ho
         parent::save($item);
     }
 
+    public function lockMembershipChanges(): void {}
+
     public function get(string $id): ?Household
     {
         return $this->find($id);
