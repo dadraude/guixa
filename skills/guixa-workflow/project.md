@@ -1,7 +1,30 @@
 # Guixa execution profile
 
-Read this profile once in the coordinator and pass resolved values to workers. It is project
-configuration, not permission to run the commands or access a remote service.
+Read this profile once in the coordinator and pass resolved values to workers. Its standing
+authorization is the single source of permission for workflow operations.
+
+## Standing authorization
+
+Invoking a workflow skill grants these operations for Linear `draude`/`DRA`/`Coop` and GitHub `origin`
+through the current `gh` session. Everything else is asked first.
+
+Pre-authorized:
+
+- Read the project's issues, relations, PRs, checks and CI runs.
+- Dispatch every admitted task (dependency-ready, compatible, within Limits).
+- Set an admitted issue `In Progress`; on Stop, comment the blocker and return it to `Todo`.
+- Create and clean up task worktrees, branches and `guixa_test_draNN*` databases.
+- Push the task branch, open its PR against `main`, and push new commits for CI fixes and
+  merges of `main` when the PR conflicts.
+- Edit admitted `plan.md`/`tasks.md` and append Deviation entries to `log.md`.
+
+Ask first:
+
+- Merging any PR (the user merges).
+- Product decisions: `spec.md` changes, OQ answers, behaviour changes.
+- Publishing new tickets; reorganizing existing tickets, relations, labels or automations.
+- Force-push, pushing to `main`, rewriting published history, other remotes, workspaces or credentials,
+  deleting branches or tickets, the `guixa`/`guixa_test` databases, machine configuration.
 
 ## Identities and paths
 
@@ -30,7 +53,7 @@ Use the project's configured PHP 8.5 environment. The existing local option is
 If unavailable, ask for an approved runtime path; do not install or change machine configuration.
 Do not assume the coordinator's Herd isolation applies to sibling worktrees.
 
-## Commands (only after the corresponding workflow authorization)
+## Commands
 
 Each worker command sets its own cwd and environment; never rely on shell state from a previous call:
 
@@ -64,11 +87,12 @@ Discover affected generators from the repository scripts before regenerating; do
 Only the coordinator runs shared `git fetch origin`, `git worktree add/remove`, one at a time.
 Create worktrees with `git worktree add "$WORKTREE" -b "$BRANCH" "$BASE_REF"`.
 
-After a confirmed PR with current successful CI evidence, remove only the clean, task-owned worktree (never `--force`) and run the existing
-guarded cleanup helper from the coordinator with the verified PHP runtime:
+After the task's PR is merged and its merged commit is contained in `origin/main`, remove only the
+clean, task-owned worktree (never `--force`) and run the existing guarded cleanup helper from the
+coordinator with the verified PHP runtime:
 `php skills/guixa-workflow/scripts/drop-test-databases.php NN`.
 Its allowed namespace is `guixa_test_draNN` and its suffixed worker databases. A cleanup failure is
-reported, not retried destructively or treated as releasing the PR's reservation.
+reported, not retried destructively.
 
 ## Project conventions
 
@@ -85,6 +109,5 @@ reported, not retried destructively or treated as releasing the PR's reservation
   and fixtures, dependency manifests/locks, `resources/js/generated/`, feature plan/tasks/log.
 - Task commits: one line, no body or attribution, `<type>(<scope>): <description> (DRA-NN)`; preserve
   the existing branch/type convention. PR body: delivered behavior, covered R#/scenarios, review rounds,
-  Deviations (or None). Do not add provider attribution. Publication and merge are separate permissions.
-- Do not assume branch integration moved Linear status; read it back. No status/relationship update
-  is authorized merely by installing or validating these skills.
+  Deviations (or None). Do not add provider attribution.
+- Read Linear status back after integration rather than assuming the merge moved it.

@@ -1,8 +1,8 @@
 # One workflow, two runtimes
 
 The process lives in [core](core/session.md), runtime operations in [adapters](adapters/codex.md), and
-project identities/commands in [project.md](project.md). Update each rule in one place. Installing or
-testing these files never authorizes Linear writes or implementation/publishing actions.
+project identities/commands in [project.md](project.md). Update each rule in one place. Permission for
+remote and implementation actions comes only from the profile's [standing authorization](project.md#standing-authorization).
 
 ## Use
 
@@ -22,11 +22,11 @@ reload its skills or start a fresh session; do not claim discovery from the regi
 - One coordinator per feature across all runtimes; worktree isolation is not a distributed lock.
 - Shared-file/contract reservations last through verified integration, including after PR opening.
 - Fresh independent review, isolated task databases and focused rechecking after a base change remain required.
-- Local checks cover the changed behavior; full build/lint/types/tests run in CI after authorized publication.
-- An opened PR is `pending-ci`, not validated. Current candidate-bound CI success is required before cleanup.
+- Local checks cover the changed behavior; full build/lint/types/tests run in CI after publication.
+- An opened PR is `pending-ci`, not validated. Cleanup waits until the PR is merged and contained in `main`.
 - Grouping parents are not executable; hierarchy, prerequisites and contextual relations stay distinct.
 - Missing tools, permissions, independent review or native relation support stop the affected action.
-- Existing ticket reorganization and remote actions still require explicit authorization.
+- Merging, product decisions and ticket publication or reorganization stay with the user.
 
 To add a runtime, implement capability mappings in an adapter and a thin entrypoint. Do not fork the
 core or claim that every AI chat service can run it: it needs repository access, required execution
@@ -35,9 +35,9 @@ and delegation capabilities, and authorized connectors. Keep explicit-only invoc
 ## Verification and context ownership
 
 The implementer proves focused RED/GREEN; the coordinator reuses matching evidence rather than
-repeating it. A fresh reviewer checks semantics and requirements, not another full suite. After explicit
-publication approval, CI owns broad validation. See [the task lifecycle](core/task.md) for pending,
-failed, stale and successful results, bounded corrections and post-publication authorization.
+repeating it. A fresh reviewer checks semantics and requirements, not another full suite. After
+publication, CI owns broad validation. See [the task lifecycle](core/task.md) for pending,
+failed, stale and successful results, bounded corrections and post-publication fixes.
 
 Only the coordinator loads the whole adapter/profile/process. Follow [role-scoped context](core/handoff.md)
 for workers: exact relevant briefs, source sections, resolved settings and candidate evidence, not the

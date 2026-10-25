@@ -51,7 +51,7 @@ the user. Never drop required tests or spec updates to stay inside the original 
 
 ## Integration and release
 
-An open PR retains its reservation after worktree cleanup. Before releasing it, fetch the current base,
+An open PR retains its reservation and its worktree. Before releasing it, fetch the current base,
 verify that the PR is merged and that its merge/squash/rebased result is contained in that base; use the
 host's actual merged commit identity, not the pre-merge branch SHA (squash changes it). Missing or
 ambiguous integration evidence keeps the wait. Then recompute the next candidate's scope on that base.

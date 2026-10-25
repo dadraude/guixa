@@ -8,7 +8,7 @@ Dispatch with [role-scoped context](handoff.md); process and adapter documents s
 
 Read the issue before updating it. Verify an executable leaf, matching task row, completed dependencies,
 integration evidence and compatible allowed edit surfaces using [scheduling](scheduling.md). Validate
-required runtime capabilities and authorization for the target remote/session and proposed operations.
+required runtime capabilities, and that the proposed operations fall within the profile's standing authorization.
 On a wait or missing scope/capability, report it before any mutation. Then set the admitted issue active.
 
 ## 2. Prepare and implement
@@ -65,9 +65,8 @@ The coordinator routes the result:
 
 ## 6. Publish for CI
 
-Only after focused checks and required independent/native reviews cover the final candidate and
-publication is authorized for the destination, operation and session, send
-the exact checked HEAD/base to a publisher. It verifies they still match before push/PR; mismatch
+Once focused checks and required independent/native reviews cover the final candidate, send the exact
+checked HEAD/base to a publisher. It verifies they still match before push/PR; mismatch
 returns to preparation without pushing. Publish using the profile's branch and PR conventions.
 On partial/uncertain publication failure, stop and report confirmed remote state; do not blindly retry
 or send an already-pushed branch into the pre-push amend/rebase loop. Never force-push automatically.
@@ -83,29 +82,28 @@ run URL and each expected check's conclusion. For PR merge-ref runs, verify thei
 current head/base. Re-read PR identities before accepting success; changed head/base invalidates prior
 CI evidence. A green badge or an unrelated/stale run is insufficient.
 
-- All expected checks succeeded for the current candidate: report `ci-passed` and proceed to cleanup.
+- All expected checks succeeded for the current candidate: report `ci-passed`; the PR waits for the user's merge.
 - Queued/running, absent, skipped, cancelled, partial, stale or unreadable checks: remain `pending-ci`,
   report missing proof and retain state. Use a bounded native wait/completion event if available; do not
   busy-poll or run the full suite locally as a substitute. Resume observation when results are available.
 - Failed CI: report `ci-failed` with failed check names and bounded sanitized excerpts. Within the
   existing correction/review budgets, return to the implementer for a focused reproduction and fix.
-  Recheck focused evidence and independently review the changed candidate before another authorized
-  push. Use new commits on the published branch, never the pre-publication amend/rebase loop. Confirm
-  authorization covers update pushes; otherwise ask first. New commits restart CI evidence collection.
+  Recheck focused evidence and independently review the changed candidate before another push. Use new
+  commits on the published branch, never the pre-publication amend/rebase loop. New commits restart CI
+  evidence collection.
 
 Do not mark the task validated, clean up its environment or release its reservation while CI is pending
 or failed. Missing CI capability remains missing proof, not permission to skip full validation. If the
-base moves after publication, request an authorized integration update rather than auto-rebasing or
-force-pushing. Do not reset correction/review counters after publishing or restarting a session.
+PR conflicts with a moved base, merge `origin/main` into the task branch as a new commit, rerun focused
+checks, get an independent review for behavioral/contract changes, then push. Do not reset correction/review counters after publishing or restarting a session.
 
-After `ci-passed`, the coordinator removes only the clean owned worktree and invokes the guarded
-task-database cleanup from the profile, serially. A cleanup failure preserves remaining state and is
-reported. Delivery ends at a CI-validated PR, not integration; only the scheduling policy releases
-overlapping queued tasks after verified integration. Merge still requires separate authorization.
+After `ci-passed`, keep the worktree, database and reservation while the PR is open: review feedback,
+conflicts or a new CI run reuse them. Delivery ends at a CI-validated PR; the user merges. Cleanup runs
+only after verified integration, at the start of a later session ([Clean up merged tasks](session.md#clean-up-merged-tasks)).
 
 ## Stop
 
-Preserve the worktree and changes. If tracker updates were authorized, post the exact blocker/question
-and return the executable issue to Todo; otherwise report locally without a remote mutation. A failed
+Preserve the worktree and changes. Post the exact blocker/question on the issue and return it to
+Todo. A failed
 status update is pending, not a reason to retry publication. Keep the task reservation and report status,
 HEAD/base, checks/review rounds, remote outcomes and the exact decision or missing capability needed.

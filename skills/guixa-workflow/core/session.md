@@ -16,15 +16,19 @@ and authorized open PR evidence to establish edit surfaces and actual prerequisi
 each candidate as eligible, waiting-integration, needs-scope or blocked-dependency. Done alone is not
 proof that prerequisite code exists in the base. Missing tooling/evidence keeps affected tasks waiting.
 
-## Confirm scope and permissions
+## Clean up merged tasks
 
-Show the compatible batch and queued tasks with reasons. Ask one confirmation question and wait.
-Explicitly identify remote destinations, the connected session to use, and the proposed remote reads,
-status updates, push and PR creation. Never inspect ambient credentials to fill missing authorization.
-Confirmation does not authorize merging, force-pushing, changing ticket relationships or executing an
-inadmissible task. Discovery reads need their own existing authorization; ask before an unauthorized read.
+Before admitting new work, check each live task worktree's PR. When its integration is verified as in
+[scheduling](scheduling.md#integration-and-release), run the profile's cleanup serially: remove the
+clean worktree and drop its task databases. Keep and report a dirty worktree, an unverifiable PR, or a
+closed-unmerged PR until the user confirms it is abandoned.
 
-Only confirmed executable tasks may be moved to Todo. Keep grouping parents untouched.
+## Report the batch
+
+Show the compatible batch and queued tasks with reasons, then dispatch the batch without waiting. Ask
+one question only when a needed operation falls outside the profile's standing authorization.
+
+Only admitted executable tasks change status. Keep grouping parents untouched.
 
 ## Run and report
 
@@ -38,8 +42,9 @@ dependent steps. Partial/empty worker output is not success. Verify actual paths
 
 An open PR frees an execution slot, not its reservation. Recompute compatibility before admitting the
 next task. A stopped task holds overlapping work while its changes remain pending, but not disjoint work.
-When only CI/integration waits remain, report exact PRs, candidate identities and pending checks and
-stop without busy-polling or merging. Retain pending-CI environments for fixes; resume with current evidence.
+While CI runs, wait through the adapter's completion mechanism and continue each pipeline as results
+arrive. When every remaining task waits on the user's merge, report exact PRs and candidate identities
+and stop. Retain every open PR's environment for fixes; resume with current evidence.
 On resume reconstruct reservations from live worktrees and authorized PR evidence, not chat alone.
 
 Return one table: task, outcome (pending-ci/ci-failed/ci-passed/stopped/waiting-integration), PR, review rounds, deviations, retained

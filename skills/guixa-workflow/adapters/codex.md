@@ -24,7 +24,7 @@ mutation. A read-only ticket draft does not require a subagent merely to compens
 
 Use shell/file tools with explicit cwd/absolute paths. Honor sandbox refusals and the host approval
 mechanism; never weaken permissions or reroute through another tool to bypass a denial. Runtime approval
-does not replace the user's authorization for a destination, operation and connected session.
+covers the host; the profile's standing authorization covers destinations and operations.
 
 ## Tracker and questions
 
