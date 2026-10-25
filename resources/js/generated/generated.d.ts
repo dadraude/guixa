@@ -10,6 +10,10 @@ readonly householdName: string | null,
 readonly active: boolean,
 readonly invitationPending: boolean,
 };
+export type ContainerCountRow = {
+readonly total: number,
+readonly households: App.Http.HouseholdContainerRow[],
+};
 export type CutoffRuleRow = {
 readonly daysBefore: number,
 readonly time: string,
@@ -37,6 +41,11 @@ readonly cycleId: string,
 readonly pickupDate: string,
 readonly cancelled: boolean,
 readonly producers: App.Http.ProducerTotalsRow[],
+};
+export type HouseholdContainerRow = {
+readonly householdId: string,
+readonly householdName: string,
+readonly count: number,
 };
 export type HouseholdOptionRow = {
 readonly id: string,

@@ -59,5 +59,22 @@ it('flags a cancelled cycle and shows no totals (R4b, R13, S62)', function () {
         ->assertInertia(fn (Assert $page) => $page
             ->component('Manage/Cycles/Show')
             ->where('summary.cancelled', true)
-            ->has('summary.producers', 0));
+            ->has('summary.producers', 0)
+            ->where('containers.total', 0)
+            ->has('containers.households', 0));
+});
+
+it('shows the household and cycle container counts from the application query (R18a, S60)', function () {
+    [$cycleId, , $loaf] = cycleWithBaker();
+    DB::table('products')->where('id', $loaf)->update(['containers_per_unit' => '1.000']);
+    $household = householdNamed('Household A');
+    $member = memberOf($household, 'Anna');
+    $this->actingAs($member)->put("/cycles/{$cycleId}/order/lines/{$loaf}", ['quantity' => '2'])->assertRedirect();
+    DB::table('products')->where('id', $loaf)->update(['containers_per_unit' => '4.000']);
+
+    $this->actingAs(accountWith(Role::Manager))->get("/manage/cycles/{$cycleId}")
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('containers.total', 2)
+            ->where('containers.households.0.householdName', 'Household A')
+            ->where('containers.households.0.count', 2));
 });

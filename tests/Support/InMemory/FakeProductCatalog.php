@@ -37,6 +37,16 @@ final class FakeProductCatalog implements ProductCatalog
         );
     }
 
+    public function changeContainersPerUnit(string $productId, ?string $containersPerUnit): void
+    {
+        $product = $this->orderable[$productId];
+        $this->orderable[$productId] = new OrderableProduct(
+            $product->id, $product->producerId, $product->name, $product->unit,
+            $product->price, $product->variable,
+            $containersPerUnit === null ? null : Quantity::fromString($containersPerUnit),
+        );
+    }
+
     public function deactivate(string $productId): void
     {
         $this->deactivated[$productId] = $this->orderable[$productId];
