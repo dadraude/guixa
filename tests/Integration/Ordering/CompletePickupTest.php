@@ -26,7 +26,7 @@ final class CompletePickupTest extends TestCase
 
     protected function tearDown(): void
     {
-        foreach (['wallet_movements', 'stock_movements', 'order_stock_lines', 'order_lines', 'orders', 'cycle_producers', 'cycles', 'stock_products', 'households', 'users'] as $table) {
+        foreach (['wallet_movements', 'stock_movements', 'order_stock_lines', 'order_lines', 'orders', 'cycle_producers', 'cycles', 'stock_products', 'households', 'users', 'products', 'producers'] as $table) {
             DB::table($table)->delete();
         }
 
