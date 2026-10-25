@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { Form, Head, Link } from '@inertiajs/vue3';
+import { trans } from 'laravel-vue-i18n';
+import SettlementDetails from './SettlementDetails.vue';
 import AccountHouseholdController from '@/actions/App/Http/Controllers/Manage/AccountHouseholdController';
 import HouseholdController from '@/actions/App/Http/Controllers/Manage/HouseholdController';
 import HouseholdMemberController from '@/actions/App/Http/Controllers/Manage/HouseholdMemberController';
@@ -15,6 +17,7 @@ import { Label } from '@/components/ui/label';
 const props = defineProps<{
     household: App.Http.HouseholdRow;
     otherHouseholds: App.Http.HouseholdSummaryRow[];
+    deactivationWarning: App.Http.HouseholdSettlementRow;
 }>();
 
 defineOptions({
@@ -251,6 +254,61 @@ const expiry = (iso: string | null) =>
                 </div>
                 <Button type="submit" :disabled="processing">
                     Send invitation
+                </Button>
+            </Form>
+        </section>
+
+        <section
+            v-if="household.active"
+            class="grid gap-3 rounded-lg border p-4"
+            aria-labelledby="deactivation-heading"
+        >
+            <h2 id="deactivation-heading" class="text-lg font-medium">
+                {{ trans('Deactivate household') }}
+            </h2>
+            <p class="text-sm">
+                {{
+                    trans(
+                        'Deactivating unlinks every member. Orders, pickups and balance stay available to settle.',
+                    )
+                }}
+            </p>
+            <SettlementDetails :settlement="deactivationWarning" />
+            <Form
+                v-bind="HouseholdController.deactivate.form(household.id)"
+                v-slot="{ processing }"
+            >
+                <Button
+                    type="submit"
+                    variant="destructive"
+                    class="min-h-11"
+                    :disabled="processing"
+                >
+                    {{ trans('Deactivate household') }}
+                </Button>
+            </Form>
+        </section>
+        <section
+            v-else
+            class="grid gap-3 rounded-lg border p-4"
+            aria-labelledby="reactivation-heading"
+        >
+            <h2 id="reactivation-heading" class="text-lg font-medium">
+                {{ trans('Reactivate household') }}
+            </h2>
+            <p class="text-sm">
+                {{
+                    trans(
+                        'Members can be linked to this household again after reactivation.',
+                    )
+                }}
+            </p>
+            <Form
+                v-bind="HouseholdController.reactivate.form(household.id)"
+                v-slot="{ processing }"
+            >
+                <Button type="submit" class="min-h-11" :disabled="processing">
+                    {{ trans('Reactivate household') }}
                 </Button>
             </Form>
         </section>

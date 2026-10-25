@@ -224,6 +224,16 @@ final class EloquentOrderRepository implements OrderRepository
             ->all();
     }
 
+    public function pendingPickupCycleIdsOfHousehold(string $householdId): array
+    {
+        return array_values(DB::table('orders')
+            ->where('household_id', $householdId)
+            ->where('pickup_status', PickupStatus::Pending->value)
+            ->pluck('cycle_id')
+            ->map(fn ($cycleId): string => (string) $cycleId)
+            ->all());
+    }
+
     public function lockFor(string $cycleId, string $householdId): Order
     {
         // The unique (cycle, household) index makes a second concurrent insert wait for the first and then do nothing.

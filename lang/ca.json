@@ -83,5 +83,13 @@
     "Total to charge": "Total a cobrar",
     "Completed": "Completada",
     "Containers to collect": "Envasos per recollir",
-    "Cycle total": "Total del cicle"
+    "Cycle total": "Total del cicle",
+    "Balance": "Saldo",
+    "Pending pickups": "Recollides pendents",
+    "None": "Cap",
+    "To settle": "Pendents de liquidar",
+    "Deactivate household": "Desactiva la llar",
+    "Reactivate household": "Reactiva la llar",
+    "Deactivating unlinks every member. Orders, pickups and balance stay available to settle.": "La desactivació desvincula tots els membres. Les comandes, les recollides i el saldo es conserven per liquidar-los.",
+    "Members can be linked to this household again after reactivation.": "Després de reactivar la llar, s'hi poden tornar a vincular membres."
 }

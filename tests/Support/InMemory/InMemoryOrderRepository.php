@@ -4,6 +4,7 @@ namespace Tests\Support\InMemory;
 
 use Guixa\Ordering\Domain\Order;
 use Guixa\Ordering\Domain\OrderRepository;
+use Guixa\Ordering\Domain\PickupStatus;
 
 /** @extends InMemoryRepository<Order> */
 final class InMemoryOrderRepository extends InMemoryRepository implements OrderRepository
@@ -71,6 +72,14 @@ final class InMemoryOrderRepository extends InMemoryRepository implements OrderR
         }
 
         return $counts;
+    }
+
+    public function pendingPickupCycleIdsOfHousehold(string $householdId): array
+    {
+        return array_values(array_map(
+            fn (Order $order) => $order->cycleId,
+            array_filter($this->all(), fn (Order $order) => $order->householdId === $householdId && $order->pickup() === PickupStatus::Pending),
+        ));
     }
 
     public function lockFor(string $cycleId, string $householdId): Order

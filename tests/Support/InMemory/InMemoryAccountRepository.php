@@ -13,7 +13,30 @@ final class InMemoryAccountRepository extends InMemoryRepository implements Acco
     /** @param Account $item */
     public function save(object $item): void
     {
+        $stored = $this->find($item->id);
+
+        if ($stored !== null) {
+            $item = Account::restore(
+                $item->id, $item->name, $item->email, $item->roles, $stored->householdId,
+                $item->producerId, $item->activatedAt, $item->deactivatedAt,
+            );
+        }
+
         parent::save($item);
+    }
+
+    public function saveHouseholdLink(Account $account): void
+    {
+        $stored = $this->find($account->id);
+
+        if ($stored === null) {
+            return;
+        }
+
+        parent::save(Account::restore(
+            $stored->id, $stored->name, $stored->email, $stored->roles, $account->householdId,
+            $stored->producerId, $stored->activatedAt, $stored->deactivatedAt,
+        ));
     }
 
     public function get(string $id): ?Account

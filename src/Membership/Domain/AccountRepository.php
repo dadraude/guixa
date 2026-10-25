@@ -8,7 +8,11 @@ interface AccountRepository
 {
     public function nextId(): string;
 
+    /** Existing-account detail saves leave the stored household link unchanged. */
     public function save(Account $account): void;
+
+    /** Persist only the domain-approved household link change under the membership lock. */
+    public function saveHouseholdLink(Account $account): void;
 
     public function get(string $id): ?Account;
 

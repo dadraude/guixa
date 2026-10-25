@@ -129,6 +129,8 @@ Route::middleware(['auth', 'verified', 'role:manager'])->prefix('manage')->name(
     Route::post('households', [HouseholdController::class, 'store'])->name('households.store');
     Route::get('households/{household}', [HouseholdController::class, 'show'])->whereUuid('household')->name('households.show');
     Route::put('households/{household}', [HouseholdController::class, 'update'])->whereUuid('household')->name('households.update');
+    Route::post('households/{household}/deactivate', [HouseholdController::class, 'deactivate'])->whereUuid('household')->name('households.deactivate');
+    Route::post('households/{household}/reactivate', [HouseholdController::class, 'reactivate'])->whereUuid('household')->name('households.reactivate');
     Route::post('households/{household}/members', [HouseholdMemberController::class, 'store'])
         ->whereUuid('household')
         ->name('households.members.store');

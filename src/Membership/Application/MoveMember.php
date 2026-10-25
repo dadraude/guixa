@@ -23,9 +23,9 @@ final class MoveMember
     {
         $actor->assertManager();
 
-        $target = $this->households->get($householdId) ?? throw HouseholdNotFound::withId($householdId);
-
-        $this->transactions->run(function () use ($accountId, $target): void {
+        $this->transactions->run(function () use ($accountId, $householdId): void {
+            $this->households->lockMembershipChanges();
+            $target = $this->households->get($householdId) ?? throw HouseholdNotFound::withId($householdId);
             $account = $this->accounts->get($accountId) ?? throw AccountNotFound::withId($accountId);
 
             if ($account->householdId === $target->id) {
@@ -34,7 +34,7 @@ final class MoveMember
 
             $previousHouseholdId = $account->householdId;
             $account->moveTo($target->id);
-            $this->accounts->save($account);
+            $this->accounts->saveHouseholdLink($account);
 
             if (! $target->isActive()) {
                 $target->reactivate();
