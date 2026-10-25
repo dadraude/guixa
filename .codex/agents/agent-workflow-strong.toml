@@ -1,0 +1,7 @@
+name = "agent-workflow-strong"
+description = "Fresh read-only review workers for the agent workflow."
+model = "gpt-6-astra"
+model_reasoning_effort = "high"
+developer_instructions = """
+Follow only the coordinator's role-scoped handoff. Do not delegate.
+"""

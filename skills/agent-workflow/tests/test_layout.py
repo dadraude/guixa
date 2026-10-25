@@ -64,6 +64,19 @@ class WorkflowLayoutTest(unittest.TestCase):
     def test_profile_has_every_template_section(self):
         self.assertEqual(headings(PROFILE), headings(WORKFLOW / "profile-template.md"))
 
+    def test_profile_routes_every_role_to_a_model_per_runtime(self):
+        handoff = (WORKFLOW / "core/handoff.md").read_text()
+        roles = {row.split("|")[1].strip() for row in re.findall(r"^\| [A-Z].*$", handoff, re.MULTILINE)}
+        roles = {role for role in roles if role != "Role"}
+        section = PROFILE.read_text().split("## Model routing", 1)[1].split("\n## ", 1)[0]
+        routed = []
+        for row in re.findall(r"^\| (?:Light|Standard|Strong) .*$", section, re.MULTILINE):
+            _, _, cell_roles, claude, codex, _ = [cell.strip() for cell in row.split("|")]
+            self.assertRegex(claude, r"^`[\w.-]+`$")
+            self.assertRegex(codex, r"^`[\w.-]+`$")
+            routed += [role.strip() for role in cell_roles.split(",")]
+        self.assertCountEqual(routed, sorted({r.replace(" / ", "/") for r in roles}))
+
     def test_core_does_not_bind_a_provider_or_machine(self):
         files = list((WORKFLOW / "core").glob("*.md"))
         self.assertEqual({file.stem for file in files},
