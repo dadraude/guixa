@@ -95,7 +95,8 @@ export function expandMatrix(manifest) {
                 selected.map((item) => {
                     requireValue(
                         item &&
-                            Object.keys(item).sort().join(',') === 'mode,text,width' &&
+                            Object.keys(item).sort().join(',') ===
+                                'mode,text,width' &&
                             matrix.widths.includes(item.width) &&
                             matrix.modes.includes(item.mode) &&
                             matrix.text.includes(item.text),

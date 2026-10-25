@@ -94,7 +94,9 @@ void test('plan reports the case count without a browser or committed fixture', 
         const result = spawnSync(
             process.execPath,
             [
-                fileURLToPath(new URL('../../scripts/visual/run.mjs', import.meta.url)),
+                fileURLToPath(
+                    new URL('../../scripts/visual/run.mjs', import.meta.url),
+                ),
                 'plan',
                 path,
             ],

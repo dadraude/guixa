@@ -231,7 +231,9 @@ async function main() {
     const cases = expandMatrix(manifest);
     if (command === 'plan') {
         for (const view of manifest.views) {
-            const count = cases.filter((item) => item.view.id === view.id).length;
+            const count = cases.filter(
+                (item) => item.view.id === view.id,
+            ).length;
             console.log(`${view.id}: ${count} cases`);
         }
         console.log(`Total: ${cases.length} cases`);
