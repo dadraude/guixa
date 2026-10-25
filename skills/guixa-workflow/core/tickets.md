@@ -24,12 +24,21 @@ execution/setup instructions or authorize implementation.
 
 ## Decision Gates
 
-| Relationship      | When to propose it                                                                                                                                                          |
-| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Parent → children | A coherent deliverable needs multiple executable slices. Reuse an explicitly selected source issue as parent, or propose a new grouping parent for spec/conversation input. |
-| Blocking          | One slice genuinely requires another's result before it can proceed. Keep these edges between executable tasks, with no cycles.                                             |
-| Related           | A decision, follow-up or adjacent task provides useful context without being a prerequisite. Do not relate everything just because it shares a parent.                      |
-| No parent         | A standalone slice, or an approved project/milestone already supplies sufficient grouping. Do not create redundant containers.                                              |
+| Relationship      | When to propose it                                                                                                                                                                                                                      |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Parent → children | One deliverable (feature, bug or task) decomposes into executable slices that roll up into it and share its context. Reuse an explicitly selected source issue as parent, or propose a new grouping parent for spec/conversation input. |
+| Blocking          | Separate items with a sequential dependency: B cannot start or finish until A is done, often across features, workflows or teams, each with its own owner and cycle. Keep these edges between executable tasks, with no cycles.         |
+| Related           | A decision, follow-up or adjacent task provides useful context without being a prerequisite. Do not relate everything just because it shares a parent.                                                                                  |
+| No parent         | A standalone slice, or an approved project/milestone already supplies sufficient grouping. Do not create redundant containers.                                                                                                          |
+
+Linear constraints behind these gates:
+
+- A sub-issue has exactly one parent. If a slice seems to belong to two deliverables, it is a separate
+  issue linked by blocking or related, not a shared child.
+- Sub-issues inherit project, cycle, priority and team from the parent. Pick a parent only when those
+  should match; work needing its own owner, cycle or team is a separate top-level issue with blocking.
+- A team may auto-close the parent when all sub-issues are done, so a parent must hold only the slices
+  that complete its deliverable.
 
 Grouping parents describe the outcome and completion criteria, have no executable `Tnn` prefix and
 receive no `ready-for-agent` label. Each executable child maps to a task row and uses `Tnn — Title`.
