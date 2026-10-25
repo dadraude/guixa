@@ -47,7 +47,9 @@ const sections = computed(() =>
             :key="section.title"
             class="space-y-3"
         >
-            <h2 class="text-lg font-semibold">{{ section.title }}</h2>
+            <h2 class="pilot-heading text-xl font-semibold">
+                {{ section.title }}
+            </h2>
             <ul class="grid gap-3">
                 <li
                     v-for="cycle in section.cycles"

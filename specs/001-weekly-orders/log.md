@@ -937,3 +937,35 @@ Why: a member added or moved while a manager deactivates the target must see its
 
 T32 (`plan.md`, Membership persistence): existing-account detail saves retain the stored household link; `saveHouseholdLink` persists only an explicit link change made by a serialized Membership command. Creating a new account still stores its initial link.
 Why: a role, invitation or other account-detail save made from an earlier snapshot could otherwise restore a link after deactivation or a move. The user approved this bounded persistence change; invitation and password transaction flow is unchanged.
+
+
+## 2026-10-25 · Deviation
+
+T39 (`plan.md`, Application visual identity): the explicit pilot boundary is a reactive layout opt-in
+for `Orders/Index` and `Orders/Edit`, provided to the portaled sheet, dropdown, dialog, tooltip and
+toaster. A class on each portal root carries the same semantic tokens outside the shell subtree;
+the body and root receive no pilot token override. This was needed because Reka and Sonner render
+some content under `body`, beyond the layout's inherited CSS variables. Navigation to another page
+removes the opt-in; no preference storage or ordering behavior changed.
+
+
+## 2026-10-25 · Deviation
+
+T39 (`plan.md`, Visual system): at 200% text, the icon beside the order title left too little width
+and split the Catalan heading mid-word. The header now wraps the icon above the title when needed.
+Rendered 375 px evidence also exposed a light control border below 3:1; the scoped border token was
+darkened to meet the boundary requirement. The task-local visual fixture initially omitted the
+existing bundled Instrument Sans face, so a local build was used only to provide that asset, and
+the evidence distinguishes the mocked browser fixture from the HTTP regression tests.
+
+
+## 2026-10-25 · Deviation
+
+T39 visual review: the shared `InputError` red utility colors missed 4.5:1 on the pilot cream and
+dark backgrounds. The order editor now scopes its error text to the pilot destructive token without
+changing other pages. The product quantity input no longer overrides the semantic input border;
+its pilot fill uses the card color so the light and dark unfocused boundaries reach 3:1. Portaled
+dialog and sheet backdrops now carry the same reactive pilot boundary as their content, including
+reduced-motion handling. A true 375 px CDP viewport replaced cropped command-line Chrome mobile
+captures; Welcome and both ordering appearances showed no horizontal page overflow. The task-local
+visual evidence was refreshed with computed colors, focus and motion measurements.

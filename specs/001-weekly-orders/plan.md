@@ -3,10 +3,10 @@
 Status: Accepted (2026-10-21) · Spec: [spec.md](spec.md) + areas (R1–R36b, S1–S61) · Rules: [constitution](../constitution.md)
 
 Accepted amendment (2026-10-24): **Application visual identity** below. The user approved the plan;
-the associated tasks were separately approved. Implementation is on hold at the user's request;
-Linear tickets have been created, but this does not authorize implementation.
+the associated tasks were separately approved. The user subsequently authorized T39 implementation
+on 2026-10-25. T40 still requires explicit approval of the T39 visual pilot.
 T37/T38 reconciliation is complete: T37 = DRA-195 and T38 = DRA-194, both Done with evidence.
-Their native prerequisite links to T39 / DRA-190 are recorded; T39 remains Backlog and on hold.
+Their native prerequisite links to T39 / DRA-190 are recorded.
 
 ## Bootstrap
 
@@ -577,9 +577,9 @@ as DRA-195, separately from the unstarted visual identity amendment below.
 
 ## Application visual identity
 
-**Status: Accepted (2026-10-24).** Route: plan only, because this changes presentation without
-changing the spec's requirements or acceptance scenarios. The task amendment is also accepted;
-the user explicitly requested ticket creation first and no implementation yet.
+**Status: Accepted (2026-10-24); T39 implementation authorized 2026-10-25.** Route: plan only,
+because this changes presentation without changing the spec's requirements or acceptance scenarios.
+The task amendment is accepted; wider rollout still waits for the T39 visual review.
 
 ### Scope and invariants
 
@@ -649,6 +649,15 @@ than reusing light surface values; check the same states in both themes.
 3. Complete the presentation and regression checks below, recording observed results per delivery.
    Future screens inherit the approved system when their own tasks are implemented; this slice does
    not bring unimplemented features forward.
+
+For T39, `AppLayout` recognizes only `Orders/Index` and `Orders/Edit` and passes a reactive opt-in
+through `AppSidebarLayout`. The layout provides that flag to portal wrappers. The shell, mobile
+sheet, dropdown, dialog, tooltip and toaster attach `pilot-theme` only while opted in; `app.css`
+declares the palette once under that class, including dark counterparts. No unconditional root or
+body token is changed, and an Inertia page change removes the opt-in without changing the saved
+light/dark/system preference. The page header wraps at enlarged text sizes; only page and prominent
+section headings receive the Georgia token. The [T39 visual check](../../docs/visual-checks/dra-190.md)
+records the observed browser matrix and its mocked-transport limit.
 
 The pilot is a review checkpoint, not a second theme implementation. Reuse the same semantic tokens
 and presentation components throughout. Preserve existing page orchestration and the constitution's
