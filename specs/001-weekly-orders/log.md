@@ -980,3 +980,13 @@ selected and focus states. The quantity input has a darker neutral inset, and th
 uses the popover surface to separate it from the canvas. The light token block, scope and ordering
 behavior are unchanged. This adjusts the accepted pilot's dark presentation before visual
 approval of any wider rollout.
+
+
+## 2026-10-25 · Deviation
+
+T39 visual evidence correction: review found that the normal-motion dialog screenshot had been
+taken during its entrance animation, making underlying card text appear through the panel. The
+user then said “ok!” to one additional review round for the correction. The task-local CDP harness
+now waits for an open state, opacity 1 and finished root animations before capturing the dialog or
+user menu.
+The refreshed screenshots show settled panels; the palette and application behavior did not change.

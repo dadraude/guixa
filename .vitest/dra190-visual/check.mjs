@@ -65,6 +65,32 @@ try {
                 returnByValue: true,
             })
         ).result.value;
+    const waitForSettled = async (selector) => {
+        await evaluate(
+            'new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))',
+        );
+        for (let attempt = 0; attempt < 200; attempt++) {
+            const state = await evaluate(`(() => {
+                const element = document.querySelector(${JSON.stringify(selector)});
+                if (!element) return null;
+                const animations = element.getAnimations();
+                return {
+                    dataState: element.getAttribute('data-state'),
+                    opacity: getComputedStyle(element).opacity,
+                    animationCount: animations.length,
+                    activeAnimations: animations.filter(animation => animation.playState !== 'finished').length,
+                };
+            })()`);
+            if (
+                state?.dataState === 'open' &&
+                state.opacity === '1' &&
+                state.activeAnimations === 0
+            )
+                return state;
+            await new Promise((resolve) => setTimeout(resolve, 25));
+        }
+        throw new Error(`Overlay did not settle: ${selector}`);
+    };
     await send('Page.enable');
     for (const [
         scenario,
@@ -161,8 +187,10 @@ try {
         ],
     ].filter(
         (row) =>
-            !process.argv.includes('--dark-only') ||
-            ['dark', 'system'].includes(row[1]),
+            (!process.argv.includes('--dark-only') ||
+                ['dark', 'system'].includes(row[1])) &&
+            (!process.argv.includes('--overlays-only') ||
+                ['dialog', 'menu'].includes(row[7])),
     )) {
         await send('Emulation.setDeviceMetricsOverride', {
             width,
@@ -218,7 +246,18 @@ try {
             await evaluate(
                 "document.querySelector('[data-test=sidebar-menu-button]').click()",
             );
-            await new Promise((resolve) => setTimeout(resolve, 100));
+        }
+        if (overlayKind === 'dialog' || overlayKind === 'menu') {
+            const selector =
+                overlayKind === 'dialog'
+                    ? '[data-slot="dialog-content"]'
+                    : '[data-slot="dropdown-menu-content"]';
+            console.log(
+                JSON.stringify({
+                    capture: overlayKind,
+                    settled: await waitForSettled(selector),
+                }),
+            );
         }
         const result = await evaluate(`(() => {
       const describe = selector => {
