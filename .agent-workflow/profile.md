@@ -39,14 +39,15 @@ Ask first:
 | Relation fields                           | `parentId`, `blockedBy`/`blocks`, `relatedTo` on `save_issue`, where exposed                                                  |
 | Codex entrypoint prefix                   | `agent-workflow` (`$agent-workflow-implement-session`, `$agent-workflow-implement-task DRA-NN`, `$agent-workflow-to-tickets`) |
 | Remote / base                             | `origin` / `main`                                                                                                             |
-| Task branch                               | `feature/dra-NN-<3-6 title words>`; `chore/` for tooling, test support or CI                                                  |
+| Task branch                               | `feature/dra-NN-<3-6 title words>`; `chore/` for tooling, test support or CI; `docs/` for documents only                      |
 | Worktree root                             | Sibling of the selected repository: `<repo-parent>/<repo-name>-worktrees`                                                     |
 | Task worktree                             | `<worktree-root>/dra-NN`                                                                                                      |
 | Test database                             | `guixa_test_draNN`; parallel workers may add `_test_N`                                                                        |
 | Limits                                    | 3 task pipelines in flight; 3 review rounds; stop after 2 consecutive failed attempts per validation stage                    |
 
-Resolve `REPO_ROOT` with `git rev-parse --show-toplevel` in the coordinator's selected checkout;
-retain it across all workers instead of recomputing it from their working directory. Derive
+Resolve `REPO_ROOT` as the main checkout, the parent of
+`git rev-parse --path-format=absolute --git-common-dir`, so a coordinator started inside a worktree
+still finds it; retain it across all workers instead of recomputing it from their working directory. Derive
 `WORKTREE_ROOT` from that root's parent/name, and resolve `WORKTREE`, `NN`, `TEST_DB`, `BRANCH` and
 `BASE_REF=origin/main` before dispatch. Validate `NN` as digits. Never reuse or overwrite an existing
 task worktree without reconciling its owner/state. Paths containing spaces must remain quoted.

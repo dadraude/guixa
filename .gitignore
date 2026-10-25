@@ -41,6 +41,8 @@ yarn-error.log
 !/.agents/skills/agent-workflow-*/agents/openai.yaml
 /.amp
 /.claude/*
+!/.claude/settings.json
+!/.claude/hooks/
 !/.claude/skills/
 /.claude/skills/*
 !/.claude/skills/implement-session/
@@ -57,8 +59,6 @@ yarn-error.log
 /.kiro
 /.pi
 /.mcp.json
-/AGENTS.md
-/CLAUDE.md
 /boost.json
 /opencode.json
 /opencode.jsonc
