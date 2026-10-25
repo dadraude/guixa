@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Form, Head, Link } from '@inertiajs/vue3';
 import { trans } from 'laravel-vue-i18n';
+import { reactive } from 'vue';
 import CycleCancellationController from '@/actions/App/Http/Controllers/Manage/CycleCancellationController';
 import CycleController from '@/actions/App/Http/Controllers/Manage/CycleController';
 import CycleCutoffController from '@/actions/App/Http/Controllers/Manage/CycleCutoffController';
@@ -53,12 +54,26 @@ const missingProducers = (cycle: App.Http.CycleRow) =>
                 (participant) => participant.producerId === producer.id,
             ),
     );
+
+type CutoffDraft = { date: string; time: string };
+
+const cutoffDrafts = reactive<Record<string, CutoffDraft>>({});
+
+function cutoffDraft(cycleId: string, producerId: string): CutoffDraft {
+    const key = `${cycleId}:${producerId}`;
+    return (cutoffDrafts[key] ??= { date: '', time: '' });
+}
+
+function cutoffValue(cycleId: string, producerId: string): string {
+    const { date, time } = cutoffDraft(cycleId, producerId);
+    return date && time ? `${date}T${time}` : '';
+}
 </script>
 
 <template>
     <Head title="Cycles" />
 
-    <div class="flex flex-col gap-8 p-4">
+    <div class="pilot-page pilot-manager-page">
         <Heading
             title="Cycles"
             :description="
@@ -293,13 +308,82 @@ const missingProducers = (cycle: App.Http.CycleRow) =>
                                 class="flex items-center gap-2"
                                 v-slot="{ errors, processing }"
                             >
-                                <Input
+                                <div
+                                    class="grid w-full min-w-0 grid-cols-1 gap-2"
+                                >
+                                    <Label
+                                        :for="`cutoff-date-${cycle.id}-${participant.producerId}`"
+                                    >
+                                        {{ trans('Cutoff date') }}
+                                    </Label>
+                                    <Input
+                                        :id="`cutoff-date-${cycle.id}-${participant.producerId}`"
+                                        v-model="
+                                            cutoffDraft(
+                                                cycle.id,
+                                                participant.producerId,
+                                            ).date
+                                        "
+                                        :data-test="`cutoff-date-${cycle.id}-${participant.producerId}`"
+                                        type="date"
+                                        required
+                                    />
+                                </div>
+                                <div
+                                    class="grid w-full min-w-0 grid-cols-1 gap-2"
+                                >
+                                    <Label
+                                        :for="`cutoff-time-${cycle.id}-${participant.producerId}`"
+                                    >
+                                        {{ trans('Cutoff time') }}
+                                    </Label>
+                                    <Input
+                                        :id="`cutoff-time-${cycle.id}-${participant.producerId}`"
+                                        v-model="
+                                            cutoffDraft(
+                                                cycle.id,
+                                                participant.producerId,
+                                            ).time
+                                        "
+                                        :data-test="`cutoff-time-${cycle.id}-${participant.producerId}`"
+                                        type="time"
+                                        required
+                                    />
+                                </div>
+                                <input
+                                    type="hidden"
                                     name="cutoff"
-                                    type="datetime-local"
-                                    required
-                                    class="w-fit"
-                                    :aria-label="`New cutoff for ${participant.producerName}`"
+                                    :value="
+                                        cutoffValue(
+                                            cycle.id,
+                                            participant.producerId,
+                                        )
+                                    "
                                 />
+                                <output
+                                    v-if="
+                                        cutoffValue(
+                                            cycle.id,
+                                            participant.producerId,
+                                        )
+                                    "
+                                    :for="`cutoff-date-${cycle.id}-${participant.producerId} cutoff-time-${cycle.id}-${participant.producerId}`"
+                                    :data-test="`cutoff-preview-${cycle.id}-${participant.producerId}`"
+                                    class="block w-full text-base break-words text-muted-foreground"
+                                >
+                                    {{
+                                        cutoffDraft(
+                                            cycle.id,
+                                            participant.producerId,
+                                        ).date
+                                    }}
+                                    {{
+                                        cutoffDraft(
+                                            cycle.id,
+                                            participant.producerId,
+                                        ).time
+                                    }}
+                                </output>
                                 <Button
                                     type="submit"
                                     variant="outline"

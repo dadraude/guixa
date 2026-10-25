@@ -293,6 +293,120 @@
     align-items: center;
 }
 
+.pilot-theme .pilot-manager-page {
+    container: manager-page / inline-size;
+}
+
+.pilot-theme .pilot-manager-page > :is(form, section, ul) {
+    min-width: 0;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--card);
+    color: var(--card-foreground);
+    padding: 1rem;
+}
+
+.pilot-theme .pilot-manager-page :is(form, section, ul, li) {
+    min-width: 0;
+}
+
+.pilot-theme .pilot-manager-page :is(input, select) {
+    max-width: 100%;
+}
+
+.pilot-theme .pilot-manager-page select {
+    min-height: 44px;
+}
+
+.pilot-theme .pilot-manager-page button {
+    height: auto;
+    min-width: 44px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+.pilot-theme .pilot-manager-page a {
+    display: inline-flex;
+    min-width: 44px;
+    align-items: center;
+}
+
+.pilot-theme
+    .pilot-manager-page
+    label:has(input:is([type='checkbox'], [type='radio'])) {
+    min-height: 44px;
+}
+
+.pilot-theme .pilot-manager-page :is(li, p, h2) {
+    overflow-wrap: anywhere;
+}
+
+.pilot-theme .pilot-manager-list {
+    container: pilot-manager / inline-size;
+    min-width: 0;
+}
+
+.pilot-theme .pilot-manager-page > ul > li,
+.pilot-theme .pilot-manager-page > section > ul > li {
+    padding-block: 0.75rem;
+}
+
+@container manager-page (max-width: 36rem) {
+    .pilot-theme .pilot-manager-page > ul > li[data-test^='cycle-'] {
+        padding-inline: 0;
+    }
+
+    .pilot-theme .pilot-manager-page form.flex {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .pilot-theme .pilot-manager-page li form.flex {
+        width: 100%;
+    }
+
+    .pilot-theme .pilot-manager-page li > div.flex.items-center.justify-between,
+    .pilot-theme .pilot-manager-page li > div.flex.justify-between {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .pilot-theme .pilot-manager-page li > div.flex > span,
+    .pilot-theme .pilot-manager-page li > div.flex > a {
+        max-width: 100%;
+        overflow-wrap: anywhere;
+    }
+
+    .pilot-theme .pilot-manager-page li > div.flex > span:first-child {
+        flex-basis: 100%;
+    }
+
+    .pilot-theme
+        .pilot-manager-page
+        li
+        > div.flex.items-center.justify-between
+        > span:first-child
+        > span {
+        display: block;
+        margin-left: 0;
+    }
+}
+
+@media (max-width: 639px) {
+    .pilot-theme
+        .pilot-manager-page
+        input:is([type='date'], [type='datetime-local'], [type='time']) {
+        font-size: 0.875rem;
+        padding-inline: 0.5rem;
+    }
+}
+
+.pilot-theme .pilot-manager-page input[data-test^='cutoff-date-'],
+.pilot-theme .pilot-manager-page input[data-test^='cutoff-time-'] {
+    font-size: 1rem;
+    padding-inline: 0.25rem;
+}
+
 .pilot-theme .pilot-data-table {
     border-collapse: separate;
     border-spacing: 0;
@@ -351,6 +465,21 @@
 
 .pilot-theme .pilot-cell-label {
     display: none;
+}
+
+@container pilot-manager (min-width: 58.001rem) {
+    .pilot-theme .pilot-manager-table {
+        table-layout: fixed;
+    }
+
+    .pilot-theme .pilot-manager-table :is(th, td):first-child {
+        width: 26%;
+        overflow-wrap: anywhere;
+    }
+
+    .pilot-theme .pilot-manager-table :is(th, td):last-child {
+        width: 21%;
+    }
 }
 
 .pilot-theme .pilot-back-link {
@@ -455,6 +584,53 @@
     }
 }
 
+@container pilot-manager (max-width: 58rem) {
+    .pilot-theme .pilot-manager-table,
+    .pilot-theme .pilot-manager-table tbody,
+    .pilot-theme .pilot-manager-table tr,
+    .pilot-theme .pilot-manager-table td {
+        display: block;
+    }
+
+    .pilot-theme .pilot-manager-table {
+        border: 0;
+        background: transparent;
+    }
+
+    .pilot-theme .pilot-manager-table thead {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+    }
+
+    .pilot-theme .pilot-manager-table tr {
+        margin-bottom: 0.75rem;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: var(--card);
+        padding: 0.5rem;
+    }
+
+    .pilot-theme .pilot-manager-table td,
+    .pilot-theme .pilot-manager-table tbody tr:not(:last-child) td {
+        border: 0;
+        padding: 0.5rem;
+        text-align: left;
+        overflow-wrap: anywhere;
+    }
+
+    .pilot-theme .pilot-manager-table .pilot-cell-label {
+        display: block;
+        margin-bottom: 0.125rem;
+        color: var(--muted-foreground);
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+}
+
 @container pilot-wallet (max-width: 52rem) {
     .pilot-theme .pilot-wallet-table,
     .pilot-theme .pilot-wallet-table tbody,
@@ -516,6 +692,51 @@
 
 .dark .pilot-theme[data-slot='dialog-content'] {
     background-color: var(--popover);
+}
+
+.pilot-theme[data-slot='dialog-content']:has([data-test^='confirm-cancel-']) {
+    max-height: calc(100dvh - 2rem);
+    overflow-y: auto;
+    padding-inline: 1rem;
+    padding-top: 4rem;
+    padding-bottom: 1rem;
+}
+
+.pilot-theme[data-slot='dialog-content']:has([data-test^='confirm-cancel-'])
+    [data-slot='dialog-footer']
+    button {
+    min-height: 2.75rem;
+}
+
+.pilot-theme[data-slot='dialog-content']:has([data-test^='confirm-cancel-'])
+    form.space-y-6
+    > :not(:last-child) {
+    margin-block-end: 1rem;
+}
+
+.pilot-theme[data-slot='dialog-content']:has([data-test^='confirm-cancel-'])
+    [data-slot='dialog-header'].space-y-3
+    > :not(:last-child) {
+    margin-block-end: 0.5rem;
+}
+
+.pilot-theme[data-slot='dialog-content']:has([data-test^='confirm-cancel-'])
+    [data-slot='dialog-header'] {
+    row-gap: 0.25rem;
+}
+
+.pilot-theme[data-slot='dialog-content']:has([data-test^='confirm-cancel-'])
+    [data-slot='dialog-footer'] {
+    row-gap: 0.25rem;
+}
+
+.pilot-theme[data-slot='dialog-content'] [data-test^='confirm-cancel-'] {
+    background-color: var(--destructive);
+    color: var(--destructive-foreground);
+}
+
+.pilot-theme[data-slot='dialog-content'] [data-test^='confirm-cancel-']:hover {
+    background-color: color-mix(in srgb, var(--destructive) 90%, #000);
 }
 
 .pilot-theme .order-page-header > div:last-child {

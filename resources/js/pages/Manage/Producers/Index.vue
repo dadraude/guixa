@@ -24,7 +24,7 @@ const daysLabel = (days: number) => (days === 1 ? '1 day' : `${days} days`);
 <template>
     <Head title="Producers" />
 
-    <div class="flex flex-col gap-8 p-4">
+    <div class="pilot-page pilot-manager-page">
         <Heading
             title="Producers"
             description="Suppliers, their default cutoff and their login account"

@@ -30,7 +30,7 @@ const weekdays = [
 <template>
     <Head title="Settings" />
 
-    <div class="max-w-xl space-y-8 p-4">
+    <div class="pilot-page pilot-manager-page max-w-xl">
         <Heading
             title="Settings"
             description="How the cooperative works every week"

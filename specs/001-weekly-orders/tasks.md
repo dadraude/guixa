@@ -5,7 +5,8 @@ Status: Accepted (2026-10-21) · Spec: [spec.md](spec.md) + areas · Plan: [plan
 Accepted amendment (2026-10-24): **Application visual identity — T39–T42** and the added T33
 dependency. Corresponding Linear tickets have been created. On 2026-10-25 the user authorized T39
 implementation only. The T39 visual pilot was explicitly approved on DRA-191 on 2026-10-25;
-T40 is implemented for review with focused and rendered evidence. T41 remains after T40.
+T40 is implemented with focused and rendered evidence. T41 is implemented for independent review
+with [rendered manager evidence](../../docs/visual-checks/dra-192.md); T42 remains after T41.
 
 How to work a task:
 
@@ -163,7 +164,7 @@ products, added in opposite order, both complete.
 
 ## Application visual identity — T39–T42
 
-**Status: Accepted — T39 approved for rollout; T40 implemented for review (2026-10-25); T41–T42 unstarted.** Implements the accepted
+**Status: Accepted — T39 approved for rollout; T40 implemented; T41 implemented for review (2026-10-25); T42 unstarted.** Implements the accepted
 [Application visual identity](plan.md#application-visual-identity) amendment through the **plan only**
 route. No new `R#` or `S#`: the references below identify existing behavior to preserve, not new
 domain work. T37/T38 and their original scopes are unchanged; T36 remains separate.
@@ -270,6 +271,25 @@ their desktop headers; existing wallet amounts and producer prices remain unchan
   existing field labels, validation, confirmation dialogs, cancelled states, permissions and action
   destinations. Recheck manager access to the shared wallet. Do not add reception/pickup pages or
   any other not-yet-implemented feature to satisfy the rollout.
+
+T41 implementation evidence (2026-10-25): [rendered page and state matrix](../../docs/visual-checks/dra-192.md),
+test-first route opt-in and responsive stock/return row labels, focused manager/cycle/wallet HTTP
+regressions, and keyboard focus at enlarged text. The fourteen existing manager views use the
+same theme boundary. Manager navigation from household detail to the shared wallet is checked;
+wallet implementation remains T40. The first independent review found a filled cutoff truncated
+at 200% text and a stock adjustment cycle select beyond its card. Focused red/green rendered and
+submission checks cover the corrected controls in both themes; the same cutoff request value and
+movement cycle ID are retained. A second review found insufficient dark cancellation-button
+contrast; a portal-scoped foreground/background pair and normal/hover rendered assertions now
+clear 4.5:1 in both themes. A third review found title/Close overlap at 200% text and
+36 px footer targets at normal phone text; scoped portal spacing and target sizes now have
+rendered geometry checks in both themes. No new domain scenario was introduced. Full CI and independent
+review are pending.
+The committed T41 visual manifest expands all fourteen manager views and applicable states
+through the shared runner's full width/theme/text matrix. Its long-content case detected
+and verified the Accounts household-select wrap at 1024 px/100% and fixed-column
+stock/return desktop tables at 1280 px; shared report and gallery
+stay in untracked task artifacts.
 - **T42:** check every inventoried settings/authentication page with the same matrix, including
   validation, keyboard submission, password/2FA controls, invitation and verification states as
   already supported. Exercise light/dark/system selection and its existing persistence. Revisit the
@@ -282,8 +302,8 @@ Any added/changed copy uses `lang/`; these tasks do not absorb T36 or claim its 
 botanical decoration must stay within the accepted plan and must not delay a usable pilot.
 
 **Execution gate:** the user supplied the T39 implementation instruction and then explicitly
-approved its visual pilot on DRA-191 on 2026-10-25. T40 is implemented for independent review;
-T41–T42 have not started. Pilot approval does not grant publication or feature completion. T33
+approved its visual pilot on DRA-191 on 2026-10-25. T40 and T41 are implemented for independent review;
+T42 has not started. Pilot approval does not grant publication or feature completion. T33
 includes T42 as a completion dependency.
 
 ## Closure

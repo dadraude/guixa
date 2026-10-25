@@ -35,7 +35,7 @@ const expiry = (iso: string | null) =>
 <template>
     <Head :title="household.name" />
 
-    <div class="flex flex-col gap-8 p-4">
+    <div class="pilot-page pilot-manager-page">
         <Heading
             :title="household.name"
             :description="
