@@ -29,6 +29,15 @@ class ProjectWorkflowTest(unittest.TestCase):
             self.assertIn(WORKFLOW / "core" / f"{new}.md", set(local_links(path)))
             self.assertLess(len(path.read_text().splitlines()), 12)
 
+    def test_codex_agents_pin_the_profile_models(self):
+        section = (ROOT / ".agent-workflow/profile.md").read_text().split("## Model routing", 1)[1]
+        for tier, model in re.findall(r"^\| (Light|Standard|Strong) .*\| `([\w.-]+)` *\|$", section, re.MULTILINE):
+            with self.subTest(tier=tier):
+                agent = (ROOT / f".codex/agents/agent-workflow-{tier.lower()}.toml").read_text()
+                self.assertIn(f'name = "agent-workflow-{tier.lower()}"', agent)
+                self.assertIn(f'model = "{model}"', agent)
+                self.assertRegex(agent, r'model_reasoning_effort = "\w+"')
+
     def test_cleanup_keeps_a_single_implementation(self):
         shared = ROOT / ".agent-workflow/scripts/drop-test-databases.php"
         self.assertTrue(shared.is_file())

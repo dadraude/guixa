@@ -12,10 +12,10 @@ completion mechanism and verify a terminal result before a dependent step; parti
 For fixes, use the host's supported resume mechanism; `SendMessage` is usable only when actually exposed
 and applicable to that worker. Do not assume `ToolSearch`, team messaging or background tools exist.
 
-Preserve the existing role defaults when available: haiku for discovery/status/checks, sonnet for
-implementation/preparation/publication, opus for a fresh read-only review. Host/user policy wins; if a
-requested model is unavailable, report it and use only an explicitly permitted fallback. Do not silently
-weaken independent review or invent a model. No nested delegation, even when the host would allow it.
+Pass the role's model from the profile's Model routing on every `Agent` call; an omitted `model`
+inherits the coordinator's and spends a higher tier. Host/user policy wins; if a requested model is
+unavailable, report it and use only an explicitly permitted fallback. Do not silently weaken independent
+review or invent a model. No nested delegation, even when the host would allow it.
 Cap parallelism by both the project limit and live host capacity.
 
 Use [role-scoped handoffs](../core/handoff.md) with explicit relevant paths/sections and resolved settings,

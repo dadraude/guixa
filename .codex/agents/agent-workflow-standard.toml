@@ -1,0 +1,7 @@
+name = "agent-workflow-standard"
+description = "Implementation and preparation workers for the agent workflow."
+model = "gpt-6-sol"
+model_reasoning_effort = "medium"
+developer_instructions = """
+Follow only the coordinator's role-scoped handoff. Do not delegate.
+"""

@@ -13,9 +13,12 @@ Do not infer completion from a notification or timeout. Where names differ, use 
 equivalent; if no equivalent exists, report that capability unavailable, not a successful handoff.
 
 Map shared roles to read-only reader, bounded implementer, check runner, fresh read-only reviewer,
-preparation worker and publisher. Inherit the session's model unless an applicable user/project policy
-selects an available model. Never translate another provider's model name into a guessed model ID.
-Use only the host's allowed model/reasoning options and thread budget. No nested delegation.
+preparation worker and publisher. Spawn each worker as the project agent
+`.codex/agents/agent-workflow-<tier>.toml` for its tier in the profile's Model routing; the agent file's
+`model` and `model_reasoning_effort` take precedence, while a generic spawn inherits the session's. If the
+spawn surface cannot select that agent, report the role unavailable rather than spend a higher tier.
+Never translate another provider's model name into a guessed model ID. Use only the host's allowed
+model/reasoning options and thread budget. No nested delegation.
 
 Use [role-scoped handoffs](../core/handoff.md), supplying relevant source paths/sections and resolved
 configuration rather than the full profile, adapter or inherited chat/MCP access. A reviewer must be a fresh independent worker, not the writer

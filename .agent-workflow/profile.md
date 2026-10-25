@@ -57,6 +57,18 @@ Use the project's configured PHP 8.5 environment. The existing local option is
 If unavailable, ask for an approved runtime path; do not install or change machine configuration.
 Do not assume the coordinator's Herd isolation applies to sibling worktrees.
 
+## Model routing
+
+Every dispatch sets its role's model explicitly; a worker never inherits the coordinator's model.
+The coordinator runs on the session model the user chose.
+Codex pins each tier in `.codex/agents/agent-workflow-<tier>.toml` (efforts: low, medium, high).
+
+| Tier     | Roles                                                | Claude Code | Codex         |
+| -------- | ---------------------------------------------------- | ----------- | ------------- |
+| Light    | Discovery, Local check runner, Publisher/CI observer | `haiku`     | `gpt-6-luna`  |
+| Standard | Implementer, Preparation                             | `sonnet`    | `gpt-6-sol`   |
+| Strong   | Reviewer                                             | `opus`      | `gpt-6-astra` |
+
 ## Tracker constraints
 
 Linear rules the ticket gates rely on:

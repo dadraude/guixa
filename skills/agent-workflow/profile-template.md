@@ -38,6 +38,16 @@ Ask first:
 
 <How to resolve paths and the runtime environment for workers.>
 
+## Model routing
+
+Every dispatch sets its role's model explicitly; a worker never inherits the coordinator's model.
+
+| Tier     | Roles                                                | Claude Code | Codex      |
+| -------- | ---------------------------------------------------- | ----------- | ---------- |
+| Light    | Discovery, Local check runner, Publisher/CI observer | <model>     | <model ID> |
+| Standard | Implementer, Preparation                             | <model>     | <model ID> |
+| Strong   | Reviewer                                             | <model>     | <model ID> |
+
 ## Tracker constraints
 
 <Tracker rules the ticket gates rely on: parent cardinality, inherited fields, automations.>

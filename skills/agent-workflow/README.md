@@ -10,7 +10,9 @@ profile's standing authorization.
 
 1. Copy `skills/agent-workflow/` unchanged.
 2. Copy [profile-template.md](profile-template.md) to `.agent-workflow/profile.md` and fill it in.
-3. Add the thin entrypoints, each linking its adapter, the profile and its core process:
+3. For Codex, add `.codex/agents/agent-workflow-<tier>.toml` for each tier in the profile's Model
+   routing, setting `model` and `model_reasoning_effort`; workers spawned without one inherit the session's.
+4. Add the thin entrypoints, each linking its adapter, the profile and its core process:
 
 | Task                        | Codex (`.agents/skills/`)          | Claude Code (`.claude/skills/`) |
 | --------------------------- | ---------------------------------- | ------------------------------- |
