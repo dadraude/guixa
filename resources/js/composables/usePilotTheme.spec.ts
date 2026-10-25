@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { describe, expect, it, vi } from 'vite-plus/test';
+import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 import { mount } from '@vue/test-utils';
 import { defineComponent, h, nextTick } from 'vue';
 import { usePage } from '@inertiajs/vue3';
@@ -93,11 +93,20 @@ const SheetPortal = defineComponent({
 });
 
 describe('pilot theme layout and portal', () => {
-    it('themes the real shell and dialog only on the two admitted pages, including navigation away', async () => {
+    const mountedWrappers: Array<{ unmount: () => void }> = [];
+
+    afterEach(async () => {
+        for (const wrapper of mountedWrappers.splice(0)) wrapper.unmount();
+        await nextTick();
+    });
+
+    it('themes the shell and dialog on admitted pages and clears them after navigation away', async () => {
         const page = usePage();
+        page.component = 'Welcome';
         const wrapper = mount(AppLayout, {
             slots: { default: () => h(Portal) },
         });
+        mountedWrappers.push(wrapper);
         await nextTick();
         const shell = wrapper.get('[data-test="shell"]');
         const dialog = () =>
@@ -108,6 +117,11 @@ describe('pilot theme layout and portal', () => {
         expect(shell.classes()).not.toContain('pilot-theme');
         expect(dialog()?.classList.contains('pilot-theme')).toBe(false);
         expect(overlay()?.classList.contains('pilot-theme')).toBe(false);
+        page.component = 'Dashboard';
+        await nextTick();
+        expect(shell.classes()).toContain('pilot-theme');
+        expect(dialog()?.classList.contains('pilot-theme')).toBe(true);
+        expect(overlay()?.classList.contains('pilot-theme')).toBe(true);
         page.component = 'Orders/Index';
         await nextTick();
         expect(shell.classes()).toContain('pilot-theme');
@@ -122,15 +136,15 @@ describe('pilot theme layout and portal', () => {
         expect(shell.classes()).not.toContain('pilot-theme');
         expect(dialog()?.classList.contains('pilot-theme')).toBe(false);
         expect(overlay()?.classList.contains('pilot-theme')).toBe(false);
-        wrapper.unmount();
     });
 
     it('scopes the sheet backdrop with its content and clears both after navigation', async () => {
         const page = usePage();
-        page.component = 'Dashboard';
+        page.component = 'Welcome';
         const wrapper = mount(AppLayout, {
             slots: { default: () => h(SheetPortal) },
         });
+        mountedWrappers.push(wrapper);
         const content = () =>
             document.querySelector('[data-slot="sheet-content"]');
         const overlay = () =>
@@ -138,6 +152,10 @@ describe('pilot theme layout and portal', () => {
         await nextTick();
         expect(content()?.classList.contains('pilot-theme')).toBe(false);
         expect(overlay()?.classList.contains('pilot-theme')).toBe(false);
+        page.component = 'Dashboard';
+        await nextTick();
+        expect(content()?.classList.contains('pilot-theme')).toBe(true);
+        expect(overlay()?.classList.contains('pilot-theme')).toBe(true);
         page.component = 'Orders/Index';
         await nextTick();
         expect(content()?.classList.contains('pilot-theme')).toBe(true);
@@ -146,11 +164,11 @@ describe('pilot theme layout and portal', () => {
         await nextTick();
         expect(content()?.classList.contains('pilot-theme')).toBe(false);
         expect(overlay()?.classList.contains('pilot-theme')).toBe(false);
-        wrapper.unmount();
     });
 
     it('defaults a portal outside the layout to neutral tokens', async () => {
         const wrapper = mount(Portal);
+        mountedWrappers.push(wrapper);
         await nextTick();
         expect(
             document
@@ -162,6 +180,5 @@ describe('pilot theme layout and portal', () => {
                 .querySelector('[data-slot="dialog-overlay"]')
                 ?.classList.contains('pilot-theme'),
         ).toBe(false);
-        wrapper.unmount();
     });
 });

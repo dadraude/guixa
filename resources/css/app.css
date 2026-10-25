@@ -246,6 +246,262 @@
     font-family: var(--font-heading);
 }
 
+.pilot-theme .pilot-page {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 1rem;
+}
+
+@media (min-width: 640px) {
+    .pilot-theme .pilot-page {
+        gap: 2rem;
+        padding: 2rem;
+    }
+}
+
+.pilot-theme .pilot-panel {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--card);
+    color: var(--card-foreground);
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.04);
+}
+
+.pilot-theme .pilot-empty-state {
+    border: 1px dashed var(--border);
+    border-radius: var(--radius);
+    background: var(--muted);
+    padding: 1.5rem;
+}
+
+.pilot-theme .pilot-page button,
+.pilot-theme .pilot-page a,
+.pilot-theme .pilot-page input:not([type='hidden']) {
+    min-height: 44px;
+}
+
+.pilot-theme .pilot-page input[type='checkbox'] {
+    min-height: 20px;
+    min-width: 20px;
+}
+
+.pilot-theme .pilot-page label[for='variable'] {
+    display: flex;
+    min-height: 44px;
+    align-items: center;
+}
+
+.pilot-theme .pilot-data-table {
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--card);
+    color: var(--card-foreground);
+}
+
+.pilot-theme .pilot-product-list {
+    container: pilot-products / inline-size;
+}
+
+.pilot-theme .pilot-cycle-products {
+    container: pilot-cycle-products / inline-size;
+}
+
+@container pilot-cycle-products (max-width: 42rem) {
+    .pilot-theme .pilot-cycle-products > li {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
+.pilot-theme .pilot-wallet-movements {
+    container: pilot-wallet / inline-size;
+    min-width: 0;
+}
+
+.pilot-theme .pilot-wallet-forms {
+    container: pilot-wallet-forms / inline-size;
+    min-width: 0;
+}
+
+.pilot-theme .pilot-wallet-forms button {
+    height: auto;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+@container pilot-wallet-forms (min-width: 52rem) {
+    .pilot-theme .pilot-wallet-form-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+.pilot-theme .pilot-data-table th,
+.pilot-theme .pilot-data-table td {
+    padding: 0.875rem;
+    vertical-align: middle;
+}
+
+.pilot-theme .pilot-data-table tbody tr:not(:last-child) td {
+    border-bottom: 1px solid var(--border);
+}
+
+.pilot-theme .pilot-cell-label {
+    display: none;
+}
+
+.pilot-theme .pilot-back-link {
+    color: var(--primary);
+}
+
+.pilot-theme .pilot-page .text-red-600 {
+    color: var(--destructive);
+}
+
+@media (max-width: 639px) {
+    .pilot-theme .pilot-data-table,
+    .pilot-theme .pilot-data-table tbody,
+    .pilot-theme .pilot-data-table tr,
+    .pilot-theme .pilot-data-table td {
+        display: block;
+    }
+
+    .pilot-theme .pilot-data-table {
+        border: 0;
+        background: transparent;
+    }
+
+    .pilot-theme .pilot-data-table thead {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+    }
+
+    .pilot-theme .pilot-data-table tr {
+        margin-bottom: 0.75rem;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: var(--card);
+        padding: 0.5rem;
+    }
+
+    .pilot-theme .pilot-data-table td,
+    .pilot-theme .pilot-data-table tbody tr:not(:last-child) td {
+        border: 0;
+        padding: 0.5rem;
+        text-align: left;
+        overflow-wrap: anywhere;
+    }
+
+    .pilot-theme .pilot-data-table .pilot-cell-label {
+        display: block;
+        margin-bottom: 0.125rem;
+        color: var(--muted-foreground);
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+}
+
+@container pilot-products (max-width: 58rem) {
+    .pilot-theme .pilot-product-table,
+    .pilot-theme .pilot-product-table tbody,
+    .pilot-theme .pilot-product-table tr,
+    .pilot-theme .pilot-product-table td {
+        display: block;
+    }
+
+    .pilot-theme .pilot-product-table {
+        border: 0;
+        background: transparent;
+    }
+
+    .pilot-theme .pilot-product-table thead {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+    }
+
+    .pilot-theme .pilot-product-table tr {
+        margin-bottom: 0.75rem;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: var(--card);
+        padding: 0.5rem;
+    }
+
+    .pilot-theme .pilot-product-table td,
+    .pilot-theme .pilot-product-table tbody tr:not(:last-child) td {
+        border: 0;
+        padding: 0.5rem;
+        text-align: left;
+        overflow-wrap: anywhere;
+    }
+
+    .pilot-theme .pilot-product-table .pilot-cell-label {
+        display: block;
+        margin-bottom: 0.125rem;
+        color: var(--muted-foreground);
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+}
+
+@container pilot-wallet (max-width: 52rem) {
+    .pilot-theme .pilot-wallet-table,
+    .pilot-theme .pilot-wallet-table tbody,
+    .pilot-theme .pilot-wallet-table tr,
+    .pilot-theme .pilot-wallet-table td {
+        display: block;
+    }
+
+    .pilot-theme .pilot-wallet-table {
+        border: 0;
+        background: transparent;
+    }
+
+    .pilot-theme .pilot-wallet-table thead {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+    }
+
+    .pilot-theme .pilot-wallet-table tr {
+        margin-bottom: 0.75rem;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: var(--card);
+        padding: 0.5rem;
+    }
+
+    .pilot-theme .pilot-wallet-table td,
+    .pilot-theme .pilot-wallet-table tbody tr:not(:last-child) td {
+        border: 0;
+        padding: 0.5rem;
+        text-align: left;
+        overflow-wrap: anywhere;
+    }
+
+    .pilot-theme .pilot-wallet-table .pilot-cell-label {
+        display: block;
+        margin-bottom: 0.125rem;
+        color: var(--muted-foreground);
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+}
+
 .pilot-theme .pilot-error p {
     color: var(--destructive);
 }

@@ -990,3 +990,90 @@ user then said “ok!” to one additional review round for the correction. The 
 now waits for an open state, opacity 1 and finished root animations before capturing the dialog or
 user menu.
 The refreshed screenshots show settled panels; the palette and application behavior did not change.
+
+
+## 2026-10-25 · Change
+
+T40 (`plan.md`, `tasks.md`, Application visual identity): the approved T39 pilot now extends through
+the existing Dashboard, Wallet/Statement and producer pages after the explicit visual approval
+recorded on DRA-191. The plan records one reused route opt-in and presentation classes; the task
+records focused and rendered evidence in `docs/visual-checks/dra-191.md`. No R#/S# or product
+behavior changed. CI and independent review remain separate completion gates.
+
+
+## 2026-10-25 · Deviation
+
+T40 (`plan.md`, Visual system): the existing shared `InputError` utility colors did not use the
+approved scoped destructive pair on the newly themed wallet and producer forms. The T40 page
+boundary now applies that existing token to form errors without restyling excluded pages.
+Mobile wallet and product tables repeat their original column headings beside each value; those
+new visible labels use the existing translation mechanism and narrowly added `lang/ca.json` keys.
+No value, form request or domain state changed.
+
+
+## 2026-10-25 · Deviation
+
+T40 (`plan.md`, Verification and review gate): a valid 59-character product name without spaces
+extended past the producer cycle summary panel at 375 px. The name now wraps within that panel;
+the task-local browser fixture records both unsent and sent long-name states. The review also
+expanded 200% text and keyboard-focus evidence to every T40 view, including both wallet roles
+and controls below the initial viewport. Product data and availability requests are unchanged.
+
+
+## 2026-10-25 · Change
+
+T40 (`plan.md`, `tasks.md`, Application visual identity): current-status sentences that still
+described T40 as unstarted or T39's approval as pending were reconciled with the recorded pilot
+approval and T40 implementation for independent review. Explicitly historical planning snapshots
+remain historical. This changes status documentation only.
+
+
+## 2026-10-25 · Deviation
+
+T40 (`plan.md`, Verification and review gate): the first 200% text sweep found that the manager
+wallet form grid kept an intrinsic minimum width, placing its cards 36 px beyond the 375 px
+viewport even though document scroll width stayed 375 px. The narrow layout now uses a zero-minimum
+grid column; the browser fixture asserts panel bounds in addition to document overflow. Both
+manager forms and their offscreen controls remain reachable without changing requests or amounts.
+
+
+## 2026-10-25 · Deviation
+
+T40 (`plan.md`, Verification and review gate): at 1280 px with 200% text, the producer product
+table's status and action cells extended beyond the viewport although document and panel bounds
+appeared valid. A task-local browser probe first failed with action cells reaching x=1641.81.
+The product list now uses a container query to present rows as cards when six columns cannot fit;
+normal 1280 px text still uses the table. The fixture checks table-cell edges and horizontal
+visibility of the keyboard-focused action. No product status, action destination or form request
+changed.
+
+
+## 2026-10-25 · Deviation
+
+T40 (`plan.md`, Verification and review gate): the wallet movement table in both roles overflowed
+its panel at 200% text on 1024 and 1280 px desktops. A browser probe first failed at 1280 px with
+the table ending at x=1280 beyond panel content x=1152 and the main clipping edge x=1264. Wallet
+movement rows now reflow as cards when their container cannot hold the columns; normal 1280 px
+text retains the table. The fixture checks text and table bounds against panel content and clipping
+ancestors, plus focused-control horizontal visibility. Wallet amounts, roles and requests are unchanged.
+
+
+## 2026-10-25 · Deviation
+
+T40 (`plan.md`, Verification and review gate): both manager wallet forms remained side by side at
+1024 px with 200% text despite each card being too narrow for labels and buttons. A task-local
+browser probe first failed at 1280 px when correction button text reached x=1168.73 beyond card
+content x=1152; the 1024 px cards also showed overlapping labels. The form grid now stacks by
+available container width, and button text wraps within its card. Normal 1280 px text retains two
+columns. The fixture checks headings, labels, inputs and button text against panel content, plus
+neighboring producer forms at enlarged desktop text. Form requests and wallet amounts are unchanged.
+
+
+## 2026-10-25 · Deviation
+
+T40 (`plan.md`, Verification and review gate): at 1024 px with 200% text, the unsent producer
+cycle summary's side-by-side availability forms squeezed “Pa de pagès” to a zero-width name box
+and “Mel de muntanya” to 26.625 px. A browser probe failed before the fix. The rows now stack by
+available list width; both names have 286 px boxes and their text and controls fit within the row.
+The visual fixture covers all eight T40 views at 1024 px/200% in both themes with keyboard focus
+and relevant text/container bounds. Availability requests and sent quantities are unchanged.

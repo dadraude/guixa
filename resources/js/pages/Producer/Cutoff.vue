@@ -23,7 +23,7 @@ defineProps<{
 <template>
     <Head title="Default cutoff" />
 
-    <div class="max-w-xl p-4">
+    <div class="pilot-page max-w-3xl">
         <Heading
             title="Default cutoff"
             description="Orders for your products close this long before each pickup. A change only affects cycles where you start participating afterwards."
@@ -31,7 +31,7 @@ defineProps<{
 
         <Form
             v-bind="CutoffController.update.form()"
-            class="space-y-6"
+            class="pilot-panel max-w-xl space-y-6 p-5 sm:p-6"
             v-slot="{ errors, processing }"
         >
             <div class="grid gap-2">

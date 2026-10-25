@@ -35,7 +35,7 @@ describe('pilot theme page selection', () => {
         page.component = 'Dashboard';
         await nextTick();
         expect(wrapper.get('[data-pilot]').attributes('data-pilot')).toBe(
-            'false',
+            'true',
         );
         page.component = 'Orders/Edit';
         await nextTick();
@@ -48,7 +48,13 @@ describe('pilot theme page selection', () => {
     it.each([
         ['Orders/Index', true],
         ['Orders/Edit', true],
-        ['Dashboard', false],
+        ['Dashboard', true],
+        ['Wallet/Statement', true],
+        ['Producer/Cutoff', true],
+        ['Producer/CycleSummary', true],
+        ['Producer/Products/Index', true],
+        ['Producer/Products/Create', true],
+        ['Producer/Products/Edit', true],
         ['Welcome', false],
         ['Orders/Other', false],
     ])('%s is pilot: %s', (page, expected) => {
