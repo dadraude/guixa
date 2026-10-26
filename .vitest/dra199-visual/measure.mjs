@@ -126,7 +126,7 @@ try {
         await browser.send('Page.navigate', { url: url.href });
         await waitFor(
             browser,
-            `location.href === ${JSON.stringify(url.href)} && document.readyState === 'complete' && !!document.querySelector(${JSON.stringify(state.ready ?? view.root)})`,
+            `location.href === ${JSON.stringify(url.href)} && document.readyState === 'complete' && document.fonts.status === 'loaded' && !!document.querySelector(${JSON.stringify(state.ready ?? view.root)})`,
             `${view.id}/${state.id}`,
         );
 

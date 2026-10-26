@@ -2,6 +2,10 @@
 
 @import 'tw-animate-css';
 
+@import '@fontsource-variable/inter/wght.css';
+@import '@fontsource-variable/source-serif-4/wght.css';
+@import '@fontsource-variable/jetbrains-mono/wght.css';
+
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 
@@ -164,73 +168,97 @@
 
 /* Theme values live on opted-in layout and portal roots. */
 .pilot-theme {
-    --background: #f7f3e8;
-    --foreground: #283127;
-    --card: #fffdf8;
-    --card-foreground: #283127;
-    --popover: #fffdf8;
-    --popover-foreground: #283127;
-    --primary: #3f5d3a;
-    --primary-foreground: #ffffff;
-    --secondary: #e3ebdd;
-    --secondary-foreground: #283127;
-    --muted: #eef0e7;
-    --muted-foreground: #4c5a48;
-    --accent: #f2ddd1;
-    --accent-foreground: #283127;
-    --destructive: #9e342e;
-    --destructive-foreground: #ffffff;
-    --border: #70846a;
-    --input: #70846a;
-    --ring: #3f5d3a;
-    --sidebar-background: #e3ebdd;
-    --sidebar-foreground: #283127;
-    --sidebar-primary: #3f5d3a;
-    --sidebar-primary-foreground: #ffffff;
-    --sidebar-accent: #d8e3d2;
-    --sidebar-accent-foreground: #283127;
-    --sidebar-border: #70846a;
-    --sidebar-ring: #3f5d3a;
-    --sidebar: #e3ebdd;
-    --pilot-terracotta: #b85c38;
+    --background: oklch(1 0 0);
+    --foreground: oklch(0.32 0 0);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.32 0 0);
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.32 0 0);
+    --primary: oklch(0.52 0.19 259.76);
+    --primary-foreground: oklch(1 0 0);
+    --secondary: oklch(0.97 0 0);
+    --secondary-foreground: oklch(0.45 0.03 257.68);
+    --muted: oklch(0.98 0 0);
+    --muted-foreground: oklch(0.55 0.02 264.41);
+    --accent: oklch(0.95 0.03 233.56);
+    --accent-foreground: oklch(0.38 0.14 265.59);
+    --destructive: oklch(0.56 0.21 25.39);
+    --destructive-foreground: oklch(1 0 0);
+    --border: oklch(0.93 0.01 261.82);
+    --input: oklch(0.66 0.01 261.82);
+    --ring: var(--primary);
+    --chart-1: oklch(0.62 0.19 259.76);
+    --chart-2: oklch(0.55 0.22 262.96);
+    --chart-3: oklch(0.49 0.22 264.43);
+    --chart-4: oklch(0.42 0.18 265.55);
+    --chart-5: oklch(0.38 0.14 265.59);
+    --sidebar-background: oklch(0.98 0 0);
+    --sidebar-foreground: oklch(0.14 0 0);
+    --sidebar-primary: oklch(0.2 0 0);
+    --sidebar-primary-foreground: oklch(0.98 0 0);
+    --sidebar-accent: oklch(0.97 0 0);
+    --sidebar-accent-foreground: oklch(0.2 0 0);
+    --sidebar-border: oklch(0.92 0 0);
+    --sidebar-ring: oklch(0.71 0 0);
+    --sidebar: var(--sidebar-background);
+    --shadow-2xs: 0 1px 3px 0 oklch(0 0 0 / 0.05);
+    --shadow-xs: 0 1px 3px 0 oklch(0 0 0 / 0.05);
+    --shadow-sm:
+        0 1px 3px 0 oklch(0 0 0 / 0.1), 0 1px 2px -1px oklch(0 0 0 / 0.1);
+    --shadow: 0 1px 3px 0 oklch(0 0 0 / 0.1), 0 1px 2px -1px oklch(0 0 0 / 0.1);
+    --shadow-md:
+        0 1px 3px 0 oklch(0 0 0 / 0.1), 0 2px 4px -1px oklch(0 0 0 / 0.1);
+    --shadow-lg:
+        0 1px 3px 0 oklch(0 0 0 / 0.1), 0 4px 6px -1px oklch(0 0 0 / 0.1);
+    --shadow-xl:
+        0 1px 3px 0 oklch(0 0 0 / 0.1), 0 8px 10px -1px oklch(0 0 0 / 0.1);
+    --shadow-2xl: 0 1px 3px 0 oklch(0 0 0 / 0.25);
+    --pilot-terracotta: var(--primary);
     --pilot-success: #2d684a;
     --pilot-success-foreground: #ffffff;
     --pilot-warning: #795014;
     --pilot-warning-foreground: #ffffff;
-    --font-heading: Georgia, 'Times New Roman', serif;
-    --radius: 0.75rem;
+    --font-heading: 'Inter Variable', ui-sans-serif, sans-serif;
+    --font-body: 'Source Serif 4 Variable', ui-serif, Georgia, serif;
+    --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
+    --radius: 0.625rem;
+    font-family: var(--font-body);
 }
 
 .dark .pilot-theme {
-    --background: #181b1d;
-    --foreground: #f2f0e9;
-    --card: #303537;
-    --card-foreground: #f2f0e9;
-    --popover: #3b4245;
-    --popover-foreground: #f2f0e9;
-    --primary: #bdd5a8;
-    --primary-foreground: #1b211c;
-    --secondary: #3c4346;
-    --secondary-foreground: #f2f0e9;
-    --muted: #3a4144;
-    --muted-foreground: #c7cdcf;
-    --accent: #454c4f;
-    --accent-foreground: #f2f0e9;
-    --destructive: #f5a39b;
-    --destructive-foreground: #241c1c;
-    --border: #919da2;
-    --input: #a5b1b5;
-    --ring: #bdd5a8;
-    --sidebar-background: #252a2c;
-    --sidebar-foreground: #f2f0e9;
-    --sidebar-primary: #bdd5a8;
-    --sidebar-primary-foreground: #1b211c;
-    --sidebar-accent: #3f4a41;
-    --sidebar-accent-foreground: #f2f0e9;
-    --sidebar-border: #919da2;
-    --sidebar-ring: #bdd5a8;
-    --sidebar: #252a2c;
-    --pilot-terracotta: #e79a79;
+    --background: oklch(0.2 0 0);
+    --foreground: oklch(0.92 0 0);
+    --card: oklch(0.27 0 0);
+    --card-foreground: oklch(0.92 0 0);
+    --popover: oklch(0.27 0 0);
+    --popover-foreground: oklch(0.92 0 0);
+    --primary: oklch(0.71 0.14 254.69);
+    --primary-foreground: oklch(0.2 0 0);
+    --secondary: oklch(0.27 0 0);
+    --secondary-foreground: oklch(0.92 0 0);
+    --muted: oklch(0.27 0 0);
+    --muted-foreground: oklch(0.72 0 0);
+    --accent: oklch(0.38 0.14 265.59);
+    --accent-foreground: oklch(0.88 0.06 254.63);
+    --destructive: oklch(0.72 0.17 25.39);
+    --destructive-foreground: oklch(0.2 0 0);
+    --border: oklch(0.37 0 0);
+    --input: oklch(0.55 0 0);
+    --ring: var(--primary);
+    --chart-1: oklch(0.71 0.14 254.69);
+    --chart-2: oklch(0.62 0.19 259.76);
+    --chart-3: oklch(0.55 0.22 262.96);
+    --chart-4: oklch(0.49 0.22 264.43);
+    --chart-5: oklch(0.42 0.18 265.55);
+    --sidebar-background: oklch(0.21 0.01 285.93);
+    --sidebar-foreground: oklch(0.99 0 0);
+    --sidebar-primary: oklch(0.49 0.24 264.4);
+    --sidebar-primary-foreground: oklch(0.99 0 0);
+    --sidebar-accent: oklch(0.27 0.01 286.1);
+    --sidebar-accent-foreground: oklch(0.99 0 0);
+    --sidebar-border: oklch(1 0 0 / 10%);
+    --sidebar-ring: oklch(0.55 0.02 285.93);
+    --sidebar: var(--sidebar-background);
     --pilot-success: #a1dbb2;
     --pilot-success-foreground: #19231d;
     --pilot-warning: #f3ce85;
@@ -244,6 +272,21 @@
 
 .pilot-theme .pilot-heading {
     font-family: var(--font-heading);
+}
+
+.pilot-theme :is(h1, h2, h3, h4, h5, h6) {
+    font-family: var(--font-heading);
+    letter-spacing: -0.015em;
+}
+
+.pilot-theme :is(code, pre) {
+    font-family: var(--font-mono);
+}
+
+html[data-font-fallback='true'] .pilot-theme {
+    --font-heading: ui-sans-serif, system-ui, sans-serif;
+    --font-body: ui-serif, Georgia, serif;
+    --font-mono: ui-monospace, monospace;
 }
 
 .pilot-theme .pilot-page {

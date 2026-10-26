@@ -674,6 +674,20 @@ The pilot is a review checkpoint, not a second theme implementation. Reuse the s
 and presentation components throughout. Preserve existing page orchestration and the constitution's
 component boundaries; do not refactor business logic or shared interaction behavior for visual polish.
 
+#### 2026-10-26 Modern Minimal theme replacement
+
+The user's later request to apply the [Modern Minimal registry theme](https://shadcnstudio.com/r/themes/modern-minimal.json)
+supersedes this section's cream, olive, terracotta, Instrument Sans and Georgia
+visual choices within the existing `pilot-theme` boundary. Use the registry's
+semantic light/dark palette, Inter headings, Source Serif 4 body text, JetBrains
+Mono code text and restrained shadows. Keep the accepted layout, touch targets,
+behavior and opt-in scope, so the guest `Welcome` page retains its own styling.
+The registry item targets React; adapt its tokens to the existing shadcn-vue
+setup without installing React components. Where the registry omits a dark
+semantic pair, supply a readable counterpart. Adjust the light primary,
+destructive and input-edge tones only as needed for the accepted contrast
+requirements; record exact values and checks in the DRA-199 visual record.
+
 T40 extends the same reactive opt-in to Dashboard, Wallet/Statement and the five existing producer
 pages. Their current page components retain their props, actions and form contracts. Shared page,
 panel, empty-state and mobile table presentation classes live under the pilot theme, so the two
@@ -760,7 +774,8 @@ by this amendment; `spec.md`, the area requirements and the constitution are unc
 **Status: Accepted (2026-10-26).** Route: plan only, because this
 changes spacing, sizes and alignment without changing the spec's requirements or acceptance
 scenarios. It makes the [Application visual identity](#application-visual-identity) Layout bullet
-("consistent spacing") concrete; palette, typography choices, scope and invariants stay as accepted.
+("consistent spacing") concrete; palette and typography follow the latest
+accepted visual-system amendment above, while scope and invariants stay as accepted.
 
 The 2026-10-26 inventory found no arbitrary spacing values (`p-[13px]`) in `resources/js` outside the
 excluded `Welcome.vue`, but no
@@ -783,7 +798,7 @@ motion. No component library is added.
 - **Type scale:** five sizes with Tailwind's default line heights: `text-xs` for metadata only,
   `text-sm` for secondary text and labels, `text-base` for body text and form inputs, `text-lg` for
   section headings and `text-2xl` for page titles. Form inputs stay at 16 px or more on phones.
-  Headings keep the accepted Georgia token; amounts use tabular figures.
+  Headings use the current theme's heading token; amounts use tabular figures.
 - **Component padding:** each pattern has one fixed padding and internal gap, so pages stop setting
   them one by one:
 
