@@ -39,8 +39,8 @@ onMounted(async () => {
 </script>
 
 <template>
-    <Card class="w-full">
-        <CardHeader>
+    <Card class="w-full gap-4 py-4 shadow-none">
+        <CardHeader class="px-4">
             <CardTitle class="flex gap-3">
                 <LockKeyhole class="size-4" />2FA recovery codes
             </CardTitle>
@@ -49,7 +49,7 @@ onMounted(async () => {
                 device. Store them in a secure password manager.
             </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent class="px-4">
             <div
                 class="flex flex-col gap-3 select-none sm:flex-row sm:items-center sm:justify-between"
             >
@@ -84,7 +84,7 @@ onMounted(async () => {
                     'relative overflow-hidden transition-all duration-300',
                     isRecoveryCodesVisible
                         ? 'h-auto opacity-100'
-                        : 'h-0 opacity-0',
+                        : 'invisible h-0 opacity-0',
                 ]"
             >
                 <div v-if="errors?.length" class="mt-6">

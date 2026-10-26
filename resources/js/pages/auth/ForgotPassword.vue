@@ -26,7 +26,7 @@ defineProps<{
 
     <div
         v-if="status"
-        class="mb-4 text-center text-sm font-medium text-green-600"
+        class="pilot-status mb-4 text-center text-sm font-medium"
     >
         {{ status }}
     </div>
@@ -58,7 +58,9 @@ defineProps<{
             </div>
         </Form>
 
-        <div class="space-x-1 text-center text-sm text-muted-foreground">
+        <div
+            class="flex flex-wrap items-center justify-center gap-x-1 text-center text-sm text-muted-foreground"
+        >
             <span>Or, return to</span>
             <TextLink :href="login()">log in</TextLink>
         </div>

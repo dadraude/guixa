@@ -1,0 +1,2202 @@
+{
+    "baseUrl": "http://127.0.0.1:5182",
+    "height": 900,
+    "rootFontPx": 16,
+    "darkSelector": "html.dark",
+    "matrix": {
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark", "system-light", "system-dark"],
+        "text": [100, 200]
+    },
+    "views": [
+        {
+            "id": "login",
+            "path": "/.vitest/dra193-visual/index.html",
+            "query": {
+                "scenario": "login",
+                "role": "guest"
+            },
+            "root": "html[data-visual-ready=\"true\"] .pilot-auth",
+            "panels": ".pilot-panel",
+            "fonts": ["16px \"Instrument Sans\""],
+            "focus": [
+                ".pilot-auth button[type=\"button\"]",
+                "#email",
+                "#password",
+                "#remember",
+                "[data-test=\"login-button\"]",
+                "a[href*=\"forgot\"]"
+            ],
+            "states": [
+                {
+                    "id": "populated",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "error",
+                    "query": {
+                        "error": 1
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "processing",
+                    "query": {
+                        "processing": 1
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "focus": [
+                            ".pilot-auth button[type=\"button\"]",
+                            "#email",
+                            "#password",
+                            "#remember",
+                            "a[href*=\"forgot\"]"
+                        ]
+                    },
+                    "settled": [".pilot-auth h1"]
+                },
+                {
+                    "id": "status",
+                    "query": {
+                        "status": 1
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "no-reset-link",
+                    "query": {
+                        "reset": 0
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "focus": [
+                            ".pilot-auth button[type=\"button\"]",
+                            "#email",
+                            "#password",
+                            "#remember",
+                            "[data-test=\"login-button\"]"
+                        ]
+                    }
+                },
+                {
+                    "id": "passkey-error",
+                    "query": {
+                        "passkeyError": 1
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "system-appearance",
+                    "query": {
+                        "appearance": "system"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "system-dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "system-light",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "reduced-motion",
+                    "query": {
+                        "processing": 1
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "reducedMotion": true,
+                    "checks": {
+                        "focus": ["#email", "#password", "#remember"]
+                    },
+                    "settled": [".pilot-auth h1"]
+                },
+                {
+                    "id": "font-fallback",
+                    "query": {
+                        "fallback": 1
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "fonts": ["16px sans-serif"],
+                        "systemFonts": true
+                    }
+                }
+            ],
+            "content": "h1:not(.sr-only),h2,h3,label:not(.sr-only):not(:has(.sr-only)),input:not([aria-hidden=\"true\"]):not([type=\"hidden\"]),button:not(:has(> .sr-only)),a:not(:has(.sr-only)),p,span:not(.sr-only),[data-visual-text]"
+        },
+        {
+            "id": "forgot-password",
+            "path": "/.vitest/dra193-visual/index.html",
+            "query": {
+                "scenario": "forgot-password",
+                "role": "guest"
+            },
+            "root": "html[data-visual-ready=\"true\"] .pilot-auth",
+            "panels": ".pilot-panel",
+            "fonts": ["16px \"Instrument Sans\""],
+            "focus": [
+                "#email",
+                "[data-test=\"email-password-reset-link-button\"]",
+                ".pilot-auth a[href*=\"login\"]"
+            ],
+            "states": [
+                {
+                    "id": "populated",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "status",
+                    "query": {
+                        "status": 1
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "error-processing",
+                    "query": {
+                        "error": 1,
+                        "processing": 1
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "focus": ["#email", ".pilot-auth a[href*=\"login\"]"]
+                    },
+                    "settled": [".pilot-auth h1"]
+                }
+            ],
+            "content": "h1:not(.sr-only),h2,h3,label:not(.sr-only):not(:has(.sr-only)),input:not([aria-hidden=\"true\"]):not([type=\"hidden\"]),button:not(:has(> .sr-only)),a:not(:has(.sr-only)),p,span:not(.sr-only),[data-visual-text]"
+        },
+        {
+            "id": "reset-password",
+            "path": "/.vitest/dra193-visual/index.html",
+            "query": {
+                "scenario": "reset-password",
+                "role": "guest"
+            },
+            "root": "html[data-visual-ready=\"true\"] .pilot-auth",
+            "panels": ".pilot-panel",
+            "fonts": ["16px \"Instrument Sans\""],
+            "focus": [
+                "#password",
+                "#password_confirmation",
+                "[data-test=\"reset-password-button\"]"
+            ],
+            "states": [
+                {
+                    "id": "populated",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "error-processing",
+                    "query": {
+                        "error": 1,
+                        "processing": 1
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "focus": ["#password", "#password_confirmation"]
+                    },
+                    "settled": [".pilot-auth h1"]
+                }
+            ],
+            "content": "h1:not(.sr-only),h2,h3,label:not(.sr-only):not(:has(.sr-only)),input:not([aria-hidden=\"true\"]):not([type=\"hidden\"]),button:not(:has(> .sr-only)),a:not(:has(.sr-only)),p,span:not(.sr-only),[data-visual-text]"
+        },
+        {
+            "id": "confirm-password",
+            "path": "/.vitest/dra193-visual/index.html",
+            "query": {
+                "scenario": "confirm-password",
+                "role": "guest"
+            },
+            "root": "html[data-visual-ready=\"true\"] .pilot-auth",
+            "panels": ".pilot-panel",
+            "fonts": ["16px \"Instrument Sans\""],
+            "focus": [
+                ".pilot-auth button[type=\"button\"]",
+                "#password",
+                "[data-test=\"confirm-password-button\"]"
+            ],
+            "states": [
+                {
+                    "id": "populated",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "error-processing",
+                    "query": {
+                        "error": 1,
+                        "processing": 1
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "focus": [
+                            ".pilot-auth button[type=\"button\"]",
+                            "#password"
+                        ]
+                    },
+                    "settled": [".pilot-auth h1"]
+                }
+            ],
+            "content": "h1:not(.sr-only),h2,h3,label:not(.sr-only):not(:has(.sr-only)),input:not([aria-hidden=\"true\"]):not([type=\"hidden\"]),button:not(:has(> .sr-only)),a:not(:has(.sr-only)),p,span:not(.sr-only),[data-visual-text]"
+        },
+        {
+            "id": "two-factor-challenge",
+            "path": "/.vitest/dra193-visual/index.html",
+            "query": {
+                "scenario": "two-factor-challenge",
+                "role": "guest"
+            },
+            "root": "html[data-visual-ready=\"true\"] .pilot-auth",
+            "panels": ".pilot-panel",
+            "fonts": ["16px \"Instrument Sans\""],
+            "focus": [
+                "#otp",
+                ".pilot-auth button[type=\"submit\"]",
+                ".pilot-auth button[type=\"button\"]"
+            ],
+            "states": [
+                {
+                    "id": "otp",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "settled": [".pilot-auth h1"]
+                },
+                {
+                    "id": "otp-error",
+                    "query": {
+                        "error": 1
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "settled": [".pilot-auth h1"]
+                },
+                {
+                    "id": "recovery",
+                    "query": {
+                        "recovery": 1
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "focus": [
+                            "input[name=\"recovery_code\"]",
+                            ".pilot-auth button[type=\"submit\"]",
+                            ".pilot-auth button[type=\"button\"]"
+                        ]
+                    }
+                },
+                {
+                    "id": "recovery-error-processing",
+                    "query": {
+                        "recovery": 1,
+                        "error": 1,
+                        "processing": 1
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "focus": [
+                            "input[name=\"recovery_code\"]",
+                            ".pilot-auth button[type=\"button\"]"
+                        ]
+                    },
+                    "settled": [".pilot-auth h1"]
+                }
+            ],
+            "content": "h1:not(.sr-only),h2,h3,label:not(.sr-only):not(:has(.sr-only)),input:not([aria-hidden=\"true\"]):not([type=\"hidden\"]),button:not(:has(> .sr-only)),a:not(:has(.sr-only)),p,span:not(.sr-only),[data-visual-text]"
+        },
+        {
+            "id": "verify-email",
+            "path": "/.vitest/dra193-visual/index.html",
+            "query": {
+                "scenario": "verify-email",
+                "role": "guest"
+            },
+            "root": "html[data-visual-ready=\"true\"] .pilot-auth",
+            "panels": ".pilot-panel",
+            "fonts": ["16px \"Instrument Sans\""],
+            "focus": [
+                ".pilot-auth button[type=\"submit\"], .pilot-auth form button",
+                ".pilot-auth form button:last-of-type"
+            ],
+            "states": [
+                {
+                    "id": "populated",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "link-sent",
+                    "query": {
+                        "status": 1
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "processing",
+                    "query": {
+                        "processing": 1
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "focus": [".pilot-auth form button:last-of-type"]
+                    },
+                    "settled": [".pilot-auth h1"]
+                }
+            ],
+            "content": "h1:not(.sr-only),h2,h3,label:not(.sr-only):not(:has(.sr-only)),input:not([aria-hidden=\"true\"]):not([type=\"hidden\"]),button:not(:has(> .sr-only)),a:not(:has(.sr-only)),p,span:not(.sr-only),[data-visual-text]"
+        },
+        {
+            "id": "accept-invitation",
+            "path": "/.vitest/dra193-visual/index.html",
+            "query": {
+                "scenario": "accept-invitation",
+                "role": "guest"
+            },
+            "root": "html[data-visual-ready=\"true\"] .pilot-auth",
+            "panels": ".pilot-panel",
+            "fonts": ["16px \"Instrument Sans\""],
+            "focus": [
+                "#password",
+                "#password_confirmation",
+                "[data-test=\"accept-invitation-button\"]"
+            ],
+            "states": [
+                {
+                    "id": "populated",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "error-processing",
+                    "query": {
+                        "error": 1,
+                        "processing": 1
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "focus": ["#password", "#password_confirmation"]
+                    },
+                    "settled": [".pilot-auth h1"]
+                }
+            ],
+            "content": "h1:not(.sr-only),h2,h3,label:not(.sr-only):not(:has(.sr-only)),input:not([aria-hidden=\"true\"]):not([type=\"hidden\"]),button:not(:has(> .sr-only)),a:not(:has(.sr-only)),p,span:not(.sr-only),[data-visual-text]"
+        },
+        {
+            "id": "settings-profile",
+            "path": "/.vitest/dra193-visual/index.html",
+            "query": {
+                "scenario": "settings-profile",
+                "role": "manager"
+            },
+            "root": "html[data-visual-ready=\"true\"] .pilot-page",
+            "panels": ".pilot-panel",
+            "fonts": ["16px \"Instrument Sans\""],
+            "focus": [
+                "#name",
+                "#email",
+                "[data-test=\"update-profile-button\"]",
+                "[data-test=\"delete-user-button\"]"
+            ],
+            "states": [
+                {
+                    "id": "populated-member",
+                    "query": {
+                        "role": "member"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "populated-producer",
+                    "query": {
+                        "role": "producer"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "populated-manager",
+                    "query": {
+                        "role": "manager"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "unverified-email",
+                    "query": {
+                        "unverified": 1
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "focus": [
+                            "#name",
+                            "#email",
+                            ".pilot-page form button[type=\"submit\"], .pilot-page form a[href*=\"verification\"], .pilot-page form button",
+                            "[data-test=\"update-profile-button\"]",
+                            "[data-test=\"delete-user-button\"]"
+                        ]
+                    }
+                },
+                {
+                    "id": "error-processing",
+                    "query": {
+                        "error": 1,
+                        "processing": 1
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "focus": [
+                            "#name",
+                            "#email",
+                            "[data-test=\"delete-user-button\"]"
+                        ]
+                    }
+                },
+                {
+                    "id": "long-content",
+                    "query": {
+                        "long": 1
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "delete-dialog",
+                    "query": {
+                        "dialog": 1
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "root": "html[data-visual-ready=\"true\"] [data-slot=\"dialog-content\"]",
+                        "panels": "[data-slot=\"dialog-content\"] > :not([data-slot=\"dialog-close\"])",
+                        "focus": [
+                            "[data-slot=\"dialog-content\"] #password",
+                            "[data-slot=\"dialog-content\"] [data-slot=\"dialog-close\"]",
+                            "[data-test=\"confirm-delete-user-button\"]"
+                        ]
+                    },
+                    "settled": ["[data-slot=\"dialog-content\"]"],
+                    "ready": "html[data-visual-ready=\"true\"] [data-slot=\"dialog-content\"]"
+                },
+                {
+                    "id": "delete-dialog-error",
+                    "query": {
+                        "dialog": 1,
+                        "error": 1
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "root": "html[data-visual-ready=\"true\"] [data-slot=\"dialog-content\"]",
+                        "panels": "[data-slot=\"dialog-content\"] > :not([data-slot=\"dialog-close\"])",
+                        "focus": [
+                            "[data-slot=\"dialog-content\"] #password",
+                            "[data-test=\"confirm-delete-user-button\"]"
+                        ]
+                    },
+                    "settled": ["[data-slot=\"dialog-content\"]"],
+                    "ready": "html[data-visual-ready=\"true\"] [data-slot=\"dialog-content\"]"
+                },
+                {
+                    "id": "system-appearance",
+                    "query": {
+                        "appearance": "system"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "system-dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "system-light",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "reduced-motion",
+                    "query": {
+                        "dialog": 1
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "reducedMotion": true,
+                    "checks": {
+                        "root": "html[data-visual-ready=\"true\"] [data-slot=\"dialog-content\"]",
+                        "panels": "[data-slot=\"dialog-content\"] > :not([data-slot=\"dialog-close\"])",
+                        "focus": [
+                            "[data-slot=\"dialog-content\"] #password",
+                            "[data-test=\"confirm-delete-user-button\"]"
+                        ]
+                    },
+                    "settled": ["[data-slot=\"dialog-content\"]"],
+                    "ready": "html[data-visual-ready=\"true\"] [data-slot=\"dialog-content\"]"
+                },
+                {
+                    "id": "font-fallback",
+                    "query": {
+                        "fallback": 1
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "fonts": ["16px sans-serif"],
+                        "systemFonts": true
+                    }
+                }
+            ],
+            "content": "h1:not(.sr-only),h2,h3,label:not(.sr-only):not(:has(.sr-only)),input:not([aria-hidden=\"true\"]):not([type=\"hidden\"]),button:not(:has(> .sr-only)),a:not(:has(.sr-only)),p,span:not(.sr-only),[data-visual-text]"
+        },
+        {
+            "id": "settings-security",
+            "path": "/.vitest/dra193-visual/index.html",
+            "query": {
+                "scenario": "settings-security",
+                "role": "manager"
+            },
+            "root": "html[data-visual-ready=\"true\"] .pilot-page",
+            "panels": ".pilot-panel",
+            "fonts": ["16px \"Instrument Sans\""],
+            "focus": [
+                "#current_password",
+                "#password",
+                "#password_confirmation",
+                "[data-test=\"update-password-button\"]"
+            ],
+            "states": [
+                {
+                    "id": "populated-member",
+                    "query": {
+                        "role": "member"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "populated-producer",
+                    "query": {
+                        "role": "producer"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "populated-manager",
+                    "query": {
+                        "role": "manager"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "two-factor-enabled",
+                    "query": {
+                        "twofactor": 1
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "passkeys-empty",
+                    "query": {
+                        "passkeys": 0
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "manage-unavailable",
+                    "query": {
+                        "manage": 0
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "focus": [
+                            "#current_password",
+                            "#password",
+                            "#password_confirmation",
+                            "[data-test=\"update-password-button\"]"
+                        ]
+                    }
+                },
+                {
+                    "id": "passkeys-unsupported",
+                    "query": {
+                        "unsupported": 1
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "error-processing",
+                    "query": {
+                        "error": 1,
+                        "processing": 1
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "focus": [
+                            "#current_password",
+                            "#password",
+                            "#password_confirmation"
+                        ]
+                    }
+                },
+                {
+                    "id": "long-content",
+                    "query": {
+                        "long": 1
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "setup-modal",
+                    "query": {
+                        "setup": 1
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "root": "html[data-visual-ready=\"true\"] [data-slot=\"dialog-content\"]",
+                        "panels": "[data-slot=\"dialog-content\"] > :not([data-slot=\"dialog-close\"])",
+                        "focus": [
+                            "[data-slot=\"dialog-content\"] button.w-full",
+                            "[data-slot=\"dialog-content\"] [data-slot=\"dialog-close\"]"
+                        ]
+                    },
+                    "settled": ["[data-slot=\"dialog-content\"]"],
+                    "ready": "html[data-visual-ready=\"true\"] [data-slot=\"dialog-content\"]"
+                },
+                {
+                    "id": "setup-modal-confirm",
+                    "query": {
+                        "setup": "confirm"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "root": "html[data-visual-ready=\"true\"] [data-slot=\"dialog-content\"]",
+                        "panels": "[data-slot=\"dialog-content\"] > :not([data-slot=\"dialog-close\"])",
+                        "focus": [
+                            "[data-slot=\"dialog-content\"] #otp",
+                            "[data-slot=\"dialog-content\"] button.flex-auto",
+                            "[data-slot=\"dialog-content\"] [data-slot=\"dialog-close\"]"
+                        ]
+                    },
+                    "settled": ["[data-slot=\"dialog-content\"]"],
+                    "ready": "html[data-visual-ready=\"true\"] [data-slot=\"dialog-content\"]"
+                },
+                {
+                    "id": "passkey-remove-dialog",
+                    "query": {
+                        "dialog": 1
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "root": "html[data-visual-ready=\"true\"] [data-slot=\"dialog-content\"]",
+                        "panels": "[data-slot=\"dialog-content\"] > :not([data-slot=\"dialog-close\"])",
+                        "focus": [
+                            "[data-slot=\"dialog-content\"] button.bg-destructive",
+                            "[data-slot=\"dialog-content\"] [data-slot=\"dialog-close\"]"
+                        ]
+                    },
+                    "settled": ["[data-slot=\"dialog-content\"]"],
+                    "ready": "html[data-visual-ready=\"true\"] [data-slot=\"dialog-content\"]"
+                },
+                {
+                    "id": "passkey-register-form",
+                    "query": {
+                        "register": 1
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "focus": [
+                            "#passkey-name",
+                            ".pilot-page form button[type=\"submit\"]"
+                        ]
+                    }
+                },
+                {
+                    "id": "reduced-motion",
+                    "query": {
+                        "setup": 1
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "reducedMotion": true,
+                    "checks": {
+                        "root": "html[data-visual-ready=\"true\"] [data-slot=\"dialog-content\"]",
+                        "panels": "[data-slot=\"dialog-content\"] > :not([data-slot=\"dialog-close\"])",
+                        "focus": [
+                            "[data-slot=\"dialog-content\"] button.w-full",
+                            "[data-slot=\"dialog-content\"] [data-slot=\"dialog-close\"]"
+                        ]
+                    },
+                    "settled": ["[data-slot=\"dialog-content\"]"],
+                    "ready": "html[data-visual-ready=\"true\"] [data-slot=\"dialog-content\"]"
+                }
+            ],
+            "content": "h1:not(.sr-only),h2,h3,label:not(.sr-only):not(:has(.sr-only)),input:not([aria-hidden=\"true\"]):not([type=\"hidden\"]),button:not(:has(> .sr-only)),a:not(:has(.sr-only)),p,span:not(.sr-only),[data-visual-text]"
+        },
+        {
+            "id": "settings-appearance",
+            "path": "/.vitest/dra193-visual/index.html",
+            "query": {
+                "scenario": "settings-appearance",
+                "role": "manager"
+            },
+            "root": "html[data-visual-ready=\"true\"] .pilot-page",
+            "panels": ".pilot-panel",
+            "fonts": ["16px \"Instrument Sans\""],
+            "focus": [".pilot-page [role=\"tab\"], .pilot-page button"],
+            "states": [
+                {
+                    "id": "populated-member",
+                    "query": {
+                        "role": "member"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "populated-producer",
+                    "query": {
+                        "role": "producer"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "populated-manager",
+                    "query": {
+                        "role": "manager"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "system-selected",
+                    "query": {
+                        "appearance": "system"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "system-dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "system-light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "system-dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "reduced-motion",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "reducedMotion": true
+                },
+                {
+                    "id": "font-fallback",
+                    "query": {
+                        "fallback": 1
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "fonts": ["16px sans-serif"],
+                        "systemFonts": true
+                    }
+                }
+            ],
+            "content": "h1:not(.sr-only),h2,h3,label:not(.sr-only):not(:has(.sr-only)),input:not([aria-hidden=\"true\"]):not([type=\"hidden\"]),button:not(:has(> .sr-only)),a:not(:has(.sr-only)),p,span:not(.sr-only),[data-visual-text]"
+        },
+        {
+            "id": "regression-orders-index",
+            "path": "/.vitest/dra193-visual/index.html",
+            "query": {
+                "scenario": "regression-orders-index",
+                "role": "member"
+            },
+            "root": "html[data-visual-ready=\"true\"] main",
+            "panels": "main > div > *",
+            "fonts": ["16px \"Instrument Sans\""],
+            "focus": ["main a"],
+            "content": "h1:not(.sr-only),h2,h3,label:not(.sr-only):not(:has(.sr-only)),input:not([aria-hidden=\"true\"]):not([type=\"hidden\"]),button:not(:has(> .sr-only)),a:not(:has(.sr-only)),p,span:not(.sr-only),[data-visual-text]",
+            "states": [
+                {
+                    "id": "populated",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "empty",
+                    "query": {
+                        "empty": 1
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "focus": ["[data-sidebar=\"trigger\"]"]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "regression-orders-edit",
+            "path": "/.vitest/dra193-visual/index.html",
+            "query": {
+                "scenario": "regression-orders-edit",
+                "role": "member"
+            },
+            "root": "html[data-visual-ready=\"true\"] main",
+            "panels": "main > div > *",
+            "fonts": ["16px \"Instrument Sans\""],
+            "focus": ["[data-test^=\"quantity-\"]"],
+            "content": "h1:not(.sr-only),h2,h3,label:not(.sr-only):not(:has(.sr-only)),input:not([aria-hidden=\"true\"]):not([type=\"hidden\"]),button:not(:has(> .sr-only)),a:not(:has(.sr-only)),p,span:not(.sr-only),[data-visual-text]",
+            "states": [
+                {
+                    "id": "populated",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "ordered",
+                    "query": {
+                        "order": "ordered",
+                        "dirty": 1
+                    },
+                    "cases": [
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "focus": [
+                            "[data-test^=\"quantity-\"]",
+                            "[data-test^=\"save-\"]"
+                        ]
+                    }
+                },
+                {
+                    "id": "marked",
+                    "query": {
+                        "order": "marked"
+                    },
+                    "cases": [
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "focus": ["[data-test^=\"remove-\"]"]
+                    }
+                },
+                {
+                    "id": "closed",
+                    "query": {
+                        "order": "closed"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "focus": ["main a"]
+                    }
+                },
+                {
+                    "id": "pickup",
+                    "query": {
+                        "order": "pickup"
+                    },
+                    "cases": [
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "focus": ["main a"]
+                    }
+                },
+                {
+                    "id": "cancelled",
+                    "query": {
+                        "order": "cancelled"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "focus": ["main a"]
+                    }
+                },
+                {
+                    "id": "long-name",
+                    "query": {
+                        "order": "ordered",
+                        "long": 1,
+                        "dirty": 1
+                    },
+                    "cases": [
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "focus": [
+                            "[data-test^=\"quantity-\"]",
+                            "[data-test^=\"save-\"]"
+                        ]
+                    }
+                },
+                {
+                    "id": "error",
+                    "query": {
+                        "error": 1
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "regression-dashboard",
+            "path": "/.vitest/dra193-visual/index.html",
+            "query": {
+                "scenario": "regression-dashboard",
+                "role": "member"
+            },
+            "root": "html[data-visual-ready=\"true\"] main",
+            "panels": ".pilot-page",
+            "fonts": ["16px \"Instrument Sans\""],
+            "focus": ["[data-sidebar=\"trigger\"]"],
+            "content": "h1:not(.sr-only),h2,h3,label:not(.sr-only):not(:has(.sr-only)),input:not([aria-hidden=\"true\"]):not([type=\"hidden\"]),button:not(:has(> .sr-only)),a:not(:has(.sr-only)),p,span:not(.sr-only),[data-visual-text]",
+            "states": [
+                {
+                    "id": "populated",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "regression-producer-cutoff",
+            "path": "/.vitest/dra193-visual/index.html",
+            "query": {
+                "scenario": "regression-producer-cutoff",
+                "role": "producer"
+            },
+            "root": "html[data-visual-ready=\"true\"] main",
+            "panels": ".pilot-page",
+            "fonts": ["16px \"Instrument Sans\""],
+            "focus": ["main input, main button"],
+            "content": "h1:not(.sr-only),h2,h3,label:not(.sr-only):not(:has(.sr-only)),input:not([aria-hidden=\"true\"]):not([type=\"hidden\"]),button:not(:has(> .sr-only)),a:not(:has(.sr-only)),p,span:not(.sr-only),[data-visual-text]",
+            "states": [
+                {
+                    "id": "populated",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "error",
+                    "query": {
+                        "error": 1
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "regression-manager-cycles",
+            "path": "/.vitest/dra193-visual/index.html",
+            "query": {
+                "scenario": "regression-manager-cycles",
+                "role": "manager"
+            },
+            "root": "html[data-visual-ready=\"true\"] main",
+            "panels": ".pilot-page",
+            "fonts": ["16px \"Instrument Sans\""],
+            "focus": ["main input, main button"],
+            "content": "h1:not(.sr-only),h2,h3,label:not(.sr-only):not(:has(.sr-only)),input:not([aria-hidden=\"true\"]):not([type=\"hidden\"]),button:not(:has(> .sr-only)),a:not(:has(.sr-only)),p,span:not(.sr-only),[data-visual-text]",
+            "states": [
+                {
+                    "id": "populated",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "error",
+                    "query": {
+                        "error": 1
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "welcome-unchanged",
+            "path": "/.vitest/dra193-visual/index.html",
+            "query": {
+                "scenario": "welcome",
+                "role": "guest"
+            },
+            "root": "html[data-visual-ready=\"true\"] main",
+            "panels": "main",
+            "fonts": ["16px sans-serif"],
+            "systemFonts": true,
+            "focus": ["header a"],
+            "content": "h1:not(.sr-only),h2,h3,label:not(.sr-only):not(:has(.sr-only)),input:not([aria-hidden=\"true\"]):not([type=\"hidden\"]),button:not(:has(> .sr-only)),a:not(:has(.sr-only)),p,span:not(.sr-only),[data-visual-text]",
+            "states": [
+                {
+                    "id": "populated",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "system-appearance",
+                    "query": {
+                        "appearance": "system"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "system-dark",
+                            "text": 100
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

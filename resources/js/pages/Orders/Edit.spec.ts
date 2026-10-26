@@ -100,6 +100,56 @@ describe('member order editor presentation', () => {
         );
     });
 
+    it('names each row control after its product without hidden text', () => {
+        const rowMarkup = async (order: unknown) => {
+            const element = document.createElement('div');
+            document.body.append(element);
+            const app = createApp(Edit, { order });
+            installTranslations(app);
+            app.mount(element);
+            await nextTick();
+            const row = element.querySelector('li')!;
+            const result = {
+                hidden: row.querySelectorAll('.sr-only').length,
+                names: [...row.querySelectorAll('[aria-label]')].map((node) =>
+                    node.getAttribute('aria-label'),
+                ),
+            };
+            app.unmount();
+            element.remove();
+            return result;
+        };
+        const marked = {
+            ...order,
+            producers: [{ ...order.producers[0], open: false }],
+            lines: [
+                {
+                    productId: 'bread',
+                    producerId: 'baker',
+                    producerName: 'Forn de la plaça',
+                    name: 'Pa de pagès',
+                    unit: 'unitat',
+                    price: '3.50',
+                    variable: false,
+                    quantity: '2.000',
+                    notDelivered: true,
+                },
+            ],
+        };
+
+        return Promise.all([rowMarkup(order), rowMarkup(marked)]).then(
+            ([plain, removable]) => {
+                expect(plain.hidden).toBe(0);
+                expect(plain.names).toEqual([
+                    'Quantitat — Pa de pagès',
+                    'Desa — Pa de pagès',
+                ]);
+                expect(removable.hidden).toBe(0);
+                expect(removable.names).toContain('Elimina — Pa de pagès');
+            },
+        );
+    });
+
     it('retains the cancelled notice without any product controls', async () => {
         const html = await render(Edit, {
             order: { ...order, cancelled: true },

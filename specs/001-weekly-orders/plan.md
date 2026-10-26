@@ -579,7 +579,7 @@ as DRA-195, separately from the staged visual identity amendment below.
 
 ## Application visual identity
 
-**Status: Accepted (2026-10-24); T39 approved for rollout, T40 implemented and T41 implemented for review (2026-10-25); T42 unstarted.** Route: plan only,
+**Status: Accepted (2026-10-24); T39 approved for rollout, T40 implemented and T41 implemented for review (2026-10-25); T42 implemented for review (2026-10-26).** Route: plan only,
 because this changes presentation without changing the spec's requirements or acceptance scenarios.
 The task amendment is accepted; the T39 visual review was approved on DRA-191 before T40 began.
 
@@ -714,6 +714,21 @@ The T41 shared visual manifest exercises every manager view and applicable state
 full width, theme and text matrix. Its long-content sweep also constrains the Accounts
 household select and Move control inside their card at 1024 px, and long stock/return names
 inside desktop table columns at 1280 px.
+
+T42 adds `settings/{Appearance,Profile,Security}` and the seven `auth/*` pages to the same
+reactive opt-in. Settings reuse `AppLayout`; `AuthLayout` now reads the page name and passes the
+same flag to `AuthSimpleLayout`, which provides the theme to its portals and renders the form card
+as the shared `.pilot-panel`. Only those exact page names opt in, so `Welcome` has no layout,
+no theme class and no changed asset. The settings navigation and its content switch between
+stacked and side-by-side by the available content width, not the viewport, because the app
+sidebar narrows the content at enlarged text. Account, passkey and recovery-code sections are
+panels; literal red, green and neutral colours on these pages resolve to the scoped destructive,
+success and border tokens, destructive buttons in the settings page and its portals pair the
+theme's destructive foreground, and dialogs that may exceed a phone viewport scroll internally
+and keep the focused control visible. Existing authentication, passkey, two-factor, invitation,
+verification and appearance behavior, requests and persistence are unchanged. The Orders edit product rows, a T39 layout that fixed its columns by viewport and failed at 1024 px with 200% text, now choose their columns by the row's own width. The
+[T42 visual check](../../docs/visual-checks/dra-193.md) records the rendered matrix, the
+checks outside the shared harness and the pending items.
 
 ### Verification and review gate
 

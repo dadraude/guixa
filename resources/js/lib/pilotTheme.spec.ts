@@ -4,6 +4,7 @@ import { mount } from '@vue/test-utils';
 import { nextTick } from 'vue';
 import { usePage } from '@inertiajs/vue3';
 import AppLayout from '@/layouts/AppLayout.vue';
+import AuthLayout from '@/layouts/AuthLayout.vue';
 import { isPilotThemePage } from './pilotTheme';
 
 vi.mock('@inertiajs/vue3', async () => {
@@ -25,7 +26,37 @@ vi.mock('@/layouts/app/AppSidebarLayout.vue', async () => {
     };
 });
 
+vi.mock('@/layouts/auth/AuthSimpleLayout.vue', async () => {
+    const { defineComponent, h } = await import('vue');
+    return {
+        default: defineComponent({
+            props: { pilotTheme: Boolean, title: String, description: String },
+            setup(props) {
+                return () =>
+                    h('div', { 'data-auth-pilot': String(props.pilotTheme) });
+            },
+        }),
+    };
+});
+
 describe('pilot theme page selection', () => {
+    it('opts the actual AuthLayout in for authentication pages only', async () => {
+        const page = usePage();
+        page.component = 'auth/Login';
+        const wrapper = mount(AuthLayout);
+        const flag = () =>
+            wrapper.get('[data-auth-pilot]').attributes('data-auth-pilot');
+        expect(flag()).toBe('true');
+        page.component = 'auth/TwoFactorChallenge';
+        await nextTick();
+        expect(flag()).toBe('true');
+        page.component = 'Welcome';
+        await nextTick();
+        expect(flag()).toBe('false');
+        wrapper.unmount();
+        page.component = 'Orders/Index';
+    });
+
     it('updates the actual AppLayout opt-in as Inertia changes page', async () => {
         const page = usePage();
         const wrapper = mount(AppLayout);
@@ -69,6 +100,18 @@ describe('pilot theme page selection', () => {
         ['Manage/ReturnItems/Index', true],
         ['Manage/ReturnItems/Create', true],
         ['Manage/ReturnItems/Edit', true],
+        ['settings/Appearance', true],
+        ['settings/Profile', true],
+        ['settings/Security', true],
+        ['auth/AcceptInvitation', true],
+        ['auth/ConfirmPassword', true],
+        ['auth/ForgotPassword', true],
+        ['auth/Login', true],
+        ['auth/ResetPassword', true],
+        ['auth/TwoFactorChallenge', true],
+        ['auth/VerifyEmail', true],
+        ['auth/Other', false],
+        ['settings/Other', false],
         ['Welcome', false],
         ['Orders/Other', false],
     ])('%s is pilot: %s', (page, expected) => {

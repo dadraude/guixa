@@ -22,6 +22,16 @@ const pilotPages = new Set([
     'Manage/ReturnItems/Index',
     'Manage/ReturnItems/Create',
     'Manage/ReturnItems/Edit',
+    'settings/Appearance',
+    'settings/Profile',
+    'settings/Security',
+    'auth/AcceptInvitation',
+    'auth/ConfirmPassword',
+    'auth/ForgotPassword',
+    'auth/Login',
+    'auth/ResetPassword',
+    'auth/TwoFactorChallenge',
+    'auth/VerifyEmail',
 ]);
 
 export function isPilotThemePage(pageName: string): boolean {

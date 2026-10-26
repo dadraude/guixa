@@ -19,19 +19,23 @@ import {
 import { Label } from '@/components/ui/label';
 
 const passwordInput = useTemplateRef('passwordInput');
+
+// Radix focuses the first control without scrolling, so keep it visible in a tall dialog.
+const scrollFocusIntoView = (event: FocusEvent): void =>
+    (event.target as HTMLElement).scrollIntoView({ block: 'nearest' });
 </script>
 
 <template>
-    <div class="space-y-6">
+    <div class="pilot-panel space-y-6 p-3 sm:p-6">
         <Heading
             variant="small"
             title="Delete account"
             description="Delete your account and all of its resources"
         />
         <div
-            class="space-y-4 rounded-lg border border-red-100 bg-red-50 p-4 dark:border-red-200/10 dark:bg-red-700/10"
+            class="space-y-4 rounded-lg border border-destructive bg-destructive/10 p-4"
         >
-            <div class="relative space-y-0.5 text-red-600 dark:text-red-100">
+            <div class="relative space-y-0.5 text-destructive">
                 <p class="font-medium">Warning</p>
                 <p class="text-sm">
                     Please proceed with caution, this cannot be undone.
@@ -43,7 +47,10 @@ const passwordInput = useTemplateRef('passwordInput');
                         >Delete account</Button
                     >
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent
+                    class="pilot-touch-dialog"
+                    @focusin="scrollFocusIntoView"
+                >
                     <Form
                         v-bind="ProfileController.destroy.form()"
                         reset-on-success
@@ -68,7 +75,7 @@ const passwordInput = useTemplateRef('passwordInput');
                             </DialogDescription>
                         </DialogHeader>
 
-                        <div class="grid gap-2">
+                        <div class="pilot-error grid gap-2">
                             <Label for="password" class="sr-only"
                                 >Password</Label
                             >
