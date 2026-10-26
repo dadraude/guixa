@@ -17,6 +17,10 @@ execution/setup instructions or authorize implementation.
 - Make executable slices independently verifiable, with their code, tests and docs together. Do not
   split one behavior into separate layer-only tickets. For a cross-cutting mechanical refactor, use
   expand, migrate, contract with real prerequisite edges rather than pretending each layer stands alone.
+- Shape a batch as tracer bullets whenever it can be: the first executable slice is the thinnest one
+  that runs end to end through every layer it needs and gives the user something to review; later
+  slices reuse and widen that path and are blocked by it. If no end-to-end first slice is possible,
+  say why in the proposed breakdown.
 - Use the tracker's native parent, blocking and related fields (named in the profile), not only
   mentions in descriptions.
 - Never use blocking links to encode temporary shared-file contention. The implementation scheduler
@@ -42,7 +46,8 @@ Parent status does not gate its children. Do not make a child blocked by its own
 ## Execution Steps
 
 1. Inspect the current project, matching issues and relationships to avoid duplicates. Draft vertical
-   slices from the authorized requirements, using the project's domain vocabulary.
+   slices from the authorized requirements, using the project's domain vocabulary, with the tracer
+   slice first.
 2. Present one proposed breakdown: title, parent (or none), deliverable, acceptance criteria, source
    task link, blockers and contextual relations with a short reason. Include any proposed new parent.
    Ask one approval question and wait. Do not silently turn existing issues into children.

@@ -10,6 +10,11 @@ no code is written before its spec is accepted.
    `spec.md` keeps the glossary, roles and an index of the areas. `R#` and `S#` stay global.
 3. `NNN-feature/plan.md` — how: domain model, use cases, ports/adapters, persistence, UI routes.
 4. `NNN-feature/tasks.md` — ordered, small tasks, each linked to the `R#` and scenarios it covers.
+   Tasks are tracer bullets wherever possible: the first task is the thinnest slice that runs end to
+   end through every layer it needs (page, use case, domain, persistence, tests) and stops for review;
+   each later task is another vertical slice that reuses and widens that path. A layer-only task
+   (only the schema, only the tokens) is used only when no vertical slice can be delivered, and its
+   row says why.
 
 Alongside them, `NNN-feature/log.md` keeps the why. It is append-only: entries are never edited or
 removed, so the reasoning survives after the spec is rewritten. Each entry is dated and is one of:
