@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { Form, Head } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import StockMovementController from '@/actions/App/Http/Controllers/Manage/StockMovementController';
 import StockProductController from '@/actions/App/Http/Controllers/Manage/StockProductController';
+import FormSelect from '@/components/FormSelect.vue';
 import Heading from '@/components/Heading.vue';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
@@ -18,19 +19,24 @@ defineOptions({
     },
 });
 
-defineProps<{
+const props = defineProps<{
     product: App.Http.StockLevelRow;
     cycles: App.Http.CycleOptionRow[];
 }>();
 
-const selectedAdjustmentCycleLabel = ref('');
-
-function updateSelectedCycle(event: Event): void {
-    const select = event.target as HTMLSelectElement;
-    selectedAdjustmentCycleLabel.value = select.value
-        ? (select.selectedOptions[0]?.textContent?.trim() ?? '')
-        : '';
-}
+const selectedAdjustmentCycleId = ref<string | null>(null);
+const cycleOptions = computed(() =>
+    props.cycles.map((cycle) => ({
+        value: cycle.id,
+        label: `Pickup ${cycle.pickupDate}`,
+    })),
+);
+const selectedAdjustmentCycleLabel = computed(
+    () =>
+        cycleOptions.value.find(
+            (option) => option.value === selectedAdjustmentCycleId.value,
+        )?.label ?? '',
+);
 </script>
 
 <template>
@@ -86,7 +92,7 @@ function updateSelectedCycle(event: Event): void {
             v-bind="StockMovementController.storeAdjustment.form(product.id)"
             class="space-y-4"
             reset-on-success
-            @reset="selectedAdjustmentCycleLabel = ''"
+            @reset="selectedAdjustmentCycleId = null"
             v-slot="{ errors, processing }"
         >
             <h2 class="text-lg font-medium">Record an adjustment</h2>
@@ -119,29 +125,32 @@ function updateSelectedCycle(event: Event): void {
 
             <div class="grid min-w-0 grid-cols-1 gap-2">
                 <Label for="adjustment-cycle">Cycle (optional)</Label>
-                <select
+                <FormSelect
                     id="adjustment-cycle"
+                    v-model="selectedAdjustmentCycleId"
                     name="cycle_id"
-                    class="h-9 w-full min-w-0 rounded-md border bg-background px-2 text-sm"
-                    @change="updateSelectedCycle"
-                >
-                    <option value="">No cycle</option>
-                    <option
-                        v-for="cycle in cycles"
-                        :key="cycle.id"
-                        :value="cycle.id"
-                    >
-                        Pickup {{ cycle.pickupDate }}
-                    </option>
-                </select>
+                    :options="cycleOptions"
+                    placeholder="No cycle"
+                    class="w-full"
+                />
                 <output
-                    v-if="selectedAdjustmentCycleLabel"
+                    v-if="selectedAdjustmentCycleId"
                     for="adjustment-cycle"
                     data-test="adjustment-cycle-preview"
                     class="block w-full text-base break-words text-muted-foreground"
                 >
                     {{ selectedAdjustmentCycleLabel }}
                 </output>
+                <Button
+                    v-if="selectedAdjustmentCycleId"
+                    type="button"
+                    variant="outline"
+                    class="min-h-11 w-fit"
+                    data-test="clear-adjustment-cycle"
+                    @click="selectedAdjustmentCycleId = null"
+                >
+                    No cycle
+                </Button>
                 <InputError :message="errors.cycle_id" />
             </div>
 

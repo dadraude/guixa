@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { trans } from 'laravel-vue-i18n';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import FormSelect from '@/components/FormSelect.vue';
 import { euros } from './euros';
 
-defineProps<{
+const props = defineProps<{
     lines: App.Http.PickupStockLineRow[];
     options: App.Http.StockLevelRow[];
     editable: boolean;
@@ -21,6 +22,13 @@ const emit = defineEmits<{
 
 const productId = ref('');
 const quantity = ref('');
+
+const productOptions = computed(() =>
+    props.options.map((option) => ({
+        value: option.id,
+        label: `${option.name} (${option.available} ${option.unit})`,
+    })),
+);
 
 const submit = () => {
     if (productId.value === '' || quantity.value.trim() === '') {
@@ -82,23 +90,14 @@ const submit = () => {
             data-test="add-stock-form"
             @submit.prevent="submit"
         >
-            <select
+            <FormSelect
                 v-model="productId"
-                class="h-11 min-w-0 flex-1 rounded-md border border-input bg-transparent px-2 text-base"
+                :options="productOptions"
+                :placeholder="trans('Choose a product')"
+                class="h-11 min-w-0 flex-1 basis-44"
                 :aria-label="trans('Stock product')"
                 data-test="stock-product"
-            >
-                <option value="" disabled>
-                    {{ trans('Choose a product') }}
-                </option>
-                <option
-                    v-for="option in options"
-                    :key="option.id"
-                    :value="option.id"
-                >
-                    {{ option.name }} ({{ option.available }} {{ option.unit }})
-                </option>
-            </select>
+            />
             <Input
                 v-model="quantity"
                 inputmode="decimal"

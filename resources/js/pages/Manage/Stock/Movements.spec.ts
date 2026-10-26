@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { describe, expect, it, vi } from 'vite-plus/test';
-import { mount } from '@vue/test-utils';
+import { flushPromises, mount } from '@vue/test-utils';
 import { defineComponent, h, nextTick } from 'vue';
 import Movements from './Movements.vue';
 
@@ -30,16 +30,38 @@ describe('stock adjustment cycle selection', () => {
                 },
                 cycles: [{ id: 'cycle', pickupDate: '2026-11-07' }],
             },
+            attachTo: document.body,
         });
         const select = wrapper.get('#adjustment-cycle');
         const form = select.element.closest('form') as HTMLFormElement;
+        await nextTick();
         expect(new FormData(form).get('cycle_id')).toBe('');
 
-        await select.setValue('cycle');
+        await select.trigger('keydown', { key: 'ArrowDown' });
+        await flushPromises();
+        const option = [...document.querySelectorAll('[role="option"]')].find(
+            (element) => element.textContent?.includes('Pickup 2026-11-07'),
+        );
+        expect(option).toBeTruthy();
+        option!.dispatchEvent(new Event('pointerup', { bubbles: true }));
+        await flushPromises();
         expect(
             wrapper.get('[data-test="adjustment-cycle-preview"]').text(),
         ).toBe('Pickup 2026-11-07');
         expect(new FormData(form).get('cycle_id')).toBe('cycle');
+
+        await wrapper
+            .get('[data-test="clear-adjustment-cycle"]')
+            .trigger('click');
+        expect(new FormData(form).get('cycle_id')).toBe('');
+
+        await select.trigger('keydown', { key: 'ArrowDown' });
+        await flushPromises();
+        const secondOption = [
+            ...document.querySelectorAll('[role="option"]'),
+        ].find((element) => element.textContent?.includes('Pickup 2026-11-07'));
+        secondOption!.dispatchEvent(new Event('pointerup', { bubbles: true }));
+        await flushPromises();
 
         form.reset();
         await nextTick();

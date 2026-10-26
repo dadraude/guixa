@@ -1,0 +1,64 @@
+{
+    "baseUrl": "http://127.0.0.1:5180",
+    "rootFontPx": 16,
+    "darkSelector": "html.dark",
+    "matrix": {
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark"],
+        "text": [100, 200]
+    },
+    "views": [
+        {
+            "id": "select-controls",
+            "path": "/visual-selects.html",
+            "root": "[data-visual-root]",
+            "panels": ".visual-panel",
+            "content": "h1,h2,label,input,button,a,[data-visual-text]",
+            "fonts": ["16px Instrument Sans"],
+            "systemFonts": true,
+            "focus": [
+                "#fixture-weekday",
+                "#fixture-household",
+                "#fixture-product",
+                "#fixture-cycle"
+            ],
+            "states": [
+                {
+                    "id": "populated",
+                    "cases": [
+                        { "width": 375, "mode": "light", "text": 100 },
+                        { "width": 375, "mode": "dark", "text": 100 },
+                        { "width": 1280, "mode": "light", "text": 100 },
+                        { "width": 1280, "mode": "dark", "text": 100 },
+                        { "width": 1024, "mode": "light", "text": 200 },
+                        { "width": 1024, "mode": "dark", "text": 200 }
+                    ]
+                },
+                {
+                    "id": "open",
+                    "query": { "open": 1 },
+                    "settled": ["[data-slot=select-content][data-state=open]"],
+                    "checks": {
+                        "focus": [],
+                        "noFocusReason": "The open menu captures focus; keyboard selection is covered by interaction tests."
+                    },
+                    "cases": [
+                        { "width": 375, "mode": "light", "text": 100 },
+                        { "width": 375, "mode": "dark", "text": 100 },
+                        { "width": 1280, "mode": "light", "text": 100 }
+                    ]
+                },
+                {
+                    "id": "long-content",
+                    "query": { "long": 1 },
+                    "cases": [{ "width": 375, "mode": "light", "text": 200 }]
+                },
+                {
+                    "id": "disabled",
+                    "query": { "disabled": 1 },
+                    "cases": [{ "width": 375, "mode": "dark", "text": 100 }]
+                }
+            ]
+        }
+    ]
+}

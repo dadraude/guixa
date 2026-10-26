@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { Form, Head } from '@inertiajs/vue3';
+import { computed } from 'vue';
 import AccountDeactivationController from '@/actions/App/Http/Controllers/Manage/AccountDeactivationController';
 import AccountController from '@/actions/App/Http/Controllers/Manage/AccountController';
 import AccountHouseholdController from '@/actions/App/Http/Controllers/Manage/AccountHouseholdController';
 import ManagerRoleController from '@/actions/App/Http/Controllers/Manage/ManagerRoleController';
+import FormSelect from '@/components/FormSelect.vue';
 import Heading from '@/components/Heading.vue';
 import InputError from '@/components/InputError.vue';
 import { Badge } from '@/components/ui/badge';
@@ -15,10 +17,17 @@ defineOptions({
     },
 });
 
-defineProps<{
+const props = defineProps<{
     accounts: App.Http.AccountRow[];
     households: App.Http.HouseholdSummaryRow[];
 }>();
+
+const householdOptions = computed(() =>
+    props.households.map((household) => ({
+        value: household.id,
+        label: household.name,
+    })),
+);
 
 const isManager = (account: App.Http.AccountRow) =>
     account.roles.includes('manager');
@@ -85,21 +94,17 @@ const isManager = (account: App.Http.AccountRow) =>
                         class="flex max-w-full min-w-0 flex-wrap items-center gap-2"
                         v-slot="{ errors, processing }"
                     >
-                        <select
+                        <FormSelect
                             name="household_id"
                             required
-                            class="h-8 max-w-full min-w-0 flex-1 rounded-md border bg-background px-2 text-sm"
+                            :options="householdOptions"
+                            :default-value="
+                                account.householdId ??
+                                householdOptions[0]?.value
+                            "
+                            class="max-w-full min-w-0 flex-1 basis-44"
                             :aria-label="`Household for ${account.name}`"
-                        >
-                            <option
-                                v-for="household in households"
-                                :key="household.id"
-                                :value="household.id"
-                                :selected="household.id === account.householdId"
-                            >
-                                {{ household.name }}
-                            </option>
-                        </select>
+                        />
                         <Button
                             type="submit"
                             variant="outline"

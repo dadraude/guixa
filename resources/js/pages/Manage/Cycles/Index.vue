@@ -6,6 +6,7 @@ import CycleCancellationController from '@/actions/App/Http/Controllers/Manage/C
 import CycleController from '@/actions/App/Http/Controllers/Manage/CycleController';
 import CycleCutoffController from '@/actions/App/Http/Controllers/Manage/CycleCutoffController';
 import CycleParticipantController from '@/actions/App/Http/Controllers/Manage/CycleParticipantController';
+import FormSelect from '@/components/FormSelect.vue';
 import Heading from '@/components/Heading.vue';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
@@ -43,6 +44,10 @@ const weekdays = [
     'Saturday',
     'Sunday',
 ];
+const weekdayOptions = weekdays.map((label, index) => ({
+    value: String(index + 1),
+    label,
+}));
 
 const cutoffLabel = (cutoff: string | null) =>
     cutoff === null ? 'no cutoff' : new Date(cutoff).toLocaleString();
@@ -106,20 +111,14 @@ function cutoffValue(cycleId: string, producerId: string): string {
                 <template v-if="pickupWeekday === null">
                     <div class="grid gap-2">
                         <Label for="cycle-weekday">Pickup weekday</Label>
-                        <select
+                        <FormSelect
                             id="cycle-weekday"
                             name="pickup_weekday"
                             required
-                            class="h-9 w-fit rounded-md border bg-background px-2 text-sm"
-                        >
-                            <option
-                                v-for="(name, index) in weekdays"
-                                :key="name"
-                                :value="index + 1"
-                            >
-                                {{ name }}
-                            </option>
-                        </select>
+                            :options="weekdayOptions"
+                            :default-value="weekdayOptions[0]?.value"
+                            class="w-full min-w-0 sm:w-fit sm:min-w-44"
+                        />
                         <InputError :message="errors.pickup_weekday" />
                     </div>
 

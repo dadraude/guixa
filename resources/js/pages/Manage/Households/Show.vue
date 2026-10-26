@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Form, Head, Link } from '@inertiajs/vue3';
+import { computed } from 'vue';
 import { trans } from 'laravel-vue-i18n';
 import SettlementDetails from './SettlementDetails.vue';
 import AccountHouseholdController from '@/actions/App/Http/Controllers/Manage/AccountHouseholdController';
@@ -7,6 +8,7 @@ import HouseholdController from '@/actions/App/Http/Controllers/Manage/Household
 import HouseholdMemberController from '@/actions/App/Http/Controllers/Manage/HouseholdMemberController';
 import HouseholdWalletController from '@/actions/App/Http/Controllers/Manage/HouseholdWalletController';
 import InvitationController from '@/actions/App/Http/Controllers/Manage/InvitationController';
+import FormSelect from '@/components/FormSelect.vue';
 import Heading from '@/components/Heading.vue';
 import InputError from '@/components/InputError.vue';
 import { Badge } from '@/components/ui/badge';
@@ -27,6 +29,13 @@ defineOptions({
         ],
     },
 });
+
+const otherHouseholdOptions = computed(() =>
+    props.otherHouseholds.map((household) => ({
+        value: household.id,
+        label: household.name,
+    })),
+);
 
 const expiry = (iso: string | null) =>
     iso ? new Date(iso).toLocaleString() : '';
@@ -114,20 +123,14 @@ const expiry = (iso: string | null) =>
                             class="flex items-center gap-2"
                             v-slot="{ errors, processing }"
                         >
-                            <select
+                            <FormSelect
                                 name="household_id"
                                 required
-                                class="h-8 rounded-md border bg-background px-2 text-sm"
+                                :options="otherHouseholdOptions"
+                                :default-value="otherHouseholdOptions[0]?.value"
+                                class="w-full min-w-0 sm:w-fit sm:min-w-44"
                                 :aria-label="`Move ${member.name} to`"
-                            >
-                                <option
-                                    v-for="other in otherHouseholds"
-                                    :key="other.id"
-                                    :value="other.id"
-                                >
-                                    {{ other.name }}
-                                </option>
-                            </select>
+                            />
                             <Button
                                 type="submit"
                                 variant="outline"
