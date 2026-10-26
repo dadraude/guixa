@@ -9,6 +9,9 @@ T40 is implemented with focused and rendered evidence. T41 is implemented for in
 with [rendered manager evidence](../../docs/visual-checks/dra-192.md); T42 is implemented for
 independent review with [rendered settings/authentication evidence](../../docs/visual-checks/dra-193.md).
 
+Proposed amendment (2026-10-26): **Layout rules — T43–T46**, pending the user's review; not yet
+tracked in Linear.
+
 How to work a task:
 
 - One task = one vertical slice: domain → use case → repository (in-memory + Eloquent) → HTTP → Vue page,
@@ -322,6 +325,31 @@ botanical decoration must stay within the accepted plan and must not delay a usa
 approved its visual pilot on DRA-191 on 2026-10-25. T40, T41 and T42 are implemented for independent
 review. Pilot approval does not grant publication or feature completion. T33 includes T42 as a
 completion dependency.
+
+## Layout rules — T43–T46
+
+**Status: Proposed (2026-10-26), pending the user's review.** Implements the proposed
+[Layout rules](plan.md#layout-rules) amendment through the **plan only** route, as tracer bullets:
+T43 takes one flow from rules to tokens to screens to rendered check; T44–T46 reuse it per area.
+No new `R#` or `S#`. Not yet tracked in Linear.
+
+| ID | Task | Covers | After |
+| --- | --- | --- | --- |
+| T43 | Tracer: define the page, panel, form, list-row and action-row patterns, the type scale and the target rule; apply them to `Orders/Index`, `Orders/Edit` and their shell; add the static spacing check; present rendered captures for visual approval | [Plan · Layout rules](plan.md#layout-rules), Constitution (UI); existing T37/T39 ordering scenario coverage | T42 |
+| T44 | Apply the layout rules to the T40 inventory (dashboard, wallet, producer pages); add them to the static check | [Plan · Layout rules](plan.md#layout-rules); existing T40 coverage | T43 **and explicit visual approval** |
+| T45 | Apply the layout rules to the T41 inventory (manager pages); add them to the static check | [Plan · Layout rules](plan.md#layout-rules); existing T41 coverage | T43 **and explicit visual approval** |
+| T46 | Apply the layout rules to the T42 inventory (settings and authentication pages); add them to the static check | [Plan · Layout rules](plan.md#layout-rules); existing T42 coverage | T43 **and explicit visual approval** |
+
+Each task's pages are the matching row of the [Existing-screen inventory](#existing-screen-inventory)
+(T39's row for T43). T44–T46 do not depend on each other and touch disjoint pages; a pattern change
+they need in `resources/css/app.css` is coordinated so two slices do not edit the same rule at once.
+
+**Done when (each task):** its pages use only the plan's spacing grid and patterns, the static check
+covers its files and passes, every control is at least 44 × 44 px, and a visual check in
+`docs/visual-checks/` records the rendered matrix (375 px, 1024 px/200% text, 1280 px; light and
+dark) with the shared left edge and no horizontal overflow. Existing requests, props, validation,
+permissions and translations are unchanged and their tests pass. T43 stops for explicit visual
+approval before T44–T46 start.
 
 ## Closure
 

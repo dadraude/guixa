@@ -10,6 +10,9 @@ T41 is implemented for independent review with [rendered manager evidence](../..
 T37/T38 reconciliation is complete: T37 = DRA-195 and T38 = DRA-194, both Done with evidence.
 Their native prerequisite links to T39 / DRA-190 are recorded.
 
+Proposed amendment (2026-10-26): **Layout rules** below, pending the user's review. No tasks are
+approved or implemented by it.
+
 ## Bootstrap
 
 - Laravel 13 **Vue starter kit** (Inertia 3 + Vue 3 + TS + Vite, Tailwind 4 + shadcn-vue, Fortify auth). Public registration disabled.
@@ -751,6 +754,84 @@ checks outside the shared harness and the pending items.
 Approval of this section authorizes preparation of linked tasks only. Task approval and the visual
 pilot review remain separate checkpoints. No task IDs, completed checks or implementation are claimed
 by this amendment; `spec.md`, the area requirements and the constitution are unchanged.
+
+## Layout rules
+
+**Status: Proposed (2026-10-26), pending the user's review.** Route: plan only, because this
+changes spacing, sizes and alignment without changing the spec's requirements or acceptance
+scenarios. It makes the [Application visual identity](#application-visual-identity) Layout bullet
+("consistent spacing") concrete; palette, typography choices, scope and invariants stay as accepted.
+
+The 2026-10-26 inventory found no arbitrary spacing values (`p-[13px]`) in `resources/js` outside the
+excluded `Welcome.vue`, but no
+agreed subset of Tailwind's 4 px scale either: pages mix `gap-1/2/3/4/6`, `p-3/4/5/6/8` and
+`px-2/3/4/5/6`, and off-grid steps such as `p-5`, `gap-3` and `py-1.5` sit next to on-grid ones.
+The rules below adopt Material Design's layout principles (8 px grid, minimum target size, type
+scale, fixed component padding, page margins), not its components, elevation, colours, shapes or
+motion. No component library is added.
+
+### Rules
+
+- **Spacing grid:** space between and inside containers uses 8 px steps: Tailwind `2`, `4`, `6`, `8`
+  and `12` (8, 16, 24, 32, 48 px) in `gap-*`, `space-*`, `p*-*` and `m*-*`. The 4 px step (`1`) is
+  allowed only inside a single control or inline group, such as an icon beside its label or a
+  badge's padding. Other steps (`3`, `5`, `1.5`, `7`…) and arbitrary values are not used.
+- **Targets:** keep the constitution's 44 × 44 px minimum for every interactive control, including
+  checkboxes, radio items, icon buttons and row actions. Where a visual control is smaller, its hit
+  area reaches 44 px; adjacent targets keep at least 8 px between them. Material's 48 px is not
+  adopted, because the constitution already sets 44 px.
+- **Type scale:** five sizes with Tailwind's default line heights: `text-xs` for metadata only,
+  `text-sm` for secondary text and labels, `text-base` for body text and form inputs, `text-lg` for
+  section headings and `text-2xl` for page titles. Form inputs stay at 16 px or more on phones.
+  Headings keep the accepted Georgia token; amounts use tabular figures.
+- **Component padding:** each pattern has one fixed padding and internal gap, so pages stop setting
+  them one by one:
+
+  | Pattern | Phone | From `md` | Inside |
+  | --- | --- | --- | --- |
+  | Page | `px-4 py-6` | `px-6 py-8` | `gap-6` between sections |
+  | Panel / card | `p-4` | `p-6` | `gap-4` between blocks |
+  | Form | — | — | `gap-6` between fields; `gap-2` from label to input to error |
+  | List row | `py-4` | `py-4` | `gap-2` inside the row; `gap-4` before its actions |
+  | Action row | — | — | `gap-2` between buttons; primary action last |
+
+- **Alignment:** headings, panels, forms and tables on a page share the page's left edge. Text and
+  labels are start-aligned; amounts and quantities are end-aligned in tables and lists. Icons align
+  to the first text line's centre.
+
+Express the patterns through the existing `.pilot-*` presentation classes in `resources/css/app.css`
+or, where markup repeats, a presentation component; one definition per pattern. The shared shadcn-vue
+primitives under `resources/js/components/ui/` keep their internal padding, but their rendered size
+must still meet the target rule. The pilot tasks may tune the values above after their visual review;
+the tuned value replaces the one here and is logged as a **Change**.
+
+### Delivery: tracer bullets
+
+Deliver the rules as thin vertical slices, each from rule to token to screens to rendered check,
+reviewable and mergeable on its own. The first slice proves the whole path on one flow before the
+others reuse it.
+
+1. **Tracer (T43):** the member ordering flow and its shell (`Orders/Index`, `Orders/Edit`), as in the
+   T39 pilot. Define the patterns above, apply them to those screens, add the static check below, and
+   present light/dark captures at 375 px, 1024 px/200% text and 1280 px for visual approval.
+2. **Area slices (T44–T46):** after that approval, apply the same patterns to the T40, T41 and T42
+   screen inventories in [tasks.md](tasks.md#existing-screen-inventory). Each slice adds a pattern
+   only when its screens need one T43 did not; it fixes off-grid values in its own screens only.
+
+Each slice's off-grid fixes stay within its inventory, so slices after T43 do not touch the same pages
+and can run in parallel.
+
+### Verification
+
+- **Static check:** a focused test fails when a page, layout or presentation component in a migrated
+  slice uses a spacing utility outside the grid above, or an arbitrary spacing value. Each slice adds
+  its files to the checked set; `components/ui/` and `Welcome.vue` are excluded.
+- **Rendered check:** the shared visual harness (`skills/agent-workflow/scripts/visual/`) runs the slice's screens at
+  375 px, 1024 px/200% text and 1280 px in light and dark, checking 44 px targets, the shared left
+  edge and no horizontal overflow. Record the results in the slice's visual check.
+- **Regression:** everything in the visual identity
+  [Verification and review gate](#verification-and-review-gate) still applies. No request, prop,
+  validation, permission or translation changes; no new `R#` or `S#`.
 
 ## Translations
 

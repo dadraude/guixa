@@ -1169,3 +1169,26 @@ the same accessible names for quantity, save and remove through `aria-label` ins
 text. Requests, drafts, totals and marked-line behavior are unchanged. The Orders edit spec, the
 Orders index spec and the ordering HTTP tests were run; the regression manifest keeps and now
 passes every 1024 px/200% and 375 px/200% case for Orders index and edit.
+
+## 2026-10-26 · Change
+
+`plan.md` (new Layout rules section, header): concrete layout rules for the existing visual identity.
+Spacing between and inside containers uses 8 px steps (Tailwind `2/4/6/8/12`), with the 4 px step only
+inside a single control; controls keep the constitution's 44 × 44 px minimum; a five-size type scale;
+one fixed padding per page, panel, form, list-row and action-row pattern; one left edge per page with
+end-aligned amounts. Delivery is tracer bullets: a tracer slice on the member ordering flow, then one
+slice per existing-screen inventory, each with a static spacing check and a rendered check. Material
+Design's layout principles are adopted, not its components, elevation, colours, shapes or motion.
+Why: the 2026-10-26 inventory found pages mixing on-grid and off-grid Tailwind steps (`p-5`, `gap-3`,
+`py-1.5`) with no agreed subset, and the visual identity's Layout bullet asked only for "consistent
+spacing". The user asked to apply Material Design's rules ("i meant the rules"), chose the plan-only
+route with tasks and Linear, and asked for the delivery as tracer bullets ("we want tracer bullets").
+
+## 2026-10-26 · Change
+
+`tasks.md` (new Layout rules section, header): T43 is the tracer slice (patterns, type scale, target
+rule and static check on `Orders/Index`, `Orders/Edit` and their shell, stopping for visual approval);
+T44, T45 and T46 apply the rules to the T40, T41 and T42 inventories, each after T43 and its approval,
+independent of each other. T33's dependencies are unchanged. Not yet tracked in Linear.
+Why: follows the `plan.md` Layout rules change above. The user approved writing the plan amendment,
+tasks and log entry with these slices ("yes").
