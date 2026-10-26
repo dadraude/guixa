@@ -5,7 +5,7 @@ use Guixa\Membership\Application\ListHouseholdsToSettle;
 use Guixa\Membership\Domain\ValueObject\PendingHouseholdPickup;
 use Guixa\Membership\Infrastructure\Ordering\OrderingHouseholdPickups;
 use Guixa\Membership\Infrastructure\Wallet\WalletHouseholdBalances;
-use Guixa\Ordering\Application\ListPendingPickups;
+use Guixa\Ordering\Application\ReadPendingPickups;
 use Guixa\Ordering\Domain\Cycle;
 use Guixa\Ordering\Domain\Error\NoHousehold;
 use Guixa\Ordering\Domain\Order;
@@ -15,7 +15,7 @@ use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Error\NotAllowed;
 use Guixa\Shared\Domain\Money;
 use Guixa\Shared\Domain\Quantity;
-use Guixa\Wallet\Application\GetBalance;
+use Guixa\Wallet\Application\ReadHouseholdBalance;
 use Guixa\Wallet\Application\RecordCorrection;
 use Tests\Support\Membership\MembershipWorld;
 use Tests\Support\Ordering\OrderingWorld;
@@ -104,8 +104,8 @@ it('keeps a real ordered line and pickup through deactivation until pickup and w
     ));
     $correction = new RecordCorrection($ordering->movements, $ordering->clock);
     $correction($membership->manager, $household, -500, 'Opening adjustment');
-    $balances = new WalletHouseholdBalances(new GetBalance($ordering->movements));
-    $pickups = new OrderingHouseholdPickups(new ListPendingPickups($ordering->cycles, $ordering->orders));
+    $balances = new WalletHouseholdBalances(new ReadHouseholdBalance($ordering->movements));
+    $pickups = new OrderingHouseholdPickups(new ReadPendingPickups($ordering->cycles, $ordering->orders));
     $warning = new GetHouseholdDeactivationWarning($membership->households, $balances, $pickups);
     $toSettle = new ListHouseholdsToSettle($membership->households, $balances, $pickups);
 

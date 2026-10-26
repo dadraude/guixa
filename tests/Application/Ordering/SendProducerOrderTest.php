@@ -10,7 +10,6 @@ use Guixa\Ordering\Domain\Error\ProducerOrderSent;
 use Guixa\Ordering\Domain\Error\ProducerStillOpen;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Error\NotAllowed;
-use Guixa\Shared\Domain\Role;
 use Tests\Support\Ordering\OrderingWorld;
 
 const SEND_ANNA = '00000000-0000-7000-8000-0000000000a1';
@@ -25,8 +24,8 @@ beforeEach(function () {
     $this->jam = $this->world->catalog->offer(OrderingWorld::BAKER, 'Jam', 'jar', 400, variable: false);
     $this->apples = $this->world->catalog->offer(OrderingWorld::GROWER, 'Apples', 'kg', 300, variable: true);
     $this->cycleId = ($this->world->openCycle)($this->world->manager, '2026-11-07', [OrderingWorld::BAKER, OrderingWorld::GROWER]);
-    $this->anna = new Actor(SEND_ANNA, [Role::Member], SEND_HOUSEHOLD_H);
-    $this->biel = new Actor(SEND_BIEL, [Role::Member], SEND_HOUSEHOLD_J);
+    $this->anna = Actor::memberOf(SEND_ANNA, SEND_HOUSEHOLD_H);
+    $this->biel = Actor::memberOf(SEND_BIEL, SEND_HOUSEHOLD_J);
     $this->order = fn (Actor $member, string $productId, string $quantity) => ($this->world->setOrderLine)($member, $this->cycleId, $productId, $quantity);
     $this->closeBaker = fn () => ($this->world->closeProducerNow)($this->world->manager, $this->cycleId, OrderingWorld::BAKER);
     $this->send = fn (string $producerId = OrderingWorld::BAKER) => ($this->world->sendProducerOrder)($this->world->manager, $this->cycleId, $producerId);
@@ -292,7 +291,7 @@ it('skips cancelled cycles and sends nothing twice (D10)', function () {
 it('refuses to mark a product unavailable or available once its producer order is sent (R3c)', function () {
     ($this->closeBaker)();
     ($this->send)();
-    $baker = new Actor('00000000-0000-7000-8000-0000000000aa', [Role::Producer], null, OrderingWorld::BAKER);
+    $baker = Actor::producer('00000000-0000-7000-8000-0000000000aa', OrderingWorld::BAKER);
 
     expect(fn () => ($this->world->setProductAvailability)($baker, $this->cycleId, $this->bread, false))->toThrow(ProducerOrderSent::class)
         ->and(fn () => ($this->world->setProductAvailability)($baker, $this->cycleId, $this->bread, true))->toThrow(ProducerOrderSent::class);
@@ -301,7 +300,7 @@ it('refuses to mark a product unavailable or available once its producer order i
 it('still lets a producer whose order is not sent mark its products while another is sent (R3c)', function () {
     ($this->closeBaker)();
     ($this->send)();
-    $grower = new Actor('00000000-0000-7000-8000-0000000000ab', [Role::Producer], null, OrderingWorld::GROWER);
+    $grower = Actor::producer('00000000-0000-7000-8000-0000000000ab', OrderingWorld::GROWER);
 
     ($this->world->setProductAvailability)($grower, $this->cycleId, $this->apples, false);
 

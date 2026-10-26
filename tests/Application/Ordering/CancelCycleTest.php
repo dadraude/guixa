@@ -4,7 +4,6 @@ use Guixa\Ordering\Domain\Error\CycleCancelled;
 use Guixa\Ordering\Domain\Error\CycleNotFound;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Error\NotAllowed;
-use Guixa\Shared\Domain\Role;
 use Tests\Support\Ordering\OrderingWorld;
 
 const CANCEL_ANNA = '00000000-0000-7000-8000-0000000000a1';
@@ -17,8 +16,8 @@ beforeEach(function () {
     $this->world = new OrderingWorld('2026-10-22 10:00');
     $this->bread = $this->world->catalog->offer(OrderingWorld::BAKER, 'Loaf', 'loaf', 350, variable: false);
     $this->cycleId = ($this->world->openCycle)($this->world->manager, '2026-11-07', [OrderingWorld::BAKER]);
-    $this->anna = new Actor(CANCEL_ANNA, [Role::Member], CANCEL_HOUSEHOLD_H);
-    $this->biel = new Actor(CANCEL_BIEL, [Role::Member], CANCEL_HOUSEHOLD_J);
+    $this->anna = Actor::memberOf(CANCEL_ANNA, CANCEL_HOUSEHOLD_H);
+    $this->biel = Actor::memberOf(CANCEL_BIEL, CANCEL_HOUSEHOLD_J);
     ($this->world->setOrderLine)($this->anna, $this->cycleId, $this->bread, '2');
     ($this->world->setOrderLine)($this->biel, $this->cycleId, $this->bread, '1');
     $this->cycle = fn () => collect(($this->world->listCycles)($this->world->manager))->firstWhere('id', $this->cycleId);

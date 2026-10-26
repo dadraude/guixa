@@ -5,7 +5,6 @@ namespace Tests\Integration\Membership;
 use Guixa\Membership\Application\AddMember;
 use Guixa\Membership\Application\DeactivateHousehold;
 use Guixa\Shared\Application\Actor;
-use Guixa\Shared\Domain\Role;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -92,7 +91,7 @@ final class HouseholdDeactivationTest extends TestCase
 
     private function manager(): Actor
     {
-        return new Actor('00000000-0000-7000-8000-00000000000a', [Role::Manager]);
+        return Actor::manager('00000000-0000-7000-8000-00000000000a');
     }
 
     /** @return array<int, resource> */

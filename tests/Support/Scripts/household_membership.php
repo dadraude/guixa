@@ -6,14 +6,13 @@ use Guixa\Membership\Application\AddMember;
 use Guixa\Membership\Application\GrantManagerRole;
 use Guixa\Membership\Application\MoveMember;
 use Guixa\Shared\Application\Actor;
-use Guixa\Shared\Domain\Role;
 use Illuminate\Contracts\Console\Kernel;
 
 require dirname(__DIR__, 3).'/vendor/autoload.php';
 
 $app = require dirname(__DIR__, 3).'/bootstrap/app.php';
 $app->make(Kernel::class)->bootstrap();
-$manager = new Actor('00000000-0000-7000-8000-00000000000a', [Role::Manager]);
+$manager = Actor::manager('00000000-0000-7000-8000-00000000000a');
 
 try {
     if ($argv[1] === 'add') {

@@ -6,6 +6,7 @@ use Guixa\Shared\Domain\Role;
 use Guixa\Wallet\Application\ChargeForPickup;
 use Guixa\Wallet\Application\GetBalance;
 use Guixa\Wallet\Application\GetWalletStatement;
+use Guixa\Wallet\Application\ReadHouseholdBalance;
 use Guixa\Wallet\Application\RecordCorrection;
 use Guixa\Wallet\Application\RecordTopUp;
 use Guixa\Wallet\Domain\Error\CorrectionNoteRequired;
@@ -18,9 +19,9 @@ use Tests\Support\InMemory\InMemoryMovementRepository;
 beforeEach(function () {
     $this->movements = new InMemoryMovementRepository;
     $this->clock = new FrozenClock('2026-10-22 10:00:00');
-    $this->manager = new Actor('manager-account', [Role::Manager]);
+    $this->manager = Actor::manager('manager-account');
     $this->household = 'household-h';
-    $this->member = new Actor('anna-account', [Role::Member], 'household-h');
+    $this->member = Actor::memberOf('anna-account', 'household-h');
     $this->topUp = new RecordTopUp($this->movements, $this->clock);
     $this->correct = new RecordCorrection($this->movements, $this->clock);
     $this->charge = new ChargeForPickup($this->movements, $this->clock);
@@ -118,7 +119,7 @@ it('keeps recording to managers and the balance query to managers (R29, R32)', f
 })->with([Role::Member, Role::Producer]);
 
 it('refuses the statement to a producer and to a member of no household', function () {
-    expect(fn () => ($this->statement)(new Actor('p', [Role::Producer], null, 'producer-1'), $this->household))->toThrow(NotAllowed::class);
+    expect(fn () => ($this->statement)(Actor::producer('p', 'producer-1'), $this->household))->toThrow(NotAllowed::class);
     expect(fn () => ($this->statement)(new Actor('a', [Role::Member]), $this->household))->toThrow(NotAllowed::class);
 });
 
@@ -126,4 +127,12 @@ it('lets a manager still top up a household without members (R35a)', function ()
     ($this->topUp)($this->manager, 'deactivated-household', 800, 'cash');
 
     expect(($this->balance)($this->manager, 'deactivated-household'))->toBe(800);
+});
+
+it('reads a household balance for another context without an actor (R30, R35a)', function () {
+    ($this->topUp)($this->manager, $this->household, 500, 'cash');
+    ($this->charge)($this->manager, $this->household, 'cycle-1', 1200);
+
+    expect((new ReadHouseholdBalance($this->movements))($this->household))->toBe(-700)
+        ->and((new ReadHouseholdBalance($this->movements))('household-j'))->toBe(0);
 });

@@ -12,7 +12,6 @@ use Guixa\Ordering\Application\WalletLedger;
 use Guixa\Ordering\Domain\CycleRepository;
 use Guixa\Ordering\Domain\Error\NotEnoughStock;
 use Guixa\Shared\Application\Actor;
-use Guixa\Shared\Domain\Role;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -226,7 +225,7 @@ final class CompletePickupTest extends TestCase
         DB::table('cycle_producers')->insert(['cycle_id' => $cycle, 'producer_id' => $producer, 'participating' => true, 'sent_at' => now(), 'validated_at' => now(), 'distributed_at' => now()]);
         $order = $this->order($cycle, $household, $manager, $producer, $product);
 
-        return [new Actor($manager, [Role::Manager]), $cycle, $household, $order];
+        return [Actor::manager($manager), $cycle, $household, $order];
     }
 
     /** @return array{string, string} household and order, with a loaf pickup like the first one */

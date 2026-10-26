@@ -180,8 +180,8 @@ final class MembershipWorld
         $this->suspendProducerRole = new SuspendProducerRole($this->accounts);
         $this->restoreProducerRole = new RestoreProducerRole($this->accounts);
 
-        $this->manager = new Actor('00000000-0000-7000-8000-00000000000a', [Role::Manager]);
-        $this->member = new Actor('00000000-0000-7000-8000-00000000000b', [Role::Member], '00000000-0000-7000-8000-00000000000c');
+        $this->manager = Actor::manager('00000000-0000-7000-8000-00000000000a');
+        $this->member = Actor::memberOf('00000000-0000-7000-8000-00000000000b', '00000000-0000-7000-8000-00000000000c');
     }
 
     /** An active account that holds only the manager role, as the installation command would leave it. */

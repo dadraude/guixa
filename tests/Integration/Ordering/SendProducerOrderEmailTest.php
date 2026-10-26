@@ -9,7 +9,6 @@ use Guixa\Ordering\Application\SetOrderLine;
 use Guixa\Ordering\Domain\Error\ProducerHasNoAccount;
 use Guixa\Ordering\Infrastructure\Membership\ProducerNotifierMail;
 use Guixa\Shared\Application\Actor;
-use Guixa\Shared\Domain\Role;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -56,12 +55,12 @@ final class SendProducerOrderEmailTest extends TestCase
 
     private function manager(): Actor
     {
-        return new Actor((string) Str::uuid7(), [Role::Manager]);
+        return Actor::manager((string) Str::uuid7());
     }
 
     private function orderAndClose(): void
     {
-        $member = new Actor($this->anna, [Role::Member], $this->household);
+        $member = Actor::memberOf($this->anna, $this->household);
         app(SetOrderLine::class)($member, $this->cycle, $this->products[0], '2');
         app(SetOrderLine::class)($member, $this->cycle, $this->products[1], '1');
         DB::table('cycle_producers')->where('cycle_id', $this->cycle)->update(['closes_at' => now()->subMinute()->toIso8601String()]);

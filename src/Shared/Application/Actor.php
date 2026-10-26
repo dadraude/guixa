@@ -28,6 +28,21 @@ final readonly class Actor
         ));
     }
 
+    public static function manager(string $accountId): self
+    {
+        return new self($accountId, [Role::Manager]);
+    }
+
+    public static function memberOf(string $accountId, string $householdId): self
+    {
+        return new self($accountId, [], $householdId);
+    }
+
+    public static function producer(string $accountId, string $producerId): self
+    {
+        return new self($accountId, [Role::Producer], producerId: $producerId);
+    }
+
     public function hasRole(Role $role): bool
     {
         return in_array($role, $this->roles, true);

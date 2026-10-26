@@ -8,7 +8,6 @@ use Guixa\Ordering\Application\SetOrderLine;
 use Guixa\Ordering\Domain\CycleRepository;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Clock;
-use Guixa\Shared\Domain\Role;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -50,7 +49,7 @@ final class OrderLineConcurrencyTest extends TestCase
     public function two_calls_for_a_household_that_already_has_an_order_keep_every_line(): void
     {
         [$anna, $household, $cycle, $products] = $this->world(3);
-        app(SetOrderLine::class)(new Actor($anna, [Role::Member], $household), $cycle, $products[2], '1');
+        app(SetOrderLine::class)(Actor::memberOf($anna, $household), $cycle, $products[2], '1');
 
         $this->setWhileAnotherCallWaits($anna, $household, $cycle, $products[0], $products[1]);
 
@@ -106,7 +105,7 @@ final class OrderLineConcurrencyTest extends TestCase
         // still sees the producer open, so only the committed `sent_at` can reject its line.
         $this->app->instance(Clock::class, new FrozenClock(now()->addHours(2)->toIso8601String()));
         DB::beginTransaction();
-        app(SendProducerOrder::class)(new Actor((string) Str::uuid7(), [Role::Manager]), $cycle, $sentProducer);
+        app(SendProducerOrder::class)(Actor::manager((string) Str::uuid7()), $cycle, $sentProducer);
         $this->other = $this->startSettingLine($anna, $household, $cycle, $product, $pipes);
         $this->waitUntilAnotherSessionWaitsForALock();
         DB::commit();
@@ -146,7 +145,7 @@ final class OrderLineConcurrencyTest extends TestCase
     private function setWhileAnotherCallWaits(string $anna, string $household, string $cycle, string $first, string $second): void
     {
         DB::beginTransaction();
-        app(SetOrderLine::class)(new Actor($anna, [Role::Member], $household), $cycle, $first, '2');
+        app(SetOrderLine::class)(Actor::memberOf($anna, $household), $cycle, $first, '2');
         $other = $this->other = $this->startSettingLine($anna, $household, $cycle, $second, $pipes);
         $this->waitUntilAnotherSessionWaitsForALock();
         DB::commit();

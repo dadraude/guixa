@@ -8,7 +8,6 @@ use Guixa\Catalog\Domain\Error\ProductNotFound;
 use Guixa\Catalog\Domain\Error\UnitRequired;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Error\NotAllowed;
-use Guixa\Shared\Domain\Role;
 use Tests\Support\Catalog\CatalogWorld;
 
 beforeEach(function () {
@@ -178,6 +177,6 @@ it('keeps product management to producers, not managers or members (R1, R2)', fu
         ->and(fn () => ($this->world->updateProduct)($actor, $id, 'Stolen', 'loaf', 100, false, null))->toThrow(NotAllowed::class)
         ->and(fn () => ($this->world->deactivateProduct)($actor, $id))->toThrow(NotAllowed::class);
 })->with([
-    'manager' => fn () => new Actor('00000000-0000-7000-8000-00000000000a', [Role::Manager]),
-    'member' => fn () => new Actor('00000000-0000-7000-8000-00000000000b', [Role::Member], 'h1'),
+    'manager' => fn () => Actor::manager('00000000-0000-7000-8000-00000000000a'),
+    'member' => fn () => Actor::memberOf('00000000-0000-7000-8000-00000000000b', 'h1'),
 ]);

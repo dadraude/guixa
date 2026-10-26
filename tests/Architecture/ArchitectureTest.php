@@ -3,7 +3,7 @@
 use Illuminate\Database\Eloquent\Model;
 
 /*
- * Architecture rules A1-A8 of specs/constitution.md, one test per rule, each looping over every
+ * Architecture rules A1-A8 and A10 of specs/constitution.md, one test per rule, each looping over every
  * bounded context found in src/. A9 (frontend boundaries) is enforced by Oxlint in vite.config.ts.
  */
 
@@ -133,6 +133,30 @@ arch('A7 repository ports are interfaces in Domain', function () {
 
             expect((new ReflectionClass($class))->isInterface())
                 ->toBeTrue("{$class} must be an interface");
+        }
+    }
+});
+
+arch('A10 actors are built only in Shared, never forged by a context or the app', function () {
+    $root = dirname(__DIR__, 2);
+    $directories = ["{$root}/app"];
+
+    foreach (architectureContexts() as $context) {
+        $directories[] = "{$root}/src/{$context}";
+    }
+
+    foreach ($directories as $directory) {
+        $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($directory, FilesystemIterator::SKIP_DOTS));
+
+        foreach ($files as $file) {
+            if ($file->getExtension() !== 'php') {
+                continue;
+            }
+
+            $relative = substr($file->getPathname(), strlen($root) + 1);
+
+            expect(file_get_contents($file->getPathname()))
+                ->not->toMatch('/new\s+(?:[\w\\\\]*\\\\)?Actor\s*\(|\bActor::(?!class\b)\w+\s*\(/', "{$relative} must not build an Actor (A10)");
         }
     }
 });

@@ -80,3 +80,34 @@ it('answers role checks by name, ignoring unknown names', function () {
         ->and($actor->hasAnyRole('producer', 'nonsense'))->toBeFalse()
         ->and($actor->roleNames())->toBe(['manager', 'member']);
 });
+
+it('builds a manager with no household or producer', function () {
+    $actor = Actor::manager('a1');
+
+    $actor->assertManager();
+
+    expect($actor->accountId)->toBe('a1')
+        ->and($actor->roles)->toBe([Role::Manager])
+        ->and($actor->householdId)->toBeNull()
+        ->and($actor->producerId)->toBeNull();
+});
+
+it('builds a member of exactly one household (R35)', function () {
+    $actor = Actor::memberOf('a1', 'h7');
+
+    $actor->assertMemberOf('h7');
+
+    expect($actor->roles)->toBe([Role::Member])
+        ->and(fn () => $actor->assertMemberOf('h8'))->toThrow(NotAllowed::class)
+        ->and(fn () => $actor->assertManager())->toThrow(NotAllowed::class);
+});
+
+it('builds a producer of exactly one producer', function () {
+    $actor = Actor::producer('a1', 'p3');
+
+    $actor->assertProducerOf('p3');
+
+    expect($actor->roles)->toBe([Role::Producer])
+        ->and($actor->householdId)->toBeNull()
+        ->and(fn () => $actor->assertProducerOf('p4'))->toThrow(NotAllowed::class);
+});

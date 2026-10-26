@@ -18,7 +18,7 @@ const HOUSEHOLD_ONE = '00000000-0000-7000-8000-0000000000e1';
 
 function producerActor(string $producerId): Actor
 {
-    return new Actor('00000000-0000-7000-8000-0000000000aa', [Role::Producer], null, $producerId);
+    return Actor::producer('00000000-0000-7000-8000-0000000000aa', $producerId);
 }
 
 beforeEach(function () {
@@ -27,7 +27,7 @@ beforeEach(function () {
     $this->jam = $this->world->catalog->offer(OrderingWorld::BAKER, 'Jam', 'jar', 450, variable: false);
     $this->cycleA = ($this->world->openCycle)($this->world->manager, '2026-11-07', [OrderingWorld::BAKER]);
     $this->cycleB = ($this->world->openCycle)($this->world->manager, '2026-11-14', [OrderingWorld::BAKER]);
-    $this->anna = new Actor(AVAILABILITY_MEMBER_ANNA, [Role::Member], HOUSEHOLD_ONE);
+    $this->anna = Actor::memberOf(AVAILABILITY_MEMBER_ANNA, HOUSEHOLD_ONE);
     $this->baker = producerActor(OrderingWorld::BAKER);
     $this->order = fn (string $cycleId) => ($this->world->getHouseholdOrder)($this->anna, $cycleId);
     $this->marked = fn (string $cycleId) => collect(($this->order)($cycleId)->lines)->pluck('notDelivered', 'productId')->all();
@@ -166,7 +166,7 @@ it('lets any member of the household remove a marked line and refuses an account
 
     expect(fn () => ($this->world->removeMarkedLine)(new Actor(MEMBER_BIEL, [Role::Member]), $this->cycleA, $this->jam))->toThrow(NoHousehold::class);
 
-    ($this->world->removeMarkedLine)(new Actor(MEMBER_BIEL, [Role::Member], HOUSEHOLD_ONE), $this->cycleA, $this->jam);
+    ($this->world->removeMarkedLine)(Actor::memberOf(MEMBER_BIEL, HOUSEHOLD_ONE), $this->cycleA, $this->jam);
 
     expect(($this->order)($this->cycleA)->lines)->toBe([]);
 });

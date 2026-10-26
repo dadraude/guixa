@@ -38,7 +38,7 @@ final class ManagerRoleConcurrencyTest extends TestCase
         $first = $this->manager($accounts, 'Carla', 'carla@example.org');
         $second = $this->manager($accounts, 'Dan', 'dan@example.org');
         $removeManagerRole = app(RemoveManagerRole::class);
-        $actor = new Actor('00000000-0000-7000-8000-00000000000a', [Role::Manager]);
+        $actor = Actor::manager('00000000-0000-7000-8000-00000000000a');
 
         // This transaction removes the first manager's role and commits only after the other process started
         // its own removal. Without the lock, that process would still see two managers.

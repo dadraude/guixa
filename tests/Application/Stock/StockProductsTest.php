@@ -16,7 +16,7 @@ use Tests\Support\InMemory\InMemoryStockProductRepository;
 
 beforeEach(function () {
     $this->products = new InMemoryStockProductRepository;
-    $this->manager = new Actor('manager-account', [Role::Manager]);
+    $this->manager = Actor::manager('manager-account');
     $this->create = new CreateStockProduct($this->products);
     $this->update = new UpdateStockProduct($this->products);
     $this->deactivate = new DeactivateStockProduct($this->products);

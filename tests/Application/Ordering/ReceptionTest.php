@@ -15,7 +15,6 @@ use Guixa\Ordering\Domain\Error\ProductNotOrderable;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Error\InvalidQuantity;
 use Guixa\Shared\Domain\Error\NotAllowed;
-use Guixa\Shared\Domain\Role;
 use Tests\Support\Ordering\OrderingWorld;
 
 const RECEPTION_A = '00000000-0000-7000-8000-0000000000e1';
@@ -38,9 +37,9 @@ beforeEach(function () {
     $this->apples = $this->world->catalog->offer(OrderingWorld::GROWER, 'Apples', 'kg', 280, variable: true);
     $this->cycleId = ($this->world->openCycle)($this->world->manager, '2026-11-07', [OrderingWorld::BAKER, OrderingWorld::GROWER]);
     $this->households = [
-        'A' => new Actor('00000000-0000-7000-8000-0000000000a1', [Role::Member], RECEPTION_A),
-        'B' => new Actor('00000000-0000-7000-8000-0000000000a2', [Role::Member], RECEPTION_B),
-        'C' => new Actor('00000000-0000-7000-8000-0000000000a3', [Role::Member], RECEPTION_C),
+        'A' => Actor::memberOf('00000000-0000-7000-8000-0000000000a1', RECEPTION_A),
+        'B' => Actor::memberOf('00000000-0000-7000-8000-0000000000a2', RECEPTION_B),
+        'C' => Actor::memberOf('00000000-0000-7000-8000-0000000000a3', RECEPTION_C),
     ];
     $this->householdIds = ['A' => RECEPTION_A, 'B' => RECEPTION_B, 'C' => RECEPTION_C, 'D' => RECEPTION_D];
     $this->minute = 0;
@@ -120,7 +119,7 @@ it('leaves the lines marked will not be delivered out of the reception and out o
     ($this->order)('A', $this->bread, '4');
     ($this->order)('A', $this->jam, '2');
     ($this->order)('B', $this->bread, '6');
-    ($this->world->setProductAvailability)(new Actor('00000000-0000-7000-8000-0000000000aa', [Role::Producer], null, OrderingWorld::BAKER), $this->cycleId, $this->jam, false);
+    ($this->world->setProductAvailability)(Actor::producer('00000000-0000-7000-8000-0000000000aa', OrderingWorld::BAKER), $this->cycleId, $this->jam, false);
     ($this->send)();
 
     expect(collect(($this->reception)()->products)->pluck('name')->all())->toBe(['Bread']);
@@ -347,7 +346,7 @@ it('refuses an allocation for a product that is not in the reception (R16)', fun
 it('refuses an allocation to a household whose line is marked will not be delivered, but not to another one (R3b, R16)', function () {
     ($this->order)('A', $this->bread, '4');
     ($this->order)('B', $this->jam, '2');
-    ($this->world->setProductAvailability)(new Actor('00000000-0000-7000-8000-0000000000aa', [Role::Producer], null, OrderingWorld::BAKER), $this->cycleId, $this->jam, false);
+    ($this->world->setProductAvailability)(Actor::producer('00000000-0000-7000-8000-0000000000aa', OrderingWorld::BAKER), $this->cycleId, $this->jam, false);
     ($this->send)();
     ($this->addUnordered)($this->jam, '2');
 
@@ -435,7 +434,7 @@ it('keeps allocation-only lines out of what members ordered, cycle totals and pr
     ($this->allocate)($this->bread, 'D', '1');
 
     $summary = ($this->world->getCycleSummary)($this->world->manager, $this->cycleId);
-    $producerSummary = ($this->world->getProducerCycleSummary)(new Actor('00000000-0000-7000-8000-0000000000aa', [Role::Producer], null, OrderingWorld::BAKER), $this->cycleId);
+    $producerSummary = ($this->world->getProducerCycleSummary)(Actor::producer('00000000-0000-7000-8000-0000000000aa', OrderingWorld::BAKER), $this->cycleId);
     $memberOrder = ($this->world->getHouseholdOrder)($this->households['A'], $this->cycleId);
 
     expect(collect($summary->producers[0]->products)->pluck('name')->all())->toBe(['Bread'])
