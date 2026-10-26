@@ -20,7 +20,7 @@ defineProps<{
 <template>
     <Head title="Stock" />
 
-    <div class="pilot-page pilot-manager-page">
+    <div class="pilot-page pilot-layout-page pilot-manager-page">
         <div class="flex flex-wrap items-start justify-between gap-4">
             <Heading
                 title="Stock"
@@ -33,7 +33,7 @@ defineProps<{
 
         <p
             v-if="products.length === 0"
-            class="pilot-empty-state text-sm text-muted-foreground"
+            class="pilot-layout-notice text-sm text-muted-foreground"
         >
             No stock products yet.
         </p>
@@ -100,7 +100,7 @@ defineProps<{
                             {{ product.active ? 'Active' : 'Deactivated' }}
                         </td>
                         <td class="py-2">
-                            <div class="flex flex-wrap justify-end gap-2">
+                            <div class="pilot-action-row justify-end">
                                 <Button variant="outline" size="sm" as-child>
                                     <Link
                                         :href="

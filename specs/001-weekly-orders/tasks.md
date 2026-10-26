@@ -328,8 +328,8 @@ completion dependency.
 
 ## Layout rules — T43–T46
 
-**Status: Accepted (2026-10-26); the user authorized T43 implementation on 2026-10-26; T44–T46 stay
-gated on T43's explicit visual approval.** Implements the accepted
+**Status: Accepted (2026-10-26); the user authorized T43 implementation and explicitly approved
+its visual layout for the manager rollout on 2026-10-26.** Implements the accepted
 [Layout rules](plan.md#layout-rules) amendment through the **plan only** route, as tracer bullets:
 T43 takes one flow from rules to tokens to screens to rendered check; T44–T46 reuse it per area.
 No new `R#` or `S#`.
@@ -363,6 +363,12 @@ covers its files and passes, every control is at least 44 × 44 px, and a visual
 dark) with the shared left edge and no horizontal overflow. Existing requests, props, validation,
 permissions and translations are unchanged and their tests pass. T43 stops for explicit visual
 approval before T44–T46 start.
+
+T45 implementation evidence (2026-10-26): [text-only rendered manager
+matrix](../../docs/visual-checks/dra-199.md), the extended static spacing
+check, focused manager Vue tests, type check, frontend check and build. The
+user requested no screenshots and will inspect the layout directly. The T45
+manager inventory is prepared for that visual review.
 
 ## Closure
 

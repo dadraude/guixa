@@ -331,7 +331,7 @@
                         "empty": 1
                     },
                     "checks": {
-                        "panels": ".pilot-empty-state"
+                        "panels": ".pilot-layout-notice"
                     }
                 },
                 {
@@ -469,7 +469,7 @@
                         "empty": 1
                     },
                     "checks": {
-                        "panels": ".pilot-empty-state"
+                        "panels": ".pilot-layout-notice"
                     }
                 },
                 {

@@ -78,7 +78,7 @@ function cutoffValue(cycleId: string, producerId: string): string {
 <template>
     <Head title="Cycles" />
 
-    <div class="pilot-page pilot-manager-page">
+    <div class="pilot-page pilot-layout-page pilot-manager-page">
         <Heading
             title="Cycles"
             :description="
@@ -88,12 +88,12 @@ function cutoffValue(cycleId: string, producerId: string): string {
             "
         />
 
-        <section class="flex flex-col gap-3">
+        <section class="flex flex-col gap-4">
             <h2 class="text-lg font-medium">Open a cycle</h2>
 
             <Form
                 v-bind="CycleController.store.form()"
-                class="flex flex-col gap-3"
+                class="flex flex-col gap-6"
                 v-slot="{ errors, processing }"
             >
                 <div class="grid gap-2">
@@ -185,11 +185,11 @@ function cutoffValue(cycleId: string, producerId: string): string {
             No cycles yet.
         </p>
 
-        <ul v-else class="divide-y rounded-lg border">
+        <ul v-else class="pilot-list">
             <li
                 v-for="cycle in cycles"
                 :key="cycle.id"
-                class="flex flex-col gap-3 p-3"
+                class="flex flex-col gap-4 p-4"
                 :data-test="`cycle-${cycle.id}`"
             >
                 <div class="flex items-center justify-between gap-2">
@@ -235,7 +235,7 @@ function cutoffValue(cycleId: string, producerId: string): string {
                                 class="space-y-6"
                                 v-slot="{ errors, processing }"
                             >
-                                <DialogHeader class="space-y-3">
+                                <DialogHeader class="space-y-4">
                                     <DialogTitle>
                                         Cancel the cycle with pickup
                                         {{ cycle.pickupDate }}?

@@ -1200,3 +1200,13 @@ amendment and T43–T46 move from Proposed to Accepted and are tracked in Linear
 blocked by DRA-193) and DRA-198, DRA-199, DRA-200 (T44–T46, each blocked by DRA-197), in the
 Application visual identity milestone, Backlog. Implementation is not authorized by this change.
 Why: the user approved the tasks and asked for the Linear issues with T43 blocking T44–T46 ("yes").
+
+## 2026-10-26 · Change
+
+`tasks.md` and `docs/visual-checks/dra-197.md` (T43 approval): the user explicitly approved the
+merged member ordering layout pilot as the basis for the manager rollout, T45. The manager screens
+use the existing Page, Panel, Notice, List and Action row patterns. The user asked for no screenshot
+work and offered to verify the finished layout, so T45 records browser geometry measurements and
+leaves aesthetic approval with the user.
+Why: the project requires explicit human approval of T43 before T45, and the user supplied it
+while selecting manager screens as the first area to improve.

@@ -25,6 +25,20 @@ export const checkedFiles = [
     'components/pickup/Adjustments.vue',
     'components/pickup/StockLines.vue',
     'components/pickup/ReturnLines.vue',
+    'pages/Manage/Accounts/Index.vue',
+    'pages/Manage/Households/Index.vue',
+    'pages/Manage/Households/Show.vue',
+    'pages/Manage/Producers/Index.vue',
+    'pages/Manage/Cycles/Index.vue',
+    'pages/Manage/Cycles/Show.vue',
+    'pages/Manage/Settings.vue',
+    'pages/Manage/Stock/Index.vue',
+    'pages/Manage/Stock/Create.vue',
+    'pages/Manage/Stock/Edit.vue',
+    'pages/Manage/Stock/Movements.vue',
+    'pages/Manage/ReturnItems/Index.vue',
+    'pages/Manage/ReturnItems/Create.vue',
+    'pages/Manage/ReturnItems/Edit.vue',
 ];
 
 const sources = import.meta.glob<string>('/resources/js/**/*.vue', {

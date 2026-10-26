@@ -19,7 +19,7 @@ defineOptions({
 <template>
     <Head :title="`Cycle ${summary.pickupDate}`" />
 
-    <div class="pilot-page pilot-manager-page">
+    <div class="pilot-page pilot-layout-page pilot-manager-page">
         <Heading
             :title="`Pickup ${summary.pickupDate}`"
             description="What was ordered, per producer and product"
@@ -43,7 +43,7 @@ defineOptions({
 
         <section
             v-if="!summary.cancelled"
-            class="flex flex-col gap-3"
+            class="flex flex-col gap-4"
             data-test="container-counts"
         >
             <h2 class="text-lg font-medium">
@@ -52,11 +52,11 @@ defineOptions({
             <p data-test="container-total">
                 {{ trans('Cycle total') }}: {{ containers.total }}
             </p>
-            <ul class="divide-y rounded-lg border">
+            <ul class="pilot-list">
                 <li
                     v-for="household in containers.households"
                     :key="household.householdId"
-                    class="flex items-center justify-between gap-3 p-3"
+                    class="flex items-center justify-between gap-4 p-4"
                     :data-test="`container-household-${household.householdId}`"
                 >
                     <span class="min-w-0 break-words">{{
@@ -70,16 +70,16 @@ defineOptions({
         <section
             v-for="producer in summary.producers"
             :key="producer.producerId"
-            class="flex flex-col gap-3"
+            class="flex flex-col gap-4"
             :data-test="`producer-${producer.producerId}`"
         >
             <h2 class="text-lg font-medium">{{ producer.producerName }}</h2>
 
-            <ul class="divide-y rounded-lg border">
+            <ul class="pilot-list">
                 <li
                     v-for="product in producer.products"
                     :key="product.productId"
-                    class="flex flex-col gap-2 p-3"
+                    class="flex flex-col gap-2 p-4"
                     :data-test="`product-${product.productId}`"
                 >
                     <div class="flex justify-between gap-2 font-medium">

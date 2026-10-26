@@ -36,17 +36,17 @@ const isManager = (account: App.Http.AccountRow) =>
 <template>
     <Head title="Accounts" />
 
-    <div class="pilot-page pilot-manager-page">
+    <div class="pilot-page pilot-layout-page pilot-manager-page">
         <Heading
             title="Accounts"
             description="Grant roles, link members to households and deactivate accounts"
         />
 
-        <ul class="divide-y rounded-lg border">
+        <ul class="pilot-list">
             <li
                 v-for="account in accounts"
                 :key="account.accountId"
-                class="flex flex-col gap-3 p-3"
+                class="flex flex-col gap-4 p-4"
             >
                 <div class="flex flex-wrap items-center justify-between gap-2">
                     <span>
@@ -83,7 +83,7 @@ const isManager = (account: App.Http.AccountRow) =>
                     }}
                 </p>
 
-                <div class="flex flex-wrap items-start gap-3">
+                <div class="pilot-action-row">
                     <Form
                         v-if="account.active"
                         v-bind="

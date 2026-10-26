@@ -27,7 +27,7 @@ defineProps<{
 <template>
     <Head title="Households" />
 
-    <div class="pilot-page pilot-manager-page">
+    <div class="pilot-page pilot-layout-page pilot-manager-page">
         <Heading
             title="Households"
             description="Create households and invite their members"
@@ -49,13 +49,13 @@ defineProps<{
 
         <section
             v-if="toSettle.length > 0"
-            class="grid gap-3"
+            class="grid gap-4"
             aria-labelledby="to-settle-heading"
         >
             <h2 id="to-settle-heading" class="text-lg font-medium">
                 {{ trans('To settle') }}
             </h2>
-            <ul class="grid gap-3">
+            <ul class="grid gap-4">
                 <li
                     v-for="settlement in toSettle"
                     :key="settlement.householdId"
@@ -76,11 +76,11 @@ defineProps<{
             There are no households yet.
         </p>
 
-        <ul v-else class="divide-y rounded-lg border">
+        <ul v-else class="pilot-list">
             <li
                 v-for="household in households"
                 :key="household.id"
-                class="flex items-center justify-between gap-4 p-3"
+                class="flex items-center justify-between gap-4 p-4"
             >
                 <Link
                     :href="HouseholdController.show(household.id)"

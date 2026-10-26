@@ -291,9 +291,13 @@
 
 .pilot-theme .pilot-layout-panel {
     display: flex;
-    min-width: 0;
     flex-direction: column;
     gap: 1rem;
+}
+
+.pilot-theme .pilot-layout-panel,
+.pilot-theme .pilot-manager-page > :is(form, section, ul) {
+    min-width: 0;
     padding: 1rem;
     border: 1px solid var(--border);
     border-radius: var(--radius);
@@ -414,7 +418,8 @@
     }
 
     .pilot-theme .pilot-layout-panel,
-    .pilot-theme .pilot-layout-notice {
+    .pilot-theme .pilot-layout-notice,
+    .pilot-theme .pilot-manager-page > :is(form, section, ul) {
         padding: 1.5rem;
     }
 }
@@ -438,15 +443,6 @@
 
 .pilot-theme .pilot-manager-page {
     container: manager-page / inline-size;
-}
-
-.pilot-theme .pilot-manager-page > :is(form, section, ul) {
-    min-width: 0;
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    background: var(--card);
-    color: var(--card-foreground);
-    padding: 1rem;
 }
 
 .pilot-theme .pilot-manager-page :is(form, section, ul, li) {
@@ -491,7 +487,7 @@
 
 .pilot-theme .pilot-manager-page > ul > li,
 .pilot-theme .pilot-manager-page > section > ul > li {
-    padding-block: 0.75rem;
+    padding-block: 1rem;
 }
 
 @container manager-page (max-width: 36rem) {
@@ -539,7 +535,7 @@
     .pilot-theme
         .pilot-manager-page
         input:is([type='date'], [type='datetime-local'], [type='time']) {
-        font-size: 0.875rem;
+        font-size: 1rem;
         padding-inline: 0.5rem;
     }
 }
