@@ -10,8 +10,8 @@ T41 is implemented for independent review with [rendered manager evidence](../..
 T37/T38 reconciliation is complete: T37 = DRA-195 and T38 = DRA-194, both Done with evidence.
 Their native prerequisite links to T39 / DRA-190 are recorded.
 
-Proposed amendment (2026-10-26): **Layout rules** below, pending the user's review. No tasks are
-approved or implemented by it.
+Accepted amendment (2026-10-26): **Layout rules** below, delivered by T43–T46 (DRA-197–DRA-200).
+Implementation is not yet authorized.
 
 ## Bootstrap
 
@@ -757,7 +757,7 @@ by this amendment; `spec.md`, the area requirements and the constitution are unc
 
 ## Layout rules
 
-**Status: Proposed (2026-10-26), pending the user's review.** Route: plan only, because this
+**Status: Accepted (2026-10-26).** Route: plan only, because this
 changes spacing, sizes and alignment without changing the spec's requirements or acceptance
 scenarios. It makes the [Application visual identity](#application-visual-identity) Layout bullet
 ("consistent spacing") concrete; palette, typography choices, scope and invariants stay as accepted.

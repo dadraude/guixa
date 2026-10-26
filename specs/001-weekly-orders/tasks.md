@@ -9,8 +9,8 @@ T40 is implemented with focused and rendered evidence. T41 is implemented for in
 with [rendered manager evidence](../../docs/visual-checks/dra-192.md); T42 is implemented for
 independent review with [rendered settings/authentication evidence](../../docs/visual-checks/dra-193.md).
 
-Proposed amendment (2026-10-26): **Layout rules — T43–T46**, pending the user's review; not yet
-tracked in Linear.
+Accepted amendment (2026-10-26): **Layout rules — T43–T46**, tracked in Linear as DRA-197–DRA-200.
+Implementation is not yet authorized.
 
 How to work a task:
 
@@ -328,10 +328,22 @@ completion dependency.
 
 ## Layout rules — T43–T46
 
-**Status: Proposed (2026-10-26), pending the user's review.** Implements the proposed
+**Status: Accepted (2026-10-26); implementation not yet authorized.** Implements the accepted
 [Layout rules](plan.md#layout-rules) amendment through the **plan only** route, as tracer bullets:
 T43 takes one flow from rules to tokens to screens to rendered check; T44–T46 reuse it per area.
-No new `R#` or `S#`. Not yet tracked in Linear.
+No new `R#` or `S#`.
+
+### Linear tracking (2026-10-26)
+
+Project [Coop](https://linear.app/draude/project/coop-f80f57e1496d), milestone **Application visual
+identity**. All four issues were created in **Backlog**, unassigned and without `ready-for-agent`.
+
+| Task | Linear issue | Native blocked-by relation | Additional gate |
+| --- | --- | --- | --- |
+| T43 | [DRA-197](https://linear.app/draude/issue/DRA-197/t43-layout-rules-tracer-on-member-ordering) | DRA-193 (T42, Done) | — |
+| T44 | [DRA-198](https://linear.app/draude/issue/DRA-198/t44-layout-rules-for-dashboard-wallet-and-producer-screens) | DRA-197 | Explicit visual approval of T43 |
+| T45 | [DRA-199](https://linear.app/draude/issue/DRA-199/t45-layout-rules-for-manager-screens) | DRA-197 | Explicit visual approval of T43 |
+| T46 | [DRA-200](https://linear.app/draude/issue/DRA-200/t46-layout-rules-for-settings-and-authentication-screens) | DRA-197 | Explicit visual approval of T43 |
 
 | ID | Task | Covers | After |
 | --- | --- | --- | --- |

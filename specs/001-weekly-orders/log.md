@@ -1192,3 +1192,11 @@ T44, T45 and T46 apply the rules to the T40, T41 and T42 inventories, each after
 independent of each other. T33's dependencies are unchanged. Not yet tracked in Linear.
 Why: follows the `plan.md` Layout rules change above. The user approved writing the plan amendment,
 tasks and log entry with these slices ("yes").
+
+## 2026-10-26 · Change
+
+`plan.md` and `tasks.md` (Layout rules status, headers; new Linear tracking table): the Layout rules
+amendment and T43–T46 move from Proposed to Accepted and are tracked in Linear as DRA-197 (T43,
+blocked by DRA-193) and DRA-198, DRA-199, DRA-200 (T44–T46, each blocked by DRA-197), in the
+Application visual identity milestone, Backlog. Implementation is not authorized by this change.
+Why: the user approved the tasks and asked for the Linear issues with T43 blocking T44–T46 ("yes").
