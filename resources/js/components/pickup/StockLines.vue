@@ -33,7 +33,7 @@ const submit = () => {
 </script>
 
 <template>
-    <section class="flex flex-col gap-3" data-test="stock-lines">
+    <section class="flex flex-col gap-4" data-test="stock-lines">
         <h3 class="text-base font-medium">{{ trans('Stock') }}</h3>
 
         <p
@@ -44,21 +44,23 @@ const submit = () => {
             {{ trans('No stock has been added to this pickup.') }}
         </p>
 
-        <ul class="divide-y">
+        <ul class="pilot-list">
             <li
                 v-for="line in lines"
                 :key="line.stockProductId"
-                class="flex flex-wrap items-center justify-between gap-2 py-2"
+                class="pilot-list-row"
                 :data-test="`stock-line-${line.stockProductId}`"
             >
-                <div class="flex min-w-0 flex-col">
+                <div class="pilot-list-row-body">
                     <span>{{ line.name }}</span>
                     <span class="text-xs text-muted-foreground">
                         {{ line.quantity }} {{ line.unit }} ·
                         {{ euros(line.unitPriceCents) }} / {{ line.unit }}
                     </span>
                 </div>
-                <span data-test="amount">{{ euros(line.amountCents) }}</span>
+                <span class="pilot-amount" data-test="amount">{{
+                    euros(line.amountCents)
+                }}</span>
                 <Button
                     v-if="editable"
                     type="button"
@@ -82,7 +84,7 @@ const submit = () => {
         >
             <select
                 v-model="productId"
-                class="h-11 min-w-0 flex-1 rounded-md border border-input bg-transparent px-3 text-base"
+                class="h-11 min-w-0 flex-1 rounded-md border border-input bg-transparent px-2 text-base"
                 :aria-label="trans('Stock product')"
                 data-test="stock-product"
             >

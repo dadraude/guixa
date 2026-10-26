@@ -83,10 +83,10 @@ const lineTotal = (price: string, quantity: string) =>
 
 <template>
     <Head :title="trans('Order')" />
-    <div class="mx-auto flex w-full max-w-5xl flex-col gap-6 p-4 sm:p-8">
+    <div class="pilot-layout-page mx-auto max-w-5xl">
         <Link
             :href="OrderController.index.url()"
-            class="inline-flex min-h-11 w-fit items-center gap-2 rounded-md px-2 text-sm font-medium hover:bg-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+            class="-ml-2 inline-flex min-h-11 w-fit items-center gap-2 rounded-md px-2 text-sm font-medium hover:bg-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
         >
             <ArrowLeft class="size-4" aria-hidden="true" />{{
                 trans('Back to orders')
@@ -103,7 +103,7 @@ const lineTotal = (price: string, quantity: string) =>
         <InputError :message="domainError" role="alert" class="pilot-error" />
         <p
             v-if="order.cancelled"
-            class="rounded-2xl border border-dashed bg-muted/50 p-6 font-medium"
+            class="pilot-layout-notice font-medium"
             data-test="order-cancelled"
         >
             {{
@@ -114,35 +114,35 @@ const lineTotal = (price: string, quantity: string) =>
         </p>
         <p
             v-else-if="order.producers.length === 0"
-            class="rounded-2xl border border-dashed p-6 text-muted-foreground"
+            class="pilot-layout-notice text-muted-foreground"
         >
             {{ trans('No producer takes part in this cycle yet.') }}
         </p>
         <section
             v-if="order.pickup"
-            class="min-w-0 overflow-hidden rounded-2xl border bg-card text-card-foreground shadow-xs"
+            class="pilot-layout-panel"
             data-test="pickup"
         >
-            <h2
-                class="pilot-heading border-b bg-muted/40 p-4 text-xl font-semibold sm:px-5"
-            >
-                {{ trans('Your pickup') }}
-            </h2>
+            <div class="pilot-layout-panel-header">
+                <h2 class="pilot-heading text-lg font-semibold">
+                    {{ trans('Your pickup') }}
+                </h2>
+            </div>
             <p
                 v-if="order.pickup.status === 'nothing_to_collect'"
-                class="p-4 text-muted-foreground sm:px-5"
+                class="text-muted-foreground"
                 data-test="pickup-nothing"
             >
                 {{ trans('There is nothing to collect in this pickup.') }}
             </p>
-            <ul v-else class="divide-y">
+            <ul v-else class="pilot-list">
                 <li
                     v-for="line in order.pickup.lines"
                     :key="line.productId"
-                    class="flex flex-wrap items-center justify-between gap-2 p-4 sm:px-5"
+                    class="pilot-list-row"
                     :data-test="`pickup-line-${line.productId}`"
                 >
-                    <div class="flex min-w-0 flex-col">
+                    <div class="pilot-list-row-body">
                         <span class="font-medium wrap-anywhere">{{
                             line.name
                         }}</span>
@@ -160,14 +160,14 @@ const lineTotal = (price: string, quantity: string) =>
                             {{ cents(line.unitPriceCents) }}
                         </span>
                     </div>
-                    <span data-test="pickup-line-amount">{{
+                    <span class="pilot-amount" data-test="pickup-line-amount">{{
                         cents(line.amountCents)
                     }}</span>
                 </li>
             </ul>
             <div
                 v-if="order.pickup.stockLines.length > 0"
-                class="border-t p-4 sm:px-5"
+                class="pilot-layout-panel-section"
             >
                 <StockLines
                     :lines="order.pickup.stockLines"
@@ -178,7 +178,7 @@ const lineTotal = (price: string, quantity: string) =>
             </div>
             <div
                 v-if="order.pickup.returnLines.length > 0"
-                class="border-t p-4 sm:px-5"
+                class="pilot-layout-panel-section"
             >
                 <ReturnLines
                     :lines="order.pickup.returnLines"
@@ -189,16 +189,16 @@ const lineTotal = (price: string, quantity: string) =>
             </div>
             <div
                 v-if="order.pickup.originalChargeCents != null"
-                class="border-t p-4 sm:px-5"
+                class="pilot-layout-panel-section"
             >
                 <Adjustments
                     :lines="order.pickup.adjustments ?? []"
                     :original-charge-cents="order.pickup.originalChargeCents"
                 />
             </div>
-            <p class="flex justify-between border-t p-4 font-semibold sm:px-5">
+            <p class="pilot-layout-panel-section pilot-total-row font-semibold">
                 <span>{{ trans('Pickup total') }}</span>
-                <span data-test="pickup-total">{{
+                <span class="pilot-amount" data-test="pickup-total">{{
                     cents(order.pickup.totalCents)
                 }}</span>
             </p>
@@ -215,18 +215,16 @@ const lineTotal = (price: string, quantity: string) =>
             <section
                 v-for="group in groups"
                 :key="group.producerId"
-                class="min-w-0 overflow-hidden rounded-2xl border bg-card text-card-foreground shadow-xs"
+                class="pilot-layout-panel"
             >
-                <div
-                    class="flex flex-wrap items-center justify-between gap-3 border-b bg-muted/40 p-4 sm:px-5"
-                >
+                <div class="pilot-layout-panel-header">
                     <h2
-                        class="pilot-heading min-w-0 text-xl font-semibold wrap-anywhere"
+                        class="pilot-heading min-w-0 text-lg font-semibold wrap-anywhere"
                     >
                         {{ group.producerName }}
                     </h2>
                     <span
-                        class="rounded-full border px-3 py-1 text-sm font-medium"
+                        class="rounded-full border px-2 py-1 text-sm font-medium"
                         :class="
                             group.open
                                 ? 'bg-primary text-primary-foreground'
@@ -236,13 +234,10 @@ const lineTotal = (price: string, quantity: string) =>
                         {{ group.open ? trans('Open') : trans('Closed') }}
                     </span>
                 </div>
-                <p
-                    v-if="group.rows.length === 0"
-                    class="p-5 text-muted-foreground"
-                >
+                <p v-if="group.rows.length === 0" class="text-muted-foreground">
                     {{ trans('Nothing to order from this producer.') }}
                 </p>
-                <ul v-else class="divide-y">
+                <ul v-else class="pilot-list">
                     <OrderProductRow
                         v-for="row in group.rows"
                         :key="row.productId"
@@ -264,11 +259,11 @@ const lineTotal = (price: string, quantity: string) =>
             </section>
         </template>
         <div
-            class="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-primary p-5 text-primary-foreground sm:p-6"
+            class="pilot-layout-panel pilot-layout-total pilot-total-row"
             data-test="order-total"
         >
             <span class="text-lg font-medium">{{ trans('Total') }}</span>
-            <span class="text-2xl font-semibold tabular-nums">{{
+            <span class="pilot-amount text-2xl font-semibold">{{
                 formatMoney(total)
             }}</span>
         </div>

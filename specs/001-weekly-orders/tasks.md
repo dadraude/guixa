@@ -10,7 +10,7 @@ with [rendered manager evidence](../../docs/visual-checks/dra-192.md); T42 is im
 independent review with [rendered settings/authentication evidence](../../docs/visual-checks/dra-193.md).
 
 Accepted amendment (2026-10-26): **Layout rules — T43–T46**, tracked in Linear as DRA-197–DRA-200.
-Implementation is not yet authorized.
+T43 implementation was authorized on 2026-10-26; T44–T46 remain gated.
 
 How to work a task:
 
@@ -328,7 +328,8 @@ completion dependency.
 
 ## Layout rules — T43–T46
 
-**Status: Accepted (2026-10-26); implementation not yet authorized.** Implements the accepted
+**Status: Accepted (2026-10-26); the user authorized T43 implementation on 2026-10-26; T44–T46 stay
+gated on T43's explicit visual approval.** Implements the accepted
 [Layout rules](plan.md#layout-rules) amendment through the **plan only** route, as tracer bullets:
 T43 takes one flow from rules to tokens to screens to rendered check; T44–T46 reuse it per area.
 No new `R#` or `S#`.

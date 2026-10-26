@@ -7,12 +7,12 @@ defineProps<{ cycle: App.Http.MemberCycleRow }>();
 </script>
 
 <template>
-    <div class="flex min-h-24 items-center gap-4 p-4 sm:p-5">
+    <div class="flex items-center gap-4">
         <CalendarDays
             class="size-6 shrink-0 text-muted-foreground"
             aria-hidden="true"
         />
-        <div class="min-w-0 flex-1 space-y-1 wrap-anywhere">
+        <div class="min-w-0 flex-1 space-y-2 wrap-anywhere">
             <p class="font-semibold">
                 {{
                     trans('Pickup on :date', {
