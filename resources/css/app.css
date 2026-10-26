@@ -952,6 +952,29 @@
     }
 }
 
+@container pilot-manager (min-width: 36rem) and (max-width: 58rem) {
+    .pilot-theme .pilot-manager-table tbody tr {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.5rem 1rem;
+        align-items: start;
+    }
+
+    .pilot-theme .pilot-manager-table td {
+        min-width: 0;
+    }
+
+    .pilot-theme .pilot-manager-table td:last-child {
+        grid-column: 1 / -1;
+    }
+}
+
+@container pilot-manager (min-width: 42rem) and (max-width: 58rem) {
+    .pilot-theme .pilot-manager-table tbody tr {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
 @container pilot-wallet (max-width: 52rem) {
     .pilot-theme .pilot-wallet-table,
     .pilot-theme .pilot-wallet-table tbody,

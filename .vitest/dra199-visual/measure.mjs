@@ -15,6 +15,11 @@ const populatedCases = [
     { width: 1280, mode: 'dark', text: 100 },
 ];
 const cyclePreviewCase = { width: 729, mode: 'light', text: 100 };
+const managerTablePreviewCases = [680, 729, 1024].map((width) => ({
+    width,
+    mode: 'light',
+    text: 100,
+}));
 const presentationOnlyStates = new Set([
     'populated',
     'blank',
@@ -24,6 +29,13 @@ const presentationOnlyStates = new Set([
 ]);
 
 const allCases = views.flatMap((view) => [
+    ...(['stock', 'return-items'].includes(view.id)
+        ? managerTablePreviewCases.map((dimensions) => ({
+              view,
+              state: view.states.find((state) => state.id === 'populated'),
+              ...dimensions,
+          }))
+        : []),
     ...(view.id === 'cycles'
         ? [
               {
@@ -58,6 +70,17 @@ const cases = process.argv.includes('--cycle-only')
               (item.width === 729 || item.width === 1280) &&
               item.mode === 'light',
       )
+    : process.argv.includes('--tables-only')
+      ? allCases.filter(
+            (item) =>
+                ['stock', 'return-items'].includes(item.view.id) &&
+                item.state.id === 'populated' &&
+                item.mode === 'light' &&
+                item.text === 100 &&
+                managerTablePreviewCases.some(
+                    (dimensions) => dimensions.width === item.width,
+                ),
+        )
     : allCases;
 
 const browser = await openChrome();
@@ -211,6 +234,38 @@ try {
                 issues.push(`Cycle card horizontal inset difference: ${cycle.insetDifference}px`);
             if (cycle.topInsetDifference === null || Math.abs(cycle.topInsetDifference) > 1)
                 issues.push(`Cycle card top inset difference: ${cycle.topInsetDifference}px`);
+        }
+        if (
+            ['stock', 'return-items'].includes(view.id) &&
+            state.id === 'populated' &&
+            mode === 'light' &&
+            text === 100 &&
+            managerTablePreviewCases.some(
+                (dimensions) => dimensions.width === width,
+            )
+        ) {
+            const row = await browser.evaluate(`(() => {
+                const first = document.querySelector('.pilot-manager-table tbody tr');
+                const cells = [...first.querySelectorAll('td')];
+                return {
+                    height: first.getBoundingClientRect().height,
+                    columns: new Set(cells.map((cell) =>
+                        Math.round(cell.getBoundingClientRect().left)
+                    )).size,
+                };
+            })()`);
+            if (row.columns < 2)
+                issues.push(`Manager table card has ${row.columns} column`);
+            const maxHeight =
+                view.id === 'stock'
+                    ? width < 700
+                        ? 300
+                        : 270
+                    : width < 700
+                      ? 230
+                      : 190;
+            if (row.height > maxHeight)
+                issues.push(`Manager table card height: ${row.height}px`);
         }
         if (issues.length) {
             failed++;
