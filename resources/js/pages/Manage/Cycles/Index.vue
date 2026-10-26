@@ -76,7 +76,7 @@ function cutoffLabel(value: string | null) {
 <template>
     <Head title="Cicles" />
     <div class="pilot-page pilot-layout-page pilot-manager-page">
-        <div class="flex flex-wrap items-end justify-between gap-3">
+        <div class="flex flex-wrap items-end justify-between gap-4">
             <Heading title="Cicles" :description="pageDescription" />
             <Button
                 class="min-h-11"
@@ -95,13 +95,13 @@ function cutoffLabel(value: string | null) {
             <li
                 v-for="cycle in cycles"
                 :key="cycle.id"
-                class="grid gap-3"
+                class="grid gap-4"
                 :data-test="`cycle-${cycle.id}`"
             >
                 <div
-                    class="flex flex-wrap items-center justify-between gap-3 border-b pb-3"
+                    class="flex flex-wrap items-center justify-between gap-4 border-b pb-4"
                 >
-                    <div class="flex flex-wrap items-center gap-3">
+                    <div class="flex flex-wrap items-center gap-4">
                         <h2 class="text-lg font-semibold">
                             Recollida {{ dateLabel(cycle.pickupDate) }}
                         </h2>

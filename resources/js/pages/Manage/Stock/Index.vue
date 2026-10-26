@@ -38,7 +38,7 @@ function editProduct(product: App.Http.StockLevelRow, event: MouseEvent) {
 <template>
     <Head title="Estoc" />
     <div class="pilot-page pilot-layout-page pilot-manager-page">
-        <div class="flex flex-wrap items-end justify-between gap-3">
+        <div class="flex flex-wrap items-end justify-between gap-4">
             <Heading
                 title="Estoc"
                 description="Productes per a la recollida."
@@ -56,7 +56,7 @@ function editProduct(product: App.Http.StockLevelRow, event: MouseEvent) {
             Encara no hi ha productes d’estoc.
         </p>
         <section v-else class="manager-stock-list">
-            <div class="flex flex-wrap items-end justify-between gap-3 pb-3">
+            <div class="flex flex-wrap items-end justify-between gap-4 pb-4">
                 <div>
                     <h2 class="text-lg font-semibold">Productes</h2>
                     <p class="text-sm text-muted-foreground">
@@ -84,7 +84,7 @@ function editProduct(product: App.Http.StockLevelRow, event: MouseEvent) {
                 <li v-for="product in filteredProducts" :key="product.id">
                     <button
                         type="button"
-                        class="flex min-h-16 w-full items-center justify-between gap-3 py-2 text-left"
+                        class="flex min-h-16 w-full items-center justify-between gap-4 py-2 text-left"
                         :aria-label="`Edita ${product.name}`"
                         @click="editProduct(product, $event)"
                     >
@@ -122,12 +122,12 @@ function editProduct(product: App.Http.StockLevelRow, event: MouseEvent) {
                 <table class="w-full text-left text-sm">
                     <thead class="bg-muted/50 text-xs uppercase">
                         <tr>
-                            <th scope="col" class="px-3 py-2">Producte</th>
-                            <th scope="col" class="px-3 py-2">Unitat</th>
-                            <th scope="col" class="px-3 py-2">Preu</th>
-                            <th scope="col" class="px-3 py-2">Disponible</th>
-                            <th scope="col" class="px-3 py-2">Estat</th>
-                            <th scope="col" class="px-3 py-2">Accions</th>
+                            <th scope="col" class="px-2 py-2">Producte</th>
+                            <th scope="col" class="px-2 py-2">Unitat</th>
+                            <th scope="col" class="px-2 py-2">Preu</th>
+                            <th scope="col" class="px-2 py-2">Disponible</th>
+                            <th scope="col" class="px-2 py-2">Estat</th>
+                            <th scope="col" class="px-2 py-2">Accions</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y">
@@ -135,20 +135,20 @@ function editProduct(product: App.Http.StockLevelRow, event: MouseEvent) {
                             v-for="product in filteredProducts"
                             :key="product.id"
                         >
-                            <th scope="row" class="px-3 py-2 font-medium">
+                            <th scope="row" class="px-2 py-2 font-medium">
                                 {{ product.name }}
                             </th>
-                            <td class="px-3 py-2">{{ product.unit }}</td>
-                            <td class="px-3 py-2 tabular-nums">
+                            <td class="px-2 py-2">{{ product.unit }}</td>
+                            <td class="px-2 py-2 tabular-nums">
                                 {{ formatEuroAmount(product.price) }}
                             </td>
-                            <td class="px-3 py-2 tabular-nums">
+                            <td class="px-2 py-2 tabular-nums">
                                 {{ product.available }}
                             </td>
-                            <td class="px-3 py-2">
+                            <td class="px-2 py-2">
                                 {{ product.active ? 'Actiu' : 'Inactiu' }}
                             </td>
-                            <td class="px-3 py-2">
+                            <td class="px-2 py-2">
                                 <div class="flex gap-2">
                                     <Button
                                         variant="outline"
