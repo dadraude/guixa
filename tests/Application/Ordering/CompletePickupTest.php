@@ -20,7 +20,6 @@ use Guixa\Ordering\Domain\ReceptionLoader;
 use Guixa\Ordering\Domain\StockLine;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Error\NotAllowed;
-use Guixa\Shared\Domain\Role;
 use Guixa\Wallet\Domain\Error\InvalidTopUpAmount;
 use Tests\Support\InMemory\ImmediateTransactionRunner;
 use Tests\Support\Ordering\OrderingWorld;
@@ -36,8 +35,8 @@ beforeEach(function () {
     $this->bread = $this->world->catalog->offer(OrderingWorld::BAKER, 'Bread', 'loaf', 300, variable: false);
     $this->beef = $this->world->catalog->offer(OrderingWorld::BAKER, 'Beef', 'kg', 2000, variable: true);
     $this->cycleId = ($this->world->openCycle)($this->world->manager, '2026-11-07', [OrderingWorld::BAKER]);
-    $this->memberA = new Actor('00000000-0000-7000-8000-0000000000a1', [Role::Member], COMPLETE_A);
-    $this->baker = new Actor('00000000-0000-7000-8000-0000000000a2', [Role::Producer], null, OrderingWorld::BAKER);
+    $this->memberA = Actor::memberOf('00000000-0000-7000-8000-0000000000a1', COMPLETE_A);
+    $this->baker = Actor::producer('00000000-0000-7000-8000-0000000000a2', OrderingWorld::BAKER);
 
     $transactions = new ImmediateTransactionRunner;
     $loader = new ReceptionLoader($this->world->orders, $this->world->catalog, $this->world->availability, $this->world->receivedTotals);
@@ -273,7 +272,7 @@ it('completes a late pickup after the pickup date with the next cycle already op
 })->group('R19', 'S26');
 
 it('can be done by a manager only, and only for a settled cycle and an existing pickup (R22)', function () {
-    $member = new Actor('00000000-0000-7000-8000-0000000000a1', [Role::Member], COMPLETE_A);
+    $member = Actor::memberOf('00000000-0000-7000-8000-0000000000a1', COMPLETE_A);
     $complete = fn (Actor $actor, string $cycle, string $household) => ($this->world->completePickup)($actor, $cycle, $household, null);
 
     expect(fn () => $complete($this->world->manager, $this->cycleId, COMPLETE_A))->toThrow(CycleNotSettled::class)

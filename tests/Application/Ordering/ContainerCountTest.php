@@ -11,7 +11,6 @@ use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Error\NotAllowed;
 use Guixa\Shared\Domain\Money;
 use Guixa\Shared\Domain\Quantity;
-use Guixa\Shared\Domain\Role;
 use Tests\Support\InMemory\ImmediateTransactionRunner;
 use Tests\Support\Ordering\OrderingWorld;
 
@@ -23,8 +22,8 @@ beforeEach(function () {
     $this->world->households->know(CONTAINER_H, 'Household H');
     $this->world->households->know(CONTAINER_K, 'Household K');
     $this->cycleId = ($this->world->openCycle)($this->world->manager, '2026-11-07', [OrderingWorld::BAKER]);
-    $this->h = new Actor('00000000-0000-7000-8000-0000000000a1', [Role::Member], CONTAINER_H);
-    $this->k = new Actor('00000000-0000-7000-8000-0000000000a2', [Role::Member], CONTAINER_K);
+    $this->h = Actor::memberOf('00000000-0000-7000-8000-0000000000a1', CONTAINER_H);
+    $this->k = Actor::memberOf('00000000-0000-7000-8000-0000000000a2', CONTAINER_K);
 });
 
 it('counts rounded snapshotted allocation and stock lines per household and cycle (R1, R10, R18a, R20, R25, S60)', function () {
@@ -104,7 +103,7 @@ it('derives unsent not-delivered marks and restores counts when the cause clears
     $bread = $this->world->catalog->offer(OrderingWorld::BAKER, 'Bread', 'loaf', 300, false, '1');
     ($this->world->setOrderLine)($this->h, $this->cycleId, $bread, '2');
     $count = fn () => ($this->world->getContainerCount)($this->world->manager, $this->cycleId)->total;
-    $baker = new Actor('00000000-0000-7000-8000-0000000000b3', [Role::Producer], null, OrderingWorld::BAKER);
+    $baker = Actor::producer('00000000-0000-7000-8000-0000000000b3', OrderingWorld::BAKER);
 
     expect($count())->toBe(2);
     $this->world->catalog->deactivate($bread);

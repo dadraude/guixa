@@ -19,7 +19,6 @@ use Guixa\Catalog\Application\ReactivateProduct;
 use Guixa\Catalog\Application\SetDefaultCutoff;
 use Guixa\Catalog\Application\UpdateProduct;
 use Guixa\Shared\Application\Actor;
-use Guixa\Shared\Domain\Role;
 use Tests\Support\FrozenClock;
 use Tests\Support\InMemory\FakeProducerAccess;
 use Tests\Support\InMemory\FakeProducerCycles;
@@ -101,11 +100,11 @@ final class CatalogWorld
         $this->listProducerProductsForReception = new ListProducerProductsForReception($this->products);
         $this->getProducerCutoffRule = new GetProducerCutoffRule($this->producers);
 
-        $this->manager = new Actor('00000000-0000-7000-8000-00000000000a', [Role::Manager]);
+        $this->manager = Actor::manager('00000000-0000-7000-8000-00000000000a');
     }
 
     public function producerActor(string $producerId): Actor
     {
-        return new Actor('00000000-0000-7000-8000-0000000000aa', [Role::Producer], null, $producerId);
+        return Actor::producer('00000000-0000-7000-8000-0000000000aa', $producerId);
     }
 }

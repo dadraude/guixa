@@ -14,7 +14,7 @@ use Tests\Support\InMemory\InMemoryReturnItemRepository;
 
 beforeEach(function () {
     $this->items = new InMemoryReturnItemRepository;
-    $this->manager = new Actor('manager-account', [Role::Manager]);
+    $this->manager = Actor::manager('manager-account');
     $this->create = new CreateReturnItem($this->items);
     $this->update = new UpdateReturnItem($this->items);
     $this->deactivate = new DeactivateReturnItem($this->items);

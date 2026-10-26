@@ -49,7 +49,6 @@ use Guixa\Ordering\Infrastructure\Stock\StockModuleStockSeller;
 use Guixa\Ordering\Infrastructure\Wallet\WalletModuleLedger;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Money;
-use Guixa\Shared\Domain\Role;
 use Guixa\Stock\Application\GetReturnItem;
 use Guixa\Stock\Application\GetStockOffer;
 use Guixa\Stock\Application\RecordStockEntry;
@@ -245,7 +244,7 @@ final class OrderingWorld
         $this->openPickup = new OpenPickup($this->cycles, $this->orders, $this->households, $transactions);
         $this->adjustDeliveredQuantity = new AdjustDeliveredQuantity($this->cycles, $this->orders, $transactions);
 
-        $this->manager = new Actor('00000000-0000-7000-8000-00000000000a', [Role::Manager]);
+        $this->manager = Actor::manager('00000000-0000-7000-8000-00000000000a');
 
         // Stock is the real Stock module over in-memory repositories, reached through Ordering's adapters.
         $this->stockProducts = new InMemoryStockProductRepository;
@@ -317,7 +316,7 @@ final class OrderingWorld
 
     public function member(): Actor
     {
-        return new Actor('00000000-0000-7000-8000-0000000000cc', [Role::Member], '00000000-0000-7000-8000-0000000000dd');
+        return Actor::memberOf('00000000-0000-7000-8000-0000000000cc', '00000000-0000-7000-8000-0000000000dd');
     }
 }
 

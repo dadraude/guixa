@@ -12,7 +12,7 @@ beforeEach(function () {
     // Thursday 22 October 2026; the baker closes on Wednesday 4 November at 20:00 for the 7 November pickup.
     $this->world = new OrderingWorld('2026-10-22 10:00');
     $this->bread = $this->world->catalog->offer(OrderingWorld::BAKER, 'Loaf', 'loaf', 350, variable: false);
-    $this->anna = new Actor(MEMBER_ANNA, [Role::Member], MEMBER_HOUSEHOLD);
+    $this->anna = Actor::memberOf(MEMBER_ANNA, MEMBER_HOUSEHOLD);
     $this->list = fn (?Actor $actor = null) => ($this->world->listMemberCycles)($actor ?? $this->anna);
 });
 
@@ -56,7 +56,7 @@ it('tells how many lines the household has placed in each cycle before it is set
 it('does not count the lines of another household (R7)', function () {
     $cycleId = ($this->world->openCycle)($this->world->manager, '2026-11-07', [OrderingWorld::BAKER]);
     ($this->world->setOrderLine)($this->anna, $cycleId, $this->bread, '2');
-    $other = new Actor('00000000-0000-7000-8000-0000000000a2', [Role::Member], '00000000-0000-7000-8000-0000000000e2');
+    $other = Actor::memberOf('00000000-0000-7000-8000-0000000000a2', '00000000-0000-7000-8000-0000000000e2');
 
     expect(($this->list)($other)[0]->lineCount)->toBe(0);
 });

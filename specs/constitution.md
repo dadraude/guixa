@@ -74,6 +74,9 @@ iterating over every context. A rule change edits this list first.
   never call `router`, `axios` or `fetch`, and never import `@inertiajs/*`. Enforced with Oxlint
   `no-restricted-imports` / `no-restricted-globals`.
   The starter-kit components that predate this rule are listed as exceptions in `vite.config.ts`.
+- **A10 — Actors come from the entry point.** Outside `src/Shared`, nothing in `src/` or `app/` builds
+  an `Actor`; it arrives from `ActorResolver` at the user entry point. A context that needs another
+  context's data calls an internal query that takes no actor, instead of forging one.
 
 ## Principles
 

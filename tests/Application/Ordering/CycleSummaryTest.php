@@ -3,7 +3,6 @@
 use Guixa\Ordering\Domain\Error\CycleNotFound;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Error\NotAllowed;
-use Guixa\Shared\Domain\Role;
 use Tests\Support\Ordering\OrderingWorld;
 
 const SUMMARY_HOUSEHOLD_A = '00000000-0000-7000-8000-0000000000e1';
@@ -11,7 +10,7 @@ const SUMMARY_HOUSEHOLD_B = '00000000-0000-7000-8000-0000000000e2';
 
 function summaryMember(string $accountId, string $householdId): Actor
 {
-    return new Actor($accountId, [Role::Member], $householdId);
+    return Actor::memberOf($accountId, $householdId);
 }
 
 beforeEach(function () {

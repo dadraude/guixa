@@ -26,7 +26,6 @@ use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Error\InvalidQuantity;
 use Guixa\Shared\Domain\Error\NotAllowed;
 use Guixa\Shared\Domain\Money;
-use Guixa\Shared\Domain\Role;
 use Tests\Support\InMemory\ImmediateTransactionRunner;
 use Tests\Support\Ordering\OrderingWorld;
 
@@ -43,7 +42,7 @@ beforeEach(function () {
     $this->bread = $this->world->catalog->offer(OrderingWorld::BAKER, 'Bread', 'loaf', 300, variable: false);
     $this->beef = $this->world->catalog->offer(OrderingWorld::BAKER, 'Beef', 'kg', 2000, variable: true);
     $this->cycleId = ($this->world->openCycle)($this->world->manager, '2026-11-07', [OrderingWorld::BAKER]);
-    $this->memberA = new Actor('00000000-0000-7000-8000-0000000000a1', [Role::Member], PICKUP_A);
+    $this->memberA = Actor::memberOf('00000000-0000-7000-8000-0000000000a1', PICKUP_A);
 
     $transactions = new ImmediateTransactionRunner;
     $loader = new ReceptionLoader($this->world->orders, $this->world->catalog, $this->world->availability, $this->world->receivedTotals);

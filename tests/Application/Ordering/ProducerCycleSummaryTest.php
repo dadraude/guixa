@@ -19,10 +19,10 @@ beforeEach(function () {
     $this->jam = $this->world->catalog->offer(OrderingWorld::BAKER, 'Jam', 'jar', 400, variable: false);
     $this->apples = $this->world->catalog->offer(OrderingWorld::GROWER, 'Apples', 'kg', 300, variable: true);
     $this->cycleId = ($this->world->openCycle)($this->world->manager, '2026-11-07', [OrderingWorld::BAKER, OrderingWorld::GROWER]);
-    $this->anna = new Actor(PRODUCER_SUMMARY_ANNA, [Role::Member], PRODUCER_SUMMARY_HOUSEHOLD_A);
-    $this->biel = new Actor(PRODUCER_SUMMARY_BIEL, [Role::Member], PRODUCER_SUMMARY_HOUSEHOLD_B);
-    $this->baker = new Actor('00000000-0000-7000-8000-0000000000aa', [Role::Producer], null, OrderingWorld::BAKER);
-    $this->grower = new Actor('00000000-0000-7000-8000-0000000000ab', [Role::Producer], null, OrderingWorld::GROWER);
+    $this->anna = Actor::memberOf(PRODUCER_SUMMARY_ANNA, PRODUCER_SUMMARY_HOUSEHOLD_A);
+    $this->biel = Actor::memberOf(PRODUCER_SUMMARY_BIEL, PRODUCER_SUMMARY_HOUSEHOLD_B);
+    $this->baker = Actor::producer('00000000-0000-7000-8000-0000000000aa', OrderingWorld::BAKER);
+    $this->grower = Actor::producer('00000000-0000-7000-8000-0000000000ab', OrderingWorld::GROWER);
     $this->order = fn (Actor $member, string $productId, string $quantity) => ($this->world->setOrderLine)($member, $this->cycleId, $productId, $quantity);
     $this->closeBaker = fn () => ($this->world->closeProducerNow)($this->world->manager, $this->cycleId, OrderingWorld::BAKER);
     $this->sendBaker = fn () => ($this->world->sendProducerOrder)($this->world->manager, $this->cycleId, OrderingWorld::BAKER);
@@ -68,7 +68,7 @@ it('keeps a sent order unchanged when a product is deactivated afterwards (R3a, 
 });
 
 it('is for the producer of the cycle only, not for another producer, a manager or a member (R2, S7)', function () {
-    $other = new Actor('00000000-0000-7000-8000-0000000000ac', [Role::Producer], null, '00000000-0000-7000-8000-0000000000b9');
+    $other = Actor::producer('00000000-0000-7000-8000-0000000000ac', '00000000-0000-7000-8000-0000000000b9');
 
     expect(fn () => ($this->summary)($this->world->manager))->toThrow(NotAllowed::class)
         ->and(fn () => ($this->summary)($this->anna))->toThrow(NotAllowed::class)

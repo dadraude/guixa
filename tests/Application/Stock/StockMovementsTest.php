@@ -33,7 +33,7 @@ beforeEach(function () {
     $this->clock = new FrozenClock('2026-10-22 10:00:00');
     $ledger = new StockLedger($this->movements);
     $transactions = new ImmediateTransactionRunner;
-    $this->manager = new Actor('manager-account', [Role::Manager]);
+    $this->manager = Actor::manager('manager-account');
 
     $this->entry = new RecordStockEntry($this->products, $this->movements, $ledger, $transactions, $this->clock);
     $this->adjust = new RecordStockAdjustment($this->products, $this->movements, $ledger, $transactions, $this->clock);

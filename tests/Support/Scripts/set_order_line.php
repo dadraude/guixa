@@ -8,7 +8,6 @@
 
 use Guixa\Ordering\Application\SetOrderLine;
 use Guixa\Shared\Application\Actor;
-use Guixa\Shared\Domain\Role;
 use Illuminate\Contracts\Console\Kernel;
 
 require dirname(__DIR__, 3).'/vendor/autoload.php';
@@ -17,7 +16,7 @@ $app = require dirname(__DIR__, 3).'/bootstrap/app.php';
 $app->make(Kernel::class)->bootstrap();
 
 try {
-    $app->make(SetOrderLine::class)(new Actor($argv[1], [Role::Member], $argv[2]), $argv[3], $argv[4], $argv[5]);
+    $app->make(SetOrderLine::class)(Actor::memberOf($argv[1], $argv[2]), $argv[3], $argv[4], $argv[5]);
     echo 'set';
 } catch (Throwable $e) {
     echo (new ReflectionClass($e))->getShortName();

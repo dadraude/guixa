@@ -22,7 +22,6 @@ use Guixa\Ordering\Domain\PickupStatus;
 use Guixa\Ordering\Domain\ReceptionLoader;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Error\NotAllowed;
-use Guixa\Shared\Domain\Role;
 use Tests\Support\InMemory\ImmediateTransactionRunner;
 use Tests\Support\Ordering\OrderingWorld;
 
@@ -41,9 +40,9 @@ beforeEach(function () {
     $this->apples = $this->world->catalog->offer(OrderingWorld::GROWER, 'Apples', 'kg', 280, variable: true);
     $this->cycleId = ($this->world->openCycle)($this->world->manager, '2026-11-07', [OrderingWorld::BAKER, OrderingWorld::GROWER]);
     $this->households = [
-        'A' => new Actor('00000000-0000-7000-8000-0000000000a1', [Role::Member], DIST_A),
-        'B' => new Actor('00000000-0000-7000-8000-0000000000a2', [Role::Member], DIST_B),
-        'C' => new Actor('00000000-0000-7000-8000-0000000000a3', [Role::Member], DIST_C),
+        'A' => Actor::memberOf('00000000-0000-7000-8000-0000000000a1', DIST_A),
+        'B' => Actor::memberOf('00000000-0000-7000-8000-0000000000a2', DIST_B),
+        'C' => Actor::memberOf('00000000-0000-7000-8000-0000000000a3', DIST_C),
     ];
     $this->householdIds = ['A' => DIST_A, 'B' => DIST_B, 'C' => DIST_C];
 
