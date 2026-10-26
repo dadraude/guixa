@@ -37,7 +37,7 @@ defineOptions({
 
     <h1 class="sr-only">Security settings</h1>
 
-    <div class="space-y-6">
+    <div class="pilot-panel space-y-6 p-3 sm:p-6">
         <Heading
             variant="small"
             title="Update password"

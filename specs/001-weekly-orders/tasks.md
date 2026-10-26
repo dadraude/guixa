@@ -6,7 +6,8 @@ Accepted amendment (2026-10-24): **Application visual identity — T39–T42** a
 dependency. Corresponding Linear tickets have been created. On 2026-10-25 the user authorized T39
 implementation only. The T39 visual pilot was explicitly approved on DRA-191 on 2026-10-25;
 T40 is implemented with focused and rendered evidence. T41 is implemented for independent review
-with [rendered manager evidence](../../docs/visual-checks/dra-192.md); T42 remains after T41.
+with [rendered manager evidence](../../docs/visual-checks/dra-192.md); T42 is implemented for
+independent review with [rendered settings/authentication evidence](../../docs/visual-checks/dra-193.md).
 
 How to work a task:
 
@@ -164,7 +165,7 @@ products, added in opposite order, both complete.
 
 ## Application visual identity — T39–T42
 
-**Status: Accepted — T39 approved for rollout; T40 implemented; T41 implemented for review (2026-10-25); T42 unstarted.** Implements the accepted
+**Status: Accepted — T39 approved for rollout; T40 implemented; T41 implemented for review (2026-10-25); T42 implemented for review (2026-10-26).** Implements the accepted
 [Application visual identity](plan.md#application-visual-identity) amendment through the **plan only**
 route. No new `R#` or `S#`: the references below identify existing behavior to preserve, not new
 domain work. T37/T38 and their original scopes are unchanged; T36 remains separate.
@@ -296,15 +297,31 @@ stay in untracked task artifacts.
   pilot and one existing page per role for shared-theme regressions, and verify `Welcome` remains
   unchanged. Record any inaccessible state or unavailable proof as pending, not passed.
 
+T42 implementation evidence (2026-10-26): [rendered page and state matrix](../../docs/visual-checks/dra-193.md),
+test-first route opt-in (`pilotTheme.spec.ts`: the three settings and seven authentication pages,
+and the actual `AuthLayout` flag), focused authentication, settings and invitation HTTP regressions,
+and acceptance checks outside the shared harness (contrast, 44 px targets, appearance persistence,
+Enter submission, selected navigation, settings gutter, Welcome probe). The shared manifest declares
+228 cases. It exercises the seven authentication pages, the three settings pages with member,
+producer and manager navigation, and their dialogs (measured on the dialog itself), in both themes,
+system appearance, reduced motion and fallback fonts. Its regression views cover Orders index and
+edit (several row states), Dashboard, Producer Cutoff and manager Cycles at 375 and 1280 px in both
+themes at 100% text, and 1024 px/200% in light; the three pages with forms add a 375 px/200% error
+state in both themes, and Orders add 1024/200 and 375/200 variants. The fixture mounts real pages
+and layouts with mocked transport. By user decision, a pre-existing T39 defect found here
+(Orders/Edit product rows at 1024 px/200% text) is fixed in T42. No authentication or security
+logic changed. Real passkey/WebAuthn ceremonies, the real 2FA QR code and server round trips are
+pending (mocked transport). Full CI and independent review are pending.
+
 For every task, apply all checks in the plan's verification section, including contrast, asset and
 reduced-motion checks; record actual results per affected page and relevant focused test command.
 Any added/changed copy uses `lang/`; these tasks do not absorb T36 or claim its completion. Optional
 botanical decoration must stay within the accepted plan and must not delay a usable pilot.
 
 **Execution gate:** the user supplied the T39 implementation instruction and then explicitly
-approved its visual pilot on DRA-191 on 2026-10-25. T40 and T41 are implemented for independent review;
-T42 has not started. Pilot approval does not grant publication or feature completion. T33
-includes T42 as a completion dependency.
+approved its visual pilot on DRA-191 on 2026-10-25. T40, T41 and T42 are implemented for independent
+review. Pilot approval does not grant publication or feature completion. T33 includes T42 as a
+completion dependency.
 
 ## Closure
 

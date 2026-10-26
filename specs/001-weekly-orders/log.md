@@ -1141,3 +1141,31 @@ The same sweep found an unbroken long stock name expanding the desktop table at 
 and pushing row actions beyond the viewport. The shared stock/return table style now uses
 fixed columns and wraps the name cell; both desktop tables keep their semantics and all
 row actions remain visible. The four light/dark long-name desktop captures are retained.
+
+
+## 2026-10-26 · Deviation
+
+T42 (`plan.md`, Visual system / Verification and review gate): the shared visual harness and
+the acceptance probes found presentation defects that the plan's single theme boundary did not
+anticipate, all fixed without changing authentication, security or settings behavior. The
+settings layout used the viewport `lg` breakpoint, which placed the navigation beside the content
+at 1024 px with 200% text although the app sidebar leaves only a narrow column; it now follows
+the content width, and its gutter stays 1rem until the content is narrower than 20rem. The
+two-factor recovery-codes block stayed focusable and readable by assistive technology while
+collapsed (zero height, transparent); it is now not rendered visually or in the accessibility
+tree until shown. The passkey list item, the OTP slots (authentication and the setup modal), the
+setup modal QR code and button row, the auth card, panel padding and the settings destructive
+buttons were reflowed or re-colored for 375 px/200% text and 3:1 or 4.5:1 contrast; a Radix
+dialog focuses its first control without scrolling, so tall dialogs scroll the focused control
+into view. The four additional components (`TwoFactorSetupModal`, `TwoFactorRecoveryCodes`,
+`PasskeyItem`, `PasskeyRegister`) were admitted for this. `InputError`, `Welcome` and the shared UI
+primitives are unchanged.
+
+Pre-existing T39 defect fixed in T42 by user decision: at 1024 px with 200% text, the Orders edit
+product rows kept four fixed `rem` columns chosen by the viewport breakpoint, so the app sidebar
+left the product name no width (one letter per line) and the price overlapped the quantity label.
+`OrderProductRow` now chooses its columns from the row's own width (container query) and exposes
+the same accessible names for quantity, save and remove through `aria-label` instead of hidden
+text. Requests, drafts, totals and marked-line behavior are unchanged. The Orders edit spec, the
+Orders index spec and the ordering HTTP tests were run; the regression manifest keeps and now
+passes every 1024 px/200% and 375 px/200% case for Orders index and edit.

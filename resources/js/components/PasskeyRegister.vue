@@ -90,7 +90,7 @@ const handleCancel = () => {
 
         <InputError v-if="error" :message="error" />
 
-        <div class="flex gap-2">
+        <div class="flex flex-wrap gap-2">
             <Button type="submit" :disabled="isLoading || !name.trim()">
                 {{ isLoading ? 'Registering...' : 'Register passkey' }}
             </Button>

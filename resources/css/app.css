@@ -490,6 +490,174 @@
     color: var(--destructive);
 }
 
+/* Authentication and settings */
+.pilot-theme .pilot-settings {
+    container: pilot-settings / inline-size;
+}
+
+/* Gutter follows the content width in the current text size, so it stays 1rem+ until it cannot. */
+.pilot-theme .pilot-settings .pilot-settings-inner {
+    padding: 0.5rem;
+}
+
+@container pilot-settings (min-width: 20rem) {
+    .pilot-theme .pilot-settings .pilot-settings-inner {
+        padding: 1rem;
+    }
+}
+
+@container pilot-settings (min-width: 40rem) {
+    .pilot-theme .pilot-settings .pilot-settings-inner {
+        padding: 2rem;
+    }
+}
+
+.pilot-theme .pilot-settings-body {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.pilot-theme .pilot-settings-nav {
+    width: 100%;
+    max-width: 36rem;
+}
+
+.pilot-theme .pilot-settings-separator {
+    display: block;
+}
+
+/* The app sidebar narrows the content, so wide layouts follow its width, not the viewport. */
+@container pilot-settings (min-width: 44rem) {
+    .pilot-theme .pilot-settings-body {
+        flex-direction: row;
+        gap: 3rem;
+    }
+
+    .pilot-theme .pilot-settings-nav {
+        width: 12rem;
+        flex-shrink: 0;
+    }
+
+    .pilot-theme .pilot-settings-separator {
+        display: none;
+    }
+}
+
+.pilot-theme .pilot-auth :has(> * > [data-slot='input-otp']),
+.pilot-theme.pilot-touch-dialog :has(> * > [data-slot='input-otp']) {
+    width: 100%;
+    max-width: 15rem;
+}
+
+.pilot-theme .pilot-auth :has(> [data-slot='input-otp']),
+.pilot-theme.pilot-touch-dialog :has(> [data-slot='input-otp']) {
+    width: 100%;
+}
+
+/* The library widens the overlay when it suspects a password-manager badge. */
+.pilot-theme .pilot-auth input[data-slot='input-otp'],
+.pilot-theme.pilot-touch-dialog input[data-slot='input-otp'] {
+    max-width: 100%;
+}
+
+.pilot-theme .pilot-auth [data-slot='input-otp-group'],
+.pilot-theme.pilot-touch-dialog [data-slot='input-otp-group'] {
+    width: 100%;
+    justify-content: center;
+}
+
+.pilot-theme .pilot-auth [data-slot='input-otp-slot'],
+.pilot-theme.pilot-touch-dialog [data-slot='input-otp-slot'] {
+    width: auto;
+    min-width: 0;
+    max-width: 2.25rem;
+    flex: 1 1 0;
+}
+
+.pilot-theme .pilot-auth button,
+.pilot-theme .pilot-settings button,
+.pilot-theme.pilot-touch-dialog button {
+    max-width: 100%;
+    height: auto;
+    white-space: normal;
+}
+
+.pilot-theme .pilot-auth :is(button, input:not([type='hidden'])) {
+    min-height: 44px;
+}
+
+/* Inline links only honour min-height as flex items. */
+.pilot-theme .pilot-auth a {
+    display: inline-flex;
+    min-width: 44px;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+}
+
+.pilot-theme .pilot-auth input[type='checkbox'],
+.pilot-theme :is(.pilot-auth, .pilot-page) [role='checkbox'] {
+    min-height: 20px;
+    min-width: 20px;
+}
+
+.pilot-theme .pilot-auth .text-red-600,
+.pilot-theme.pilot-touch-dialog .text-red-600 {
+    color: var(--destructive);
+}
+
+.pilot-theme .pilot-status {
+    color: var(--pilot-success);
+}
+
+.pilot-theme .pilot-settings button.bg-destructive,
+.pilot-theme.pilot-touch-dialog button.bg-destructive {
+    background-color: var(--destructive);
+    color: var(--destructive-foreground);
+}
+
+.pilot-theme .pilot-settings button.bg-destructive:hover,
+.pilot-theme.pilot-touch-dialog button.bg-destructive:hover {
+    background-color: color-mix(in srgb, var(--destructive) 90%, #000);
+}
+
+.pilot-theme.pilot-touch-dialog {
+    grid-template-columns: minmax(0, 1fr);
+    padding-inline: 1rem;
+    max-height: calc(100dvh - 2rem);
+    overflow-y: auto;
+    padding-top: 3.5rem;
+}
+
+.pilot-theme.pilot-touch-dialog {
+    --pilot-dialog-surface: var(--background);
+}
+
+.dark .pilot-theme.pilot-touch-dialog {
+    --pilot-dialog-surface: var(--popover);
+}
+
+/* Separator labels mask the rule behind them, so they take the dialog's own surface. */
+.pilot-theme.pilot-touch-dialog .pilot-separator-label {
+    background-color: var(--pilot-dialog-surface);
+}
+
+.pilot-theme.pilot-touch-dialog > * {
+    min-width: 0;
+}
+
+.pilot-theme.pilot-touch-dialog [data-slot='dialog-title'],
+.pilot-theme.pilot-touch-dialog [data-slot='dialog-description'] {
+    overflow-wrap: anywhere;
+}
+
+.pilot-theme.pilot-touch-dialog
+    :is(button, a, input:not([type='hidden']), [data-slot='button']) {
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+}
+
 @media (max-width: 639px) {
     .pilot-theme .pilot-data-table,
     .pilot-theme .pilot-data-table tbody,

@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="ca">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link
+            id="fixture-font"
+            rel="stylesheet"
+            href="/build/assets/fonts-C9MNnjVw.css"
+        />
+        <script>
+            const query = new URLSearchParams(location.search);
+            if (query.get('fallback') === '1') {
+                document.getElementById('fixture-font').remove();
+            }
+            if (query.get('unsupported') === '1') {
+                delete window.PublicKeyCredential;
+            }
+        </script>
+        <title>DRA-193 visual fixture</title>
+    </head>
+    <body>
+        <div id="app"></div>
+        <script type="module" src="/.vitest/dra193-visual/main.ts"></script>
+    </body>
+</html>
