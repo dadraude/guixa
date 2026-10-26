@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { mount } from '@vue/test-utils';
+import { flushPromises, mount } from '@vue/test-utils';
 import { describe, expect, it } from 'vite-plus/test';
 import StockLines from './StockLines.vue';
 
@@ -65,7 +65,16 @@ describe('stock lines', () => {
     it('asks to add the chosen product with the typed quantity', async () => {
         const wrapper = stockLines();
 
-        await wrapper.get('[data-test="stock-product"]').setValue('cheese');
+        await wrapper
+            .get('[data-test="stock-product"]')
+            .trigger('keydown', { key: 'ArrowDown' });
+        await flushPromises();
+        const option = [...document.querySelectorAll('[role="option"]')].find(
+            (element) => element.textContent?.includes('Cheese'),
+        );
+        expect(option).toBeTruthy();
+        option!.dispatchEvent(new Event('pointerup', { bubbles: true }));
+        await flushPromises();
         await wrapper.get('[data-test="stock-quantity"]').setValue('0.250');
         await wrapper.get('[data-test="add-stock-form"]').trigger('submit');
 
@@ -111,12 +120,18 @@ describe('stock lines', () => {
         );
     });
 
-    it('offers the available quantity of each product', () => {
+    it('offers the available quantity of each product', async () => {
         const wrapper = stockLines();
 
-        expect(wrapper.get('option[value="cheese"]').text()).toContain(
-            '3.500 kg',
-        );
+        await wrapper
+            .get('[data-test="stock-product"]')
+            .trigger('keydown', { key: 'ArrowDown' });
+        await flushPromises();
+        expect(
+            [...document.querySelectorAll('[role="option"]')].some((option) =>
+                option.textContent?.includes('3.500 kg'),
+            ),
+        ).toBe(true);
     });
 
     it('is read-only when the pickup cannot change', () => {

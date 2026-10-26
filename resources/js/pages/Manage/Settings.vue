@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Form, Head } from '@inertiajs/vue3';
 import SettingsController from '@/actions/App/Http/Controllers/Manage/SettingsController';
+import FormSelect from '@/components/FormSelect.vue';
 import Heading from '@/components/Heading.vue';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
@@ -25,6 +26,10 @@ const weekdays = [
     'Saturday',
     'Sunday',
 ];
+const weekdayOptions = weekdays.map((label, index) => ({
+    value: String(index + 1),
+    label,
+}));
 </script>
 
 <template>
@@ -43,23 +48,14 @@ const weekdays = [
         >
             <div class="grid gap-2">
                 <Label for="pickup-weekday">Pickup weekday</Label>
-                <select
+                <FormSelect
                     id="pickup-weekday"
                     name="pickup_weekday"
-                    class="h-9 rounded-md border bg-background px-2 text-sm"
-                    :value="pickupWeekday ?? ''"
-                >
-                    <option v-if="pickupWeekday === null" value="" disabled>
-                        Not set
-                    </option>
-                    <option
-                        v-for="(name, index) in weekdays"
-                        :key="name"
-                        :value="index + 1"
-                    >
-                        {{ name }}
-                    </option>
-                </select>
+                    :options="weekdayOptions"
+                    :default-value="pickupWeekday?.toString()"
+                    placeholder="Not set"
+                    class="w-full min-w-0 sm:w-fit sm:min-w-44"
+                />
                 <InputError :message="errors.pickup_weekday || errors.domain" />
             </div>
             <Button

@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { mount } from '@vue/test-utils';
+import { flushPromises, mount } from '@vue/test-utils';
 import { describe, expect, it } from 'vite-plus/test';
 import ReturnLines from './ReturnLines.vue';
 
@@ -51,7 +51,16 @@ describe('return lines', () => {
     it('asks to add the chosen item with the typed whole quantity, deactivated items included', async () => {
         const wrapper = returnLines();
 
-        await wrapper.get('[data-test="return-item"]').setValue('crate');
+        await wrapper
+            .get('[data-test="return-item"]')
+            .trigger('keydown', { key: 'ArrowDown' });
+        await flushPromises();
+        const option = [...document.querySelectorAll('[role="option"]')].find(
+            (element) => element.textContent?.includes('Crate'),
+        );
+        expect(option).toBeTruthy();
+        option!.dispatchEvent(new Event('pointerup', { bubbles: true }));
+        await flushPromises();
         await wrapper.get('[data-test="return-quantity"]').setValue('3');
         await wrapper.get('[data-test="add-return-form"]').trigger('submit');
 
@@ -113,10 +122,17 @@ describe('return lines', () => {
         expect(wrapper.text()).toContain('The item is invalid.');
     });
 
-    it('formats the amounts of the options with a comma, like the lines', () => {
+    it('formats the amounts of the options with a comma, like the lines', async () => {
         const wrapper = returnLines();
 
-        expect(wrapper.get('option[value="jar"]').text()).toContain('0,50 €');
-        expect(wrapper.get('option[value="crate"]').text()).toContain('2,00 €');
+        await wrapper
+            .get('[data-test="return-item"]')
+            .trigger('keydown', { key: 'ArrowDown' });
+        await flushPromises();
+        const labels = [...document.querySelectorAll('[role="option"]')].map(
+            (option) => option.textContent,
+        );
+        expect(labels.some((label) => label?.includes('0,50 €'))).toBe(true);
+        expect(labels.some((label) => label?.includes('2,00 €'))).toBe(true);
     });
 });

@@ -101,7 +101,7 @@ describe('reception page', () => {
         expect(html).toContain('Unbalanced by 1.000 loaf');
         expect(html).toContain('data-test="balanced"');
         expect(html).toContain('Set by hand');
-        expect(html).toContain('Household D');
+        expect(html).toContain('Another household…');
         expect(html).toContain('Nope');
     });
 

@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { trans } from 'laravel-vue-i18n';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import FormSelect from '@/components/FormSelect.vue';
 import { euros } from './euros';
 
-defineProps<{
+const props = defineProps<{
     lines: App.Http.PickupReturnLineRow[];
     options: App.Http.ReturnItemRow[];
     editable: boolean;
@@ -21,6 +22,13 @@ const emit = defineEmits<{
 
 const itemId = ref('');
 const quantity = ref('');
+
+const itemOptions = computed(() =>
+    props.options.map((option) => ({
+        value: option.id,
+        label: `${option.name} (${euros(option.amountCents)})`,
+    })),
+);
 
 const submit = () => {
     if (itemId.value === '' || quantity.value.trim() === '') {
@@ -81,21 +89,14 @@ const submit = () => {
             data-test="add-return-form"
             @submit.prevent="submit"
         >
-            <select
+            <FormSelect
                 v-model="itemId"
-                class="h-11 min-w-0 flex-1 rounded-md border border-input bg-transparent px-2 text-base"
+                :options="itemOptions"
+                :placeholder="trans('Choose an item')"
+                class="h-11 min-w-0 flex-1 basis-44"
                 :aria-label="trans('Return item')"
                 data-test="return-item"
-            >
-                <option value="" disabled>{{ trans('Choose an item') }}</option>
-                <option
-                    v-for="option in options"
-                    :key="option.id"
-                    :value="option.id"
-                >
-                    {{ option.name }} ({{ euros(option.amountCents) }})
-                </option>
-            </select>
+            />
             <Input
                 v-model="quantity"
                 inputmode="numeric"

@@ -10,6 +10,7 @@ import ReceptionValidationController from '@/actions/App/Http/Controllers/Manage
 import AddAllocationForm from '@/components/reception/AddAllocationForm.vue';
 import AllocationRow from '@/components/reception/AllocationRow.vue';
 import ReceivedTotalForm from '@/components/reception/ReceivedTotalForm.vue';
+import FormSelect from '@/components/FormSelect.vue';
 import Heading from '@/components/Heading.vue';
 import InputError from '@/components/InputError.vue';
 import { Badge } from '@/components/ui/badge';
@@ -101,6 +102,13 @@ const canDistribute = computed(
         props.reception.products.every(
             (product) => product.balancedForDistribution,
         ),
+);
+
+const unorderedProductOptions = computed(() =>
+    props.reception.unorderedOptions.map((option) => ({
+        value: option.productId,
+        label: `${option.name} (${option.unit})`,
+    })),
 );
 
 const addProduct = computed(() =>
@@ -347,20 +355,14 @@ const addProduct = computed(() =>
                 <label class="text-sm font-medium" for="unordered-product">
                     Add a product nobody ordered
                 </label>
-                <select
+                <FormSelect
                     id="unordered-product"
                     name="product_id"
                     required
-                    class="h-9 rounded-md border bg-background px-2 text-sm"
-                >
-                    <option
-                        v-for="option in reception.unorderedOptions"
-                        :key="option.productId"
-                        :value="option.productId"
-                    >
-                        {{ option.name }} ({{ option.unit }})
-                    </option>
-                </select>
+                    :options="unorderedProductOptions"
+                    :default-value="unorderedProductOptions[0]?.value"
+                    class="w-full min-w-0 sm:w-fit sm:min-w-44"
+                />
             </div>
             <Input
                 name="received"

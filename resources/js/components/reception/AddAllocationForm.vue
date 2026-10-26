@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
+import FormSelect from '@/components/FormSelect.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
@@ -26,6 +27,13 @@ const candidates = computed(() =>
     ),
 );
 
+const candidateOptions = computed(() =>
+    candidates.value.map((option) => ({
+        value: option.id,
+        label: option.name,
+    })),
+);
+
 const submit = () => {
     if (household.value === '') {
         return;
@@ -44,20 +52,13 @@ const submit = () => {
         :data-test="`add-allocation-${product.productId}`"
         @submit.prevent="submit"
     >
-        <select
+        <FormSelect
             v-model="household"
+            :options="candidateOptions"
+            placeholder="Another household…"
             :aria-label="`Household to allocate ${product.name} to`"
-            class="h-9 rounded-md border bg-background px-2 text-sm"
-        >
-            <option value="" disabled>Another household…</option>
-            <option
-                v-for="option in candidates"
-                :key="option.id"
-                :value="option.id"
-            >
-                {{ option.name }}
-            </option>
-        </select>
+            class="w-full min-w-0 sm:w-fit sm:min-w-44"
+        />
         <Input
             v-model="quantity"
             inputmode="decimal"
