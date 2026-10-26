@@ -7,6 +7,7 @@ import InputError from '@/components/InputError.vue';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import NativeDialog from '@/components/manager/NativeDialog.vue';
+import { formatEuroAmount } from '@/lib/formatEuroAmount';
 
 const props = defineProps<{
     open: boolean;
@@ -99,7 +100,7 @@ function changeStatus() {
     >
         <template v-if="product">
             <p class="text-sm text-muted-foreground">
-                {{ product.unit }} · {{ product.price }} € ·
+                {{ product.unit }} · {{ formatEuroAmount(product.price) }} ·
                 {{ product.active ? 'Actiu' : 'Inactiu' }}
             </p>
             <form class="mt-4 space-y-4" @submit.prevent="saveAvailable">

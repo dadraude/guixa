@@ -9,6 +9,7 @@ import Heading from '@/components/Heading.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { formatEuroAmount } from '@/lib/formatEuroAmount';
 
 defineOptions({
     layout: {
@@ -92,7 +93,8 @@ function editProduct(product: App.Http.StockLevelRow, event: MouseEvent) {
                                 product.name
                             }}</span>
                             <span class="block text-xs text-muted-foreground"
-                                >{{ product.unit }} · {{ product.price }} €
+                                >{{ product.unit }} ·
+                                {{ formatEuroAmount(product.price) }}
                                 <span
                                     v-if="!product.active"
                                     class="text-destructive"
@@ -138,7 +140,7 @@ function editProduct(product: App.Http.StockLevelRow, event: MouseEvent) {
                             </th>
                             <td class="px-3 py-2">{{ product.unit }}</td>
                             <td class="px-3 py-2 tabular-nums">
-                                {{ product.price }} €
+                                {{ formatEuroAmount(product.price) }}
                             </td>
                             <td class="px-3 py-2 tabular-nums">
                                 {{ product.available }}
