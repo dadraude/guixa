@@ -318,12 +318,18 @@
                 "role": "manager"
             },
             "root": "html[data-visual-ready=\"true\"] .pilot-page",
-            "panels": "tbody",
+            "panels": "tbody, .pilot-stock-mobile-list",
             "fonts": ["16px \"Instrument Sans\""],
             "focus": ["[data-visual-focus-last=\"true\"]"],
             "states": [
                 {
                     "id": "populated"
+                },
+                {
+                    "id": "many-products",
+                    "query": {
+                        "many": 1
+                    }
                 },
                 {
                     "id": "empty",

@@ -25,6 +25,7 @@ const scenario = query.get('scenario') ?? 'accounts';
 const isEmpty = query.get('empty') === '1';
 const isCancelled = query.get('cancelled') === '1';
 const isInactive = query.get('inactive') === '1';
+const manyProducts = query.get('many') === '1';
 const longName = query.get('long') === '1';
 const name = longName ? 'H'.repeat(59) : 'Casa Riera';
 const householdSummary = {
@@ -225,7 +226,17 @@ const views: Record<
     stock: {
         component: 'Manage/Stock/Index',
         view: Stock,
-        props: { products: isEmpty ? [] : [stockProduct] },
+        props: {
+            products: isEmpty
+                ? []
+                : manyProducts
+                  ? Array.from({ length: 20 }, (_, index) => ({
+                        ...stockProduct,
+                        id: `stock-${index + 1}`,
+                        name: `Product ${index + 1}`,
+                    }))
+                  : [stockProduct],
+        },
     },
     'stock-create': {
         component: 'Manage/Stock/Create',

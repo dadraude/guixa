@@ -40,9 +40,13 @@ describe('manager list presentation', () => {
         );
 
         expect(html).toContain('pilot-manager-table');
+        expect(html).toContain('pilot-stock-mobile-list');
+        expect(html).toContain('<summary');
         expect(html).toContain('pilot-cell-label');
         expect(html).toContain('Available');
         expect(html).toContain('Movements');
+        expect(html).toContain('deactivate-mobile-stock-1');
+        expect(html).toContain('deactivate-stock-1');
     });
 
     it('keeps return item column meanings visible when rows reflow', async () => {

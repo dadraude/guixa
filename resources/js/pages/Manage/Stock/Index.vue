@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { Form, Head, Link } from '@inertiajs/vue3';
-import StockMovementController from '@/actions/App/Http/Controllers/Manage/StockMovementController';
+import { Head, Link } from '@inertiajs/vue3';
+import { ChevronDown } from '@lucide/vue';
 import StockProductController from '@/actions/App/Http/Controllers/Manage/StockProductController';
 import Heading from '@/components/Heading.vue';
 import { Button } from '@/components/ui/button';
 import { trans } from 'laravel-vue-i18n';
+import StockProductActions from './StockProductActions.vue';
 
 defineOptions({
     layout: {
@@ -38,7 +39,69 @@ defineProps<{
             No stock products yet.
         </p>
 
-        <div v-else class="pilot-manager-list">
+        <ul v-else class="pilot-stock-mobile-list sm:hidden">
+            <li v-for="product in products" :key="product.id">
+                <details>
+                    <summary class="pilot-stock-mobile-summary">
+                        <span class="min-w-0">
+                            <span class="block font-semibold">{{
+                                product.name
+                            }}</span>
+                            <span class="block text-xs text-muted-foreground">
+                                {{ product.unit
+                                }}<span v-if="product.variable">
+                                    (variable)</span
+                                >
+                                <span v-if="!product.active">
+                                    · Deactivated</span
+                                >
+                            </span>
+                        </span>
+                        <span class="text-right tabular-nums">
+                            <span class="block font-semibold">
+                                {{ product.available }}
+                                {{ trans('Available').toLowerCase() }}
+                            </span>
+                            <span class="block text-xs text-muted-foreground">
+                                {{ product.price }} EUR
+                            </span>
+                        </span>
+                        <ChevronDown
+                            class="size-4 shrink-0"
+                            aria-hidden="true"
+                        />
+                    </summary>
+                    <div class="pilot-stock-mobile-details">
+                        <dl class="grid grid-cols-2 gap-2 text-sm">
+                            <div>
+                                <dt class="text-muted-foreground">
+                                    {{ trans('Containers per unit') }}
+                                </dt>
+                                <dd>{{ product.containersPerUnit ?? '-' }}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-muted-foreground">
+                                    {{ trans('Status') }}
+                                </dt>
+                                <dd>
+                                    {{
+                                        product.active
+                                            ? 'Active'
+                                            : 'Deactivated'
+                                    }}
+                                </dd>
+                            </div>
+                        </dl>
+                        <StockProductActions :product="product" mobile />
+                    </div>
+                </details>
+            </li>
+        </ul>
+
+        <div
+            v-if="products.length > 0"
+            class="pilot-manager-list hidden sm:block"
+        >
             <table class="pilot-data-table pilot-manager-table w-full text-sm">
                 <thead>
                     <tr class="border-b text-left">
@@ -100,45 +163,7 @@ defineProps<{
                             {{ product.active ? 'Active' : 'Deactivated' }}
                         </td>
                         <td class="py-2">
-                            <div class="pilot-action-row justify-end">
-                                <Button variant="outline" size="sm" as-child>
-                                    <Link
-                                        :href="
-                                            StockMovementController.show(
-                                                product.id,
-                                            )
-                                        "
-                                        >Movements</Link
-                                    >
-                                </Button>
-                                <Button variant="outline" size="sm" as-child>
-                                    <Link
-                                        :href="
-                                            StockProductController.edit(
-                                                product.id,
-                                            )
-                                        "
-                                        >Edit</Link
-                                    >
-                                </Button>
-                                <Form
-                                    v-if="product.active"
-                                    v-bind="
-                                        StockProductController.destroy.form(
-                                            product.id,
-                                        )
-                                    "
-                                >
-                                    <Button
-                                        type="submit"
-                                        variant="outline"
-                                        size="sm"
-                                        :data-test="`deactivate-${product.id}`"
-                                    >
-                                        Deactivate
-                                    </Button>
-                                </Form>
-                            </div>
+                            <StockProductActions :product="product" />
                         </td>
                     </tr>
                 </tbody>

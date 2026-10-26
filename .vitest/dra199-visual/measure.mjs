@@ -29,6 +29,15 @@ const presentationOnlyStates = new Set([
 ]);
 
 const allCases = views.flatMap((view) => [
+    ...(view.id === 'stock'
+        ? [320, 375].map((width) => ({
+              view,
+              state: view.states.find((state) => state.id === 'many-products'),
+              width,
+              mode: 'light',
+              text: 100,
+          }))
+        : []),
     ...(['stock', 'return-items'].includes(view.id)
         ? managerTablePreviewCases.map((dimensions) => ({
               view,
@@ -62,7 +71,14 @@ const allCases = views.flatMap((view) => [
             text: 200,
         })),
 ]);
-const cases = process.argv.includes('--cycle-only')
+const cases = process.argv.includes('--mobile-stock-only')
+    ? allCases.filter(
+          (item) =>
+              item.view.id === 'stock' &&
+              ['many-products', 'long-content', 'inactive'].includes(item.state.id) &&
+              (item.width === 320 || item.width === 375),
+      )
+    : process.argv.includes('--cycle-only')
     ? allCases.filter(
           (item) =>
               item.view.id === 'cycles' &&
@@ -189,6 +205,44 @@ try {
             issues.push(`${geometry.misaligned} misaligned page children`);
         if (geometry.listInsets)
             issues.push(`${geometry.listInsets} list content insets differ from their panels`);
+        if (view.id === 'stock' && state.id === 'many-products') {
+            const mobile = await browser.evaluate(`(() => {
+                const rows = [...document.querySelectorAll('.pilot-stock-mobile-list > li')];
+                const summaries = rows.map((row) => row.querySelector('summary'));
+                const first = rows[0].querySelector('details');
+                const result = {
+                    count: rows.length,
+                    closed: rows.every((row) => !row.querySelector('details').open),
+                    height: summaries[0].getBoundingClientRect().height,
+                    visible: summaries.filter((summary) =>
+                        summary.getBoundingClientRect().bottom <= innerHeight
+                    ).length,
+                };
+                first.open = true;
+                result.actions = [...first.querySelectorAll('a, button')].filter((node) =>
+                    node.getBoundingClientRect().height >= 44
+                ).length;
+                return result;
+            })()`);
+            if (mobile.count !== 20 || !mobile.closed)
+                issues.push(`Stock list count or closed state: ${mobile.count}, ${mobile.closed}`);
+            if (
+                text === 100 &&
+                (mobile.height > (width < 375 ? 160 : 80) ||
+                    mobile.visible < (width < 375 ? 3 : 4))
+            )
+                issues.push(`Stock phone density: ${mobile.height}px row, ${mobile.visible} visible`);
+            if (mobile.actions !== 3)
+                issues.push(`Expanded stock actions: ${mobile.actions}`);
+            const expanded = await browser.evaluate(
+                `(${measureLayout.toString()})(${JSON.stringify({
+                    root: view.root,
+                    panels: view.panels,
+                    content: view.content,
+                })})`,
+            );
+            issues.push(...expanded.failures);
+        }
         if (
             view.id === 'cycles' &&
             state.id === 'populated' &&
