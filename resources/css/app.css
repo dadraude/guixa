@@ -583,7 +583,13 @@
     white-space: normal;
 }
 
-.pilot-theme .pilot-auth :is(button, input:not([type='hidden'])) {
+/* Checkboxes are excluded: their label carries the 44px target, and this selector outranks their sizing below. */
+.pilot-theme
+    .pilot-auth
+    :is(
+        button:not([role='checkbox']),
+        input:not([type='hidden'], [type='checkbox'])
+    ) {
     min-height: 44px;
 }
 
