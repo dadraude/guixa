@@ -150,7 +150,11 @@ describe('pickup page', () => {
 
     it('offers to complete a pending pickup with an optional top-up', async () => {
         const html = await renderToString(
-            createSSRApp(Show, { pickup: pickup(false) }),
+            createSSRApp(Show, {
+                pickup: pickup(false),
+                stockProducts,
+                returnItems,
+            }),
         );
 
         expect(html).toContain('data-test="complete-form"');
@@ -162,6 +166,8 @@ describe('pickup page', () => {
         const html = await renderToString(
             createSSRApp(Show, {
                 pickup: { ...pickup(false), status: 'completed' },
+                stockProducts,
+                returnItems,
             }),
         );
 
@@ -172,7 +178,11 @@ describe('pickup page', () => {
 
     it('flags an adjusted line', async () => {
         const html = await renderToString(
-            createSSRApp(Show, { pickup: pickup(true) }),
+            createSSRApp(Show, {
+                pickup: pickup(true),
+                stockProducts,
+                returnItems,
+            }),
         );
 
         expect(html).toContain('data-test="adjusted"');
@@ -184,6 +194,8 @@ describe('pickup page', () => {
         const html = await renderToString(
             createSSRApp(Show, {
                 pickup: { ...pickup(false), status: 'nothing_to_collect' },
+                stockProducts,
+                returnItems,
             }),
         );
 
