@@ -22,11 +22,11 @@ const emit = defineEmits<{
 </script>
 
 <template>
-    <li class="@container min-w-0">
+    <li class="pilot-list-item @container">
         <div
-            class="grid min-w-0 gap-4 p-4 @2xl:grid-cols-[minmax(0,1fr)_8rem_7rem_6rem] @2xl:items-end @2xl:p-5"
+            class="grid min-w-0 gap-4 @2xl:grid-cols-[minmax(0,1fr)_8rem_7rem_6rem] @2xl:items-end"
         >
-            <div class="min-w-0 space-y-1 @2xl:self-center">
+            <div class="min-w-0 space-y-2 @2xl:self-center">
                 <h3 class="font-semibold wrap-anywhere">{{ row.name }}</h3>
                 <p class="text-sm text-muted-foreground">
                     {{ formatMoney(row.price) }} / {{ row.unit }}
@@ -42,7 +42,7 @@ const emit = defineEmits<{
             <div class="space-y-2">
                 <label
                     :for="`quantity-${row.productId}`"
-                    class="text-sm font-medium"
+                    class="block text-sm font-medium"
                 >
                     {{ trans('Quantity') }}
                 </label>
@@ -59,36 +59,40 @@ const emit = defineEmits<{
                 />
             </div>
             <div
-                class="flex items-center justify-between gap-2 @2xl:block @2xl:space-y-2 @2xl:text-right"
+                class="flex items-center justify-between gap-2 @2xl:flex-col @2xl:items-end @2xl:justify-start"
             >
                 <span class="text-sm text-muted-foreground">{{
                     trans('Amount')
                 }}</span>
-                <p class="font-semibold tabular-nums @2xl:min-h-11 @2xl:pt-2.5">
+                <p
+                    class="pilot-amount font-semibold @2xl:flex @2xl:min-h-11 @2xl:items-center"
+                >
                     {{ formatMoney(amount) }}
                 </p>
             </div>
-            <Button
-                v-if="row.notDelivered"
-                variant="outline"
-                class="min-h-11 min-w-11"
-                :disabled="saving"
-                :aria-label="`${trans('Remove')} — ${row.name}`"
-                :data-test="`remove-${row.productId}`"
-                @click="emit('remove')"
-            >
-                {{ trans('Remove') }}
-            </Button>
-            <Button
-                v-else
-                class="min-h-11 min-w-11"
-                :disabled="!open || saving || !dirty"
-                :aria-label="`${trans('Save')} — ${row.name}`"
-                :data-test="`save-${row.productId}`"
-                @click="emit('save')"
-            >
-                {{ trans('Save') }}
-            </Button>
+            <div class="pilot-action-row @2xl:justify-end">
+                <Button
+                    v-if="row.notDelivered"
+                    variant="outline"
+                    class="min-h-11 min-w-11"
+                    :disabled="saving"
+                    :aria-label="`${trans('Remove')} — ${row.name}`"
+                    :data-test="`remove-${row.productId}`"
+                    @click="emit('remove')"
+                >
+                    {{ trans('Remove') }}
+                </Button>
+                <Button
+                    v-else
+                    class="min-h-11 min-w-11"
+                    :disabled="!open || saving || !dirty"
+                    :aria-label="`${trans('Save')} — ${row.name}`"
+                    :data-test="`save-${row.productId}`"
+                    @click="emit('save')"
+                >
+                    {{ trans('Save') }}
+                </Button>
+            </div>
         </div>
     </li>
 </template>

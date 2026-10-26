@@ -20,7 +20,7 @@ const { isCurrentUrl } = useCurrentUrl();
 <template>
     <SidebarGroup v-if="areas.length > 1" class="px-2 py-0">
         <SidebarGroupLabel>{{ trans('Areas') }}</SidebarGroupLabel>
-        <SidebarMenu>
+        <SidebarMenu class="gap-2">
             <SidebarMenuItem v-for="area in areas" :key="area.role">
                 <SidebarMenuButton
                     as-child

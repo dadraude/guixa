@@ -21,7 +21,7 @@ const { isCurrentUrl } = useCurrentUrl();
 <template>
     <SidebarGroup class="px-2 py-0">
         <SidebarGroupLabel>{{ trans('Navigation') }}</SidebarGroupLabel>
-        <SidebarMenu>
+        <SidebarMenu class="gap-2">
             <SidebarMenuItem v-for="item in items" :key="item.title">
                 <SidebarMenuButton
                     as-child

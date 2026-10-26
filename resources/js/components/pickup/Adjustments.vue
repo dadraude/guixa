@@ -9,9 +9,12 @@ defineProps<{
 </script>
 
 <template>
-    <section class="flex flex-col gap-3" data-test="pickup-adjustments">
-        <p v-if="originalChargeCents !== null" class="text-sm">
-            {{ trans('Original charge') }}: {{ euros(originalChargeCents) }}
+    <section class="flex flex-col gap-4" data-test="pickup-adjustments">
+        <p v-if="originalChargeCents !== null" class="pilot-total-row text-sm">
+            <span>{{ trans('Original charge') }}:</span>
+            <span class="pilot-amount" data-test="original-charge">{{
+                euros(originalChargeCents)
+            }}</span>
         </p>
         <template v-if="lines.length > 0">
             <h3 class="font-medium">{{ trans('Pickup adjustments') }}</h3>
@@ -22,11 +25,11 @@ defineProps<{
                     )
                 }}
             </p>
-            <ul class="divide-y">
+            <ul class="pilot-list">
                 <li
                     v-for="line in lines"
                     :key="line.id"
-                    class="flex flex-wrap justify-between gap-2 py-3"
+                    class="pilot-list-row"
                     :data-test="`pickup-adjustment-${line.id}`"
                 >
                     <span class="min-w-0 wrap-anywhere">{{ line.name }}</span>
@@ -39,10 +42,18 @@ defineProps<{
                             trans('Allocation reconciled; no extra charge')
                         }}</span
                     >
-                    <template v-else>
-                        <span>{{ line.quantityDelta }} {{ line.unit }}</span>
-                        <span>{{ euros(line.amountCents) }}</span>
-                    </template>
+                    <span v-else class="pilot-list-figures">
+                        <span
+                            class="pilot-amount"
+                            data-test="adjustment-quantity"
+                            >{{ line.quantityDelta }} {{ line.unit }}</span
+                        >
+                        <span
+                            class="pilot-amount"
+                            data-test="adjustment-amount"
+                            >{{ euros(line.amountCents) }}</span
+                        >
+                    </span>
                 </li>
             </ul>
         </template>

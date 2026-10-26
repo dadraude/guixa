@@ -1,0 +1,331 @@
+{
+    "baseUrl": "http://127.0.0.1:5183",
+    "height": 900,
+    "rootFontPx": 16,
+    "darkSelector": "html.dark",
+    "matrix": {
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark"],
+        "text": [100, 200]
+    },
+    "views": [
+        {
+            "path": "/.vitest/dra197-visual/index.html",
+            "root": "html[data-visual-ready=\"true\"] main",
+            "panels": "main > div > *",
+            "fonts": ["16px \"Instrument Sans\""],
+            "id": "orders-index",
+            "query": {
+                "scenario": "orders-index"
+            },
+            "focus": [
+                "[data-sidebar=\"trigger\"]",
+                "[data-test^=\"cycle-\"] a"
+            ],
+            "states": [
+                {
+                    "id": "populated",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "empty",
+                    "query": {
+                        "empty": 1
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "focus": ["[data-sidebar=\"trigger\"]"]
+                    }
+                },
+                {
+                    "id": "sidebar-open",
+                    "query": {
+                        "sidebar": 1
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "focus": [
+                            "[data-sidebar=\"sidebar\"][data-mobile=\"true\"] a"
+                        ]
+                    }
+                }
+            ],
+            "content": "h1:not(.sr-only),h2,h3,label:not(.sr-only):not(:has(.sr-only)),input:not([aria-hidden=\"true\"]):not([type=\"hidden\"]),button:not(:has(> .sr-only)),a:not(:has(.sr-only)),p,span:not(.sr-only),[data-visual-text]"
+        },
+        {
+            "path": "/.vitest/dra197-visual/index.html",
+            "root": "html[data-visual-ready=\"true\"] main",
+            "panels": "main > div > *",
+            "fonts": ["16px \"Instrument Sans\""],
+            "id": "orders-edit",
+            "query": {
+                "scenario": "orders-edit",
+                "dirty": 1
+            },
+            "focus": [
+                "main a",
+                "[data-test^=\"quantity-\"]",
+                "[data-test^=\"save-\"]"
+            ],
+            "states": [
+                {
+                    "id": "populated",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "marked",
+                    "query": {
+                        "order": "marked",
+                        "dirty": 0
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "focus": ["main a", "[data-test^=\"remove-\"]"]
+                    }
+                },
+                {
+                    "id": "closed",
+                    "query": {
+                        "order": "closed",
+                        "dirty": 0
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "focus": ["main a"]
+                    }
+                },
+                {
+                    "id": "pickup",
+                    "query": {
+                        "order": "pickup",
+                        "dirty": 0
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "focus": ["main a", "[data-test^=\"quantity-\"]"]
+                    }
+                },
+                {
+                    "id": "cancelled",
+                    "query": {
+                        "order": "cancelled",
+                        "dirty": 0
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "focus": ["main a"]
+                    }
+                },
+                {
+                    "id": "long-name",
+                    "query": {
+                        "long": 1
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "error",
+                    "query": {
+                        "error": 1,
+                        "dirty": 0
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "focus": ["main a"]
+                    }
+                },
+                {
+                    "id": "no-producers",
+                    "query": {
+                        "order": "no-producers",
+                        "dirty": 0
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "focus": ["main a"]
+                    }
+                }
+            ],
+            "content": "h1:not(.sr-only),h2,h3,label:not(.sr-only):not(:has(.sr-only)),input:not([aria-hidden=\"true\"]):not([type=\"hidden\"]),button:not(:has(> .sr-only)),a:not(:has(.sr-only)),p,span:not(.sr-only),[data-visual-text]"
+        },
+        {
+            "path": "/.vitest/dra197-visual/index.html",
+            "root": "html[data-visual-ready=\"true\"] main",
+            "panels": "main > div > *",
+            "fonts": ["16px \"Instrument Sans\""],
+            "id": "pickup-show",
+            "query": {
+                "scenario": "pickup-show"
+            },
+            "focus": [
+                "main a",
+                "[data-test^=\"remove-stock-\"]",
+                "[data-test=\"stock-product\"]"
+            ],
+            "states": [
+                {
+                    "id": "manager-regression",
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                }
+            ],
+            "content": "h1:not(.sr-only),h2,h3,label:not(.sr-only):not(:has(.sr-only)),input:not([aria-hidden=\"true\"]):not([type=\"hidden\"]),button:not(:has(> .sr-only)),a:not(:has(.sr-only)),p,span:not(.sr-only),[data-visual-text]"
+        }
+    ]
+}

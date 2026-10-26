@@ -30,14 +30,14 @@ const sections = computed(() =>
 
 <template>
     <Head :title="trans('Orders')" />
-    <div class="mx-auto flex w-full max-w-4xl flex-col gap-8 p-4 sm:p-8">
+    <div class="pilot-layout-page mx-auto max-w-4xl">
         <OrderPageHeader
             :title="trans('Orders')"
             :description="trans('The cycles your household can order in')"
         />
         <p
             v-if="cycles.length === 0"
-            class="rounded-2xl border border-dashed bg-muted/40 p-8 text-center text-muted-foreground"
+            class="pilot-layout-notice text-muted-foreground"
             data-test="no-cycles"
         >
             {{ trans('There are no cycles yet.') }}
@@ -45,12 +45,12 @@ const sections = computed(() =>
         <section
             v-for="section in sections"
             :key="section.title"
-            class="space-y-3"
+            class="flex flex-col gap-4"
         >
-            <h2 class="pilot-heading text-xl font-semibold">
+            <h2 class="pilot-heading text-lg font-semibold">
                 {{ section.title }}
             </h2>
-            <ul class="grid gap-3">
+            <ul class="flex flex-col gap-4">
                 <li
                     v-for="cycle in section.cycles"
                     :key="cycle.cycleId"
@@ -60,7 +60,7 @@ const sections = computed(() =>
                         :href="
                             OrderController.edit.url({ cycle: cycle.cycleId })
                         "
-                        class="block rounded-2xl border bg-card text-card-foreground shadow-xs transition-colors hover:bg-accent focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring motion-reduce:transition-none"
+                        class="pilot-layout-panel transition-colors focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring motion-reduce:transition-none"
                     >
                         <CycleCard :cycle="cycle" />
                     </Link>

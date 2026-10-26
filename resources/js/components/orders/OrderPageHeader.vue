@@ -15,11 +15,11 @@ defineProps<{ title: string; description: string }>();
         </div>
         <div class="min-w-0 flex-1 space-y-2">
             <h1
-                class="pilot-heading text-2xl font-semibold tracking-tight wrap-anywhere sm:text-3xl"
+                class="pilot-heading text-2xl font-semibold tracking-tight wrap-anywhere"
             >
                 {{ title }}
             </h1>
-            <p class="text-base leading-relaxed text-muted-foreground">
+            <p class="text-base text-muted-foreground">
                 {{ description }}
             </p>
         </div>

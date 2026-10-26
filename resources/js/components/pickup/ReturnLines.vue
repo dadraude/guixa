@@ -33,7 +33,7 @@ const submit = () => {
 </script>
 
 <template>
-    <section class="flex flex-col gap-3" data-test="return-lines">
+    <section class="flex flex-col gap-4" data-test="return-lines">
         <h3 class="text-base font-medium">{{ trans('Returns') }}</h3>
 
         <p
@@ -44,20 +44,22 @@ const submit = () => {
             {{ trans('No returns have been added to this pickup.') }}
         </p>
 
-        <ul class="divide-y">
+        <ul class="pilot-list">
             <li
                 v-for="line in lines"
                 :key="line.returnItemId"
-                class="flex flex-wrap items-center justify-between gap-2 py-2"
+                class="pilot-list-row"
                 :data-test="`return-line-${line.returnItemId}`"
             >
-                <div class="flex min-w-0 flex-col">
+                <div class="pilot-list-row-body">
                     <span>{{ line.name }}</span>
                     <span class="text-xs text-muted-foreground">
                         {{ line.quantity }} × {{ euros(line.amountCents) }}
                     </span>
                 </div>
-                <span data-test="credit">−{{ euros(line.creditCents) }}</span>
+                <span class="pilot-amount" data-test="credit"
+                    >−{{ euros(line.creditCents) }}</span
+                >
                 <Button
                     v-if="editable"
                     type="button"
@@ -81,7 +83,7 @@ const submit = () => {
         >
             <select
                 v-model="itemId"
-                class="h-11 min-w-0 flex-1 rounded-md border border-input bg-transparent px-3 text-base"
+                class="h-11 min-w-0 flex-1 rounded-md border border-input bg-transparent px-2 text-base"
                 :aria-label="trans('Return item')"
                 data-test="return-item"
             >
