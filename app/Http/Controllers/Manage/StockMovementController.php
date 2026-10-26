@@ -9,10 +9,12 @@ use App\Http\Requests\Manage\StockEntryRequest;
 use App\Http\StockLevelRow;
 use Guixa\Ordering\Application\ListCycles;
 use Guixa\Shared\Application\Actor;
+use Guixa\Shared\Domain\Quantity;
 use Guixa\Stock\Application\ListStock;
 use Guixa\Stock\Application\RecordStockAdjustment;
 use Guixa\Stock\Application\RecordStockEntry;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -41,5 +43,24 @@ class StockMovementController extends Controller
         $record($actor, $stockProduct, $request->quantity(), $request->string('note')->toString(), $request->cycleId());
 
         return to_route('manage.stock.movements.show', $stockProduct);
+    }
+
+    public function setAvailable(string $stockProduct, Request $request, Actor $actor, ListStock $list, RecordStockAdjustment $record): RedirectResponse
+    {
+        $data = $request->validate([
+            'available' => ['required', 'string', 'regex:/^\d{1,7}(?:[.,]\d{1,3})?$/'],
+        ]);
+        $level = collect($list($actor))->firstWhere('id', $stockProduct);
+        abort_if($level === null, 404);
+
+        $desired = Quantity::fromString(str_replace(',', '.', $data['available']));
+        $current = Quantity::fromString($level->available);
+        $difference = $desired->thousandths - $current->thousandths;
+        if ($difference !== 0) {
+            $quantity = sprintf('%s%d.%03d', $difference < 0 ? '-' : '', intdiv(abs($difference), 1000), abs($difference) % 1000);
+            $record($actor, $stockProduct, $quantity, 'Recompte d’estoc', null);
+        }
+
+        return to_route('manage.stock.index');
     }
 }

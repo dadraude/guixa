@@ -1220,3 +1220,184 @@ html[data-font-fallback='true'] .pilot-theme {
         @apply bg-background text-foreground;
     }
 }
+
+/* Shared cooperative manager surface, adapted from the approved Flowbite view. */
+.coop-manager-shell {
+    --background: #f7f6f0;
+    --foreground: #26372f;
+    --card: #fffdfa;
+    --card-foreground: #26372f;
+    --popover: #fffdfa;
+    --popover-foreground: #26372f;
+    --primary: #0e7490;
+    --primary-foreground: #fff;
+    --secondary: #eaf0e7;
+    --secondary-foreground: #26372f;
+    --muted: #eaf0e7;
+    --muted-foreground: #53675c;
+    --accent: #e0f5f5;
+    --accent-foreground: #155e75;
+    --border: #d5ddd5;
+    --input: #7c8d80;
+    --ring: #0e7490;
+    --sidebar: #fffdfa;
+    --sidebar-foreground: #26372f;
+    --sidebar-accent: #e0f5f5;
+    --sidebar-accent-foreground: #155e75;
+    --sidebar-border: #d5ddd5;
+    --sidebar-primary: #0e7490;
+    font-family: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
+}
+.dark .coop-manager-shell {
+    --background: #17231f;
+    --foreground: #f5f5ed;
+    --card: #21312a;
+    --card-foreground: #f5f5ed;
+    --popover: #21312a;
+    --popover-foreground: #f5f5ed;
+    --primary: #22d3ee;
+    --primary-foreground: #17231f;
+    --secondary: #2b4034;
+    --secondary-foreground: #f5f5ed;
+    --muted: #2b4034;
+    --muted-foreground: #c5d3c7;
+    --accent: #174450;
+    --accent-foreground: #e0faff;
+    --border: #506658;
+    --input: #7e9785;
+    --ring: #22d3ee;
+    --sidebar: #21312a;
+    --sidebar-foreground: #f5f5ed;
+    --sidebar-accent: #174450;
+    --sidebar-accent-foreground: #e0faff;
+    --sidebar-border: #506658;
+    --sidebar-primary: #22d3ee;
+}
+.coop-manager-shell .pilot-heading {
+    font-family: 'Source Serif 4 Variable', Georgia, serif;
+}
+.coop-manager-shell .pilot-layout-page {
+    max-width: 64rem;
+    margin-inline: auto;
+    gap: 1rem;
+    padding: 1rem;
+}
+.coop-manager-shell .pilot-layout-panel,
+.coop-manager-shell .pilot-manager-page > :is(form, section, ul) {
+    padding: 1rem;
+    box-shadow: 0 2px 10px rgb(31 58 43 / 5%);
+}
+.coop-manager-shell
+    .pilot-manager-page
+    > :is(form, section, ul)
+    :is(form, section, ul) {
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    padding: 0;
+}
+.coop-manager-shell .pilot-manager-page button,
+.coop-manager-shell .pilot-manager-page a,
+.coop-manager-shell
+    .pilot-manager-page
+    input:not([type='checkbox'], [type='radio'], [type='hidden']) {
+    min-height: 44px;
+}
+.coop-manager-shell
+    .pilot-manager-page
+    input:not([type='checkbox'], [type='radio'], [type='hidden']) {
+    font-size: 1rem;
+}
+.manager-dialog {
+    width: min(34rem, calc(100vw - 2rem));
+    max-height: calc(100dvh - 2rem);
+    margin: auto;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    background: var(--card);
+    color: var(--card-foreground);
+    box-shadow: 0 20px 60px rgb(12 25 20 / 25%);
+    padding: 1rem;
+}
+.manager-dialog::backdrop {
+    background: rgb(12 25 20 / 60%);
+}
+.manager-dialog input:not([type='checkbox'], [type='radio']) {
+    min-height: 44px;
+    font-size: 1rem;
+}
+.manager-dialog label:has(input:is([type='checkbox'], [type='radio'])) {
+    min-height: 44px;
+}
+.manager-button {
+    display: inline-flex;
+    min-height: 44px;
+    min-width: 44px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--primary);
+    border-radius: 0.5rem;
+    background: var(--primary);
+    color: var(--primary-foreground);
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+.manager-button-secondary {
+    border-color: var(--input);
+    background: var(--card);
+    color: var(--foreground);
+}
+.manager-button-danger {
+    border-color: var(--destructive);
+    background: var(--destructive);
+    color: #fff;
+}
+.manager-button:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+}
+.manager-button:disabled {
+    opacity: 0.5;
+}
+.coop-manager-shell .manager-stock-list {
+    container: manager-stock / inline-size;
+}
+.coop-manager-shell .manager-stock-table {
+    display: none;
+}
+.coop-manager-shell .manager-stock-rows {
+    display: block;
+}
+.coop-manager-shell .pilot-manager-page > section .manager-stock-rows > li {
+    padding: 0;
+}
+html:has(.coop-manager-shell) {
+    scrollbar-gutter: stable;
+}
+@container manager-stock (max-width: 18rem) {
+    .coop-manager-shell .manager-stock-rows button {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .coop-manager-shell .manager-stock-rows button > span:last-child {
+        text-align: left;
+    }
+    .coop-manager-shell
+        .manager-stock-rows
+        button
+        > span:last-child
+        > span:last-child {
+        justify-content: flex-start;
+    }
+}
+@container manager-stock (min-width: 56rem) {
+    .coop-manager-shell .manager-stock-table {
+        display: block;
+    }
+    .coop-manager-shell .manager-stock-rows {
+        display: none;
+    }
+}

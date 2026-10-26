@@ -10,10 +10,15 @@ const { breadcrumbs = [] } = defineProps<{
 }>();
 const page = usePage();
 const pilotTheme = computed(() => isPilotThemePage(page.component));
+const managerTheme = computed(() => page.component.startsWith('Manage/'));
 </script>
 
 <template>
-    <AppLayout :breadcrumbs="breadcrumbs" :pilot-theme="pilotTheme">
+    <AppLayout
+        :breadcrumbs="breadcrumbs"
+        :pilot-theme="pilotTheme"
+        :manager-theme="managerTheme"
+    >
         <slot />
     </AppLayout>
 </template>

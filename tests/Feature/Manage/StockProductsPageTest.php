@@ -26,6 +26,8 @@ it('keeps the stock pages to managers', function (string $method, string $uri) {
     ['get', '/manage/stock/{id}/edit'],
     ['put', '/manage/stock/{id}'],
     ['delete', '/manage/stock/{id}'],
+    ['put', '/manage/stock/{id}/available'],
+    ['put', '/manage/stock/{id}/reactivation'],
 ]);
 
 it('lists the stock products with their price as a decimal string (R25)', function () {
@@ -122,6 +124,40 @@ it('deactivates a stock product (R25)', function () {
     expect($product->refresh()->active)->toBeFalse();
 });
 
+it('reactivates a stock product from the manager list', function () {
+    $product = honey(['active' => false]);
+
+    $this->actingAs(accountWith(Role::Manager))
+        ->put("/manage/stock/{$product->id}/reactivation")
+        ->assertRedirect('/manage/stock');
+
+    expect($product->refresh()->active)->toBeTrue();
+});
+
+it('sets an absolute stock count through an audited adjustment', function () {
+    $product = honey();
+    $manager = accountWith(Role::Manager);
+    $this->actingAs($manager)->post("/manage/stock/{$product->id}/entries", ['quantity' => '10']);
+
+    $this->actingAs($manager)->put("/manage/stock/{$product->id}/available", ['available' => '8,5'])
+        ->assertRedirect('/manage/stock');
+    $this->actingAs($manager)->get('/manage/stock')
+        ->assertInertia(fn (Assert $page) => $page->where('products.0.available', '8.500'));
+    expect(DB::table('stock_movements')->count())->toBe(2)
+        ->and(DB::table('stock_movements')->where('note', 'Recompte d’estoc')->count())->toBe(1);
+
+    $this->actingAs($manager)->put("/manage/stock/{$product->id}/available", ['available' => '8.500'])
+        ->assertRedirect('/manage/stock');
+    expect(DB::table('stock_movements')->count())->toBe(2);
+});
+
+it('rejects an invalid absolute stock count', function () {
+    $product = honey();
+    $this->actingAs(accountWith(Role::Manager))
+        ->put("/manage/stock/{$product->id}/available", ['available' => '-1'])
+        ->assertSessionHasErrors('available');
+});
+
 it('answers 404 to a stock product id that is not a UUID', function (string $method, string $uri) {
     $this->actingAs(accountWith(Role::Manager))->{$method}($uri, [
         'name' => 'Honey', 'unit' => 'jar', 'price' => '1', 'variable' => false,
@@ -130,6 +166,8 @@ it('answers 404 to a stock product id that is not a UUID', function (string $met
     ['get', '/manage/stock/not-a-uuid/edit'],
     ['put', '/manage/stock/not-a-uuid'],
     ['delete', '/manage/stock/not-a-uuid'],
+    ['put', '/manage/stock/not-a-uuid/available'],
+    ['put', '/manage/stock/not-a-uuid/reactivation'],
 ]);
 
 it('accepts a comma as the decimal separator of containers per unit', function () {

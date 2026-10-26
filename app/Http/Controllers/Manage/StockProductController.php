@@ -11,6 +11,7 @@ use Guixa\Stock\Application\CreateStockProduct;
 use Guixa\Stock\Application\DeactivateStockProduct;
 use Guixa\Stock\Application\ListStock;
 use Guixa\Stock\Application\ListStockProducts;
+use Guixa\Stock\Application\ReactivateStockProduct;
 use Guixa\Stock\Application\UpdateStockProduct;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
@@ -70,6 +71,13 @@ class StockProductController extends Controller
     public function destroy(string $stockProduct, Actor $actor, DeactivateStockProduct $deactivate): RedirectResponse
     {
         $deactivate($actor, $stockProduct);
+
+        return to_route('manage.stock.index');
+    }
+
+    public function reactivate(string $stockProduct, Actor $actor, ReactivateStockProduct $reactivate): RedirectResponse
+    {
+        $reactivate($actor, $stockProduct);
 
         return to_route('manage.stock.index');
     }

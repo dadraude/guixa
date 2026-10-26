@@ -11,11 +11,13 @@ import { providePilotTheme } from '@/composables/usePilotTheme';
 type Props = {
     breadcrumbs?: BreadcrumbItem[];
     pilotTheme?: boolean;
+    managerTheme?: boolean;
 };
 
 const props = withDefaults(defineProps<Props>(), {
     breadcrumbs: () => [],
     pilotTheme: false,
+    managerTheme: false,
 });
 providePilotTheme(toRef(props, 'pilotTheme'));
 </script>
@@ -23,7 +25,7 @@ providePilotTheme(toRef(props, 'pilotTheme'));
 <template>
     <AppShell
         variant="sidebar"
-        :class="pilotTheme ? 'pilot-theme bg-background text-foreground' : ''"
+        :class="`${pilotTheme ? 'pilot-theme bg-background text-foreground' : ''} ${managerTheme ? 'coop-manager-shell' : ''}`"
     >
         <AppSidebar />
         <AppContent variant="sidebar" class="min-w-0 overflow-x-clip">

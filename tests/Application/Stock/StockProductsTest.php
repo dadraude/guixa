@@ -6,6 +6,7 @@ use Guixa\Shared\Domain\Role;
 use Guixa\Stock\Application\CreateStockProduct;
 use Guixa\Stock\Application\DeactivateStockProduct;
 use Guixa\Stock\Application\ListStockProducts;
+use Guixa\Stock\Application\ReactivateStockProduct;
 use Guixa\Stock\Application\UpdateStockProduct;
 use Guixa\Stock\Domain\Error\InvalidContainersPerUnit;
 use Guixa\Stock\Domain\Error\InvalidPrice;
@@ -20,6 +21,7 @@ beforeEach(function () {
     $this->create = new CreateStockProduct($this->products);
     $this->update = new UpdateStockProduct($this->products);
     $this->deactivate = new DeactivateStockProduct($this->products);
+    $this->reactivate = new ReactivateStockProduct($this->products);
     $this->list = new ListStockProducts($this->products);
 });
 
@@ -93,6 +95,14 @@ it('deactivates a stock product and keeps it listed as inactive (R25)', function
     ($this->deactivate)($this->manager, $id);
 
     expect(($this->list)($this->manager)[0]->active)->toBeFalse();
+});
+
+it('reactivates a previously deactivated stock product', function () {
+    $id = ($this->create)($this->manager, 'Honey', 'jar', 650, false, null);
+    ($this->deactivate)($this->manager, $id);
+    ($this->reactivate)($this->manager, $id);
+
+    expect(($this->list)($this->manager)[0]->active)->toBeTrue();
 });
 
 it('fails on an unknown stock product', function () {

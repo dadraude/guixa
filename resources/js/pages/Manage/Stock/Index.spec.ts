@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import { describe, expect, it, vi } from 'vite-plus/test';
 import { createSSRApp, defineComponent, h } from 'vue';
 import { renderToString } from 'vue/server-renderer';
@@ -18,35 +19,30 @@ vi.mock('@inertiajs/vue3', () => ({
             () =>
                 h('form', slots.default?.({ errors: {}, processing: false })),
     }),
+    router: { put: vi.fn(), delete: vi.fn() },
 }));
 
 describe('manager list presentation', () => {
-    it('keeps stock column meanings visible when rows reflow', async () => {
+    it('renders 20 compact stock rows and a six-column desktop table', async () => {
+        const products = Array.from({ length: 20 }, (_, index) => ({
+            id: `stock-${index}`,
+            name: `Producte ${index}`,
+            unit: 'pot',
+            variable: false,
+            price: '5.00',
+            containersPerUnit: '1.000',
+            available: '9.000',
+            active: index !== 0,
+        }));
         const html = await renderToString(
-            createSSRApp(StockIndex, {
-                products: [
-                    {
-                        id: 'stock-1',
-                        name: 'Honey',
-                        unit: 'jar',
-                        variable: false,
-                        price: '5.00',
-                        containersPerUnit: 1,
-                        available: 9,
-                        active: true,
-                    },
-                ],
-            }),
+            createSSRApp(StockIndex, { products }),
         );
-
-        expect(html).toContain('pilot-manager-table');
-        expect(html).toContain('pilot-stock-mobile-list');
-        expect(html).toContain('<summary');
-        expect(html).toContain('pilot-cell-label');
-        expect(html).toContain('Available');
-        expect(html).toContain('Movements');
-        expect(html).toContain('deactivate-mobile-stock-1');
-        expect(html).toContain('deactivate-stock-1');
+        expect(html.match(/min-h-16 w-full/g) ?? []).toHaveLength(20);
+        expect(html).toContain('manager-stock-table');
+        expect(html).toContain('Cerca productes');
+        expect(html).toContain('Inactiu');
+        expect(html).toContain('Moviments');
+        expect(html).toContain('<dialog');
     });
 
     it('keeps return item column meanings visible when rows reflow', async () => {
@@ -62,7 +58,6 @@ describe('manager list presentation', () => {
                 ],
             }),
         );
-
         expect(html).toContain('pilot-manager-table');
         expect(html).toContain('pilot-cell-label');
         expect(html).toContain('0.50');
