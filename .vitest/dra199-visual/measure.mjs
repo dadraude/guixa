@@ -14,6 +14,7 @@ const populatedCases = [
     { width: 1280, mode: 'light', text: 100 },
     { width: 1280, mode: 'dark', text: 100 },
 ];
+const cyclePreviewCase = { width: 729, mode: 'light', text: 100 };
 const presentationOnlyStates = new Set([
     'populated',
     'blank',
@@ -22,7 +23,16 @@ const presentationOnlyStates = new Set([
     'font-fallback',
 ]);
 
-const cases = views.flatMap((view) => [
+const allCases = views.flatMap((view) => [
+    ...(view.id === 'cycles'
+        ? [
+              {
+                  view,
+                  state: view.states.find((state) => state.id === 'populated'),
+                  ...cyclePreviewCase,
+              },
+          ]
+        : []),
     ...populatedCases.map((dimensions) => ({
         view,
         state:
@@ -40,6 +50,15 @@ const cases = views.flatMap((view) => [
             text: 200,
         })),
 ]);
+const cases = process.argv.includes('--cycle-only')
+    ? allCases.filter(
+          (item) =>
+              item.view.id === 'cycles' &&
+              item.state.id === 'populated' &&
+              (item.width === 729 || item.width === 1280) &&
+              item.mode === 'light',
+      )
+    : allCases;
 
 const browser = await openChrome();
 let failed = 0;
@@ -109,12 +128,22 @@ try {
             const misaligned = [...page.children].filter(visible).filter((node) =>
                 Math.abs(node.getBoundingClientRect().left - left) > 1
             );
+            const listInsets = [...page.querySelectorAll('ul.pilot-list')]
+                .filter(visible)
+                .filter((list) => {
+                    const firstContent = list.querySelector(':scope > li > *');
+                    if (!firstContent) return false;
+                    const expected = list.getBoundingClientRect().left +
+                        parseFloat(getComputedStyle(list).paddingLeft);
+                    return Math.abs(firstContent.getBoundingClientRect().left - expected) > 1;
+                });
             return {
                 pagePadding: parseFloat(pageStyle.paddingLeft),
                 pageGap: parseFloat(pageStyle.rowGap),
                 panelPadding: panel && parseFloat(getComputedStyle(panel).paddingLeft),
                 small: small.length,
                 misaligned: misaligned.length,
+                listInsets: listInsets.length,
             };
         })()`);
 
@@ -135,6 +164,54 @@ try {
         if (geometry.small) issues.push(`${geometry.small} small controls`);
         if (geometry.misaligned)
             issues.push(`${geometry.misaligned} misaligned page children`);
+        if (geometry.listInsets)
+            issues.push(`${geometry.listInsets} list content insets differ from their panels`);
+        if (
+            view.id === 'cycles' &&
+            state.id === 'populated' &&
+            (width === 729 || width === 1280)
+        ) {
+            const cycle = await browser.evaluate(`(() => {
+                const rect = (selector) => document.querySelector(selector)?.getBoundingClientRect();
+                const orders = rect('[data-test^="summary-"]');
+                const cancel = rect('[data-test^="cancel-"]');
+                const controls = [
+                    rect('[data-test^="cutoff-date-"]'),
+                    rect('[data-test^="cutoff-time-"]'),
+                    rect('[data-test^="set-cutoff-"]'),
+                    rect('[data-test^="close-now-"]'),
+                    rect('[data-test^="clear-cutoff-"]'),
+                ];
+                const openPanel = rect('.pilot-manager-page > section');
+                const openHeading = rect('.pilot-manager-page > section h2');
+                const cyclePanel = rect('.pilot-manager-page > ul.pilot-list');
+                const cycleHeading = rect('[data-test^="cycle-"] > div:first-child > span:first-child');
+                const cycleHeader = rect('[data-test^="cycle-"] > div:first-child');
+                return {
+                    actionGap: orders && cancel ? cancel.left - orders.right : null,
+                    bottomSpread: controls.every(Boolean)
+                        ? Math.max(...controls.map((box) => box.bottom)) -
+                          Math.min(...controls.map((box) => box.bottom))
+                        : null,
+                    insetDifference: openPanel && openHeading && cyclePanel && cycleHeading
+                        ? (cycleHeading.left - cyclePanel.left) -
+                          (openHeading.left - openPanel.left)
+                        : null,
+                    topInsetDifference: openPanel && openHeading && cyclePanel && cycleHeader
+                        ? (cycleHeader.top - cyclePanel.top) -
+                          (openHeading.top - openPanel.top)
+                        : null,
+                };
+            })()`);
+            if (cycle.actionGap === null || cycle.actionGap > 16)
+                issues.push(`Cycle header action gap: ${cycle.actionGap}px`);
+            if (cycle.bottomSpread === null || cycle.bottomSpread > 2)
+                issues.push(`Cycle cutoff bottom spread: ${cycle.bottomSpread}px`);
+            if (cycle.insetDifference === null || Math.abs(cycle.insetDifference) > 1)
+                issues.push(`Cycle card horizontal inset difference: ${cycle.insetDifference}px`);
+            if (cycle.topInsetDifference === null || Math.abs(cycle.topInsetDifference) > 1)
+                issues.push(`Cycle card top inset difference: ${cycle.topInsetDifference}px`);
+        }
         if (issues.length) {
             failed++;
             console.error(

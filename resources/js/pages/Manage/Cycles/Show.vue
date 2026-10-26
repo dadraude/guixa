@@ -56,7 +56,7 @@ defineOptions({
                 <li
                     v-for="household in containers.households"
                     :key="household.householdId"
-                    class="flex items-center justify-between gap-4 p-4"
+                    class="flex items-center justify-between gap-4"
                     :data-test="`container-household-${household.householdId}`"
                 >
                     <span class="min-w-0 break-words">{{
@@ -79,7 +79,7 @@ defineOptions({
                 <li
                     v-for="product in producer.products"
                     :key="product.productId"
-                    class="flex flex-col gap-2 p-4"
+                    class="flex flex-col gap-2"
                     :data-test="`product-${product.productId}`"
                 >
                     <div class="flex justify-between gap-2 font-medium">

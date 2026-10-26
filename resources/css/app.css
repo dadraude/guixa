@@ -490,6 +490,14 @@
     padding-block: 1rem;
 }
 
+.pilot-theme .pilot-manager-page .pilot-list > li:first-child {
+    padding-top: 0;
+}
+
+.pilot-theme .pilot-manager-page .pilot-list > li:last-child {
+    padding-bottom: 0;
+}
+
 @container manager-page (max-width: 36rem) {
     .pilot-theme .pilot-manager-page > ul > li[data-test^='cycle-'] {
         padding-inline: 0;

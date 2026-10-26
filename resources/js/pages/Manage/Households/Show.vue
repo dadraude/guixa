@@ -88,7 +88,7 @@ const expiry = (iso: string | null) =>
                 <li
                     v-for="member in props.household.members"
                     :key="member.accountId"
-                    class="flex flex-col gap-4 p-4"
+                    class="flex flex-col gap-4"
                 >
                     <div class="flex items-center justify-between gap-2">
                         <span>

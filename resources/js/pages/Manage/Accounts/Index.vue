@@ -46,7 +46,7 @@ const isManager = (account: App.Http.AccountRow) =>
             <li
                 v-for="account in accounts"
                 :key="account.accountId"
-                class="flex flex-col gap-4 p-4"
+                class="flex flex-col gap-4"
             >
                 <div class="flex flex-wrap items-center justify-between gap-2">
                     <span>

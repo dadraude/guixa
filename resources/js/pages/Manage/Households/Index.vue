@@ -80,7 +80,7 @@ defineProps<{
             <li
                 v-for="household in households"
                 :key="household.id"
-                class="flex items-center justify-between gap-4 p-4"
+                class="flex items-center justify-between gap-4"
             >
                 <Link
                     :href="HouseholdController.show(household.id)"

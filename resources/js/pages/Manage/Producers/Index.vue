@@ -90,7 +90,7 @@ const daysLabel = (days: number) => (days === 1 ? '1 day' : `${days} days`);
             <li
                 v-for="producer in producers"
                 :key="producer.id"
-                class="flex flex-col gap-4 p-4"
+                class="flex flex-col gap-4"
                 :class="{ 'text-muted-foreground': !producer.active }"
             >
                 <div class="flex items-center justify-between gap-2">
