@@ -67,39 +67,42 @@ defineProps<{
                     <h2 class="text-lg font-semibold">
                         {{ trans('Your work, organized') }}
                     </h2>
-                    <ul class="grid gap-3">
+                    <ul class="grid min-w-0 gap-3">
                         <li
-                            class="flex items-center gap-4 rounded-xl bg-muted p-4"
+                            class="flex min-w-0 items-center gap-3 rounded-xl bg-muted p-3"
                         >
                             <ShoppingBasket
                                 class="size-5 shrink-0 text-primary"
                                 aria-hidden="true"
                             />
-                            <span class="font-medium">{{
-                                trans('Orders')
-                            }}</span>
+                            <span
+                                class="min-w-0 font-medium [overflow-wrap:anywhere]"
+                                >{{ trans('Orders') }}</span
+                            >
                         </li>
                         <li
-                            class="flex items-center gap-4 rounded-xl bg-muted p-4"
+                            class="flex min-w-0 items-center gap-3 rounded-xl bg-muted p-3"
                         >
                             <PackageCheck
                                 class="size-5 shrink-0 text-primary"
                                 aria-hidden="true"
                             />
-                            <span class="font-medium">{{
-                                trans('Pickups')
-                            }}</span>
+                            <span
+                                class="min-w-0 font-medium [overflow-wrap:anywhere]"
+                                >{{ trans('Pickups') }}</span
+                            >
                         </li>
                         <li
-                            class="flex items-center gap-4 rounded-xl bg-muted p-4"
+                            class="flex min-w-0 items-center gap-3 rounded-xl bg-muted p-3"
                         >
                             <UsersRound
                                 class="size-5 shrink-0 text-primary"
                                 aria-hidden="true"
                             />
-                            <span class="font-medium">{{
-                                trans('Households')
-                            }}</span>
+                            <span
+                                class="min-w-0 font-medium [overflow-wrap:anywhere]"
+                                >{{ trans('Households') }}</span
+                            >
                         </li>
                     </ul>
                 </section>
