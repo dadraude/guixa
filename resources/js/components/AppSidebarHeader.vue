@@ -9,8 +9,11 @@ defineProps<{ sectionTitle: string }>();
 </script>
 
 <template>
-    <header class="material-app-bar daisy-navbar" data-test="material-app-bar">
-        <div class="daisy-navbar-start min-w-0 gap-2">
+    <header
+        class="material-app-bar flex items-center justify-between"
+        data-test="material-app-bar"
+    >
+        <div class="flex min-w-0 items-center gap-2">
             <SidebarTrigger class="min-h-11 min-w-11" />
             <div class="material-app-brand">
                 <span class="material-app-brand-icon" aria-hidden="true">
@@ -22,7 +25,7 @@ defineProps<{ sectionTitle: string }>();
                 {{ trans(sectionTitle) }}
             </span>
         </div>
-        <div class="daisy-navbar-end min-w-0 gap-2">
+        <div class="flex min-w-0 items-center justify-end gap-2">
             <AppearanceMenu />
             <div class="material-app-bar-user">
                 <NavUser />

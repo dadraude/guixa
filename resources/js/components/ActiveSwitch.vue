@@ -19,7 +19,6 @@ function submitChange(event: Event) {
     <label class="pilot-status-switch">
         <input
             type="checkbox"
-            class="daisy-toggle daisy-toggle-primary"
             :checked="active"
             :disabled="processing"
             :aria-label="`${trans(active ? 'Deactivate' : 'Reactivate')}: ${name}`"

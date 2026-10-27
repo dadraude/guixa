@@ -1,10 +1,4 @@
 @import 'tailwindcss';
-@plugin 'daisyui' {
-    themes: false;
-    prefix: daisy-;
-    exclude: rootscrollgutter;
-}
-
 @import 'tw-animate-css';
 
 @import '@fontsource-variable/nunito/wght.css';
@@ -633,16 +627,42 @@ html[data-font-fallback='true'] .pilot-theme {
     white-space: nowrap;
 }
 
-.pilot-theme .pilot-status-switch .daisy-toggle {
-    --border: 2px;
-    --radius-selector: 9999px;
-    --color-base-content: var(--foreground);
-    --color-base-100: var(--card);
-    --color-primary: var(--primary);
+.pilot-theme .pilot-status-switch input[type='checkbox'] {
+    appearance: none;
+    position: relative;
     width: 44px;
     height: 24px;
-    min-height: 24px;
     flex: none;
+    border: 2px solid var(--muted-foreground);
+    border-radius: 9999px;
+    background: var(--card);
+    cursor: pointer;
+}
+
+.pilot-theme .pilot-status-switch input[type='checkbox']::before {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--muted-foreground);
+}
+
+.pilot-theme .pilot-status-switch input[type='checkbox']:checked {
+    border-color: var(--primary);
+    background: var(--primary);
+}
+
+.pilot-theme .pilot-status-switch input[type='checkbox']:checked::before {
+    transform: translateX(20px);
+    background: var(--primary-foreground);
+}
+
+.pilot-theme .pilot-status-switch input[type='checkbox']:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
 }
 
 .pilot-theme .pilot-status-switch input:disabled {
