@@ -44,6 +44,26 @@
                             "width": 1024,
                             "mode": "dark",
                             "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 200
                         }
                     ]
                 },

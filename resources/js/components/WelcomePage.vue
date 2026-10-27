@@ -28,7 +28,7 @@ defineProps<{
             </header>
 
             <main
-                class="grid flex-1 items-center gap-10 py-12 sm:py-16 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.8fr)] lg:gap-16"
+                class="grid flex-1 items-center gap-10 py-12 sm:py-16 xl:grid-cols-[minmax(0,1fr)_minmax(18rem,0.8fr)] xl:gap-16"
             >
                 <section class="min-w-0">
                     <p class="text-sm font-semibold tracking-wide text-primary">
