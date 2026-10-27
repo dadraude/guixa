@@ -22,7 +22,7 @@ defineProps<{
 <template>
     <Head title="Edit stock product" />
 
-    <div class="pilot-page pilot-manager-page max-w-xl">
+    <div class="pilot-page pilot-layout-page pilot-manager-page max-w-xl">
         <Heading :title="`Edit ${product.name}`" />
 
         <Form

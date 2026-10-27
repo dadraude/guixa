@@ -23,7 +23,7 @@ defineProps<{
 <template>
     <Head title="Return items" />
 
-    <div class="pilot-page pilot-manager-page">
+    <div class="pilot-page pilot-layout-page pilot-manager-page">
         <div class="flex flex-wrap items-start justify-between gap-4">
             <Heading
                 title="Return items"
@@ -39,7 +39,7 @@ defineProps<{
 
         <p
             v-if="items.length === 0"
-            class="pilot-empty-state text-sm text-muted-foreground"
+            class="pilot-layout-notice text-sm text-muted-foreground"
         >
             No return items yet.
         </p>

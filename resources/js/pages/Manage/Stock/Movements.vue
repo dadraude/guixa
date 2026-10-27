@@ -42,7 +42,7 @@ const selectedAdjustmentCycleLabel = computed(
 <template>
     <Head title="Stock movements" />
 
-    <div class="pilot-page pilot-manager-page max-w-xl">
+    <div class="pilot-page pilot-layout-page pilot-manager-page max-w-xl">
         <Heading
             :title="product.name"
             :description="`${product.available} ${product.unit} available`"
@@ -50,7 +50,7 @@ const selectedAdjustmentCycleLabel = computed(
 
         <Form
             v-bind="StockMovementController.storeEntry.form(product.id)"
-            class="space-y-4"
+            class="space-y-6"
             reset-on-success
             v-slot="{ errors, processing }"
         >
@@ -90,7 +90,7 @@ const selectedAdjustmentCycleLabel = computed(
 
         <Form
             v-bind="StockMovementController.storeAdjustment.form(product.id)"
-            class="space-y-4"
+            class="space-y-6"
             reset-on-success
             @reset="selectedAdjustmentCycleId = null"
             v-slot="{ errors, processing }"

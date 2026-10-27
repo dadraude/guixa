@@ -25,19 +25,19 @@ const daysLabel = (days: number) => (days === 1 ? '1 day' : `${days} days`);
 <template>
     <Head title="Producers" />
 
-    <div class="pilot-page pilot-manager-page">
+    <div class="pilot-page pilot-layout-page pilot-manager-page">
         <Heading
             title="Producers"
             description="Suppliers, their default cutoff and their login account"
         />
 
-        <section class="flex flex-col gap-3">
+        <section class="flex flex-col gap-4">
             <h2 class="text-lg font-medium">New producer</h2>
 
             <Form
                 v-bind="ProducerController.store.form()"
                 :reset-on-success="['name']"
-                class="flex flex-wrap items-end gap-2"
+                class="flex flex-wrap items-end gap-6"
                 v-slot="{ errors, processing }"
             >
                 <div class="grid gap-2">
@@ -87,15 +87,15 @@ const daysLabel = (days: number) => (days === 1 ? '1 day' : `${days} days`);
             No producers yet.
         </p>
 
-        <ul v-else class="divide-y rounded-lg border">
+        <ul v-else class="pilot-list">
             <li
                 v-for="producer in producers"
                 :key="producer.id"
-                class="flex flex-col gap-3 p-3"
+                class="flex flex-col gap-4"
                 :class="{ 'text-muted-foreground': !producer.active }"
             >
                 <div class="flex items-center justify-between gap-2">
-                    <span class="flex flex-wrap items-center gap-3">
+                    <span class="flex flex-wrap items-center gap-4">
                         <span class="font-medium">{{ producer.name }}</span>
                         <StatusIndicator
                             :label="producer.active ? 'Active' : 'Deactivated'"
@@ -127,7 +127,7 @@ const daysLabel = (days: number) => (days === 1 ? '1 day' : `${days} days`);
                     v-else
                     v-bind="ProducerAccountController.store.form(producer.id)"
                     :reset-on-success="['name', 'email']"
-                    class="flex flex-wrap items-end gap-2"
+                    class="flex flex-wrap items-end gap-6"
                     v-slot="{ errors, processing }"
                 >
                     <div class="grid gap-1">

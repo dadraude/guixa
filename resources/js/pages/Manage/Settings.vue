@@ -35,7 +35,7 @@ const weekdayOptions = weekdays.map((label, index) => ({
 <template>
     <Head title="Settings" />
 
-    <div class="pilot-page pilot-manager-page max-w-xl">
+    <div class="pilot-page pilot-layout-page pilot-manager-page max-w-xl">
         <Heading
             title="Settings"
             description="How the cooperative works every week"

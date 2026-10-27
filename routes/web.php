@@ -77,6 +77,9 @@ Route::middleware(['auth', 'verified', 'role:manager'])->prefix('manage')->name(
     Route::post('stock/{stockProduct}/adjustments', [StockMovementController::class, 'storeAdjustment'])
         ->whereUuid('stockProduct')
         ->name('stock.adjustments.store');
+    Route::put('stock/{stockProduct}/available', [StockMovementController::class, 'setAvailable'])
+        ->whereUuid('stockProduct')
+        ->name('stock.available.update');
     Route::resource('return-items', ReturnItemController::class)
         ->parameters(['return-items' => 'returnItem'])
         ->except(['show'])

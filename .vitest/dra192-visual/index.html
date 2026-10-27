@@ -10,6 +10,7 @@
         />
         <script>
             if (new URLSearchParams(location.search).get('fallback') === '1') {
+                document.documentElement.dataset.fontFallback = 'true';
                 document.getElementById('fixture-font').remove();
             }
         </script>

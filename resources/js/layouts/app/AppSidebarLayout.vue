@@ -16,11 +16,13 @@ import { dashboard } from '@/routes';
 type Props = {
     breadcrumbs?: BreadcrumbItem[];
     pilotTheme?: boolean;
+    managerTheme?: boolean;
 };
 
 const props = withDefaults(defineProps<Props>(), {
     breadcrumbs: () => [],
     pilotTheme: false,
+    managerTheme: false,
 });
 providePilotTheme(toRef(props, 'pilotTheme'));
 
@@ -47,11 +49,7 @@ const pageBreadcrumbs = computed(() => [
 <template>
     <AppShell
         variant="sidebar"
-        :class="
-            pilotTheme
-                ? 'material-app-shell pilot-theme bg-background text-foreground'
-                : 'material-app-shell'
-        "
+        :class="`material-app-shell ${pilotTheme ? 'pilot-theme bg-background text-foreground' : ''} ${managerTheme ? 'coop-manager-shell' : ''}`"
     >
         <a class="material-skip-link" href="#main-content">
             {{ trans('Skip to content') }}

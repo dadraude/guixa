@@ -5,7 +5,7 @@ import SettlementDetails from './SettlementDetails.vue';
 import HouseholdController from '@/actions/App/Http/Controllers/Manage/HouseholdController';
 import Heading from '@/components/Heading.vue';
 import InputError from '@/components/InputError.vue';
-import StatusIndicator from '@/components/StatusIndicator.vue';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -27,7 +27,7 @@ defineProps<{
 <template>
     <Head title="Households" />
 
-    <div class="pilot-page pilot-manager-page">
+    <div class="pilot-page pilot-layout-page pilot-manager-page">
         <Heading
             title="Households"
             description="Create households and invite their members"
@@ -49,13 +49,13 @@ defineProps<{
 
         <section
             v-if="toSettle.length > 0"
-            class="grid gap-3"
+            class="grid gap-4"
             aria-labelledby="to-settle-heading"
         >
             <h2 id="to-settle-heading" class="text-lg font-medium">
                 {{ trans('To settle') }}
             </h2>
-            <ul class="grid gap-3">
+            <ul class="grid gap-4">
                 <li
                     v-for="settlement in toSettle"
                     :key="settlement.householdId"
@@ -76,11 +76,11 @@ defineProps<{
             There are no households yet.
         </p>
 
-        <ul v-else class="divide-y rounded-lg border">
+        <ul v-else class="pilot-list">
             <li
                 v-for="household in households"
                 :key="household.id"
-                class="flex flex-wrap items-center justify-between gap-4 p-3"
+                class="flex items-center justify-between gap-4"
             >
                 <Link
                     :href="HouseholdController.show(household.id)"
@@ -92,10 +92,9 @@ defineProps<{
                     class="flex items-center gap-2 text-sm text-muted-foreground"
                 >
                     {{ household.memberCount }} members
-                    <StatusIndicator
-                        :label="household.active ? 'Active' : 'Inactive'"
-                        :tone="household.active ? 'success' : 'danger'"
-                    />
+                    <Badge v-if="!household.active" variant="secondary">
+                        Inactive
+                    </Badge>
                 </span>
             </li>
         </ul>
