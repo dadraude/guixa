@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Form, Head } from '@inertiajs/vue3';
+import { trans } from 'laravel-vue-i18n';
 import ProducerAccountController from '@/actions/App/Http/Controllers/Manage/ProducerAccountController';
 import ProducerController from '@/actions/App/Http/Controllers/Manage/ProducerController';
 import Heading from '@/components/Heading.vue';
@@ -130,22 +131,26 @@ const daysLabel = (days: number) => (days === 1 ? '1 day' : `${days} days`);
                     class="flex flex-wrap items-end gap-6"
                     v-slot="{ errors, processing }"
                 >
-                    <div class="grid gap-1">
+                    <div class="grid gap-2">
+                        <Label :for="`account-name-${producer.id}`">
+                            {{ trans('Account name') }}
+                        </Label>
                         <Input
+                            :id="`account-name-${producer.id}`"
                             name="name"
                             required
-                            placeholder="Account name"
-                            class="h-8"
                         />
                         <InputError :message="errors.name" />
                     </div>
-                    <div class="grid gap-1">
+                    <div class="grid gap-2">
+                        <Label :for="`account-email-${producer.id}`">
+                            {{ trans('Account email') }}
+                        </Label>
                         <Input
+                            :id="`account-email-${producer.id}`"
                             name="email"
                             type="email"
                             required
-                            placeholder="Account email"
-                            class="h-8"
                         />
                         <InputError :message="errors.email || errors.domain" />
                     </div>

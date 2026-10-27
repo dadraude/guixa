@@ -1667,3 +1667,224 @@ html:has(.coop-manager-shell) {
         display: none;
     }
 }
+
+/* Approved reference-style pilot: Cycles and Producers indexes only. */
+.reference-pilot {
+    --radius: 0.875rem;
+    --sidebar-background: var(--palette-brand);
+    --sidebar-foreground: var(--palette-surface);
+    --sidebar-accent: color-mix(
+        in srgb,
+        var(--palette-surface) 16%,
+        var(--palette-brand)
+    );
+    --sidebar-accent-foreground: var(--palette-surface);
+    --sidebar-border: color-mix(
+        in srgb,
+        var(--palette-surface) 24%,
+        var(--palette-brand)
+    );
+    --material-surface-container: var(--background);
+    --material-selected-container: var(--sidebar-accent);
+}
+
+.dark .reference-pilot {
+    --sidebar-background: var(--palette-dark-sidebar);
+    --sidebar-foreground: var(--palette-dark-ink);
+    --sidebar-accent: var(--palette-dark-sidebar-accent);
+    --sidebar-accent-foreground: var(--palette-dark-ink);
+    --sidebar-border: var(--palette-dark-border);
+}
+
+.reference-pilot [data-sidebar='sidebar'] {
+    background: var(--sidebar-background);
+    color: var(--sidebar-foreground);
+}
+
+/* The mobile sheet is portalled under body, outside .reference-pilot. */
+html:has(.reference-pilot) [data-sidebar='sidebar'][data-mobile='true'] {
+    --sidebar-background: var(--palette-brand);
+    --sidebar-foreground: var(--palette-surface);
+    --sidebar-accent: color-mix(
+        in srgb,
+        var(--palette-surface) 16%,
+        var(--palette-brand)
+    );
+    --sidebar-accent-foreground: var(--palette-surface);
+    background: var(--sidebar-background);
+    color: var(--sidebar-foreground);
+}
+
+html.dark:has(.reference-pilot) [data-sidebar='sidebar'][data-mobile='true'] {
+    --sidebar-background: var(--palette-dark-sidebar);
+    --sidebar-foreground: var(--palette-dark-ink);
+    --sidebar-accent: var(--palette-dark-sidebar-accent);
+    --sidebar-accent-foreground: var(--palette-dark-ink);
+}
+
+:is(
+        .reference-pilot [data-slot='sidebar'],
+        html:has(.reference-pilot) [data-sidebar='sidebar'][data-mobile='true']
+    )
+    [data-sidebar='menu-button'] {
+    height: auto;
+    min-height: 2.75rem;
+    overflow: visible;
+    white-space: normal;
+}
+
+:is(
+        .reference-pilot [data-slot='sidebar'],
+        html:has(.reference-pilot) [data-sidebar='sidebar'][data-mobile='true']
+    )
+    [data-sidebar='menu-button']
+    > span:last-child {
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+}
+
+.reference-sidebar-brand {
+    display: flex;
+    min-height: 5rem;
+    align-items: center;
+    gap: 0.75rem;
+    padding-inline: 1rem;
+    color: var(--sidebar-foreground);
+    font-size: 1.25rem;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.reference-sidebar-brand-mark {
+    display: grid;
+    width: 2.5rem;
+    height: 2.5rem;
+    flex: none;
+    place-items: center;
+    border-radius: 0.75rem;
+    background: var(--sidebar-foreground);
+    color: var(--sidebar-background);
+}
+
+.reference-pilot .material-app-bar {
+    border-bottom: 0;
+    background: var(--background);
+}
+
+.reference-pilot .material-app-brand {
+    color: var(--foreground);
+}
+
+.reference-pilot .material-app-content {
+    max-width: 90rem;
+}
+
+.reference-pilot .material-page-trail {
+    color: var(--muted-foreground);
+}
+
+.reference-pilot .pilot-layout-page {
+    max-width: 80rem;
+    gap: 1.5rem;
+}
+
+.reference-pilot .pilot-manager-page > .flex:first-child header {
+    margin-bottom: 0;
+}
+
+.reference-pilot .pilot-heading {
+    font-size: clamp(1.75rem, 3vw, 2.5rem);
+    font-weight: 800;
+    letter-spacing: -0.035em;
+    line-height: 1.15;
+}
+
+.reference-pilot .pilot-manager-page > :is(form, section, ul),
+.reference-pilot .pilot-layout-panel {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: 0 2px 6px color-mix(in srgb, var(--foreground) 5%, transparent);
+}
+
+.reference-pilot .material-status {
+    border-radius: 9999px;
+    background: var(--secondary);
+    color: var(--secondary-foreground);
+    padding: 0.25rem 0.625rem;
+}
+
+.reference-pilot .manager-dialog,
+.reference-pilot .manager-button {
+    border-radius: 0.75rem;
+}
+
+.reference-pilot [data-slot='breadcrumb-link'] {
+    display: inline-flex;
+    min-width: 44px;
+    min-height: 44px;
+    align-items: center;
+    padding-inline: 0.5rem;
+}
+
+:is(.reference-pilot, html:has(.reference-pilot) .manager-dialog)
+    input:is([type='time'], [type='date']):focus-within {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+}
+
+.reference-pilot .manager-dialog form[method='dialog'] .manager-button {
+    width: 2rem;
+    min-width: 44px;
+    height: 2rem;
+    min-height: 44px;
+    padding: 0;
+}
+
+.reference-pilot .manager-dialog form[method='dialog'] {
+    flex: none;
+}
+
+:is(.dark .reference-pilot, html.dark:has(.reference-pilot) .manager-dialog)
+    input:is([type='time'], [type='date']) {
+    color-scheme: dark;
+}
+
+@media (min-width: 48rem) {
+    .reference-pilot .material-app-bar {
+        width: calc(100% - var(--sidebar-width));
+        margin-left: var(--sidebar-width);
+    }
+
+    .reference-pilot:has([data-slot='sidebar'][data-state='collapsed'])
+        .material-app-bar {
+        width: calc(100% - var(--sidebar-width-icon));
+        margin-left: var(--sidebar-width-icon);
+    }
+
+    .reference-pilot .material-app-brand {
+        display: none;
+    }
+
+    .reference-pilot
+        .material-app-body
+        [data-slot='sidebar'][data-side]
+        > .fixed {
+        top: 0;
+        height: 100svh;
+    }
+
+    .reference-pilot
+        [data-slot='sidebar'][data-collapsible='icon']
+        .reference-sidebar-brand {
+        justify-content: center;
+        padding-inline: 0.5rem;
+    }
+
+    .reference-pilot
+        [data-slot='sidebar'][data-collapsible='icon']
+        .reference-sidebar-brand-mark {
+        width: 2rem;
+        height: 2rem;
+    }
+}

@@ -900,6 +900,35 @@ and can run in parallel.
   [Verification and review gate](#verification-and-review-gate) still applies. No request, prop,
   validation, permission or translation changes; no new `R#` or `S#`.
 
+## Reference style refresh
+
+**Status: Accepted (2026-10-27).** Route: plan only. The user approved the
+[reference-style proposal](../../docs/visual-design/2026-10-27-reference-style-proposal.md)
+and its light/dark concept preview on 2026-10-27. This changes presentation, not any `R#`, `S#`,
+route, permission, Inertia prop, validation rule or domain behavior. T47–T51 deliver it in slices.
+
+Use the shared semantic palette in `public/theme-colors.css`: a warm near-white canvas, white cards,
+deep green brand action and navigation, and neutral charcoal dark mode. The four supplied Common Ground
+screens are references for hierarchy and surface treatment; their brand, data, labels and gold button
+do not become Guixa content. Preserve the current role-aware destinations, appearance control,
+account menu, mobile navigation, skip link, translations, status meanings and 44 px targets. Reuse the
+existing page/panel/form/list/action patterns and components before adding another variant. Any new
+visible copy uses `lang/`.
+
+The first production pilot (T47) is the shared shell on the manager Cycles and Producers indexes.
+The manager layout slice T45 is merged; the dashboard and settings layout slices T44 and T46 are
+still separate at this amendment, so T47 avoids their page files. T47 may style only its opted-in
+routes; it does not silently restyle every signed-in page. The broader dashboard, member, producer,
+manager and account rollout follows after the relevant layout slices land and the first pilot's
+rendered light/dark review is accepted. The guest Welcome page is outside this refresh.
+
+For each slice, record an exact route/state inventory and reused component paths before editing.
+Use the shared visual runner with a committed fixture and manifest, including 375 and 1280 px in
+light/dark for each affected route and 1024 px at 200% text for distinct layout patterns. Check
+empty, invalid, disabled, long-content and open-dialog states where applicable; verify contrast,
+keyboard focus, touch size, no clipping and reduced motion. Keep generated captures outside tracked
+source, except the approved concept preview attached to the proposal.
+
 ## Translations
 
 Constitution, UI (*Translatable*). `ca` is the default and fallback locale and the only one shipped.

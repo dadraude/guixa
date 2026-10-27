@@ -17,12 +17,14 @@ type Props = {
     breadcrumbs?: BreadcrumbItem[];
     pilotTheme?: boolean;
     managerTheme?: boolean;
+    referencePilot?: boolean;
 };
 
 const props = withDefaults(defineProps<Props>(), {
     breadcrumbs: () => [],
     pilotTheme: false,
     managerTheme: false,
+    referencePilot: false,
 });
 providePilotTheme(toRef(props, 'pilotTheme'));
 
@@ -49,14 +51,15 @@ const pageBreadcrumbs = computed(() => [
 <template>
     <AppShell
         variant="sidebar"
-        :class="`material-app-shell ${pilotTheme ? 'pilot-theme bg-background text-foreground' : ''} ${managerTheme ? 'coop-manager-shell' : ''}`"
+        :sidebar-width="referencePilot ? 'min(16rem, 42vw)' : undefined"
+        :class="`material-app-shell ${pilotTheme ? 'pilot-theme bg-background text-foreground' : ''} ${managerTheme ? 'coop-manager-shell' : ''} ${referencePilot ? 'reference-pilot' : ''}`"
     >
         <a class="material-skip-link" href="#main-content">
             {{ trans('Skip to content') }}
         </a>
         <AppSidebarHeader :section-title="sectionTitle" />
         <div class="material-app-body">
-            <AppSidebar />
+            <AppSidebar :reference-pilot="referencePilot" />
             <AppContent variant="sidebar" class="min-w-0 overflow-x-clip">
                 <div
                     id="main-content"

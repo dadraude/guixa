@@ -31,6 +31,8 @@
     "Type": "Tipus",
     "Note": "Nota",
     "Name": "Nom",
+    "Account name": "Nom del compte",
+    "Account email": "Correu del compte",
     "Unit": "Unitat",
     "Price": "Preu",
     "Containers per unit": "Envasos per unitat",
