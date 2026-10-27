@@ -1,6 +1,6 @@
 # Reference style for Guixa — proposal
 
-**Status:** Approved for a staged rollout, 2026-10-27. T47 is the first production pilot; its visual review gates T48–T51. This is a presentation change to the accepted visual identity in `specs/001-weekly-orders/plan.md`. It does not change the weekly-orders requirements or scenarios. T45 is merged; T44 and T46 are separate in-flight layout-rule work and must be reconciled before their routes join the rollout.
+**Status:** Approved for a staged rollout, 2026-10-27. T47 was merged. After reviewing it, the user requested the [all-page continuation](2026-10-27-reference-style-rollout.md), including the public Welcome page and a simplified breadcrumb/header hierarchy. This is a presentation change to the accepted visual identity in `specs/001-weekly-orders/plan.md`. It does not change the weekly-orders requirements or scenarios. T45 is merged; separate T44/T46 layout work must be reconciled if it lands before the continuation merges.
 
 ## Intent
 
@@ -37,7 +37,7 @@ The same visual language should ultimately cover stock, return items, reception,
 ## Presentation rules
 
 1. **Navigation:** At desktop widths, propose a persistent brand-green left rail with Guixa identity at the top, clear selected and expanded states, and grouped destinations. Keep the current compact/mobile drawer pattern and role-aware navigation. The appearance and account controls must remain findable at every width. Do not add a new destination or rename a domain concept from the screenshots.
-2. **Hierarchy:** Use one clear page title and one useful description where the page already supports it. Small category labels may be used only with translated, meaningful wording. Reuse the current Nunito/body and heading tokens unless an accepted amendment changes typography. Keep amounts and quantities tabular.
+2. **Hierarchy:** Use one clear page title and one useful description where the page already supports it. On the pilot routes, put the breadcrumb in the desktop top bar instead of repeating the current page title there; on narrow screens, place it immediately below the compact header. Keep the page H1 as the content title. Small category labels may be used only with translated, meaningful wording. Reuse the current Nunito/body and heading tokens unless an accepted amendment changes typography. Keep amounts and quantities tabular.
 3. **Surfaces:** Use the existing page, panel, form, list-row, and action-row patterns from the accepted layout rules. Panels use a visible border or subtle shadow, consistent corner radius, and shared spacing. Forms, list actions, empty states, and dialogs remain distinct at a glance.
 4. **Data:** Desktop lists may use aligned columns where they improve scanning. On phones, reflow into labeled rows or cards with all essential values and actions visible; no page-level horizontal scroll. A status badge always includes text. Keep totals and dates readable at 200% text.
 5. **Interaction:** Preserve current routes, permissions, Inertia props, validation, save/submit behavior, and domain states. Use the current shadcn-vue primitives and shared components before adding any new component. Every target remains at least 44 × 44 px, with keyboard focus and reduced-motion support.

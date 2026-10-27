@@ -1,0 +1,1536 @@
+{
+    "baseUrl": "http://127.0.0.1:5185",
+    "rootFontPx": 16,
+    "darkSelector": "html.dark",
+    "matrix": {
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark"],
+        "text": [100, 200]
+    },
+    "views": [
+        {
+            "id": "dashboard",
+            "path": "/visual-reference-all-pages.html",
+            "query": {
+                "page": "Dashboard"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["button[data-sidebar=\"trigger\"]"],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "manage-accounts-index",
+            "path": "/visual-reference-all-pages.html",
+            "query": {
+                "page": "Manage/Accounts/Index"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["button[data-sidebar=\"trigger\"]"],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "manage-cycles-index",
+            "path": "/visual-reference-all-pages.html",
+            "query": {
+                "page": "Manage/Cycles/Index"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["button[data-sidebar=\"trigger\"]"],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "manage-cycles-show",
+            "path": "/visual-reference-all-pages.html",
+            "query": {
+                "page": "Manage/Cycles/Show"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["button[data-sidebar=\"trigger\"]"],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "manage-households-index",
+            "path": "/visual-reference-all-pages.html",
+            "query": {
+                "page": "Manage/Households/Index"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["button[data-sidebar=\"trigger\"]"],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "manage-households-show",
+            "path": "/visual-reference-all-pages.html",
+            "query": {
+                "page": "Manage/Households/Show"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["button[data-sidebar=\"trigger\"]"],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "manage-pickups-index",
+            "path": "/visual-reference-all-pages.html",
+            "query": {
+                "page": "Manage/Pickups/Index"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["button[data-sidebar=\"trigger\"]"],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "manage-pickups-show",
+            "path": "/visual-reference-all-pages.html",
+            "query": {
+                "page": "Manage/Pickups/Show"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["button[data-sidebar=\"trigger\"]"],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "manage-producers-index",
+            "path": "/visual-reference-all-pages.html",
+            "query": {
+                "page": "Manage/Producers/Index"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["button[data-sidebar=\"trigger\"]"],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "manage-reception-show",
+            "path": "/visual-reference-all-pages.html",
+            "query": {
+                "page": "Manage/Reception/Show"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["button[data-sidebar=\"trigger\"]"],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "manage-returnitems-create",
+            "path": "/visual-reference-all-pages.html",
+            "query": {
+                "page": "Manage/ReturnItems/Create"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["button[data-sidebar=\"trigger\"]"],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "manage-returnitems-edit",
+            "path": "/visual-reference-all-pages.html",
+            "query": {
+                "page": "Manage/ReturnItems/Edit"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["button[data-sidebar=\"trigger\"]"],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "manage-returnitems-index",
+            "path": "/visual-reference-all-pages.html",
+            "query": {
+                "page": "Manage/ReturnItems/Index"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["button[data-sidebar=\"trigger\"]"],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "manage-settings",
+            "path": "/visual-reference-all-pages.html",
+            "query": {
+                "page": "Manage/Settings"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["button[data-sidebar=\"trigger\"]"],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "manage-stock-create",
+            "path": "/visual-reference-all-pages.html",
+            "query": {
+                "page": "Manage/Stock/Create"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["button[data-sidebar=\"trigger\"]"],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "manage-stock-edit",
+            "path": "/visual-reference-all-pages.html",
+            "query": {
+                "page": "Manage/Stock/Edit"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["button[data-sidebar=\"trigger\"]"],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "manage-stock-index",
+            "path": "/visual-reference-all-pages.html",
+            "query": {
+                "page": "Manage/Stock/Index"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["button[data-sidebar=\"trigger\"]"],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "manage-stock-movements",
+            "path": "/visual-reference-all-pages.html",
+            "query": {
+                "page": "Manage/Stock/Movements"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["button[data-sidebar=\"trigger\"]"],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "orders-edit",
+            "path": "/visual-reference-all-pages.html",
+            "query": {
+                "page": "Orders/Edit"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["button[data-sidebar=\"trigger\"]"],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "orders-index",
+            "path": "/visual-reference-all-pages.html",
+            "query": {
+                "page": "Orders/Index"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["button[data-sidebar=\"trigger\"]"],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "producer-cutoff",
+            "path": "/visual-reference-all-pages.html",
+            "query": {
+                "page": "Producer/Cutoff"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["button[data-sidebar=\"trigger\"]"],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "producer-cyclesummary",
+            "path": "/visual-reference-all-pages.html",
+            "query": {
+                "page": "Producer/CycleSummary"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["button[data-sidebar=\"trigger\"]"],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "producer-products-create",
+            "path": "/visual-reference-all-pages.html",
+            "query": {
+                "page": "Producer/Products/Create"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["button[data-sidebar=\"trigger\"]"],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "producer-products-edit",
+            "path": "/visual-reference-all-pages.html",
+            "query": {
+                "page": "Producer/Products/Edit"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["button[data-sidebar=\"trigger\"]"],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "producer-products-index",
+            "path": "/visual-reference-all-pages.html",
+            "query": {
+                "page": "Producer/Products/Index"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["button[data-sidebar=\"trigger\"]"],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "wallet-statement",
+            "path": "/visual-reference-all-pages.html",
+            "query": {
+                "page": "Wallet/Statement"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["button[data-sidebar=\"trigger\"]"],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "welcome",
+            "path": "/visual-reference-all-pages.html",
+            "query": {
+                "page": "Welcome"
+            },
+            "root": ".reference-style-welcome",
+            "panels": "[data-visual-panel]",
+            "content": "h1,h2,p,a,li",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["#welcome-action"],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "auth-acceptinvitation",
+            "path": "/visual-reference-all-pages.html",
+            "query": {
+                "page": "auth/AcceptInvitation"
+            },
+            "root": ".reference-style-auth",
+            "panels": ".pilot-panel",
+            "content": "h1,h2,label,input:not([aria-hidden='true']),button,a,p",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [".reference-style-auth a[href]"],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "auth-confirmpassword",
+            "path": "/visual-reference-all-pages.html",
+            "query": {
+                "page": "auth/ConfirmPassword"
+            },
+            "root": ".reference-style-auth",
+            "panels": ".pilot-panel",
+            "content": "h1,h2,label,input:not([aria-hidden='true']),button,a,p",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [".reference-style-auth a[href]"],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "auth-forgotpassword",
+            "path": "/visual-reference-all-pages.html",
+            "query": {
+                "page": "auth/ForgotPassword"
+            },
+            "root": ".reference-style-auth",
+            "panels": ".pilot-panel",
+            "content": "h1,h2,label,input:not([aria-hidden='true']),button,a,p",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [".reference-style-auth a[href]"],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "auth-login",
+            "path": "/visual-reference-all-pages.html",
+            "query": {
+                "page": "auth/Login"
+            },
+            "root": ".reference-style-auth",
+            "panels": ".pilot-panel",
+            "content": "h1,h2,label,input:not([aria-hidden='true']),button,a,p",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [".reference-style-auth a[href]"],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "auth-resetpassword",
+            "path": "/visual-reference-all-pages.html",
+            "query": {
+                "page": "auth/ResetPassword"
+            },
+            "root": ".reference-style-auth",
+            "panels": ".pilot-panel",
+            "content": "h1,h2,label,input:not([aria-hidden='true']),button,a,p",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [".reference-style-auth a[href]"],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "auth-twofactorchallenge",
+            "path": "/visual-reference-all-pages.html",
+            "query": {
+                "page": "auth/TwoFactorChallenge"
+            },
+            "root": ".reference-style-auth",
+            "panels": ".pilot-panel",
+            "content": "h1,h2,label,input:not([aria-hidden='true']),button,a,p",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [".reference-style-auth a[href]"],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "settled": [".reference-style-auth h1"]
+                }
+            ]
+        },
+        {
+            "id": "auth-verifyemail",
+            "path": "/visual-reference-all-pages.html",
+            "query": {
+                "page": "auth/VerifyEmail"
+            },
+            "root": ".reference-style-auth",
+            "panels": ".pilot-panel",
+            "content": "h1,h2,label,input:not([aria-hidden='true']),button,a,p",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [".reference-style-auth a[href]"],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "settings-appearance",
+            "path": "/visual-reference-all-pages.html",
+            "query": {
+                "page": "settings/Appearance"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["button[data-sidebar=\"trigger\"]"],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "settings-profile",
+            "path": "/visual-reference-all-pages.html",
+            "query": {
+                "page": "settings/Profile"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["button[data-sidebar=\"trigger\"]"],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "settings-security",
+            "path": "/visual-reference-all-pages.html",
+            "query": {
+                "page": "settings/Security"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["button[data-sidebar=\"trigger\"]"],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

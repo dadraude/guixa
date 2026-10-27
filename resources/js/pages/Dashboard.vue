@@ -111,7 +111,7 @@ const isProducer = computed(() => props.roles.includes('producer'));
         </header>
 
         <section
-            class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+            class="dashboard-summary grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
             aria-label="summary"
         >
             <article v-if="isMember" class="pilot-layout-panel">

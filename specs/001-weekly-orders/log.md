@@ -1275,3 +1275,12 @@ own palette, and approved the mapped proposal and light/dark concept preview wit
 and shared shell; the dashboard and settings slices follow their in-flight layout
 work. Why: keep Guixa's workflows and semantic colors while adopting the reference's
 clear navigation, page hierarchy and calm operational panels in reviewable steps.
+
+## 2026-10-27 · Change
+
+After T47 merged in PR #239, the user identified repeated page titles in the top bar,
+breadcrumb and content heading, requested the breadcrumb at the top, and asked that the
+same style cover all pages. The continuation applies the shared shell to all signed-in
+routes, aligns authentication and Welcome with the palette, and converts the remaining
+bare manager workflow pages to the established panel pattern. T48–T51 are authorized
+together; the exact route inventory and visual matrix are in the all-page rollout note.

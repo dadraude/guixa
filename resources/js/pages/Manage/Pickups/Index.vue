@@ -40,7 +40,7 @@ const openForm = (householdId: string) =>
 <template>
     <Head title="Pickups" />
 
-    <div class="flex flex-col gap-8 p-4">
+    <div class="pilot-page pilot-layout-page pilot-manager-page">
         <Heading
             title="Pickups"
             description="Households collect their allocation and stock products."

@@ -122,7 +122,7 @@ const addProduct = computed(() =>
 <template>
     <Head :title="`Reception ${reception.producerName}`" />
 
-    <div class="flex flex-col gap-8 p-4">
+    <div class="pilot-page pilot-layout-page pilot-manager-page">
         <Heading
             :title="`Reception: ${reception.producerName}`"
             :description="`Pickup ${reception.pickupDate}. Check what arrived and share it among the households.`"

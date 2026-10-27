@@ -1,11 +1,14 @@
 <script setup lang="ts">
-import { trans } from 'laravel-vue-i18n';
 import AppLogoIcon from '@/components/AppLogoIcon.vue';
 import AppearanceMenu from '@/components/AppearanceMenu.vue';
+import Breadcrumbs from '@/components/Breadcrumbs.vue';
 import NavUser from '@/components/NavUser.vue';
 import { SidebarTrigger } from '@/components/ui/sidebar';
+import type { BreadcrumbItem } from '@/types';
 
-defineProps<{ sectionTitle: string }>();
+defineProps<{
+    breadcrumbs: BreadcrumbItem[];
+}>();
 </script>
 
 <template>
@@ -21,9 +24,9 @@ defineProps<{ sectionTitle: string }>();
                 </span>
                 <span>Guixa</span>
             </div>
-            <span class="material-app-bar-title" data-test="app-section-title">
-                {{ trans(sectionTitle) }}
-            </span>
+            <div class="reference-app-bar-trail">
+                <Breadcrumbs :breadcrumbs="breadcrumbs" />
+            </div>
         </div>
         <div class="flex min-w-0 items-center justify-end gap-2">
             <AppearanceMenu />

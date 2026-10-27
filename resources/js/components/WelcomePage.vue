@@ -12,7 +12,7 @@ defineProps<{
 
 <template>
     <div
-        class="pilot-theme min-h-svh bg-background text-foreground"
+        class="pilot-theme reference-style-welcome min-h-svh bg-background text-foreground"
         data-visual-root
     >
         <div

@@ -114,7 +114,7 @@ const adjust = (productId: string, quantity: string) =>
 <template>
     <Head :title="`Pickup ${pickup.householdName}`" />
 
-    <div class="flex flex-col gap-8 p-4">
+    <div class="pilot-page pilot-layout-page pilot-manager-page">
         <Heading
             :title="`Pickup: ${pickup.householdName}`"
             :description="`Pickup ${pickup.pickupDate}. Check what the household takes home and adjust what is needed.`"
