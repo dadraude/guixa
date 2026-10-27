@@ -726,6 +726,20 @@ Dark mode uses neutral stepped charcoal surfaces with a soft green primary.
 Retain Nunito and the established control sizes. Avoid gradients and decorative
 color blocks; let contrast, spacing and labels convey the action hierarchy.
 
+#### 2026-10-27 App-wide visual rollout
+
+The user extended the modern visual direction to the whole application. All
+operational, manager, account and authentication routes already use the shared
+semantic palette. Replace the Laravel starter Welcome page with a Guixa landing
+page using the same canvas, card, typography and action tokens. Align the shared
+validation error, navigation progress indicator, document fallback background,
+page title and browser favicon with those tokens and Guixa identity. Preserve
+routes and authentication behavior. The existing `Button` serves the landing
+page primary action; the new `WelcomePage` component keeps the live route and
+visual fixture on identical markup. Check the guest and signed-in variants at
+375 and 1280 px in both themes and the guest page at 1024 px with 200% root
+text. Reuse the existing manager/shared-control manifest for action hierarchy.
+
 T40 extends the same reactive opt-in to Dashboard, Wallet/Statement and the five existing producer
 pages. Their current page components retain their props, actions and form contracts. Shared page,
 panel, empty-state and mobile table presentation classes live under the pilot theme, so the two

@@ -1257,3 +1257,11 @@ The semantic palette now uses near-white surfaces, charcoal text, one deep
 green primary and restrained neutral accents; dark surfaces are neutral
 charcoal. The primary, secondary, outline and destructive action meanings and
 the bordered field treatment stay consistent.
+
+## 2026-10-27 · Deviation
+
+`plan.md` (Application visual identity / App-wide visual rollout): the user
+requested the modern visual system throughout the application. The remaining
+Laravel starter Welcome page now uses Guixa branding and the shared palette;
+shared error text, navigation progress, document fallback and favicon are also
+aligned. Existing route behavior and button roles are retained.

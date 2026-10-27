@@ -1,0 +1,86 @@
+{
+    "baseUrl": "http://127.0.0.1:5182",
+    "rootFontPx": 16,
+    "darkSelector": "html.dark",
+    "views": [
+        {
+            "id": "welcome",
+            "path": "/visual-welcome.html",
+            "root": "[data-visual-root]",
+            "panels": "[data-visual-panel]",
+            "content": "h1,h2,p,a,li",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["#welcome-action"],
+            "states": [
+                {
+                    "id": "guest",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "authenticated",
+                    "query": {
+                        "authenticated": 1
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "matrix": {
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark"],
+        "text": [100, 200]
+    }
+}
