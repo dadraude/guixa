@@ -4,15 +4,112 @@ import { renderToString } from 'vue/server-renderer';
 import { installTranslations } from '@/lib/i18n';
 import Dashboard from './Dashboard.vue';
 
-vi.mock('@inertiajs/vue3', () => ({ Head: () => null }));
+vi.mock('@inertiajs/vue3', () => ({
+    Head: () => null,
+    Link: (_props: unknown, { slots }: { slots: { default?: () => string } }) =>
+        slots.default?.() ?? '',
+    usePage: () => ({
+        props: {
+            auth: { user: { name: 'Test User' } },
+        },
+    }),
+}));
+
+vi.mock('@/actions/App/Http/Controllers/OrderController', () => ({
+    default: { index: () => '/' },
+}));
+vi.mock('@/actions/App/Http/Controllers/WalletController', () => ({
+    default: { show: () => '/wallet' },
+}));
+vi.mock('@/actions/App/Http/Controllers/Manage/CycleController', () => ({
+    default: { index: () => '/manage/cycles' },
+}));
+vi.mock('@/actions/App/Http/Controllers/Manage/HouseholdController', () => ({
+    default: { index: () => '/manage/households' },
+}));
+vi.mock('@/actions/App/Http/Controllers/Manage/ProducerController', () => ({
+    default: { index: () => '/manage/producers' },
+}));
+vi.mock('@/actions/App/Http/Controllers/Manage/StockProductController', () => ({
+    default: { index: () => '/manage/stock' },
+}));
+vi.mock('@/actions/App/Http/Controllers/Manage/AccountController', () => ({
+    default: { index: () => '/manage/accounts' },
+}));
+vi.mock('@/actions/App/Http/Controllers/Manage/ReturnItemController', () => ({
+    default: { index: () => '/manage/return-items' },
+}));
+vi.mock('@/actions/App/Http/Controllers/Manage/SettingsController', () => ({
+    default: { show: () => '/manage/settings' },
+}));
+vi.mock('@/actions/App/Http/Controllers/Producer/ProductController', () => ({
+    default: { index: () => '/producer/products' },
+}));
+vi.mock('@/actions/App/Http/Controllers/Producer/CutoffController', () => ({
+    default: { show: () => '/producer/cutoff' },
+}));
 
 describe('dashboard presentation', () => {
-    it('renders the existing translated dashboard title with the placeholders', async () => {
-        const app = createSSRApp(Dashboard);
+    it('renders the translated dashboard title', async () => {
+        const app = createSSRApp(Dashboard, {
+            roles: ['member'],
+            isManager: false,
+            isMember: true,
+            nextPickup: '2026-11-05',
+            openCycles: 1,
+            balance: 5000,
+            pendingPickups: [],
+            managerSummary: null,
+        });
         installTranslations(app);
         const html = await renderToString(app);
 
         expect(html).toContain('Inici');
-        expect(html.match(/pilot-panel/g)).toHaveLength(4);
+    });
+
+    it('shows member summary cards for a member', async () => {
+        const app = createSSRApp(Dashboard, {
+            roles: ['member'],
+            isManager: false,
+            isMember: true,
+            nextPickup: '2026-11-05',
+            openCycles: 2,
+            balance: 5000,
+            pendingPickups: [],
+            managerSummary: null,
+        });
+        installTranslations(app);
+        const html = await renderToString(app);
+
+        expect(html).toContain('Saldo');
+        expect(html).toContain('Recollida');
+    });
+
+    it('shows manager summary for a manager', async () => {
+        const app = createSSRApp(Dashboard, {
+            roles: ['manager'],
+            isManager: true,
+            isMember: false,
+            nextPickup: null,
+            openCycles: 0,
+            balance: null,
+            pendingPickups: [],
+            managerSummary: {
+                cycles: 3,
+                activeCycles: 1,
+                households: 5,
+                activeHouseholds: 4,
+                accounts: 10,
+                pendingInvitations: 2,
+                producers: 6,
+                activeProducers: 5,
+            },
+        });
+        installTranslations(app);
+        const html = await renderToString(app);
+
+        expect(html).toContain('Cooperativa');
+        expect(html).toContain('Cicles');
+        expect(html).toContain('Comptes');
     });
 });
