@@ -19,6 +19,7 @@ import type { LucideIcon } from '@lucide/vue';
 import { trans } from 'laravel-vue-i18n';
 import { computed } from 'vue';
 import { formatEuroAmount } from '@/lib/formatEuroAmount';
+import type { NavItem } from '@/types';
 import OrderController from '@/actions/App/Http/Controllers/OrderController';
 import WalletController from '@/actions/App/Http/Controllers/WalletController';
 import CycleController from '@/actions/App/Http/Controllers/Manage/CycleController';
@@ -71,7 +72,7 @@ const formattedDate = (iso: string) =>
         month: 'short',
     }).format(new Date(iso));
 
-type QuickLink = { title: string; href: string; icon: LucideIcon };
+type QuickLink = { title: string; href: NavItem['href']; icon: LucideIcon };
 
 const memberLinks: QuickLink[] = [
     { title: 'Orders', href: OrderController.index(), icon: ShoppingBasket },
@@ -113,10 +114,7 @@ const isProducer = computed(() => props.roles.includes('producer'));
             class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
             aria-label="summary"
         >
-            <article
-                v-if="isMember"
-                class="pilot-layout-panel"
-            >
+            <article v-if="isMember" class="pilot-layout-panel">
                 <div class="flex items-center gap-3">
                     <span
                         class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-[var(--secondary)] text-[var(--secondary-foreground)]"
@@ -128,16 +126,17 @@ const isProducer = computed(() => props.roles.includes('producer'));
                             {{ trans('Next pickup') }}
                         </p>
                         <p class="truncate text-lg font-semibold">
-                            {{ nextPickup ? formattedDate(nextPickup) : trans('None') }}
+                            {{
+                                nextPickup
+                                    ? formattedDate(nextPickup)
+                                    : trans('None')
+                            }}
                         </p>
                     </div>
                 </div>
             </article>
 
-            <article
-                v-if="isMember"
-                class="pilot-layout-panel"
-            >
+            <article v-if="isMember" class="pilot-layout-panel">
                 <div class="flex items-center gap-3">
                     <span
                         class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-[var(--secondary)] text-[var(--secondary-foreground)]"
@@ -155,10 +154,7 @@ const isProducer = computed(() => props.roles.includes('producer'));
                 </div>
             </article>
 
-            <article
-                v-if="isMember"
-                class="pilot-layout-panel"
-            >
+            <article v-if="isMember" class="pilot-layout-panel">
                 <div class="flex items-center gap-3">
                     <span
                         class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-[var(--secondary)] text-[var(--secondary-foreground)]"
@@ -193,7 +189,9 @@ const isProducer = computed(() => props.roles.includes('producer'));
                     :key="p.cycleId"
                     class="pilot-list-row"
                 >
-                    <span class="text-sm">{{ formattedDate(p.pickupDate) }}</span>
+                    <span class="text-sm">{{
+                        formattedDate(p.pickupDate)
+                    }}</span>
                 </li>
             </ul>
         </section>
@@ -253,7 +251,11 @@ const isProducer = computed(() => props.roles.includes('producer'));
                     :href="link.href"
                     class="manager-button inline-flex min-h-11 items-center gap-2 rounded-xl bg-[var(--secondary)] px-4 text-sm font-medium text-[var(--secondary-foreground)] transition-colors hover:bg-[var(--accent)]"
                 >
-                    <component :is="link.icon" class="size-4" aria-hidden="true" />
+                    <component
+                        :is="link.icon"
+                        class="size-4"
+                        aria-hidden="true"
+                    />
                     {{ trans(link.title) }}
                 </Link>
             </div>
@@ -276,7 +278,11 @@ const isProducer = computed(() => props.roles.includes('producer'));
                     :href="link.href"
                     class="manager-button inline-flex min-h-11 items-center gap-2 rounded-xl bg-[var(--secondary)] px-4 text-sm font-medium text-[var(--secondary-foreground)] transition-colors hover:bg-[var(--accent)]"
                 >
-                    <component :is="link.icon" class="size-4" aria-hidden="true" />
+                    <component
+                        :is="link.icon"
+                        class="size-4"
+                        aria-hidden="true"
+                    />
                     {{ trans(link.title) }}
                 </Link>
             </div>
@@ -299,7 +305,11 @@ const isProducer = computed(() => props.roles.includes('producer'));
                     :href="link.href"
                     class="manager-button inline-flex min-h-11 items-center gap-2 rounded-xl bg-[var(--secondary)] px-4 text-sm font-medium text-[var(--secondary-foreground)] transition-colors hover:bg-[var(--accent)]"
                 >
-                    <component :is="link.icon" class="size-4" aria-hidden="true" />
+                    <component
+                        :is="link.icon"
+                        class="size-4"
+                        aria-hidden="true"
+                    />
                     {{ trans(link.title) }}
                 </Link>
             </div>
