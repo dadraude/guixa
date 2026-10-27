@@ -1,0 +1,225 @@
+/*
+ * Paletes editables: canvieu els valors d’aquest primer bloc i recarregueu la pàgina.
+ * El navegador serveix aquest fitxer directament; no cal compilar els assets.
+ * Si canvieu un color principal, reviseu també els colors de text i focus per mantenir el contrast.
+ */
+:root {
+    /* Compartit */
+    --palette-white: #ffffff;
+    --palette-ink: #090e18;
+
+    /* Tema blau: pàgines públiques, sòcies i productores */
+    --palette-blue-primary: #08137b;
+    --palette-blue-deep: #061789;
+    --palette-blue-light: #75abed;
+    --palette-blue-medium: #3e67b2;
+    --palette-blue-strong: #344897;
+    --palette-blue-pale: #b7e0f8;
+    --palette-blue-mist: #9aaee5;
+    --palette-blue-teal: #67a1b4;
+    --palette-blue-background: #eff4f8;
+    --palette-blue-surface: #e4eaf3;
+    --palette-blue-dark-background: #070810;
+    --palette-blue-muted: #4a585b;
+    --palette-blue-dark-muted: #a0a3ae;
+
+    /* Administració: els cinc colors de la referència */
+    --palette-admin-green: #39a845;
+    --palette-admin-aqua: #98dddf;
+    --palette-admin-lavender: #ccb5d6;
+    --palette-admin-pink: #ffbbb9;
+    --palette-admin-white: #f4f9ff;
+
+    /* Administració: contrast de text, camps i mode fosc */
+    --palette-admin-ink: #16231b;
+    --palette-admin-muted-text: #405a5d;
+    --palette-admin-lavender-ink: #2c1e35;
+    --palette-admin-border: #c8d7d9;
+    --palette-admin-input-border: #6b8488;
+    --palette-admin-focus: #287a34;
+    --palette-admin-dark-background: #0e1517;
+    --palette-admin-dark-surface: #172124;
+    --palette-admin-dark-secondary: #254648;
+    --palette-admin-dark-muted: #1d2c30;
+    --palette-admin-dark-muted-text: #bdccd0;
+    --palette-admin-dark-accent: #4b3d54;
+    --palette-admin-dark-border: #60797b;
+    --palette-admin-dark-input-border: #719196;
+    --palette-admin-dark-sidebar: #142023;
+}
+
+/* Assignació dels colors als elements de la interfície. */
+:root {
+    --background: var(--palette-blue-background);
+    --foreground: var(--palette-ink);
+    --card: var(--palette-white);
+    --card-foreground: var(--palette-ink);
+    --popover: var(--palette-white);
+    --popover-foreground: var(--palette-ink);
+    --primary: var(--palette-blue-primary);
+    --primary-foreground: var(--palette-white);
+    --secondary: var(--palette-blue-surface);
+    --secondary-foreground: var(--palette-blue-primary);
+    --muted: var(--palette-blue-surface);
+    --muted-foreground: var(--palette-blue-muted);
+    --accent: var(--palette-blue-pale);
+    --accent-foreground: var(--palette-blue-primary);
+    --destructive: hsl(0 84.2% 60.2%);
+    --destructive-foreground: hsl(0 0% 98%);
+    --border: var(--palette-blue-mist);
+    --input: var(--palette-blue-muted);
+    --ring: var(--palette-blue-medium);
+    --chart-1: var(--palette-blue-light);
+    --chart-2: var(--palette-blue-medium);
+    --chart-3: var(--palette-blue-strong);
+    --chart-4: var(--palette-blue-teal);
+    --chart-5: var(--palette-blue-deep);
+    --sidebar-background: var(--palette-blue-surface);
+    --sidebar-foreground: var(--palette-ink);
+    --sidebar-primary: var(--palette-blue-primary);
+    --sidebar-primary-foreground: var(--palette-white);
+    --sidebar-accent: var(--palette-blue-pale);
+    --sidebar-accent-foreground: var(--palette-blue-primary);
+    --sidebar-border: var(--palette-blue-mist);
+    --sidebar-ring: var(--palette-blue-medium);
+    --sidebar: var(--palette-blue-surface);
+}
+
+.dark {
+    --background: var(--palette-blue-dark-background);
+    --foreground: var(--palette-blue-background);
+    --card: var(--palette-ink);
+    --card-foreground: var(--palette-blue-background);
+    --popover: var(--palette-ink);
+    --popover-foreground: var(--palette-blue-background);
+    --primary: var(--palette-blue-light);
+    --primary-foreground: var(--palette-blue-dark-background);
+    --secondary: color-mix(
+        in srgb,
+        var(--palette-blue-strong) 35%,
+        var(--palette-ink)
+    );
+    --secondary-foreground: var(--palette-blue-background);
+    --muted: color-mix(
+        in srgb,
+        var(--palette-blue-strong) 35%,
+        var(--palette-ink)
+    );
+    --muted-foreground: var(--palette-blue-dark-muted);
+    --accent: var(--palette-blue-strong);
+    --accent-foreground: var(--palette-blue-background);
+    --destructive: hsl(0 84% 60%);
+    --destructive-foreground: hsl(0 0% 98%);
+    --border: var(--palette-blue-muted);
+    --input: var(--palette-blue-dark-muted);
+    --ring: var(--palette-blue-light);
+    --chart-1: var(--palette-blue-pale);
+    --chart-2: var(--palette-blue-light);
+    --chart-3: var(--palette-blue-teal);
+    --chart-4: var(--palette-blue-mist);
+    --chart-5: var(--palette-blue-medium);
+    --sidebar-background: var(--palette-ink);
+    --sidebar-foreground: var(--palette-blue-background);
+    --sidebar-primary: var(--palette-blue-light);
+    --sidebar-primary-foreground: var(--palette-blue-dark-background);
+    --sidebar-accent: var(--palette-blue-strong);
+    --sidebar-accent-foreground: var(--palette-blue-background);
+    --sidebar-border: var(--palette-blue-muted);
+    --sidebar-ring: var(--palette-blue-light);
+    --sidebar: var(--palette-ink);
+}
+
+.pilot-theme {
+    --destructive: oklch(0.56 0.21 25.39);
+    --destructive-foreground: oklch(1 0 0);
+    --pilot-success: #2d684a;
+    --pilot-success-foreground: var(--palette-white);
+    --pilot-warning: #795014;
+    --pilot-warning-foreground: var(--palette-white);
+}
+
+.dark .pilot-theme {
+    --destructive: oklch(0.72 0.17 25.39);
+    --destructive-foreground: oklch(0.2 0 0);
+    --pilot-success: #a1dbb2;
+    --pilot-success-foreground: #19231d;
+    --pilot-warning: #f3ce85;
+    --pilot-warning-foreground: #2a2113;
+    --pilot-input-fill: color-mix(
+        in srgb,
+        var(--palette-blue-strong) 35%,
+        var(--palette-ink)
+    );
+}
+
+.coop-manager-shell {
+    --background: var(--palette-admin-white);
+    --foreground: var(--palette-admin-ink);
+    --card: var(--palette-white);
+    --card-foreground: var(--palette-admin-ink);
+    --popover: var(--palette-white);
+    --popover-foreground: var(--palette-admin-ink);
+    --primary: var(--palette-admin-green);
+    --primary-foreground: var(--palette-ink);
+    --secondary: var(--palette-admin-aqua);
+    --secondary-foreground: var(--palette-admin-ink);
+    --muted: color-mix(
+        in srgb,
+        var(--palette-admin-aqua) 18%,
+        var(--palette-admin-white)
+    );
+    --muted-foreground: var(--palette-admin-muted-text);
+    --accent: var(--palette-admin-lavender);
+    --accent-foreground: var(--palette-admin-lavender-ink);
+    --border: var(--palette-admin-border);
+    --input: var(--palette-admin-input-border);
+    --ring: var(--palette-admin-focus);
+    --sidebar: var(--palette-admin-white);
+    --sidebar-foreground: var(--palette-admin-ink);
+    --sidebar-accent: var(--palette-admin-aqua);
+    --sidebar-accent-foreground: var(--palette-admin-ink);
+    --sidebar-border: var(--palette-admin-border);
+    --sidebar-primary: var(--palette-admin-green);
+    --sidebar-primary-foreground: var(--palette-ink);
+    --sidebar-background: var(--palette-admin-white);
+    --sidebar-ring: var(--palette-admin-focus);
+    --chart-1: var(--palette-admin-green);
+    --chart-2: var(--palette-admin-aqua);
+    --chart-3: var(--palette-admin-lavender);
+    --chart-4: var(--palette-admin-pink);
+    --chart-5: var(--palette-admin-focus);
+}
+
+.dark .coop-manager-shell {
+    --background: var(--palette-admin-dark-background);
+    --foreground: var(--palette-admin-white);
+    --card: var(--palette-admin-dark-surface);
+    --card-foreground: var(--palette-admin-white);
+    --popover: var(--palette-admin-dark-surface);
+    --popover-foreground: var(--palette-admin-white);
+    --primary: var(--palette-admin-aqua);
+    --primary-foreground: var(--palette-admin-dark-background);
+    --secondary: var(--palette-admin-dark-secondary);
+    --secondary-foreground: var(--palette-admin-white);
+    --muted: var(--palette-admin-dark-muted);
+    --muted-foreground: var(--palette-admin-dark-muted-text);
+    --accent: var(--palette-admin-dark-accent);
+    --accent-foreground: var(--palette-admin-white);
+    --border: var(--palette-admin-dark-border);
+    --input: var(--palette-admin-dark-input-border);
+    --ring: var(--palette-admin-aqua);
+    --sidebar: var(--palette-admin-dark-sidebar);
+    --sidebar-foreground: var(--palette-admin-white);
+    --sidebar-accent: var(--palette-admin-dark-secondary);
+    --sidebar-accent-foreground: var(--palette-admin-white);
+    --sidebar-border: var(--palette-admin-dark-border);
+    --sidebar-primary: var(--palette-admin-aqua);
+    --sidebar-primary-foreground: var(--palette-admin-dark-background);
+    --sidebar-background: var(--palette-admin-dark-sidebar);
+    --sidebar-ring: var(--palette-admin-aqua);
+    --chart-1: var(--palette-admin-green);
+    --chart-2: var(--palette-admin-aqua);
+    --chart-3: var(--palette-admin-lavender);
+    --chart-4: var(--palette-admin-pink);
+    --chart-5: var(--palette-admin-white);
+}
