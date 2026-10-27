@@ -38,6 +38,24 @@ export const checkedFiles = [
     'pages/Manage/ReturnItems/Index.vue',
     'pages/Manage/ReturnItems/Create.vue',
     'pages/Manage/ReturnItems/Edit.vue',
+    'pages/settings/Appearance.vue',
+    'pages/settings/Profile.vue',
+    'pages/settings/Security.vue',
+    'pages/auth/AcceptInvitation.vue',
+    'pages/auth/ConfirmPassword.vue',
+    'pages/auth/ForgotPassword.vue',
+    'pages/auth/Login.vue',
+    'pages/auth/ResetPassword.vue',
+    'pages/auth/TwoFactorChallenge.vue',
+    'pages/auth/VerifyEmail.vue',
+    'layouts/settings/Layout.vue',
+    'layouts/AuthLayout.vue',
+    'layouts/auth/AuthSimpleLayout.vue',
+    'components/Heading.vue',
+    'components/DeleteUser.vue',
+    'components/ManageTwoFactor.vue',
+    'components/TwoFactorRecoveryCodes.vue',
+    'components/ManagePasskeys.vue',
 ];
 
 const sources = import.meta.glob<string>('/resources/js/**/*.vue', {
@@ -48,8 +66,18 @@ const sources = import.meta.glob<string>('/resources/js/**/*.vue', {
 
 const excludedFromChecks = ['components/ui/', 'pages/Welcome.vue'];
 
+// T46: existing spacing retained after rendered before/after review.
+// The allowlist is exact by file and class; new off-grid values still fail.
+const retainedT46Spacing: Record<string, readonly string[]> = {
+    'pages/auth/Login.vue': ['space-x-3'],
+    'layouts/auth/AuthSimpleLayout.vue': ['md:p-10'],
+    'components/Heading.vue': ['space-y-0.5', 'mb-0.5'],
+    'components/DeleteUser.vue': ['space-y-0.5', 'space-y-3'],
+    'components/TwoFactorRecoveryCodes.vue': ['gap-3', 'mt-3', 'space-y-3'],
+};
+
 const spacingUtility =
-    /^-?(?:p|px|py|pt|pr|pb|pl|ps|pe|m|mx|my|mt|mr|mb|ml|ms|me|gap|gap-x|gap-y|space-x|space-y)-(.+)$/;
+    /^-?(?:p|px|py|pt|pr|pb|pl|ps|pe|m|mx|my|mt|mr|mb|ml|ms|me|gap-x|gap-y|gap|space-x|space-y)-(.+)$/;
 const sizeUtility = /^-?(?:w|h|size|min-w|min-h|max-w|max-h)-\[.+\]$/;
 // Step 1 (4 px) is allowed everywhere: the check cannot tell a single control
 // from a container, so review and the visual check cover that rule.
@@ -110,7 +138,7 @@ describe('layout rules static check', () => {
 
     it('accepts the grid steps, with variants and negative margins', () => {
         const classes =
-            'p-4 md:p-6 gap-2 @2xl:px-6 py-8 mt-12 -ml-1 mx-auto group-data-[collapsible=icon]:p-0 min-h-11 size-4 grid-cols-[minmax(0,1fr)_8rem]';
+            'p-4 md:p-6 gap-2 gap-x-2 gap-x-1 @2xl:px-6 py-8 mt-12 -ml-1 mx-auto group-data-[collapsible=icon]:p-0 min-h-11 size-4 grid-cols-[minmax(0,1fr)_8rem]';
         expect(offGridClasses(classes)).toEqual([]);
     });
 
@@ -124,6 +152,8 @@ describe('layout rules static check', () => {
     });
 
     it.each(checkedFiles)('%s uses only the spacing grid', (file) => {
-        expect(offGridClasses(sources[`/resources/js/${file}`])).toEqual([]);
+        expect(offGridClasses(sources[`/resources/js/${file}`])).toEqual(
+            retainedT46Spacing[file] ?? [],
+        );
     });
 });

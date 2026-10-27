@@ -51,7 +51,7 @@ onMounted(async () => {
         </CardHeader>
         <CardContent class="px-4">
             <div
-                class="flex flex-col gap-3 select-none sm:flex-row sm:items-center sm:justify-between"
+                class="flex flex-col gap-3 select-none sm:flex-row sm:flex-wrap sm:items-center sm:justify-between"
             >
                 <Button @click="toggleRecoveryCodesVisibility" class="w-fit">
                     <component

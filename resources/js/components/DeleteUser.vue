@@ -26,7 +26,7 @@ const scrollFocusIntoView = (event: FocusEvent): void =>
 </script>
 
 <template>
-    <div class="pilot-panel space-y-6 p-3 sm:p-6">
+    <div class="pilot-panel space-y-6 p-4 sm:p-6">
         <Heading
             variant="small"
             title="Delete account"
