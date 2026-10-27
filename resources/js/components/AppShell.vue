@@ -23,7 +23,12 @@ const isOpen = usePage().props.sidebarOpen;
     >
         <slot />
     </div>
-    <SidebarProvider v-else :default-open="isOpen" :class="$props.class">
+    <SidebarProvider
+        v-else
+        :default-open="isOpen"
+        sidebar-width="min(16rem, 30vw)"
+        :class="$props.class"
+    >
         <slot />
     </SidebarProvider>
 </template>

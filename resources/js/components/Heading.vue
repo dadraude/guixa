@@ -3,6 +3,7 @@ type Props = {
     title: string;
     description?: string;
     variant?: 'default' | 'small';
+    as?: 'h1' | 'h2' | 'div';
 };
 
 withDefaults(defineProps<Props>(), {
@@ -12,7 +13,8 @@ withDefaults(defineProps<Props>(), {
 
 <template>
     <header :class="variant === 'small' ? '' : 'mb-8 space-y-0.5'">
-        <h2
+        <component
+            :is="as ?? (variant === 'small' ? 'h2' : 'h1')"
             class="pilot-heading"
             :class="
                 variant === 'small'
@@ -21,7 +23,7 @@ withDefaults(defineProps<Props>(), {
             "
         >
             {{ title }}
-        </h2>
+        </component>
         <p v-if="description" class="text-sm text-muted-foreground">
             {{ description }}
         </p>

@@ -18,7 +18,7 @@ providePilotTheme(toRef(props, 'pilotTheme'));
 
 <template>
     <div
-        class="flex min-h-svh flex-col items-center justify-center gap-6 bg-background p-4 sm:p-6 md:p-10"
+        class="material-auth flex min-h-svh flex-col items-center justify-center gap-6 bg-background p-4 sm:p-6 md:p-10"
         :class="pilotTheme ? 'pilot-theme text-foreground' : ''"
     >
         <div class="pilot-auth w-full max-w-sm">

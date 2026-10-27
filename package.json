@@ -36,6 +36,7 @@
         "@vitejs/plugin-vue": "^6.0.0",
         "@vue/test-utils": "2.5.1",
         "concurrently": "^10.0.3",
+        "daisyui": "^5.7.50",
         "jsdom": "30.1.2",
         "typescript": "^6.0.3",
         "vite": "catalog:",

@@ -8,13 +8,16 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
+import { useAppNavigation } from '@/composables/useAppNavigation';
 import { useCurrentUrl } from '@/composables/useCurrentUrl';
+import { toUrl } from '@/lib/utils';
 import type { NavItem } from '@/types';
 
 defineProps<{
     items: NavItem[];
 }>();
 
+const { currentItem } = useAppNavigation();
 const { isCurrentUrl } = useCurrentUrl();
 </script>
 
@@ -26,10 +29,18 @@ const { isCurrentUrl } = useCurrentUrl();
                 <SidebarMenuButton
                     as-child
                     class="min-h-11 group-data-[collapsible=icon]:min-h-11 group-data-[collapsible=icon]:min-w-11"
-                    :is-active="isCurrentUrl(item.href)"
+                    :is-active="
+                        currentItem &&
+                        toUrl(currentItem.href) === toUrl(item.href)
+                    "
                     :tooltip="trans(item.title)"
                 >
-                    <Link :href="item.href">
+                    <Link
+                        :href="item.href"
+                        :aria-current="
+                            isCurrentUrl(item.href) ? 'page' : undefined
+                        "
+                    >
                         <component :is="item.icon" aria-hidden="true" />
                         <span>{{ trans(item.title) }}</span>
                     </Link>

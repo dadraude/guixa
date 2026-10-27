@@ -32,6 +32,7 @@ const { isCurrentOrParentUrl } = useCurrentUrl();
     <div class="pilot-settings">
         <div class="pilot-page pilot-settings-inner">
             <Heading
+                as="div"
                 title="Settings"
                 description="Manage your profile and account settings"
             />

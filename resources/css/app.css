@@ -1,4 +1,9 @@
 @import 'tailwindcss';
+@plugin 'daisyui' {
+    themes: false;
+    prefix: daisy-;
+    exclude: rootscrollgutter;
+}
 
 @import 'tw-animate-css';
 
@@ -1058,6 +1063,110 @@
 
 .pilot-theme .order-page-header > div:last-child {
     min-width: min(100%, 12rem);
+}
+
+/* Shared Material 3 scaffold. Existing Guixa color tokens supply its roles. */
+.material-app-shell {
+    --material-surface: var(--background);
+    --material-surface-container: var(--sidebar-background);
+    --material-on-surface: var(--foreground);
+    --material-selected-container: var(--sidebar-accent);
+    background: var(--material-surface);
+    color: var(--material-on-surface);
+}
+
+.material-app-shell [data-sidebar='sidebar'] {
+    background: var(--material-surface-container);
+}
+
+[data-sidebar='sidebar'][data-mobile='true'] {
+    max-width: calc(100vw - 2rem);
+}
+
+.material-app-shell [data-sidebar='menu-button'][data-active='true'] {
+    border-radius: 9999px;
+    background: var(--material-selected-container);
+    color: var(--sidebar-accent-foreground);
+}
+
+.material-app-bar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    min-height: 4rem;
+    gap: 1rem;
+    padding-inline: 1rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--material-surface);
+}
+
+.material-app-bar-brand,
+.material-app-bar-title {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.material-app-bar-brand {
+    color: var(--muted-foreground);
+    font-size: 0.75rem;
+    line-height: 1rem;
+}
+
+.material-app-bar-title {
+    font-family: var(--font-sans);
+    font-size: 1.125rem;
+    font-weight: 600;
+    line-height: 1.5rem;
+}
+
+.material-app-content {
+    width: 100%;
+    max-width: 80rem;
+    min-width: 0;
+    flex: 1;
+    margin-inline: auto;
+}
+
+.material-app-shell
+    .material-app-content
+    > :is(.pilot-page, .pilot-layout-page),
+.material-app-shell .material-app-content > .flex.flex-col.gap-8.p-4 {
+    padding: 1.5rem 1rem;
+}
+
+.material-skip-link {
+    position: fixed;
+    top: 0.5rem;
+    left: 0.5rem;
+    z-index: 60;
+    transform: translateY(-200%);
+    border-radius: 9999px;
+    background: var(--primary);
+    color: var(--primary-foreground);
+    padding: 0.75rem 1rem;
+}
+
+.material-skip-link:focus-visible {
+    transform: translateY(0);
+}
+
+.material-auth .pilot-panel {
+    border-radius: 1.5rem;
+}
+
+@media (min-width: 48rem) {
+    .material-app-bar {
+        padding-inline: 1.5rem;
+    }
+
+    .material-app-shell
+        .material-app-content
+        > :is(.pilot-page, .pilot-layout-page),
+    .material-app-shell .material-app-content > .flex.flex-col.gap-8.p-4 {
+        padding: 2rem 1.5rem;
+    }
 }
 
 .pilot-theme :focus-visible,
