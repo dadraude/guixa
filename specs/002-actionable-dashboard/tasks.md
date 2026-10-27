@@ -2,6 +2,19 @@
 
 Status: Accepted (2026-10-27). [Spec](spec.md) and [plan](plan.md) accepted.
 
+## Linear tracking (2026-10-27)
+
+Workspace `draude`, team `DRA`, project [Coop](https://linear.app/draude/project/coop-f80f57e1496d), milestone **Actionable dashboard**. Four root issues form a tracer sequence through native blocked-by relations; no parent issue or contextual relations were added. The T01–T04 IDs are scoped to spec 002 and their issue titles include that spec to distinguish them from IDs in spec 001.
+
+| Task | Linear issue | Native blocked by |
+| --- | --- | --- |
+| T01 | [DRA-201](https://linear.app/draude/issue/DRA-201/t01-dashboard-manager-focus-and-first-actions-spec-002) | — |
+| T02 | [DRA-202](https://linear.app/draude/issue/DRA-202/t02-dashboard-manager-progress-and-pickups-spec-002) | DRA-201 |
+| T03 | [DRA-203](https://linear.app/draude/issue/DRA-203/t03-dashboard-role-aware-attention-spec-002) | DRA-202 |
+| T04 | [DRA-204](https://linear.app/draude/issue/DRA-204/t04-dashboard-four-cycle-history-spec-002) | DRA-203 |
+
+All four issues are Backlog, unassigned and without `ready-for-agent`. Ticket creation does not authorize implementation. The T01 implementation draft remains stopped in its separate worktree.
+
 Each task is a reviewable vertical slice through authorized Application reads, HTTP props, translated Vue presentation, and its focused tests. Keep the existing dashboard route and accepted palette. A task is done when its listed scenarios pass, relevant architecture and type checks stay green, and its changed interface passes the visual and accessibility checks in R10. Record any behavior change in the spec first and any implementation deviation in [log.md](log.md).
 
 | ID | Task | Covers | After |

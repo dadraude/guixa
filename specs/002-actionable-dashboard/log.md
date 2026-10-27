@@ -70,3 +70,13 @@ Q: “Please review the proposed spec and reply ‘accept spec’ if it matches 
 A: “ok”
 
 The answer accepts the proposed spec, plan and T01 start. Their status was updated to Accepted before production work.
+
+## 2026-10-27 · Q&A
+
+Q: “Do you approve creating the milestone and four Backlog issues with these dependencies?”
+
+A: “yes”
+
+## 2026-10-27 · Change
+
+`tasks.md` now links T01–T04 to Linear DRA-201–DRA-204 under the new **Actionable dashboard** milestone in Coop. Native blocking relations are T01 → T02 → T03 → T04, with no parent or contextual links. Readback confirmed each issue is in Backlog without `ready-for-agent`. This records the user's approval to publish and track the tracer sequence; implementation remains stopped as separately instructed.
