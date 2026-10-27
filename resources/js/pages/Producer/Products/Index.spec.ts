@@ -42,9 +42,10 @@ describe('producer product mobile row labels', () => {
         expect(html).toContain('Unitat');
         expect(html).toContain('Preu');
         expect(html).toContain('Envasos per unitat');
-        expect(html).toContain('Estat');
+        expect(html).toContain('Actiu');
         expect(html).toContain('Pa de pagès');
         expect(html).toContain('3.50 EUR');
-        expect(html).toContain('Deactivate');
+        expect(html).toContain('aria-label="Desactiva: Pa de pagès"');
+        expect(html).toContain('pilot-table-actions');
     });
 });

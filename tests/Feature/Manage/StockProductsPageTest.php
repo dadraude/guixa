@@ -26,6 +26,7 @@ it('keeps the stock pages to managers', function (string $method, string $uri) {
     ['get', '/manage/stock/{id}/edit'],
     ['put', '/manage/stock/{id}'],
     ['delete', '/manage/stock/{id}'],
+    ['put', '/manage/stock/{id}/reactivation'],
 ]);
 
 it('lists the stock products with their price as a decimal string (R25)', function () {
@@ -122,6 +123,16 @@ it('deactivates a stock product (R25)', function () {
     expect($product->refresh()->active)->toBeFalse();
 });
 
+it('reactivates a stock product (R25)', function () {
+    $product = honey(['active' => false]);
+
+    $this->actingAs(accountWith(Role::Manager))
+        ->put("/manage/stock/{$product->id}/reactivation")
+        ->assertRedirect('/manage/stock');
+
+    expect($product->refresh()->active)->toBeTrue();
+});
+
 it('answers 404 to a stock product id that is not a UUID', function (string $method, string $uri) {
     $this->actingAs(accountWith(Role::Manager))->{$method}($uri, [
         'name' => 'Honey', 'unit' => 'jar', 'price' => '1', 'variable' => false,
@@ -130,6 +141,7 @@ it('answers 404 to a stock product id that is not a UUID', function (string $met
     ['get', '/manage/stock/not-a-uuid/edit'],
     ['put', '/manage/stock/not-a-uuid'],
     ['delete', '/manage/stock/not-a-uuid'],
+    ['put', '/manage/stock/not-a-uuid/reactivation'],
 ]);
 
 it('accepts a comma as the decimal separator of containers per unit', function () {

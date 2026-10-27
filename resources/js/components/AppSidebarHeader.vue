@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { trans } from 'laravel-vue-i18n';
 import AppLogoIcon from '@/components/AppLogoIcon.vue';
+import AppearanceMenu from '@/components/AppearanceMenu.vue';
 import NavUser from '@/components/NavUser.vue';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 
@@ -21,7 +22,8 @@ defineProps<{ sectionTitle: string }>();
                 {{ trans(sectionTitle) }}
             </span>
         </div>
-        <div class="daisy-navbar-end min-w-0">
+        <div class="daisy-navbar-end min-w-0 gap-2">
+            <AppearanceMenu />
             <div class="material-app-bar-user">
                 <NavUser />
             </div>

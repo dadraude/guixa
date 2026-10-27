@@ -1,16 +1,22 @@
 import { usePage } from '@inertiajs/vue3';
 import {
+    Boxes,
     CalendarDays,
     Home,
     LayoutGrid,
     Package,
     Settings,
+    Settings2,
+    ShoppingBasket,
+    Sprout,
     Timer,
     Undo2,
     UserCog,
+    UsersRound,
     Wallet,
     Wheat,
 } from '@lucide/vue';
+import type { LucideIcon } from '@lucide/vue';
 import { computed } from 'vue';
 import OrderController from '@/actions/App/Http/Controllers/OrderController';
 import AccountController from '@/actions/App/Http/Controllers/Manage/AccountController';
@@ -29,6 +35,7 @@ import type { NavItem } from '@/types';
 
 export type NavigationSection = {
     title: string;
+    icon: LucideIcon;
     items: NavItem[];
 };
 
@@ -50,17 +57,25 @@ export function navigationSectionsFor(
     return [
         {
             title: 'Overview',
+            icon: LayoutGrid,
             items: [
                 { title: 'Dashboard', href: dashboard(), icon: LayoutGrid },
             ],
         },
         ...(roles.has('member')
-            ? [{ title: 'Orders and wallet', items: memberItems }]
+            ? [
+                  {
+                      title: 'Orders and wallet',
+                      icon: ShoppingBasket,
+                      items: memberItems,
+                  },
+              ]
             : []),
         ...(roles.has('manager')
             ? [
                   {
                       title: 'Cooperative',
+                      icon: UsersRound,
                       items: [
                           {
                               title: 'Cycles',
@@ -76,6 +91,7 @@ export function navigationSectionsFor(
                   },
                   {
                       title: 'Catalog and stock',
+                      icon: Boxes,
                       items: [
                           {
                               title: 'Producers',
@@ -96,6 +112,7 @@ export function navigationSectionsFor(
                   },
                   {
                       title: 'Administration',
+                      icon: Settings2,
                       items: [
                           {
                               title: 'Accounts',
@@ -112,7 +129,7 @@ export function navigationSectionsFor(
               ]
             : []),
         ...(roles.has('producer')
-            ? [{ title: 'Production', items: producerItems }]
+            ? [{ title: 'Production', icon: Sprout, items: producerItems }]
             : []),
     ];
 }

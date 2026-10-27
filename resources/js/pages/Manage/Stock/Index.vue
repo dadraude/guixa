@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { Form, Head, Link } from '@inertiajs/vue3';
+import { History, Pencil, Plus } from '@lucide/vue';
 import StockMovementController from '@/actions/App/Http/Controllers/Manage/StockMovementController';
 import StockProductController from '@/actions/App/Http/Controllers/Manage/StockProductController';
 import Heading from '@/components/Heading.vue';
-import StatusIndicator from '@/components/StatusIndicator.vue';
+import ActiveSwitch from '@/components/ActiveSwitch.vue';
 import { Button } from '@/components/ui/button';
 import { trans } from 'laravel-vue-i18n';
 
@@ -28,7 +29,10 @@ defineProps<{
                 description="Products kept at the cooperative and sold at pickup"
             />
             <Button as-child>
-                <Link :href="StockProductController.create()">New product</Link>
+                <Link :href="StockProductController.create()">
+                    <Plus aria-hidden="true" />
+                    New product
+                </Link>
             </Button>
         </div>
 
@@ -43,6 +47,7 @@ defineProps<{
             <table class="pilot-data-table pilot-manager-table w-full text-sm">
                 <thead>
                     <tr class="border-b text-left">
+                        <th scope="col" class="py-2">{{ trans('Active') }}</th>
                         <th scope="col" class="py-2">{{ trans('Name') }}</th>
                         <th scope="col" class="py-2">{{ trans('Unit') }}</th>
                         <th scope="col" class="py-2">{{ trans('Price') }}</th>
@@ -52,8 +57,7 @@ defineProps<{
                         <th scope="col" class="py-2">
                             {{ trans('Available') }}
                         </th>
-                        <th scope="col" class="py-2">{{ trans('Status') }}</th>
-                        <th scope="col" class="py-2" />
+                        <th scope="col" class="py-2">{{ trans('Actions') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -63,6 +67,31 @@ defineProps<{
                         class="border-b"
                         :class="{ 'text-muted-foreground': !product.active }"
                     >
+                        <td class="py-2">
+                            <span class="pilot-cell-label" aria-hidden="true">{{
+                                trans('Active')
+                            }}</span>
+                            <Form
+                                v-bind="
+                                    product.active
+                                        ? StockProductController.destroy.form(
+                                              product.id,
+                                          )
+                                        : StockProductController.reactivate.form(
+                                              product.id,
+                                          )
+                                "
+                                v-slot="{ processing }"
+                                class="pilot-status-switch-form"
+                            >
+                                <ActiveSwitch
+                                    :id="product.id"
+                                    :active="product.active"
+                                    :name="product.name"
+                                    :processing="processing"
+                                />
+                            </Form>
+                        </td>
                         <td class="py-2 font-medium">
                             <span class="pilot-cell-label" aria-hidden="true">{{
                                 trans('Name')
@@ -96,54 +125,45 @@ defineProps<{
                         </td>
                         <td class="py-2">
                             <span class="pilot-cell-label" aria-hidden="true">{{
-                                trans('Status')
+                                trans('Actions')
                             }}</span>
-                            <StatusIndicator
-                                :label="
-                                    product.active ? 'Active' : 'Deactivated'
-                                "
-                                :tone="product.active ? 'success' : 'danger'"
-                            />
-                        </td>
-                        <td class="py-2">
-                            <div class="flex flex-wrap justify-end gap-2">
-                                <Button variant="outline" size="sm" as-child>
+                            <div class="pilot-table-actions">
+                                <Button
+                                    variant="outline"
+                                    size="icon"
+                                    class="size-11"
+                                    as-child
+                                >
                                     <Link
                                         :href="
                                             StockMovementController.show(
                                                 product.id,
                                             )
                                         "
-                                        >Movements</Link
+                                        :aria-label="`${trans('Movements')}: ${product.name}`"
+                                        :title="trans('Movements')"
                                     >
+                                        <History aria-hidden="true" />
+                                    </Link>
                                 </Button>
-                                <Button variant="outline" size="sm" as-child>
+                                <Button
+                                    variant="outline"
+                                    size="icon"
+                                    class="size-11"
+                                    as-child
+                                >
                                     <Link
                                         :href="
                                             StockProductController.edit(
                                                 product.id,
                                             )
                                         "
-                                        >Edit</Link
+                                        :aria-label="`${trans('Edit')}: ${product.name}`"
+                                        :title="trans('Edit')"
                                     >
+                                        <Pencil aria-hidden="true" />
+                                    </Link>
                                 </Button>
-                                <Form
-                                    v-if="product.active"
-                                    v-bind="
-                                        StockProductController.destroy.form(
-                                            product.id,
-                                        )
-                                    "
-                                >
-                                    <Button
-                                        type="submit"
-                                        variant="outline"
-                                        size="sm"
-                                        :data-test="`deactivate-${product.id}`"
-                                    >
-                                        Deactivate
-                                    </Button>
-                                </Form>
                             </div>
                         </td>
                     </tr>

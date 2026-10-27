@@ -636,6 +636,46 @@
     border-bottom: 1px solid var(--material-divider);
 }
 
+.pilot-theme .pilot-table-actions {
+    --pilot-action-size: clamp(44px, 2.75rem, 56px);
+    display: inline-grid;
+    grid-auto-flow: column;
+    grid-auto-columns: var(--pilot-action-size);
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.pilot-theme .pilot-table-actions form,
+.pilot-theme .pilot-table-actions :is(a, button) {
+    width: var(--pilot-action-size);
+    height: var(--pilot-action-size);
+}
+
+.pilot-theme .pilot-status-switch {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.pilot-theme .pilot-status-switch .daisy-toggle {
+    --border: 2px;
+    --radius-selector: 9999px;
+    --color-base-content: var(--foreground);
+    --color-base-100: var(--card);
+    --color-primary: var(--primary);
+    width: 44px;
+    height: 24px;
+    min-height: 24px;
+    flex: none;
+}
+
+.pilot-theme .pilot-status-switch input:disabled {
+    cursor: wait;
+}
+
 .pilot-theme .divide-y > :not(:last-child) {
     border-color: var(--material-divider);
 }
@@ -676,12 +716,16 @@
     }
 
     .pilot-theme .pilot-manager-table :is(th, td):first-child {
-        width: 26%;
+        width: 18%;
+    }
+
+    .pilot-theme .pilot-manager-table :is(th, td):nth-child(2) {
+        width: 24%;
         overflow-wrap: anywhere;
     }
 
     .pilot-theme .pilot-manager-table :is(th, td):last-child {
-        width: 21%;
+        width: 15%;
     }
 }
 
@@ -893,7 +937,7 @@
 
     .pilot-theme .pilot-data-table tr {
         margin-bottom: 0.75rem;
-        border: 1px solid var(--border);
+        border: 0;
         border-radius: var(--radius);
         background: var(--card);
         padding: 0.5rem;
@@ -940,7 +984,7 @@
 
     .pilot-theme .pilot-product-table tr {
         margin-bottom: 0.75rem;
-        border: 1px solid var(--border);
+        border: 0;
         border-radius: var(--radius);
         background: var(--card);
         padding: 0.5rem;
@@ -1174,9 +1218,14 @@
 }
 
 .material-app-shell [data-sidebar='menu-button'][data-active='true'] {
-    border-radius: 9999px;
+    border-radius: 0.75rem;
     background: var(--material-selected-container);
     color: var(--sidebar-accent-foreground);
+}
+
+.material-nav-submenu {
+    width: calc(100% - 1.5rem);
+    margin-left: 1.5rem;
 }
 
 .material-app-bar {

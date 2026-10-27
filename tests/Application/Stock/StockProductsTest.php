@@ -6,6 +6,7 @@ use Guixa\Shared\Domain\Role;
 use Guixa\Stock\Application\CreateStockProduct;
 use Guixa\Stock\Application\DeactivateStockProduct;
 use Guixa\Stock\Application\ListStockProducts;
+use Guixa\Stock\Application\ReactivateStockProduct;
 use Guixa\Stock\Application\UpdateStockProduct;
 use Guixa\Stock\Domain\Error\InvalidContainersPerUnit;
 use Guixa\Stock\Domain\Error\InvalidPrice;
@@ -20,6 +21,7 @@ beforeEach(function () {
     $this->create = new CreateStockProduct($this->products);
     $this->update = new UpdateStockProduct($this->products);
     $this->deactivate = new DeactivateStockProduct($this->products);
+    $this->reactivate = new ReactivateStockProduct($this->products);
     $this->list = new ListStockProducts($this->products);
 });
 
@@ -95,10 +97,21 @@ it('deactivates a stock product and keeps it listed as inactive (R25)', function
     expect(($this->list)($this->manager)[0]->active)->toBeFalse();
 });
 
+it('reactivates a stock product without changing its details (R25)', function () {
+    $id = ($this->create)($this->manager, 'Honey', 'jar', 650, false, null);
+    ($this->deactivate)($this->manager, $id);
+
+    ($this->reactivate)($this->manager, $id);
+
+    expect(($this->list)($this->manager)[0]->active)->toBeTrue();
+    expect(($this->list)($this->manager)[0]->priceCents)->toBe(650);
+});
+
 it('fails on an unknown stock product', function () {
     expect(fn () => ($this->update)($this->manager, 'missing', 'Honey', 'jar', 100, false, null))
         ->toThrow(StockProductNotFound::class);
     expect(fn () => ($this->deactivate)($this->manager, 'missing'))->toThrow(StockProductNotFound::class);
+    expect(fn () => ($this->reactivate)($this->manager, 'missing'))->toThrow(StockProductNotFound::class);
 });
 
 it('lists stock products by name', function () {
@@ -117,5 +130,6 @@ it('only lets a manager manage stock products (R25, R36a)', function (Role $role
     expect(fn () => ($this->create)($actor, 'Oil', 'bottle', 900, false, null))->toThrow(NotAllowed::class);
     expect(fn () => ($this->update)($actor, $id, 'Oil', 'bottle', 900, false, null))->toThrow(NotAllowed::class);
     expect(fn () => ($this->deactivate)($actor, $id))->toThrow(NotAllowed::class);
+    expect(fn () => ($this->reactivate)($actor, $id))->toThrow(NotAllowed::class);
     expect(fn () => ($this->list)($actor))->toThrow(NotAllowed::class);
 })->with([Role::Member, Role::Producer]);

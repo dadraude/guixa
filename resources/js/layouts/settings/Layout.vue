@@ -5,7 +5,6 @@ import Heading from '@/components/Heading.vue';
 import { Button } from '@/components/ui/button';
 import { useCurrentUrl } from '@/composables/useCurrentUrl';
 import { toUrl } from '@/lib/utils';
-import { edit as editAppearance } from '@/routes/appearance';
 import { edit as editProfile } from '@/routes/profile';
 import { edit as editSecurity } from '@/routes/security';
 import type { NavItem } from '@/types';
@@ -18,10 +17,6 @@ const sidebarNavItems: NavItem[] = [
     {
         title: 'Security',
         href: editSecurity(),
-    },
-    {
-        title: 'Appearance',
-        href: editAppearance(),
     },
 ];
 
@@ -43,7 +38,7 @@ const { isCurrentOrParentUrl } = useCurrentUrl();
                         {{ trans('Account settings') }}
                     </h2>
                     <p class="mb-4 text-sm text-muted-foreground">
-                        {{ trans('Profile, security and appearance') }}
+                        {{ trans('Profile and security') }}
                     </p>
                     <nav
                         class="flex flex-col space-y-1 space-x-0"
@@ -71,7 +66,7 @@ const { isCurrentOrParentUrl } = useCurrentUrl();
                                 "
                             >
                                 <component :is="item.icon" class="h-4 w-4" />
-                                {{ item.title }}
+                                {{ trans(item.title) }}
                             </Link>
                         </Button>
                     </nav>

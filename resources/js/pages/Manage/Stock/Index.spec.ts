@@ -42,7 +42,9 @@ describe('manager list presentation', () => {
         expect(html).toContain('pilot-manager-table');
         expect(html).toContain('pilot-cell-label');
         expect(html).toContain('Available');
-        expect(html).toContain('Movements');
+        expect(html).toContain('aria-label="Movements: Honey"');
+        expect(html).toContain('aria-label="Deactivate: Honey"');
+        expect(html).toContain('pilot-table-actions');
     });
 
     it('keeps return item column meanings visible when rows reflow', async () => {
@@ -62,6 +64,7 @@ describe('manager list presentation', () => {
         expect(html).toContain('pilot-manager-table');
         expect(html).toContain('pilot-cell-label');
         expect(html).toContain('0.50');
-        expect(html).toContain('Deactivate');
+        expect(html).toContain('aria-label="Deactivate: Jar"');
+        expect(html).toContain('pilot-table-actions');
     });
 });
