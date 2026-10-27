@@ -843,6 +843,10 @@ motion. No component library is added.
   and `12` (8, 16, 24, 32, 48 px) in `gap-*`, `space-*`, `p*-*` and `m*-*`. The 4 px step (`1`) is
   allowed only inside a single control or inline group, such as an icon beside its label or a
   badge's padding. Other steps (`3`, `5`, `1.5`, `7`…) and arbitrary values are not used.
+  For T46 only, an existing off-grid utility may remain when a measured and inspected comparison
+  finds that replacing it does not improve the current settings or authentication UI. Each retained
+  file/class pair is documented in the T46 visual check and guarded by an exact allowlist in the
+  static check; other utilities remain subject to the grid.
 - **Targets:** keep the constitution's 44 × 44 px minimum for every interactive control, including
   checkboxes, radio items, icon buttons and row actions. Where a visual control is smaller, its hit
   area reaches 44 px; adjacent targets keep at least 8 px between them. Material's 48 px is not

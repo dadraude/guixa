@@ -61,7 +61,7 @@ const toggleRecoveryMode = (clearErrors: () => void): void => {
             >
                 <input type="hidden" name="code" :value="code" />
                 <div
-                    class="flex flex-col items-center justify-center space-y-3 text-center"
+                    class="flex flex-col items-center justify-center space-y-4 text-center"
                 >
                     <div class="flex w-full items-center justify-center">
                         <InputOTP

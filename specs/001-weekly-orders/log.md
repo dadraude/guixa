@@ -1284,3 +1284,13 @@ same style cover all pages. The continuation applies the shared shell to all sig
 routes, aligns authentication and Welcome with the palette, and converts the remaining
 bare manager workflow pages to the established panel pattern. T48–T51 are authorized
 together; the exact route inventory and visual matrix are in the all-page rollout note.
+
+## 2026-10-27 · Change
+
+`plan.md` (Layout rules) and `tasks.md` (T46 Done when): the user's instruction,
+“don't change new ui/layout if it's not an improvement over the current”
+requires retaining sound settings and authentication spacing even where the earlier
+grid would replace it. T46 therefore permits only documented, measured existing
+file/class exceptions in the static check; all other spacing remains strict. This
+keeps the approved T43 patterns where they improve the current screens without
+regressing the PR #240 baseline. No product behavior or `R#`/`S#` changes.

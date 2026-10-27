@@ -357,8 +357,9 @@ Each task's pages are the matching row of the [Existing-screen inventory](#exist
 (T39's row for T43). T44–T46 do not depend on each other and touch disjoint pages; a pattern change
 they need in `resources/css/app.css` is coordinated so two slices do not edit the same rule at once.
 
-**Done when (each task):** its pages use only the plan's spacing grid and patterns, the static check
-covers its files and passes, every control is at least 44 × 44 px, and a visual check in
+**Done when (each task):** its pages use the plan's spacing grid and patterns, subject to the
+measured, exact-file/class T46 exceptions in the plan; the static check covers its files and passes,
+every control is at least 44 × 44 px, and a visual check in
 `docs/visual-checks/` records the rendered matrix (375 px, 1024 px/200% text, 1280 px; light and
 dark) with the shared left edge and no horizontal overflow. Existing requests, props, validation,
 permissions and translations are unchanged and their tests pass. T43 stops for explicit visual

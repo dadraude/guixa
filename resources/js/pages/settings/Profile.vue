@@ -32,7 +32,7 @@ const user = computed(() => page.props.auth.user);
 
     <h1 class="sr-only">Profile settings</h1>
 
-    <div class="pilot-panel flex flex-col space-y-6 p-3 sm:p-6">
+    <div class="pilot-panel flex flex-col space-y-6 p-4 sm:p-6">
         <Heading
             variant="small"
             title="Profile"

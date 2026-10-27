@@ -21,7 +21,7 @@ defineOptions({
 
     <h1 class="sr-only">{{ trans('Appearance settings') }}</h1>
 
-    <div class="pilot-panel space-y-6 p-3 sm:p-6">
+    <div class="pilot-panel space-y-6 p-4 sm:p-6">
         <Heading variant="small" :title="trans('Appearance settings')" />
         <p class="text-sm text-muted-foreground">
             {{ trans('Select the theme from the top-right menu.') }}
