@@ -1540,6 +1540,33 @@ html[data-font-fallback='true'] .pilot-theme {
     input:not([type='checkbox'], [type='radio'], [type='hidden']) {
     font-size: 1rem;
 }
+
+/* Manager form fields need a visible edge on touch layouts, where the shared
+   filled field treatment otherwise resembles the primary action. */
+@media (max-width: 47.999rem) {
+    .coop-manager-shell
+        :is(input[data-slot='input'], button[data-slot='select-trigger']) {
+        border: 1px solid var(--input);
+        border-radius: 0.5rem;
+        background: var(--card);
+    }
+
+    .coop-manager-shell
+        :is(
+            input[data-slot='input'],
+            button[data-slot='select-trigger']
+        ):focus-visible {
+        border-color: var(--ring);
+    }
+
+    .coop-manager-shell
+        :is(
+            input[data-slot='input'],
+            button[data-slot='select-trigger']
+        )[aria-invalid='true'] {
+        border-color: var(--destructive);
+    }
+}
 .manager-dialog {
     width: min(34rem, calc(100vw - 2rem));
     max-height: calc(100dvh - 2rem);

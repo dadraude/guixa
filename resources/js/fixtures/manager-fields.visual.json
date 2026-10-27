@@ -1,0 +1,93 @@
+{
+    "baseUrl": "http://127.0.0.1:5181",
+    "rootFontPx": 16,
+    "darkSelector": "html.dark",
+    "matrix": {
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark"],
+        "text": [100, 200]
+    },
+    "views": [
+        {
+            "id": "manager-form-fields",
+            "path": "/visual-manager-fields.html",
+            "root": "[data-visual-root]",
+            "panels": ".visual-panel",
+            "content": "h1,label,input,button,p",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["#fixture-name", "#fixture-create", "#fixture-household"],
+            "states": [
+                {
+                    "id": "populated",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "invalid",
+                    "query": {
+                        "invalid": 1
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "disabled",
+                    "query": {
+                        "disabled": 1
+                    },
+                    "checks": {
+                        "focus": [],
+                        "noFocusReason": "All fixture controls are disabled in this state."
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
