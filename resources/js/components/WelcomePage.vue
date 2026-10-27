@@ -60,7 +60,7 @@ defineProps<{
                 </section>
 
                 <section
-                    class="grid min-w-0 gap-5 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-7"
+                    class="grid min-w-0 gap-5 rounded-2xl border border-border bg-card p-4 shadow-sm sm:p-7"
                     data-visual-panel
                     :aria-label="trans('Your work, organized')"
                 >
@@ -69,38 +69,38 @@ defineProps<{
                     </h2>
                     <ul class="grid min-w-0 gap-3">
                         <li
-                            class="flex min-w-0 items-center gap-3 rounded-xl bg-muted p-3"
+                            class="flex min-w-0 flex-wrap items-center gap-2 rounded-xl bg-muted p-2"
                         >
                             <ShoppingBasket
                                 class="size-5 shrink-0 text-primary"
                                 aria-hidden="true"
                             />
                             <span
-                                class="min-w-0 font-medium [overflow-wrap:anywhere]"
+                                class="min-w-0 flex-[1_1_8rem] font-medium [overflow-wrap:anywhere]"
                                 >{{ trans('Orders') }}</span
                             >
                         </li>
                         <li
-                            class="flex min-w-0 items-center gap-3 rounded-xl bg-muted p-3"
+                            class="flex min-w-0 flex-wrap items-center gap-2 rounded-xl bg-muted p-2"
                         >
                             <PackageCheck
                                 class="size-5 shrink-0 text-primary"
                                 aria-hidden="true"
                             />
                             <span
-                                class="min-w-0 font-medium [overflow-wrap:anywhere]"
+                                class="min-w-0 flex-[1_1_8rem] font-medium [overflow-wrap:anywhere]"
                                 >{{ trans('Pickups') }}</span
                             >
                         </li>
                         <li
-                            class="flex min-w-0 items-center gap-3 rounded-xl bg-muted p-3"
+                            class="flex min-w-0 flex-wrap items-center gap-2 rounded-xl bg-muted p-2"
                         >
                             <UsersRound
                                 class="size-5 shrink-0 text-primary"
                                 aria-hidden="true"
                             />
                             <span
-                                class="min-w-0 font-medium [overflow-wrap:anywhere]"
+                                class="min-w-0 flex-[1_1_8rem] font-medium [overflow-wrap:anywhere]"
                                 >{{ trans('Households') }}</span
                             >
                         </li>
