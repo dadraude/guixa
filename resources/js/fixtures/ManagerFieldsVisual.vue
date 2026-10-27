@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 const query = new URLSearchParams(window.location.search);
 const invalid = query.has('invalid');
 const disabled = query.has('disabled');
+const manager = query.get('role') !== 'shared';
 const householdOptions = [
     { value: 'casa-1', label: 'Casa 1' },
     { value: 'casa-2', label: 'Casa 2' },
@@ -15,7 +16,8 @@ const householdOptions = [
 
 <template>
     <main
-        class="pilot-theme coop-manager-shell min-h-screen bg-background text-foreground"
+        class="pilot-theme min-h-screen bg-background text-foreground"
+        :class="{ 'coop-manager-shell': manager }"
     >
         <div
             class="pilot-page pilot-layout-page pilot-manager-page"
@@ -60,6 +62,27 @@ const householdOptions = [
                     >Manage</Button
                 >
             </form>
+            <section v-if="!disabled" class="visual-panel grid gap-3">
+                <h2 class="text-lg font-semibold">Action patterns</h2>
+                <div class="flex flex-wrap gap-2">
+                    <Button id="fixture-primary" type="button">Save</Button>
+                    <Button
+                        id="fixture-secondary"
+                        type="button"
+                        variant="secondary"
+                        >Cancel</Button
+                    >
+                    <Button id="fixture-outline" type="button" variant="outline"
+                        >View details</Button
+                    >
+                    <Button
+                        id="fixture-destructive"
+                        type="button"
+                        variant="destructive"
+                        >Delete</Button
+                    >
+                </div>
+            </section>
         </div>
     </main>
 </template>

@@ -1,5 +1,5 @@
 {
-    "baseUrl": "http://127.0.0.1:5181",
+    "baseUrl": "http://127.0.0.1:5182",
     "rootFontPx": 16,
     "darkSelector": "html.dark",
     "matrix": {
@@ -15,7 +15,15 @@
             "panels": ".visual-panel",
             "content": "h1,label,input,button,p",
             "fonts": ["16px Nunito Variable"],
-            "focus": ["#fixture-name", "#fixture-create", "#fixture-household"],
+            "focus": [
+                "#fixture-name",
+                "#fixture-create",
+                "#fixture-household",
+                "#fixture-primary",
+                "#fixture-secondary",
+                "#fixture-outline",
+                "#fixture-destructive"
+            ],
             "states": [
                 {
                     "id": "populated",
@@ -88,6 +96,68 @@
                     ]
                 }
             ]
+        },
+        {
+            "id": "shared-action-tokens",
+            "path": "/visual-manager-fields.html",
+            "root": "[data-visual-root]",
+            "panels": ".visual-panel",
+            "content": "h1,label,input,button,p",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "#fixture-name",
+                "#fixture-create",
+                "#fixture-household",
+                "#fixture-primary",
+                "#fixture-secondary",
+                "#fixture-outline",
+                "#fixture-destructive"
+            ],
+            "states": [
+                {
+                    "id": "populated",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                }
+            ],
+            "query": {
+                "role": "shared"
+            }
         }
     ]
 }

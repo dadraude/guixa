@@ -1237,3 +1237,14 @@ requested a font with softer forms that is easier to read. The opted-in
 application theme uses locally bundled Nunito for headings and interface text
 in place of Inter and Source Serif 4, while JetBrains Mono remains for code.
 The existing theme boundary and fallback behavior remain in place.
+
+## 2026-10-27 · Deviation
+
+`plan.md` (Application visual identity / Unified warm application palette):
+the user asked to replace the separate blue and manager palettes with one soft,
+warm system and to assign consistent visual roles to actions. The semantic
+light/dark tokens now share cream, olive, sage and clay across operational
+screens. The shared button variants use primary, secondary, outlined and
+destructive treatments; text inputs and select triggers retain a distinct
+bordered field treatment. The `Welcome` artwork remains outside the themed
+application screens.

@@ -659,10 +659,9 @@ html[data-font-fallback='true'] .pilot-theme {
 
 .pilot-theme :is(input[data-slot='input'], button[data-slot='select-trigger']) {
     min-height: 2.75rem;
-    border: 0;
-    border-bottom: 2px solid var(--material-divider);
-    border-radius: 0.75rem 0.75rem 0.25rem 0.25rem;
-    background: var(--secondary);
+    border: 1px solid var(--input);
+    border-radius: 0.5rem;
+    background: var(--card);
     box-shadow: none;
 }
 
@@ -670,8 +669,16 @@ html[data-font-fallback='true'] .pilot-theme {
     :is(
         input[data-slot='input'],
         button[data-slot='select-trigger']
+    )[aria-invalid='true'] {
+    border-color: var(--destructive);
+}
+
+.pilot-theme
+    :is(
+        input[data-slot='input'],
+        button[data-slot='select-trigger']
     ):focus-visible {
-    border-bottom-color: var(--primary);
+    border-color: var(--ring);
 }
 
 /* Fields keep keyboard focus within their own edge at every width. */
@@ -697,7 +704,7 @@ html[data-font-fallback='true'] .pilot-theme {
     box-shadow: inset 0 0 0 1px var(--destructive);
 }
 
-/* Desktop fields use a full edge; touch layouts keep their existing field shape. */
+/* Desktop fields add subtle depth while keeping the same full edge. */
 @media (min-width: 48rem) {
     .pilot-theme
         :is(
@@ -1517,7 +1524,7 @@ html[data-font-fallback='true'] .pilot-theme {
 .coop-manager-shell .pilot-layout-panel,
 .coop-manager-shell .pilot-manager-page > :is(form, section, ul) {
     padding: 1rem;
-    box-shadow: 0 2px 10px rgb(31 58 43 / 5%);
+    box-shadow: 0 2px 10px rgb(49 43 33 / 5%);
 }
 .coop-manager-shell
     .pilot-manager-page
@@ -1541,32 +1548,6 @@ html[data-font-fallback='true'] .pilot-theme {
     font-size: 1rem;
 }
 
-/* Manager form fields need a visible edge on touch layouts, where the shared
-   filled field treatment otherwise resembles the primary action. */
-@media (max-width: 47.999rem) {
-    .coop-manager-shell
-        :is(input[data-slot='input'], button[data-slot='select-trigger']) {
-        border: 1px solid var(--input);
-        border-radius: 0.5rem;
-        background: var(--card);
-    }
-
-    .coop-manager-shell
-        :is(
-            input[data-slot='input'],
-            button[data-slot='select-trigger']
-        ):focus-visible {
-        border-color: var(--ring);
-    }
-
-    .coop-manager-shell
-        :is(
-            input[data-slot='input'],
-            button[data-slot='select-trigger']
-        )[aria-invalid='true'] {
-        border-color: var(--destructive);
-    }
-}
 .manager-dialog {
     width: min(34rem, calc(100vw - 2rem));
     max-height: calc(100dvh - 2rem);
@@ -1577,11 +1558,11 @@ html[data-font-fallback='true'] .pilot-theme {
     border-radius: 0.75rem;
     background: var(--card);
     color: var(--card-foreground);
-    box-shadow: 0 20px 60px rgb(12 25 20 / 25%);
+    box-shadow: 0 20px 60px rgb(32 27 22 / 25%);
     padding: 1rem;
 }
 .manager-dialog::backdrop {
-    background: rgb(12 25 20 / 60%);
+    background: rgb(32 27 22 / 60%);
 }
 .manager-dialog input:not([type='checkbox'], [type='radio']) {
     min-height: 44px;
@@ -1612,7 +1593,7 @@ html[data-font-fallback='true'] .pilot-theme {
 .manager-button-danger {
     border-color: var(--destructive);
     background: var(--destructive);
-    color: #fff;
+    color: var(--destructive-foreground);
 }
 .manager-button:focus-visible {
     outline: 2px solid var(--ring);

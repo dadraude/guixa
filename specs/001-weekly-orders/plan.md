@@ -697,6 +697,24 @@ existing `pilot-theme` boundary, including manager pages and portal content.
 Keep JetBrains Mono for code and a system sans-serif fallback. The guest
 `Welcome` page remains outside the themed boundary.
 
+#### 2026-10-27 Unified warm application palette
+
+The user's request for one calmer, warmer palette supersedes the separate blue
+application and green/aqua/lavender manager color assignments. Use one set of
+semantic light/dark tokens for member, producer, manager, settings and auth
+screens, with a cream canvas, quiet card surfaces, olive primary and restrained
+clay accent. Dark mode uses stepped warm charcoal surfaces rather than a green
+wash. The guest `Welcome` page keeps its own hardcoded illustration and colors.
+
+Actions have a stable hierarchy across roles: the filled olive button is the
+primary action, a pale sage fill is secondary, a bordered card-surface button
+is an alternative secondary action, and destructive actions use the dedicated
+red token. Clay is for incidental emphasis and hover states, never a competing
+primary button. Shared text inputs and select triggers have a card surface and
+visible field border at every width, so their role differs from filled actions.
+Keep semantic success, warning and error colors distinct and verify text,
+control-edge and focus contrast in light and dark modes.
+
 T40 extends the same reactive opt-in to Dashboard, Wallet/Statement and the five existing producer
 pages. Their current page components retain their props, actions and form contracts. Shared page,
 panel, empty-state and mobile table presentation classes live under the pilot theme, so the two
