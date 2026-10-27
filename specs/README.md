@@ -58,6 +58,7 @@ design principles and the gap analysis there.
 | ID  | Feature                         | Status |
 | --- | ------------------------------- | ------ |
 | 001 | [Weekly orders](001-weekly-orders/spec.md) | Spec revised (OQ1–OQ19 resolved) · plan + tasks accepted (2026-10-21) · in progress, status in Linear (Coop) |
+| 002 | [Actionable dashboard](002-actionable-dashboard/spec.md) | Accepted (2026-10-27) · T01–T04 ready for implementation |
 
 ## Roadmap
 
