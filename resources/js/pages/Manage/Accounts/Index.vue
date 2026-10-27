@@ -5,6 +5,7 @@ import AccountDeactivationController from '@/actions/App/Http/Controllers/Manage
 import AccountController from '@/actions/App/Http/Controllers/Manage/AccountController';
 import AccountHouseholdController from '@/actions/App/Http/Controllers/Manage/AccountHouseholdController';
 import ManagerRoleController from '@/actions/App/Http/Controllers/Manage/ManagerRoleController';
+import ActiveSwitch from '@/components/ActiveSwitch.vue';
 import FormSelect from '@/components/FormSelect.vue';
 import Heading from '@/components/Heading.vue';
 import InputError from '@/components/InputError.vue';
@@ -40,23 +41,32 @@ const isManager = (account: App.Http.AccountRow) =>
     <div class="pilot-page pilot-layout-page pilot-manager-page">
         <Heading
             title="Accounts"
-            description="Grant roles, link members to households and deactivate accounts"
+            description="Grant roles, link members to households and manage account status"
         />
 
-        <ul class="pilot-list">
+        <p
+            v-if="accounts.length === 0"
+            class="pilot-layout-notice text-sm text-muted-foreground"
+        >
+            No accounts yet.
+        </p>
+
+        <ul v-else class="pilot-list">
             <li
                 v-for="account in accounts"
                 :key="account.accountId"
                 class="flex flex-col gap-4"
             >
-                <div class="flex flex-wrap items-center justify-between gap-2">
-                    <span>
-                        <span class="font-medium">{{ account.name }}</span>
-                        <span class="ml-2 text-sm text-muted-foreground">
+                <div class="flex flex-wrap items-start justify-between gap-4">
+                    <div class="max-w-full min-w-0">
+                        <h2 class="font-medium">{{ account.name }}</h2>
+                        <p class="text-sm break-all text-muted-foreground">
                             {{ account.email }}
-                        </span>
-                    </span>
-                    <span class="flex flex-wrap gap-2">
+                        </p>
+                    </div>
+                    <div
+                        class="flex max-w-full min-w-0 flex-wrap items-center gap-4"
+                    >
                         <Badge
                             v-for="role in account.roles"
                             :key="role"
@@ -65,22 +75,35 @@ const isManager = (account: App.Http.AccountRow) =>
                             {{ role }}
                         </Badge>
                         <StatusIndicator
-                            :label="
-                                !account.active
-                                    ? 'Deactivated'
-                                    : account.invitationPending
-                                      ? 'Invitation pending'
-                                      : 'Active'
-                            "
-                            :tone="
-                                !account.active
-                                    ? 'danger'
-                                    : account.invitationPending
-                                      ? 'warning'
-                                      : 'success'
-                            "
+                            v-if="account.invitationPending"
+                            label="Invitation pending"
+                            tone="warning"
                         />
-                    </span>
+                        <Form
+                            v-bind="
+                                account.active
+                                    ? AccountDeactivationController.store.form(
+                                          account.accountId,
+                                      )
+                                    : AccountDeactivationController.destroy.form(
+                                          account.accountId,
+                                      )
+                            "
+                            v-slot="{ errors, processing }"
+                            class="pilot-status-switch-form"
+                        >
+                            <ActiveSwitch
+                                :id="account.accountId"
+                                :active="account.active"
+                                :name="account.name"
+                                :processing="processing"
+                            />
+                            <InputError
+                                v-if="errors.domain"
+                                :message="errors.domain"
+                            />
+                        </Form>
+                    </div>
                 </div>
 
                 <p class="text-sm text-muted-foreground">
@@ -99,7 +122,7 @@ const isManager = (account: App.Http.AccountRow) =>
                                 account.accountId,
                             )
                         "
-                        class="flex max-w-full min-w-0 flex-wrap items-center gap-2"
+                        class="pilot-account-household-form grid w-full min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 sm:w-auto sm:grid-cols-[minmax(0,16rem)_auto]"
                         v-slot="{ errors, processing }"
                     >
                         <FormSelect
@@ -110,7 +133,7 @@ const isManager = (account: App.Http.AccountRow) =>
                                 account.householdId ??
                                 householdOptions[0]?.value
                             "
-                            class="max-w-full min-w-0 flex-1 basis-44"
+                            class="w-full min-w-0"
                             :aria-label="`Household for ${account.name}`"
                         />
                         <Button
@@ -122,6 +145,8 @@ const isManager = (account: App.Http.AccountRow) =>
                             {{ account.householdId ? 'Move' : 'Link' }}
                         </Button>
                         <InputError
+                            v-if="errors.household_id || errors.domain"
+                            class="col-span-full"
                             :message="errors.household_id || errors.domain"
                         />
                     </Form>
@@ -178,44 +203,6 @@ const isManager = (account: App.Http.AccountRow) =>
                             :disabled="processing"
                         >
                             Make manager
-                        </Button>
-                    </Form>
-
-                    <Form
-                        v-if="account.active"
-                        v-bind="
-                            AccountDeactivationController.store.form(
-                                account.accountId,
-                            )
-                        "
-                        v-slot="{ errors, processing }"
-                    >
-                        <Button
-                            type="submit"
-                            variant="destructive"
-                            size="sm"
-                            :disabled="processing"
-                        >
-                            Deactivate
-                        </Button>
-                        <InputError :message="errors.domain" />
-                    </Form>
-                    <Form
-                        v-else
-                        v-bind="
-                            AccountDeactivationController.destroy.form(
-                                account.accountId,
-                            )
-                        "
-                        v-slot="{ processing }"
-                    >
-                        <Button
-                            type="submit"
-                            variant="secondary"
-                            size="sm"
-                            :disabled="processing"
-                        >
-                            Reactivate
                         </Button>
                     </Form>
                 </div>

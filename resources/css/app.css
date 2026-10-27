@@ -396,6 +396,12 @@ html[data-font-fallback='true'] .pilot-theme {
     overflow-wrap: anywhere;
 }
 
+@container manager-page (max-width: 16rem) {
+    .pilot-theme .pilot-account-household-form {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
 .pilot-theme .pilot-manager-list {
     container: pilot-manager / inline-size;
     min-width: 0;
