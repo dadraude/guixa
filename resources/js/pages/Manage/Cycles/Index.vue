@@ -7,6 +7,7 @@ import CycleCreateDialog from './CycleCreateDialog.vue';
 import CycleManageDialog from './CycleManageDialog.vue';
 import { Button } from '@/components/ui/button';
 import Heading from '@/components/Heading.vue';
+import StatusIndicator from '@/components/StatusIndicator.vue';
 
 defineOptions({
     layout: {
@@ -105,22 +106,27 @@ function cutoffLabel(value: string | null) {
                         <h2 class="text-lg font-semibold">
                             Recollida {{ dateLabel(cycle.pickupDate) }}
                         </h2>
-                        <span
-                            class="rounded-md bg-muted px-2 py-1 text-xs font-semibold"
-                            :data-test="
-                                cycle.cancelled
-                                    ? `cancelled-${cycle.id}`
-                                    : undefined
-                            "
-                        >
-                            {{
+                        <StatusIndicator
+                            :label="
                                 cycle.cancelled
                                     ? 'Cancel·lat'
                                     : cycle.closed
                                       ? 'Tancat'
                                       : 'Obert'
-                            }}
-                        </span>
+                            "
+                            :tone="
+                                cycle.cancelled
+                                    ? 'danger'
+                                    : cycle.closed
+                                      ? 'neutral'
+                                      : 'success'
+                            "
+                            :data-test="
+                                cycle.cancelled
+                                    ? `cancelled-${cycle.id}`
+                                    : undefined
+                            "
+                        />
                     </div>
                     <div class="pilot-action-row">
                         <Button as-child variant="outline" class="min-h-11"
@@ -162,10 +168,15 @@ function cutoffLabel(value: string | null) {
                         <span class="font-medium">{{
                             participant.producerName
                         }}</span>
-                        <span class="text-sm text-muted-foreground"
-                            >{{ participant.open ? 'Obert' : 'Tancat' }},
-                            {{ cutoffLabel(participant.cutoff) }}</span
+                        <span
+                            class="flex flex-wrap items-center gap-2 text-sm text-muted-foreground"
                         >
+                            <StatusIndicator
+                                :label="participant.open ? 'Obert' : 'Tancat'"
+                                :tone="participant.open ? 'success' : 'neutral'"
+                            />
+                            {{ cutoffLabel(participant.cutoff) }}
+                        </span>
                         <Button
                             v-if="
                                 participant.participating &&

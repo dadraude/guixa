@@ -8,6 +8,7 @@ import ManagerRoleController from '@/actions/App/Http/Controllers/Manage/Manager
 import FormSelect from '@/components/FormSelect.vue';
 import Heading from '@/components/Heading.vue';
 import InputError from '@/components/InputError.vue';
+import StatusIndicator from '@/components/StatusIndicator.vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 
@@ -63,15 +64,22 @@ const isManager = (account: App.Http.AccountRow) =>
                         >
                             {{ role }}
                         </Badge>
-                        <Badge v-if="!account.active" variant="destructive">
-                            Deactivated
-                        </Badge>
-                        <Badge
-                            v-else-if="account.invitationPending"
-                            variant="secondary"
-                        >
-                            Invitation pending
-                        </Badge>
+                        <StatusIndicator
+                            :label="
+                                !account.active
+                                    ? 'Deactivated'
+                                    : account.invitationPending
+                                      ? 'Invitation pending'
+                                      : 'Active'
+                            "
+                            :tone="
+                                !account.active
+                                    ? 'danger'
+                                    : account.invitationPending
+                                      ? 'warning'
+                                      : 'success'
+                            "
+                        />
                     </span>
                 </div>
 

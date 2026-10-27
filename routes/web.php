@@ -65,6 +65,9 @@ Route::middleware(['auth', 'verified', 'role:manager'])->prefix('manage')->name(
         ->except(['show'])
         ->whereUuid('stockProduct')
         ->names('stock');
+    Route::put('stock/{stockProduct}/reactivation', [StockProductController::class, 'reactivate'])
+        ->whereUuid('stockProduct')
+        ->name('stock.reactivate');
     Route::get('stock/{stockProduct}/movements', [StockMovementController::class, 'show'])
         ->whereUuid('stockProduct')
         ->name('stock.movements.show');
@@ -77,14 +80,14 @@ Route::middleware(['auth', 'verified', 'role:manager'])->prefix('manage')->name(
     Route::put('stock/{stockProduct}/available', [StockMovementController::class, 'setAvailable'])
         ->whereUuid('stockProduct')
         ->name('stock.available.update');
-    Route::put('stock/{stockProduct}/reactivation', [StockProductController::class, 'reactivate'])
-        ->whereUuid('stockProduct')
-        ->name('stock.reactivate');
     Route::resource('return-items', ReturnItemController::class)
         ->parameters(['return-items' => 'returnItem'])
         ->except(['show'])
         ->whereUuid('returnItem')
         ->names('return-items');
+    Route::put('return-items/{returnItem}/reactivation', [ReturnItemController::class, 'reactivate'])
+        ->whereUuid('returnItem')
+        ->name('return-items.reactivate');
 
     Route::get('cycles', [CycleController::class, 'index'])->name('cycles.index');
     Route::post('cycles', [CycleController::class, 'store'])->name('cycles.store');

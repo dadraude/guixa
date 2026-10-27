@@ -37,11 +37,13 @@ describe('manager list presentation', () => {
         const html = await renderToString(
             createSSRApp(StockIndex, { products }),
         );
-        expect(html.match(/min-h-16 w-full/g) ?? []).toHaveLength(20);
+        expect(html.match(/min-h-16 min-w-0 flex-1/g) ?? []).toHaveLength(20);
         expect(html).toContain('manager-stock-table');
         expect(html).toContain('Cerca productes');
-        expect(html).toContain('Inactiu');
-        expect(html).toContain('Moviments');
+        expect(html).toContain('aria-label="Reactivate: Producte 0"');
+        expect(html).toContain('aria-label="Deactivate: Producte 1"');
+        expect(html).toContain('aria-label="Edit: Producte 0"');
+        expect(html).toContain('aria-label="Movements: Producte 0"');
         expect(html).toContain('<dialog');
     });
 

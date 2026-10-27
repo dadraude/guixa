@@ -11,7 +11,7 @@ import InvitationController from '@/actions/App/Http/Controllers/Manage/Invitati
 import FormSelect from '@/components/FormSelect.vue';
 import Heading from '@/components/Heading.vue';
 import InputError from '@/components/InputError.vue';
-import { Badge } from '@/components/ui/badge';
+import StatusIndicator from '@/components/StatusIndicator.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -97,19 +97,16 @@ const expiry = (iso: string | null) =>
                                 {{ member.email }}
                             </span>
                         </span>
-                        <Badge
-                            :variant="
-                                member.invitationPending
-                                    ? 'secondary'
-                                    : 'default'
-                            "
-                        >
-                            {{
+                        <StatusIndicator
+                            :label="
                                 member.invitationPending
                                     ? 'Invitation pending'
                                     : 'Active'
-                            }}
-                        </Badge>
+                            "
+                            :tone="
+                                member.invitationPending ? 'warning' : 'success'
+                            "
+                        />
                     </div>
 
                     <div class="pilot-action-row">

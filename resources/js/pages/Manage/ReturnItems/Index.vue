@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { Form, Head, Link } from '@inertiajs/vue3';
+import { Pencil, Plus } from '@lucide/vue';
 import ReturnItemController from '@/actions/App/Http/Controllers/Manage/ReturnItemController';
 import Heading from '@/components/Heading.vue';
+import ActiveSwitch from '@/components/ActiveSwitch.vue';
 import { Button } from '@/components/ui/button';
 import { trans } from 'laravel-vue-i18n';
 
@@ -28,9 +30,10 @@ defineProps<{
                 description="Containers households bring back and get credited for"
             />
             <Button as-child>
-                <Link :href="ReturnItemController.create()"
-                    >New return item</Link
-                >
+                <Link :href="ReturnItemController.create()">
+                    <Plus aria-hidden="true" />
+                    New return item
+                </Link>
             </Button>
         </div>
 
@@ -45,10 +48,10 @@ defineProps<{
             <table class="pilot-data-table pilot-manager-table w-full text-sm">
                 <thead>
                     <tr class="border-b text-left">
+                        <th scope="col" class="py-2">{{ trans('Active') }}</th>
                         <th scope="col" class="py-2">{{ trans('Name') }}</th>
                         <th scope="col" class="py-2">{{ trans('Amount') }}</th>
-                        <th scope="col" class="py-2">{{ trans('Status') }}</th>
-                        <th scope="col" class="py-2" />
+                        <th scope="col" class="py-2">{{ trans('Actions') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -58,6 +61,31 @@ defineProps<{
                         class="border-b"
                         :class="{ 'text-muted-foreground': !item.active }"
                     >
+                        <td class="py-2">
+                            <span class="pilot-cell-label" aria-hidden="true">{{
+                                trans('Active')
+                            }}</span>
+                            <Form
+                                v-bind="
+                                    item.active
+                                        ? ReturnItemController.destroy.form(
+                                              item.id,
+                                          )
+                                        : ReturnItemController.reactivate.form(
+                                              item.id,
+                                          )
+                                "
+                                v-slot="{ processing }"
+                                class="pilot-status-switch-form"
+                            >
+                                <ActiveSwitch
+                                    :id="item.id"
+                                    :active="item.active"
+                                    :name="item.name"
+                                    :processing="processing"
+                                />
+                            </Form>
+                        </td>
                         <td class="py-2 font-medium">
                             <span class="pilot-cell-label" aria-hidden="true">{{
                                 trans('Name')
@@ -72,37 +100,25 @@ defineProps<{
                         </td>
                         <td class="py-2">
                             <span class="pilot-cell-label" aria-hidden="true">{{
-                                trans('Status')
+                                trans('Actions')
                             }}</span>
-                            {{ item.active ? 'Active' : 'Deactivated' }}
-                        </td>
-                        <td class="py-2">
-                            <div class="pilot-action-row justify-end">
-                                <Button variant="outline" size="sm" as-child>
+                            <div class="pilot-table-actions">
+                                <Button
+                                    variant="outline"
+                                    size="icon"
+                                    class="size-11"
+                                    as-child
+                                >
                                     <Link
                                         :href="
                                             ReturnItemController.edit(item.id)
                                         "
-                                        >Edit</Link
+                                        :aria-label="`${trans('Edit')}: ${item.name}`"
+                                        :title="trans('Edit')"
                                     >
+                                        <Pencil aria-hidden="true" />
+                                    </Link>
                                 </Button>
-                                <Form
-                                    v-if="item.active"
-                                    v-bind="
-                                        ReturnItemController.destroy.form(
-                                            item.id,
-                                        )
-                                    "
-                                >
-                                    <Button
-                                        type="submit"
-                                        variant="outline"
-                                        size="sm"
-                                        :data-test="`deactivate-${item.id}`"
-                                    >
-                                        Deactivate
-                                    </Button>
-                                </Form>
                             </div>
                         </td>
                     </tr>

@@ -1,15 +1,17 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
+import { Form, Head, Link } from '@inertiajs/vue3';
 import { computed, shallowRef } from 'vue';
-import { Pencil } from '@lucide/vue';
+import { History, Pencil, Plus } from '@lucide/vue';
 import StockProductController from '@/actions/App/Http/Controllers/Manage/StockProductController';
 import StockMovementController from '@/actions/App/Http/Controllers/Manage/StockMovementController';
 import StockEditDialog from './StockEditDialog.vue';
 import Heading from '@/components/Heading.vue';
+import ActiveSwitch from '@/components/ActiveSwitch.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { formatEuroAmount } from '@/lib/formatEuroAmount';
+import { trans } from 'laravel-vue-i18n';
 
 defineOptions({
     layout: {
@@ -43,11 +45,12 @@ function editProduct(product: App.Http.StockLevelRow, event: MouseEvent) {
                 title="Estoc"
                 description="Productes per a la recollida."
             />
-            <Button as-child class="min-h-11"
-                ><Link :href="StockProductController.create()"
-                    >Afegeix un producte</Link
-                ></Button
-            >
+            <Button as-child class="min-h-11">
+                <Link :href="StockProductController.create()">
+                    <Plus aria-hidden="true" />
+                    Afegeix un producte
+                </Link>
+            </Button>
         </div>
         <p
             v-if="products.length === 0"
@@ -81,10 +84,34 @@ function editProduct(product: App.Http.StockLevelRow, event: MouseEvent) {
                 No hi ha productes que coincideixin amb la cerca.
             </p>
             <ul v-else class="manager-stock-rows divide-y border-t">
-                <li v-for="product in filteredProducts" :key="product.id">
+                <li
+                    v-for="product in filteredProducts"
+                    :key="product.id"
+                    class="flex min-w-0 items-center gap-4"
+                >
+                    <Form
+                        v-bind="
+                            product.active
+                                ? StockProductController.destroy.form(
+                                      product.id,
+                                  )
+                                : StockProductController.reactivate.form(
+                                      product.id,
+                                  )
+                        "
+                        v-slot="{ processing }"
+                        class="pilot-status-switch-form shrink-0"
+                    >
+                        <ActiveSwitch
+                            :id="product.id"
+                            :active="product.active"
+                            :name="product.name"
+                            :processing="processing"
+                        />
+                    </Form>
                     <button
                         type="button"
-                        class="flex min-h-16 w-full items-center justify-between gap-4 py-2 text-left"
+                        class="flex min-h-16 min-w-0 flex-1 items-center justify-between gap-4 py-2 text-left"
                         :aria-label="`Edita ${product.name}`"
                         @click="editProduct(product, $event)"
                     >
@@ -94,12 +121,7 @@ function editProduct(product: App.Http.StockLevelRow, event: MouseEvent) {
                             }}</span>
                             <span class="block text-xs text-muted-foreground"
                                 >{{ product.unit }} ·
-                                {{ formatEuroAmount(product.price) }}
-                                <span
-                                    v-if="!product.active"
-                                    class="text-destructive"
-                                    >· Inactiu</span
-                                ></span
+                                {{ formatEuroAmount(product.price) }}</span
                             >
                         </span>
                         <span class="shrink-0 text-right">
@@ -122,11 +144,13 @@ function editProduct(product: App.Http.StockLevelRow, event: MouseEvent) {
                 <table class="w-full text-left text-sm">
                     <thead class="bg-muted/50 text-xs uppercase">
                         <tr>
+                            <th scope="col" class="px-2 py-2">
+                                {{ trans('Active') }}
+                            </th>
                             <th scope="col" class="px-2 py-2">Producte</th>
                             <th scope="col" class="px-2 py-2">Unitat</th>
                             <th scope="col" class="px-2 py-2">Preu</th>
                             <th scope="col" class="px-2 py-2">Disponible</th>
-                            <th scope="col" class="px-2 py-2">Estat</th>
                             <th scope="col" class="px-2 py-2">Accions</th>
                         </tr>
                     </thead>
@@ -135,6 +159,28 @@ function editProduct(product: App.Http.StockLevelRow, event: MouseEvent) {
                             v-for="product in filteredProducts"
                             :key="product.id"
                         >
+                            <td class="px-2 py-2">
+                                <Form
+                                    v-bind="
+                                        product.active
+                                            ? StockProductController.destroy.form(
+                                                  product.id,
+                                              )
+                                            : StockProductController.reactivate.form(
+                                                  product.id,
+                                              )
+                                    "
+                                    v-slot="{ processing }"
+                                    class="pilot-status-switch-form"
+                                >
+                                    <ActiveSwitch
+                                        :id="product.id"
+                                        :active="product.active"
+                                        :name="product.name"
+                                        :processing="processing"
+                                    />
+                                </Form>
+                            </td>
                             <th scope="row" class="px-2 py-2 font-medium">
                                 {{ product.name }}
                             </th>
@@ -146,31 +192,35 @@ function editProduct(product: App.Http.StockLevelRow, event: MouseEvent) {
                                 {{ product.available }}
                             </td>
                             <td class="px-2 py-2">
-                                {{ product.active ? 'Actiu' : 'Inactiu' }}
-                            </td>
-                            <td class="px-2 py-2">
-                                <div class="flex gap-2">
+                                <div class="pilot-table-actions">
                                     <Button
                                         variant="outline"
-                                        size="sm"
-                                        class="min-h-11"
+                                        size="icon"
+                                        class="size-11"
+                                        :aria-label="`${trans('Edit')}: ${product.name}`"
+                                        :title="trans('Edit')"
                                         @click="editProduct(product, $event)"
-                                        >Edita</Button
                                     >
+                                        <Pencil aria-hidden="true" />
+                                    </Button>
                                     <Button
                                         as-child
                                         variant="outline"
-                                        size="sm"
-                                        class="min-h-11"
-                                        ><Link
+                                        size="icon"
+                                        class="size-11"
+                                    >
+                                        <Link
                                             :href="
                                                 StockMovementController.show(
                                                     product.id,
                                                 )
                                             "
-                                            >Moviments</Link
-                                        ></Button
-                                    >
+                                            :aria-label="`${trans('Movements')}: ${product.name}`"
+                                            :title="trans('Movements')"
+                                        >
+                                            <History aria-hidden="true" />
+                                        </Link>
+                                    </Button>
                                 </div>
                             </td>
                         </tr>

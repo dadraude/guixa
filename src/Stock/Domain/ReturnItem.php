@@ -50,6 +50,11 @@ final class ReturnItem
         $this->active = false;
     }
 
+    public function reactivate(): void
+    {
+        $this->active = true;
+    }
+
     public function name(): string
     {
         return $this->name;

@@ -1,27 +1,32 @@
 <script setup lang="ts">
-import Breadcrumbs from '@/components/Breadcrumbs.vue';
+import { trans } from 'laravel-vue-i18n';
+import AppLogoIcon from '@/components/AppLogoIcon.vue';
+import AppearanceMenu from '@/components/AppearanceMenu.vue';
+import NavUser from '@/components/NavUser.vue';
 import { SidebarTrigger } from '@/components/ui/sidebar';
-import type { BreadcrumbItem } from '@/types';
 
-withDefaults(
-    defineProps<{
-        breadcrumbs?: BreadcrumbItem[];
-    }>(),
-    {
-        breadcrumbs: () => [],
-    },
-);
+defineProps<{ sectionTitle: string }>();
 </script>
 
 <template>
-    <header
-        class="flex h-16 shrink-0 items-center gap-2 border-b border-sidebar-border/70 px-4 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 md:px-6"
-    >
-        <div class="flex items-center gap-2">
-            <SidebarTrigger class="-ml-1 min-h-11 min-w-11" />
-            <template v-if="breadcrumbs && breadcrumbs.length > 0">
-                <Breadcrumbs :breadcrumbs="breadcrumbs" />
-            </template>
+    <header class="material-app-bar daisy-navbar" data-test="material-app-bar">
+        <div class="daisy-navbar-start min-w-0 gap-2">
+            <SidebarTrigger class="min-h-11 min-w-11" />
+            <div class="material-app-brand">
+                <span class="material-app-brand-icon" aria-hidden="true">
+                    <AppLogoIcon class="size-5" />
+                </span>
+                <span>Guixa</span>
+            </div>
+            <span class="material-app-bar-title" data-test="app-section-title">
+                {{ trans(sectionTitle) }}
+            </span>
+        </div>
+        <div class="daisy-navbar-end min-w-0 gap-2">
+            <AppearanceMenu />
+            <div class="material-app-bar-user">
+                <NavUser />
+            </div>
         </div>
     </header>
 </template>

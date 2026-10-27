@@ -404,13 +404,13 @@ Domain
 - `StockProduct` and `ReturnItem` are mutable entities with a private constructor, `create` and `restore`; `change`
   re-checks every rule, so create and update share them. Rule breaches throw `NameRequired`, `UnitRequired`,
   `InvalidPrice`, `InvalidContainersPerUnit` (zero or not a valid quantity) and `InvalidReturnAmount`.
-  Only deactivation exists (no reactivation).
+  Deactivation and reactivation preserve each item's data and history.
 
 Use cases
 | Use case | Actor | Covers |
 | --- | --- | --- |
-| `CreateStockProduct`, `UpdateStockProduct`, `DeactivateStockProduct` | manager | R25 |
-| `CreateReturnItem`, `UpdateReturnItem`, `DeactivateReturnItem` | manager | R25 |
+| `CreateStockProduct`, `UpdateStockProduct`, `DeactivateStockProduct`, `ReactivateStockProduct` | manager | R25 |
+| `CreateReturnItem`, `UpdateReturnItem`, `DeactivateReturnItem`, `ReactivateReturnItem` | manager | R25 |
 | `ListStockProducts`, `ListReturnItems` (inactive ones included, by name) | manager | R25 |
 | `RecordStockEntry` | manager | R26, S23 |
 | `RecordStockAdjustment` (optional cycle) | manager | R27, S23 |
@@ -519,7 +519,7 @@ role areas (R36a); the layout shows a switch between them.
 | `POST/DELETE …/pickups/{household}/stock-lines[/{stockProduct}]` | partial reload | `AddStockToPickup`, `RemoveStockFromPickup` |
 | `POST/DELETE …/pickups/{household}/return-lines[/{returnItem}]` | partial reload | `AddReturnToPickup`, `RemoveReturnFromPickup` |
 | `POST …/pickups/{household}/complete`, `…/not-collected` | redirect to pickups index | `CompletePickup`, `MarkPickupNotCollected` |
-| `/manage/stock…`, `/manage/return-items…` | `Manage/Stock/{Index,Create,Edit,Movements}`, `Manage/ReturnItems/{Index,Create,Edit}` | Stock CRUD (T24); `GET /manage/stock/{stockProduct}/movements` and `POST …/entries`, `POST …/adjustments` (T25): `ListStock`, `RecordStockEntry`, `RecordStockAdjustment`. The stock index lists `StockLevelRow`s (available quantity). The movements page lists the cycles (`ListCycles`) in the adjustment form's optional cycle picker; `cycle_id` must exist in `cycles` (friendly validation; `stock_movements.cycle_id` also has a foreign key to `cycles`, added by T11) |
+| `/manage/stock…`, `/manage/return-items…` | `Manage/Stock/{Index,Create,Edit,Movements}`, `Manage/ReturnItems/{Index,Create,Edit}` | Stock CRUD (T24), plus `PUT /manage/stock/{stockProduct}/reactivation` and `PUT /manage/return-items/{returnItem}/reactivation`; `GET /manage/stock/{stockProduct}/movements` and `POST …/entries`, `POST …/adjustments` (T25): `ListStock`, `RecordStockEntry`, `RecordStockAdjustment`. The stock index lists `StockLevelRow`s (available quantity). The movements page lists the cycles (`ListCycles`) in the adjustment form's optional cycle picker; `cycle_id` must exist in `cycles` (friendly validation; `stock_movements.cycle_id` also has a foreign key to `cycles`, added by T11) |
 | `PUT/DELETE /manage/accounts/{account}/household`, `PUT/DELETE …/manager-role`, `POST/DELETE …/deactivation` | redirect back | `MoveMember`/`UnlinkMember`, `GrantManagerRole`/`RemoveManagerRole`, `DeactivateAccount`/`ReactivateAccount` |
 | `/manage/households…`, `/manage/producers…`, `/manage/accounts…` | `Manage/Households/*`, `Manage/Producers/*`, `Manage/Accounts/*` | Membership + Catalog |
 | `GET/POST /manage/producers`, `POST /manage/producers/{producer}/account` | `Manage/Producers/Index` (list with each producer's account email and invitation state, create form, invite form only for producers without an account) | `ListProducers` + `ListProducerAccounts` (the controller joins them into `ProducerRow`), `CreateProducer`, `InviteProducerAccount` |

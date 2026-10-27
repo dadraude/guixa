@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
+import { trans } from 'laravel-vue-i18n';
 import Heading from '@/components/Heading.vue';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
 import { useCurrentUrl } from '@/composables/useCurrentUrl';
 import { toUrl } from '@/lib/utils';
-import { edit as editAppearance } from '@/routes/appearance';
 import { edit as editProfile } from '@/routes/profile';
 import { edit as editSecurity } from '@/routes/security';
 import type { NavItem } from '@/types';
@@ -19,10 +18,6 @@ const sidebarNavItems: NavItem[] = [
         title: 'Security',
         href: editSecurity(),
     },
-    {
-        title: 'Appearance',
-        href: editAppearance(),
-    },
 ];
 
 const { isCurrentOrParentUrl } = useCurrentUrl();
@@ -32,12 +27,19 @@ const { isCurrentOrParentUrl } = useCurrentUrl();
     <div class="pilot-settings">
         <div class="pilot-page pilot-settings-inner">
             <Heading
+                as="div"
                 title="Settings"
                 description="Manage your profile and account settings"
             />
 
             <div class="pilot-settings-body">
-                <aside class="pilot-settings-nav">
+                <aside class="pilot-settings-nav pilot-panel p-4 sm:p-6">
+                    <h2 class="mb-2 text-lg font-semibold">
+                        {{ trans('Account settings') }}
+                    </h2>
+                    <p class="mb-4 text-sm text-muted-foreground">
+                        {{ trans('Profile and security') }}
+                    </p>
                     <nav
                         class="flex flex-col space-y-1 space-x-0"
                         aria-label="Settings"
@@ -64,16 +66,14 @@ const { isCurrentOrParentUrl } = useCurrentUrl();
                                 "
                             >
                                 <component :is="item.icon" class="h-4 w-4" />
-                                {{ item.title }}
+                                {{ trans(item.title) }}
                             </Link>
                         </Button>
                     </nav>
                 </aside>
 
-                <Separator class="pilot-settings-separator" />
-
-                <div class="min-w-0 flex-1 md:max-w-2xl">
-                    <section class="max-w-xl min-w-0 space-y-6">
+                <div class="pilot-settings-main min-w-0">
+                    <section class="min-w-0 space-y-6">
                         <slot />
                     </section>
                 </div>

@@ -1201,6 +1201,13 @@ blocked by DRA-193) and DRA-198, DRA-199, DRA-200 (T44–T46, each blocked by DR
 Application visual identity milestone, Backlog. Implementation is not authorized by this change.
 Why: the user approved the tasks and asked for the Linear issues with T43 blocking T44–T46 ("yes").
 
+## 2026-10-27 · Change
+
+`stock-wallet.md` R25 and `plan.md` Stock rules, use cases, and HTTP routes: managers can reactivate
+inactive stock products and return items. The list puts an active switch first, allowing the manager to
+deactivate or reactivate directly. Reactivation preserves product details, return amounts, and movement
+history. Why: the user explicitly selected reactivation for the new switch after the earlier rule allowed
+only deactivation.
 ## 2026-10-26 · Change
 
 `tasks.md` and `docs/visual-checks/dra-197.md` (T43 approval): the user explicitly approved the

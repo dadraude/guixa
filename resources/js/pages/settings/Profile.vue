@@ -41,7 +41,7 @@ const user = computed(() => page.props.auth.user);
 
         <Form
             v-bind="ProfileController.update.form()"
-            class="space-y-6"
+            class="material-settings-form"
             v-slot="{ errors, processing }"
         >
             <div class="grid gap-2">

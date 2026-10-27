@@ -13,6 +13,7 @@ final class ReactivateStockProduct
     public function __invoke(Actor $actor, string $id): void
     {
         $actor->assertManager();
+
         $product = $this->products->get($id) ?? throw StockProductNotFound::withId($id);
         $product->reactivate();
         $this->products->add($product);

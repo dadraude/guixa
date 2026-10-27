@@ -8,12 +8,19 @@ import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 
 vi.mock('@inertiajs/vue3', async () => {
-    const { reactive } = await import('vue');
+    const { defineComponent, h, reactive } = await import('vue');
     const page = reactive({
         component: 'Dashboard',
+        url: '/',
         props: { sidebarOpen: true },
     });
-    return { usePage: () => page };
+    const Link = defineComponent({
+        props: { href: [String, Object] },
+        setup(props, { slots }) {
+            return () => h('a', { href: props.href }, slots.default?.());
+        },
+    });
+    return { usePage: () => page, Link };
 });
 
 vi.mock('@/components/AppShell.vue', async () => {

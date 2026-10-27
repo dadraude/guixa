@@ -1,4 +1,9 @@
 @import 'tailwindcss';
+@plugin 'daisyui' {
+    themes: false;
+    prefix: daisy-;
+    exclude: rootscrollgutter;
+}
 
 @import 'tw-animate-css';
 
@@ -214,6 +219,7 @@
         0 1px 3px 0 oklch(0 0 0 / 0.1), 0 8px 10px -1px oklch(0 0 0 / 0.1);
     --shadow-2xl: 0 1px 3px 0 oklch(0 0 0 / 0.25);
     --pilot-terracotta: var(--primary);
+    --material-divider: color-mix(in srgb, var(--foreground) 12%, transparent);
     --pilot-success: #2d684a;
     --pilot-success-foreground: #ffffff;
     --pilot-warning: #795014;
@@ -259,11 +265,12 @@
     --sidebar-border: oklch(1 0 0 / 10%);
     --sidebar-ring: oklch(0.55 0.02 285.93);
     --sidebar: var(--sidebar-background);
+    --material-divider: color-mix(in srgb, var(--foreground) 12%, transparent);
     --pilot-success: #a1dbb2;
     --pilot-success-foreground: #19231d;
     --pilot-warning: #f3ce85;
     --pilot-warning-foreground: #2a2113;
-    --pilot-input-fill: #202527;
+    --pilot-input-fill: #374151;
 }
 
 .pilot-theme .order-page-header {
@@ -305,15 +312,15 @@ html[data-font-fallback='true'] .pilot-theme {
 }
 
 .pilot-theme .pilot-panel {
-    border: 1px solid var(--border);
+    border: 0;
     border-radius: var(--radius);
     background: var(--card);
     color: var(--card-foreground);
-    box-shadow: 0 1px 2px rgb(0 0 0 / 0.04);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 0.06);
 }
 
 .pilot-theme .pilot-empty-state {
-    border: 1px dashed var(--border);
+    border: 0;
     border-radius: var(--radius);
     background: var(--muted);
     padding: 1.5rem;
@@ -342,11 +349,11 @@ html[data-font-fallback='true'] .pilot-theme {
 .pilot-theme .pilot-manager-page > :is(form, section, ul) {
     min-width: 0;
     padding: 1rem;
-    border: 1px solid var(--border);
+    border: 0;
     border-radius: var(--radius);
     background: var(--card);
     color: var(--card-foreground);
-    box-shadow: 0 1px 2px rgb(0 0 0 / 0.04);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 0.06);
 }
 
 .pilot-theme a.pilot-layout-panel:hover {
@@ -355,7 +362,7 @@ html[data-font-fallback='true'] .pilot-theme {
 
 .pilot-theme .pilot-layout-notice {
     padding: 1rem;
-    border: 1px dashed var(--border);
+    border: 0;
     border-radius: var(--radius);
     background: var(--muted);
 }
@@ -367,12 +374,12 @@ html[data-font-fallback='true'] .pilot-theme {
     justify-content: space-between;
     gap: 0.5rem 1rem;
     padding-bottom: 1rem;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--material-divider);
 }
 
 .pilot-theme .pilot-layout-panel-section {
     padding-top: 1rem;
-    border-top: 1px solid var(--border);
+    border-top: 1px solid var(--material-divider);
 }
 
 /* Total bar: the panel recoloured, laid out as a total row. */
@@ -400,7 +407,7 @@ html[data-font-fallback='true'] .pilot-theme {
 }
 
 .pilot-list > li + li {
-    border-top: 1px solid var(--border);
+    border-top: 1px solid var(--material-divider, var(--border));
 }
 
 .pilot-list-item,
@@ -486,6 +493,26 @@ html[data-font-fallback='true'] .pilot-theme {
 
 .pilot-theme .pilot-manager-page {
     container: manager-page / inline-size;
+}
+
+.pilot-theme .pilot-manager-page > :is(form, section, ul) {
+    min-width: 0;
+    border: 0;
+    border-radius: var(--radius);
+    background: var(--card);
+    color: var(--card-foreground);
+    padding: 1rem;
+}
+
+.pilot-theme .pilot-manager-page > section > ul {
+    border: 0;
+    border-radius: var(--radius);
+    background: var(--muted);
+}
+
+.pilot-theme .pilot-manager-page > section li.rounded-lg.border {
+    border: 0;
+    background: var(--muted);
 }
 
 .pilot-theme .pilot-manager-page :is(form, section, ul, li) {
@@ -664,10 +691,23 @@ html[data-font-fallback='true'] .pilot-theme {
 .pilot-theme .pilot-data-table {
     border-collapse: separate;
     border-spacing: 0;
-    border: 1px solid var(--border);
+    border: 0;
     border-radius: var(--radius);
     background: var(--card);
     color: var(--card-foreground);
+}
+
+.pilot-theme .pilot-data-table thead {
+    background: var(--muted);
+    color: var(--muted-foreground);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+}
+
+.pilot-theme .pilot-data-table tbody tr {
+    border-color: var(--material-divider);
 }
 
 .pilot-theme .pilot-product-list {
@@ -714,7 +754,77 @@ html[data-font-fallback='true'] .pilot-theme {
 }
 
 .pilot-theme .pilot-data-table tbody tr:not(:last-child) td {
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--material-divider);
+}
+
+.pilot-theme .pilot-table-actions {
+    --pilot-action-size: clamp(44px, 2.75rem, 56px);
+    display: inline-grid;
+    grid-auto-flow: column;
+    grid-auto-columns: var(--pilot-action-size);
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.pilot-theme .pilot-table-actions form,
+.pilot-theme .pilot-table-actions :is(a, button) {
+    width: var(--pilot-action-size);
+    height: var(--pilot-action-size);
+}
+
+.pilot-theme .pilot-status-switch {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.pilot-theme .pilot-status-switch .daisy-toggle {
+    --border: 2px;
+    --radius-selector: 9999px;
+    --color-base-content: var(--foreground);
+    --color-base-100: var(--card);
+    --color-primary: var(--primary);
+    width: 44px;
+    height: 24px;
+    min-height: 24px;
+    flex: none;
+}
+
+.pilot-theme .pilot-status-switch input:disabled {
+    cursor: wait;
+}
+
+.pilot-theme .divide-y > :not(:last-child) {
+    border-color: var(--material-divider);
+}
+
+.pilot-theme :is(ul, li, section, article, div).rounded-lg.border {
+    border: 0;
+}
+
+.pilot-theme :is(input[data-slot='input'], button[data-slot='select-trigger']) {
+    min-height: 2.75rem;
+    border: 0;
+    border-bottom: 2px solid var(--material-divider);
+    border-radius: 0.75rem 0.75rem 0.25rem 0.25rem;
+    background: var(--secondary);
+    box-shadow: none;
+}
+
+.pilot-theme
+    :is(
+        input[data-slot='input'],
+        button[data-slot='select-trigger']
+    ):focus-visible {
+    border-bottom-color: var(--primary);
+}
+
+.pilot-theme[data-slot='dialog-content'],
+.pilot-theme.pilot-touch-dialog {
+    border: 0;
 }
 
 .pilot-theme .pilot-cell-label {
@@ -727,12 +837,16 @@ html[data-font-fallback='true'] .pilot-theme {
     }
 
     .pilot-theme .pilot-manager-table :is(th, td):first-child {
-        width: 26%;
+        width: 18%;
+    }
+
+    .pilot-theme .pilot-manager-table :is(th, td):nth-child(2) {
+        width: 24%;
         overflow-wrap: anywhere;
     }
 
     .pilot-theme .pilot-manager-table :is(th, td):last-child {
-        width: 21%;
+        width: 15%;
     }
 }
 
@@ -767,34 +881,36 @@ html[data-font-fallback='true'] .pilot-theme {
 }
 
 .pilot-theme .pilot-settings-body {
-    display: flex;
-    flex-direction: column;
+    display: grid;
     gap: 1.5rem;
 }
 
 .pilot-theme .pilot-settings-nav {
     width: 100%;
-    max-width: 36rem;
-}
-
-.pilot-theme .pilot-settings-separator {
-    display: block;
+    min-width: 0;
 }
 
 /* The app sidebar narrows the content, so wide layouts follow its width, not the viewport. */
-@container pilot-settings (min-width: 44rem) {
+@container pilot-settings (min-width: 52rem) {
     .pilot-theme .pilot-settings-body {
-        flex-direction: row;
-        gap: 3rem;
+        grid-template-columns: minmax(13rem, 0.75fr) minmax(0, 2fr);
+        align-items: start;
+        gap: 1.5rem;
+    }
+}
+
+.pilot-theme .material-settings-form {
+    display: grid;
+    gap: 1.5rem;
+}
+
+@container pilot-settings (min-width: 52rem) {
+    .pilot-theme .material-settings-form {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    .pilot-theme .pilot-settings-nav {
-        width: 12rem;
-        flex-shrink: 0;
-    }
-
-    .pilot-theme .pilot-settings-separator {
-        display: none;
+    .pilot-theme .material-settings-form > :nth-child(n + 3) {
+        grid-column: 1 / -1;
     }
 }
 
@@ -942,7 +1058,7 @@ html[data-font-fallback='true'] .pilot-theme {
 
     .pilot-theme .pilot-data-table tr {
         margin-bottom: 0.75rem;
-        border: 1px solid var(--border);
+        border: 0;
         border-radius: var(--radius);
         background: var(--card);
         padding: 0.5rem;
@@ -989,7 +1105,7 @@ html[data-font-fallback='true'] .pilot-theme {
 
     .pilot-theme .pilot-product-table tr {
         margin-bottom: 0.75rem;
-        border: 1px solid var(--border);
+        border: 0;
         border-radius: var(--radius);
         background: var(--card);
         padding: 0.5rem;
@@ -1192,6 +1308,228 @@ html[data-font-fallback='true'] .pilot-theme {
 
 .pilot-theme .order-page-header > div:last-child {
     min-width: min(100%, 12rem);
+}
+
+/* Shared Material 3 scaffold with a cool, layered admin palette. */
+.material-app-shell {
+    --material-surface: var(--background);
+    --material-surface-container: var(--sidebar-background);
+    --material-on-surface: var(--foreground);
+    --material-selected-container: var(--sidebar-accent);
+    flex-direction: column;
+    background: var(--material-surface);
+    color: var(--material-on-surface);
+}
+
+.material-app-body {
+    display: flex;
+    width: 100%;
+    min-height: calc(100svh - 4rem);
+}
+
+.material-app-body [data-slot='sidebar'][data-side] > .fixed {
+    top: 4rem;
+    height: calc(100svh - 4rem);
+}
+
+[data-slot='sidebar-content'] {
+    overflow-x: hidden;
+    overflow-y: auto;
+    scrollbar-width: none;
+}
+
+/* Keep wheel, touch, and keyboard scrolling while hiding the browser chrome. */
+:where(html, body, .pilot-theme, .pilot-theme *) {
+    scrollbar-width: none;
+}
+
+:where(
+    html,
+    body,
+    .pilot-theme,
+    .pilot-theme *,
+    [data-slot='sidebar-content']
+)::-webkit-scrollbar {
+    display: none;
+}
+
+.material-app-shell [data-sidebar='sidebar'] {
+    background: var(--material-surface-container);
+}
+
+[data-sidebar='sidebar'][data-mobile='true'] {
+    max-width: calc(100vw - 2rem);
+}
+
+.material-app-shell [data-sidebar='menu-button'][data-active='true'] {
+    border-radius: 0.75rem;
+    background: var(--material-selected-container);
+    color: var(--sidebar-accent-foreground);
+}
+
+.material-nav-submenu {
+    width: calc(100% - 1.5rem);
+    margin-left: 1.5rem;
+}
+
+.material-app-bar {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    width: 100%;
+    min-height: 4rem;
+    gap: 1rem;
+    padding-inline: 1rem;
+    border-bottom: 1px solid var(--material-divider);
+    background: var(--material-surface-container);
+}
+
+.material-app-brand {
+    display: inline-flex;
+    min-width: 0;
+    min-height: 2.75rem;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--sidebar-foreground);
+    font-size: 1.25rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.material-app-brand-icon {
+    display: grid;
+    width: 2rem;
+    height: 2rem;
+    flex: none;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--primary);
+    color: var(--primary-foreground);
+}
+
+.material-app-bar-title {
+    display: none;
+    min-width: 0;
+    overflow: hidden;
+    color: var(--muted-foreground);
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.material-app-bar-user {
+    width: 3rem;
+}
+
+.material-app-bar-user [data-slot='sidebar-menu-button'] {
+    min-height: 2.75rem;
+    min-width: 2.75rem;
+}
+
+.material-app-bar-user [data-slot='sidebar-menu-button'] > .grid,
+.material-app-bar-user [data-slot='sidebar-menu-button'] > svg:last-child {
+    display: none;
+}
+
+.material-page-trail {
+    padding: 1.5rem 1rem 0;
+}
+
+.material-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--foreground);
+    font-size: 0.875rem;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.material-status-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    flex: none;
+    border-radius: 50%;
+    background: var(--muted-foreground);
+}
+
+.material-status[data-tone='success'] .material-status-dot {
+    background: var(--pilot-success);
+}
+
+.material-status[data-tone='warning'] .material-status-dot {
+    background: var(--pilot-warning);
+}
+
+.material-status[data-tone='danger'] .material-status-dot {
+    background: var(--destructive);
+}
+
+.material-app-content {
+    width: 100%;
+    max-width: 96rem;
+    min-width: 0;
+    flex: 1;
+    margin-inline: auto;
+}
+
+.material-app-shell
+    .material-app-content
+    > :is(.pilot-page, .pilot-layout-page),
+.material-app-shell .material-app-content > .flex.flex-col.gap-8.p-4 {
+    padding: 1.5rem 1rem;
+}
+
+.material-skip-link {
+    position: fixed;
+    top: 0.5rem;
+    left: 0.5rem;
+    z-index: 60;
+    transform: translateY(-200%);
+    border-radius: 9999px;
+    background: var(--primary);
+    color: var(--primary-foreground);
+    padding: 0.75rem 1rem;
+}
+
+.material-skip-link:focus-visible {
+    transform: translateY(0);
+}
+
+.material-auth .pilot-panel {
+    border-radius: 1.5rem;
+}
+
+@media (min-width: 48rem) {
+    .material-app-bar {
+        padding-inline: 1.5rem;
+    }
+
+    .material-app-bar-title {
+        display: block;
+    }
+
+    .material-app-bar-user {
+        width: 12rem;
+    }
+
+    .material-app-bar-user [data-slot='sidebar-menu-button'] > .grid,
+    .material-app-bar-user [data-slot='sidebar-menu-button'] > svg:last-child {
+        display: grid;
+    }
+
+    .material-page-trail {
+        padding-inline: 1.5rem;
+    }
+
+    .material-app-shell
+        .material-app-content
+        > :is(.pilot-page, .pilot-layout-page),
+    .material-app-shell .material-app-content > .flex.flex-col.gap-8.p-4 {
+        padding: 2rem 1.5rem;
+    }
 }
 
 .pilot-theme :focus-visible,

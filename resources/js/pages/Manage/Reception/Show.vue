@@ -209,7 +209,7 @@ const addProduct = computed(() =>
         <section
             v-for="product in reception.products"
             :key="product.productId"
-            class="flex flex-col gap-3 rounded-lg border p-3"
+            class="pilot-panel flex flex-col gap-3 p-3"
             :data-test="`product-${product.productId}`"
         >
             <div class="flex flex-wrap items-center justify-between gap-2">
