@@ -688,6 +688,15 @@ semantic pair, supply a readable counterpart. Adjust the light primary,
 destructive and input-edge tones only as needed for the accepted contrast
 requirements; record exact values and checks in the DRA-199 visual record.
 
+#### 2026-10-27 Readability refinement
+
+The user's request for softer, easier-to-read lettering replaces the Inter
+heading and Source Serif 4 body pairing with the self-hosted Nunito variable
+family. Use it for headings, body text, navigation and controls inside the
+existing `pilot-theme` boundary, including manager pages and portal content.
+Keep JetBrains Mono for code and a system sans-serif fallback. The guest
+`Welcome` page remains outside the themed boundary.
+
 T40 extends the same reactive opt-in to Dashboard, Wallet/Statement and the five existing producer
 pages. Their current page components retain their props, actions and form contracts. Shared page,
 panel, empty-state and mobile table presentation classes live under the pilot theme, so the two

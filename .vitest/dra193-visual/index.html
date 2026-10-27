@@ -3,15 +3,10 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link
-            id="fixture-font"
-            rel="stylesheet"
-            href="/build/assets/fonts-C9MNnjVw.css"
-        />
         <script>
             const query = new URLSearchParams(location.search);
             if (query.get('fallback') === '1') {
-                document.getElementById('fixture-font').remove();
+                document.documentElement.dataset.fontFallback = 'true';
             }
             if (query.get('unsupported') === '1') {
                 delete window.PublicKeyCredential;

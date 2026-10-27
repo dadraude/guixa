@@ -94,9 +94,9 @@ try {
             .map(([fill, ratio]) => `${fill} hover: ${ratio.toFixed(2)}:1`));
         if (result.input < 3)
             issues.push(`input/card: ${result.input.toFixed(2)}:1`);
-        if (!result.bodyFont.includes('Source Serif 4 Variable'))
+        if (!result.bodyFont.includes('Nunito Variable'))
             issues.push(`body font: ${result.bodyFont}`);
-        if (!result.headingFont.includes('Inter Variable'))
+        if (!result.headingFont.includes('Nunito Variable'))
             issues.push(`heading font: ${result.headingFont}`);
         if (issues.length) {
             failed++;

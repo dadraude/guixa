@@ -1229,3 +1229,11 @@ fonts and shadows are adapted to shadcn-vue rather than installing React
 components. Light primary and destructive fills are darkened to keep white text
 at 4.5:1; input edges and omitted dark pairs are completed for contrast. The
 user will inspect the live layout; no new screenshots were requested or taken.
+
+## 2026-10-27 · Deviation
+
+`plan.md` (Application visual identity / Readability refinement): the user
+requested a font with softer forms that is easier to read. The opted-in
+application theme uses locally bundled Nunito for headings and interface text
+in place of Inter and Source Serif 4, while JetBrains Mono remains for code.
+The existing theme boundary and fallback behavior remain in place.
