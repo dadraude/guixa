@@ -1144,6 +1144,27 @@
     height: calc(100svh - 4rem);
 }
 
+[data-slot='sidebar-content'] {
+    overflow-x: hidden;
+    overflow-y: auto;
+    scrollbar-width: none;
+}
+
+/* Keep wheel, touch, and keyboard scrolling while hiding the browser chrome. */
+:where(html, body, .pilot-theme, .pilot-theme *) {
+    scrollbar-width: none;
+}
+
+:where(
+    html,
+    body,
+    .pilot-theme,
+    .pilot-theme *,
+    [data-slot='sidebar-content']
+)::-webkit-scrollbar {
+    display: none;
+}
+
 .material-app-shell [data-sidebar='sidebar'] {
     background: var(--material-surface-container);
 }
