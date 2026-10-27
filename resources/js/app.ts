@@ -6,7 +6,7 @@ import SettingsLayout from '@/layouts/settings/Layout.vue';
 import { initializeFlashToast } from '@/lib/flashToast';
 import { installTranslations } from '@/lib/i18n';
 
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+const appName = import.meta.env.VITE_APP_NAME || 'Guixa';
 
 void createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
@@ -33,7 +33,7 @@ void createInertiaApp({
         });
     },
     progress: {
-        color: '#4B5563',
+        color: 'var(--primary)',
     },
 });
 

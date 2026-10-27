@@ -1,225 +1,122 @@
 /*
- * Paletes editables: canvieu els valors d’aquest primer bloc i recarregueu la pàgina.
- * El navegador serveix aquest fitxer directament; no cal compilar els assets.
- * Si canvieu un color principal, reviseu també els colors de text i focus per mantenir el contrast.
+ * Paleta compartida: superfícies neutres, contrast nítid i un sol color de marca.
+ * Editeu els valors d'aquest bloc i recarregueu la pàgina.
  */
 :root {
-    /* Compartit */
-    --palette-white: #ffffff;
-    --palette-ink: #090e18;
+    --palette-canvas: #f8f7f4;
+    --palette-surface: #ffffff;
+    --palette-ink: #202b26;
+    --palette-brand: #246b57;
+    --palette-soft: #e8efeb;
+    --palette-soft-ink: #305747;
+    --palette-hover: #eceae5;
+    --palette-hover-ink: #36463e;
+    --palette-muted: #f2f4f1;
+    --palette-muted-ink: #58665e;
+    --palette-border: #d6ded8;
+    --palette-field-border: #788a7d;
+    --palette-danger: #a94440;
+    --palette-sidebar: #f1f3f0;
 
-    /* Tema blau: pàgines públiques, sòcies i productores */
-    --palette-blue-primary: #08137b;
-    --palette-blue-deep: #061789;
-    --palette-blue-light: #75abed;
-    --palette-blue-medium: #3e67b2;
-    --palette-blue-strong: #344897;
-    --palette-blue-pale: #b7e0f8;
-    --palette-blue-mist: #9aaee5;
-    --palette-blue-teal: #67a1b4;
-    --palette-blue-background: #eff4f8;
-    --palette-blue-surface: #e4eaf3;
-    --palette-blue-dark-background: #070810;
-    --palette-blue-muted: #4a585b;
-    --palette-blue-dark-muted: #a0a3ae;
-
-    /* Administració: els cinc colors de la referència */
-    --palette-admin-green: #39a845;
-    --palette-admin-aqua: #98dddf;
-    --palette-admin-lavender: #ccb5d6;
-    --palette-admin-pink: #ffbbb9;
-    --palette-admin-white: #f4f9ff;
-
-    /* Administració: contrast de text, camps i mode fosc */
-    --palette-admin-ink: #16231b;
-    --palette-admin-muted-text: #405a5d;
-    --palette-admin-lavender-ink: #2c1e35;
-    --palette-admin-border: #c8d7d9;
-    --palette-admin-input-border: #6b8488;
-    --palette-admin-focus: #287a34;
-    --palette-admin-dark-background: #0e1517;
-    --palette-admin-dark-surface: #172124;
-    --palette-admin-dark-secondary: #254648;
-    --palette-admin-dark-muted: #1d2c30;
-    --palette-admin-dark-muted-text: #bdccd0;
-    --palette-admin-dark-accent: #4b3d54;
-    --palette-admin-dark-border: #60797b;
-    --palette-admin-dark-input-border: #719196;
-    --palette-admin-dark-sidebar: #142023;
+    --palette-dark-canvas: #1b1e1c;
+    --palette-dark-surface: #252a27;
+    --palette-dark-ink: #ecf2ed;
+    --palette-dark-brand: #a7d7c1;
+    --palette-dark-soft: #343a36;
+    --palette-dark-hover: #373a37;
+    --palette-dark-muted: #2f3430;
+    --palette-dark-muted-ink: #bcc9bf;
+    --palette-dark-border: #6b786f;
+    --palette-dark-field-border: #95a99b;
+    --palette-dark-danger: #e3918c;
+    --palette-dark-sidebar: #202521;
+    --palette-dark-sidebar-accent: #343d36;
 }
 
-/* Assignació dels colors als elements de la interfície. */
+/* Una acció principal de marca, accions secundàries neutres i perill reservat al vermell. */
 :root {
-    --background: var(--palette-blue-background);
+    --background: var(--palette-canvas);
     --foreground: var(--palette-ink);
-    --card: var(--palette-white);
+    --card: var(--palette-surface);
     --card-foreground: var(--palette-ink);
-    --popover: var(--palette-white);
+    --popover: var(--palette-surface);
     --popover-foreground: var(--palette-ink);
-    --primary: var(--palette-blue-primary);
-    --primary-foreground: var(--palette-white);
-    --secondary: var(--palette-blue-surface);
-    --secondary-foreground: var(--palette-blue-primary);
-    --muted: var(--palette-blue-surface);
-    --muted-foreground: var(--palette-blue-muted);
-    --accent: var(--palette-blue-pale);
-    --accent-foreground: var(--palette-blue-primary);
-    --destructive: hsl(0 84.2% 60.2%);
-    --destructive-foreground: hsl(0 0% 98%);
-    --border: var(--palette-blue-mist);
-    --input: var(--palette-blue-muted);
-    --ring: var(--palette-blue-medium);
-    --chart-1: var(--palette-blue-light);
-    --chart-2: var(--palette-blue-medium);
-    --chart-3: var(--palette-blue-strong);
-    --chart-4: var(--palette-blue-teal);
-    --chart-5: var(--palette-blue-deep);
-    --sidebar-background: var(--palette-blue-surface);
+    --primary: var(--palette-brand);
+    --primary-foreground: var(--palette-surface);
+    --secondary: var(--palette-soft);
+    --secondary-foreground: var(--palette-soft-ink);
+    --muted: var(--palette-muted);
+    --muted-foreground: var(--palette-muted-ink);
+    --accent: var(--palette-hover);
+    --accent-foreground: var(--palette-hover-ink);
+    --destructive: var(--palette-danger);
+    --destructive-foreground: #ffffff;
+    --border: var(--palette-border);
+    --input: var(--palette-field-border);
+    --ring: var(--palette-brand);
+    --chart-1: #246b57;
+    --chart-2: #64a38c;
+    --chart-3: #668b9c;
+    --chart-4: #b19673;
+    --chart-5: #7d8ea4;
+    --sidebar: var(--palette-sidebar);
+    --sidebar-background: var(--palette-sidebar);
     --sidebar-foreground: var(--palette-ink);
-    --sidebar-primary: var(--palette-blue-primary);
-    --sidebar-primary-foreground: var(--palette-white);
-    --sidebar-accent: var(--palette-blue-pale);
-    --sidebar-accent-foreground: var(--palette-blue-primary);
-    --sidebar-border: var(--palette-blue-mist);
-    --sidebar-ring: var(--palette-blue-medium);
-    --sidebar: var(--palette-blue-surface);
+    --sidebar-primary: var(--palette-brand);
+    --sidebar-primary-foreground: var(--palette-surface);
+    --sidebar-accent: var(--palette-soft);
+    --sidebar-accent-foreground: var(--palette-soft-ink);
+    --sidebar-border: var(--palette-border);
+    --sidebar-ring: var(--palette-brand);
 }
 
 .dark {
-    --background: var(--palette-blue-dark-background);
-    --foreground: var(--palette-blue-background);
-    --card: var(--palette-ink);
-    --card-foreground: var(--palette-blue-background);
-    --popover: var(--palette-ink);
-    --popover-foreground: var(--palette-blue-background);
-    --primary: var(--palette-blue-light);
-    --primary-foreground: var(--palette-blue-dark-background);
-    --secondary: color-mix(
-        in srgb,
-        var(--palette-blue-strong) 35%,
-        var(--palette-ink)
-    );
-    --secondary-foreground: var(--palette-blue-background);
-    --muted: color-mix(
-        in srgb,
-        var(--palette-blue-strong) 35%,
-        var(--palette-ink)
-    );
-    --muted-foreground: var(--palette-blue-dark-muted);
-    --accent: var(--palette-blue-strong);
-    --accent-foreground: var(--palette-blue-background);
-    --destructive: hsl(0 84% 60%);
-    --destructive-foreground: hsl(0 0% 98%);
-    --border: var(--palette-blue-muted);
-    --input: var(--palette-blue-dark-muted);
-    --ring: var(--palette-blue-light);
-    --chart-1: var(--palette-blue-pale);
-    --chart-2: var(--palette-blue-light);
-    --chart-3: var(--palette-blue-teal);
-    --chart-4: var(--palette-blue-mist);
-    --chart-5: var(--palette-blue-medium);
-    --sidebar-background: var(--palette-ink);
-    --sidebar-foreground: var(--palette-blue-background);
-    --sidebar-primary: var(--palette-blue-light);
-    --sidebar-primary-foreground: var(--palette-blue-dark-background);
-    --sidebar-accent: var(--palette-blue-strong);
-    --sidebar-accent-foreground: var(--palette-blue-background);
-    --sidebar-border: var(--palette-blue-muted);
-    --sidebar-ring: var(--palette-blue-light);
-    --sidebar: var(--palette-ink);
+    --background: var(--palette-dark-canvas);
+    --foreground: var(--palette-dark-ink);
+    --card: var(--palette-dark-surface);
+    --card-foreground: var(--palette-dark-ink);
+    --popover: var(--palette-dark-surface);
+    --popover-foreground: var(--palette-dark-ink);
+    --primary: var(--palette-dark-brand);
+    --primary-foreground: #1b3026;
+    --secondary: var(--palette-dark-soft);
+    --secondary-foreground: #ecf2ed;
+    --muted: var(--palette-dark-muted);
+    --muted-foreground: var(--palette-dark-muted-ink);
+    --accent: var(--palette-dark-hover);
+    --accent-foreground: #ecf2ed;
+    --destructive: var(--palette-dark-danger);
+    --destructive-foreground: #2b1f1e;
+    --border: var(--palette-dark-border);
+    --input: var(--palette-dark-field-border);
+    --ring: var(--palette-dark-brand);
+    --chart-1: #a7d7c1;
+    --chart-2: #83b8a0;
+    --chart-3: #8fb0bb;
+    --chart-4: #c6b59b;
+    --chart-5: #aab7d0;
+    --sidebar: var(--palette-dark-sidebar);
+    --sidebar-background: var(--palette-dark-sidebar);
+    --sidebar-foreground: var(--palette-dark-ink);
+    --sidebar-primary: var(--palette-dark-brand);
+    --sidebar-primary-foreground: #1b3026;
+    --sidebar-accent: var(--palette-dark-sidebar-accent);
+    --sidebar-accent-foreground: var(--palette-dark-ink);
+    --sidebar-border: var(--palette-dark-border);
+    --sidebar-ring: var(--palette-dark-brand);
 }
 
 .pilot-theme {
-    --destructive: oklch(0.56 0.21 25.39);
-    --destructive-foreground: oklch(1 0 0);
-    --pilot-success: #2d684a;
-    --pilot-success-foreground: var(--palette-white);
-    --pilot-warning: #795014;
-    --pilot-warning-foreground: var(--palette-white);
+    --pilot-success: #276b4e;
+    --pilot-success-foreground: #ffffff;
+    --pilot-warning: #8f5d2e;
+    --pilot-warning-foreground: #ffffff;
 }
 
 .dark .pilot-theme {
-    --destructive: oklch(0.72 0.17 25.39);
-    --destructive-foreground: oklch(0.2 0 0);
-    --pilot-success: #a1dbb2;
-    --pilot-success-foreground: #19231d;
-    --pilot-warning: #f3ce85;
-    --pilot-warning-foreground: #2a2113;
-    --pilot-input-fill: color-mix(
-        in srgb,
-        var(--palette-blue-strong) 35%,
-        var(--palette-ink)
-    );
-}
-
-.coop-manager-shell {
-    --background: var(--palette-admin-white);
-    --foreground: var(--palette-admin-ink);
-    --card: var(--palette-white);
-    --card-foreground: var(--palette-admin-ink);
-    --popover: var(--palette-white);
-    --popover-foreground: var(--palette-admin-ink);
-    --primary: var(--palette-admin-green);
-    --primary-foreground: var(--palette-ink);
-    --secondary: var(--palette-admin-aqua);
-    --secondary-foreground: var(--palette-admin-ink);
-    --muted: color-mix(
-        in srgb,
-        var(--palette-admin-aqua) 18%,
-        var(--palette-admin-white)
-    );
-    --muted-foreground: var(--palette-admin-muted-text);
-    --accent: var(--palette-admin-lavender);
-    --accent-foreground: var(--palette-admin-lavender-ink);
-    --border: var(--palette-admin-border);
-    --input: var(--palette-admin-input-border);
-    --ring: var(--palette-admin-focus);
-    --sidebar: var(--palette-admin-white);
-    --sidebar-foreground: var(--palette-admin-ink);
-    --sidebar-accent: var(--palette-admin-aqua);
-    --sidebar-accent-foreground: var(--palette-admin-ink);
-    --sidebar-border: var(--palette-admin-border);
-    --sidebar-primary: var(--palette-admin-green);
-    --sidebar-primary-foreground: var(--palette-ink);
-    --sidebar-background: var(--palette-admin-white);
-    --sidebar-ring: var(--palette-admin-focus);
-    --chart-1: var(--palette-admin-green);
-    --chart-2: var(--palette-admin-aqua);
-    --chart-3: var(--palette-admin-lavender);
-    --chart-4: var(--palette-admin-pink);
-    --chart-5: var(--palette-admin-focus);
-}
-
-.dark .coop-manager-shell {
-    --background: var(--palette-admin-dark-background);
-    --foreground: var(--palette-admin-white);
-    --card: var(--palette-admin-dark-surface);
-    --card-foreground: var(--palette-admin-white);
-    --popover: var(--palette-admin-dark-surface);
-    --popover-foreground: var(--palette-admin-white);
-    --primary: var(--palette-admin-aqua);
-    --primary-foreground: var(--palette-admin-dark-background);
-    --secondary: var(--palette-admin-dark-secondary);
-    --secondary-foreground: var(--palette-admin-white);
-    --muted: var(--palette-admin-dark-muted);
-    --muted-foreground: var(--palette-admin-dark-muted-text);
-    --accent: var(--palette-admin-dark-accent);
-    --accent-foreground: var(--palette-admin-white);
-    --border: var(--palette-admin-dark-border);
-    --input: var(--palette-admin-dark-input-border);
-    --ring: var(--palette-admin-aqua);
-    --sidebar: var(--palette-admin-dark-sidebar);
-    --sidebar-foreground: var(--palette-admin-white);
-    --sidebar-accent: var(--palette-admin-dark-secondary);
-    --sidebar-accent-foreground: var(--palette-admin-white);
-    --sidebar-border: var(--palette-admin-dark-border);
-    --sidebar-primary: var(--palette-admin-aqua);
-    --sidebar-primary-foreground: var(--palette-admin-dark-background);
-    --sidebar-background: var(--palette-admin-dark-sidebar);
-    --sidebar-ring: var(--palette-admin-aqua);
-    --chart-1: var(--palette-admin-green);
-    --chart-2: var(--palette-admin-aqua);
-    --chart-3: var(--palette-admin-lavender);
-    --chart-4: var(--palette-admin-pink);
-    --chart-5: var(--palette-admin-white);
+    --pilot-success: #a9dcc1;
+    --pilot-success-foreground: #1b3026;
+    --pilot-warning: #efc693;
+    --pilot-warning-foreground: #302417;
+    --pilot-input-fill: var(--palette-dark-soft);
 }

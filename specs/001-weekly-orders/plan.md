@@ -697,6 +697,49 @@ existing `pilot-theme` boundary, including manager pages and portal content.
 Keep JetBrains Mono for code and a system sans-serif fallback. The guest
 `Welcome` page remains outside the themed boundary.
 
+#### 2026-10-27 Unified warm application palette
+
+The user's request for one calmer, warmer palette supersedes the separate blue
+application and green/aqua/lavender manager color assignments. Use one set of
+semantic light/dark tokens for member, producer, manager, settings and auth
+screens, with a cream canvas, quiet card surfaces, olive primary and restrained
+clay accent. Dark mode uses stepped warm charcoal surfaces rather than a green
+wash. The guest `Welcome` page keeps its own hardcoded illustration and colors.
+
+Actions have a stable hierarchy across roles: the filled olive button is the
+primary action, a pale sage fill is secondary, a bordered card-surface button
+is an alternative secondary action, and destructive actions use the dedicated
+red token. Clay is for incidental emphasis and hover states, never a competing
+primary button. Shared text inputs and select triggers have a card surface and
+visible field border at every width, so their role differs from filled actions.
+Keep semantic success, warning and error colors distinct and verify text,
+control-edge and focus contrast in light and dark modes.
+
+#### 2026-10-27 Modern visual refinement
+
+After reviewing the warm preview, the user found the cream, olive and clay
+combination too retro. Keep the action hierarchy above, but use a nearly white
+warm-neutral canvas (`#F8F7F4`), white cards, charcoal text and a single deep
+green (`#246B57`) for primary actions. Secondary surfaces are muted gray-green;
+hover emphasis is a low-chroma neutral rather than a separate colorful fill.
+Dark mode uses neutral stepped charcoal surfaces with a soft green primary.
+Retain Nunito and the established control sizes. Avoid gradients and decorative
+color blocks; let contrast, spacing and labels convey the action hierarchy.
+
+#### 2026-10-27 App-wide visual rollout
+
+The user extended the modern visual direction to the whole application. All
+operational, manager, account and authentication routes already use the shared
+semantic palette. Replace the Laravel starter Welcome page with a Guixa landing
+page using the same canvas, card, typography and action tokens. Align the shared
+validation error, navigation progress indicator, document fallback background,
+page title and browser favicon with those tokens and Guixa identity. Preserve
+routes and authentication behavior. The existing `Button` serves the landing
+page primary action; the new `WelcomePage` component keeps the live route and
+visual fixture on identical markup. Check the guest and signed-in variants at
+375 and 1280 px in both themes and the guest page at 1024 px with 200% root
+text. Reuse the existing manager/shared-control manifest for action hierarchy.
+
 T40 extends the same reactive opt-in to Dashboard, Wallet/Statement and the five existing producer
 pages. Their current page components retain their props, actions and form contracts. Shared page,
 panel, empty-state and mobile table presentation classes live under the pilot theme, so the two
