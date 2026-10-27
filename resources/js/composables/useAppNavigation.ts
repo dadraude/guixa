@@ -27,15 +27,10 @@ import { toUrl } from '@/lib/utils';
 import { dashboard } from '@/routes';
 import type { NavItem } from '@/types';
 
-const managerItems: NavItem[] = [
-    { title: 'Cycles', href: CycleController.index(), icon: CalendarDays },
-    { title: 'Households', href: HouseholdController.index(), icon: Home },
-    { title: 'Accounts', href: AccountController.index(), icon: UserCog },
-    { title: 'Producers', href: ProducerController.index(), icon: Wheat },
-    { title: 'Stock', href: StockProductController.index(), icon: Package },
-    { title: 'Return items', href: ReturnItemController.index(), icon: Undo2 },
-    { title: 'Settings', href: SettingsController.show(), icon: Settings },
-];
+export type NavigationSection = {
+    title: string;
+    items: NavItem[];
+};
 
 const producerItems: NavItem[] = [
     { title: 'Products', href: ProductController.index(), icon: Package },
@@ -47,17 +42,85 @@ const memberItems: NavItem[] = [
     { title: 'Wallet', href: WalletController.show(), icon: Wallet },
 ];
 
-export function navigationItemsFor(
+export function navigationSectionsFor(
     areas: readonly { role: string }[],
-): NavItem[] {
+): NavigationSection[] {
     const roles = new Set(areas.map((area) => area.role));
 
     return [
-        { title: 'Dashboard', href: dashboard(), icon: LayoutGrid },
-        ...(roles.has('member') ? memberItems : []),
-        ...(roles.has('manager') ? managerItems : []),
-        ...(roles.has('producer') ? producerItems : []),
+        {
+            title: 'Overview',
+            items: [
+                { title: 'Dashboard', href: dashboard(), icon: LayoutGrid },
+            ],
+        },
+        ...(roles.has('member')
+            ? [{ title: 'Orders and wallet', items: memberItems }]
+            : []),
+        ...(roles.has('manager')
+            ? [
+                  {
+                      title: 'Cooperative',
+                      items: [
+                          {
+                              title: 'Cycles',
+                              href: CycleController.index(),
+                              icon: CalendarDays,
+                          },
+                          {
+                              title: 'Households',
+                              href: HouseholdController.index(),
+                              icon: Home,
+                          },
+                      ],
+                  },
+                  {
+                      title: 'Catalog and stock',
+                      items: [
+                          {
+                              title: 'Producers',
+                              href: ProducerController.index(),
+                              icon: Wheat,
+                          },
+                          {
+                              title: 'Stock',
+                              href: StockProductController.index(),
+                              icon: Package,
+                          },
+                          {
+                              title: 'Return items',
+                              href: ReturnItemController.index(),
+                              icon: Undo2,
+                          },
+                      ],
+                  },
+                  {
+                      title: 'Administration',
+                      items: [
+                          {
+                              title: 'Accounts',
+                              href: AccountController.index(),
+                              icon: UserCog,
+                          },
+                          {
+                              title: 'Settings',
+                              href: SettingsController.show(),
+                              icon: Settings,
+                          },
+                      ],
+                  },
+              ]
+            : []),
+        ...(roles.has('producer')
+            ? [{ title: 'Production', items: producerItems }]
+            : []),
     ];
+}
+
+export function navigationItemsFor(
+    areas: readonly { role: string }[],
+): NavItem[] {
+    return navigationSectionsFor(areas).flatMap((section) => section.items);
 }
 
 function pathOf(url: string): string {
@@ -89,10 +152,13 @@ export function currentNavigationItem(
 export function useAppNavigation() {
     const page = usePage();
     const areas = computed(() => page.props.roleAreas ?? []);
-    const items = computed(() => navigationItemsFor(areas.value));
+    const sections = computed(() => navigationSectionsFor(areas.value));
+    const items = computed(() =>
+        sections.value.flatMap((section) => section.items),
+    );
     const currentItem = computed(() =>
         currentNavigationItem(items.value, page.url),
     );
 
-    return { areas, items, currentItem };
+    return { areas, sections, items, currentItem };
 }

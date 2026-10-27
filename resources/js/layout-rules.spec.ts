@@ -16,7 +16,6 @@ export const checkedFiles = [
     'components/AppSidebarHeader.vue',
     'components/Breadcrumbs.vue',
     'components/NavMain.vue',
-    'components/NavRoleAreas.vue',
     'components/NavUser.vue',
     'components/NavFooter.vue',
     'components/UserInfo.vue',

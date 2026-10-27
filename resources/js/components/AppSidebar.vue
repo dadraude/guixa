@@ -4,7 +4,6 @@ import { BookOpen, FolderGit2 } from '@lucide/vue';
 import AppLogo from '@/components/AppLogo.vue';
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
-import NavRoleAreas from '@/components/NavRoleAreas.vue';
 import NavUser from '@/components/NavUser.vue';
 import { useAppNavigation } from '@/composables/useAppNavigation';
 import {
@@ -19,7 +18,7 @@ import {
 import { dashboard } from '@/routes';
 import type { NavItem } from '@/types';
 
-const { areas: roleAreas, items: mainNavItems } = useAppNavigation();
+const { sections } = useAppNavigation();
 
 const footerNavItems: NavItem[] = [
     {
@@ -50,8 +49,7 @@ const footerNavItems: NavItem[] = [
         </SidebarHeader>
 
         <SidebarContent>
-            <NavRoleAreas :areas="roleAreas" />
-            <NavMain :items="mainNavItems" />
+            <NavMain :sections="sections" />
         </SidebarContent>
 
         <SidebarFooter>
