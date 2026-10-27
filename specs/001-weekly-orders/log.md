@@ -1265,3 +1265,13 @@ requested the modern visual system throughout the application. The remaining
 Laravel starter Welcome page now uses Guixa branding and the shared palette;
 shared error text, navigation progress, document fallback and favicon are also
 aligned. Existing route behavior and button roles are retained.
+
+## 2026-10-27 · Change
+
+`plan.md` (Reference style refresh) and `tasks.md` (T47–T51): the user supplied four
+Common Ground interface screenshots, asked to apply their style to Guixa using its
+own palette, and approved the mapped proposal and light/dark concept preview with
+“approved!”. The first code pilot uses the manager Cycles and Producers indexes
+and shared shell; the dashboard and settings slices follow their in-flight layout
+work. Why: keep Guixa's workflows and semantic colors while adopting the reference's
+clear navigation, page hierarchy and calm operational panels in reviewable steps.

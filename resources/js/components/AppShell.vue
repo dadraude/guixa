@@ -6,6 +6,7 @@ import type { AppVariant } from '@/types';
 type Props = {
     variant?: AppVariant;
     class?: string;
+    sidebarWidth?: string;
 };
 
 withDefaults(defineProps<Props>(), {
@@ -26,7 +27,7 @@ const isOpen = usePage().props.sidebarOpen;
     <SidebarProvider
         v-else
         :default-open="isOpen"
-        sidebar-width="min(16rem, 30vw)"
+        :sidebar-width="sidebarWidth ?? 'min(16rem, 30vw)'"
         :class="$props.class"
     >
         <slot />
