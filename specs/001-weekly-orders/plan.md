@@ -918,9 +918,11 @@ visible copy uses `lang/`.
 The first production pilot (T47) is the shared shell on the manager Cycles and Producers indexes.
 The manager layout slice T45 is merged; the dashboard and settings layout slices T44 and T46 are
 still separate at this amendment, so T47 avoids their page files. T47 may style only its opted-in
-routes; it does not silently restyle every signed-in page. The broader dashboard, member, producer,
-manager and account rollout follows after the relevant layout slices land and the first pilot's
-rendered light/dark review is accepted. The guest Welcome page is outside this refresh.
+routes; it does not silently restyle every signed-in page. After reviewing the merged pilot, the user
+requested the broader dashboard, member, producer, manager, settings, authentication and Welcome
+rollout together. The [all-page inventory](../../docs/visual-design/2026-10-27-reference-style-rollout.md)
+records the combined route scope and shared components. Reconcile T44/T46 if their layout work lands
+before the combined rollout merges.
 
 For each slice, record an exact route/state inventory and reused component paths before editing.
 Use the shared visual runner with a committed fixture and manifest, including 375 and 1280 px in

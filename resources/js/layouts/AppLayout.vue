@@ -11,9 +11,6 @@ const { breadcrumbs = [] } = defineProps<{
 const page = usePage();
 const pilotTheme = computed(() => isPilotThemePage(page.component));
 const managerTheme = computed(() => page.component.startsWith('Manage/'));
-const referencePilot = computed(() =>
-    ['Manage/Cycles/Index', 'Manage/Producers/Index'].includes(page.component),
-);
 </script>
 
 <template>
@@ -21,7 +18,6 @@ const referencePilot = computed(() =>
         :breadcrumbs="breadcrumbs"
         :pilot-theme="pilotTheme"
         :manager-theme="managerTheme"
-        :reference-pilot="referencePilot"
     >
         <slot />
     </AppLayout>

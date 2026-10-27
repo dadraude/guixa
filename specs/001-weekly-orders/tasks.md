@@ -374,22 +374,25 @@ manager inventory is prepared for that visual review.
 
 **Status: Accepted (2026-10-27).** The user approved the
 [reference-style proposal](../../docs/visual-design/2026-10-27-reference-style-proposal.md)
-and authorized the first pilot. Implements [Plan · Reference style refresh](plan.md#reference-style-refresh)
+and authorized the first pilot. After reviewing the merged pilot, the user requested the
+[all-page rollout](../../docs/visual-design/2026-10-27-reference-style-rollout.md) and a top-bar
+breadcrumb in place of the repeated title. Implements [Plan · Reference style refresh](plan.md#reference-style-refresh)
 through the **plan only** route. No new `R#` or `S#`. These are local task rows; no Linear tickets
 have been published for them.
 
 | ID | Task | Covers | After |
 | --- | --- | --- | --- |
 | T47 | Pilot the reference shell and shared palette treatment on manager Cycles and Producers indexes; preserve all existing actions, forms and dialogs; present rendered light/dark evidence for approval | Plan · Reference style refresh; Constitution (UI); existing T41 manager scenarios | T45 |
-| T48 | Apply the accepted pilot to Dashboard, member ordering, wallet and producer screens, preserving role-specific content and phone ordering | Plan · Reference style refresh; existing T39/T40 scenarios | T47 visual approval and T44 |
-| T49 | Apply the same panel, status and responsive list patterns to remaining manager directories | Plan · Reference style refresh; existing T41 scenarios | T47 visual approval |
+| T48 | Apply the accepted pilot to Dashboard, member ordering, wallet and producer screens, preserving role-specific content and phone ordering | Plan · Reference style refresh; existing T39/T40 scenarios | T47; reconcile T44 if it lands |
+| T49 | Apply the same panel, status and responsive list patterns to remaining manager directories | Plan · Reference style refresh; existing T41 scenarios | T47 |
 | T50 | Apply the system to manager details, reception, pickups and their overlays | Plan · Reference style refresh; existing T41 scenarios | T49 |
-| T51 | Carry the approved treatment into settings and authentication while retaining appearance, passkey and 2FA behavior | Plan · Reference style refresh; existing T42 scenarios | T47 visual approval and T46 |
+| T51 | Carry the approved treatment into settings, authentication and Welcome while retaining appearance, passkey and 2FA behavior | Plan · Reference style refresh; existing T42 scenarios | T47; reconcile T46 if it lands |
 
 **Done when (each task):** the exact affected route/role and state inventory is documented; its
 shared components and tokens are reused; existing behavior and focused tests still pass; rendered
 375/1280 px light/dark and distinct 1024 px/200% states pass the shared visual verifier; contrast,
-focus, 44 px targets and no clipping are checked. T47 stops for visual approval before T48–T51.
+focus, 44 px targets and no clipping are checked. The user's 2026-10-27 continuation authorizes
+T48–T51 together after inspecting the merged T47 pilot.
 
 ## Closure
 

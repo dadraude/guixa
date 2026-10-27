@@ -6,17 +6,12 @@ import { useAppNavigation } from '@/composables/useAppNavigation';
 import { Sidebar, SidebarContent } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 
-withDefaults(defineProps<{ referencePilot?: boolean }>(), {
-    referencePilot: false,
-});
-
 const { sections, currentItem } = useAppNavigation();
 </script>
 
 <template>
     <Sidebar collapsible="icon" variant="sidebar" class="material-nav-drawer">
         <Link
-            v-if="referencePilot"
             :href="dashboard()"
             class="reference-sidebar-brand"
             aria-label="Guixa"

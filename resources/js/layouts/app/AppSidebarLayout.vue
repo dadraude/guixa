@@ -17,14 +17,12 @@ type Props = {
     breadcrumbs?: BreadcrumbItem[];
     pilotTheme?: boolean;
     managerTheme?: boolean;
-    referencePilot?: boolean;
 };
 
 const props = withDefaults(defineProps<Props>(), {
     breadcrumbs: () => [],
     pilotTheme: false,
     managerTheme: false,
-    referencePilot: false,
 });
 providePilotTheme(toRef(props, 'pilotTheme'));
 
@@ -51,22 +49,22 @@ const pageBreadcrumbs = computed(() => [
 <template>
     <AppShell
         variant="sidebar"
-        :sidebar-width="referencePilot ? 'min(16rem, 42vw)' : undefined"
-        :class="`material-app-shell ${pilotTheme ? 'pilot-theme bg-background text-foreground' : ''} ${managerTheme ? 'coop-manager-shell' : ''} ${referencePilot ? 'reference-pilot' : ''}`"
+        sidebar-width="min(16rem, 42vw)"
+        :class="`material-app-shell reference-style ${pilotTheme ? 'pilot-theme bg-background text-foreground' : ''} ${managerTheme ? 'coop-manager-shell' : ''}`"
     >
         <a class="material-skip-link" href="#main-content">
             {{ trans('Skip to content') }}
         </a>
-        <AppSidebarHeader :section-title="sectionTitle" />
+        <AppSidebarHeader :breadcrumbs="pageBreadcrumbs" />
         <div class="material-app-body">
-            <AppSidebar :reference-pilot="referencePilot" />
+            <AppSidebar />
             <AppContent variant="sidebar" class="min-w-0 overflow-x-clip">
                 <div
                     id="main-content"
                     class="material-app-content"
                     tabindex="-1"
                 >
-                    <div class="material-page-trail">
+                    <div class="material-page-trail reference-mobile-trail">
                         <Breadcrumbs :breadcrumbs="pageBreadcrumbs" />
                     </div>
                     <slot />
