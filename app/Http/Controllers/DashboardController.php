@@ -5,12 +5,12 @@ namespace App\Http\Controllers;
 use Guixa\Catalog\Application\ListProducers;
 use Guixa\Membership\Application\ListAccounts;
 use Guixa\Membership\Application\ListHouseholds;
-use Guixa\Membership\Application\ReadHouseholdBalance;
 use Guixa\Ordering\Application\ListCycles;
 use Guixa\Ordering\Application\ListMemberCycles;
 use Guixa\Ordering\Application\PendingPickupData;
 use Guixa\Ordering\Application\ReadPendingPickups;
 use Guixa\Shared\Application\Actor;
+use Guixa\Wallet\Application\ReadHouseholdBalance;
 use Inertia\Inertia;
 use Inertia\Response;
 

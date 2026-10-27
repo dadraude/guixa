@@ -21,7 +21,9 @@ class DashboardTest extends TestCase
         $user = User::factory()->create();
         $this->actingAs($user);
 
-        $response = $this->get(route('dashboard'));
-        $response->assertOk();
+        $this->withHeader('X-Inertia', 'true')->get(route('dashboard'))
+            ->assertOk()
+            ->assertHeader('X-Inertia', 'true')
+            ->assertJsonPath('component', 'Dashboard');
     }
 }
