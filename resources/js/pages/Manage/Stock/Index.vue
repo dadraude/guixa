@@ -3,6 +3,7 @@ import { Form, Head, Link } from '@inertiajs/vue3';
 import StockMovementController from '@/actions/App/Http/Controllers/Manage/StockMovementController';
 import StockProductController from '@/actions/App/Http/Controllers/Manage/StockProductController';
 import Heading from '@/components/Heading.vue';
+import StatusIndicator from '@/components/StatusIndicator.vue';
 import { Button } from '@/components/ui/button';
 import { trans } from 'laravel-vue-i18n';
 
@@ -97,7 +98,12 @@ defineProps<{
                             <span class="pilot-cell-label" aria-hidden="true">{{
                                 trans('Status')
                             }}</span>
-                            {{ product.active ? 'Active' : 'Deactivated' }}
+                            <StatusIndicator
+                                :label="
+                                    product.active ? 'Active' : 'Deactivated'
+                                "
+                                :tone="product.active ? 'success' : 'danger'"
+                            />
                         </td>
                         <td class="py-2">
                             <div class="flex flex-wrap justify-end gap-2">

@@ -4,6 +4,7 @@ import ProducerAccountController from '@/actions/App/Http/Controllers/Manage/Pro
 import ProducerController from '@/actions/App/Http/Controllers/Manage/ProducerController';
 import Heading from '@/components/Heading.vue';
 import InputError from '@/components/InputError.vue';
+import StatusIndicator from '@/components/StatusIndicator.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -94,7 +95,13 @@ const daysLabel = (days: number) => (days === 1 ? '1 day' : `${days} days`);
                 :class="{ 'text-muted-foreground': !producer.active }"
             >
                 <div class="flex items-center justify-between gap-2">
-                    <span class="font-medium">{{ producer.name }}</span>
+                    <span class="flex flex-wrap items-center gap-3">
+                        <span class="font-medium">{{ producer.name }}</span>
+                        <StatusIndicator
+                            :label="producer.active ? 'Active' : 'Deactivated'"
+                            :tone="producer.active ? 'success' : 'danger'"
+                        />
+                    </span>
                     <span class="text-sm text-muted-foreground">
                         Cutoff {{ daysLabel(producer.cutoffDaysBefore) }} before
                         pickup, at {{ producer.cutoffTime }}

@@ -1,39 +1,30 @@
 <script setup lang="ts">
 import { trans } from 'laravel-vue-i18n';
-import Breadcrumbs from '@/components/Breadcrumbs.vue';
+import AppLogoIcon from '@/components/AppLogoIcon.vue';
+import NavUser from '@/components/NavUser.vue';
 import { SidebarTrigger } from '@/components/ui/sidebar';
-import type { BreadcrumbItem } from '@/types';
 
-withDefaults(
-    defineProps<{
-        breadcrumbs?: BreadcrumbItem[];
-        sectionTitle: string;
-    }>(),
-    {
-        breadcrumbs: () => [],
-    },
-);
+defineProps<{ sectionTitle: string }>();
 </script>
 
 <template>
     <header class="material-app-bar daisy-navbar" data-test="material-app-bar">
-        <div class="daisy-navbar-start min-w-0 gap-4">
+        <div class="daisy-navbar-start min-w-0 gap-2">
             <SidebarTrigger class="min-h-11 min-w-11" />
-            <div class="min-w-0 leading-tight">
-                <span class="material-app-bar-brand">Guixa</span>
-                <span
-                    class="material-app-bar-title"
-                    data-test="app-section-title"
-                >
-                    {{ trans(sectionTitle) }}
+            <div class="material-app-brand">
+                <span class="material-app-brand-icon" aria-hidden="true">
+                    <AppLogoIcon class="size-5" />
                 </span>
+                <span>Guixa</span>
             </div>
+            <span class="material-app-bar-title" data-test="app-section-title">
+                {{ trans(sectionTitle) }}
+            </span>
         </div>
-        <div
-            v-if="breadcrumbs.length > 0"
-            class="daisy-navbar-end hidden min-w-0 md:flex"
-        >
-            <Breadcrumbs :breadcrumbs="breadcrumbs" />
+        <div class="daisy-navbar-end min-w-0">
+            <div class="material-app-bar-user">
+                <NavUser />
+            </div>
         </div>
     </header>
 </template>

@@ -5,7 +5,7 @@ import SettlementDetails from './SettlementDetails.vue';
 import HouseholdController from '@/actions/App/Http/Controllers/Manage/HouseholdController';
 import Heading from '@/components/Heading.vue';
 import InputError from '@/components/InputError.vue';
-import { Badge } from '@/components/ui/badge';
+import StatusIndicator from '@/components/StatusIndicator.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -80,7 +80,7 @@ defineProps<{
             <li
                 v-for="household in households"
                 :key="household.id"
-                class="flex items-center justify-between gap-4 p-3"
+                class="flex flex-wrap items-center justify-between gap-4 p-3"
             >
                 <Link
                     :href="HouseholdController.show(household.id)"
@@ -92,9 +92,10 @@ defineProps<{
                     class="flex items-center gap-2 text-sm text-muted-foreground"
                 >
                     {{ household.memberCount }} members
-                    <Badge v-if="!household.active" variant="secondary">
-                        Inactive
-                    </Badge>
+                    <StatusIndicator
+                        :label="household.active ? 'Active' : 'Inactive'"
+                        :tone="household.active ? 'success' : 'danger'"
+                    />
                 </span>
             </li>
         </ul>

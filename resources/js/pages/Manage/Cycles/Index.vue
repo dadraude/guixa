@@ -9,6 +9,7 @@ import CycleParticipantController from '@/actions/App/Http/Controllers/Manage/Cy
 import FormSelect from '@/components/FormSelect.vue';
 import Heading from '@/components/Heading.vue';
 import InputError from '@/components/InputError.vue';
+import StatusIndicator from '@/components/StatusIndicator.vue';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -203,69 +204,71 @@ function cutoffValue(cycleId: string, producerId: string): string {
                     >
                         Orders
                     </Link>
-                    <span
+                    <StatusIndicator
                         v-if="cycle.cancelled"
-                        class="text-sm text-muted-foreground"
+                        label="Cycle cancelled"
+                        tone="danger"
                         :data-test="`cancelled-${cycle.id}`"
-                    >
-                        Cancelled
-                    </span>
-                    <span
+                    />
+                    <StatusIndicator
                         v-else-if="cycle.closed"
-                        class="text-sm text-muted-foreground"
-                        >{{ trans('Cycle closed') }}</span
-                    >
-                    <Dialog v-else>
-                        <DialogTrigger as-child>
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                :data-test="`cancel-${cycle.id}`"
-                            >
-                                Cancel cycle
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                            <Form
-                                v-bind="
-                                    CycleCancellationController.store.form({
-                                        cycle: cycle.id,
-                                    })
-                                "
-                                class="space-y-6"
-                                v-slot="{ errors, processing }"
-                            >
-                                <DialogHeader class="space-y-3">
-                                    <DialogTitle>
-                                        Cancel the cycle with pickup
-                                        {{ cycle.pickupDate }}?
-                                    </DialogTitle>
-                                    <DialogDescription>
-                                        This discards the orders of every
-                                        household in this cycle and cannot be
-                                        undone. Members will see the cycle as
-                                        cancelled.
-                                    </DialogDescription>
-                                </DialogHeader>
-                                <InputError :message="errors.domain" />
-                                <DialogFooter class="gap-2">
-                                    <DialogClose as-child>
-                                        <Button variant="secondary">
-                                            Keep cycle
+                        label="Cycle closed"
+                        tone="neutral"
+                    />
+                    <template v-else>
+                        <StatusIndicator label="Open" tone="success" />
+                        <Dialog>
+                            <DialogTrigger as-child>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    :data-test="`cancel-${cycle.id}`"
+                                >
+                                    Cancel cycle
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                                <Form
+                                    v-bind="
+                                        CycleCancellationController.store.form({
+                                            cycle: cycle.id,
+                                        })
+                                    "
+                                    class="space-y-6"
+                                    v-slot="{ errors, processing }"
+                                >
+                                    <DialogHeader class="space-y-3">
+                                        <DialogTitle>
+                                            Cancel the cycle with pickup
+                                            {{ cycle.pickupDate }}?
+                                        </DialogTitle>
+                                        <DialogDescription>
+                                            This discards the orders of every
+                                            household in this cycle and cannot
+                                            be undone. Members will see the
+                                            cycle as cancelled.
+                                        </DialogDescription>
+                                    </DialogHeader>
+                                    <InputError :message="errors.domain" />
+                                    <DialogFooter class="gap-2">
+                                        <DialogClose as-child>
+                                            <Button variant="secondary">
+                                                Keep cycle
+                                            </Button>
+                                        </DialogClose>
+                                        <Button
+                                            type="submit"
+                                            variant="destructive"
+                                            :disabled="processing"
+                                            :data-test="`confirm-cancel-${cycle.id}`"
+                                        >
+                                            Cancel cycle
                                         </Button>
-                                    </DialogClose>
-                                    <Button
-                                        type="submit"
-                                        variant="destructive"
-                                        :disabled="processing"
-                                        :data-test="`confirm-cancel-${cycle.id}`"
-                                    >
-                                        Cancel cycle
-                                    </Button>
-                                </DialogFooter>
-                            </Form>
-                        </DialogContent>
-                    </Dialog>
+                                    </DialogFooter>
+                                </Form>
+                            </DialogContent>
+                        </Dialog>
+                    </template>
                 </div>
 
                 <p
@@ -283,9 +286,18 @@ function cutoffValue(cycleId: string, producerId: string): string {
                     >
                         <div class="flex justify-between gap-2">
                             <span>{{ participant.producerName }}</span>
-                            <span class="text-muted-foreground">
-                                {{ participant.open ? 'Open' : 'Closed' }},
-                                {{ cutoffLabel(participant.cutoff) }}
+                            <span class="flex flex-wrap items-center gap-2">
+                                <StatusIndicator
+                                    :label="
+                                        participant.open ? 'Open' : 'Closed'
+                                    "
+                                    :tone="
+                                        participant.open ? 'success' : 'neutral'
+                                    "
+                                />
+                                <span class="text-muted-foreground">
+                                    {{ cutoffLabel(participant.cutoff) }}
+                                </span>
                             </span>
                         </div>
 

@@ -2,6 +2,7 @@
 import { Form, Head, Link } from '@inertiajs/vue3';
 import ReturnItemController from '@/actions/App/Http/Controllers/Manage/ReturnItemController';
 import Heading from '@/components/Heading.vue';
+import StatusIndicator from '@/components/StatusIndicator.vue';
 import { Button } from '@/components/ui/button';
 import { trans } from 'laravel-vue-i18n';
 
@@ -74,7 +75,10 @@ defineProps<{
                             <span class="pilot-cell-label" aria-hidden="true">{{
                                 trans('Status')
                             }}</span>
-                            {{ item.active ? 'Active' : 'Deactivated' }}
+                            <StatusIndicator
+                                :label="item.active ? 'Active' : 'Deactivated'"
+                                :tone="item.active ? 'success' : 'danger'"
+                            />
                         </td>
                         <td class="py-2">
                             <div class="flex flex-wrap justify-end gap-2">
