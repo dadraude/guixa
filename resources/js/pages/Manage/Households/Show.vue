@@ -44,7 +44,7 @@ const expiry = (iso: string | null) =>
 <template>
     <Head :title="household.name" />
 
-    <div class="pilot-page pilot-manager-page">
+    <div class="pilot-page pilot-layout-page pilot-manager-page">
         <Heading
             :title="household.name"
             :description="
@@ -74,7 +74,7 @@ const expiry = (iso: string | null) =>
             </Button>
         </Form>
 
-        <section class="flex flex-col gap-3">
+        <section class="flex flex-col gap-4">
             <h2 class="text-lg font-medium">Members</h2>
 
             <p
@@ -84,11 +84,11 @@ const expiry = (iso: string | null) =>
                 This household has no members.
             </p>
 
-            <ul v-else class="divide-y rounded-lg border">
+            <ul v-else class="pilot-list">
                 <li
                     v-for="member in props.household.members"
                     :key="member.accountId"
-                    class="flex flex-col gap-3 p-3"
+                    class="flex flex-col gap-4"
                 >
                     <div class="flex items-center justify-between gap-2">
                         <span>
@@ -112,7 +112,7 @@ const expiry = (iso: string | null) =>
                         </Badge>
                     </div>
 
-                    <div class="flex flex-wrap items-start gap-3">
+                    <div class="pilot-action-row">
                         <Form
                             v-if="otherHouseholds.length > 0"
                             v-bind="
@@ -163,7 +163,7 @@ const expiry = (iso: string | null) =>
 
                     <div
                         v-if="member.invitationPending"
-                        class="flex flex-wrap items-end gap-3"
+                        class="pilot-action-row"
                     >
                         <p class="text-sm text-muted-foreground">
                             <template v-if="member.invitationExpired">
@@ -231,13 +231,13 @@ const expiry = (iso: string | null) =>
             </ul>
         </section>
 
-        <section class="flex flex-col gap-3">
+        <section class="flex flex-col gap-4">
             <h2 class="text-lg font-medium">Add a member</h2>
 
             <Form
                 v-bind="HouseholdMemberController.store.form(household.id)"
                 :reset-on-success="['name', 'email']"
-                class="flex flex-wrap items-end gap-2"
+                class="flex flex-wrap items-end gap-6"
                 v-slot="{ errors, processing }"
             >
                 <div class="grid gap-2">
@@ -263,7 +263,7 @@ const expiry = (iso: string | null) =>
 
         <section
             v-if="household.active"
-            class="grid gap-3 rounded-lg border p-4"
+            class="grid gap-4"
             aria-labelledby="deactivation-heading"
         >
             <h2 id="deactivation-heading" class="text-lg font-medium">
@@ -293,7 +293,7 @@ const expiry = (iso: string | null) =>
         </section>
         <section
             v-else
-            class="grid gap-3 rounded-lg border p-4"
+            class="grid gap-4"
             aria-labelledby="reactivation-heading"
         >
             <h2 id="reactivation-heading" class="text-lg font-medium">

@@ -18,7 +18,7 @@ defineOptions({
 <template>
     <Head title="New return item" />
 
-    <div class="pilot-page pilot-manager-page max-w-xl">
+    <div class="pilot-page pilot-layout-page pilot-manager-page max-w-xl">
         <Heading title="New return item" />
 
         <Form

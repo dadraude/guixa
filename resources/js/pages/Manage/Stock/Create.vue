@@ -18,7 +18,7 @@ defineOptions({
 <template>
     <Head title="New stock product" />
 
-    <div class="pilot-page pilot-manager-page max-w-xl">
+    <div class="pilot-page pilot-layout-page pilot-manager-page max-w-xl">
         <Heading title="New stock product" />
 
         <Form
