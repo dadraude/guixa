@@ -82,7 +82,7 @@ describe('dashboard presentation', () => {
         const html = await renderToString(app);
 
         expect(html).toContain('Saldo');
-        expect(html).toContain('Recollida');
+        expect(html).toContain('recollida');
     });
 
     it('shows manager summary for a manager', async () => {

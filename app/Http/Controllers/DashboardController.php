@@ -69,9 +69,25 @@ class DashboardController extends Controller
 
             $managerSummary = [
                 'cycles' => count($cycles),
+                'activeCycles' => count(array_filter(
+                    $cycles,
+                    fn ($c) => ! $c->cancelled && ! $c->closed,
+                )),
                 'households' => count($households),
+                'activeHouseholds' => count(array_filter(
+                    $households,
+                    fn ($h) => $h->active,
+                )),
                 'accounts' => count($accounts),
+                'pendingInvitations' => count(array_filter(
+                    $accounts,
+                    fn ($a) => $a->invitationPending,
+                )),
                 'producers' => count($producers),
+                'activeProducers' => count(array_filter(
+                    $producers,
+                    fn ($p) => $p->active,
+                )),
             ];
         }
 
