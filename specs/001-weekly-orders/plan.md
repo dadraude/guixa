@@ -715,6 +715,17 @@ visible field border at every width, so their role differs from filled actions.
 Keep semantic success, warning and error colors distinct and verify text,
 control-edge and focus contrast in light and dark modes.
 
+#### 2026-10-27 Modern visual refinement
+
+After reviewing the warm preview, the user found the cream, olive and clay
+combination too retro. Keep the action hierarchy above, but use a nearly white
+warm-neutral canvas (`#F8F7F4`), white cards, charcoal text and a single deep
+green (`#246B57`) for primary actions. Secondary surfaces are muted gray-green;
+hover emphasis is a low-chroma neutral rather than a separate colorful fill.
+Dark mode uses neutral stepped charcoal surfaces with a soft green primary.
+Retain Nunito and the established control sizes. Avoid gradients and decorative
+color blocks; let contrast, spacing and labels convey the action hierarchy.
+
 T40 extends the same reactive opt-in to Dashboard, Wallet/Statement and the five existing producer
 pages. Their current page components retain their props, actions and form contracts. Shared page,
 panel, empty-state and mobile table presentation classes live under the pilot theme, so the two

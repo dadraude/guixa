@@ -1,122 +1,122 @@
 /*
- * Paleta compartida: editeu els colors d'aquest bloc i recarregueu la pàgina.
- * Les variables semàntiques de sota mantenen els mateixos patrons d'acció a tots els rols.
+ * Paleta compartida: superfícies neutres, contrast nítid i un sol color de marca.
+ * Editeu els valors d'aquest bloc i recarregueu la pàgina.
  */
 :root {
-    --palette-paper: #f7f4ed;
-    --palette-card: #fffdf9;
-    --palette-ink: #293027;
-    --palette-olive: #49613f;
-    --palette-sage: #e4e8dd;
-    --palette-sage-ink: #2f4431;
-    --palette-clay: #ead9c9;
-    --palette-clay-ink: #5c3d2c;
-    --palette-muted: #f0eee7;
-    --palette-muted-ink: #586055;
-    --palette-border: #d4d1c5;
-    --palette-field-border: #858679;
-    --palette-danger: #a33f35;
-    --palette-sidebar: #efeee5;
+    --palette-canvas: #f8f7f4;
+    --palette-surface: #ffffff;
+    --palette-ink: #202b26;
+    --palette-brand: #246b57;
+    --palette-soft: #e8efeb;
+    --palette-soft-ink: #305747;
+    --palette-hover: #eceae5;
+    --palette-hover-ink: #36463e;
+    --palette-muted: #f2f4f1;
+    --palette-muted-ink: #58665e;
+    --palette-border: #d6ded8;
+    --palette-field-border: #788a7d;
+    --palette-danger: #a94440;
+    --palette-sidebar: #f1f3f0;
 
-    --palette-dark-paper: #242520;
-    --palette-dark-card: #303029;
-    --palette-dark-ink: #f2efe6;
-    --palette-dark-olive: #b5c59d;
-    --palette-dark-sage: #3f4037;
-    --palette-dark-clay: #58483d;
-    --palette-dark-muted: #393a33;
-    --palette-dark-muted-ink: #c5c7b8;
-    --palette-dark-border: #6f7468;
-    --palette-dark-field-border: #969a8a;
-    --palette-dark-danger: #d68b80;
-    --palette-dark-sidebar: #292b25;
-    --palette-dark-sidebar-accent: #43483b;
+    --palette-dark-canvas: #1b1e1c;
+    --palette-dark-surface: #252a27;
+    --palette-dark-ink: #ecf2ed;
+    --palette-dark-brand: #a7d7c1;
+    --palette-dark-soft: #343a36;
+    --palette-dark-hover: #373a37;
+    --palette-dark-muted: #2f3430;
+    --palette-dark-muted-ink: #bcc9bf;
+    --palette-dark-border: #6b786f;
+    --palette-dark-field-border: #95a99b;
+    --palette-dark-danger: #e3918c;
+    --palette-dark-sidebar: #202521;
+    --palette-dark-sidebar-accent: #343d36;
 }
 
-/* Una acció principal oliva, accions secundàries neutres i perill reservat al vermell. */
+/* Una acció principal de marca, accions secundàries neutres i perill reservat al vermell. */
 :root {
-    --background: var(--palette-paper);
+    --background: var(--palette-canvas);
     --foreground: var(--palette-ink);
-    --card: var(--palette-card);
+    --card: var(--palette-surface);
     --card-foreground: var(--palette-ink);
-    --popover: var(--palette-card);
+    --popover: var(--palette-surface);
     --popover-foreground: var(--palette-ink);
-    --primary: var(--palette-olive);
-    --primary-foreground: var(--palette-card);
-    --secondary: var(--palette-sage);
-    --secondary-foreground: var(--palette-sage-ink);
+    --primary: var(--palette-brand);
+    --primary-foreground: var(--palette-surface);
+    --secondary: var(--palette-soft);
+    --secondary-foreground: var(--palette-soft-ink);
     --muted: var(--palette-muted);
     --muted-foreground: var(--palette-muted-ink);
-    --accent: var(--palette-clay);
-    --accent-foreground: var(--palette-clay-ink);
+    --accent: var(--palette-hover);
+    --accent-foreground: var(--palette-hover-ink);
     --destructive: var(--palette-danger);
     --destructive-foreground: #ffffff;
     --border: var(--palette-border);
     --input: var(--palette-field-border);
-    --ring: var(--palette-olive);
-    --chart-1: #49613f;
-    --chart-2: #9b6a50;
-    --chart-3: #a37f42;
-    --chart-4: #6d8071;
-    --chart-5: #8e6c69;
+    --ring: var(--palette-brand);
+    --chart-1: #246b57;
+    --chart-2: #64a38c;
+    --chart-3: #668b9c;
+    --chart-4: #b19673;
+    --chart-5: #7d8ea4;
     --sidebar: var(--palette-sidebar);
     --sidebar-background: var(--palette-sidebar);
     --sidebar-foreground: var(--palette-ink);
-    --sidebar-primary: var(--palette-olive);
-    --sidebar-primary-foreground: var(--palette-card);
-    --sidebar-accent: var(--palette-sage);
-    --sidebar-accent-foreground: var(--palette-sage-ink);
+    --sidebar-primary: var(--palette-brand);
+    --sidebar-primary-foreground: var(--palette-surface);
+    --sidebar-accent: var(--palette-soft);
+    --sidebar-accent-foreground: var(--palette-soft-ink);
     --sidebar-border: var(--palette-border);
-    --sidebar-ring: var(--palette-olive);
+    --sidebar-ring: var(--palette-brand);
 }
 
 .dark {
-    --background: var(--palette-dark-paper);
+    --background: var(--palette-dark-canvas);
     --foreground: var(--palette-dark-ink);
-    --card: var(--palette-dark-card);
+    --card: var(--palette-dark-surface);
     --card-foreground: var(--palette-dark-ink);
-    --popover: var(--palette-dark-card);
+    --popover: var(--palette-dark-surface);
     --popover-foreground: var(--palette-dark-ink);
-    --primary: var(--palette-dark-olive);
-    --primary-foreground: #20271d;
-    --secondary: var(--palette-dark-sage);
-    --secondary-foreground: #ecece2;
+    --primary: var(--palette-dark-brand);
+    --primary-foreground: #1b3026;
+    --secondary: var(--palette-dark-soft);
+    --secondary-foreground: #ecf2ed;
     --muted: var(--palette-dark-muted);
     --muted-foreground: var(--palette-dark-muted-ink);
-    --accent: var(--palette-dark-clay);
-    --accent-foreground: #f2e4d7;
+    --accent: var(--palette-dark-hover);
+    --accent-foreground: #ecf2ed;
     --destructive: var(--palette-dark-danger);
-    --destructive-foreground: #2a1f1b;
+    --destructive-foreground: #2b1f1e;
     --border: var(--palette-dark-border);
     --input: var(--palette-dark-field-border);
-    --ring: var(--palette-dark-olive);
-    --chart-1: #b5c59d;
-    --chart-2: #d7aa91;
-    --chart-3: #dfc792;
-    --chart-4: #a2b8a1;
-    --chart-5: #c6a9a5;
+    --ring: var(--palette-dark-brand);
+    --chart-1: #a7d7c1;
+    --chart-2: #83b8a0;
+    --chart-3: #8fb0bb;
+    --chart-4: #c6b59b;
+    --chart-5: #aab7d0;
     --sidebar: var(--palette-dark-sidebar);
     --sidebar-background: var(--palette-dark-sidebar);
     --sidebar-foreground: var(--palette-dark-ink);
-    --sidebar-primary: var(--palette-dark-olive);
-    --sidebar-primary-foreground: #20271d;
+    --sidebar-primary: var(--palette-dark-brand);
+    --sidebar-primary-foreground: #1b3026;
     --sidebar-accent: var(--palette-dark-sidebar-accent);
     --sidebar-accent-foreground: var(--palette-dark-ink);
     --sidebar-border: var(--palette-dark-border);
-    --sidebar-ring: var(--palette-dark-olive);
+    --sidebar-ring: var(--palette-dark-brand);
 }
 
 .pilot-theme {
-    --pilot-success: #3e6442;
+    --pilot-success: #276b4e;
     --pilot-success-foreground: #ffffff;
-    --pilot-warning: #80602c;
+    --pilot-warning: #8f5d2e;
     --pilot-warning-foreground: #ffffff;
 }
 
 .dark .pilot-theme {
-    --pilot-success: #a8c7a5;
-    --pilot-success-foreground: #223026;
-    --pilot-warning: #e2c38c;
-    --pilot-warning-foreground: #2a251b;
-    --pilot-input-fill: var(--palette-dark-sage);
+    --pilot-success: #a9dcc1;
+    --pilot-success-foreground: #1b3026;
+    --pilot-warning: #efc693;
+    --pilot-warning-foreground: #302417;
+    --pilot-input-fill: var(--palette-dark-soft);
 }

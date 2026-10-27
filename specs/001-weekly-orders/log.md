@@ -1248,3 +1248,12 @@ screens. The shared button variants use primary, secondary, outlined and
 destructive treatments; text inputs and select triggers retain a distinct
 bordered field treatment. The `Welcome` artwork remains outside the themed
 application screens.
+
+## 2026-10-27 · Deviation
+
+`plan.md` (Application visual identity / Modern visual refinement): after
+seeing the unified warm preview, the user asked for a more modern appearance.
+The semantic palette now uses near-white surfaces, charcoal text, one deep
+green primary and restrained neutral accents; dark surfaces are neutral
+charcoal. The primary, secondary, outline and destructive action meanings and
+the bordered field treatment stay consistent.
