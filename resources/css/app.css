@@ -7,8 +7,7 @@
 
 @import 'tw-animate-css';
 
-@import '@fontsource-variable/inter/wght.css';
-@import '@fontsource-variable/source-serif-4/wght.css';
+@import '@fontsource-variable/nunito/wght.css';
 @import '@fontsource-variable/jetbrains-mono/wght.css';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
@@ -118,8 +117,9 @@
     --shadow-2xl: 0 1px 3px 0 oklch(0 0 0 / 0.25);
     --pilot-terracotta: var(--primary);
     --material-divider: color-mix(in srgb, var(--foreground) 12%, transparent);
-    --font-heading: 'Inter Variable', ui-sans-serif, sans-serif;
-    --font-body: 'Source Serif 4 Variable', ui-serif, Georgia, serif;
+    --font-heading: 'Nunito Variable', ui-sans-serif, system-ui, sans-serif;
+    --font-body: 'Nunito Variable', ui-sans-serif, system-ui, sans-serif;
+    --font-sans: var(--font-body);
     --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
     --radius: 0.625rem;
     font-family: var(--font-body);
@@ -144,7 +144,7 @@
 
 html[data-font-fallback='true'] .pilot-theme {
     --font-heading: ui-sans-serif, system-ui, sans-serif;
-    --font-body: ui-serif, Georgia, serif;
+    --font-body: ui-sans-serif, system-ui, sans-serif;
     --font-mono: ui-monospace, monospace;
 }
 
@@ -1502,11 +1502,11 @@ html[data-font-fallback='true'] .pilot-theme {
 
 /* Shared cooperative manager typography and layout. */
 .coop-manager-shell {
-    font-family: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
+    font-family: var(--font-body, ui-sans-serif);
 }
 
 .coop-manager-shell .pilot-heading {
-    font-family: 'Source Serif 4 Variable', Georgia, serif;
+    font-family: var(--font-heading, ui-sans-serif);
 }
 .coop-manager-shell .pilot-layout-page {
     max-width: 64rem;

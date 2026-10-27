@@ -18,7 +18,7 @@
             },
             "root": "html[data-visual-ready=\"true\"] .pilot-auth",
             "panels": ".pilot-panel",
-            "fonts": ["16px \"Instrument Sans\""],
+            "fonts": ["16px \"Nunito Variable\""],
             "focus": [
                 ".pilot-auth button[type=\"button\"]",
                 "#email",
@@ -232,7 +232,7 @@
             },
             "root": "html[data-visual-ready=\"true\"] .pilot-auth",
             "panels": ".pilot-panel",
-            "fonts": ["16px \"Instrument Sans\""],
+            "fonts": ["16px \"Nunito Variable\""],
             "focus": [
                 "#email",
                 "[data-test=\"email-password-reset-link-button\"]",
@@ -332,7 +332,7 @@
             },
             "root": "html[data-visual-ready=\"true\"] .pilot-auth",
             "panels": ".pilot-panel",
-            "fonts": ["16px \"Instrument Sans\""],
+            "fonts": ["16px \"Nunito Variable\""],
             "focus": [
                 "#password",
                 "#password_confirmation",
@@ -414,7 +414,7 @@
             },
             "root": "html[data-visual-ready=\"true\"] .pilot-auth",
             "panels": ".pilot-panel",
-            "fonts": ["16px \"Instrument Sans\""],
+            "fonts": ["16px \"Nunito Variable\""],
             "focus": [
                 ".pilot-auth button[type=\"button\"]",
                 "#password",
@@ -499,7 +499,7 @@
             },
             "root": "html[data-visual-ready=\"true\"] .pilot-auth",
             "panels": ".pilot-panel",
-            "fonts": ["16px \"Instrument Sans\""],
+            "fonts": ["16px \"Nunito Variable\""],
             "focus": [
                 "#otp",
                 ".pilot-auth button[type=\"submit\"]",
@@ -635,7 +635,7 @@
             },
             "root": "html[data-visual-ready=\"true\"] .pilot-auth",
             "panels": ".pilot-panel",
-            "fonts": ["16px \"Instrument Sans\""],
+            "fonts": ["16px \"Nunito Variable\""],
             "focus": [
                 ".pilot-auth button[type=\"submit\"], .pilot-auth form button",
                 ".pilot-auth form button:last-of-type"
@@ -733,7 +733,7 @@
             },
             "root": "html[data-visual-ready=\"true\"] .pilot-auth",
             "panels": ".pilot-panel",
-            "fonts": ["16px \"Instrument Sans\""],
+            "fonts": ["16px \"Nunito Variable\""],
             "focus": [
                 "#password",
                 "#password_confirmation",
@@ -815,7 +815,7 @@
             },
             "root": "html[data-visual-ready=\"true\"] .pilot-page",
             "panels": ".pilot-panel",
-            "fonts": ["16px \"Instrument Sans\""],
+            "fonts": ["16px \"Nunito Variable\""],
             "focus": [
                 "#name",
                 "#email",
@@ -1127,7 +1127,7 @@
             },
             "root": "html[data-visual-ready=\"true\"] .pilot-page",
             "panels": ".pilot-panel",
-            "fonts": ["16px \"Instrument Sans\""],
+            "fonts": ["16px \"Nunito Variable\""],
             "focus": [
                 "#current_password",
                 "#password",
@@ -1503,7 +1503,7 @@
             },
             "root": "html[data-visual-ready=\"true\"] .pilot-page",
             "panels": ".pilot-panel",
-            "fonts": ["16px \"Instrument Sans\""],
+            "fonts": ["16px \"Nunito Variable\""],
             "focus": [".pilot-page [role=\"tab\"], .pilot-page button"],
             "states": [
                 {
@@ -1673,7 +1673,7 @@
             },
             "root": "html[data-visual-ready=\"true\"] main",
             "panels": "main > div > *",
-            "fonts": ["16px \"Instrument Sans\""],
+            "fonts": ["16px \"Nunito Variable\""],
             "focus": ["main a"],
             "content": "h1:not(.sr-only),h2,h3,label:not(.sr-only):not(:has(.sr-only)),input:not([aria-hidden=\"true\"]):not([type=\"hidden\"]),button:not(:has(> .sr-only)),a:not(:has(.sr-only)),p,span:not(.sr-only),[data-visual-text]",
             "states": [
@@ -1764,7 +1764,7 @@
             },
             "root": "html[data-visual-ready=\"true\"] main",
             "panels": "main > div > *",
-            "fonts": ["16px \"Instrument Sans\""],
+            "fonts": ["16px \"Nunito Variable\""],
             "focus": ["[data-test^=\"quantity-\"]"],
             "content": "h1:not(.sr-only),h2,h3,label:not(.sr-only):not(:has(.sr-only)),input:not([aria-hidden=\"true\"]):not([type=\"hidden\"]),button:not(:has(> .sr-only)),a:not(:has(.sr-only)),p,span:not(.sr-only),[data-visual-text]",
             "states": [
@@ -1982,7 +1982,7 @@
             },
             "root": "html[data-visual-ready=\"true\"] main",
             "panels": ".pilot-page",
-            "fonts": ["16px \"Instrument Sans\""],
+            "fonts": ["16px \"Nunito Variable\""],
             "focus": ["[data-sidebar=\"trigger\"]"],
             "content": "h1:not(.sr-only),h2,h3,label:not(.sr-only):not(:has(.sr-only)),input:not([aria-hidden=\"true\"]):not([type=\"hidden\"]),button:not(:has(> .sr-only)),a:not(:has(.sr-only)),p,span:not(.sr-only),[data-visual-text]",
             "states": [
@@ -2027,7 +2027,7 @@
             },
             "root": "html[data-visual-ready=\"true\"] main",
             "panels": ".pilot-page",
-            "fonts": ["16px \"Instrument Sans\""],
+            "fonts": ["16px \"Nunito Variable\""],
             "focus": ["main input, main button"],
             "content": "h1:not(.sr-only),h2,h3,label:not(.sr-only):not(:has(.sr-only)),input:not([aria-hidden=\"true\"]):not([type=\"hidden\"]),button:not(:has(> .sr-only)),a:not(:has(.sr-only)),p,span:not(.sr-only),[data-visual-text]",
             "states": [
@@ -2090,7 +2090,7 @@
             },
             "root": "html[data-visual-ready=\"true\"] main",
             "panels": ".pilot-page",
-            "fonts": ["16px \"Instrument Sans\""],
+            "fonts": ["16px \"Nunito Variable\""],
             "focus": ["main input, main button"],
             "content": "h1:not(.sr-only),h2,h3,label:not(.sr-only):not(:has(.sr-only)),input:not([aria-hidden=\"true\"]):not([type=\"hidden\"]),button:not(:has(> .sr-only)),a:not(:has(.sr-only)),p,span:not(.sr-only),[data-visual-text]",
             "states": [

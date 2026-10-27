@@ -13,7 +13,7 @@
             "path": "/.vitest/dra197-visual/index.html",
             "root": "html[data-visual-ready=\"true\"] main",
             "panels": "main > div > *",
-            "fonts": ["16px \"Instrument Sans\""],
+            "fonts": ["16px \"Nunito Variable\""],
             "id": "orders-index",
             "query": {
                 "scenario": "orders-index"
@@ -104,7 +104,7 @@
             "path": "/.vitest/dra197-visual/index.html",
             "root": "html[data-visual-ready=\"true\"] main",
             "panels": "main > div > *",
-            "fonts": ["16px \"Instrument Sans\""],
+            "fonts": ["16px \"Nunito Variable\""],
             "id": "orders-edit",
             "query": {
                 "scenario": "orders-edit",
@@ -298,7 +298,7 @@
             "path": "/.vitest/dra197-visual/index.html",
             "root": "html[data-visual-ready=\"true\"] main",
             "panels": "main > div > *",
-            "fonts": ["16px \"Instrument Sans\""],
+            "fonts": ["16px \"Nunito Variable\""],
             "id": "pickup-show",
             "query": {
                 "scenario": "pickup-show"
