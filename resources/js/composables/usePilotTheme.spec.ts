@@ -1,5 +1,12 @@
 // @vitest-environment jsdom
-import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
+import {
+    afterEach,
+    beforeEach,
+    describe,
+    expect,
+    it,
+    vi,
+} from 'vite-plus/test';
 import { mount } from '@vue/test-utils';
 import { defineComponent, h, nextTick } from 'vue';
 import { usePage } from '@inertiajs/vue3';
@@ -76,7 +83,7 @@ const Portal = defineComponent({
                 {
                     default: () =>
                         h(DialogContent, null, {
-                            default: () => h(DialogTitle, 'Scope probe'),
+                            default: () => h(DialogTitle, () => 'Scope probe'),
                         }),
                 },
             );
@@ -92,7 +99,7 @@ const SheetPortal = defineComponent({
                 {
                     default: () =>
                         h(SheetContent, null, {
-                            default: () => h(SheetTitle, 'Scope probe'),
+                            default: () => h(SheetTitle, () => 'Scope probe'),
                         }),
                 },
             );
@@ -102,9 +109,24 @@ const SheetPortal = defineComponent({
 describe('pilot theme layout and portal', () => {
     const mountedWrappers: Array<{ unmount: () => void }> = [];
 
+    beforeEach(() => {
+        vi.spyOn(console, 'warn');
+    });
+
     afterEach(async () => {
         for (const wrapper of mountedWrappers.splice(0)) wrapper.unmount();
         await nextTick();
+        const warnings = vi.mocked(console.warn).mock.calls;
+        vi.restoreAllMocks();
+        expect(
+            warnings.some(
+                ([message]) =>
+                    typeof message === 'string' &&
+                    message.includes(
+                        'Non-function value encountered for default slot',
+                    ),
+            ),
+        ).toBe(false);
     });
 
     it('themes the shell and dialog on admitted pages and clears them after navigation away', async () => {
