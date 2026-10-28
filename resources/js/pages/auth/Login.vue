@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { trans } from 'laravel-vue-i18n';
 import { Form, Head } from '@inertiajs/vue3';
 import InputError from '@/components/InputError.vue';
 import PasswordInput from '@/components/PasswordInput.vue';
@@ -26,7 +27,7 @@ defineProps<{
 </script>
 
 <template>
-    <Head title="Log in" />
+    <Head :title="trans('Log in')" />
 
     <div
         v-if="status"
@@ -45,7 +46,7 @@ defineProps<{
     >
         <div class="grid gap-6">
             <div class="grid gap-2">
-                <Label for="email">Email address</Label>
+                <Label for="email">{{ trans('Email address') }}</Label>
                 <Input
                     id="email"
                     type="email"
@@ -63,14 +64,14 @@ defineProps<{
                 <div
                     class="flex flex-wrap items-center justify-between gap-x-2"
                 >
-                    <Label for="password">Password</Label>
+                    <Label for="password">{{ trans('Password') }}</Label>
                     <TextLink
                         v-if="canResetPassword"
                         :href="request()"
                         class="text-sm"
                         :tabindex="5"
                     >
-                        Forgot your password?
+                        {{ trans('Forgot your password?') }}
                     </TextLink>
                 </div>
                 <PasswordInput
@@ -79,7 +80,7 @@ defineProps<{
                     required
                     :tabindex="2"
                     autocomplete="current-password"
-                    placeholder="Password"
+                    :placeholder="trans('Password')"
                 />
                 <InputError :message="errors.password" />
             </div>
@@ -90,7 +91,7 @@ defineProps<{
                     class="flex min-h-11 items-center space-x-3"
                 >
                     <Checkbox id="remember" name="remember" :tabindex="3" />
-                    <span>Remember me</span>
+                    <span>{{ trans('Remember me') }}</span>
                 </Label>
             </div>
 
@@ -102,7 +103,7 @@ defineProps<{
                 data-test="login-button"
             >
                 <Spinner v-if="processing" />
-                Log in
+                {{ trans('Log in') }}
             </Button>
         </div>
     </Form>

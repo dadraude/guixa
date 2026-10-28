@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import { trans } from 'laravel-vue-i18n';
 import { ref, watch } from 'vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { formatQuantity } from '@/lib/locale';
 
 const props = defineProps<{
     productId: string;
@@ -31,12 +33,15 @@ watch(
         <div class="flex flex-col">
             <span>{{ allocation.householdName }}</span>
             <span class="text-xs text-muted-foreground">
-                Ordered {{ allocation.ordered }} {{ unit }}
-                <template v-if="allocation.byHand"> · Set by hand</template>
+                {{ trans('Ordered') }} {{ formatQuantity(allocation.ordered) }}
+                {{ unit }}
+                <template v-if="allocation.byHand">
+                    {{ trans('· Set by hand') }}</template
+                >
             </span>
         </div>
         <span v-if="readonly" data-test="allocated-value">
-            {{ allocation.allocated }} {{ unit }}
+            {{ formatQuantity(allocation.allocated) }} {{ unit }}
         </span>
         <form
             v-else
@@ -46,7 +51,11 @@ watch(
             <Input
                 v-model="quantity"
                 inputmode="decimal"
-                :aria-label="`Allocation of ${allocation.householdName}`"
+                :aria-label="
+                    trans('Allocation of :name', {
+                        name: allocation.householdName,
+                    })
+                "
                 class="w-28"
             />
             <Button
@@ -55,7 +64,7 @@ watch(
                 size="sm"
                 :disabled="processing"
             >
-                Save
+                {{ trans('Save') }}
             </Button>
         </form>
     </li>

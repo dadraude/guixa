@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { formatPickupDate, formatQuantity } from '@/lib/locale';
+import { trans } from 'laravel-vue-i18n';
 import { Form, Head } from '@inertiajs/vue3';
 import ProductAvailabilityController from '@/actions/App/Http/Controllers/Producer/ProductAvailabilityController';
 import Heading from '@/components/Heading.vue';
@@ -10,15 +12,23 @@ defineProps<{
 </script>
 
 <template>
-    <Head :title="`Cycle ${summary.pickupDate}`" />
+    <Head
+        :title="
+            trans('Cycle :date', { date: formatPickupDate(summary.pickupDate) })
+        "
+    />
 
     <div class="pilot-layout-page pilot-t44-page">
         <Heading
-            :title="`Pickup ${summary.pickupDate}`"
+            :title="
+                trans('Pickup :date', {
+                    date: formatPickupDate(summary.pickupDate),
+                })
+            "
             :description="
                 summary.sent
-                    ? 'What to deliver, per product'
-                    : 'Totals appear once the manager sends your order'
+                    ? trans('What to deliver, per product')
+                    : trans('Totals appear once the manager sends your order')
             "
         />
 
@@ -29,8 +39,8 @@ defineProps<{
         >
             {{
                 summary.sent
-                    ? 'Nothing to deliver.'
-                    : 'You have no products to offer.'
+                    ? trans('Nothing to deliver.')
+                    : trans('You have no products to offer.')
             }}
         </p>
 
@@ -53,7 +63,12 @@ defineProps<{
                     class="pilot-amount font-semibold"
                     data-test="quantity"
                 >
-                    {{ product.quantity }} {{ product.unit }}
+                    {{
+                        product.quantity === null
+                            ? ''
+                            : formatQuantity(product.quantity)
+                    }}
+                    {{ product.unit }}
                 </span>
 
                 <Form
@@ -75,7 +90,11 @@ defineProps<{
                         class="text-sm text-muted-foreground"
                         data-test="availability"
                     >
-                        {{ product.available ? 'Available' : 'Unavailable' }}
+                        {{
+                            product.available
+                                ? trans('Available')
+                                : trans('Unavailable')
+                        }}
                     </span>
                     <Button
                         type="submit"
@@ -85,8 +104,8 @@ defineProps<{
                     >
                         {{
                             product.available
-                                ? 'Mark unavailable'
-                                : 'Mark available'
+                                ? trans('Mark unavailable')
+                                : trans('Mark available')
                         }}
                     </Button>
                 </Form>

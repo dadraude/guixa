@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { trans } from 'laravel-vue-i18n';
 import { computed, ref } from 'vue';
 import FormSelect from '@/components/FormSelect.vue';
 import { Button } from '@/components/ui/button';
@@ -55,15 +56,17 @@ const submit = () => {
         <FormSelect
             v-model="household"
             :options="candidateOptions"
-            placeholder="Another household…"
-            :aria-label="`Household to allocate ${product.name} to`"
+            :placeholder="trans('Another household…')"
+            :aria-label="
+                trans('Household to allocate :name to', { name: product.name })
+            "
             class="w-full min-w-0 sm:w-fit sm:min-w-44"
         />
         <Input
             v-model="quantity"
             inputmode="decimal"
-            placeholder="Quantity"
-            :aria-label="`Quantity of ${product.name}`"
+            :placeholder="trans('Quantity')"
+            :aria-label="trans('Quantity of :name', { name: product.name })"
             class="w-28"
         />
         <Button
@@ -72,7 +75,7 @@ const submit = () => {
             size="sm"
             :disabled="processing"
         >
-            Allocate
+            {{ trans('Allocate') }}
         </Button>
     </form>
 </template>

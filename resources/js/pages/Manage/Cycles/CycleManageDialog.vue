@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { trans } from 'laravel-vue-i18n';
+import { formatPickupDate } from '@/lib/locale';
 import { Form } from '@inertiajs/vue3';
 import { computed, shallowRef, watch } from 'vue';
 import CycleCancellationController from '@/actions/App/Http/Controllers/Manage/CycleCancellationController';
@@ -44,22 +46,31 @@ const target = computed(() => ({
 <template>
     <NativeDialog
         :open="open"
-        :title="`Gestiona ${participant?.producerName ?? 'el cicle'}`"
+        :title="
+            participant?.producerName
+                ? trans('Manage :producer', {
+                      producer: participant.producerName,
+                  })
+                : trans('Manage cycle')
+        "
         title-id="manage-cycle-title"
         :return-focus-to="returnFocusTo"
         @close="emit('close')"
     >
         <template v-if="cycle">
             <p class="text-sm text-muted-foreground">
-                Recollida {{ cycle.pickupDate
-                }}<template v-if="participant">
-                    ·
-                    {{
-                        participant.cutoff
-                            ? 'Tancament programat'
-                            : 'Sense tancament programat'
-                    }}</template
-                >
+                {{
+                    participant
+                        ? trans('Pickup :date · :status', {
+                              date: formatPickupDate(cycle.pickupDate),
+                              status: participant.cutoff
+                                  ? trans('Scheduled cutoff')
+                                  : trans('No scheduled cutoff'),
+                          })
+                        : trans('Pickup :date', {
+                              date: formatPickupDate(cycle.pickupDate),
+                          })
+                }}
             </p>
             <Form
                 v-if="
@@ -75,7 +86,9 @@ const target = computed(() => ({
             >
                 <div class="grid gap-3 sm:grid-cols-2">
                     <div class="grid gap-2">
-                        <Label for="cutoff-date">Data de tancament</Label
+                        <Label for="cutoff-date">{{
+                            trans('Cutoff date')
+                        }}</Label
                         ><Input
                             id="cutoff-date"
                             v-model="cutoffDate"
@@ -86,7 +99,9 @@ const target = computed(() => ({
                         />
                     </div>
                     <div class="grid gap-2">
-                        <Label for="cutoff-time">Hora de tancament</Label
+                        <Label for="cutoff-time">{{
+                            trans('Cutoff time')
+                        }}</Label
                         ><Input
                             id="cutoff-time"
                             v-model="cutoffTime"
@@ -104,7 +119,7 @@ const target = computed(() => ({
                         class="manager-button manager-button-secondary"
                         @click="emit('close')"
                     >
-                        Cancel·la
+                        {{ trans('Cancel') }}
                     </button>
                     <button
                         type="submit"
@@ -112,7 +127,7 @@ const target = computed(() => ({
                         :disabled="processing"
                         data-test="set-cutoff"
                     >
-                        Desa el tancament
+                        {{ trans('Save cutoff') }}
                     </button>
                 </div>
             </Form>
@@ -129,7 +144,7 @@ const target = computed(() => ({
                     :disabled="processing"
                     data-test="clear-cutoff"
                 >
-                    Esborra el tancament
+                    {{ trans('Clear cutoff') }}
                 </button>
             </Form>
             <details
@@ -139,7 +154,7 @@ const target = computed(() => ({
                 <summary
                     class="flex min-h-11 cursor-pointer items-center font-medium"
                 >
-                    Altres accions
+                    {{ trans('Other actions') }}
                 </summary>
                 <div
                     v-if="pendingAction"
@@ -148,8 +163,12 @@ const target = computed(() => ({
                     <p class="text-sm">
                         {{
                             pendingAction === 'cancel'
-                                ? 'Es cancel·laran totes les comandes del cicle. Aquesta acció no es pot desfer.'
-                                : 'Es tancaran les comandes d’aquest productor ara.'
+                                ? trans(
+                                      'All orders in the cycle will be cancelled. This cannot be undone.',
+                                  )
+                                : trans(
+                                      "This producer's orders will close now.",
+                                  )
                         }}
                     </p>
                     <div class="mt-3 flex flex-wrap gap-2">
@@ -158,7 +177,7 @@ const target = computed(() => ({
                             class="manager-button manager-button-secondary"
                             @click="pendingAction = null"
                         >
-                            Torna
+                            {{ trans('Back') }}
                         </button>
                         <Form
                             v-if="pendingAction === 'cancel'"
@@ -176,7 +195,7 @@ const target = computed(() => ({
                                 :disabled="processing"
                                 :data-test="`confirm-cancel-${cycle.id}`"
                             >
-                                Confirma la cancel·lació
+                                {{ trans('Confirm cancellation') }}
                             </button>
                         </Form>
                         <Form
@@ -191,7 +210,7 @@ const target = computed(() => ({
                                 :disabled="processing"
                                 data-test="confirm-close"
                             >
-                                Confirma el tancament
+                                {{ trans('Confirm cutoff') }}
                             </button>
                         </Form>
                     </div>
@@ -203,7 +222,7 @@ const target = computed(() => ({
                         class="manager-button manager-button-secondary"
                         @click="pendingAction = 'close'"
                     >
-                        Tanca ara
+                        {{ trans('Close now') }}
                     </button>
                     <button
                         v-if="!participant"
@@ -212,7 +231,7 @@ const target = computed(() => ({
                         :data-test="`cancel-${cycle.id}`"
                         @click="pendingAction = 'cancel'"
                     >
-                        Cancel·la el cicle
+                        {{ trans('Cancel cycle') }}
                     </button>
                 </div>
             </details>

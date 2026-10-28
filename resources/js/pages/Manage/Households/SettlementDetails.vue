@@ -2,11 +2,11 @@
 import { Link } from '@inertiajs/vue3';
 import { trans } from 'laravel-vue-i18n';
 import PickupController from '@/actions/App/Http/Controllers/Manage/PickupController';
+import { formatMoney, formatPickupDate } from '@/lib/locale';
 
 defineProps<{ settlement: App.Http.HouseholdSettlementRow }>();
 
-const euros = (cents: number) =>
-    `${(cents / 100).toFixed(2).replace('.', ',')} €`;
+const euros = (cents: number) => formatMoney((cents / 100).toFixed(2));
 </script>
 
 <template>
@@ -37,7 +37,7 @@ const euros = (cents: number) =>
                         >
                             {{
                                 trans('Pickup on :date', {
-                                    date: pickup.pickupDate,
+                                    date: formatPickupDate(pickup.pickupDate),
                                 })
                             }}
                         </Link>

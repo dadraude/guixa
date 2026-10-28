@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { trans } from 'laravel-vue-i18n';
 import { Form, Head } from '@inertiajs/vue3';
 import CutoffController from '@/actions/App/Http/Controllers/Producer/CutoffController';
 import Heading from '@/components/Heading.vue';
@@ -21,12 +22,16 @@ defineProps<{
 </script>
 
 <template>
-    <Head title="Default cutoff" />
+    <Head :title="trans('Default cutoff')" />
 
     <div class="pilot-layout-page pilot-t44-page max-w-3xl">
         <Heading
-            title="Default cutoff"
-            description="Orders for your products close this long before each pickup. A change only affects cycles where you start participating afterwards."
+            :title="trans('Default cutoff')"
+            :description="
+                trans(
+                    'Orders for your products close this long before each pickup. A change only affects cycles where you start participating afterwards.',
+                )
+            "
         />
 
         <Form
@@ -35,7 +40,9 @@ defineProps<{
             v-slot="{ errors, processing }"
         >
             <div class="grid gap-2">
-                <Label for="days_before">Days before pickup (1 to 6)</Label>
+                <Label for="days_before">{{
+                    trans('Days before pickup (1 to 6)')
+                }}</Label>
                 <Input
                     id="days_before"
                     name="days_before"
@@ -48,7 +55,7 @@ defineProps<{
                 <InputError :message="errors.days_before" />
             </div>
             <div class="grid gap-2">
-                <Label for="time">Time</Label>
+                <Label for="time">{{ trans('Time') }}</Label>
                 <Input
                     id="time"
                     name="time"
@@ -64,7 +71,7 @@ defineProps<{
                 :disabled="processing"
                 data-test="save-cutoff"
             >
-                Save
+                {{ trans('Save') }}
             </Button>
         </Form>
     </div>

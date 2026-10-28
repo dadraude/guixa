@@ -98,7 +98,7 @@ describe('reception page', () => {
         );
 
         expect(html).toContain('Reception: Baker');
-        expect(html).toContain('Unbalanced by 1.000 loaf');
+        expect(html).toContain('Unbalanced by 1,000 loaf');
         expect(html).toContain('data-test="balanced"');
         expect(html).toContain('Set by hand');
         expect(html).toContain('Another household…');
@@ -132,7 +132,7 @@ describe('reception page', () => {
         );
 
         expect(html).toContain('data-test="adjusted"');
-        expect(html).toContain('3.120 loaf');
+        expect(html).toContain('3,120 loaf');
         expect(html).not.toContain('data-test="distribute-hint"');
     });
 

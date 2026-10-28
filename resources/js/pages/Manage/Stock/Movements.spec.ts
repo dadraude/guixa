@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from 'vite-plus/test';
 import { flushPromises, mount } from '@vue/test-utils';
 import { defineComponent, h, nextTick } from 'vue';
 import Movements from './Movements.vue';
+import { installTranslations } from '@/lib/i18n';
 
 vi.mock('@inertiajs/vue3', () => ({
     Head: () => null,
@@ -17,6 +18,7 @@ vi.mock('@inertiajs/vue3', () => ({
 describe('stock adjustment cycle selection', () => {
     it('shows the full selected label and clears it when the form resets', async () => {
         const wrapper = mount(Movements, {
+            global: { plugins: [{ install: installTranslations }] },
             props: {
                 product: {
                     id: 'honey',
@@ -40,14 +42,15 @@ describe('stock adjustment cycle selection', () => {
         await select.trigger('keydown', { key: 'ArrowDown' });
         await flushPromises();
         const option = [...document.querySelectorAll('[role="option"]')].find(
-            (element) => element.textContent?.includes('Pickup 2026-11-07'),
+            (element) =>
+                element.textContent?.includes('Recollida del 7/11/2026'),
         );
         expect(option).toBeTruthy();
         option!.dispatchEvent(new Event('pointerup', { bubbles: true }));
         await flushPromises();
         expect(
             wrapper.get('[data-test="adjustment-cycle-preview"]').text(),
-        ).toBe('Pickup 2026-11-07');
+        ).toBe('Recollida del 7/11/2026');
         expect(new FormData(form).get('cycle_id')).toBe('cycle');
 
         await wrapper
@@ -59,7 +62,9 @@ describe('stock adjustment cycle selection', () => {
         await flushPromises();
         const secondOption = [
             ...document.querySelectorAll('[role="option"]'),
-        ].find((element) => element.textContent?.includes('Pickup 2026-11-07'));
+        ].find((element) =>
+            element.textContent?.includes('Recollida del 7/11/2026'),
+        );
         secondOption!.dispatchEvent(new Event('pointerup', { bubbles: true }));
         await flushPromises();
 

@@ -7,12 +7,19 @@ use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\LogOutDeactivatedAccount;
 use App\Http\Middleware\ResolveActor;
 use Guixa\Shared\Domain\Error\NotAllowed;
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 use Illuminate\Http\Request;
+use Illuminate\Session\TokenMismatchException;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -38,7 +45,38 @@ return Application::configure(basePath: dirname(__DIR__))
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );
 
-        $exceptions->map(NotAllowed::class, fn (NotAllowed $e) => new AccessDeniedHttpException($e->getMessage(), $e));
+        $exceptions->map(NotAllowed::class, fn (NotAllowed $e) => new AccessDeniedHttpException(__('errors.NotAllowed'), $e));
         $exceptions->render(fn (Throwable $e, Request $request) => DomainErrorResponse::for($e, $request));
+        $exceptions->render(function (AuthenticationException $e, Request $request) {
+            return ($request->expectsJson() || $request->is('api/*')) && $e->getMessage() === 'Unauthenticated.'
+                ? response()->json(['message' => __('Unauthenticated.')], 401)
+                : null;
+        });
+        $exceptions->render(function (HttpExceptionInterface $e, Request $request) {
+            if (! $request->expectsJson() && ! $request->is('api/*')) {
+                return null;
+            }
+
+            $titles = [401 => 'Unauthorized', 402 => 'Payment Required', 403 => 'Forbidden', 404 => 'Not Found', 419 => 'Page Expired', 429 => 'Too Many Requests', 500 => 'Server Error', 503 => 'Service Unavailable'];
+            $title = match (true) {
+                $e instanceof ThrottleRequestsException && $e->getMessage() === 'Too Many Attempts.' => 'Too Many Requests',
+                $e->getPrevious() instanceof TokenMismatchException && $e->getMessage() === 'CSRF token mismatch.' => 'Page Expired',
+                $e->getPrevious() instanceof ModelNotFoundException => 'Not Found',
+                $e->getMessage() === '' => $titles[$e->getStatusCode()] ?? null,
+                default => null,
+            };
+
+            return $title === null ? null : response()->json(['message' => __($title)], $e->getStatusCode(), $e->getHeaders());
+        });
+        $exceptions->render(function (Throwable $e, Request $request) {
+            if (config('app.debug') || (! $request->expectsJson() && ! $request->is('api/*')) ||
+                $e instanceof HttpExceptionInterface || $e instanceof AuthenticationException ||
+                $e instanceof ValidationException || $e instanceof HttpResponseException ||
+                DomainErrorResponse::matches($e)) {
+                return null;
+            }
+
+            return response()->json(['message' => __('Server Error')], 500);
+        });
         $exceptions->dontReportWhen(fn (Throwable $e) => DomainErrorResponse::matches($e));
     })->create();

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { trans } from 'laravel-vue-i18n';
 import { Form, Head } from '@inertiajs/vue3';
 import SettingsController from '@/actions/App/Http/Controllers/Manage/SettingsController';
 import FormSelect from '@/components/FormSelect.vue';
@@ -18,13 +19,13 @@ defineProps<{
 }>();
 
 const weekdays = [
-    'Monday',
-    'Tuesday',
-    'Wednesday',
-    'Thursday',
-    'Friday',
-    'Saturday',
-    'Sunday',
+    trans('Monday'),
+    trans('Tuesday'),
+    trans('Wednesday'),
+    trans('Thursday'),
+    trans('Friday'),
+    trans('Saturday'),
+    trans('Sunday'),
 ];
 const weekdayOptions = weekdays.map((label, index) => ({
     value: String(index + 1),
@@ -33,12 +34,12 @@ const weekdayOptions = weekdays.map((label, index) => ({
 </script>
 
 <template>
-    <Head title="Settings" />
+    <Head :title="trans('Settings')" />
 
     <div class="pilot-page pilot-layout-page pilot-manager-page max-w-xl">
         <Heading
-            title="Settings"
-            description="How the cooperative works every week"
+            :title="trans('Settings')"
+            :description="trans('How the cooperative works every week')"
         />
 
         <Form
@@ -47,13 +48,15 @@ const weekdayOptions = weekdays.map((label, index) => ({
             v-slot="{ errors, processing }"
         >
             <div class="grid gap-2">
-                <Label for="pickup-weekday">Pickup weekday</Label>
+                <Label for="pickup-weekday">{{
+                    trans('Pickup weekday')
+                }}</Label>
                 <FormSelect
                     id="pickup-weekday"
                     name="pickup_weekday"
                     :options="weekdayOptions"
                     :default-value="pickupWeekday?.toString()"
-                    placeholder="Not set"
+                    :placeholder="trans('Not set')"
                     class="w-full min-w-0 sm:w-fit sm:min-w-44"
                 />
                 <InputError :message="errors.pickup_weekday || errors.domain" />
@@ -63,15 +66,18 @@ const weekdayOptions = weekdays.map((label, index) => ({
                 :disabled="processing"
                 data-test="save-pickup-weekday"
             >
-                Save
+                {{ trans('Save') }}
             </Button>
         </Form>
         <p v-if="pickupWeekday === null" class="text-sm text-muted-foreground">
-            Not set: opening a cycle will ask for it.
+            {{ trans('Not set: opening a cycle will ask for it.') }}
         </p>
         <p class="text-sm text-muted-foreground">
-            Changing it affects only cycles opened afterwards; cycles already
-            open keep their pickup date.
+            {{
+                trans(
+                    'Changing it affects only cycles opened afterwards; cycles already open keep their pickup date.',
+                )
+            }}
         </p>
     </div>
 </template>

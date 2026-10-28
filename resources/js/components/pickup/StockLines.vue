@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import FormSelect from '@/components/FormSelect.vue';
 import { euros } from './euros';
+import { formatQuantity } from '@/lib/locale';
 
 const props = defineProps<{
     lines: App.Http.PickupStockLineRow[];
@@ -26,7 +27,7 @@ const quantity = ref('');
 const productOptions = computed(() =>
     props.options.map((option) => ({
         value: option.id,
-        label: `${option.name} (${option.available} ${option.unit})`,
+        label: `${option.name} (${formatQuantity(option.available)} ${option.unit})`,
     })),
 );
 
@@ -62,7 +63,7 @@ const submit = () => {
                 <div class="pilot-list-row-body">
                     <span>{{ line.name }}</span>
                     <span class="text-xs text-muted-foreground">
-                        {{ line.quantity }} {{ line.unit }} ·
+                        {{ formatQuantity(line.quantity) }} {{ line.unit }} ·
                         {{ euros(line.unitPriceCents) }} / {{ line.unit }}
                     </span>
                 </div>

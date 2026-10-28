@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { trans } from 'laravel-vue-i18n';
-
 withDefaults(
     defineProps<{
         label: string;
@@ -13,6 +11,6 @@ withDefaults(
 <template>
     <span class="material-status" :data-tone="tone">
         <span class="material-status-dot" aria-hidden="true" />
-        <span>{{ trans(label) }}</span>
+        <span>{{ label }}</span>
     </span>
 </template>

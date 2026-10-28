@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { formatEventDateTime, formatMoney } from '@/lib/locale';
 import { Form, Head, Link } from '@inertiajs/vue3';
 import HouseholdController from '@/actions/App/Http/Controllers/Manage/HouseholdController';
 import HouseholdWalletController from '@/actions/App/Http/Controllers/Manage/HouseholdWalletController';
@@ -15,20 +16,28 @@ defineProps<{
 }>();
 
 const typeLabels: Record<string, string> = {
-    top_up: 'Top-up',
-    charge: 'Charge',
-    credit: 'Credit',
-    correction: 'Correction',
+    top_up: trans('Top-up'),
+    charge: trans('Charge'),
+    credit: trans('Credit'),
+    correction: trans('Correction'),
 };
 </script>
 
 <template>
-    <Head title="Wallet" />
+    <Head :title="trans('Wallet')" />
 
     <div class="pilot-layout-page pilot-t44-page">
         <Heading
-            :title="household ? `${household.name} wallet` : 'Wallet'"
-            :description="`Balance: ${wallet.balance} EUR`"
+            :title="
+                household
+                    ? trans(':name wallet', { name: household.name })
+                    : trans('Wallet')
+            "
+            :description="
+                trans('Balance: :amount', {
+                    amount: formatMoney(wallet.balance),
+                })
+            "
         />
 
         <div v-if="household" class="pilot-wallet-forms">
@@ -37,7 +46,7 @@ const typeLabels: Record<string, string> = {
             >
                 <section class="pilot-layout-panel">
                     <h2 class="pilot-heading text-lg font-medium">
-                        Record a top-up
+                        {{ trans('Record a top-up') }}
                     </h2>
                     <Form
                         v-bind="
@@ -48,7 +57,9 @@ const typeLabels: Record<string, string> = {
                         v-slot="{ errors, processing }"
                     >
                         <div class="grid gap-2">
-                            <Label for="top-up-amount">Amount (EUR)</Label>
+                            <Label for="top-up-amount">{{
+                                trans('Amount (EUR)')
+                            }}</Label>
                             <Input
                                 id="top-up-amount"
                                 name="amount"
@@ -60,7 +71,9 @@ const typeLabels: Record<string, string> = {
                             />
                         </div>
                         <div class="grid gap-2">
-                            <Label for="top-up-note">Note (optional)</Label>
+                            <Label for="top-up-note">{{
+                                trans('Note (optional)')
+                            }}</Label>
                             <Input id="top-up-note" name="note" />
                             <InputError :message="errors.note" />
                         </div>
@@ -69,14 +82,14 @@ const typeLabels: Record<string, string> = {
                             :disabled="processing"
                             data-test="record-top-up"
                         >
-                            Record top-up
+                            {{ trans('Record top-up') }}
                         </Button>
                     </Form>
                 </section>
 
                 <section class="pilot-layout-panel">
                     <h2 class="pilot-heading text-lg font-medium">
-                        Record a correction
+                        {{ trans('Record a correction') }}
                     </h2>
                     <Form
                         v-bind="
@@ -88,7 +101,9 @@ const typeLabels: Record<string, string> = {
                     >
                         <div class="grid gap-2">
                             <Label for="correction-amount">
-                                Amount (EUR, negative to subtract)
+                                {{
+                                    trans('Amount (EUR, negative to subtract)')
+                                }}
                             </Label>
                             <Input
                                 id="correction-amount"
@@ -101,7 +116,9 @@ const typeLabels: Record<string, string> = {
                             />
                         </div>
                         <div class="grid gap-2">
-                            <Label for="correction-note">Note</Label>
+                            <Label for="correction-note">{{
+                                trans('Note')
+                            }}</Label>
                             <Input id="correction-note" name="note" required />
                             <InputError :message="errors.note" />
                         </div>
@@ -111,7 +128,7 @@ const typeLabels: Record<string, string> = {
                             :disabled="processing"
                             data-test="record-correction"
                         >
-                            Record correction
+                            {{ trans('Record correction') }}
                         </Button>
                     </Form>
                 </section>
@@ -119,13 +136,15 @@ const typeLabels: Record<string, string> = {
         </div>
 
         <section class="pilot-layout-panel">
-            <h2 class="pilot-heading text-lg font-medium">Movements</h2>
+            <h2 class="pilot-heading text-lg font-medium">
+                {{ trans('Movements') }}
+            </h2>
 
             <p
                 v-if="wallet.movements.length === 0"
                 class="pilot-layout-notice text-sm text-muted-foreground"
             >
-                No movements yet.
+                {{ trans('No movements yet.') }}
             </p>
 
             <div v-else class="pilot-wallet-movements">
@@ -160,7 +179,7 @@ const typeLabels: Record<string, string> = {
                                     aria-hidden="true"
                                     >{{ trans('Date') }}</span
                                 >
-                                {{ movement.occurredAt }}
+                                {{ formatEventDateTime(movement.occurredAt) }}
                             </td>
                             <td class="py-2">
                                 <span
@@ -183,7 +202,7 @@ const typeLabels: Record<string, string> = {
                                     aria-hidden="true"
                                     >{{ trans('Amount') }}</span
                                 >
-                                {{ movement.amount }} EUR
+                                {{ formatMoney(movement.amount) }}
                             </td>
                         </tr>
                     </tbody>
@@ -196,7 +215,7 @@ const typeLabels: Record<string, string> = {
             :href="HouseholdController.show(household.id)"
             class="pilot-back-link text-sm underline-offset-4 hover:underline"
         >
-            Back to {{ household.name }}
+            {{ trans('Back to :household', { household: household.name }) }}
         </Link>
     </div>
 </template>

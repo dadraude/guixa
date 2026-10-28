@@ -12,10 +12,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { formatEuroAmount } from '@/lib/formatEuroAmount';
 import { trans } from 'laravel-vue-i18n';
+import { formatQuantity } from '@/lib/locale';
 
 defineOptions({
     layout: {
-        breadcrumbs: [{ title: 'Estoc', href: StockProductController.index() }],
+        breadcrumbs: [{ title: 'Stock', href: StockProductController.index() }],
     },
 });
 const props = defineProps<{ products: App.Http.StockLevelRow[] }>();
@@ -38,17 +39,17 @@ function editProduct(product: App.Http.StockLevelRow, event: MouseEvent) {
 </script>
 
 <template>
-    <Head title="Estoc" />
+    <Head :title="trans('Stock')" />
     <div class="pilot-page pilot-layout-page pilot-manager-page">
         <div class="flex flex-wrap items-end justify-between gap-4">
             <Heading
-                title="Estoc"
-                description="Productes per a la recollida."
+                :title="trans('Stock')"
+                :description="trans('Products for pickup.')"
             />
             <Button as-child class="min-h-11">
                 <Link :href="StockProductController.create()">
                     <Plus aria-hidden="true" />
-                    Afegeix un producte
+                    {{ trans('Add a product') }}
                 </Link>
             </Button>
         </div>
@@ -56,23 +57,34 @@ function editProduct(product: App.Http.StockLevelRow, event: MouseEvent) {
             v-if="products.length === 0"
             class="pilot-layout-notice text-sm text-muted-foreground"
         >
-            Encara no hi ha productes d’estoc.
+            {{ trans('No stock products yet.') }}
         </p>
         <section v-else class="manager-stock-list">
             <div class="flex flex-wrap items-end justify-between gap-4 pb-4">
                 <div>
-                    <h2 class="text-lg font-semibold">Productes</h2>
+                    <h2 class="text-lg font-semibold">
+                        {{ trans('Products') }}
+                    </h2>
                     <p class="text-sm text-muted-foreground">
-                        {{ filteredProducts.length }} de {{ products.length }}
+                        {{
+                            trans(':filtered of :total', {
+                                filtered: formatQuantity(
+                                    String(filteredProducts.length),
+                                ),
+                                total: formatQuantity(String(products.length)),
+                            })
+                        }}
                     </p>
                 </div>
                 <div class="w-full sm:w-64">
-                    <Label for="stock-search">Cerca productes</Label>
+                    <Label for="stock-search">{{
+                        trans('Search products')
+                    }}</Label>
                     <Input
                         id="stock-search"
                         v-model="search"
                         type="search"
-                        placeholder="Cerca pel nom"
+                        :placeholder="trans('Search by name')"
                         class="mt-2"
                     />
                 </div>
@@ -81,7 +93,7 @@ function editProduct(product: App.Http.StockLevelRow, event: MouseEvent) {
                 v-if="filteredProducts.length === 0"
                 class="border-t py-4 text-sm text-muted-foreground"
             >
-                No hi ha productes que coincideixin amb la cerca.
+                {{ trans('No products match the search.') }}
             </p>
             <ul v-else class="manager-stock-rows divide-y border-t">
                 <li
@@ -112,11 +124,13 @@ function editProduct(product: App.Http.StockLevelRow, event: MouseEvent) {
                     <button
                         type="button"
                         class="flex min-h-16 min-w-0 flex-1 items-center justify-between gap-4 py-2 text-left"
-                        :aria-label="`Edita ${product.name}`"
+                        :aria-label="
+                            trans('Edit :name', { name: product.name })
+                        "
                         @click="editProduct(product, $event)"
                     >
                         <span class="min-w-0">
-                            <span class="block truncate font-medium">{{
+                            <span class="block font-medium break-words">{{
                                 product.name
                             }}</span>
                             <span class="block text-xs text-muted-foreground"
@@ -126,11 +140,11 @@ function editProduct(product: App.Http.StockLevelRow, event: MouseEvent) {
                         </span>
                         <span class="shrink-0 text-right">
                             <span class="block font-semibold tabular-nums">{{
-                                product.available
+                                formatQuantity(product.available)
                             }}</span>
                             <span
                                 class="flex items-center justify-end gap-1 text-xs text-muted-foreground"
-                                >disponibles
+                                >{{ trans('available') }}
                                 <Pencil class="size-4" aria-hidden="true"
                             /></span>
                         </span>
@@ -147,11 +161,21 @@ function editProduct(product: App.Http.StockLevelRow, event: MouseEvent) {
                             <th scope="col" class="px-2 py-2">
                                 {{ trans('Active') }}
                             </th>
-                            <th scope="col" class="px-2 py-2">Producte</th>
-                            <th scope="col" class="px-2 py-2">Unitat</th>
-                            <th scope="col" class="px-2 py-2">Preu</th>
-                            <th scope="col" class="px-2 py-2">Disponible</th>
-                            <th scope="col" class="px-2 py-2">Accions</th>
+                            <th scope="col" class="px-2 py-2">
+                                {{ trans('Product') }}
+                            </th>
+                            <th scope="col" class="px-2 py-2">
+                                {{ trans('Unit') }}
+                            </th>
+                            <th scope="col" class="px-2 py-2">
+                                {{ trans('Price') }}
+                            </th>
+                            <th scope="col" class="px-2 py-2">
+                                {{ trans('Available') }}
+                            </th>
+                            <th scope="col" class="px-2 py-2">
+                                {{ trans('Actions') }}
+                            </th>
                         </tr>
                     </thead>
                     <tbody class="divide-y">
@@ -189,7 +213,7 @@ function editProduct(product: App.Http.StockLevelRow, event: MouseEvent) {
                                 {{ formatEuroAmount(product.price) }}
                             </td>
                             <td class="px-2 py-2 tabular-nums">
-                                {{ product.available }}
+                                {{ formatQuantity(product.available) }}
                             </td>
                             <td class="px-2 py-2">
                                 <div class="pilot-table-actions">

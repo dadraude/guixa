@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { trans } from 'laravel-vue-i18n';
 import { Form } from '@inertiajs/vue3';
 import CycleController from '@/actions/App/Http/Controllers/Manage/CycleController';
 import FormSelect from '@/components/FormSelect.vue';
@@ -15,13 +16,13 @@ defineProps<{
 }>();
 const emit = defineEmits<{ close: [] }>();
 const weekdays = [
-    'Dilluns',
-    'Dimarts',
-    'Dimecres',
-    'Dijous',
-    'Divendres',
-    'Dissabte',
-    'Diumenge',
+    trans('Monday'),
+    trans('Tuesday'),
+    trans('Wednesday'),
+    trans('Thursday'),
+    trans('Friday'),
+    trans('Saturday'),
+    trans('Sunday'),
 ];
 const weekdayOptions = weekdays.map((label, index) => ({
     value: String(index + 1),
@@ -32,7 +33,7 @@ const weekdayOptions = weekdays.map((label, index) => ({
 <template>
     <NativeDialog
         :open="open"
-        title="Obre un cicle"
+        :title="trans('Open a cycle')"
         title-id="create-cycle-title"
         :return-focus-to="returnFocusTo"
         @close="emit('close')"
@@ -44,7 +45,7 @@ const weekdayOptions = weekdays.map((label, index) => ({
             v-slot="{ errors, processing }"
         >
             <div class="grid gap-2">
-                <Label for="pickup-date">Data de recollida</Label>
+                <Label for="pickup-date">{{ trans('Pickup date') }}</Label>
                 <Input
                     id="pickup-date"
                     name="pickup_date"
@@ -56,7 +57,9 @@ const weekdayOptions = weekdays.map((label, index) => ({
             </div>
             <template v-if="pickupWeekday === null">
                 <div class="grid gap-2">
-                    <Label for="cycle-weekday">Dia de recollida</Label>
+                    <Label for="cycle-weekday">{{
+                        trans('Pickup weekday')
+                    }}</Label>
                     <FormSelect
                         id="cycle-weekday"
                         name="pickup_weekday"
@@ -69,7 +72,7 @@ const weekdayOptions = weekdays.map((label, index) => ({
                 </div>
                 <fieldset class="grid gap-1">
                     <legend class="text-sm font-medium">
-                        Aquest dia serà permanent?
+                        {{ trans('Will this weekday be permanent?') }}
                     </legend>
                     <label class="flex items-center gap-2"
                         ><input
@@ -78,24 +81,24 @@ const weekdayOptions = weekdays.map((label, index) => ({
                             value="1"
                             required
                         />
-                        Sí, per a la cooperativa</label
+                        {{ trans('Yes, for the cooperative') }}</label
                     >
                     <label class="flex items-center gap-2"
-                        ><input type="radio" name="permanent" value="0" /> Només
-                        per a aquest cicle</label
+                        ><input type="radio" name="permanent" value="0" />
+                        {{ trans('Only for this cycle') }}</label
                     >
                     <InputError :message="errors.permanent" />
                 </fieldset>
             </template>
             <fieldset class="grid gap-1">
                 <legend class="text-sm font-medium">
-                    Productors participants
+                    {{ trans('Participating producers') }}
                 </legend>
                 <p
                     v-if="producers.length === 0"
                     class="text-sm text-muted-foreground"
                 >
-                    No hi ha productors actius.
+                    {{ trans('There are no active producers.') }}
                 </p>
                 <label
                     v-for="producer in producers"
@@ -118,7 +121,7 @@ const weekdayOptions = weekdays.map((label, index) => ({
                     class="manager-button manager-button-secondary"
                     @click="emit('close')"
                 >
-                    Cancel·la
+                    {{ trans('Cancel') }}
                 </button>
                 <button
                     type="submit"
@@ -126,7 +129,7 @@ const weekdayOptions = weekdays.map((label, index) => ({
                     :disabled="processing"
                     data-test="open-cycle"
                 >
-                    Obre el cicle
+                    {{ trans('Open cycle') }}
                 </button>
             </div>
         </Form>

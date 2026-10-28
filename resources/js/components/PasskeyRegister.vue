@@ -1,10 +1,13 @@
 <script setup lang="ts">
+import { trans } from 'laravel-vue-i18n';
 import { usePasskeyRegister } from '@laravel/passkeys/vue';
 import { ref } from 'vue';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { passkeyErrorText } from '@/lib/passkeyErrors';
+import { computed } from 'vue';
 
 const emit = defineEmits<{
     success: [];
@@ -29,19 +32,22 @@ const getDefaultPasskeyName = () => {
         { pattern: /Windows/, name: 'Windows' },
     ].find(({ pattern }) => pattern.test(ua))?.name;
 
-    return [browser, os].filter(Boolean).join(' on ') || '';
+    return browser && os
+        ? trans(':browser on :os', { browser, os })
+        : (browser ?? os ?? '');
 };
 
 const name = ref(getDefaultPasskeyName());
 const showForm = ref(false);
 
-const { register, isLoading, error, isSupported } = usePasskeyRegister({
+const { register, isLoading, errorInstance, isSupported } = usePasskeyRegister({
     onSuccess: () => {
         name.value = '';
         showForm.value = false;
         emit('success');
     },
 });
+const errorText = computed(() => passkeyErrorText(errorInstance.value));
 
 const handleSubmit = async (event: Event) => {
     event.preventDefault();
@@ -61,11 +67,11 @@ const handleCancel = () => {
 
 <template>
     <div v-if="!isSupported" class="text-sm text-muted-foreground">
-        Passkeys are not supported in this browser.
+        {{ trans('Passkeys are not supported in this browser.') }}
     </div>
 
     <Button v-else-if="!showForm" variant="outline" @click="showForm = true">
-        Add passkey
+        {{ trans('Add passkey') }}
     </Button>
 
     <form
@@ -74,28 +80,32 @@ const handleCancel = () => {
         class="space-y-4 rounded-lg border border-border bg-muted/50 p-4"
     >
         <div class="grid gap-2">
-            <Label for="passkey-name">Passkey name</Label>
+            <Label for="passkey-name">{{ trans('Passkey name') }}</Label>
             <Input
                 id="passkey-name"
                 type="text"
                 v-model="name"
-                placeholder="e.g., MacBook Pro, iPhone"
+                :placeholder="trans('e.g., MacBook Pro, iPhone')"
                 class="mt-1 block w-full border-foreground/20"
                 v-focus
             />
             <p class="text-xs text-muted-foreground">
-                A name helps you identify this passkey later.
+                {{ trans('A name helps you identify this passkey later.') }}
             </p>
         </div>
 
-        <InputError v-if="error" :message="error" />
+        <InputError v-if="errorText" :message="errorText" />
 
         <div class="flex flex-wrap gap-2">
             <Button type="submit" :disabled="isLoading || !name.trim()">
-                {{ isLoading ? 'Registering...' : 'Register passkey' }}
+                {{
+                    isLoading
+                        ? trans('Registering...')
+                        : trans('Register passkey')
+                }}
             </Button>
             <Button type="button" variant="ghost" @click="handleCancel">
-                Cancel
+                {{ trans('Cancel') }}
             </Button>
         </div>
     </form>

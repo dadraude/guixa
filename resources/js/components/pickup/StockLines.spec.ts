@@ -55,10 +55,10 @@ describe('stock lines', () => {
             'Honey',
         );
         expect(wrapper.get('[data-test="stock-line-honey"]').text()).toContain(
-            '2.000 jar',
+            '2,000 jar',
         );
         expect(wrapper.get('[data-test="stock-line-honey"]').text()).toContain(
-            '12,00 €',
+            '12,00\u00a0€',
         );
     });
 
@@ -129,7 +129,7 @@ describe('stock lines', () => {
         await flushPromises();
         expect(
             [...document.querySelectorAll('[role="option"]')].some((option) =>
-                option.textContent?.includes('3.500 kg'),
+                option.textContent?.includes('3,500 kg'),
             ),
         ).toBe(true);
     });
@@ -159,6 +159,6 @@ describe('stock lines', () => {
     });
 
     it('formats the unit price with a comma', () => {
-        expect(stockLines().text()).toContain('6,00 €');
+        expect(stockLines().text()).toContain('6,00\u00a0€');
     });
 });

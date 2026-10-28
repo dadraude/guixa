@@ -1,4 +1,5 @@
 import { useHttp } from '@inertiajs/vue3';
+import { trans } from 'laravel-vue-i18n';
 import type { ComputedRef, Ref } from 'vue';
 import { computed, ref } from 'vue';
 import { qrCode, recoveryCodes, secretKey } from '@/routes/two-factor';
@@ -39,7 +40,7 @@ export const useTwoFactorAuth = (): UseTwoFactorAuthReturn => {
 
             qrCodeSvg.value = svg;
         } catch {
-            errors.value.push('Failed to fetch QR code');
+            errors.value.push(trans('Failed to fetch QR code'));
             qrCodeSvg.value = null;
         }
     };
@@ -52,7 +53,7 @@ export const useTwoFactorAuth = (): UseTwoFactorAuthReturn => {
 
             manualSetupKey.value = key;
         } catch {
-            errors.value.push('Failed to fetch a setup key');
+            errors.value.push(trans('Failed to fetch a setup key'));
             manualSetupKey.value = null;
         }
     };
@@ -80,7 +81,7 @@ export const useTwoFactorAuth = (): UseTwoFactorAuthReturn => {
                 recoveryCodes(),
             )) as string[];
         } catch {
-            errors.value.push('Failed to fetch recovery codes');
+            errors.value.push(trans('Failed to fetch recovery codes'));
             recoveryCodesList.value = [];
         }
     };

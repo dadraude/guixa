@@ -6,6 +6,7 @@ import PickupController from '@/actions/App/Http/Controllers/Manage/PickupContro
 import Heading from '@/components/Heading.vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { formatMoney } from '@/lib/locale';
 
 const props = defineProps<{
     cycleId: string;
@@ -21,14 +22,13 @@ defineOptions({
 });
 
 const statusLabels: Record<string, string> = {
-    pending: 'Pending',
-    completed: 'Completed',
-    not_collected: 'Not collected',
-    nothing_to_collect: 'Nothing to collect',
+    pending: trans('Pending'),
+    completed: trans('Completed'),
+    not_collected: trans('Not collected'),
+    nothing_to_collect: trans('Nothing to collect'),
 };
 
-const euros = (cents: number) =>
-    `${(cents / 100).toFixed(2).replace('.', ',')} €`;
+const euros = (cents: number) => formatMoney((cents / 100).toFixed(2));
 
 const openForm = (householdId: string) =>
     PickupController.store.form({
@@ -38,12 +38,14 @@ const openForm = (householdId: string) =>
 </script>
 
 <template>
-    <Head title="Pickups" />
+    <Head :title="trans('Pickups')" />
 
     <div class="pilot-page pilot-layout-page pilot-manager-page">
         <Heading
-            title="Pickups"
-            description="Households collect their allocation and stock products."
+            :title="trans('Pickups')"
+            :description="
+                trans('Households collect their allocation and stock products.')
+            "
         />
 
         <p
@@ -59,7 +61,7 @@ const openForm = (householdId: string) =>
             class="text-sm text-muted-foreground"
             data-test="no-pickups"
         >
-            No household has a pickup in this cycle yet.
+            {{ trans('No household has a pickup in this cycle yet.') }}
         </p>
 
         <ul class="divide-y">
@@ -81,7 +83,7 @@ const openForm = (householdId: string) =>
                     {{ pickup.householdName }}
                 </Link>
                 <Badge variant="secondary">
-                    {{ trans(statusLabels[pickup.status] ?? pickup.status) }}
+                    {{ statusLabels[pickup.status] ?? pickup.status }}
                 </Badge>
                 <span>{{ euros(pickup.totalCents) }}</span>
             </li>
@@ -91,9 +93,13 @@ const openForm = (householdId: string) =>
             v-if="!closed && households.length > 0"
             class="flex flex-col gap-2"
         >
-            <h2 class="text-lg font-medium">Open a pickup</h2>
+            <h2 class="text-lg font-medium">{{ trans('Open a pickup') }}</h2>
             <p class="text-sm text-muted-foreground">
-                For a household without an order, for example to sell it stock.
+                {{
+                    trans(
+                        'For a household without an order, for example to sell it stock.',
+                    )
+                }}
             </p>
             <ul class="divide-y">
                 <li
@@ -105,7 +111,7 @@ const openForm = (householdId: string) =>
                     <span>{{ household.name }}</span>
                     <Form v-bind="openForm(household.id)">
                         <Button type="submit" variant="outline" size="sm">
-                            Open pickup
+                            {{ trans('Open pickup') }}
                         </Button>
                     </Form>
                 </li>

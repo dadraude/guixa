@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { trans } from 'laravel-vue-i18n';
 import { Form, Head } from '@inertiajs/vue3';
 import InputError from '@/components/InputError.vue';
 import PasswordInput from '@/components/PasswordInput.vue';
@@ -21,7 +22,7 @@ defineProps<{
 </script>
 
 <template>
-    <Head title="Set your password" />
+    <Head :title="trans('Set your password')" />
 
     <Form
         v-bind="accept.form(token)"
@@ -32,27 +33,29 @@ defineProps<{
             <InputError :message="errors.domain" />
 
             <div class="grid gap-2">
-                <Label for="password">Password</Label>
+                <Label for="password">{{ trans('Password') }}</Label>
                 <PasswordInput
                     id="password"
                     name="password"
                     autocomplete="new-password"
                     class="mt-1 block w-full"
                     autofocus
-                    placeholder="Password"
+                    :placeholder="trans('Password')"
                     :passwordrules="passwordRules"
                 />
                 <InputError :message="errors.password" />
             </div>
 
             <div class="grid gap-2">
-                <Label for="password_confirmation">Confirm password</Label>
+                <Label for="password_confirmation">{{
+                    trans('Confirm password')
+                }}</Label>
                 <PasswordInput
                     id="password_confirmation"
                     name="password_confirmation"
                     autocomplete="new-password"
                     class="mt-1 block w-full"
-                    placeholder="Confirm password"
+                    :placeholder="trans('Confirm password')"
                     :passwordrules="passwordRules"
                 />
                 <InputError :message="errors.password_confirmation" />
@@ -65,7 +68,7 @@ defineProps<{
                 data-test="accept-invitation-button"
             >
                 <Spinner v-if="processing" />
-                Set password
+                {{ trans('Set password') }}
             </Button>
         </div>
     </Form>

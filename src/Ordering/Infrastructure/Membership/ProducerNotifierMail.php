@@ -18,16 +18,27 @@ final class ProducerNotifierMail extends Mailable
 
     public function envelope(): Envelope
     {
-        return new Envelope(subject: 'Guixa order for '.$this->pickupDate->format('Y-m-d'));
+        return new Envelope(subject: __('Guixa order for :date', ['date' => $this->pickupDate->format('d/m/Y')]));
     }
 
     public function content(): Content
     {
         $lines = array_map(
-            fn (array $total) => '- '.e($total['name']).': '.e($total['quantity']).' '.e($total['unit']),
+            fn (array $total) => '- '.e($total['name']).': '.e(self::formatQuantity($total['quantity'])).' '.e($total['unit']),
             $this->totals,
         );
 
-        return new Content(htmlString: '<p>Order for the pickup on '.$this->pickupDate->format('Y-m-d').':</p><p>'.implode('<br>', $lines).'</p>');
+        return new Content(htmlString: '<p>'.e(__('Order for the pickup on :date:', ['date' => $this->pickupDate->format('d/m/Y')])).'</p><p>'.implode('<br>', $lines).'</p>');
+    }
+
+    private static function formatQuantity(string $quantity): string
+    {
+        if (! preg_match('/^(-?)(\d+)(?:\.(\d+))?$/', $quantity, $parts)) {
+            return $quantity;
+        }
+
+        $integer = preg_replace('/\B(?=(\d{3})+(?!\d))/', '.', $parts[2]);
+
+        return ($parts[1] === '-' ? '−' : '').$integer.(isset($parts[3]) ? ','.$parts[3] : '');
     }
 }

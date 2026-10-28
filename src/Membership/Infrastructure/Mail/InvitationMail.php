@@ -3,6 +3,7 @@
 namespace Guixa\Membership\Infrastructure\Mail;
 
 use DateTimeImmutable;
+use Carbon\CarbonImmutable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
@@ -17,11 +18,16 @@ final class InvitationMail extends Mailable
 
     public function envelope(): Envelope
     {
-        return new Envelope(subject: 'Set your Guixa password');
+        return new Envelope(subject: __('Set your Guixa password'));
     }
 
     public function content(): Content
     {
-        return new Content(markdown: 'mail.invitation');
+        return new Content(markdown: 'mail.invitation', with: ['expiry' => $this->localizedExpiry()]);
+    }
+
+    public function localizedExpiry(): string
+    {
+        return CarbonImmutable::instance($this->expiresAt)->locale('ca')->isoFormat('D [de] MMMM [de] YYYY, HH:mm');
     }
 }

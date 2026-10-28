@@ -9,7 +9,7 @@ import ReturnLines from '@/components/pickup/ReturnLines.vue';
 import StockLines from '@/components/pickup/StockLines.vue';
 import OrderPageHeader from '@/components/orders/OrderPageHeader.vue';
 import OrderProductRow from '@/components/orders/OrderProductRow.vue';
-import { formatMoney, formatPickupDate } from '@/lib/locale';
+import { formatMoney, formatPickupDate, formatQuantity } from '@/lib/locale';
 import InputError from '@/components/InputError.vue';
 import { orderRows, type OrderRow } from '@/lib/orderRows';
 import { lineCents, orderTotal } from '@/lib/orderTotal';
@@ -151,8 +151,10 @@ const lineTotal = (price: string, quantity: string) =>
                                 trans(
                                     'Ordered :ordered, delivered :delivered',
                                     {
-                                        ordered: line.ordered,
-                                        delivered: line.delivered,
+                                        ordered: formatQuantity(line.ordered),
+                                        delivered: formatQuantity(
+                                            line.delivered,
+                                        ),
                                     },
                                 )
                             }}

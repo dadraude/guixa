@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { trans } from 'laravel-vue-i18n';
 import { Form } from '@inertiajs/vue3';
 import { ShieldCheck } from '@lucide/vue';
 import { onUnmounted, ref } from 'vue';
@@ -31,8 +32,10 @@ onUnmounted(() => clearTwoFactorAuthData());
     <div v-if="canManageTwoFactor" class="pilot-panel space-y-6 p-4 sm:p-6">
         <Heading
             variant="small"
-            title="Two-factor authentication"
-            description="Manage your two-factor authentication settings"
+            :title="trans('Two-factor authentication')"
+            :description="
+                trans('Manage your two-factor authentication settings')
+            "
         />
 
         <div
@@ -40,14 +43,16 @@ onUnmounted(() => clearTwoFactorAuthData());
             class="flex flex-col items-start justify-start space-y-4"
         >
             <p class="text-sm text-muted-foreground">
-                When you enable two-factor authentication, you will be prompted
-                for a secure pin during login. This pin can be retrieved from a
-                TOTP-supported application on your phone.
+                {{
+                    trans(
+                        'When you enable two-factor authentication, you will be prompted for a secure pin during login. This pin can be retrieved from a TOTP-supported application on your phone.',
+                    )
+                }}
             </p>
 
             <div>
                 <Button v-if="hasSetupData" @click="showSetupModal = true">
-                    <ShieldCheck />Continue setup
+                    <ShieldCheck />{{ trans('Continue setup') }}
                 </Button>
                 <Form
                     v-else
@@ -56,7 +61,7 @@ onUnmounted(() => clearTwoFactorAuthData());
                     #default="{ processing }"
                 >
                     <Button type="submit" :disabled="processing">
-                        Enable 2FA
+                        {{ trans('Enable 2FA') }}
                     </Button>
                 </Form>
             </div>
@@ -64,9 +69,11 @@ onUnmounted(() => clearTwoFactorAuthData());
 
         <div v-else class="flex flex-col items-start justify-start space-y-4">
             <p class="text-sm text-muted-foreground">
-                You will be prompted for a secure, random pin during login,
-                which you can retrieve from the TOTP-supported application on
-                your phone.
+                {{
+                    trans(
+                        'You will be prompted for a secure, random pin during login, which you can retrieve from the TOTP-supported application on your phone.',
+                    )
+                }}
             </p>
 
             <div class="relative inline">
@@ -76,7 +83,7 @@ onUnmounted(() => clearTwoFactorAuthData());
                         type="submit"
                         :disabled="processing"
                     >
-                        Disable 2FA
+                        {{ trans('Disable 2FA') }}
                     </Button>
                 </Form>
             </div>

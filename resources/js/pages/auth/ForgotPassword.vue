@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { trans } from 'laravel-vue-i18n';
 import { Form, Head } from '@inertiajs/vue3';
 import InputError from '@/components/InputError.vue';
 import TextLink from '@/components/TextLink.vue';
@@ -22,7 +23,7 @@ defineProps<{
 </script>
 
 <template>
-    <Head title="Forgot password" />
+    <Head :title="trans('Forgot password')" />
 
     <div
         v-if="status"
@@ -34,7 +35,7 @@ defineProps<{
     <div class="space-y-6">
         <Form v-bind="email.form()" v-slot="{ errors, processing }">
             <div class="grid gap-2">
-                <Label for="email">Email address</Label>
+                <Label for="email">{{ trans('Email address') }}</Label>
                 <Input
                     id="email"
                     type="email"
@@ -53,7 +54,7 @@ defineProps<{
                     data-test="email-password-reset-link-button"
                 >
                     <Spinner v-if="processing" />
-                    Email password reset link
+                    {{ trans('Email password reset link') }}
                 </Button>
             </div>
         </Form>
@@ -61,8 +62,8 @@ defineProps<{
         <div
             class="flex flex-wrap items-center justify-center gap-x-1 text-center text-sm text-muted-foreground"
         >
-            <span>Or, return to</span>
-            <TextLink :href="login()">log in</TextLink>
+            <span>{{ trans('Or, return to') }}</span>
+            <TextLink :href="login()">{{ trans('log in') }}</TextLink>
         </div>
     </div>
 </template>

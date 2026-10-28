@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { trans } from 'laravel-vue-i18n';
 import { KeyRound, Trash2 } from '@lucide/vue';
 import { ref } from 'vue';
 import { Button } from '@/components/ui/button';
@@ -62,14 +63,20 @@ const handleDelete = () => {
                 <p
                     class="text-sm [overflow-wrap:anywhere] text-muted-foreground"
                 >
-                    Added {{ passkey.created_at_diff }}
+                    {{
+                        trans('Added :time', { time: passkey.created_at_diff })
+                    }}
                     <template v-if="passkey.last_used_at_diff">
                         <span
                             class="mx-1 text-muted-foreground"
                             aria-hidden="true"
                             >/</span
                         >
-                        Last used {{ passkey.last_used_at_diff }}
+                        {{
+                            trans('Last used :time', {
+                                time: passkey.last_used_at_diff,
+                            })
+                        }}
                     </template>
                 </p>
             </div>
@@ -80,7 +87,7 @@ const handleDelete = () => {
                 <Button
                     variant="ghost"
                     size="sm"
-                    aria-label="Remove"
+                    :aria-label="trans('Remove')"
                     class="min-h-11 min-w-11 shrink-0 text-destructive hover:bg-destructive/10 hover:text-destructive"
                 >
                     <Trash2 class="h-4 w-4" />
@@ -91,21 +98,31 @@ const handleDelete = () => {
                 class="pilot-touch-dialog"
                 @focusin="scrollFocusIntoView"
             >
-                <DialogTitle>Remove passkey</DialogTitle>
+                <DialogTitle>{{ trans('Remove passkey') }}</DialogTitle>
                 <DialogDescription>
-                    Are you sure you want to remove the "{{ passkey.name }}"
-                    passkey? You will no longer be able to use it to sign in.
+                    {{
+                        trans(
+                            'Are you sure you want to remove the :name passkey? You will no longer be able to use it to sign in.',
+                            { name: passkey.name },
+                        )
+                    }}
                 </DialogDescription>
                 <DialogFooter class="gap-2">
                     <DialogClose as-child>
-                        <Button variant="secondary">Cancel</Button>
+                        <Button variant="secondary">{{
+                            trans('Cancel')
+                        }}</Button>
                     </DialogClose>
                     <Button
                         variant="destructive"
                         :disabled="isDeleting"
                         @click="handleDelete"
                     >
-                        {{ isDeleting ? 'Removing...' : 'Remove passkey' }}
+                        {{
+                            isDeleting
+                                ? trans('Removing...')
+                                : trans('Remove passkey')
+                        }}
                     </Button>
                 </DialogFooter>
             </DialogContent>

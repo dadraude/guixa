@@ -78,6 +78,23 @@ describe('pickup page', () => {
         shared.errors = { domain: 'Nope' };
     });
 
+    it('renders grouped positive and negative pickup money without changing cents', async () => {
+        const source = {
+            ...pickup(false),
+            balanceCents: -123450,
+            totalCents: 123450,
+            resultingBalanceCents: -246900,
+        };
+        const html = await renderToString(
+            createSSRApp(Show, { pickup: source, stockProducts, returnItems }),
+        );
+
+        expect(html).toContain('1.234,50\u00a0€');
+        expect(html).toContain('-1.234,50\u00a0€');
+        expect(html).toContain('-2.469,00\u00a0€');
+        expect(source.totalCents).toBe(123450);
+    });
+
     it('offers not collected only for pending pickups and explains the charge', async () => {
         const render = (status: string) =>
             renderToString(
@@ -124,8 +141,8 @@ describe('pickup page', () => {
         );
         expect(html).toContain('data-test="pickup-adjustment-adjustment"');
         expect(html).toContain('Original charge');
-        expect(html).toContain('22,40 €');
-        expect(html).toContain('-0.120 kg');
+        expect(html).toContain('22,40\u00a0€');
+        expect(html).toContain('−0,120 kg');
         expect(html).toContain('Current pickup total');
         expect(html).not.toContain('data-test="resulting-balance"');
     });
@@ -141,9 +158,9 @@ describe('pickup page', () => {
 
         expect(html).toContain('Pickup: Household A');
         expect(html).toContain('data-test="delivered-form-beef"');
-        expect(html).toContain('50,00 €');
-        expect(html).toContain('20,00 €');
-        expect(html).toContain('30,00 €');
+        expect(html).toContain('50,00\u00a0€');
+        expect(html).toContain('20,00\u00a0€');
+        expect(html).toContain('30,00\u00a0€');
         expect(html).not.toContain('data-test="adjusted"');
         expect(html).toContain('Nope');
     });
@@ -186,8 +203,8 @@ describe('pickup page', () => {
         );
 
         expect(html).toContain('data-test="adjusted"');
-        expect(html).toContain('22,40 €');
-        expect(html).toContain('27,60 €');
+        expect(html).toContain('22,40\u00a0€');
+        expect(html).toContain('27,60\u00a0€');
     });
 
     it('shows the delivered quantity read-only when there is nothing to collect', async () => {
@@ -201,7 +218,7 @@ describe('pickup page', () => {
 
         expect(html).not.toContain('data-test="delivered-form-beef"');
         expect(html).toContain('data-test="delivered"');
-        expect(html).toContain('1.000 kg');
+        expect(html).toContain('1,000 kg');
     });
 
     it('shows the stock and return lines and the forms to add more', async () => {

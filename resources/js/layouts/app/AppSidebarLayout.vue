@@ -37,7 +37,7 @@ const sectionTitle = computed(
         'Guixa',
 );
 const pageBreadcrumbs = computed(() => [
-    { title: 'Dashboard', href: dashboard() },
+    { title: trans('Dashboard'), href: dashboard() },
     ...(props.breadcrumbs.length > 0
         ? props.breadcrumbs
         : sectionTitle.value === 'Dashboard'

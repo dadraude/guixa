@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { formatPickupDate, formatQuantity } from '@/lib/locale';
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import { trans } from 'laravel-vue-i18n';
 import { computed, ref } from 'vue';
@@ -112,19 +113,24 @@ const adjust = (productId: string, quantity: string) =>
 </script>
 
 <template>
-    <Head :title="`Pickup ${pickup.householdName}`" />
+    <Head :title="trans('Pickup :name', { name: pickup.householdName })" />
 
     <div class="pilot-page pilot-layout-page pilot-manager-page">
         <Heading
-            :title="`Pickup: ${pickup.householdName}`"
-            :description="`Pickup ${pickup.pickupDate}. Check what the household takes home and adjust what is needed.`"
+            :title="trans('Pickup: :name', { name: pickup.householdName })"
+            :description="
+                trans(
+                    'Pickup :date. Check what the household takes home and adjust what is needed.',
+                    { date: formatPickupDate(pickup.pickupDate) },
+                )
+            "
         />
 
         <Link
             :href="PickupController.index.url({ cycle: pickup.cycleId })"
             class="text-sm underline"
         >
-            All pickups of this cycle
+            {{ trans('All pickups of this cycle') }}
         </Link>
 
         <InputError :message="domainError" data-test="domain-error" />
@@ -134,7 +140,7 @@ const adjust = (productId: string, quantity: string) =>
             class="text-sm text-muted-foreground"
             data-test="no-lines"
         >
-            This pickup has no order lines.
+            {{ trans('This pickup has no order lines.') }}
         </p>
 
         <ul class="divide-y">
@@ -147,9 +153,17 @@ const adjust = (productId: string, quantity: string) =>
                 <div class="flex flex-col">
                     <span>{{ line.name }}</span>
                     <span class="text-xs text-muted-foreground">
-                        Ordered {{ line.ordered }} {{ line.unit }} · Allocated
-                        {{ line.allocated }} {{ line.unit }} ·
-                        {{ euros(line.unitPriceCents) }} per {{ line.unit }}
+                        {{
+                            trans(
+                                'Ordered :ordered :unit · Allocated :allocated :unit · :price per :unit',
+                                {
+                                    ordered: formatQuantity(line.ordered),
+                                    allocated: formatQuantity(line.allocated),
+                                    unit: line.unit,
+                                    price: euros(line.unitPriceCents),
+                                },
+                            )
+                        }}
                     </span>
                 </div>
                 <Badge
@@ -157,7 +171,7 @@ const adjust = (productId: string, quantity: string) =>
                     variant="outline"
                     data-test="adjusted"
                 >
-                    Adjusted
+                    {{ trans('Adjusted') }}
                 </Badge>
                 <DeliveredForm
                     v-if="pickup.status === 'pending'"
@@ -166,7 +180,7 @@ const adjust = (productId: string, quantity: string) =>
                     @save="adjust"
                 />
                 <span v-else data-test="delivered">
-                    {{ line.delivered }} {{ line.unit }}
+                    {{ formatQuantity(line.delivered) }} {{ line.unit }}
                 </span>
                 <span data-test="amount">{{ euros(line.amountCents) }}</span>
             </li>
@@ -206,7 +220,9 @@ const adjust = (productId: string, quantity: string) =>
             class="grid grid-cols-2 gap-2 text-sm sm:grid-cols-3"
         >
             <div>
-                <dt class="text-muted-foreground">Current balance</dt>
+                <dt class="text-muted-foreground">
+                    {{ trans('Current balance') }}
+                </dt>
                 <dd data-test="balance">{{ euros(pickup.balanceCents) }}</dd>
             </div>
             <div>
@@ -214,15 +230,17 @@ const adjust = (productId: string, quantity: string) =>
                     {{
                         trans(
                             pickup.status === 'pending'
-                                ? 'Total to charge'
-                                : 'Current pickup total',
+                                ? trans('Total to charge')
+                                : trans('Current pickup total'),
                         )
                     }}
                 </dt>
                 <dd data-test="total">{{ euros(pickup.totalCents) }}</dd>
             </div>
             <div v-if="pickup.status === 'pending'">
-                <dt class="text-muted-foreground">Resulting balance</dt>
+                <dt class="text-muted-foreground">
+                    {{ trans('Resulting balance') }}
+                </dt>
                 <dd data-test="resulting-balance">
                     {{ euros(pickup.resultingBalanceCents) }}
                 </dd>

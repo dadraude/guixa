@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { trans } from 'laravel-vue-i18n';
 import { Form, Head } from '@inertiajs/vue3';
 import InputError from '@/components/InputError.vue';
 import PasswordInput from '@/components/PasswordInput.vue';
@@ -22,16 +23,16 @@ defineOptions({
 </script>
 
 <template>
-    <Head title="Confirm password" />
+    <Head :title="trans('Confirm password')" />
 
     <PasskeyVerify
         :routes="{
             options: confirmOptions(),
             submit: confirmStore(),
         }"
-        label="Confirm with passkey"
-        loading-label="Confirming..."
-        separator="Or confirm with password"
+        :label="trans('Confirm with passkey')"
+        :loading-label="trans('Confirming...')"
+        :separator="trans('Or confirm with password')"
     />
 
     <Form
@@ -41,7 +42,7 @@ defineOptions({
     >
         <div class="space-y-6">
             <div class="grid gap-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">{{ trans('Password') }}</Label>
                 <PasswordInput
                     id="password"
                     name="password"
@@ -61,7 +62,7 @@ defineOptions({
                     data-test="confirm-password-button"
                 >
                     <Spinner v-if="processing" />
-                    Confirm password
+                    {{ trans('Confirm password') }}
                 </Button>
             </div>
         </div>

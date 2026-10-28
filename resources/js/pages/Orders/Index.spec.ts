@@ -57,4 +57,22 @@ describe('member cycle list presentation', () => {
         expect(html).toContain('/cycles/open/order');
         expect(html).toContain('2 productes');
     });
+
+    it('groups a four-digit product count while retaining numeric plural selection', async () => {
+        const html = await render(Index, {
+            cycles: [
+                {
+                    cycleId: 'many',
+                    pickupDate: '2026-10-30',
+                    open: true,
+                    cancelled: false,
+                    lineCount: 1234,
+                },
+            ],
+        });
+
+        expect(html).toContain('1.234 productes');
+        expect(html).not.toContain('1234 productes');
+        expect(html).toContain('/cycles/many/order');
+    });
 });

@@ -20,12 +20,12 @@ class CreateManager extends Command
         try {
             $createFirstManager($name, $email);
         } catch (DomainException $e) {
-            $this->error($e->getMessage());
+            $this->error(__('errors.'.class_basename($e)));
 
             return self::FAILURE;
         }
 
-        $this->info("Invitation sent to {$email}.");
+        $this->info(__('Invitation sent to :email.', ['email' => $email]));
 
         return self::SUCCESS;
     }

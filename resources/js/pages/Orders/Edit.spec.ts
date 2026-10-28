@@ -224,7 +224,7 @@ describe('member order editor presentation', () => {
 
         expect(html).toContain('data-test="pickup"');
         expect(html).toContain('La teva recollida');
-        expect(html).toContain('Demanat 4.000, lliurat 3.000');
+        expect(html).toContain('Demanat 4,000, lliurat 3,000');
         expect(html).toContain('data-test="pickup-total"');
         expect(html).toContain('10,50');
     });

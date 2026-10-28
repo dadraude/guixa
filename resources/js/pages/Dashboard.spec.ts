@@ -50,6 +50,33 @@ vi.mock('@/actions/App/Http/Controllers/Producer/CutoffController', () => ({
 }));
 
 describe('dashboard presentation', () => {
+    it('groups four-digit member and manager counts without changing summary values', async () => {
+        const app = createSSRApp(Dashboard, {
+            roles: ['member', 'manager'],
+            isManager: true,
+            isMember: true,
+            nextPickup: null,
+            openCycles: 1234,
+            balance: null,
+            pendingPickups: [],
+            managerSummary: {
+                cycles: 2345,
+                activeCycles: 1,
+                households: 3456,
+                activeHouseholds: 2,
+                accounts: 4567,
+                pendingInvitations: 0,
+                producers: 1,
+                activeProducers: 1,
+            },
+        });
+        installTranslations(app);
+        const html = await renderToString(app);
+
+        for (const count of ['1.234', '2.345', '3.456', '4.567'])
+            expect(html).toContain(count);
+        expect(html).not.toContain('>1234<');
+    });
     it('renders the translated dashboard title', async () => {
         const app = createSSRApp(Dashboard, {
             roles: ['member'],

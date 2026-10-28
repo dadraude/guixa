@@ -1,6 +1,6 @@
 # 001 — Weekly orders · Plan
 
-Status: Accepted (2026-10-21) · Spec: [spec.md](spec.md) + areas (R1–R36b, S1–S61) · Rules: [constitution](../constitution.md)
+Status: Accepted (2026-10-21) · Spec: [spec.md](spec.md) + areas (R1–R36b, S1–S64) · Rules: [constitution](../constitution.md)
 
 Accepted amendment (2026-10-24): **Application visual identity** below. The user approved the plan;
 the associated tasks were separately approved. The user subsequently authorized T39 implementation
@@ -966,13 +966,19 @@ for CI's full validation.
 - Dates, numbers and money: Vue formats with `Intl` and `ca-ES`; PHP uses the same locale where it formats (emails).
 - Starter-kit and shadcn-vue components' own texts (e.g. screen-reader labels) go through `trans()` too.
 - Every key used in PHP and Vue has a `ca` translation; a test fails otherwise (Testing).
+- T36 covers all applicable static user text, including originally Catalan literals, accessible copy,
+  status and validation messages, framework error pages and notification mail. English source keys and
+  Laravel `:parameter` substitution keep each whole message reorderable. A source-aware Vue scan
+  checks static template text, visible attributes and display expressions; bounded exclusions cover
+  proper names, user data and machine values. The four framework message files are pinned copies of
+  Laravel-Lang Catalan translations with their upstream license in `lang/ca/`.
 
 ## Testing
 
 | Level | What | Where |
 | --- | --- | --- |
 | Domain | Value objects, `LocalTime`, `CutoffRule`, `ProportionalAllocator` (property: Σ result == target), `Cycle`, `Order` | `tests/Unit/<Context>` |
-| Application | **Every scenario S1–S61**, with in-memory repositories and `FrozenClock` | `tests/Application/<Context>` |
+| Application | **Every scenario S1–S64**, with in-memory repositories and `FrozenClock` | `tests/Application/<Context>` |
 | Infrastructure | Each Eloquent repository against `guixa_test` (constraints, locks, numeric mapping) | `tests/Integration` |
 | HTTP | Role gates, wiring, `assertInertia` props, error → 422 and `NotAllowed` → 403 mapping | `tests/Feature` |
 | Architecture | A1–A8 | `tests/Architecture` |
