@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { trans } from 'laravel-vue-i18n';
 import { nextTick, ref, watch } from 'vue';
 
 const props = defineProps<{
@@ -48,7 +49,7 @@ function onClose() {
                 <button
                     type="submit"
                     class="manager-button manager-button-secondary"
-                    aria-label="Tanca el diàleg"
+                    :aria-label="trans('Close dialog')"
                 >
                     ×
                 </button>

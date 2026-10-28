@@ -20,20 +20,23 @@ defineProps<{
     producers: App.Http.ProducerRow[];
 }>();
 
-const daysLabel = (days: number) => (days === 1 ? '1 day' : `${days} days`);
+const daysLabel = (days: number) =>
+    days === 1 ? trans('1 day') : trans(':count days', { count: String(days) });
 </script>
 
 <template>
-    <Head title="Producers" />
+    <Head :title="trans('Producers')" />
 
     <div class="pilot-page pilot-layout-page pilot-manager-page">
         <Heading
-            title="Producers"
-            description="Suppliers, their default cutoff and their login account"
+            :title="trans('Producers')"
+            :description="
+                trans('Suppliers, their default cutoff and their login account')
+            "
         />
 
         <section class="flex flex-col gap-4">
-            <h2 class="text-lg font-medium">New producer</h2>
+            <h2 class="text-lg font-medium">{{ trans('New producer') }}</h2>
 
             <Form
                 v-bind="ProducerController.store.form()"
@@ -42,14 +45,14 @@ const daysLabel = (days: number) => (days === 1 ? '1 day' : `${days} days`);
                 v-slot="{ errors, processing }"
             >
                 <div class="grid gap-2">
-                    <Label for="producer-name">Name</Label>
+                    <Label for="producer-name">{{ trans('Name') }}</Label>
                     <Input id="producer-name" name="name" required />
                     <InputError :message="errors.name" />
                 </div>
                 <div class="grid gap-2">
-                    <Label for="producer-days"
-                        >Cutoff: days before pickup</Label
-                    >
+                    <Label for="producer-days">{{
+                        trans('Cutoff: days before pickup')
+                    }}</Label>
                     <Input
                         id="producer-days"
                         name="cutoff_days_before"
@@ -62,7 +65,9 @@ const daysLabel = (days: number) => (days === 1 ? '1 day' : `${days} days`);
                     <InputError :message="errors.cutoff_days_before" />
                 </div>
                 <div class="grid gap-2">
-                    <Label for="producer-time">Cutoff time</Label>
+                    <Label for="producer-time">{{
+                        trans('Cutoff time')
+                    }}</Label>
                     <Input
                         id="producer-time"
                         name="cutoff_time"
@@ -79,13 +84,13 @@ const daysLabel = (days: number) => (days === 1 ? '1 day' : `${days} days`);
                     :disabled="processing"
                     data-test="create-producer"
                 >
-                    Create
+                    {{ trans('Create') }}
                 </Button>
             </Form>
         </section>
 
         <p v-if="producers.length === 0" class="text-sm text-muted-foreground">
-            No producers yet.
+            {{ trans('No producers yet.') }}
         </p>
 
         <ul v-else class="pilot-list">
@@ -99,13 +104,21 @@ const daysLabel = (days: number) => (days === 1 ? '1 day' : `${days} days`);
                     <span class="flex flex-wrap items-center gap-4">
                         <span class="font-medium">{{ producer.name }}</span>
                         <StatusIndicator
-                            :label="producer.active ? 'Active' : 'Deactivated'"
+                            :label="
+                                producer.active
+                                    ? trans('Active')
+                                    : trans('Deactivated')
+                            "
                             :tone="producer.active ? 'success' : 'danger'"
                         />
                     </span>
                     <span class="text-sm text-muted-foreground">
-                        Cutoff {{ daysLabel(producer.cutoffDaysBefore) }} before
-                        pickup, at {{ producer.cutoffTime }}
+                        {{
+                            trans('Cutoff :days before pickup, at :time', {
+                                days: daysLabel(producer.cutoffDaysBefore),
+                                time: producer.cutoffTime,
+                            })
+                        }}
                     </span>
                 </div>
 
@@ -114,12 +127,16 @@ const daysLabel = (days: number) => (days === 1 ? '1 day' : `${days} days`);
                     class="text-sm"
                     :data-test="`account-${producer.id}`"
                 >
-                    Account: {{ producer.accountEmail }}
+                    {{
+                        trans('Account: :email', {
+                            email: producer.accountEmail,
+                        })
+                    }}
                     <span class="text-muted-foreground">
                         ({{
                             producer.accountInvitationPending
-                                ? 'invitation pending'
-                                : 'active'
+                                ? trans('invitation pending')
+                                : trans('active')
                         }})
                     </span>
                 </p>
@@ -161,7 +178,7 @@ const daysLabel = (days: number) => (days === 1 ? '1 day' : `${days} days`);
                         :disabled="processing"
                         :data-test="`invite-${producer.id}`"
                     >
-                        Invite account
+                        {{ trans('Invite account') }}
                     </Button>
                 </Form>
             </li>

@@ -11,11 +11,11 @@ import type { NavItem } from '@/types';
 
 const sidebarNavItems: NavItem[] = [
     {
-        title: 'Profile',
+        title: trans('Profile'),
         href: editProfile(),
     },
     {
-        title: 'Security',
+        title: trans('Security'),
         href: editSecurity(),
     },
 ];
@@ -28,8 +28,8 @@ const { isCurrentOrParentUrl } = useCurrentUrl();
         <div class="pilot-page pilot-settings-inner">
             <Heading
                 as="div"
-                title="Settings"
-                description="Manage your profile and account settings"
+                :title="trans('Settings')"
+                :description="trans('Manage your profile and account settings')"
             />
 
             <div class="pilot-settings-body">
@@ -42,7 +42,7 @@ const { isCurrentOrParentUrl } = useCurrentUrl();
                     </p>
                     <nav
                         class="flex flex-col space-y-1 space-x-0"
-                        aria-label="Settings"
+                        :aria-label="trans('Settings')"
                     >
                         <Button
                             v-for="item in sidebarNavItems"

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { trans } from 'laravel-vue-i18n';
 import type { UrlMethodPair } from '@inertiajs/core';
 import { router } from '@inertiajs/vue3';
 import { usePasskeyVerify } from '@laravel/passkeys/vue';
@@ -7,6 +8,8 @@ import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Spinner } from '@/components/ui/spinner';
+import { passkeyErrorText } from '@/lib/passkeyErrors';
+import { computed } from 'vue';
 
 type Props = {
     routes?: {
@@ -20,7 +23,7 @@ type Props = {
 
 const props = defineProps<Props>();
 
-const { verify, isLoading, error, isSupported } = usePasskeyVerify({
+const { verify, isLoading, errorInstance, isSupported } = usePasskeyVerify({
     ...(props.routes
         ? {
               routes: {
@@ -33,6 +36,7 @@ const { verify, isLoading, error, isSupported } = usePasskeyVerify({
         router.visit(response.redirect ?? '/dashboard');
     },
 });
+const errorText = computed(() => passkeyErrorText(errorInstance.value));
 </script>
 
 <template>
@@ -49,13 +53,13 @@ const { verify, isLoading, error, isSupported } = usePasskeyVerify({
                 <KeyRound v-else class="h-4 w-4" />
                 {{
                     isLoading
-                        ? (props.loadingLabel ?? 'Authenticating...')
-                        : (props.label ?? 'Sign in with a passkey')
+                        ? (props.loadingLabel ?? trans('Authenticating...'))
+                        : (props.label ?? trans('Sign in with a passkey'))
                 }}
             </Button>
 
-            <div v-if="error" class="text-center">
-                <InputError :message="error" />
+            <div v-if="errorText" class="text-center">
+                <InputError :message="errorText" />
             </div>
         </div>
 
@@ -65,7 +69,7 @@ const { verify, isLoading, error, isSupported } = usePasskeyVerify({
             </div>
             <div class="relative flex justify-center text-xs uppercase">
                 <span class="bg-card px-2 text-muted-foreground">
-                    {{ props.separator ?? 'Or continue with email' }}
+                    {{ props.separator ?? trans('Or continue with email') }}
                 </span>
             </div>
         </div>

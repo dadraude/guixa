@@ -25,6 +25,6 @@ class AcceptInvitationController extends Controller
 
         $acceptInvitation($token, $data['password']);
 
-        return to_route('login')->with('status', 'Your password is set. You can log in now.');
+        return to_route('login')->with('status', __('Your password is set. You can log in now.'));
     }
 }

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { formatPickupDate, formatQuantity } from '@/lib/locale';
 import { Head } from '@inertiajs/vue3';
 import { trans } from 'laravel-vue-i18n';
 import CycleController from '@/actions/App/Http/Controllers/Manage/CycleController';
@@ -17,12 +18,20 @@ defineOptions({
 </script>
 
 <template>
-    <Head :title="`Cycle ${summary.pickupDate}`" />
+    <Head
+        :title="
+            trans('Cycle :date', { date: formatPickupDate(summary.pickupDate) })
+        "
+    />
 
     <div class="pilot-page pilot-layout-page pilot-manager-page">
         <Heading
-            :title="`Pickup ${summary.pickupDate}`"
-            description="What was ordered, per producer and product"
+            :title="
+                trans('Pickup :date', {
+                    date: formatPickupDate(summary.pickupDate),
+                })
+            "
+            :description="trans('What was ordered, per producer and product')"
         />
 
         <p
@@ -30,7 +39,7 @@ defineOptions({
             class="text-sm text-muted-foreground"
             data-test="cancelled-notice"
         >
-            Cancelled. This cycle has no totals.
+            {{ trans('Cancelled. This cycle has no totals.') }}
         </p>
 
         <p
@@ -38,7 +47,7 @@ defineOptions({
             class="text-sm text-muted-foreground"
             data-test="no-orders"
         >
-            Nobody has ordered yet.
+            {{ trans('Nobody has ordered yet.') }}
         </p>
 
         <section
@@ -50,7 +59,11 @@ defineOptions({
                 {{ trans('Containers to collect') }}
             </h2>
             <p data-test="container-total">
-                {{ trans('Cycle total') }}: {{ containers.total }}
+                {{
+                    trans('Cycle total: :count', {
+                        count: formatQuantity(String(containers.total)),
+                    })
+                }}
             </p>
             <ul class="pilot-list">
                 <li
@@ -62,7 +75,9 @@ defineOptions({
                     <span class="min-w-0 break-words">{{
                         household.householdName
                     }}</span>
-                    <span class="shrink-0">{{ household.count }}</span>
+                    <span class="shrink-0">{{
+                        formatQuantity(String(household.count))
+                    }}</span>
                 </li>
             </ul>
         </section>
@@ -84,7 +99,10 @@ defineOptions({
                 >
                     <div class="flex justify-between gap-2 font-medium">
                         <span>{{ product.name }}</span>
-                        <span>{{ product.quantity }} {{ product.unit }}</span>
+                        <span
+                            >{{ formatQuantity(product.quantity) }}
+                            {{ product.unit }}</span
+                        >
                     </div>
                     <ul class="text-sm text-muted-foreground">
                         <li
@@ -93,7 +111,9 @@ defineOptions({
                             class="flex justify-between gap-2"
                         >
                             <span>{{ household.householdName }}</span>
-                            <span>{{ household.quantity }}</span>
+                            <span>{{
+                                formatQuantity(household.quantity)
+                            }}</span>
                         </li>
                     </ul>
                 </li>

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { trans } from 'laravel-vue-i18n';
 import InputError from '@/components/InputError.vue';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -13,19 +14,21 @@ defineProps<{
     <InputError :message="errors.domain" />
 
     <div class="grid gap-2">
-        <Label for="name">Name</Label>
+        <Label for="name">{{ trans('Name') }}</Label>
         <Input
             id="name"
             name="name"
             :default-value="item?.name"
             required
-            placeholder="Glass jar"
+            :placeholder="trans('Glass jar')"
         />
         <InputError :message="errors.name" />
     </div>
 
     <div class="grid gap-2">
-        <Label for="amount">Amount credited per unit (EUR)</Label>
+        <Label for="amount">{{
+            trans('Amount credited per unit (EUR)')
+        }}</Label>
         <Input
             id="amount"
             name="amount"

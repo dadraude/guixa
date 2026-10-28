@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { trans } from 'laravel-vue-i18n';
 import { Form } from '@inertiajs/vue3';
 import { Eye, EyeOff, LockKeyhole, RefreshCw } from '@lucide/vue';
 import { nextTick, onMounted, ref, useTemplateRef } from 'vue';
@@ -42,11 +43,14 @@ onMounted(async () => {
     <Card class="w-full gap-4 py-4 shadow-none">
         <CardHeader class="px-4">
             <CardTitle class="flex gap-3">
-                <LockKeyhole class="size-4" />2FA recovery codes
+                <LockKeyhole class="size-4" />{{ trans('2FA recovery codes') }}
             </CardTitle>
             <CardDescription>
-                Recovery codes let you regain access if you lose your 2FA
-                device. Store them in a secure password manager.
+                {{
+                    trans(
+                        'Recovery codes let you regain access if you lose your 2FA device. Store them in a secure password manager.',
+                    )
+                }}
             </CardDescription>
         </CardHeader>
         <CardContent class="px-4">
@@ -58,8 +62,11 @@ onMounted(async () => {
                         :is="isRecoveryCodesVisible ? EyeOff : Eye"
                         class="size-4"
                     />
-                    {{ isRecoveryCodesVisible ? 'Hide' : 'View' }} recovery
-                    codes
+                    {{
+                        isRecoveryCodesVisible
+                            ? trans('Hide recovery codes')
+                            : trans('View recovery codes')
+                    }}
                 </Button>
 
                 <Form
@@ -75,7 +82,7 @@ onMounted(async () => {
                         type="submit"
                         :disabled="processing"
                     >
-                        <RefreshCw /> Regenerate codes
+                        <RefreshCw /> {{ trans('Regenerate codes') }}
                     </Button>
                 </Form>
             </div>
@@ -111,10 +118,11 @@ onMounted(async () => {
                         </div>
                     </div>
                     <p class="text-xs text-muted-foreground select-none">
-                        Each recovery code can be used once to access your
-                        account and will be removed after use. If you need more,
-                        click
-                        <span class="font-bold">Regenerate codes</span> above.
+                        {{
+                            trans(
+                                'Each recovery code can be used once to access your account and will be removed after use. If you need more, click Regenerate codes above.',
+                            )
+                        }}
                     </p>
                 </div>
             </div>

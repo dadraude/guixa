@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { trans } from 'laravel-vue-i18n';
 import { Form, Head } from '@inertiajs/vue3';
 import TextLink from '@/components/TextLink.vue';
 import { Button } from '@/components/ui/button';
@@ -20,14 +21,17 @@ defineProps<{
 </script>
 
 <template>
-    <Head title="Email verification" />
+    <Head :title="trans('Email verification')" />
 
     <div
         v-if="status === 'verification-link-sent'"
         class="pilot-status mb-4 text-center text-sm font-medium"
     >
-        A new verification link has been sent to the email address you provided
-        during registration.
+        {{
+            trans(
+                'A new verification link has been sent to the email address you provided during registration.',
+            )
+        }}
     </div>
 
     <Form
@@ -37,11 +41,11 @@ defineProps<{
     >
         <Button :disabled="processing" variant="secondary">
             <Spinner v-if="processing" />
-            Resend verification email
+            {{ trans('Resend verification email') }}
         </Button>
 
         <TextLink :href="logout()" as="button" class="mx-auto block text-sm">
-            Log out
+            {{ trans('Log out') }}
         </TextLink>
     </Form>
 </template>

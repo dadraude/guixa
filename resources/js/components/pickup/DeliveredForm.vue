@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { trans } from 'laravel-vue-i18n';
 import { ref, watch } from 'vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -29,7 +30,7 @@ watch(
         <Input
             v-model="quantity"
             inputmode="decimal"
-            :aria-label="`Delivered ${line.name}`"
+            :aria-label="trans('Delivered :name', { name: line.name })"
             class="w-28"
         />
         <Button
@@ -38,7 +39,7 @@ watch(
             size="sm"
             :disabled="processing"
         >
-            Save
+            {{ trans('Save') }}
         </Button>
     </form>
 </template>

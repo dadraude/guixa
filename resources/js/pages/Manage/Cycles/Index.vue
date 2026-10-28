@@ -13,7 +13,7 @@ import StatusIndicator from '@/components/StatusIndicator.vue';
 
 defineOptions({
     layout: {
-        breadcrumbs: [{ title: 'Cicles', href: CycleController.index() }],
+        breadcrumbs: [{ title: 'Cycles', href: CycleController.index() }],
     },
 });
 const props = defineProps<{
@@ -22,13 +22,13 @@ const props = defineProps<{
     pickupWeekday: number | null;
 }>();
 const weekdays = [
-    'dilluns',
-    'dimarts',
-    'dimecres',
-    'dijous',
-    'divendres',
-    'dissabte',
-    'diumenge',
+    trans('Monday'),
+    trans('Tuesday'),
+    trans('Wednesday'),
+    trans('Thursday'),
+    trans('Friday'),
+    trans('Saturday'),
+    trans('Sunday'),
 ];
 const createOpen = shallowRef(false);
 const manageOpen = shallowRef(false);
@@ -39,8 +39,11 @@ const selectedParticipant = shallowRef<
 const dialogTrigger = shallowRef<HTMLElement | null>(null);
 const pageDescription = computed(() =>
     props.pickupWeekday === null
-        ? 'Organitzem la propera recollida.'
-        : `La recollida habitual és els ${weekdays[props.pickupWeekday - 1]}.`,
+        ? trans("Let's organize the next pickup.")
+        : trans('The usual pickup is on :weekday.', {
+              weekday:
+                  weekdays[props.pickupWeekday - 1].toLocaleLowerCase('ca-ES'),
+          }),
 );
 
 function openCreate(event: MouseEvent) {
@@ -71,28 +74,31 @@ function dateLabel(value: string) {
 }
 function cutoffLabel(value: string | null) {
     return value
-        ? `${dateLabel(value)} a les ${value.slice(11, 16)}`
-        : 'sense tancament programat';
+        ? trans(':date at :time', {
+              date: dateLabel(value),
+              time: value.slice(11, 16),
+          })
+        : trans('without a scheduled cutoff');
 }
 </script>
 
 <template>
-    <Head title="Cicles" />
+    <Head :title="trans('Cycles')" />
     <div class="pilot-page pilot-layout-page pilot-manager-page">
         <div class="flex flex-wrap items-end justify-between gap-4">
-            <Heading title="Cicles" :description="pageDescription" />
+            <Heading :title="trans('Cycles')" :description="pageDescription" />
             <Button
                 class="min-h-11"
                 data-test="open-create-cycle"
                 @click="openCreate"
-                >Obre un cicle</Button
+                >{{ trans('Open a cycle') }}</Button
             >
         </div>
         <p
             v-if="cycles.length === 0"
             class="pilot-layout-notice text-sm text-muted-foreground"
         >
-            Encara no hi ha cicles.
+            {{ trans('No cycles yet.') }}
         </p>
         <ul v-else class="pilot-list space-y-0">
             <li
@@ -106,15 +112,19 @@ function cutoffLabel(value: string | null) {
                 >
                     <div class="flex flex-wrap items-center gap-4">
                         <h2 class="text-lg font-semibold">
-                            Recollida {{ dateLabel(cycle.pickupDate) }}
+                            {{
+                                trans('Pickup :date', {
+                                    date: dateLabel(cycle.pickupDate),
+                                })
+                            }}
                         </h2>
                         <StatusIndicator
                             :label="
                                 cycle.cancelled
-                                    ? 'Cancel·lat'
+                                    ? trans('Cancelled')
                                     : cycle.closed
-                                      ? 'Tancat'
-                                      : 'Obert'
+                                      ? trans('Closed')
+                                      : trans('Open')
                             "
                             :tone="
                                 cycle.cancelled
@@ -135,7 +145,7 @@ function cutoffLabel(value: string | null) {
                             ><Link
                                 :href="CycleController.show(cycle.id)"
                                 :data-test="`summary-${cycle.id}`"
-                                >Comandes</Link
+                                >{{ trans('Orders') }}</Link
                             ></Button
                         >
                         <Button
@@ -164,7 +174,7 @@ function cutoffLabel(value: string | null) {
                     v-if="cycle.participants.length === 0"
                     class="text-sm text-muted-foreground"
                 >
-                    Encara no hi participa cap productor.
+                    {{ trans('No producer takes part in this cycle yet.') }}
                 </p>
                 <ul v-else class="divide-y">
                     <li
@@ -180,7 +190,11 @@ function cutoffLabel(value: string | null) {
                             class="flex flex-wrap items-center gap-2 text-sm text-muted-foreground"
                         >
                             <StatusIndicator
-                                :label="participant.open ? 'Obert' : 'Tancat'"
+                                :label="
+                                    participant.open
+                                        ? trans('Open')
+                                        : trans('Closed')
+                                "
                                 :tone="participant.open ? 'success' : 'neutral'"
                             />
                             {{ cutoffLabel(participant.cutoff) }}
@@ -224,7 +238,7 @@ function cutoffLabel(value: string | null) {
                     <summary
                         class="flex min-h-11 cursor-pointer items-center text-sm font-medium"
                     >
-                        Afegeix un productor
+                        {{ trans('Add a producer') }}
                     </summary>
                     <div class="pilot-action-row mt-2">
                         <Form

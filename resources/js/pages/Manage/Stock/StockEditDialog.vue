@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { trans } from 'laravel-vue-i18n';
 import { Link, router } from '@inertiajs/vue3';
 import { shallowRef, watch } from 'vue';
 import StockMovementController from '@/actions/App/Http/Controllers/Manage/StockMovementController';
@@ -31,8 +32,9 @@ watch(
 function saveAvailable() {
     if (!props.product) return;
     if (!/^\d{1,7}(?:[.,]\d{1,3})?$/.test(available.value.trim())) {
-        error.value =
-            'Introdueix una quantitat vàlida amb un màxim de tres decimals.';
+        error.value = trans(
+            'Enter a valid quantity with at most three decimal places.',
+        );
         return;
     }
     if (available.value.replace(',', '.') === props.product.available) {
@@ -54,7 +56,7 @@ function saveAvailable() {
                 error.value =
                     errors.available ??
                     errors.domain ??
-                    'No s’ha pogut desar el recompte.';
+                    trans('Could not save the count.');
             },
             onSuccess: () => emit('close'),
         },
@@ -71,7 +73,8 @@ function changeStatus() {
             processing.value = false;
         },
         onError: (errors: Record<string, string>) => {
-            error.value = errors.domain ?? 'No s’ha pogut canviar l’estat.';
+            error.value =
+                errors.domain ?? trans('Could not change the status.');
         },
         onSuccess: () => emit('close'),
     };
@@ -93,7 +96,11 @@ function changeStatus() {
 <template>
     <NativeDialog
         :open="open"
-        :title="`Edita ${product?.name ?? 'producte'}`"
+        :title="
+            product
+                ? trans('Edit :name', { name: product.name })
+                : trans('Edit product')
+        "
         title-id="stock-edit-title"
         :return-focus-to="returnFocusTo"
         @close="emit('close')"
@@ -101,13 +108,15 @@ function changeStatus() {
         <template v-if="product">
             <p class="text-sm text-muted-foreground">
                 {{ product.unit }} · {{ formatEuroAmount(product.price) }} ·
-                {{ product.active ? 'Actiu' : 'Inactiu' }}
+                {{ product.active ? trans('Active') : trans('Inactive') }}
             </p>
             <form class="mt-4 space-y-4" @submit.prevent="saveAvailable">
                 <div class="grid gap-2">
-                    <Label for="stock-available"
-                        >Quantitat disponible ({{ product.unit }})</Label
-                    >
+                    <Label for="stock-available">{{
+                        trans('Available quantity (:unit)', {
+                            unit: product.unit,
+                        })
+                    }}</Label>
                     <Input
                         id="stock-available"
                         v-model="available"
@@ -125,7 +134,7 @@ function changeStatus() {
                         class="manager-button manager-button-secondary"
                         @click="emit('close')"
                     >
-                        Cancel·la
+                        {{ trans('Cancel') }}
                     </button>
                     <button
                         type="submit"
@@ -133,7 +142,7 @@ function changeStatus() {
                         :disabled="processing"
                         data-test="save-available"
                     >
-                        Desa la quantitat
+                        {{ trans('Save quantity') }}
                     </button>
                 </div>
             </form>
@@ -141,13 +150,13 @@ function changeStatus() {
                 <summary
                     class="flex min-h-11 cursor-pointer items-center font-medium"
                 >
-                    Estat i historial
+                    {{ trans('Status and history') }}
                 </summary>
                 <div class="mt-2 flex flex-wrap items-center gap-2">
                     <Link
                         :href="StockMovementController.show(product.id)"
                         class="manager-button manager-button-secondary"
-                        >Moviments</Link
+                        >{{ trans('Movements') }}</Link
                     >
                     <button
                         type="button"
@@ -155,7 +164,11 @@ function changeStatus() {
                         :disabled="processing"
                         @click="confirmStatus = true"
                     >
-                        {{ product.active ? 'Desactiva' : 'Reactiva' }}
+                        {{
+                            product.active
+                                ? trans('Deactivate')
+                                : trans('Reactivate')
+                        }}
                     </button>
                 </div>
                 <div
@@ -165,8 +178,10 @@ function changeStatus() {
                     <p class="text-sm">
                         {{
                             product.active
-                                ? 'Vols desactivar aquest producte? Deixarà d’estar disponible per a noves recollides.'
-                                : 'Vols reactivar aquest producte?'
+                                ? trans(
+                                      'Deactivate this product? It will no longer be available for new pickups.',
+                                  )
+                                : trans('Reactivate this product?')
                         }}
                     </p>
                     <div class="mt-3 flex flex-wrap gap-2">
@@ -175,7 +190,7 @@ function changeStatus() {
                             class="manager-button manager-button-secondary"
                             @click="confirmStatus = false"
                         >
-                            Torna
+                            {{ trans('Back') }}
                         </button>
                         <button
                             type="button"
@@ -186,8 +201,8 @@ function changeStatus() {
                         >
                             {{
                                 product.active
-                                    ? 'Confirma la desactivació'
-                                    : 'Confirma la reactivació'
+                                    ? trans('Confirm deactivation')
+                                    : trans('Confirm reactivation')
                             }}
                         </button>
                     </div>

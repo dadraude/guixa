@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { trans } from 'laravel-vue-i18n';
 import type { HTMLAttributes } from "vue"
 
 const props = defineProps<{
@@ -8,7 +9,7 @@ const props = defineProps<{
 
 <template>
   <nav
-    aria-label="breadcrumb"
+    :aria-label="trans('breadcrumb')"
     data-slot="breadcrumb"
     :class="props.class"
   >

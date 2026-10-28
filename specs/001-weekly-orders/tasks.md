@@ -32,15 +32,17 @@ How to work a task:
 | T03 | `Shared`: `Money` (half-up `multiply`), `Quantity` (thousandths, `ceilToWhole`), `Clock` with the cooperative's timezone (`SystemClock` from `COOP_TIMEZONE`, `FrozenClock`), `LocalTime`, `TransactionRunner` (with `afterCommit`) | R22 rounding, Time | T01 |
 | T04 | `Actor` with several roles from the authenticated account, `role:<role>` middleware, domain error → 422 and `NotAllowed` → 403 handler, shared Inertia layout with a switch between role areas | Roles, R36a | T01 |
 | T05 | Test support: in-memory repository base and contract-test pattern shared with Eloquent repositories | Plan · Testing | T03 |
-| T36 | Remaining app-wide translation migration: pages, layouts and components not covered by T37, email subjects/bodies, Laravel framework Catalan messages, remaining domain errors, `ca-ES` formatting and exhaustive translation coverage | Constitution (UI, *Translatable*), Plan · Translations, D18 | T38 |
+| T36 | [DRA-205](https://linear.app/draude/issue/DRA-205/t36-complete-app-wide-translations): remaining app-wide translation migration across pages, layouts, components, mail, framework messages, domain errors, `ca-ES` formatting and exhaustive static-text coverage | Constitution (UI, *Translatable*), Plan · Translations, D18 | T38 |
 | T38 | Shared translation foundation: validate `laravel-vue-i18n` with Inertia 3/Vite+ (D18 fallback if incompatible), shared `lang/ca.json` Vue/Vite loading, Laravel locale defaults and shared locale, `ca-ES` formatters, focused PHP/Vue translation tests | Constitution (UI, *Translatable*), Plan · Translations, D18 | T04 |
 
 **Done when** T01: app boots on Postgres, the starter tests pass, lint and Larastan are clean, and the
 CI workflow is green on the T01 pull request. T02: a deliberate violation in a
 scratch class makes each rule fail, then is removed. T03: unit tests for rounding (e.g. 1.120 × €20.00 = €22.40),
 negative quantity rejected, string ↔ thousandths mapping, and `LocalTime` on both daylight-saving days.
-T36: every existing page, email and error message shows Catalan, each page also checked at 375 px wide; the
-translation test fails on a deliberately untranslated text, which is then removed.
+T36: every applicable static user-facing text, including original Catalan literals, page titles,
+breadcrumbs, placeholders, accessible labels, mail and framework messages, is translatable and displays
+Catalan; each page is also checked at 375 px wide. The translation test fails on deliberately
+untranslated text, which is then removed. Machine identifiers, user data and proper names remain intact.
 
 ## Phase 1 — Membership
 
@@ -399,7 +401,7 @@ T48–T51 together after inspecting the merged T47 pilot.
 
 | ID | Task | Covers | After |
 | --- | --- | --- | --- |
-| T33 | Traceability check: every `R#` and `S#` is named in at least one test (`->group('S14')` or test name); fill the gaps; set feature 001 to *Done* in `specs/README.md` | R1–R36b, S1–S62 | T14, T17, T19, T31, T32, T34, T35, T36, T37, T38, T42 |
+| T33 | Traceability check: every `R#` and `S#` is named in at least one test (`->group('S14')` or test name); fill the gaps; set feature 001 to *Done* in `specs/README.md` | R1–R36b, S1–S64 | T14, T17, T19, T31, T32, T34, T35, T36, T37, T38, T42 |
 
 ## Coverage
 

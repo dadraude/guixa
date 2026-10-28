@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ArrowRight, CalendarDays } from '@lucide/vue';
 import { trans, transChoice } from 'laravel-vue-i18n';
-import { formatPickupDate } from '@/lib/locale';
+import { formatPickupDate, formatQuantity } from '@/lib/locale';
 
 defineProps<{ cycle: App.Http.MemberCycleRow }>();
 </script>
@@ -25,8 +25,13 @@ defineProps<{ cycle: App.Http.MemberCycleRow }>();
                     cycle.lineCount === 0
                         ? trans('No products yet')
                         : transChoice(
-                              '{1} :count product|[2,*] :count products',
+                              '{1} :displayCount product|[2,*] :displayCount products',
                               cycle.lineCount,
+                              {
+                                  displayCount: formatQuantity(
+                                      String(cycle.lineCount),
+                                  ),
+                              },
                           )
                 }}
             </p>

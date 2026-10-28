@@ -45,7 +45,7 @@ describe('return lines', () => {
 
         expect(text).toContain('Glass jar');
         expect(text).toContain('4');
-        expect(text).toContain('2,00 €');
+        expect(text).toContain('2,00\u00a0€');
     });
 
     it('asks to add the chosen item with the typed whole quantity, deactivated items included', async () => {
@@ -132,7 +132,11 @@ describe('return lines', () => {
         const labels = [...document.querySelectorAll('[role="option"]')].map(
             (option) => option.textContent,
         );
-        expect(labels.some((label) => label?.includes('0,50 €'))).toBe(true);
-        expect(labels.some((label) => label?.includes('2,00 €'))).toBe(true);
+        expect(labels.some((label) => label?.includes('0,50\u00a0€'))).toBe(
+            true,
+        );
+        expect(labels.some((label) => label?.includes('2,00\u00a0€'))).toBe(
+            true,
+        );
     });
 });

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
+import { trans } from 'laravel-vue-i18n';
 import { toRef } from 'vue';
 import AppLogoIcon from '@/components/AppLogoIcon.vue';
 import { providePilotTheme } from '@/composables/usePilotTheme';
@@ -37,10 +38,10 @@ providePilotTheme(toRef(props, 'pilotTheme'));
                     </Link>
                     <div class="space-y-2 text-center">
                         <h1 class="pilot-heading text-xl font-medium">
-                            {{ title }}
+                            {{ title ? trans(title) : '' }}
                         </h1>
                         <p class="text-center text-sm text-muted-foreground">
-                            {{ description }}
+                            {{ description ? trans(description) : '' }}
                         </p>
                     </div>
                 </div>

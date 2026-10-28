@@ -1294,3 +1294,17 @@ grid would replace it. T46 therefore permits only documented, measured existing
 file/class exceptions in the static check; all other spacing remains strict. This
 keeps the approved T43 patterns where they improve the current screens without
 regressing the PR #240 baseline. No product behavior or `R#`/`S#` changes.
+
+## 2026-10-28 · Deviation
+
+`plan.md` (Translations, Testing) and `tasks.md` (T36): the user clarified that all
+applicable static user-facing text must be translatable, including existing Catalan
+literals, accessible labels, placeholders, validation, notification mail and
+framework error pages. DRA-205 therefore checks source-level translation calls in
+addition to the displayed Catalan result, and uses whole English source messages
+with placeholders where values interrupt a sentence. Actual Laravel error pages
+use the framework's translated titles and a locale-aware document language.
+Installed Laravel-Lang Catalan framework files are pinned with their upstream
+license. Proper names, user data and machine identifiers remain untranslated.
+The stale T33/Testing scenario bounds are corrected to S1–S64 to match the
+accepted scenarios; this changes no scenario or business behavior.

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { trans } from 'laravel-vue-i18n';
 import { Form, Head } from '@inertiajs/vue3';
 import { computed } from 'vue';
 import AccountDeactivationController from '@/actions/App/Http/Controllers/Manage/AccountDeactivationController';
@@ -33,22 +34,33 @@ const householdOptions = computed(() =>
 
 const isManager = (account: App.Http.AccountRow) =>
     account.roles.includes('manager');
+const roleLabels: Record<string, string> = {
+    member: 'Member',
+    manager: 'Manager',
+    producer: 'Producer',
+};
+const displayRole = (role: string) =>
+    roleLabels[role] ? trans(roleLabels[role]) : role;
 </script>
 
 <template>
-    <Head title="Accounts" />
+    <Head :title="trans('Accounts')" />
 
     <div class="pilot-page pilot-layout-page pilot-manager-page">
         <Heading
-            title="Accounts"
-            description="Grant roles, link members to households and manage account status"
+            :title="trans('Accounts')"
+            :description="
+                trans(
+                    'Grant roles, link members to households and manage account status',
+                )
+            "
         />
 
         <p
             v-if="accounts.length === 0"
             class="pilot-layout-notice text-sm text-muted-foreground"
         >
-            No accounts yet.
+            {{ trans('No accounts yet.') }}
         </p>
 
         <ul v-else class="pilot-list">
@@ -72,11 +84,11 @@ const isManager = (account: App.Http.AccountRow) =>
                             :key="role"
                             variant="outline"
                         >
-                            {{ role }}
+                            {{ displayRole(role) }}
                         </Badge>
                         <StatusIndicator
                             v-if="account.invitationPending"
-                            label="Invitation pending"
+                            :label="trans('Invitation pending')"
                             tone="warning"
                         />
                         <Form
@@ -109,8 +121,10 @@ const isManager = (account: App.Http.AccountRow) =>
                 <p class="text-sm text-muted-foreground">
                     {{
                         account.householdName
-                            ? `Household: ${account.householdName}`
-                            : 'No household'
+                            ? trans('Household: :name', {
+                                  name: account.householdName,
+                              })
+                            : trans('No household')
                     }}
                 </p>
 
@@ -134,7 +148,11 @@ const isManager = (account: App.Http.AccountRow) =>
                                 householdOptions[0]?.value
                             "
                             class="w-full min-w-0"
-                            :aria-label="`Household for ${account.name}`"
+                            :aria-label="
+                                trans('Household for :name', {
+                                    name: account.name,
+                                })
+                            "
                         />
                         <Button
                             type="submit"
@@ -142,7 +160,11 @@ const isManager = (account: App.Http.AccountRow) =>
                             size="sm"
                             :disabled="processing"
                         >
-                            {{ account.householdId ? 'Move' : 'Link' }}
+                            {{
+                                account.householdId
+                                    ? trans('Move')
+                                    : trans('Link')
+                            }}
                         </Button>
                         <InputError
                             v-if="errors.household_id || errors.domain"
@@ -166,7 +188,7 @@ const isManager = (account: App.Http.AccountRow) =>
                             size="sm"
                             :disabled="processing"
                         >
-                            Unlink
+                            {{ trans('Unlink') }}
                         </Button>
                     </Form>
 
@@ -185,7 +207,7 @@ const isManager = (account: App.Http.AccountRow) =>
                             size="sm"
                             :disabled="processing"
                         >
-                            Remove manager role
+                            {{ trans('Remove manager role') }}
                         </Button>
                         <InputError :message="errors.domain" />
                     </Form>
@@ -202,7 +224,7 @@ const isManager = (account: App.Http.AccountRow) =>
                             size="sm"
                             :disabled="processing"
                         >
-                            Make manager
+                            {{ trans('Make manager') }}
                         </Button>
                     </Form>
                 </div>

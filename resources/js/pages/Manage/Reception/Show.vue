@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { formatPickupDate, formatQuantity } from '@/lib/locale';
+import { trans } from 'laravel-vue-i18n';
 import { Form, Head, router, usePage } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 import CycleController from '@/actions/App/Http/Controllers/Manage/CycleController';
@@ -120,12 +122,25 @@ const addProduct = computed(() =>
 </script>
 
 <template>
-    <Head :title="`Reception ${reception.producerName}`" />
+    <Head
+        :title="
+            trans('Reception :producer', { producer: reception.producerName })
+        "
+    />
 
     <div class="pilot-page pilot-layout-page pilot-manager-page">
         <Heading
-            :title="`Reception: ${reception.producerName}`"
-            :description="`Pickup ${reception.pickupDate}. Check what arrived and share it among the households.`"
+            :title="
+                trans('Reception: :producer', {
+                    producer: reception.producerName,
+                })
+            "
+            :description="
+                trans(
+                    'Pickup :date. Check what arrived and share it among the households.',
+                    { date: formatPickupDate(reception.pickupDate) },
+                )
+            "
         />
 
         <InputError :message="domainError" data-test="domain-error" />
@@ -136,14 +151,14 @@ const addProduct = computed(() =>
                 variant="secondary"
                 data-test="distributed"
             >
-                Distributed: this reception is read-only
+                {{ trans('Distributed: this reception is read-only') }}
             </Badge>
             <Badge
                 v-else-if="distribution.validated"
                 variant="secondary"
                 data-test="validated"
             >
-                Validated
+                {{ trans('Validated') }}
             </Badge>
 
             <template v-if="!distribution.distributed">
@@ -159,7 +174,7 @@ const addProduct = computed(() =>
                         variant="outline"
                         :disabled="validating"
                     >
-                        Validate reception
+                        {{ trans('Validate reception') }}
                     </Button>
                 </Form>
                 <Form
@@ -172,7 +187,7 @@ const addProduct = computed(() =>
                         type="submit"
                         :disabled="distributing || !canDistribute"
                     >
-                        Mark as distributed
+                        {{ trans('Mark as distributed') }}
                     </Button>
                 </Form>
                 <p
@@ -180,9 +195,11 @@ const addProduct = computed(() =>
                     class="text-sm text-muted-foreground"
                     data-test="distribute-hint"
                 >
-                    Distribute once the reception is validated and every product
-                    is balanced. Changing a received total clears the
-                    validation.
+                    {{
+                        trans(
+                            'Distribute once the reception is validated and every product is balanced. Changing a received total clears the validation.',
+                        )
+                    }}
                 </p>
             </template>
             <Form
@@ -193,7 +210,7 @@ const addProduct = computed(() =>
                 data-test="reopen-form"
             >
                 <Button type="submit" variant="outline" :disabled="reopening">
-                    Reopen reception
+                    {{ trans('Reopen reception') }}
                 </Button>
             </Form>
         </div>
@@ -203,7 +220,7 @@ const addProduct = computed(() =>
             class="text-sm text-muted-foreground"
             data-test="no-products"
         >
-            Nothing was ordered from this producer.
+            {{ trans('Nothing was ordered from this producer.') }}
         </p>
 
         <section
@@ -219,43 +236,59 @@ const addProduct = computed(() =>
                     variant="secondary"
                     data-test="balanced"
                 >
-                    Balanced
+                    {{ trans('Balanced') }}
                 </Badge>
                 <Badge v-else variant="destructive" data-test="unbalanced">
-                    Unbalanced by {{ product.difference }} {{ product.unit }}
+                    {{
+                        trans('Unbalanced by :quantity :unit', {
+                            quantity: formatQuantity(product.difference),
+                            unit: product.unit,
+                        })
+                    }}
                 </Badge>
                 <Badge
                     v-if="product.hasAdjustments"
                     variant="outline"
                     data-test="adjusted"
                 >
-                    Adjusted at pickup: this blocks nothing
+                    {{ trans('Adjusted at pickup: this blocks nothing') }}
                 </Badge>
             </div>
 
             <dl class="grid grid-cols-2 gap-2 text-sm sm:grid-cols-4">
                 <div>
-                    <dt class="text-muted-foreground">Ordered</dt>
+                    <dt class="text-muted-foreground">
+                        {{ trans('Ordered') }}
+                    </dt>
                     <dd data-test="ordered">
-                        {{ product.ordered }} {{ product.unit }}
+                        {{ formatQuantity(product.ordered) }} {{ product.unit }}
                     </dd>
                 </div>
                 <div>
-                    <dt class="text-muted-foreground">Received</dt>
+                    <dt class="text-muted-foreground">
+                        {{ trans('Received') }}
+                    </dt>
                     <dd data-test="received">
-                        {{ product.received }} {{ product.unit }}
+                        {{ formatQuantity(product.received) }}
+                        {{ product.unit }}
                     </dd>
                 </div>
                 <div>
-                    <dt class="text-muted-foreground">Allocated</dt>
+                    <dt class="text-muted-foreground">
+                        {{ trans('Allocated') }}
+                    </dt>
                     <dd data-test="allocated">
-                        {{ product.allocated }} {{ product.unit }}
+                        {{ formatQuantity(product.allocated) }}
+                        {{ product.unit }}
                     </dd>
                 </div>
                 <div v-if="product.hasAdjustments">
-                    <dt class="text-muted-foreground">Delivered</dt>
+                    <dt class="text-muted-foreground">
+                        {{ trans('Delivered') }}
+                    </dt>
                     <dd data-test="delivered">
-                        {{ product.delivered }} {{ product.unit }}
+                        {{ formatQuantity(product.delivered) }}
+                        {{ product.unit }}
                     </dd>
                 </div>
             </dl>
@@ -278,8 +311,11 @@ const addProduct = computed(() =>
                         class="text-sm"
                         :for="`unordered-received-${product.productId}`"
                     >
-                        Nobody ordered this product, so the received total is
-                        not shared out: allocate it by hand below.
+                        {{
+                            trans(
+                                'Nobody ordered this product, so the received total is not shared out: allocate it by hand below.',
+                            )
+                        }}
                     </label>
                     <Input
                         :id="`unordered-received-${product.productId}`"
@@ -290,7 +326,7 @@ const addProduct = computed(() =>
                     />
                 </div>
                 <Button type="submit" size="sm" :disabled="saving">
-                    Set received total
+                    {{ trans('Set received total') }}
                 </Button>
             </Form>
             <ReceivedTotalForm
@@ -353,7 +389,7 @@ const addProduct = computed(() =>
         >
             <div class="grid gap-1">
                 <label class="text-sm font-medium" for="unordered-product">
-                    Add a product nobody ordered
+                    {{ trans('Add a product nobody ordered') }}
                 </label>
                 <FormSelect
                     id="unordered-product"
@@ -367,11 +403,13 @@ const addProduct = computed(() =>
             <Input
                 name="received"
                 inputmode="decimal"
-                placeholder="Received"
-                aria-label="Received total"
+                :placeholder="trans('Received')"
+                :aria-label="trans('Received total')"
                 class="w-28"
             />
-            <Button type="submit" :disabled="processing">Add product</Button>
+            <Button type="submit" :disabled="processing">{{
+                trans('Add product')
+            }}</Button>
             <InputError :message="errors.product_id" />
         </Form>
     </div>

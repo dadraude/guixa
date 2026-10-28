@@ -31,7 +31,7 @@ describe('wallet statement mobile row labels', () => {
                         id: 'one',
                         type: 'top_up',
                         amount: '50.00',
-                        occurredAt: '2026-10-24',
+                        occurredAt: '2026-10-24 12:00',
                         note: 'Transfer',
                         cycleId: null,
                     },
@@ -45,7 +45,9 @@ describe('wallet statement mobile row labels', () => {
         expect(html).toContain('Tipus');
         expect(html).toContain('Nota');
         expect(html).toContain('Import');
-        expect(html).toContain('-12.50');
-        expect(html).toContain('50.00 EUR');
+        expect(html).toContain('Saldo: -12,50\u00a0€');
+        expect(html).toContain('50,00\u00a0€');
+        expect(html).toContain('12:00');
+        expect(html).not.toContain('2026-10-24 12:00');
     });
 });

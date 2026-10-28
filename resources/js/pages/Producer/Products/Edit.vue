@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { trans } from 'laravel-vue-i18n';
 import { Form, Head } from '@inertiajs/vue3';
 import ProductController from '@/actions/App/Http/Controllers/Producer/ProductController';
 import Heading from '@/components/Heading.vue';
@@ -20,10 +21,10 @@ defineProps<{
 </script>
 
 <template>
-    <Head title="Edit product" />
+    <Head :title="trans('Edit product')" />
 
     <div class="pilot-layout-page pilot-t44-page max-w-3xl">
-        <Heading :title="`Edit ${product.name}`" />
+        <Heading :title="trans('Edit :name', { name: product.name })" />
 
         <Form
             v-bind="ProductController.update.form(product.id)"
@@ -37,7 +38,7 @@ defineProps<{
                 :disabled="processing"
                 data-test="save-product"
             >
-                Save
+                {{ trans('Save') }}
             </Button>
         </Form>
     </div>

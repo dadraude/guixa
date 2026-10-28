@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { formatPickupDate, formatQuantity } from '@/lib/locale';
+import { trans } from 'laravel-vue-i18n';
 import { Form, Head } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 import StockMovementController from '@/actions/App/Http/Controllers/Manage/StockMovementController';
@@ -28,7 +30,9 @@ const selectedAdjustmentCycleId = ref<string | null>(null);
 const cycleOptions = computed(() =>
     props.cycles.map((cycle) => ({
         value: cycle.id,
-        label: `Pickup ${cycle.pickupDate}`,
+        label: trans('Pickup :date', {
+            date: formatPickupDate(cycle.pickupDate),
+        }),
     })),
 );
 const selectedAdjustmentCycleLabel = computed(
@@ -40,12 +44,17 @@ const selectedAdjustmentCycleLabel = computed(
 </script>
 
 <template>
-    <Head title="Stock movements" />
+    <Head :title="trans('Stock movements')" />
 
     <div class="pilot-page pilot-layout-page pilot-manager-page max-w-xl">
         <Heading
             :title="product.name"
-            :description="`${product.available} ${product.unit} available`"
+            :description="
+                trans(':quantity :unit available', {
+                    quantity: formatQuantity(product.available),
+                    unit: product.unit,
+                })
+            "
         />
 
         <Form
@@ -54,11 +63,11 @@ const selectedAdjustmentCycleLabel = computed(
             reset-on-success
             v-slot="{ errors, processing }"
         >
-            <h2 class="text-lg font-medium">Record an entry</h2>
+            <h2 class="text-lg font-medium">{{ trans('Record an entry') }}</h2>
             <InputError :message="errors.domain" />
 
             <div class="grid gap-2">
-                <Label for="entry-quantity">Quantity</Label>
+                <Label for="entry-quantity">{{ trans('Quantity') }}</Label>
                 <Input
                     id="entry-quantity"
                     name="quantity"
@@ -70,11 +79,11 @@ const selectedAdjustmentCycleLabel = computed(
             </div>
 
             <div class="grid gap-2">
-                <Label for="entry-note">Note (optional)</Label>
+                <Label for="entry-note">{{ trans('Note (optional)') }}</Label>
                 <Input
                     id="entry-note"
                     name="note"
-                    placeholder="Bought from X"
+                    :placeholder="trans('Bought from X')"
                 />
                 <InputError :message="errors.note" />
             </div>
@@ -84,7 +93,7 @@ const selectedAdjustmentCycleLabel = computed(
                 :disabled="processing"
                 data-test="record-entry"
             >
-                Record entry
+                {{ trans('Record entry') }}
             </Button>
         </Form>
 
@@ -95,12 +104,14 @@ const selectedAdjustmentCycleLabel = computed(
             @reset="selectedAdjustmentCycleId = null"
             v-slot="{ errors, processing }"
         >
-            <h2 class="text-lg font-medium">Record an adjustment</h2>
+            <h2 class="text-lg font-medium">
+                {{ trans('Record an adjustment') }}
+            </h2>
             <InputError :message="errors.domain" />
 
             <div class="grid gap-2">
                 <Label for="adjustment-quantity">
-                    Quantity (negative to take stock out)
+                    {{ trans('Quantity (negative to take stock out)') }}
                 </Label>
                 <Input
                     id="adjustment-quantity"
@@ -113,24 +124,26 @@ const selectedAdjustmentCycleLabel = computed(
             </div>
 
             <div class="grid gap-2">
-                <Label for="adjustment-note">Note</Label>
+                <Label for="adjustment-note">{{ trans('Note') }}</Label>
                 <Input
                     id="adjustment-note"
                     name="note"
                     required
-                    placeholder="Broken jar, inventory count"
+                    :placeholder="trans('Broken jar, inventory count')"
                 />
                 <InputError :message="errors.note" />
             </div>
 
             <div class="grid min-w-0 grid-cols-1 gap-2">
-                <Label for="adjustment-cycle">Cycle (optional)</Label>
+                <Label for="adjustment-cycle">{{
+                    trans('Cycle (optional)')
+                }}</Label>
                 <FormSelect
                     id="adjustment-cycle"
                     v-model="selectedAdjustmentCycleId"
                     name="cycle_id"
                     :options="cycleOptions"
-                    placeholder="No cycle"
+                    :placeholder="trans('No cycle')"
                     class="w-full"
                 />
                 <output
@@ -149,7 +162,7 @@ const selectedAdjustmentCycleLabel = computed(
                     data-test="clear-adjustment-cycle"
                     @click="selectedAdjustmentCycleId = null"
                 >
-                    No cycle
+                    {{ trans('No cycle') }}
                 </Button>
                 <InputError :message="errors.cycle_id" />
             </div>
@@ -159,7 +172,7 @@ const selectedAdjustmentCycleLabel = computed(
                 :disabled="processing"
                 data-test="record-adjustment"
             >
-                Record adjustment
+                {{ trans('Record adjustment') }}
             </Button>
         </Form>
     </div>

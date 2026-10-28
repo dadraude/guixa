@@ -86,6 +86,20 @@ describe('received total form', () => {
         expect(dialog()?.textContent).toContain('will be lost');
     });
 
+    it('shows a Catalan decimal in the warning while submitting the original decimal value', async () => {
+        const wrapper = form(true);
+        await type(wrapper, '3.125');
+
+        expect(dialog()?.textContent).toContain('3,125');
+        expect((wrapper.find('input').element as HTMLInputElement).value).toBe(
+            '3.125',
+        );
+
+        button('Replace them').click();
+        await nextTick();
+        expect(wrapper.emitted('save')).toEqual([['3.125', true]]);
+    });
+
     it('changes nothing on cancel and shows the stored total again (S31)', async () => {
         const wrapper = form(true);
         await type(wrapper, '14');

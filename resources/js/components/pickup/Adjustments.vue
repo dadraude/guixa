@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { trans } from 'laravel-vue-i18n';
 import { euros } from './euros';
+import { formatQuantity } from '@/lib/locale';
 
 defineProps<{
     lines: App.Http.PickupAdjustmentRow[];
@@ -46,7 +47,8 @@ defineProps<{
                         <span
                             class="pilot-amount"
                             data-test="adjustment-quantity"
-                            >{{ line.quantityDelta }} {{ line.unit }}</span
+                            >{{ formatQuantity(line.quantityDelta) }}
+                            {{ line.unit }}</span
                         >
                         <span
                             class="pilot-amount"

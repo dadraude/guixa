@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { trans } from 'laravel-vue-i18n';
 import { Form } from '@inertiajs/vue3';
 import { useTemplateRef } from 'vue';
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
@@ -29,22 +30,28 @@ const scrollFocusIntoView = (event: FocusEvent): void =>
     <div class="pilot-panel space-y-6 p-4 sm:p-6">
         <Heading
             variant="small"
-            title="Delete account"
-            description="Delete your account and all of its resources"
+            :title="trans('Delete account')"
+            :description="trans('Delete your account and all of its resources')"
         />
         <div
             class="space-y-4 rounded-lg border border-destructive bg-destructive/10 p-4"
         >
             <div class="relative space-y-0.5 text-destructive">
-                <p class="font-medium">Warning</p>
+                <p class="font-medium">{{ trans('Warning') }}</p>
                 <p class="text-sm">
-                    Please proceed with caution, this cannot be undone.
+                    {{
+                        trans(
+                            'Please proceed with caution, this cannot be undone.',
+                        )
+                    }}
                 </p>
             </div>
             <Dialog>
                 <DialogTrigger as-child>
-                    <Button variant="destructive" data-test="delete-user-button"
-                        >Delete account</Button
+                    <Button
+                        variant="destructive"
+                        data-test="delete-user-button"
+                        >{{ trans('Delete account') }}</Button
                     >
                 </DialogTrigger>
                 <DialogContent
@@ -62,28 +69,29 @@ const scrollFocusIntoView = (event: FocusEvent): void =>
                         v-slot="{ errors, processing, reset, clearErrors }"
                     >
                         <DialogHeader class="space-y-3">
-                            <DialogTitle
-                                >Are you sure you want to delete your
-                                account?</DialogTitle
-                            >
+                            <DialogTitle>{{
+                                trans(
+                                    'Are you sure you want to delete your account?',
+                                )
+                            }}</DialogTitle>
                             <DialogDescription>
-                                Once your account is deleted, all of its
-                                resources and data will also be permanently
-                                deleted. Please enter your password to confirm
-                                you would like to permanently delete your
-                                account.
+                                {{
+                                    trans(
+                                        'Once your account is deleted, all of its resources and data will also be permanently deleted. Please enter your password to confirm you would like to permanently delete your account.',
+                                    )
+                                }}
                             </DialogDescription>
                         </DialogHeader>
 
                         <div class="pilot-error grid gap-2">
-                            <Label for="password" class="sr-only"
-                                >Password</Label
-                            >
+                            <Label for="password" class="sr-only">{{
+                                trans('Password')
+                            }}</Label>
                             <PasswordInput
                                 id="password"
                                 name="password"
                                 ref="passwordInput"
-                                placeholder="Password"
+                                :placeholder="trans('Password')"
                             />
                             <InputError :message="errors.password" />
                         </div>
@@ -99,7 +107,7 @@ const scrollFocusIntoView = (event: FocusEvent): void =>
                                         }
                                     "
                                 >
-                                    Cancel
+                                    {{ trans('Cancel') }}
                                 </Button>
                             </DialogClose>
 
@@ -109,7 +117,7 @@ const scrollFocusIntoView = (event: FocusEvent): void =>
                                 :disabled="processing"
                                 data-test="confirm-delete-user-button"
                             >
-                                Delete account
+                                {{ trans('Delete account') }}
                             </Button>
                         </DialogFooter>
                     </Form>

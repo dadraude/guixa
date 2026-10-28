@@ -1,2 +1,3 @@
-export const euros = (cents: number) =>
-    `${(cents / 100).toFixed(2).replace('.', ',')} €`;
+import { formatMoney } from '@/lib/locale';
+
+export const euros = (cents: number) => formatMoney((cents / 100).toFixed(2));

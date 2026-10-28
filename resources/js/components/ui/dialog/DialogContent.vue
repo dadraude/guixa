@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { trans } from 'laravel-vue-i18n';
 import type { DialogContentEmits, DialogContentProps } from "reka-ui"
 import type { HTMLAttributes } from "vue"
 import { X } from "@lucide/vue"
@@ -50,7 +51,7 @@ const pilotTheme = usePilotTheme()
         :class="pilotTheme && 'flex min-h-11 min-w-11 items-center justify-center opacity-100'"
       >
         <X />
-        <span class="sr-only">Close</span>
+        <span class="sr-only">{{ trans('Close') }}</span>
       </DialogClose>
     </DialogContent>
   </DialogPortal>

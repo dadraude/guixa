@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import FormSelect from '@/components/FormSelect.vue';
 import { euros } from './euros';
+import { formatQuantity } from '@/lib/locale';
 
 const props = defineProps<{
     lines: App.Http.PickupReturnLineRow[];
@@ -62,7 +63,8 @@ const submit = () => {
                 <div class="pilot-list-row-body">
                     <span>{{ line.name }}</span>
                     <span class="text-xs text-muted-foreground">
-                        {{ line.quantity }} × {{ euros(line.amountCents) }}
+                        {{ formatQuantity(String(line.quantity)) }} ×
+                        {{ euros(line.amountCents) }}
                     </span>
                 </div>
                 <span class="pilot-amount" data-test="credit"

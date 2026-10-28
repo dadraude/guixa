@@ -6,6 +6,7 @@ import Heading from '@/components/Heading.vue';
 import ActiveSwitch from '@/components/ActiveSwitch.vue';
 import { Button } from '@/components/ui/button';
 import { trans } from 'laravel-vue-i18n';
+import { formatMoney } from '@/lib/locale';
 
 defineOptions({
     layout: {
@@ -21,18 +22,22 @@ defineProps<{
 </script>
 
 <template>
-    <Head title="Return items" />
+    <Head :title="trans('Return items')" />
 
     <div class="pilot-page pilot-layout-page pilot-manager-page">
         <div class="flex flex-wrap items-start justify-between gap-4">
             <Heading
-                title="Return items"
-                description="Containers households bring back and get credited for"
+                :title="trans('Return items')"
+                :description="
+                    trans(
+                        'Containers households bring back and get credited for',
+                    )
+                "
             />
             <Button as-child>
                 <Link :href="ReturnItemController.create()">
                     <Plus aria-hidden="true" />
-                    New return item
+                    {{ trans('New return item') }}
                 </Link>
             </Button>
         </div>
@@ -41,7 +46,7 @@ defineProps<{
             v-if="items.length === 0"
             class="pilot-layout-notice text-sm text-muted-foreground"
         >
-            No return items yet.
+            {{ trans('No return items yet.') }}
         </p>
 
         <div v-else class="pilot-manager-list">
@@ -96,7 +101,7 @@ defineProps<{
                             <span class="pilot-cell-label" aria-hidden="true">{{
                                 trans('Amount')
                             }}</span
-                            >{{ item.amount }} EUR
+                            >{{ formatMoney(item.amount) }}
                         </td>
                         <td class="py-2">
                             <span class="pilot-cell-label" aria-hidden="true">{{

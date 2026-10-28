@@ -15,9 +15,9 @@ import { Button } from '@/components/ui/button';
 const { appearance, updateAppearance } = useAppearance();
 
 const options = [
-    { value: 'light', icon: Sun, label: 'Light' },
-    { value: 'dark', icon: Moon, label: 'Dark' },
-    { value: 'system', icon: Monitor, label: 'System' },
+    { value: 'light', icon: Sun, label: trans('Light') },
+    { value: 'dark', icon: Moon, label: trans('Dark') },
+    { value: 'system', icon: Monitor, label: trans('System') },
 ] as const;
 
 function selectAppearance(value: unknown) {
@@ -56,7 +56,7 @@ function selectAppearance(value: unknown) {
                     class="min-h-11 rounded-lg"
                 >
                     <component :is="option.icon" aria-hidden="true" />
-                    {{ trans(option.label) }}
+                    {{ option.label }}
                 </DropdownMenuRadioItem>
             </DropdownMenuRadioGroup>
         </DropdownMenuContent>

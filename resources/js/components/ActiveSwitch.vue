@@ -21,10 +21,12 @@ function submitChange(event: Event) {
             type="checkbox"
             :checked="active"
             :disabled="processing"
-            :aria-label="`${trans(active ? 'Deactivate' : 'Reactivate')}: ${name}`"
+            :aria-label="`${trans(active ? trans('Deactivate') : trans('Reactivate'))}: ${name}`"
             :data-test="`${active ? 'deactivate' : 'reactivate'}-${id}`"
             @change="submitChange"
         />
-        <span>{{ trans(active ? 'Active' : 'Deactivated') }}</span>
+        <span>{{
+            trans(active ? trans('Active') : trans('Deactivated'))
+        }}</span>
     </label>
 </template>

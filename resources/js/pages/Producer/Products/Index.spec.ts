@@ -28,7 +28,7 @@ describe('producer product mobile row labels', () => {
                     id: 'bread',
                     name: 'Pa de pagès',
                     unit: 'unit',
-                    price: '3.50',
+                    price: '1234.50',
                     variable: false,
                     containersPerUnit: '1',
                     active: true,
@@ -44,7 +44,7 @@ describe('producer product mobile row labels', () => {
         expect(html).toContain('Envasos per unitat');
         expect(html).toContain('Actiu');
         expect(html).toContain('Pa de pagès');
-        expect(html).toContain('3.50 EUR');
+        expect(html).toContain('1.234,50\u00a0€');
         expect(html).toContain('aria-label="Desactiva: Pa de pagès"');
         expect(html).toContain('pilot-table-actions');
         expect(html.match(/<td class="pilot-amount py-2"/g)).toHaveLength(2);

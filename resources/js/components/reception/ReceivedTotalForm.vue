@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { formatQuantity } from '@/lib/locale';
 
 const props = defineProps<{
     product: App.Http.ReceptionProductRow;
@@ -99,7 +100,7 @@ const confirm = () => save(true);
     >
         <div class="grid gap-1">
             <Label :for="`received-${product.productId}`">
-                Received ({{ product.unit }})
+                {{ trans('Received (:unit)', { unit: product.unit }) }}
             </Label>
             <Input
                 :id="`received-${product.productId}`"
@@ -114,7 +115,7 @@ const confirm = () => save(true);
             :disabled="processing"
             :data-test="`save-received-${product.productId}`"
         >
-            Set received total
+            {{ trans('Set received total') }}
         </Button>
     </form>
 
@@ -152,13 +153,20 @@ const confirm = () => save(true);
             </template>
             <template v-else>
                 <DialogHeader class="space-y-3">
-                    <DialogTitle>Replace the manual allocations?</DialogTitle>
+                    <DialogTitle>{{
+                        trans('Replace the manual allocations?')
+                    }}</DialogTitle>
                     <DialogDescription>
-                        The allocations of {{ manualHouseholds }} for
-                        {{ product.name }} were set by hand. Setting the
-                        received total to {{ received }} re-allocates everything
-                        from the ordered quantities and those manual allocations
-                        will be lost.
+                        {{
+                            trans(
+                                'The allocations of :households for :product were set by hand. Setting the received total to :received re-allocates everything from the ordered quantities and those manual allocations will be lost.',
+                                {
+                                    households: manualHouseholds,
+                                    product: product.name,
+                                    received: formatQuantity(received),
+                                },
+                            )
+                        }}
                     </DialogDescription>
                 </DialogHeader>
                 <DialogFooter class="gap-2">
@@ -167,7 +175,7 @@ const confirm = () => save(true);
                             variant="secondary"
                             :data-test="`cancel-overwrite-${product.productId}`"
                         >
-                            Cancel
+                            {{ trans('Cancel') }}
                         </Button>
                     </DialogClose>
                     <Button
@@ -176,7 +184,7 @@ const confirm = () => save(true);
                         :data-test="`confirm-overwrite-${product.productId}`"
                         @click="confirm"
                     >
-                        Replace them
+                        {{ trans('Replace them') }}
                     </Button>
                 </DialogFooter>
             </template>

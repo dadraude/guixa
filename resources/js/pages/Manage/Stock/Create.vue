@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { trans } from 'laravel-vue-i18n';
 import { Form, Head } from '@inertiajs/vue3';
 import StockProductController from '@/actions/App/Http/Controllers/Manage/StockProductController';
 import Heading from '@/components/Heading.vue';
@@ -16,10 +17,10 @@ defineOptions({
 </script>
 
 <template>
-    <Head title="New stock product" />
+    <Head :title="trans('New stock product')" />
 
     <div class="pilot-page pilot-layout-page pilot-manager-page max-w-xl">
-        <Heading title="New stock product" />
+        <Heading :title="trans('New stock product')" />
 
         <Form
             v-bind="StockProductController.store.form()"
@@ -33,7 +34,7 @@ defineOptions({
                 :disabled="processing"
                 data-test="save-stock-product"
             >
-                Create
+                {{ trans('Create') }}
             </Button>
         </Form>
     </div>

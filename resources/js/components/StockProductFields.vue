@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { trans } from 'laravel-vue-i18n';
 import InputError from '@/components/InputError.vue';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -13,31 +14,31 @@ defineProps<{
     <InputError :message="errors.domain" />
 
     <div class="grid gap-2">
-        <Label for="name">Name</Label>
+        <Label for="name">{{ trans('Name') }}</Label>
         <Input
             id="name"
             name="name"
             :default-value="product?.name"
             required
-            placeholder="Honey"
+            :placeholder="trans('Honey')"
         />
         <InputError :message="errors.name" />
     </div>
 
     <div class="grid gap-2">
-        <Label for="unit">Unit</Label>
+        <Label for="unit">{{ trans('Unit') }}</Label>
         <Input
             id="unit"
             name="unit"
             :default-value="product?.unit"
             required
-            placeholder="jar, kg, bottle"
+            :placeholder="trans('jar, kg, bottle')"
         />
         <InputError :message="errors.unit" />
     </div>
 
     <div class="grid gap-2">
-        <Label for="price">Price per unit (EUR)</Label>
+        <Label for="price">{{ trans('Price per unit (EUR)') }}</Label>
         <Input
             id="price"
             name="price"
@@ -58,13 +59,15 @@ defineProps<{
             value="1"
             :checked="product?.variable ?? false"
         />
-        <Label for="variable"
-            >Sold by variable quantity (weight or volume)</Label
-        >
+        <Label for="variable">{{
+            trans('Sold by variable quantity (weight or volume)')
+        }}</Label>
     </div>
 
     <div class="grid gap-2">
-        <Label for="containers_per_unit">Containers per unit (optional)</Label>
+        <Label for="containers_per_unit">{{
+            trans('Containers per unit (optional)')
+        }}</Label>
         <Input
             id="containers_per_unit"
             name="containers_per_unit"

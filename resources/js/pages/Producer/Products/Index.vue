@@ -6,6 +6,7 @@ import Heading from '@/components/Heading.vue';
 import ActiveSwitch from '@/components/ActiveSwitch.vue';
 import { Button } from '@/components/ui/button';
 import { trans } from 'laravel-vue-i18n';
+import { formatMoney, formatQuantity } from '@/lib/locale';
 
 defineOptions({
     layout: {
@@ -19,18 +20,18 @@ defineProps<{
 </script>
 
 <template>
-    <Head title="Products" />
+    <Head :title="trans('Products')" />
 
     <div class="pilot-layout-page pilot-t44-page">
         <div class="flex flex-wrap items-start justify-between gap-4">
             <Heading
-                title="Products"
-                description="What you offer to the cooperative"
+                :title="trans('Products')"
+                :description="trans('What you offer to the cooperative')"
             />
             <Button as-child>
                 <Link :href="ProductController.create()">
                     <Plus aria-hidden="true" />
-                    New product
+                    {{ trans('New product') }}
                 </Link>
             </Button>
         </div>
@@ -39,7 +40,7 @@ defineProps<{
             v-if="products.length === 0"
             class="pilot-layout-notice text-sm text-muted-foreground"
         >
-            No products yet.
+            {{ trans('No products yet.') }}
         </p>
 
         <div v-else class="pilot-product-list">
@@ -99,19 +100,25 @@ defineProps<{
                                 trans('Unit')
                             }}</span>
                             {{ product.unit
-                            }}<span v-if="product.variable"> (variable)</span>
+                            }}<span v-if="product.variable">
+                                {{ trans('(variable)') }}</span
+                            >
                         </td>
                         <td class="pilot-amount py-2">
                             <span class="pilot-cell-label" aria-hidden="true">{{
                                 trans('Price')
                             }}</span
-                            >{{ product.price }} EUR
+                            >{{ formatMoney(product.price) }}
                         </td>
                         <td class="pilot-amount py-2">
                             <span class="pilot-cell-label" aria-hidden="true">{{
                                 trans('Containers per unit')
                             }}</span
-                            >{{ product.containersPerUnit ?? '-' }}
+                            >{{
+                                product.containersPerUnit === null
+                                    ? '-'
+                                    : formatQuantity(product.containersPerUnit)
+                            }}
                         </td>
                         <td class="py-2">
                             <span class="pilot-cell-label" aria-hidden="true">{{

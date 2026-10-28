@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { formatQuantity } from '@/lib/locale';
 
 defineOptions({
     layout: {
@@ -25,12 +26,12 @@ defineProps<{
 </script>
 
 <template>
-    <Head title="Households" />
+    <Head :title="trans('Households')" />
 
     <div class="pilot-page pilot-layout-page pilot-manager-page">
         <Heading
-            title="Households"
-            description="Create households and invite their members"
+            :title="trans('Households')"
+            :description="trans('Create households and invite their members')"
         />
 
         <Form
@@ -40,11 +41,18 @@ defineProps<{
             v-slot="{ errors, processing }"
         >
             <div class="grid gap-2">
-                <Label for="name">New household</Label>
-                <Input id="name" name="name" required placeholder="Name" />
+                <Label for="name">{{ trans('New household') }}</Label>
+                <Input
+                    id="name"
+                    name="name"
+                    required
+                    :placeholder="trans('Name')"
+                />
                 <InputError :message="errors.name || errors.domain" />
             </div>
-            <Button type="submit" :disabled="processing">Create</Button>
+            <Button type="submit" :disabled="processing">{{
+                trans('Create')
+            }}</Button>
         </Form>
 
         <section
@@ -73,7 +81,7 @@ defineProps<{
         </section>
 
         <p v-if="households.length === 0" class="text-sm text-muted-foreground">
-            There are no households yet.
+            {{ trans('There are no households yet.') }}
         </p>
 
         <ul v-else class="pilot-list">
@@ -91,9 +99,17 @@ defineProps<{
                 <span
                     class="flex items-center gap-2 text-sm text-muted-foreground"
                 >
-                    {{ household.memberCount }} members
+                    {{
+                        household.memberCount === 1
+                            ? trans('1 member')
+                            : trans(':count members', {
+                                  count: formatQuantity(
+                                      String(household.memberCount),
+                                  ),
+                              })
+                    }}
                     <Badge v-if="!household.active" variant="secondary">
-                        Inactive
+                        {{ trans('Inactive') }}
                     </Badge>
                 </span>
             </li>

@@ -93,30 +93,30 @@ describe('manager cycles', () => {
     });
 
     it('keeps closed history visible without cycle editing actions', async () => {
-        const html = await renderToString(
-            createSSRApp(Index, {
-                cycles: [
-                    {
-                        id: 'cycle',
-                        pickupDate: '2026-11-07',
-                        cancelled: false,
-                        closed: true,
-                        participants: [
-                            {
-                                producerId: 'baker',
-                                producerName: 'Forn',
-                                participating: true,
-                                cutoff: null,
-                                open: false,
-                            },
-                        ],
-                    },
-                ],
-                producers: [{ id: 'grower', name: 'Hort' }],
-                pickupWeekday: 6,
-            }),
-        );
-        expect(html).toContain('Recollida 07/11/2026');
+        const app = createSSRApp(Index, {
+            cycles: [
+                {
+                    id: 'cycle',
+                    pickupDate: '2026-11-07',
+                    cancelled: false,
+                    closed: true,
+                    participants: [
+                        {
+                            producerId: 'baker',
+                            producerName: 'Forn',
+                            participating: true,
+                            cutoff: null,
+                            open: false,
+                        },
+                    ],
+                },
+            ],
+            producers: [{ id: 'grower', name: 'Hort' }],
+            pickupWeekday: 6,
+        });
+        installTranslations(app);
+        const html = await renderToString(app);
+        expect(html).toContain('Recollida del 07/11/2026');
         expect(html).toContain('Tancat');
         expect(html).toContain('data-test="summary-cycle"');
         expect(html).not.toContain('data-test="manage-cycle"');
@@ -125,32 +125,32 @@ describe('manager cycles', () => {
     });
 
     it('offers per-producer management and a real add-producer form for open cycles', async () => {
-        const html = await renderToString(
-            createSSRApp(Index, {
-                cycles: [
-                    {
-                        id: 'cycle',
-                        pickupDate: '2026-11-07',
-                        cancelled: false,
-                        closed: false,
-                        participants: [
-                            {
-                                producerId: 'baker',
-                                producerName: 'Forn',
-                                participating: true,
-                                cutoff: null,
-                                open: true,
-                            },
-                        ],
-                    },
-                ],
-                producers: [
-                    { id: 'baker', name: 'Forn' },
-                    { id: 'grower', name: 'Hort' },
-                ],
-                pickupWeekday: 6,
-            }),
-        );
+        const app = createSSRApp(Index, {
+            cycles: [
+                {
+                    id: 'cycle',
+                    pickupDate: '2026-11-07',
+                    cancelled: false,
+                    closed: false,
+                    participants: [
+                        {
+                            producerId: 'baker',
+                            producerName: 'Forn',
+                            participating: true,
+                            cutoff: null,
+                            open: true,
+                        },
+                    ],
+                },
+            ],
+            producers: [
+                { id: 'baker', name: 'Forn' },
+                { id: 'grower', name: 'Hort' },
+            ],
+            pickupWeekday: 6,
+        });
+        installTranslations(app);
+        const html = await renderToString(app);
         expect(html).toContain('data-test="manage-cycle-baker"');
         expect(html).toContain('data-test="add-cycle-grower"');
         expect(html).toContain('sense tancament programat');

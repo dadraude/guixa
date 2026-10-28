@@ -19,6 +19,7 @@ import type { LucideIcon } from '@lucide/vue';
 import { trans } from 'laravel-vue-i18n';
 import { computed } from 'vue';
 import { formatEuroAmount } from '@/lib/formatEuroAmount';
+import { formatQuantity } from '@/lib/locale';
 import type { NavItem } from '@/types';
 import OrderController from '@/actions/App/Http/Controllers/OrderController';
 import WalletController from '@/actions/App/Http/Controllers/WalletController';
@@ -75,23 +76,63 @@ const formattedDate = (iso: string) =>
 type QuickLink = { title: string; href: NavItem['href']; icon: LucideIcon };
 
 const memberLinks: QuickLink[] = [
-    { title: 'Orders', href: OrderController.index(), icon: ShoppingBasket },
-    { title: 'Wallet', href: WalletController.show(), icon: Wallet },
+    {
+        title: trans('Orders'),
+        href: OrderController.index(),
+        icon: ShoppingBasket,
+    },
+    { title: trans('Wallet'), href: WalletController.show(), icon: Wallet },
 ];
 
 const producerLinks: QuickLink[] = [
-    { title: 'Products', href: ProductController.index(), icon: Package },
-    { title: 'Default cutoff', href: CutoffController.show(), icon: Timer },
+    {
+        title: trans('Products'),
+        href: ProductController.index(),
+        icon: Package,
+    },
+    {
+        title: trans('Default cutoff'),
+        href: CutoffController.show(),
+        icon: Timer,
+    },
 ];
 
 const managerLinks: QuickLink[] = [
-    { title: 'Cycles', href: CycleController.index(), icon: CalendarDays },
-    { title: 'Households', href: HouseholdController.index(), icon: Home },
-    { title: 'Producers', href: ProducerController.index(), icon: Wheat },
-    { title: 'Stock', href: StockProductController.index(), icon: Package },
-    { title: 'Return items', href: ReturnItemController.index(), icon: Undo2 },
-    { title: 'Accounts', href: AccountController.index(), icon: UserCog },
-    { title: 'Settings', href: SettingsController.show(), icon: Settings },
+    {
+        title: trans('Cycles'),
+        href: CycleController.index(),
+        icon: CalendarDays,
+    },
+    {
+        title: trans('Households'),
+        href: HouseholdController.index(),
+        icon: Home,
+    },
+    {
+        title: trans('Producers'),
+        href: ProducerController.index(),
+        icon: Wheat,
+    },
+    {
+        title: trans('Stock'),
+        href: StockProductController.index(),
+        icon: Package,
+    },
+    {
+        title: trans('Return items'),
+        href: ReturnItemController.index(),
+        icon: Undo2,
+    },
+    {
+        title: trans('Accounts'),
+        href: AccountController.index(),
+        icon: UserCog,
+    },
+    {
+        title: trans('Settings'),
+        href: SettingsController.show(),
+        icon: Settings,
+    },
 ];
 
 const isProducer = computed(() => props.roles.includes('producer'));
@@ -112,7 +153,7 @@ const isProducer = computed(() => props.roles.includes('producer'));
 
         <section
             class="dashboard-summary grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
-            aria-label="summary"
+            :aria-label="trans('summary')"
         >
             <article v-if="isMember" class="pilot-layout-panel">
                 <div class="flex items-center gap-4">
@@ -166,7 +207,7 @@ const isProducer = computed(() => props.roles.includes('producer'));
                             {{ trans('Open') }}
                         </p>
                         <p class="truncate text-lg font-semibold">
-                            {{ openCycles }}
+                            {{ formatQuantity(String(openCycles)) }}
                         </p>
                     </div>
                 </div>
@@ -176,7 +217,7 @@ const isProducer = computed(() => props.roles.includes('producer'));
         <section
             v-if="pendingPickups.length > 0"
             class="pilot-layout-panel"
-            aria-label="pending pickups"
+            :aria-label="trans('pending pickups')"
         >
             <div class="pilot-layout-panel-header">
                 <h2 class="text-lg font-semibold">
@@ -199,7 +240,7 @@ const isProducer = computed(() => props.roles.includes('producer'));
         <section
             v-if="managerSummary"
             class="pilot-layout-panel"
-            aria-label="cooperative summary"
+            :aria-label="trans('cooperative summary')"
         >
             <div class="pilot-layout-panel-header">
                 <h2 class="text-lg font-semibold">
@@ -212,7 +253,7 @@ const isProducer = computed(() => props.roles.includes('producer'));
                         {{ trans('Cycles') }}
                     </p>
                     <p class="text-2xl font-semibold tabular-nums">
-                        {{ managerSummary.cycles }}
+                        {{ formatQuantity(String(managerSummary.cycles)) }}
                     </p>
                 </div>
                 <div>
@@ -220,7 +261,7 @@ const isProducer = computed(() => props.roles.includes('producer'));
                         {{ trans('Households') }}
                     </p>
                     <p class="text-2xl font-semibold tabular-nums">
-                        {{ managerSummary.households }}
+                        {{ formatQuantity(String(managerSummary.households)) }}
                     </p>
                 </div>
                 <div>
@@ -228,7 +269,7 @@ const isProducer = computed(() => props.roles.includes('producer'));
                         {{ trans('Accounts') }}
                     </p>
                     <p class="text-2xl font-semibold tabular-nums">
-                        {{ managerSummary.accounts }}
+                        {{ formatQuantity(String(managerSummary.accounts)) }}
                     </p>
                 </div>
             </div>
@@ -237,7 +278,7 @@ const isProducer = computed(() => props.roles.includes('producer'));
         <section
             v-if="isMember"
             class="pilot-layout-panel"
-            aria-label="member actions"
+            :aria-label="trans('member actions')"
         >
             <div class="pilot-layout-panel-header">
                 <h2 class="text-lg font-semibold">
@@ -256,7 +297,7 @@ const isProducer = computed(() => props.roles.includes('producer'));
                         class="size-4"
                         aria-hidden="true"
                     />
-                    {{ trans(link.title) }}
+                    {{ link.title }}
                 </Link>
             </div>
         </section>
@@ -264,7 +305,7 @@ const isProducer = computed(() => props.roles.includes('producer'));
         <section
             v-if="isProducer"
             class="pilot-layout-panel"
-            aria-label="producer actions"
+            :aria-label="trans('producer actions')"
         >
             <div class="pilot-layout-panel-header">
                 <h2 class="text-lg font-semibold">
@@ -283,7 +324,7 @@ const isProducer = computed(() => props.roles.includes('producer'));
                         class="size-4"
                         aria-hidden="true"
                     />
-                    {{ trans(link.title) }}
+                    {{ link.title }}
                 </Link>
             </div>
         </section>
@@ -291,7 +332,7 @@ const isProducer = computed(() => props.roles.includes('producer'));
         <section
             v-if="isManager"
             class="pilot-layout-panel"
-            aria-label="manager actions"
+            :aria-label="trans('manager actions')"
         >
             <div class="pilot-layout-panel-header">
                 <h2 class="text-lg font-semibold">
@@ -310,7 +351,7 @@ const isProducer = computed(() => props.roles.includes('producer'));
                         class="size-4"
                         aria-hidden="true"
                     />
-                    {{ trans(link.title) }}
+                    {{ link.title }}
                 </Link>
             </div>
         </section>
