@@ -100,8 +100,8 @@ const isProducer = computed(() => props.roles.includes('producer'));
 <template>
     <Head :title="trans('Dashboard')" />
 
-    <div class="pilot-layout-page" style="max-width: 64rem">
-        <header class="flex flex-col gap-1">
+    <div class="pilot-layout-page pilot-t44-page" style="max-width: 64rem">
+        <header class="flex flex-col gap-2">
             <h1 class="pilot-heading text-2xl font-semibold tracking-tight">
                 {{ trans('Dashboard') }}
             </h1>
@@ -115,7 +115,7 @@ const isProducer = computed(() => props.roles.includes('producer'));
             aria-label="summary"
         >
             <article v-if="isMember" class="pilot-layout-panel">
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-4">
                     <span
                         class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-[var(--secondary)] text-[var(--secondary-foreground)]"
                     >
@@ -137,7 +137,7 @@ const isProducer = computed(() => props.roles.includes('producer'));
             </article>
 
             <article v-if="isMember" class="pilot-layout-panel">
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-4">
                     <span
                         class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-[var(--secondary)] text-[var(--secondary-foreground)]"
                     >
@@ -155,7 +155,7 @@ const isProducer = computed(() => props.roles.includes('producer'));
             </article>
 
             <article v-if="isMember" class="pilot-layout-panel">
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-4">
                     <span
                         class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-[var(--secondary)] text-[var(--secondary-foreground)]"
                     >
@@ -179,7 +179,7 @@ const isProducer = computed(() => props.roles.includes('producer'));
             aria-label="pending pickups"
         >
             <div class="pilot-layout-panel-header">
-                <h2 class="text-base font-semibold">
+                <h2 class="text-lg font-semibold">
                     {{ trans('Pending pickups') }}
                 </h2>
             </div>
@@ -202,7 +202,7 @@ const isProducer = computed(() => props.roles.includes('producer'));
             aria-label="cooperative summary"
         >
             <div class="pilot-layout-panel-header">
-                <h2 class="text-base font-semibold">
+                <h2 class="text-lg font-semibold">
                     {{ trans('Cooperative') }}
                 </h2>
             </div>
@@ -240,11 +240,11 @@ const isProducer = computed(() => props.roles.includes('producer'));
             aria-label="member actions"
         >
             <div class="pilot-layout-panel-header">
-                <h2 class="text-base font-semibold">
+                <h2 class="text-lg font-semibold">
                     {{ trans('Orders and wallet') }}
                 </h2>
             </div>
-            <div class="flex flex-wrap gap-3">
+            <div class="pilot-action-row">
                 <Link
                     v-for="link in memberLinks"
                     :key="link.title"
@@ -267,11 +267,11 @@ const isProducer = computed(() => props.roles.includes('producer'));
             aria-label="producer actions"
         >
             <div class="pilot-layout-panel-header">
-                <h2 class="text-base font-semibold">
+                <h2 class="text-lg font-semibold">
                     {{ trans('Production') }}
                 </h2>
             </div>
-            <div class="flex flex-wrap gap-3">
+            <div class="pilot-action-row">
                 <Link
                     v-for="link in producerLinks"
                     :key="link.title"
@@ -294,11 +294,11 @@ const isProducer = computed(() => props.roles.includes('producer'));
             aria-label="manager actions"
         >
             <div class="pilot-layout-panel-header">
-                <h2 class="text-base font-semibold">
+                <h2 class="text-lg font-semibold">
                     {{ trans('Administration') }}
                 </h2>
             </div>
-            <div class="flex flex-wrap gap-3">
+            <div class="pilot-action-row">
                 <Link
                     v-for="link in managerLinks"
                     :key="link.title"

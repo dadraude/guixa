@@ -25,7 +25,7 @@ const typeLabels: Record<string, string> = {
 <template>
     <Head title="Wallet" />
 
-    <div class="pilot-page">
+    <div class="pilot-layout-page pilot-t44-page">
         <Heading
             :title="household ? `${household.name} wallet` : 'Wallet'"
             :description="`Balance: ${wallet.balance} EUR`"
@@ -35,8 +35,8 @@ const typeLabels: Record<string, string> = {
             <div
                 class="pilot-wallet-form-grid grid min-w-0 grid-cols-[minmax(0,1fr)] gap-4"
             >
-                <section class="pilot-panel flex flex-col gap-4 p-5 sm:p-6">
-                    <h2 class="pilot-heading text-xl font-medium">
+                <section class="pilot-layout-panel">
+                    <h2 class="pilot-heading text-lg font-medium">
                         Record a top-up
                     </h2>
                     <Form
@@ -44,7 +44,7 @@ const typeLabels: Record<string, string> = {
                             HouseholdWalletController.topUp.form(household.id)
                         "
                         :reset-on-success="['amount', 'note']"
-                        class="flex flex-col gap-3"
+                        class="pilot-layout-form flex flex-col"
                         v-slot="{ errors, processing }"
                     >
                         <div class="grid gap-2">
@@ -74,8 +74,8 @@ const typeLabels: Record<string, string> = {
                     </Form>
                 </section>
 
-                <section class="pilot-panel flex flex-col gap-4 p-5 sm:p-6">
-                    <h2 class="pilot-heading text-xl font-medium">
+                <section class="pilot-layout-panel">
+                    <h2 class="pilot-heading text-lg font-medium">
                         Record a correction
                     </h2>
                     <Form
@@ -83,7 +83,7 @@ const typeLabels: Record<string, string> = {
                             HouseholdWalletController.correct.form(household.id)
                         "
                         :reset-on-success="['amount', 'note']"
-                        class="flex flex-col gap-3"
+                        class="pilot-layout-form flex flex-col"
                         v-slot="{ errors, processing }"
                     >
                         <div class="grid gap-2">
@@ -118,12 +118,12 @@ const typeLabels: Record<string, string> = {
             </div>
         </div>
 
-        <section class="pilot-panel flex flex-col gap-4 p-5 sm:p-6">
-            <h2 class="pilot-heading text-xl font-medium">Movements</h2>
+        <section class="pilot-layout-panel">
+            <h2 class="pilot-heading text-lg font-medium">Movements</h2>
 
             <p
                 v-if="wallet.movements.length === 0"
-                class="pilot-empty-state text-sm text-muted-foreground"
+                class="pilot-layout-notice text-sm text-muted-foreground"
             >
                 No movements yet.
             </p>
@@ -177,7 +177,7 @@ const typeLabels: Record<string, string> = {
                                     >{{ trans('Note') }}</span
                                 >{{ movement.note }}
                             </td>
-                            <td class="py-2 text-right">
+                            <td class="pilot-amount py-2">
                                 <span
                                     class="pilot-cell-label"
                                     aria-hidden="true"

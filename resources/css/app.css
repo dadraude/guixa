@@ -185,10 +185,61 @@ html[data-font-fallback='true'] .pilot-theme {
     padding: 1.5rem 1rem;
 }
 
+.pilot-theme .pilot-t44-page header:has(> h1.pilot-heading) {
+    margin-bottom: 0;
+}
+
+.pilot-theme .pilot-t44-page h1.pilot-heading {
+    font-size: 1.5rem;
+    line-height: 2rem;
+}
+
+.pilot-theme
+    .pilot-t44-page
+    header[class~='space-y-0.5']:has(> p)
+    > h1.pilot-heading {
+    margin-bottom: 0.5rem;
+}
+
+.pilot-theme .pilot-t44-page :is(button, a, input:not([type='hidden'])) {
+    min-height: 44px;
+}
+
+.pilot-theme .pilot-t44-page input[type='checkbox'] {
+    min-height: 20px;
+    min-width: 20px;
+}
+
+.pilot-theme .pilot-t44-page label[for='variable'] {
+    display: flex;
+    min-height: 44px;
+    align-items: center;
+}
+
+.pilot-theme .pilot-t44-page .pilot-data-table th {
+    padding: 1rem;
+}
+
+@container pilot-products (min-width: 58.001rem) {
+    .pilot-theme .pilot-t44-page .pilot-product-table td {
+        padding: 1rem;
+    }
+}
+
+@container pilot-wallet (min-width: 52.001rem) {
+    .pilot-theme .pilot-t44-page .pilot-wallet-table td {
+        padding: 1rem;
+    }
+}
+
 .pilot-theme .pilot-layout-panel {
     display: flex;
     flex-direction: column;
     gap: 1rem;
+}
+
+.pilot-theme .pilot-t44-page .pilot-layout-form {
+    gap: 1.5rem;
 }
 
 .pilot-theme .pilot-layout-panel,
@@ -1217,6 +1268,54 @@ html[data-font-fallback='true'] .pilot-theme {
         font-size: 0.75rem;
         font-weight: 600;
     }
+}
+
+@container pilot-products (max-width: 58rem) {
+    .pilot-theme .pilot-t44-page .pilot-product-table tbody tr {
+        margin-bottom: 1rem;
+    }
+
+    .pilot-theme .pilot-t44-page .pilot-product-table tbody tr:last-child {
+        margin-bottom: 0;
+    }
+
+    .pilot-theme .pilot-t44-page .pilot-product-table .pilot-cell-label {
+        margin-bottom: 0.5rem;
+    }
+}
+
+@container pilot-wallet (max-width: 52rem) {
+    .pilot-theme .pilot-t44-page .pilot-wallet-table tbody tr {
+        margin-bottom: 1rem;
+    }
+
+    .pilot-theme .pilot-t44-page .pilot-wallet-table tbody tr:last-child {
+        margin-bottom: 0;
+    }
+
+    .pilot-theme .pilot-t44-page .pilot-wallet-table .pilot-cell-label {
+        margin-bottom: 0.5rem;
+    }
+}
+
+.pilot-theme .pilot-t44-page .pilot-product-table th:nth-child(4),
+.pilot-theme .pilot-t44-page .pilot-product-table th:nth-child(5),
+.pilot-theme .pilot-t44-page .pilot-data-table td.pilot-amount {
+    text-align: end;
+}
+
+.pilot-theme .pilot-t44-page .pilot-data-table thead,
+.pilot-theme .pilot-t44-page .pilot-data-table .pilot-cell-label {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+}
+
+.pilot-theme
+    .pilot-t44-page
+    .pilot-data-table
+    td.pilot-amount
+    .pilot-cell-label {
+    text-align: start;
 }
 
 .pilot-theme .pilot-error p {
