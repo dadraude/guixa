@@ -28,6 +28,9 @@ final class InvitationMail extends Mailable
 
     public function localizedExpiry(): string
     {
-        return CarbonImmutable::instance($this->expiresAt)->locale('ca')->isoFormat('D [de] MMMM [de] YYYY, HH:mm');
+        $expiry = CarbonImmutable::instance($this->expiresAt);
+        $expiry->locale('ca');
+
+        return $expiry->isoFormat('D [de] MMMM [de] YYYY, HH:mm');
     }
 }
