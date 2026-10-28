@@ -967,6 +967,15 @@ empty, invalid, disabled, long-content and open-dialog states where applicable; 
 keyboard focus, touch size, no clipping and reduced motion. Keep generated captures outside tracked
 source, except the approved concept preview attached to the proposal.
 
+**Integration reconciliation (2026-10-29):** T47 is integrated and its pilot-continuation
+approval is recorded. Combined T48–T51 implementation is integrated through PR #240;
+T44/#243 and T46/#242 are also integrated and their accepted layout work is retained.
+The [evidence reconciliation](../../docs/visual-checks/2026-10-29-t47-t51-reconciliation.md)
+records verified historical reports and the remaining producer/manager role and authenticated
+Welcome coverage gates. Backlog on those new tickets does not mean the rollout must be rebuilt.
+This annotation updates delivery evidence only; current spec 001 and T52–T63 retain ownership
+of superseding product behavior.
+
 ## Translations
 
 Constitution, UI (*Translatable*). `ca` is the default and fallback locale and the only one shipped.
