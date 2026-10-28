@@ -1,148 +1,148 @@
 # 001 — Weekly orders · Diagrams
 
-Derived from [plan.md](plan.md) and the [areas](spec.md#areas); when they disagree, those documents win.
+Revised (2026-10-28). Derived from [plan.md](plan.md) and the [specification areas](spec.md#areas);
+their written rules take precedence.
 
-## 1. Domains (bounded contexts and ports)
+## 1. Contexts and interfaces
 
 ```mermaid
 flowchart LR
-    subgraph Shared
-        S[Money · Quantity · Clock · LocalTime<br/>Actor · Role · TransactionRunner]
-    end
-    subgraph Membership
-        M[Household · Account · Invitation]
-    end
-    subgraph Catalog
-        C[Producer · CutoffRule · Product]
-    end
-    subgraph Ordering
-        O[CooperativeSettings · Cycle · ProducerOrder<br/>Order · OrderLine · StockLine · ReturnLine<br/>ProductAvailability · ReceivedTotal<br/>ProportionalAllocator · Reception · ContainerCount]
-    end
-    subgraph Stock
-        ST[StockProduct · ReturnItem · StockMovement<br/>SignedQuantity · StockLedger]
-    end
-    subgraph Wallet
-        W[Movement]
-    end
+    M[Membership<br/>Households · Accounts · Finance role]
+    C[Catalog<br/>Producer · Product · stock flag]
+    O[Ordering<br/>Cycles · Weekly orders<br/>Reception · Allocation]
+    SA[Sales<br/>Basket · Validation<br/>Corrections · Collection]
+    ST[Stock<br/>Return items · Stock ledger]
+    W[Wallet<br/>Global household ledger]
 
-    O -- ProductCatalog / ProducerCutoffRules --> C
-    O -- StockCatalog / ReturnItemCatalog / StockSeller --> ST
-    O -- WalletLedger --> W
-    O -- ProducerNotifier / Households --> M
-    C -- ProducerCycles --> O
-    C -- ProducerAccess --> M
-    M -- ProducerDirectory --> C
-    M -- HouseholdBalances --> W
-    M -- HouseholdPickups --> O
-
-    Membership & Catalog & Ordering & Stock & Wallet -.uses.-> Shared
+    O -->|Weekly products and cutoffs| C
+    O -->|Create and synchronize base drafts| SA
+    O -->|Validation and effective quantity summaries| SA
+    SA -->|Weekly source readiness and closure| O
+    SA -->|Stock and return offers; sell and correct| ST
+    SA -->|Charge or credit by basket| W
+    SA -->|Household identity and active state| M
+    ST -->|Product identity and lock| C
+    C -->|Retained product references| O
+    C -->|Retained basket references| SA
+    C -->|Movement history and availability| ST
+    C -->|Producer access| M
+    M -->|Pending collection summaries| SA
+    M -->|Household balance| W
 ```
+
+Each arrow is a caller-owned port with an Infrastructure adapter calling the other context's
+Application interface. Models/DTOs are translated there. All contexts remain in the same application;
+validation and linked stock/Wallet corrections share one local transaction.
 
 ## 2. Model relations
 
 ```mermaid
 erDiagram
-    HOUSEHOLD ||--o{ ACCOUNT : "has members"
-    PRODUCER ||--o| ACCOUNT : "has one producer account"
-    ACCOUNT ||--|{ ACCOUNT_ROLE : "member | manager | producer"
-    ACCOUNT ||--o| INVITATION : "activated by"
-
-    PRODUCER ||--o{ PRODUCT : sells
-    PRODUCER ||--|| CUTOFF_RULE : "default cutoff"
+    HOUSEHOLD |o--o{ ACCOUNT : "current members"
+    ACCOUNT ||--o{ ACCOUNT_ROLE : "manager or finance or producer"
+    PRODUCER |o--o| ACCOUNT : "producer account"
+    PRODUCER ||--o{ PRODUCT : "immutable source"
 
     CYCLE ||--o{ PRODUCER_ORDER : "participating producers"
-    PRODUCER ||--o{ PRODUCER_ORDER : "takes part in"
-    CYCLE ||--o{ PRODUCT_UNAVAILABILITY : marks
-    CYCLE ||--o{ RECEIVED_TOTAL : "per product"
-    PRODUCT ||--o{ RECEIVED_TOTAL : ""
+    PRODUCER ||--o{ PRODUCER_ORDER : "participates"
+    CYCLE ||--o{ ORDER : "weekly demand"
+    HOUSEHOLD ||--o{ ORDER : "one per cycle"
+    ORDER ||--o{ ORDER_LINE : "weekly quantities and retained history"
+    PRODUCT ||--o{ ORDER_LINE : "snapshot source"
+    CYCLE ||--o{ RECEIVED_TOTAL : "weekly reception"
+    PRODUCT ||--o{ RECEIVED_TOTAL : "weekly only"
 
-    CYCLE ||--o{ ORDER : "one per household"
-    HOUSEHOLD ||--o{ ORDER : places
-    ORDER ||--o{ ORDER_LINE : "ordered / allocated / delivered"
-    ORDER ||--o{ STOCK_LINE : "added at pickup"
-    ORDER ||--o{ RETURN_LINE : "added at pickup"
-    PRODUCT ||--o{ ORDER_LINE : "snapshot of"
-    STOCK_PRODUCT ||--o{ STOCK_LINE : "snapshot of"
-    RETURN_ITEM ||--o{ RETURN_LINE : "snapshot of"
+    HOUSEHOLD ||--o{ BASKET : "actual purchases"
+    ORDER |o--o| BASKET : "optional unique weekly source"
+    CYCLE |o--o{ BASKET : "optional attribution, including closed cycles"
+    BASKET ||--o{ BASKET_LINE : "current and retained contents"
+    PRODUCT |o--o{ BASKET_LINE : "weekly or stock source"
+    RETURN_ITEM |o--o{ BASKET_LINE : "return source"
+    ORDER_LINE |o--o{ BASKET_LINE : "weekly source reference"
+    BASKET ||--o{ BASKET_ADJUSTMENT : "immutable corrections"
+    BASKET ||--o{ COLLECTION_EVENT : "collection and justified corrections"
+    PRODUCT ||--o{ STOCK_MOVEMENT : "stock mode only"
+    BASKET |o--o{ STOCK_MOVEMENT : "sale or correction source"
+    HOUSEHOLD ||--o{ WALLET_MOVEMENT : "global balance"
+    BASKET |o--o{ WALLET_MOVEMENT : "charge or correction source"
 
-    STOCK_PRODUCT ||--o{ STOCK_MOVEMENT : "entry | adjustment | sale"
-    ORDER |o--o{ STOCK_MOVEMENT : "sale at pickup"
-    HOUSEHOLD ||--o{ WALLET_MOVEMENT : "top-up | charge | credit | correction"
-    CYCLE |o--o{ WALLET_MOVEMENT : "charge / credit"
-
-    CYCLE {
-        date pickupDate
-        ts cancelledAt
-        ts settledAt
-        ts closedAt
-    }
-    PRODUCER_ORDER {
-        bool participating
-        ts cutoff
-        ts sentAt
-        ts validatedAt
-        ts distributedAt
-    }
-    ORDER {
-        enum pickup "none|pending|completed|notCollected|nothingToCollect"
-        money charged
-    }
-    ORDER_LINE {
-        qty ordered
-        qty allocated
-        bool allocatedByHand
-        qty delivered
-        bool notDelivered
-        bool dropped
-    }
     PRODUCT {
+        uuid producerId
+        bool stock
         string unit
         money price
         bool variable
         qty containersPerUnit
         bool active
     }
+    ORDER_LINE {
+        qty ordered
+        qty allocated
+        bool allocatedByHand
+        ts removedAt
+        ts createdAt
+    }
+    BASKET {
+        uuid householdId
+        uuid sourceOrderId
+        uuid referenceCycleId
+        enum state "draft or validated or cancelled or nothingToCollect"
+        ts validatedAt
+        money validatedTotal
+    }
+    BASKET_LINE {
+        enum kind "weekly or stock or return"
+        qty actual
+        ts removedAt
+    }
+    COLLECTION_EVENT {
+        enum kind "collected or correctedToPending"
+        uuid recordedBy
+        ts recordedAt
+        string reason
+    }
 ```
 
-## 3. User paths
+A source order is required only for the automatic weekly base. A stock-only basket can have neither
+order nor cycle; a supplement can reference its origin cycle without another copy of weekly contents.
+Member is derived from the household link, not stored in ACCOUNT_ROLE. Removed/cancelled source
+records remain for first-use evidence; no separate used-product marker is added.
+
+## 3. Weekly and independent sales
 
 ```mermaid
 flowchart TB
-    subgraph Manager
-        direction TB
-        M0[Set pickup weekday] --> M1[Open cycle + participants]
-        M1 --> M2[Set / clear cutoffs · close producer now]
-        M2 --> M3[Send producer order<br/>→ email to producer]
-        M3 --> M4[Reception: received totals<br/>→ ProportionalAllocator · manual allocations]
-        M4 --> M5[Validate reception]
-        M5 --> M6[Mark producer distributed]
-        M6 -->|last producer| M7[Cycle settled]
-        M7 --> M8[Pickup: adjust delivered · add stock · add returns · top-up]
-        M8 --> M9{Complete or<br/>not collected}
-        M9 -->|charge wallet + sell stock| M10[Cycle closed when every pickup is done]
-        M6 -. reopen .-> M4
-        MA[Admin: households · accounts · invitations · producers · stock · wallet corrections]
-    end
+    O[Members edit weekly demand before cutoff]
+    P[Manager sends producer totals]
+    R[Manager receives, allocates and distributes]
+    D[Sales creates one base draft per household order]
+    S[Finance or Manager creates extra stock basket<br/>any time, with optional origin cycle]
+    E[Finance or Manager checks actual quantities<br/>and adds stock or return lines]
+    V[Validate basket<br/>confirm contents and check stock]
+    A[One local transaction<br/>save validation, stock sale and Wallet charge or credit]
+    F[Insufficient stock or another failure<br/>remain draft with no partial financial effects]
+    CP[Validated, pending physical collection]
+    CC[Finance, Manager or own household member<br/>marks collected; no financial effect]
+    CL[Close weekly cycle when distribution finished<br/>and every base basket validated or empty]
+    WARN[Show pending collection warning<br/>even after pickup day or cycle closure]
+    PAY[Finance or Manager records confirmed receipt<br/>independent credit to household Wallet]
+    WB[Household global Wallet balance]
+    COR[Staff append justified corrections<br/>original records remain unchanged]
 
-    subgraph Member
-        direction TB
-        U0[Accept invitation · set password] --> U1[See my cycles]
-        U1 --> U2[Edit household order<br/>until producer cutoff]
-        U2 --> U3[See order, then pickup once settled]
-        U1 --> U4[Wallet statement]
-    end
-
-    subgraph Producer
-        direction TB
-        P0[Accept invitation] --> P1[Manage own products]
-        P0 --> P2[Set default cutoff]
-        P1 --> P3[Mark product unavailable in a cycle]
-        P3 --> P4[See cycle summary of sent totals]
-    end
-
-    M1 -. opens ordering .-> U2
-    P2 -. default cutoff .-> M1
-    U2 -. lines .-> M3
-    M3 -. sent order .-> P4
-    M8 -. resulting balance .-> U4
+    O --> P --> R --> D --> E
+    S --> E
+    E --> V
+    V -->|success| A --> CP --> CC
+    V -->|failure| F --> E
+    A -->|weekly source only| CL
+    CP --> WARN
+    CL -->|while collection remains pending| WARN
+    A --> WB
+    PAY --> WB
+    A -. later correction .-> COR
+    COR --> WB
 ```
+
+Receipts independently affect the household balance; they are not allocated to a basket and are
+not a prerequisite to validation/collection. Empty-source baskets need no collection;
+zero-price goods and net-zero real-content baskets still follow the confirmed validation rules.

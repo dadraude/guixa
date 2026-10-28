@@ -1308,3 +1308,947 @@ Installed Laravel-Lang Catalan framework files are pinned with their upstream
 license. Proper names, user data and machine identifiers remain untranslated.
 The stale T33/Testing scenario bounds are corrected to S1–S64 to match the
 accepted scenarios; this changes no scenario or business behavior.
+
+
+## 2026-10-28 · Request
+
+> Hem d'ampliar specs de 001: els productes provenen d'un productor. A cada producte cal marcar si és d'stock ja que aquests no entren dins la comanda setmanal sinó que s'afegeixen manualment quan es va a recollir la comanda i el membre decideix agafar-ne.
+
+## 2026-10-28 · Q&A
+
+Q: Qui ha de gestionar les fitxes dels productes d’estoc, ara que també tindran un productor associat?
+
+Options:
+
+- El gestor (Recommended) — Manté la regla actual: el gestor administra la fitxa i n’assigna el productor.
+- El productor — Cada productor administra també les fitxes dels seus productes d’estoc.
+- Tots dos — Tant el gestor com el productor poden administrar aquestes fitxes.
+
+A: El gestor (Recommended)
+
+
+## 2026-10-28 · Q&A
+
+Q: Si un mateix article, com un oli, es ven tant per comanda setmanal com a la recollida, com el representem?
+
+Options:
+
+- Dues fitxes (Recommended) — Cada fitxa té una sola modalitat: producte d’estoc o producte de comanda setmanal.
+- Una fitxa amb dues modalitats — Un mateix producte pot entrar a la comanda setmanal i també vendre’s des de l’estoc.
+- No permetre els dos circuits — Cada article només es pot vendre per un dels dos circuits.
+
+A: Dues fitxes (Recommended)
+
+
+## 2026-10-28 · Q&A
+
+Q: Si es desactiva un productor però encara queden productes seus al local, es poden continuar venent a la recollida?
+
+Options:
+
+- Sí, fins esgotar-los (Recommended) — Es pot vendre l’estoc restant si la fitxa del producte continua activa.
+- No, bloquejar-ne la venda — Desactivar el productor impedeix també afegir els seus productes d’estoc a les recollides.
+
+A: Sí, fins esgotar-los (Recommended)
+
+
+## 2026-10-28 · Q&A
+
+Q: Un cop creada una fitxa, s’ha de poder canviar entre producte d’estoc i producte de comanda setmanal?
+
+Options:
+
+- Només abans d’usar-la (Recommended) — Es pot corregir la modalitat fins que tingui comandes o moviments; després cal crear una altra fitxa.
+- Si no té operacions pendents — Permet canviar-la quan no quedi estoc ni comandes o recollides pendents, conservant-ne l’historial.
+- No, mai — La modalitat és fixa des de la creació; qualsevol canvi requereix una nova fitxa.
+
+A: Només abans d’usar-la (Recommended)
+
+
+## 2026-10-28 · Q&A
+
+Q: Qui pot canviar la marca «d’estoc» d’una fitxa que encara no s’ha utilitzat?
+
+Options:
+
+- Només el gestor (Recommended) — El gestor decideix el circuit; el productor continua administrant les seves fitxes de comanda setmanal.
+- Gestor i productor — El productor també pot canviar el circuit de les seves fitxes abans del primer ús.
+
+A: Només el gestor (Recommended)
+
+
+## 2026-10-28 · Q&A
+
+Q: Si una fitxa té assignat el productor equivocat, quan pot corregir-lo el gestor?
+
+Options:
+
+- Abans del primer ús (Recommended) — Un cop hi ha comandes, línies de recollida o moviments, es conserva la procedència i es crea una altra fitxa.
+- També després d’usar-la — El canvi afecta operacions futures; l’historial ha de conservar el productor original de cada operació.
+- Mai — El productor és fix des de la creació; qualsevol correcció requereix una nova fitxa.
+
+A: Els productes s'haurien d'afegir des del productor, i per tan no es poden canviar de productor. Caldrà crear-ne un de nou i desactivar o eliminar l'anterior.
+
+
+## 2026-10-28 · Q&A
+
+Q: Quan podem eliminar una fitxa de producte?
+
+Options:
+
+- A — Només si mai s’ha utilitzat (recomanada): sense comandes, línies de recollida ni moviments. Si té historial, només es desactiva.
+- B — Mai: sempre es desactiva, encara que s’hagi creat per error.
+- C — Si no té operacions pendents: es pot eliminar conservant les dades de les operacions passades.
+
+A: A
+
+
+## 2026-10-28 · Q&A
+
+Q: Els membres han de poder consultar l’estoc abans d’anar a recollir la comanda?
+
+Options:
+
+- A — No ampliar la consulta (recomanada): l’estoc queda fora del selector setmanal. Els membres veuen a la recollida els productes que el gestor hi ha afegit.
+- B — Sí, catàleg informatiu: poden consultar productes, preus i existències, però no reservar-los ni afegir-los a la comanda.
+
+A: B
+
+
+## 2026-10-28 · Q&A
+
+Q: Al catàleg d’estoc, mostrem també els productes sense existències?
+
+Options:
+
+- A — Sí, indicant «esgotat» (recomanada): es mostren tots els productes d’estoc actius, encara que la quantitat disponible sigui zero.
+- B — Només els disponibles: els productes sense existències s’amaguen fins que tornen a tenir estoc.
+
+A: A
+
+
+## 2026-10-28 · Q&A
+
+Q: El productor pot consultar els seus productes d’estoc, encara que els gestioni el gestor?
+
+Options:
+
+- A — Sí, en mode consulta (recomanada): pot veure les fitxes, els preus i les existències dels seus productes d’estoc, sense modificar-los.
+- B — No: amb el rol de productor només veu els seus productes de comanda setmanal.
+
+A: A
+
+
+## 2026-10-28 · Q&A
+
+Q: Si un producte d’estoc ja té moviments o línies de recollida, se’n pot canviar la unitat o la marca de pes variable? Per exemple, passar de vendre mel per pots a vendre-la per kg.
+
+Options:
+
+- A — No (recomanada): cal crear una fitxa nova, per no barrejar quantitats amb significats diferents.
+- B — Sí, si no queda estoc ni recollides pendents: el canvi afecta les operacions futures i l’historial conserva les dades originals.
+
+A: A
+
+
+## 2026-10-28 · Q&A
+
+L’ampliació de la 001 recollirà aquest acord:
+
+- Cada producte es crea dins la fitxa d’un productor i no pot canviar de productor.
+- Cada fitxa és d’estoc o de comanda setmanal. Un article venut pels dos circuits té dues fitxes.
+- Només el gestor pot canviar-ne la modalitat, abans del primer ús.
+- El productor gestiona els productes setmanals; el gestor, els d’estoc. El productor pot consultar el seu estoc sense modificar-lo.
+- L’estoc s’afegeix manualment a la recollida. Es poden vendre existències d’un productor desactivat si el producte continua actiu.
+- Els membres disposen d’un catàleg informatiu amb preus i existències, inclosos els productes «esgotats», sense reserves.
+- Les fitxes mai utilitzades es poden eliminar; les utilitzades, només desactivar. Després del primer ús, la unitat i la marca de pes variable d’un producte d’estoc queden fixades.
+
+Q: Confirmes aquest acord per actualitzar l’spec?
+
+Options:
+
+- A — Sí, aplica’l a l’spec.
+- B — Cal revisar algun punt.
+
+A: A
+
+## 2026-10-28 · Change
+
+`spec.md` (status, glossary, roles and diagrams notice): products now belong to exactly one producer
+for their lifetime and have an exclusive weekly or stock classification. Members consult the
+informational stock catalogue; producers consult their own stock without administering it.
+Why: the user confirmed the producer, stock and visibility decisions above. The preceding diagrams,
+plan and tasks are explicitly awaiting the amendment's design stage.
+
+## 2026-10-28 · Change
+
+R1–R3c (`ordering.md`), S65–S70: products are created from a producer's record; that producer never
+changes. Only a manager changes an unused product's classification, transferring administration
+to the actor responsible for the new classification. First use includes orders, receptions, pickups
+and stock movements and remains irreversible after removing lines or cancelling a cycle. Only unused
+products may be deleted. Stock is excluded from weekly ordering; producer deactivation does not
+prevent selling remaining active stock.
+Why: the user confirmed the product identity, ownership, first-use and deletion rules. Counting
+reception as use also prevents reclassifying or deleting goods already being distributed.
+
+## 2026-10-28 · Change
+
+R25–R25c (`stock-wallet.md`), S71–S74: managers create stock products from a producer's record and
+administer them. The unit and variable flag are fixed after the first movement or pickup line.
+Producers consult only their own stock; members consult active stock across producers, with current
+prices and quantities, zero stock shown as sold out, and no reservation or weekly ordering.
+Why: the user confirmed manager administration, producer consultation, member visibility and
+protection against changing the meaning of recorded stock quantities.
+
+## 2026-10-28 · Change
+
+R20 (`pickup.md`), S75–S76: stock products chosen by a member are added manually to a pending pickup;
+weekly products cannot be added as stock. Stock sales do not require the producer's participation,
+cutoff or per-cycle availability and remain possible for an inactive producer's active products.
+The existing settled-cycle, stock-availability, price/container snapshot and atomic charge rules remain.
+The previously recorded T28 rule on inactive stock products is made explicit: existing lines survive
+and can be removed, but new lines or increases are refused.
+Why: distinguish the supplying producer from weekly participation without bypassing pickup or stock
+rules, and preserve the already decided deactivation behaviour.
+
+## 2026-10-28 · Change
+
+R14 and R16 (`reception.md`), S77: only weekly products can enter reception or allocation, including
+unrequested goods. Stock goods use entries and pickup stock lines instead.
+Why: once every product belongs to a producer, the old permission to receive any of that producer's
+products would otherwise admit stock into the weekly distribution circuit.
+
+## 2026-10-28 · Change
+
+`specs/README.md` (feature 001 status): records the 2026-10-28 product/producer/stock amendment and
+that the corresponding plan and task revisions are pending.
+Why: the accepted 2026-10-21 plan and tasks do not yet describe the amended behaviour. The user
+approved the spec amendment; this change does not proceed to the plan, tasks or implementation.
+
+Validation scope: documentation only, with no executable behaviour changed. This is the constitution's
+test-first exception for documentation; application tests are deferred to implementation of the new
+acceptance scenarios. Validate global requirement/scenario identifiers and references, local Markdown
+links, append-only history, and whitespace. No application, database or UI checks are claimed here.
+
+
+## 2026-10-28 · Change
+
+R26 (`stock-wallet.md`) and S76 (`pickup.md`): stock entries and adjustments accept only products
+marked as stock; weekly products cannot acquire stock movements or be sold through stock lines.
+R1c also makes clear that the deletion restriction does not forbid the ordinary edits allowed by
+R1 and R25a.
+Why: keep the confirmed exclusive classification consistent across inventory, ordering, reception
+and pickup, and avoid interpreting the used-product deletion rule as a ban on editing prices or names.
+
+
+## 2026-10-28 · Request
+
+> Endavant, amplia el plan.md amb els canvis de l’spec que hem acordat.
+
+The user invoked `grill-me`; continue the technical interview one question at a time with options,
+then amend the plan from the confirmed design. The product behaviour remains as agreed in the spec.
+
+
+## 2026-10-28 · Q&A
+
+Q: On ha de viure la fitxa del producte?
+
+Options:
+
+- A — Un únic model `Product` a `Catalog` (recomanada): concentra productor, dades i marca d’estoc. `Stock` gestiona les existències, els moviments i els retorns. Requereix migrar les fitxes d’estoc actuals preservant-ne els identificadors i l’historial.
+- B — Mantenir els dos models actuals: `Catalog` conserva els productes setmanals i `Stock` els d’estoc, afegint-hi el productor. Redueix la migració inicial, però canviar de modalitat implica traspassar la fitxa entre els dos models.
+
+A: A, com que no tenim res a producció no cal migrar res.
+
+Plan direction: one Catalog product identity and stock flag; Stock owns inventory movements and return
+items. The user states there is no production data, so design the fresh schema without a legacy data
+migration, import, backfill or compatibility layer. This records a plan decision, not execution of any
+database reset.
+
+
+## 2026-10-28 · Q&A
+
+Q: Com recordem que un producte ja s’ha utilitzat? Cal conservar aquest fet encara que després s’esborri una línia o es cancel·li una comanda.
+
+Options:
+
+- A — Una marca permanent al producte (recomanada): s’activa amb el primer ús confirmat i no es reinicia. Permet bloquejar l’eliminació i el canvi de modalitat sense mantenir un historial addicional.
+- B — Un registre d’usos immutable: guarda cada ús i el seu origen. Aporta traçabilitat detallada, però afegeix estructura que l’spec actual no exigeix.
+
+A: potser necessitem una sessió per la part de comanda, continguts i cistella validada + stocl
+
+This response redirects the interview; it does not select a first-use storage design. That technical
+question remains open while the order and pickup section is explored.
+
+## 2026-10-28 · Q&A
+
+Q: Quan dius «una sessió», et refereixes a:
+
+Options:
+
+- A — Una secció de l’app: mostrar la comanda prevista i la cistella final de recollida, amb les quantitats reals i l’estoc afegit.
+- B — Un concepte nou del model: una sessió de compra amb contingut editable i una cistella validada.
+- C — Una sessió de treball separada: aprofundir en comanda, cistella i estoc abans de continuar el pla.
+
+La meva interpretació inicial és A.
+
+A: A+C
+
+The user confirms the application section and a focused design interview before resuming the technical
+plan. Clarify what the proposed validated basket means against existing reception/distribution/pickup
+states; do not silently introduce a new session aggregate or checkout/validation step. The unified
+Catalog product and fresh-schema decisions remain settled.
+
+
+## 2026-10-28 · Q&A
+
+A l’spec actual, «validada» qualifica la recepció del productor.
+
+Q: Què vols dir amb «cistella validada»?
+
+Options:
+
+- A — La cistella assignada després del repartiment (recomanada): mostra què ha arribat per a la família. A la recollida encara s’ajusten quantitats i s’hi afegeix estoc abans de cobrar.
+- B — La recollida completada: inclou quantitats finals, estoc i cobrament; ja és immutable.
+- C — Una validació nova: un pas explícit per confirmar la cistella, separat del repartiment i del cobrament.
+
+A: A, un cop validada es fà el carrec i la unitat pot pagar.
+
+The user selects the allocated basket and proposes charging once it is validated, with payment then
+possible for the household. This may change R19/R22 (currently charged only on pickup completion),
+so resolve the exact charge moment before amending the spec or technical plan. Stock added later,
+quantity corrections and the meaning of household payment remain dependent decisions. Do not infer
+online payments, a new payment provider or replacement of the household wallet from this answer.
+
+
+## 2026-10-28 · Q&A
+
+Entesos: la cistella repartida genera el càrrec abans de la recollida, i la unitat ja pot pagar-lo.
+
+Q: Com cobrem l’estoc que s’hi afegeixi després?
+
+Options:
+
+- A — Càrrec addicional en completar la recollida (recomanada): l’estoc es cobra junt quan el gestor confirma què s’emporta la unitat.
+- B — Càrrec immediat per cada afegit: cada producte afegit ja modifica el moneder, encara que la recollida continuï oberta.
+
+A: Pot ser que un membre no hagi fet comanda però vulgui estoc o que després de validar i omplir la cistella recordi que vol estoc. Per tan necessitem un procés que ens permeti crear una cistella per tal d'afegir continguts de nou.
+
+The user requires basket creation both without a weekly order and after another basket has already
+been validated and filled. Explore successive baskets for a household, retaining the original validated
+basket and charge rather than silently reopening it. R19 already permits a stock-only pickup, but
+R19/R23 currently allow one pickup per household and cycle, so the additional-basket lifecycle needs
+a spec amendment before completing the technical plan. Scope in time/cycle, basket validation,
+stock charging and household payment still need to be made precise. This response proposes the
+process rather than directly selecting one of the previous charging options.
+
+
+## 2026-10-28 · Q&A
+
+Q: Quan s’han de poder crear aquestes cistelles noves?
+
+Options:
+
+- A — Durant les recollides (recomanada): el gestor pot crear-ne per a unitats sense comanda i obrir-ne d’addicionals després de validar una primera cistella.
+- B — En qualsevol moment: també es poden fer compres d’estoc fora de les recollides, encara que no hi hagi cap cicle setmanal en curs.
+
+A: a i b
+
+The user authorizes both pickup-time baskets and stock purchases at any time, without requiring a
+weekly cycle. This explicitly expands the prior out-of-scope item for stock sales outside pickup in
+spec.md and the roadmap. Basket creation permissions, validation, charging, payment, stock checks
+and linkage to weekly orders still require clarification before drafting the amended requirements
+and technical plan. No online checkout, reservation or member editing permission is inferred.
+
+
+## 2026-10-28 · Q&A
+
+Q: Qui pot crear i omplir aquestes cistelles d’estoc?
+
+Options:
+
+- A — Només el gestor (recomanada): el membre indica què vol i el gestor ho afegeix, tant durant una recollida com en una compra independent.
+- B — El gestor i els membres: cada membre també pot preparar una cistella per a la seva unitat. Això ampliaria el catàleg informatiu que havíem acordat; després concretaríem qui la valida.
+
+A: necessitem un rol d'economiques que és qui valida, afegeix stock a la cistella, fa càrrecs, cobra
+
+The user introduces an Econòmiques access role responsible for basket validation, adding stock to
+baskets, charges and collections. This does not itself grant catalogue editing or stock-inventory
+adjustment permissions. Resolve coexistence with Manager/Admin and who may prepare/create a basket;
+do not infer that members may edit a basket, that Finance can edit stock product records, or that
+collections require online payment processing. The earlier Commissions decisions (2026-10-25)
+preserve all commission powers for Admin, so any exclusive Finance permission must be explicit.
+
+
+## 2026-10-28 · Q&A
+
+Q: El gestor també ha de poder validar cistelles, fer càrrecs i registrar cobraments?
+
+Options:
+
+- A — Sí, gestor i Econòmiques (recomanada): Econòmiques assumeix aquestes funcions i el gestor conserva tots els permisos, com preveuen els acords de Comissions.
+- B — Només Econòmiques: un gestor necessita tenir també aquest rol per fer operacions econòmiques.
+
+A: a
+
+Econòmiques adds access to the agreed basket and collection operations; Manager retains all existing
+permissions, consistent with the earlier Admin/Commissions direction. This does not yet decide
+whether household members may prepare draft baskets or how payment is recorded.
+
+
+## 2026-10-28 · Q&A
+
+Q: Reservem la creació i l’edició de cistelles d’estoc a Econòmiques i al gestor?
+
+Options:
+
+- A — Sí (recomanada): el membre consulta el catàleg i indica què vol; Econòmiques o el gestor creen i omplen la cistella.
+- B — Els membres també poden preparar-les: creen esborranys per a la seva unitat; Econòmiques o el gestor els revisen i validen abans de generar el càrrec.
+
+A: A
+
+Stock basket creation and editing are limited to Econòmiques and Manager; members retain the
+informational catalogue and do not create or edit basket drafts. Existing manager access is retained.
+
+
+## 2026-10-28 · Q&A
+
+Q: Com hem de controlar què ha pagat cada unitat?
+
+Options:
+
+- A — Només amb el saldo global del moneder (recomanada): els càrrecs resten saldo i els cobraments l’augmenten. Un pagament pot cobrir diverses cistelles o deixar saldo a favor.
+- B — Saldo global i pagaments per cistella: també registrem a quines cistelles s’aplica cada pagament i quines estan pagades, parcialment pagades o pendents.
+
+A: A
+
+The household wallet remains the global balance: basket validation creates a debit and recording
+money received creates a credit. Payments are not allocated to individual baskets and there is no
+per-basket paid/partially-paid/unpaid status. One receipt may cover multiple charges or leave credit.
+Payment channels and who records receipts remain separate details; no online processing is inferred.
+
+
+## 2026-10-28 · Q&A
+
+Q: Quan s’ha acabat el repartiment, com es crea la cistella de cada unitat que ha fet comanda?
+
+Options:
+
+- A — Automàticament com a esborrany (recomanada): conté les quantitats assignades. Econòmiques o el gestor la revisen i la validen; aleshores es genera el càrrec.
+- B — Manualment des de la comanda: Econòmiques o el gestor creen la cistella quan la volen preparar, carregant-hi les quantitats assignades. El càrrec també es genera en validar-la.
+
+A: A
+
+After distribution, each household with a weekly order receives an automatically generated draft
+basket containing its allocated quantities. Finance or Manager reviews and explicitly validates it;
+creation alone does not generate a wallet charge. Stock-only/additional baskets remain created by
+Finance or Manager under the earlier decisions.
+
+
+## 2026-10-28 · Q&A
+
+Q: En validar una cistella amb estoc, descomptem també les existències?
+
+Options:
+
+- A — Sí, càrrec i sortida d’estoc alhora (recomanada): es comprova que n’hi hagi prou i es confirmen les dues operacions juntes. Si falta estoc, no es valida ni es cobra.
+- B — En entregar-la físicament: la validació genera el càrrec, però cal reservar els productes fins que la unitat se’ls emporti.
+
+A: A
+
+Basket validation checks available stock and atomically records the wallet charge and stock sale.
+If stock is insufficient, neither movement nor validation is committed. Physical handover does not
+sell the stock or charge the basket again. This is a stock sale at validation, not a stock reservation.
+
+
+## 2026-10-28 · Q&A
+
+Q: Com es confirma que una unitat ha pagat?
+
+Options:
+
+- A — Registre manual del cobrament (recomanada): Econòmiques o el gestor comproven que han rebut els diners —en efectiu o per transferència— i registren l’entrada al moneder.
+- B — Pagament integrat a l’app: la unitat paga des de l’aplicació i el moneder s’actualitza quan el servei de pagament confirma el cobrament.
+
+A: A
+
+Receipts are recorded manually by Finance or Manager after confirming money was received, including
+cash or bank transfer, as a credit to the household wallet. There is no in-app payment gateway or
+automatic payment-provider integration in this amendment. The household global balance remains the
+payment accounting model; a receipt is not assigned to individual baskets.
+
+
+## 2026-10-28 · Q&A
+
+Q: Econòmiques també ha de poder corregir errors en càrrecs, cobraments o estoc d’una cistella validada?
+
+Options:
+
+- A — Sí, amb moviments correctors i un motiu obligatori (recomanada): es conserva l’original i es registra la correcció del moneder o de l’estoc que correspongui.
+- B — Només el gestor: Econòmiques valida i cobra, però les correccions posteriors les fa el gestor.
+
+A: A
+
+Finance, as well as Manager, may correct basket charges, receipts and stock associated with a validated
+basket through new correcting movements with a mandatory reason. Original basket, wallet and stock
+records remain unchanged. This concerns corrections to the agreed basket/receipt operations, not a
+new grant to edit product catalogue records or perform unrelated inventory administration.
+
+
+## 2026-10-28 · Q&A
+
+Q: Hem de registrar també si una cistella validada ja s’ha entregat físicament?
+
+Options:
+
+- A — Sí (recomanada): queda «validada, pendent de recollir» fins que Econòmiques o el gestor marquen l’entrega. El càrrec ja està fet i no es repeteix.
+- B — No: la validació dona la cistella per finalitzada; l’app no controla si s’ha recollit.
+
+A: A i el propi membre la pot marcar com a recollida també.
+
+Validated baskets remain pending physical collection until marked collected. Finance and Manager
+may mark collection, and a member may also mark validated baskets of their own household collected.
+Record the actor and collection time. This action records handover only: it never charges the wallet,
+sells stock again or records a payment. Member access does not include creating or editing baskets,
+validating them, recording receipts or acting on another household's baskets.
+
+
+## 2026-10-28 · Q&A
+
+Q: Si Econòmiques o el gestor donen per «no recollida» una cistella validada, què fem amb l’estoc que ja s’havia cobrat?
+
+Options:
+
+- A — Mantenir la venda i el càrrec (recomanada): es registra que no s’ha recollit. Si cal retornar productes o diners, es fan moviments correctors amb motiu.
+- B — Retornar l’estoc i abonar-ne l’import automàticament: es registren els moviments inversos. Els productes de comanda setmanal continuen cobrats.
+
+A: A, ho fem perquè potser recullen la cistella un altre dia. No és que ho hagin abandonat.
+
+The user retains the sale and charge but clarifies that delayed collection is not abandonment.
+A validated basket remains pending collection after the planned pickup date and can be collected
+on a later day. Merely missing the date must not mark it terminally not collected, cancel its contents,
+return stock or credit the wallet. Corrections remain explicit with a reason. Do not interpret the
+letter A without the user's clarification as approval of an abandonment/terminal-state policy.
+
+
+## 2026-10-28 · Q&A
+
+Q: Podem tancar el cicle setmanal quan el repartiment està acabat i totes les cistelles de comanda estan validades, encara que quedin recollides pendents?
+
+Options:
+
+- A — Sí (recomanada): el cicle queda tancat i les recollides continuen gestionant-se després, sense alterar-ne el contingut ni repetir càrrecs.
+- B — Esperar les recollides: el cicle continua obert fins que totes les cistelles s’han recollit. Mentrestant es poden obrir cicles nous.
+
+A: A, però cal un avís visual de que hi ha comandes pendents de recollir.
+
+A weekly cycle may close once distribution is finished and all weekly-order baskets are validated,
+without waiting for physical collection. Pending collection remains actionable after cycle closure,
+with no repeat charge or stock sale. A persistent visual indication must expose outstanding
+collections even for closed cycles. Basket contents/financial history stay protected as agreed;
+recording a later handover does not reopen the weekly cycle. Map the indication to authorized views
+in the plan; the user requested a visual indication, not new notifications or reminders.
+
+
+## 2026-10-28 · Q&A
+
+Q: Econòmiques també pot ajustar les quantitats reals dels productes setmanals abans de validar la cistella? Per exemple, passar d’1 kg demanat a 1,120 kg entregat.
+
+Options:
+
+- A — Sí (recomanada): es conserva la quantitat demanada i el càrrec es calcula amb la quantitat real.
+- B — Només el gestor pot ajustar-les: Econòmiques afegeix estoc i valida la cistella amb les quantitats que ja s’han assignat.
+
+A: A
+
+Finance, as well as Manager, may adjust actual weekly-product quantities in a draft basket before
+validation. Original ordered quantities are retained, and the charge uses actual quantities with the
+applicable product snapshot. Validated baskets remain protected; later mistakes use the correcting
+movements already agreed, rather than rewriting the original basket or charge.
+
+
+## 2026-10-28 · Q&A
+
+Q: Com guardem que un producte ja s’ha utilitzat, per impedir eliminar-lo o canviar-lo entre estoc i comanda setmanal?
+
+Options:
+
+- A — Una marca permanent al producte (recomanada): s’activa amb el primer ús en una comanda, recepció, cistella o moviment d’estoc. Es conserva encara que després s’eliminin les línies.
+- B — Un historial immutable d’usos: guarda cada ús i el seu origen. Aporta més detall, però afegeix estructura que el funcionament acordat no necessita.
+
+A: ja tenim les comandes i cistelles on queda reflectit.
+
+The user proposes deriving product use from existing business records instead of adding redundant
+product state or a separate usage ledger. The current implementation removes order lines and deletes
+orders on cancellation (plan D14), so those references are not currently sufficient for the agreed
+irreversible first-use rule. Clarify retention of removed/cancelled document lines; do not silently
+weaken the rule to currently active references or claim existing destructive storage retains history.
+
+
+## 2026-10-28 · Q&A
+
+Q: Conservem també les línies retirades i les comandes o cistelles cancel·lades com a historial?
+
+Options:
+
+- A — Sí (recomanada): deixen de comptar en el contingut vigent, però mantenen les referències als productes. Així deduïm el primer ús dels mateixos documents, sense una marca addicional.
+- B — Mantenim l’esborrat físic dels esborranys: aleshores necessitem una marca permanent al producte per recordar que s’havia utilitzat.
+
+A: A
+
+Retain removed lines and cancelled orders/baskets as history, excluded from current contents and
+operational totals but preserving product references. Derive first-use evidence from these business
+records, receptions and immutable stock movements. Do not add a redundant product usage flag or a
+separate usage ledger. This supersedes destructive cancellation/removal in the prior plan, including
+D14, while retaining the spec's irreversible first-use rule and cancelled-cycle visible behaviour.
+
+
+## 2026-10-28 · Q&A
+
+Q: On situem el model de cistella?
+
+Options:
+
+- A — Dins d’`Ordering`, separat de la comanda (recomanada): `Order` conserva la comanda setmanal i `Basket` gestiona el contingut real, la validació i la recollida. Les cistelles d’estoc poden existir sense cicle. Reaprofitem les connexions actuals amb estoc i moneder.
+- B — En un context nou, `Sales`: concentra totes les cistelles i vendes, mentre `Ordering` conserva comandes i repartiment. Separa més les responsabilitats, però requereix noves connexions entre contextos.
+
+A: Quina seria la separació més SOLID que aporta un bon manteniment a futur? Quina creus que seria la millor estrcturació comparat amb e-comerce o eines similars?
+
+The user requests a reasoned architecture recommendation before selecting the option. The previous
+A recommendation prioritized reuse and a smaller initial refactor; compare against long-term
+cohesion and independent basket/sales lifecycle. No architecture choice is accepted by this response.
+Research primary references: commercetools Carts and Orders overview distinguishes mutable carts,
+confirmed transaction records and post-purchase processes; Microsoft tactical DDD recommends small
+aggregates for independent lifecycles; Fowler Bounded Context describes explicit context models and
+relationships. Apply these as analogies, not requirements to copy a generic commerce platform or
+introduce distributed transactions/microservices.
+
+
+## 2026-10-28 · Q&A
+
+Q: Quina opció fixem al pla?
+
+Options:
+
+- A — `Basket` dins d’`Ordering`.
+- B — `Sales` separat (recomanada).
+
+A: B
+
+Create a Sales bounded context for baskets, draft contents, actual quantities, validation, corrections
+and collection tracking. Ordering retains weekly demand, cycles, cutoffs, producer orders, reception
+and distribution. Catalog owns the single product model, Stock its inventory ledger and return items,
+Wallet the household global balance and movements, Membership accounts/households/permissions.
+Keep a modular monolith with a shared local transaction for basket validation, stock sale and wallet
+charge. Connect contexts through narrow ports and Application adapters; do not share mutable domain
+entities. This long-term cohesion choice supersedes the earlier proposal to keep Basket in Ordering.
+
+
+## 2026-10-28 · Q&A
+
+Q: Per donar accés a Econòmiques, afegim un rol específic o implantem ara el model de comissions?
+
+Options:
+
+- A — Rol específic d’Econòmiques (recomanada): el gestor l’assigna i el retira. Centralitzem les comprovacions de permisos perquè més endavant puguin dependre de comissions.
+- B — Comissions configurables ara: implementem la creació de comissions, els seus membres i permisos per àrea. Econòmiques seria una d’aquestes comissions.
+
+Recomano A per completar el flux acordat mantenint el model de comissions com una ampliació posterior.
+
+A: A
+
+Implement an explicit Finance role for this amendment, granted and revoked by Manager. Centralize
+access checks so a later Commissions implementation can supply the same permissions. Do not add
+configurable commission management now. Manager retains all Finance capabilities. Prepare the
+consolidated specification and technical-plan proposal for confirmation before applying the new flow.
+
+
+## 2026-10-28 · Q&A
+
+Hi ha un detall a concretar per conservar el recompte d’envasos per cicle.
+
+Q: Les cistelles addicionals d’estoc creades durant una recollida han de quedar vinculades al cicle?
+
+Options:
+
+- A — Sí, com a referència (recomanada): permet agrupar-les i comptar-ne els envasos. El vincle no reobre ni bloqueja el cicle. Les compres independents poden quedar sense cicle.
+- B — Sempre independents: el recompte del cicle només inclou la cistella setmanal; les cistelles d’estoc es compten per separat.
+
+A: Suposem que un membre va a recollir la comanda l'endemà del dia de recollida i agafa stock. Avisa als responsables perquè li carreguin aquell stock. Què hauríem de fer en aquest cas?
+
+The user asks to test the association policy with a late-collection example, rather than selecting
+an option yet. Proposed handling: retain the original validated weekly basket and charge; Finance
+or Manager creates a separate stock basket for the household from the reported items, may link it
+to the original cycle even when closed, validates it with one stock sale and wallet charge, and
+records collection because the goods have already been taken. Ledger movements retain their own
+recording date/time and actor; the cycle link is attribution, not backdating or a cycle reopen.
+Do not infer member basket editing, automatic notice delivery or a new messaging feature.
+
+
+## 2026-10-28 · Q&A
+
+Proposed late-collection flow: keep the original weekly basket and charge; Finance records reported
+stock in a new basket, validates it with a stock sale and additional wallet charge, and marks it
+collected because the goods were already handed over. Retain each movement's own recording date.
+
+Q: Ho fixem així?
+
+Options:
+
+- A — Sí, amb referència al cicle original quan provingui d’aquella recollida (recomanada).
+- B — La compra d’estoc sempre queda sense cicle.
+
+A: A
+
+A supplementary stock basket originating from a weekly collection may reference the original cycle,
+even when recorded after the pickup day or after cycle closure. This is attribution for grouping and
+container counts, not a prerequisite to stock sales, backdating or reopening the cycle. Independent
+stock baskets may have no cycle. Weekly order contents and prior basket charges remain immutable.
+
+
+## 2026-10-28 · Q&A
+
+The review package contained the full technical plan, the specification amendment and the context,
+model and workflow diagrams. Its summary covered the separate Sales context, automatic weekly drafts,
+Finance validation with atomic charge/stock sale, manual global-Wallet receipts, independent collection,
+closed-cycle pending warnings, optional origin-cycle links, retained history and a fresh schema.
+
+Q: Confirmes la proposta per aplicar-la a l’spec i al `plan.md`?
+
+Options:
+
+- A — Sí, aplica-la.
+- B — Cal revisar algun punt.
+
+A: A
+
+## 2026-10-28 · Change
+
+`spec.md` (status, glossary, time, roles, areas and scope): add Basket, validated basket, Finance and
+separate physical collection. Stock sales outside weekly pickups are included. Spec and plan are
+accepted for the amendment; task updates remain pending.
+Why: the user confirmed the reviewed basket/Finance proposal after the recorded interview.
+
+## 2026-10-28 · Change
+
+R4b/R9 and S9/S37/S68 (`ordering.md`): cancellation and line removal retain history but clear current
+contents/totals. Cycle-independent stock purchases survive weekly cancellation. Overlapping-cycle
+charges originate from the selected basket, and collection has no financial effect.
+Why: derive irreversible product use from existing source records and separate demand from Sales.
+
+## 2026-10-28 · Change
+
+R18/R18a and S27/S30/S40/S60/S63/S64/S77 (`reception.md`): settlement creates Sales drafts;
+redistribution distinguishes unvalidated drafts from financially frozen validated baskets, not
+physical collection. Keep the explicit choice and append-only signed adjustments before closure.
+Container counts include attributed late stock supplements; stock stays outside weekly reception.
+Why: preserve the accepted allocation algorithms while moving actual sales and collection to Sales.
+
+## 2026-10-28 · Change
+
+R19–R24b (`pickup.md`) now define baskets, validation and collection. Keep global scenario identifiers,
+reconcile the earlier charge-on-completion examples, and add S78–S90 from the confirmed proposal.
+Finance/Manager operate drafts, validate once with atomic charge/stock sale, record manual receipts and
+reasoned corrections. Members can mark their own validated baskets collected. Late collection stays
+pending; weekly closure depends on base validation and retains pending indicators. Additional baskets
+can be cycleless or reference their origin cycle without reopening it.
+Why: the user expanded the flow to successive stock baskets, purchases outside pickup, Finance access,
+separate validation/receipt/collection and persistent warnings after closure.
+
+## 2026-10-28 · Change
+
+R25a/R25c/R28–R32/R35–R36c and S24/S58/S72 (`stock-wallet.md`): product-use references are basket lines;
+stock is sold at validation; Finance/Manager record confirmed global receipts and append corrections.
+Manager grants/revokes Finance. Keep existing basket drafts and pending collections after household
+deactivation, and include both in to-settle obligations; new stock baskets still require active households.
+Why: reflect the confirmed Finance role without granting unrelated catalogue/inventory/account powers
+or losing existing obligations during the change from a single pickup to multiple baskets.
+
+## 2026-10-28 · Change
+
+`plan.md`: apply the reviewed single Catalog Product model and separate Sales context, internal ports,
+Finance capabilities, retained-reference history, fresh schema, basket-level stock/Wallet uniqueness,
+local transaction/locking protocol, source synchronization, independent collection, cycle attribution,
+route/DTO/component reuse and verification plan. Update D7/D12/D14/D16 and add D19–D25. Preserve the
+unaffected accepted presentation baseline. Source-cycle mutation locks remain compatible with FK
+key-share references; verify attributed sales versus weekly validation to avoid inverted lock ordering.
+Why: the user selected future maintenance through separate Sales, declined redundant usage state and
+legacy-data migration, and confirmed the complete technical proposal.
+
+## 2026-10-28 · Change
+
+`diagrams.md`: replace the old parallel product/pickup model with Catalog Product, weekly Ordering,
+Sales baskets, validation, independent receipts/collection and retained history. `specs/README.md`
+records the accepted spec/plan amendment and pending task updates; remove outside-pickup stock sales
+from the future roadmap because it is now included in 001.
+Why: keep the context map, workflow and feature index consistent with the accepted documents.
+
+Validation scope: documentation only. The constitution's documentation exception applies to TDD;
+no application behaviour, database or UI is changed or exercised here. Check R#/S# uniqueness and
+references, Given/When/Then coverage, local links, Markdown structure, append-only log, unchanged
+unrelated presentation/task files, whitespace and main-checkout cleanliness. Application, concurrency,
+HTTP, architecture and rendered-UI checks described by the plan belong to its implementation.
+
+
+## 2026-10-28 · Change
+
+Consistency review: R1b/R4 (`ordering.md`) and S72 (`stock-wallet.md`) now explicitly reference
+basket use, including removed/cancelled drafts, and validation-based charges rather than physical
+pickup charges. `plan.md` Membership keeps weekly orders in Ordering and baskets/collection in
+Sales, and its deactivation warning includes unresolved drafts as well as balance/pending collection.
+Why: remove four stale single-pickup references found in the independent bounded review; these are
+transcription fixes to the already confirmed flow, not additional product decisions.
+
+
+## 2026-10-28 · Change
+
+`diagrams.md` (account cardinalities): the household and producer links of an account are optional,
+matching Finance-only accounts, derived membership and producer records awaiting an account.
+Why: the new Finance scenario explicitly permits login without a household; the ER diagram must not
+imply every account has a household or producer while the spec/plan make both links optional.
+
+
+## 2026-10-28 · Request
+
+d'acord, busca l'skill primer en el projecte i apliquem el què calgui
+
+## 2026-10-28 · Request
+
+potser hauríem de tenir més d'un fitxer de tasques?
+
+## 2026-10-28 · Change
+
+`tasks.md`: draft T52–T63 from the accepted products/Sales/Finance amendment, retain T01–T51 IDs
+and amend local T33 to semantic coverage of all 65 requirements and 90 scenarios. Keep this file the
+canonical registry for workflow lookup; prerequisites describe behavior dependencies, not edit contention.
+Why: the accepted plan needs independently verifiable deliveries and an unambiguous closure gate.
+
+## 2026-10-28 · Change
+
+`tasks/baseline.md`: move the original T01–T51 scopes, dates, approvals and evidence into an explicitly
+historical snapshot, rebase its relative links and add task anchors. Current amended rules take
+precedence over its obsolete deletion/charge-on-collection instructions; original evidence is not rerun.
+Why: preserve provenance without mixing superseded behavior into executable task instructions.
+
+## 2026-10-28 · Change
+
+`tasks/catalog.md`: detail T52–T54 (unified producer catalogue tracer, retained-use guards and stock
+visibility). `tasks/sales.md`: detail T55–T58 (independent purchase tracer, Finance/receipts, contents
+and corrections). `tasks/weekly-and-collection.md`: detail T59–T63 and T33 (weekly writer cutover,
+late supplements, self-collection, lifecycle, contract cleanup and semantic audit).
+Why: the user suggested multiple task files; group by reviewable functional outcomes while preserving
+one global ID/dependency registry, end-to-end slices and the accepted domain boundaries.
+
+## 2026-10-28 · Change
+
+`tasks/coverage.md`: allocate all 65 R# and 90 S# to retained and amendment owners, with explicit
+partial-scenario completion and concurrency/atomicity/authorization obligations. This is responsibility,
+not test-passing evidence. `tasks.md` records the read-only Linear check and draft relationship proposal;
+no tracker issue, parent, status, label, description or relation was changed.
+Why: avoid coverage gaps and duplicate existing IDs; separate local drafting from external publication.
+
+## 2026-10-28 · Change
+
+`spec.md`, `plan.md`, `specs/README.md`: replace pending-task wording with draft-for-review links,
+point the plan's historical screen inventory to `tasks/baseline.md`, and document the canonical-index/
+linked-detail convention. Spec behavior and accepted plan decisions are unchanged.
+Why: make the split navigable and accurately distinguish accepted spec/plan from the proposed tasks.
+
+
+## 2026-10-28 · Change
+
+Task-draft consistency: T33 also names the architecture prerequisite T02; T55 explicitly verifies
+S72 after removed/cancelled basket use, and T60 preserves an independent stock basket if its
+referenced weekly cycle is cancelled. T62 depends on the weekly-source cutover T59 rather than
+unrelated member UI delivery; T63 explicitly waits for both collection readers and household consumers.
+Why: make partial-scenario responsibility and real dependency boundaries explicit without adding
+product behavior or changing Linear.
+
+Documentation validation: 63 unique canonical IDs, acyclic dependencies, every delivery task reachable
+from T33, all 65 requirements and 90 scenarios allocated, 703 local links/anchors resolved, historical
+baseline preserved apart from its declared navigation transformations, and prior log bytes unchanged.
+Whitespace and main-checkout cleanliness are checked separately. No application/DB/UI checks are
+claimed: this amendment only drafts task documents, using the constitution's test-first exception.
+
+
+## 2026-10-28 · Q&A
+
+Question: Aproves l’estructura i el repartiment?
+
+A. Acceptar l’esborrany documental.
+B. Revisar la mida o agrupació de les tasques.
+
+Answer: A
+
+## 2026-10-28 · Change
+
+`tasks.md`, `tasks/catalog.md`, `tasks/sales.md`, `tasks/weekly-and-collection.md` and
+`tasks/coverage.md`: mark the split document structure, T52–T63 and amended T33 scope accepted.
+The historical baseline remains unchanged. Linear publication, existing tracker amendments and
+application implementation remain separate scopes; no external operation was authorized by option A.
+Why: the user explicitly accepted the concrete document draft and task breakdown on 2026-10-28.
+
+## 2026-10-28 · Change
+
+`spec.md`, `plan.md` and `specs/README.md`: replace draft-for-review status with accepted task-breakdown
+links. Requirements, scenarios, task IDs, dependencies and acceptance criteria are unchanged.
+Why: keep document navigation and feature status consistent with the user's acceptance.
+
+## 2026-10-28 · Change
+
+`tasks.md` and `tasks/weekly-and-collection.md`: record the authorized Linear publication and
+current mappings. Created grouping parent DRA-206 and T52–T63 as DRA-207–DRA-218, all Backlog;
+only executable children have the existing `ready-for-agent` label. Published 28 child prerequisite
+edges and contextual T61/DRA-216 related links to feature-002 DRA-202/DRA-203.
+
+Updated T33/DRA-183 to the semantic audit of all 65 requirements and S1–S90, keeping Todo and
+its existing identity, fields, milestone, parents and relations. Retained the 11 original blockers
+and added T02/DRA-151, T44/DRA-198, T46/DRA-200 and T63/DRA-218 (15 total). T36/DRA-205
+was already Done at the fresh readback. No matching T47–T51 issues were found; T48 → T33,
+T50 → T33 and T51 → T33 remain mandatory gates documented in T33 but pending native relation
+mapping. No missing IDs were invented and no tasks outside T52–T63 were created.
+
+Readback verified every created parent/child, project, label, blocker and contextual relation,
+preserved existing issue parents/relations, and found no duplicates, cycles or self-blocking.
+No remote failure or unknown outcome remains. The accepted sources are still local/unpublished;
+repository locators in tickets do not claim the changes exist on main. No application implementation,
+push, PR or merge was performed. This documentary synchronization uses the test-first exception;
+structural document checks are recorded separately, with no application/DB/UI result claimed.
+Why: the user explicitly accepted the documents and authorized publication to Linear in this session.
+
+Structural validation after synchronization passed: 63 unique canonical IDs, acyclic task graph,
+every delivery reaches T33, 65 requirements and 90 scenarios allocated, 716 local links/anchors
+resolved, historical baseline unchanged and all 154,258 pre-publication log bytes preserved.
+Only the two tracker-record documents and this log changed during publication; the other 12
+accepted Markdown files remained byte-identical. `git diff --check` passed and main stayed clean.
+
+## 2026-10-28 · Change
+
+`tasks.md` and `tasks/weekly-and-collection.md`: record the explicitly authorized follow-up
+publication of T47–T51 as standalone Coop issues DRA-219–DRA-223, Backlog, ready-for-agent,
+unassigned and without delegation. Dependencies are T45 → T47, T47 → T48/T49/T51 and T49 → T50.
+T48/DRA-220 relates to integrated T44/DRA-198; T51/DRA-223 relates to integrated T46/DRA-200
+for the accepted layout reconciliation. These are contextual links, not additional blockers.
+
+Added T48/DRA-220, T50/DRA-222 and T51/DRA-223 as native blockers of T33/DRA-183 and replaced
+its obsolete pending-mapping wording. All 18 canonical closure prerequisites are now native;
+T33 remains Todo with its existing identity, metadata and other relations preserved. DRA-206
+still groups only T52–T63. No visual task was marked Done or authorized for implementation.
+The historical baseline, including its dated unpublished-task statement, remains unchanged.
+
+The user also authorized a documentation PR and requested a dashboard compatibility check.
+Source-publication guidance now points to the documentation branch pending merge, rather than
+claiming the sources must remain unpublished. Feature 002 records its own derived Sales alignment.
+Why: “Crea també T47–T51 a Linear segons les specs acceptades i afegeix els bloquejos pendents de
+T48, T50 i T51 a T33”; “fem PR del què tenim si és necessari també”; “després comprova la part
+del dashboard si cal actualitzar-la també”.
+
+## 2026-10-28 · Change
+
+`plan.md` and `tasks.md`: reconcile the documentation amendment with origin/main at b719dd5.
+Retain DRA-205's source-level translation, whole-message placeholder and framework-language
+clarifications in the current translation contract and T36 execution note. The historical task
+baseline remains unchanged; current accepted S1–S90 replaces only the superseded S1–S64 bounds.
+Both feature logs preserve the complete upstream log prefix and every byte of this amendment's
+existing appended entries. No application source was changed by the documentation integration.
+Why: publish the authorized PR against current main without discarding its merged clarifications.

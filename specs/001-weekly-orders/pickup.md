@@ -1,147 +1,259 @@
-# 001 — Weekly orders: Pickup
+# 001 — Weekly orders: Baskets, validation and collection
 
 Part of [001 — Weekly orders](spec.md): glossary, time and roles are defined there.
 
-A household collects its allocation and stock products and is charged; optional top-up on the spot.
+Weekly base and independent stock baskets, actual contents, validation, global Wallet effects and physical collection.
 
 ## Requirements
 
-### Pickup (once per household and cycle)
-
-- **R19** Once a cycle is settled, every household with an allocation has a pending pickup for that cycle.
-  A manager can also open a pickup for any active household without one (e.g. to sell stock).
-  Each order line shows its allocation as the delivered quantity, which the manager can still adjust
-  (≥ 0, in the same step as R16),
-  e.g. the real weight of a package or a damaged item. The adjustment updates the allocation, so it is
-  reflected in the reception balance (R17), where it is flagged but blocks nothing: distributing the
-  producer again after a reopen ignores it (R18).
-  A pickup stays pending until it is completed or marked not collected: it is not charged in the meantime,
-  and it can be picked up after the pickup date, even once later cycles are open.
-- **R20** The manager can add stock products to the pickup, each with a quantity. A stock line takes a
-  snapshot of the stock product's price and containers per unit when the line is added. Non-variable stock products are sold in
-  whole units; variable ones in multiples of 0.001. The quantity cannot exceed the available stock,
-  checked when the line is added and again when the pickup is completed (R22).
-  A stock line stays even if its stock product is deactivated afterwards.
-- **R20a** The manager can add return items to the pickup, each with a quantity in whole units. A return line
-  credits quantity × the return item's amount, snapshotted when the line is added.
-- **R21** The pickup shows the household's current balance, the total to charge and the resulting balance.
-  The manager can record a top-up at the same time (R29); it is an independent wallet movement.
-- **R22** Completing the pickup is rejected if any stock line exceeds the available stock at that moment
-  (the manager adjusts the line). Otherwise it does all at once or nothing:
-  charges the wallet with Σ(delivered × unit price) of order lines + Σ(quantity × price) of stock lines
-  − Σ(quantity × amount) of return lines, each line rounded to the nearest cent (half up), so the lines
-  shown add up to the charge; decreases stock by the stock lines; and freezes the pickup.
-  A negative total is recorded as a credit; a total of 0 records no wallet movement.
-- **R23** A pickup can be completed only once. A completed pickup and its order cannot be edited.
-  Original lines, the original charge and completion time remain immutable. Before cycle closure, an explicit
-  all-pickups redistribution (R18) may append signed quantity and amount adjustment lines with matching new
-  wallet corrections; it never rewrites original lines or resells stock. The pickup shows every adjustment
-  separately and its current total includes them. Other mistakes are fixed with a wallet correction (R32)
-  and a stock adjustment (R27), which can reference the cycle.
-- **R23a** **What members see.** Before the cycle is settled, a member sees the order their household
-  placed, with the *will not be delivered* marks. Once settled, they also see the pickup: per order line
-  the ordered quantity, the delivered quantity, the price and the amount; the stock and return lines; and
-  the total. A cancelled cycle shows as cancelled, and a closed cycle stays visible and read-only.
-- **R24** A pending pickup whose every allocation is 0 and that has no stock or return lines is closed
-  automatically as *nothing to collect* when the cycle is settled; nothing is recorded. If a later
-  distribution gives that household an allocation > 0, its pickup becomes pending again.
-- **R24a** When a household does not come, a manager marks its pickup as *not collected*: the household is
-  charged its delivered quantities, including pickup adjustments, as in R22 (stock and return lines are dropped), and the pickup is frozen.
-- **R24b** A cycle is *closed* once it is settled and every pickup of it is completed, not collected or
-  closed as nothing to collect, and every participating producer is distributed. Nothing in a closed cycle
-  can change: its orders, receptions and pickups are final, and later wallet corrections or stock
-  adjustments only refer to it. It leaves the pending lists.
+- **R19** **Baskets and their source.** Once the cycle first settles, each household order with eligible allocations produces one base
+  basket draft, initially containing its allocated quantities and original ordered product snapshots.
+  Creating the draft does not charge money. Creation/synchronization is idempotent by source order.
+  Finance or Manager can create additional stock baskets for any active household, including one
+  without a weekly order, at any time and without requiring an open or settled cycle.
+  A supplement originating from a collection can reference that original cycle, even if already closed;
+  independent purchases may have no cycle. The reference groups sales and container counts and does not
+  reopen the cycle, block closure, duplicate the weekly contents or backdate movements.
+- **R19a** **Draft contents and access.** Only Finance or Manager creates/edits stock basket drafts, adjusts actual weekly quantities and
+  adds/removes stock and return lines. Preserve ordered quantities separately; actual quantities obey
+  the source product's whole-unit/0.001 step and may be zero for weekly lines. Members can consult
+  their own baskets and the read-only stock catalogue but cannot edit or validate contents.
+  Finance basket access does not grant catalogue, producer/cycle/reception or general inventory
+  administration. A Manager still holds those existing permissions where applicable.
+- **R19b** **Retained history.** Removed order/basket lines and cancelled orders/baskets are retained as history. Exclude them from
+  current contents, operational totals and proportional claims, but preserve product references for
+  R1b/R1c. Re-adding a removed line creates a new line/creation moment. Cancelled cycles continue to
+  show no active orders or totals. A stock-only draft may be cancelled without a charge or stock sale.
+- **R20** **Stock basket lines.** Finance/Manager manually add active stock products, never weekly products. The producer's active
+  state, participation, cutoff and per-cycle availability do not restrict a stock sale. Each line keeps
+  the product/producer identity and its name, unit, variable, unit-price and containers snapshot when
+  first added. Adding again increases the active line using the first price/container snapshot.
+  Positive quantities obey the existing whole-unit/0.001 steps, and combined quantity is checked against
+  stock at addition and validation. Draft stock is not reserved. Existing lines survive product
+  deactivation and may be removed, but the inactive product cannot be newly added or increased.
+- **R20a** **Return lines.** Preserve return items as basket lines: positive whole quantity, fixed amount snapshotted on addition,
+  credited in the basket total. Finance/Manager can operate them as part of the basket; Manager alone
+  administers the return-item catalogue. A return-only basket may yield a wallet credit.
+- **R21** **Amounts and wallet.** Show the actual basket total, current global household balance and projected/resulting balance.
+  Receipts are recorded independently of validation after Finance/Manager confirm money received.
+  There is no basket paid/part-paid status, and a negative wallet balance remains permitted.
+- **R22** **Explicit validation.** Finance or Manager explicitly validates the basket. For a weekly base the source must be settled
+  and synchronized to the current allocation. Validate exactly once, with stock availability checked
+  again. In one transaction, confirm the immutable basket contents/total, record stock sales and append
+  one Wallet charge or credit. Failure records none of these. Calculate total as weekly actuals plus
+  stock minus returns, each monetary line rounded half up to cents; negative means credit, zero means
+  no money movement. Collection never generates another charge or stock sale.
+- **R23** **Immutable originals and corrections.** Validated contents, original charge and validation time are never overwritten. Finance/Manager may
+  append correcting quantity/amount/stock movements with a mandatory reason and original source link;
+  preserve the original basket and ledger records. Correct actual money/goods errors without silently
+  returning stock that was not returned. Cross-context corrections are atomic and cannot make stock
+  negative. Existing explicit redistribution choices append signed basket/Wallet adjustments before
+  weekly cycle closure, without reselling stock/returns. Ordinary sale/receipt corrections may reference
+  a closed cycle without reopening weekly contents. A mistaken collection mark may be corrected by
+  staff with a reason and retained original history, without financial effects.
+- **R23a** **What people see.** Members see their own ordered-versus-actual contents, draft/validated/collection status, adjustments,
+  charges and global Wallet balance. Finance/Manager see the households needed to operate baskets and
+  receipts. Keep a visual pending-collection indication after the planned date and after cycle closure:
+  own baskets for members, all for staff, and a badge/link on the referenced closed cycle. Drafts are
+  labelled in preparation rather than ready to collect. No new push/email reminder is implied.
+- **R23b** **Collection.** Finance, Manager or a current member of the basket's own household may mark a validated basket
+  collected. Record who/when; repeated marking preserves the first record and has no money/stock effect.
+  A member cannot mark another household's basket, validate a draft or record a receipt. An already
+  physically taken stock purchase reported later can be registered, validated and marked collected by
+  staff, preserving the recording date and origin-cycle reference.
+- **R24** **Delayed collection.** A validated basket stays pending until physically collected or explicitly resolved through justified
+  correction. Passing the pickup date alone is not abandonment, cancellation, a refund or return of stock.
+  Collection can be recorded on a later day and does not depend on whether the global Wallet is in debt.
+- **R24a** **No contents and draft cancellation.** Preserve the existing nothing-to-collect case: no positive weekly allocation and no stock/return
+  contents needs no charge or physical collection. If a permitted later redistribution produces goods
+  while the weekly cycle remains open, its base returns to draft and requires validation. A zero-price
+  or net-zero basket with real goods/returns may still be validated. Retain cancelled stock drafts and
+  removed lines as history. No automatic terminal not-collected/abandonment state is created by a date;
+  replace the old charge-on-not-collected command with the separate validation/collection flow.
+  A full justified contents reversal leaves no effective goods pending physical collection.
+- **R24b** **Weekly closure.** A cycle closes once settled, every participating reception is distributed and every base basket is
+  validated or has nothing to collect. Physical collection is independent and remains actionable after
+  closure. Supplementary/cycleless stock baskets never gate weekly closure. A reference from a later
+  stock purchase does not permit reopening or editing frozen weekly orders/receptions.
 
 ## Acceptance scenarios
 
-### Pickup
+**S14 — Variable quantity before basket validation** (R19a, R22)
+Given H's draft has 1 kg beef at €20/kg, its Wallet is €50, and another base remains draft so the cycle stays open
+When Finance records actual 1.120 kg and validates H's basket
+Then H is charged €22.40 with balance €27.60, while ordered 1 kg is retained
+And reception flags the −0.120 kg actual difference without blocking distribution.
 
-**S14 — Variable weight at pickup** (R19, R22)
-Given H was allocated 1 kg of beef at €20.00/kg and its wallet is at €50.00
-When the manager records 1.120 kg at H's pickup and completes it
-Then H is charged €22.40, the balance is €27.60
-And the beef reception now shows an unbalanced difference of −0.120 kg, which blocks nothing.
+**S61 — Redistributing after an actual-quantity adjustment** (R18, R19a)
+Given S14's actual difference and its still-open cycle
+When the manager reopens the beef producer and distributes again without changing allocations
+Then distribution succeeds and the −0.120 kg difference remains flagged; no charge is repeated.
 
-**S61 — Redistributing after a pickup adjustment** (R18, R19)
-Given the beef reception of S14 shows −0.120 kg because of H's adjustment at pickup
-When the manager reopens the beef producer and marks it distributed again without other changes
-Then it is accepted, and the −0.120 kg difference stays flagged.
-
-**S15 — Allocation drives the charge** (R15, R22)
-Given A ordered 4 loaves at €3.00 and was allocated 3 in S10
-When A's pickup is completed without changes
-Then A is charged €9.00.
+**S15 — Allocation drives the initial basket charge** (R15, R19, R22)
+Given A ordered 4 loaves at €3 and was allocated 3 in S10
+When its automatically created basket is validated without further actual adjustments
+Then A is charged €9.
 
 **S16 — Adding stock** (R20, R22, R28)
-Given H's order lines total €20.00, honey is a stock product at €6.00 with 5 jars available
-When the manager adds 2 jars of honey and completes the pickup
-Then H is charged €32.00 and 3 jars of honey remain.
+Given H's weekly actuals total €20 and stock honey costs €6 with 5 jars available
+When Finance adds 2 jars to H's draft and validates it
+Then H is charged €32, 3 jars remain, and later collection has no financial effect.
 
-**S17 — Not enough stock** (R20)
+**S17 — Not enough stock at addition** (R20)
 Given 1 jar of honey is available
-When the manager adds 2 jars to a pickup
-Then it is rejected and stock is unchanged.
+When Finance adds 2 jars to a draft basket
+Then it is rejected and stock and Wallet are unchanged.
 
-**S18 — Stock-only pickup** (R19, R20)
-Given household K has no order in the settled cycle
-When the manager opens K's pickup, adds 1 bottle of oil at €12.00 and completes it
-Then K is charged €12.00.
+**S18 — Stock-only basket** (R19, R20, R22)
+Given active household K has no weekly order and no cycle is required
+When Finance creates a stock basket, adds 1 available bottle of oil at €12 and validates it
+Then K is charged €12; it can be marked collected without another charge.
 
 **S41 — Returning jars** (R20a, R22)
-Given H's order lines total €10.00 and "glass jar" is a return item of €0.50
-When the manager adds 4 returned jars and completes the pickup
-Then H is charged €8.00.
+Given H's goods total €10 and a snapshotted glass-jar return credits €0.50 each
+When Finance adds 4 returns and validates the basket
+Then H is charged €8.
 
-**S45 — Stock taken by another pickup** (R20, R22, R28)
-Given 5 jars of honey are available and the pickups of H and K are both pending
-When the manager adds 3 jars to each, completes H's pickup, and then tries to complete K's
-Then K's completion is rejected as only 2 jars remain, nothing is recorded for K, and stock stays at 2.
+**S45 — Stock sold by another basket** (R20, R22, R28)
+Given 5 jars are available and H and K each have 3 jars on draft baskets
+When H's basket is validated and Finance then validates K's
+Then K's validation fails with only 2 jars available; its draft and Wallet remain unchanged.
 
-**S19 — Top-up at pickup** (R21, R22, R29)
-Given H's balance is €5.00 and its pickup totals €30.00
-When the manager records a €40.00 cash top-up and completes the pickup
-Then H's balance is €15.00 and H sees two movements: a €40.00 top-up with no cycle and a €30.00 charge
-for the cycle.
+**S19 — Independent receipt around basket validation** (R21, R22, R29)
+Given H's balance is €5 and its basket total is €30
+When Finance records a confirmed €40 cash receipt and validates the basket
+Then the global balance is €15 with separate €40 receipt and €30 basket charge
+And the receipt is not allocated to a basket or repeated by collection.
 
-**S20 — Nothing to collect** (R24, R24b)
-Given household K's only line, 1 kg of cherries, was allocated 0 because none arrived
-When the cycle is settled
-Then K's pickup is closed as nothing to collect and nothing is recorded.
+**S20 — Nothing to collect** (R24a, R24b)
+Given K's only weekly line, 1 kg cherries, was allocated 0 and it has no stock or return contents
+When the cycle settles
+Then its base has nothing to collect, with no charge or collection obligation, and does not block closure.
 
-**S42 — Not collected** (R24a, R24b)
-Given H was allocated 2 loaves at €3.00 and never came
-When the manager marks H's pickup as not collected
-Then H is charged €6.00, and once every other pickup is done the cycle is closed.
+**S42 — Missing the planned day is not abandonment** (R24, R24b)
+Given H's 2-loaf basket at €3 each was validated and charged €6
+When the planned pickup day passes without a collection mark
+Then the basket stays pending collection and the original charge remains
+And there is no automatic refund, stock return or terminal abandonment; it can be collected later.
 
-**S21 — Negative balance** (R11, R30)
-Given H's wallet is at €5.00
-When H's pickup of €30.00 is completed with no top-up
-Then the balance is −€25.00.
+**S21 — Negative balance** (R11, R22, R30)
+Given H's Wallet balance is €5
+When its €30 basket is validated without a receipt
+Then the balance is −€25 and collection remains available.
 
-**S22 — Double completion** (R23)
-Given H's pickup was completed
-When the manager tries to complete it again
-Then it is rejected and neither the wallet nor the stock change.
+**S22 — Double validation** (R22, R23)
+Given H's basket is already validated
+When Finance tries to validate it again
+Then it is rejected and neither Wallet nor stock changes.
 
-**S26 — Late pickup** (R19)
-Given H was allocated 2 loaves in cycle A (pickup Saturday 7th) and did not come
-When on Wednesday 11th, with cycle B already open, the manager completes H's pickup for cycle A
-Then H is charged for the 2 loaves of cycle A, and until then H had not been charged for them.
+**S26 — Late physical collection** (R23b, R24)
+Given H's basket for Saturday 7th is validated and charged but pending collection
+When on Wednesday 11th, with the next cycle already open, a member marks it collected
+Then the collection actor/time are recorded and no charge or stock sale is repeated.
 
 **S53 — Rounding per line** (R22)
-Given H's allocation is 0.125 kg of two products, each at €1.00/kg
-When the manager completes H's pickup
-Then each line costs €0.13 (half up) and H is charged €0.26, the sum of the lines shown.
+Given H's basket actuals are 0.125 kg of two products, each at €1/kg
+When Finance validates it
+Then each line is €0.13 half up and the charge is €0.26, matching the displayed sum.
 
-**S54 — Closed cycle** (R24b)
-Given cycle A is settled, H's pickup is completed, K's is marked not collected and L's was closed as
-nothing to collect
-When the last of them is done
-Then cycle A is closed and leaves the pending lists
-And reopening a producer of A is rejected, while a wallet correction referring to A is recorded as a new
-movement.
+**S54 — Closed cycle with pending collection** (R23a, R24b)
+Given cycle A is settled and distributed, H's base is validated, K's is the last non-empty draft,
+and L's base has nothing to collect
+When Finance validates K's base
+Then A closes even while H or K is pending collection and keeps the pending-collection indicator
+And reception reopening is rejected, while justified Wallet corrections may reference A as new movements.
 
-**S55 — Stock line survives deactivation** (R20)
-Given H's pending pickup has 1 jar of honey at €6.00 and the manager then deactivates honey
-When the manager completes H's pickup
-Then H is charged €6.00 for the jar.
+**S55 — Stock line survives product deactivation** (R20)
+Given H's draft already contains 1 jar of stock honey at €6 and the manager deactivates the product
+When Finance validates that existing line
+Then H is charged €6, while any new line or increase for inactive honey is rejected.
+
+**S75 — Remaining stock from an inactive producer** (R3a, R19, R20, R22, R25c)
+Given the beekeeper is inactive, their stock honey stays active with 5 jars at €6, and H is active
+When Finance creates a basket for H, adds 2 jars chosen by the member and validates it
+Then H is charged €12 and 3 remain, without producer participation or a settled cycle
+And that active honey remains visible in the informational stock catalogue.
+
+**S76 — Weekly products cannot be stocked or sold as stock** (R1a, R20, R26, R27)
+Given the oil producer has distinct weekly and stock oil products
+When the manager tries a stock entry/adjustment for weekly oil or adds it as a basket stock line
+Then each attempt is rejected; the stock variant remains subject to the normal quantity/availability checks.
+
+**S78 — Automatic draft, explicit Finance validation** (R18, R19, R19a, R22, R36c)
+Given a household ordered 1 kg of a variable product at €20/kg and distribution assigns 1 kg
+When distribution settles and Finance records 1.120 kg actual
+Then a base draft exists with ordered 1 kg, actual 1.120 kg and no charge yet
+And validating it charges €22.40 exactly once, retaining both quantities and the product snapshot.
+
+**S79 — Independent stock purchase** (R19, R20, R22, R23b)
+Given no weekly cycle is open and an active household has no weekly order
+When Finance creates a stock basket, adds available oil, validates it and records collection
+Then the sale and charge belong to that basket without a cycle, and collection records no second movement.
+
+**S80 — Late supplementary basket** (R19, R22, R23b, R24b)
+Given the weekly basket is validated and its cycle closed
+When a member collects next day, reports extra honey taken, and Finance records a separate honey basket
+with the original cycle reference, validates it and marks it collected
+Then the original basket/charge and cycle closure are unchanged, the new basket charges/sells honey once,
+and its recording date is not the old planned pickup date.
+
+**S81 — Insufficient stock rolls back validation** (R20, R22, R28)
+Given two drafts each contain 3 jars while 5 are available and the first is validated
+When Finance validates the second
+Then validation fails, its basket stays draft and its Wallet is unchanged; available stock remains 2.
+
+**S82 — Member self-collection is household-scoped** (R19a, R23b, R35)
+Given Anna belongs to H, H has a validated pending basket and K another basket
+When Anna marks H's basket collected and repeats the action
+Then the original collection actor/time are retained and no charge/sale is repeated
+And marking K's basket, validating a basket or editing contents is rejected.
+
+**S83 — Close weekly cycle with pending collection** (R23a, R24, R24b)
+Given distribution is finished and the last base basket is validated but not collected
+When the weekly cycle closes
+Then the pending warning/list and collection action remain visible to the authorized users
+And a member can collect later without reopening the cycle or generating money/stock movements.
+
+**S84 — Finance is additive and centrally granted** (R19a, R36a, R36c)
+Given an active account without a household and a Manager
+When Manager grants Finance
+Then that account may log in and operate baskets/receipts, but not product CRUD, cycles or general inventory
+And Manager retains Finance functions, a member-only account cannot grant Finance or validate,
+and revoking Finance removes its added access under the existing login-role rules.
+
+**S85 — Global manual receipt** (R21, R29–R32, R36c)
+Given H has two basket charges totalling €30 and its global balance is −€30
+When Finance confirms receipt of €50 by cash or bank transfer and records it
+Then H's balance is €20 with one receipt; neither basket acquires a paid/part-paid status
+And a receipt correction appends a justified movement without editing the receipt or basket charges.
+
+**S86 — Corrections retain the validated original** (R23, R27, R32)
+Given a validated stock basket and its immutable charge/sale
+When Finance records a justified correction for goods actually returned and the corresponding amount
+Then new linked stock/Wallet corrections are recorded together and original records remain unchanged
+And a missing reason, stock-negative correction or replay cannot create an invalid/duplicate effect.
+
+**S87 — Retained references establish use** (R1b, R1c, R19b)
+Given a product appeared in a line later removed from an order or stock draft, or in a cancelled document
+When the current view is read and Manager attempts to change its mode or its administrator deletes it
+Then the inactive contents are absent from current totals but the retained history blocks both operations.
+
+**S88 — Returns, zero total and no contents** (R20a, R22, R24a)
+Given a return-only basket, a basket whose goods exactly match its return credit, and a source
+with no positive goods, stock or return contents
+When Finance processes their validation/no-contents state
+Then the return-only basket credits the Wallet, the net-zero basket has no money movement but can be
+collected, and the empty source needs no collection or charge and does not block cycle closure.
+
+**S89 — Redistribution uses validation, not collection** (R18, R23, R24b)
+Given A's basket is validated but pending collection, B's is draft and the weekly cycle remains open
+When a reopened reception changes allocations
+Then the existing explicit drafts-only/all choice treats A as financially frozen
+And all appends signed adjustments/Wallet corrections without rewriting A or reselling stock/returns,
+while a closed weekly cycle still rejects reception reopening.
+
+**S90 — Supplementary containers retain cycle attribution** (R18a, R19, R24b)
+Given a weekly basket with 2 containers and a later stock supplement with 1 container referring to its closed cycle
+When the cycle's container summary is read
+Then the household/cycle count is 3 without reopening the cycle
+And an unrelated stock basket without a cycle has its own count and is not attributed to that cycle.

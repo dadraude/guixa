@@ -1,12 +1,12 @@
 # 002 — Actionable dashboard
 
-Status: Accepted (2026-10-27). The [discovery record](../../docs/ux-discovery/2026-10-27-dashboard-discovery.md) contains the request, code evidence and the user's answers.
+Status: Accepted (2026-10-27); aligned on 2026-10-28 with the accepted feature-001 Sales amendment. The [discovery record](../../docs/ux-discovery/2026-10-27-dashboard-discovery.md) contains the request, code evidence and the user's answers.
 
-The signed-in dashboard should answer what each person needs to do now. A manager sees cycle work, a member sees their ordering and pickup context, and a producer sees delivery and cutoff context. People with several roles see one ordered attention list without repeated work. Charts clarify the current cycle and show recent household ordering counts; they do not invent an alarm about low participation.
+The signed-in dashboard should answer what each person needs to do now. A manager sees cycle work and pending baskets, a member sees their ordering and basket-collection context, and a producer sees delivery and cutoff context. Finance sees only its permitted basket context and destinations. People with several roles see one ordered attention list without repeated work. Charts clarify the current cycle and show recent household ordering counts; they do not invent an alarm about low participation.
 
 ## Language
 
-Existing terms such as *cycle*, *producer order*, *cutoff*, *settled*, *closed*, *order line* and *pickup* retain their meanings in [001 — Weekly orders](../001-weekly-orders/spec.md#glossary).
+Existing terms such as *cycle*, *producer order*, *cutoff*, *settled*, *closed*, *order line*, *basket*, *validation*, *collection* and *Finance* retain their meanings in [001 — Weekly orders](../001-weekly-orders/spec.md#glossary). The accepted 001 amendment separates Sales validation from physical collection: closure may precede collection, and stock baskets may have no cycle. This alignment carries those rules into dashboard reads; it adds no new write action or product workflow.
 
 | Term | Meaning |
 | --- | --- |
@@ -18,17 +18,17 @@ Existing terms such as *cycle*, *producer order*, *cutoff*, *settled*, *closed*,
 
 ### R1 — Role-aware overview
 
-The dashboard shows only information the signed-in account may see as a manager, member of its household, or producer of its producer. A person with several roles sees one combined attention list with role labels and no duplicate item for the same work. Role-specific context follows it. No role or relevant work produces an explanatory state rather than fabricated data.
+The dashboard shows only information the signed-in account may see as a manager, Finance, member of its household, or producer of its producer. Finance access grants only the basket/receipt destinations and collection information already authorized in 001; it does not grant manager cycle, reception, account, inventory or closed-cycle participation history access. Manager retains Finance capabilities. A person with several roles sees one combined attention list with role labels and no duplicate item for the same work. Role-specific context follows it. No role or relevant work produces an explanatory state rather than fabricated data.
 
 ### R2 — Manager work
 
-The focus cycle leads the manager view. Manager attention items group actionable work by cycle and stage: participating producer orders ready to send after cutoff; sent receptions needing validation; validated receptions awaiting distribution; and pending pickups after settlement. Each item shows an exact count and links to the relevant cycle, reception, or pickup screen. Future cutoffs are context, not attention items. An empty producer order handled automatically is not volunteer work. Actionable work in later cycles remains in the combined list.
+The focus cycle leads the manager view. Manager attention items group actionable work by stage and optional source cycle: participating producer orders ready to send after cutoff; sent receptions needing validation; validated receptions awaiting distribution; and validated baskets pending physical collection. Each item shows an exact count and links to the relevant cycle, reception, or Sales basket screen. Pending collection is independent of the unfinished focus cycle: closed-cycle, attributed supplementary and cycleless baskets remain visible through the authorized Sales summary. Drafts are labelled in preparation, never ready to collect; passing a scheduled date does not abandon or cancel a basket. Future cutoffs are context, not attention items. An empty producer order handled automatically is not volunteer work. Actionable work in later cycles remains in the combined list.
 
 The manager also sees supporting exception counts, such as pending invitations, below current work. A pending invitation is not automatically an urgent attention item. All-time totals of accounts or cycles do not lead the page.
 
 ### R3 — Member context
 
-A member sees an open ordering opportunity with its applicable producer cutoffs, or the next pending pickup, before wallet balance. An order already containing items is not described as awaiting submission: ordering saves during editing. An open opportunity remains in role context; a pending pickup appears in the attention list. Links lead to the existing order, pickup or wallet screen within the member's household access.
+A member sees an open ordering opportunity with its applicable producer cutoffs, or validated baskets pending collection, before wallet balance. An order already containing items is not described as awaiting submission: ordering saves during editing. An open opportunity remains in role context; a validated pending basket appears in the attention list, including after cycle closure or without a cycle. Links lead to the existing order, Sales basket or wallet screen within the member's current household access. Basket preparation, validation and collection remain distinct; a moved or unlinked member gains no access to the former household's baskets.
 
 ### R4 — Producer context
 
@@ -40,11 +40,11 @@ Items past an actual cutoff are labeled overdue and appear first. Other actionab
 
 ### R6 — Direct access
 
-Prominent actions navigate to the relevant existing screen, where the person has full context before changing anything. The dashboard itself does not send producer orders, validate or distribute receptions, complete pickups, edit orders, change availability, or perform other state-changing actions.
+Prominent actions navigate to the relevant existing screen, where the person has full context before changing anything. The dashboard itself does not send producer orders, validate or distribute receptions, validate baskets, mark collection, record receipts, edit orders, change availability, or perform other state-changing actions.
 
 ### R7 — Current-cycle progress
 
-The manager sees a labeled producer-order status bar for the focus cycle. Its whole is the participating producers; each producer is counted once in its current state: still open for ordering, non-empty and ready for manual send, empty and awaiting automatic send, sent awaiting validation, validated awaiting distribution, or distributed. Once the cycle is settled, a separate pickup status bar counts the cycle's existing pickups once each as pending, completed, not collected, or nothing to collect. Both views show exact counts and a readable status list; color is supplementary. Reopening a producer order updates its current state without hiding pickup progress that already exists. A missing denominator has an explanatory state, not a zero-percent bar.
+The manager sees a labeled producer-order status bar for the focus cycle. Its whole is the participating producers; each producer is counted once in its current state: still open for ordering, non-empty and ready for manual send, empty and awaiting automatic send, sent awaiting validation, validated awaiting distribution, or distributed. Once the cycle is settled, a separate Sales status view counts its existing weekly base baskets once each: in preparation, validated pending collection, collected, or with no physical collection due under 001's nothing-to-collect/correction rules. Do not restore the retired date-triggered not-collected state. Attributed supplements and cycleless stock baskets remain in the pending collection list; they do not enlarge the weekly-base denominator or gate weekly closure. Both views show exact counts and a readable status list; color is supplementary. Reopening a producer order updates its current state without hiding base-basket progress that already exists; closed cycles cannot reopen. A missing denominator has an explanatory state, not a zero-percent bar.
 
 ### R8 — Four-cycle history
 
@@ -52,7 +52,7 @@ For managers, a secondary chart shows the number of ordering households in each 
 
 ### R9 — Freshness, empty states and access
 
-Values reflect current persisted state whenever the dashboard is loaded or navigated to; the page does not poll in the background. If no cycle, producer work, household, pickup, or attention item exists for a role, the page explains the state and keeps relevant permitted destinations available. A user cannot infer another household's or producer's information from counts, labels, links, or chart details.
+Values reflect current persisted state whenever the dashboard is loaded or navigated to; the page does not poll in the background. If no cycle, producer work, household, basket, or attention item exists for a role, the page explains the state and keeps relevant permitted destinations available. A user cannot infer another household's or producer's information from counts, labels, links, or chart details.
 
 ### R10 — Presentation and accessibility
 
@@ -64,7 +64,7 @@ After successful password, two-factor or passkey authentication, the account goe
 
 ## Acceptance scenarios
 
-**S1 — Combined roles (R1, R5).** Given an account with manager, member and producer access and actionable work in each area, when it opens the dashboard, then it sees one attention list with the correct role labels, each work group once, and the agreed priority order; it also sees each permitted role's context.
+**S1 — Combined roles (R1, R5).** Given an account with combined permitted manager/Finance, member and producer access and actionable work in each area, when it opens the dashboard, then it sees one attention list with the correct role labels, each work group once, and the agreed priority order; it also sees each permitted role's context. A basket visible through several roles appears once, and Finance-only access exposes no manager cycle/reception/history data.
 
 **S2 — Focus and later work (R2).** Given two non-cancelled unfinished cycles with different pickup dates and actionable work in both, when a manager opens the dashboard, then the earlier cycle leads the current-work summary and both cycles' actionable groups remain in Needs attention. A cancelled or closed cycle cannot become the focus cycle.
 
@@ -72,13 +72,13 @@ After successful password, two-factor or passkey authentication, the account goe
 
 **S4 — Reception states (R2, R7).** Given a focus cycle with sent, validated and distributed producer orders, when the manager opens the dashboard, then the attention groups and producer-order status bar reflect each producer's current stage exactly once and link to the relevant work. Reopening a distributed producer order changes its displayed stage on the next load.
 
-**S5 — Pickups after settlement (R2, R7).** Given a settled cycle with pending, completed, not-collected and nothing-to-collect pickups, when the manager opens the dashboard, then a separate pickup status bar shows their exact counts and the pending group links to pickups. If a producer order was reopened, the pickup bar remains visible.
+**S5 — Basket progress and persistent collection (R2, R7).** Given a settled cycle with base baskets in preparation, validated pending collection, collected and nothing to collect, when the manager opens the dashboard, then its separate Sales status view shows exact base-basket counts and pending items link to basket details. A permitted producer-order reopen does not hide that progress. Given validated pending baskets from a closed cycle, an attributed supplement and a cycleless purchase, they remain in the authorized pending list; supplements/cycleless baskets do not enter the weekly-base denominator, and a date alone creates no not-collected state. Collection or a justified full contents reversal removes the effective pending item on the next read.
 
-**S6 — No progress denominator (R7, R9).** Given a cycle with no participating producers or a settled cycle with no existing pickups, when the manager opens the dashboard, then the corresponding progress view explains the absence of data without showing a zero-percent chart.
+**S6 — No progress denominator (R7, R9).** Given a cycle with no participating producers or a settled cycle with no existing base baskets, when the manager opens the dashboard, then the corresponding progress view explains the absence of data without showing a zero-percent chart.
 
 **S7 — Member order opportunity (R3).** Given a household with an open cycle and an order already containing items, when its member opens the dashboard, then the opportunity and applicable cutoffs are shown without an unfinished-submission message, and the order link opens only that household's order.
 
-**S8 — Member pickup and balance (R3, R5).** Given a member with no current ordering opportunity, a pending pickup and a wallet balance, when the member opens the dashboard, then the pickup appears in Needs attention with its scheduled date, the balance is supporting context, and the pickup is not labeled overdue solely because its date passed.
+**S8 — Member basket collection and balance (R3, R5).** Given a current member with no ordering opportunity, a validated pending basket and a wallet balance, when the member opens the dashboard, then their basket appears in Needs attention with validation time and its optional scheduled/origin date, while balance remains supporting context. The same holds after cycle closure or for a cycleless basket. A draft is preparation, a date alone is not overdue, and debt does not hide collection. A moved/unlinked member cannot see the former household's basket.
 
 **S9 — Producer delivery and privacy (R4).** Given a producer with a future cutoff and a sent order to deliver, when that producer opens the dashboard, then the future cutoff is context, the sent order is an attention item linked to its own summary, and no household name or another producer's quantities appear.
 
@@ -98,7 +98,7 @@ R10 is verified with the shared visual runner and focused interaction checks in 
 
 ## Out of scope
 
-The dashboard does not add notification delivery, a reminder system, telemetry collection, a new analytics platform, forecasting, member order submission, or state-changing shortcuts. It does not turn the UX discovery's participation target into a dashboard warning. Existing permissions, ordering, reception, pickup and wallet rules remain authoritative.
+The dashboard does not add notification delivery, a reminder system, telemetry collection, a new analytics platform, forecasting, member order submission, or state-changing shortcuts. It does not turn the UX discovery's participation target into a dashboard warning. Existing permissions and the accepted 001 Ordering, reception, Sales validation/collection and Wallet rules remain authoritative. The dashboard introduces no payment allocation, abandonment state, new Finance power or direct write command.
 
 ## Open questions
 

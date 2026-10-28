@@ -8,26 +8,47 @@ Catalog, cycles and cutoffs, ordering, sending orders to producers and what prod
 
 ### Catalog
 
-- **R1** A producer creates, edits and deactivates their own products: name, unit, unit price (≥ 0),
+- **R1** A producer creates, edits and deactivates their own weekly products: name, unit, unit price (≥ 0),
   variable flag, and whether it comes with containers. When it does, the producer sets how many containers
   go with one unit (> 0, in multiples of 0.001; e.g. 2 per kg for 0.500 kg jars). While a product has lines
   in a cycle that is not settled, its unit and variable flag cannot change; its name, price and containers
   can.
-- **R2** A producer cannot see or edit another producer's products.
-- **R3** Only products that are active and available in the cycle (R3c), of producers participating in
-  it, can be ordered.
+- **R1a** **Producer and classification.** Every product is created from exactly one producer's record,
+  whether it is created by that producer (weekly products, R1) or by a manager (stock products, R25).
+  Its producer can never change. Each product has a stock flag: marked means stock, unmarked means
+  weekly. The classification applies across all cycles. The same article sold through both circuits
+  needs two distinct product records, each with its own classification.
+- **R1b** **First use.** A product has been used once it has appeared in an order, reception or basket,
+  or has any stock movement. Removing lines or cancelling their order, basket or cycle never undoes
+  first use; retained draft references count too (R19b).
+  Only a manager can change the stock flag, and only before first use. After a permitted change,
+  administration follows the new classification: the producer administers a weekly product (R1),
+  the manager a stock product (R25). A producer cannot change the stock flag.
+- **R1c** **Deletion and replacement.** Whoever administers a product under its current classification
+  (R1, R25) can delete it only if it has never been used (R1b). Once used, it cannot be deleted;
+  deactivation preserves its references and history. Other edits remain governed by R1 and R25a.
+  A wrong producer is corrected by creating a new product
+  from the right producer's record, then deactivating the old product or deleting it if unused.
+- **R2** Acting as a producer, an account cannot see or edit another producer's products. Its own
+  stock products are read-only (R25b). An account also linked to a household can consult the
+  cooperative's stock catalogue as a member (R25c); a manager administers stock products (R25).
+- **R3** Only weekly products that are active and available in the cycle (R3c), of producers
+  participating in it, can be ordered. Stock products never appear in the weekly order selector,
+  and attempts to add them to an order are rejected even if their producer participates.
 - **R3a** Only a manager deactivates or reactivates a producer. A deactivated producer loses the producer
   role: the account keeps its other roles and can still log in, and an account with no other role cannot.
   Reactivating restores the role. A deactivated producer cannot be made to participate in a cycle, and in
-  every cycle where its order is not sent it stops participating (R6c).
+  every cycle where its order is not sent it stops participating (R6c). This does not deactivate
+  its stock products: the manager can still sell their remaining stock while the product is active
+  (R20).
 - **R3b** While a producer order is not sent, a line whose product is not orderable in its cycle (the
   product is deactivated, or unavailable in the cycle) stays in the order, marked *will not be delivered*.
   Members see the mark and can remove the line. The mark disappears if the product becomes orderable
   again before the order is sent; a line a member already removed does not come back. Marked lines are
   never sent to the producer (R12a), never received and never charged.
-- **R3c** Each active product is available in every cycle by default. While its producer order is not sent,
+- **R3c** Each active weekly product is available in every cycle by default. While its producer order is not sent,
   the producer can mark a product unavailable in a cycle and available again; it cannot be newly ordered
-  in that cycle while unavailable.
+  in that cycle while unavailable. This per-cycle availability does not apply to stock products.
 
 ### Cycles and cutoffs
 
@@ -35,15 +56,19 @@ Catalog, cycles and cutoffs, ordering, sending orders to producers and what prod
   (R4c). Only one cycle per pickup date, not counting cancelled ones (R4b). A cycle's pickup date never
   changes.
   There is no limit to how many cycles are open or how far ahead.
-  A new cycle can be opened while previous cycles are still pending pickup; each pickup belongs
-  to its own cycle and charges only that cycle's order.
+  A new cycle can be opened while earlier baskets are pending physical collection. A weekly base
+  basket uses its own source order plus any stock/returns added to that basket; validation charges
+  that basket (R22), while collection has no financial effect (R23b). Independent stock baskets
+  need no cycle (R19).
 - **R4a** When opening a cycle, the manager picks which active producers participate. Until the cycle is
   settled (R18), a manager can make more producers participate. A cycle is *open* for members while at
   least one participating producer in it is open (R8).
-- **R4b** A manager can cancel a cycle while no producer order of the cycle has been sent. Its orders are
-  discarded (nothing was charged) and members see the cycle as cancelled. Once an order is sent,
-  cancelling is handled with the producer outside the app. A holiday on the pickup weekday is handled by
-  cancelling the cycle.
+- **R4b** A manager can cancel a cycle while no producer order of the cycle has been sent. Its weekly
+  orders leave current contents/totals and members see the cycle as cancelled; retain the cancelled
+  orders/lines as history (R19b), with no weekly basket charge. Independent stock baskets and their
+  posted movements remain unchanged even if they reference that cycle. Once an order is sent,
+  cancelling is handled with the producer outside the app. A holiday on the pickup weekday is handled
+  by cancelling the cycle.
 - **R4c** The cooperative has one pickup weekday, set by a manager; until one is set there is none. A
   cycle cannot be opened without a weekday: opening a cycle when the cooperative has none asks the
   manager for it, and on confirming they choose whether it is permanent (it becomes the cooperative's
@@ -74,7 +99,8 @@ Catalog, cycles and cutoffs, ordering, sending orders to producers and what prod
 - **R8** A line can only be added, changed or removed while its producer is open in that cycle (R6a).
   After the cutoff, lines of that producer are read-only; lines of producers still open stay editable.
   The only exception is removing a line marked *will not be delivered* (R3b, R6c).
-- **R9** Ordered quantity must be greater than zero. Setting it to zero removes the line.
+- **R9** Ordered quantity must be greater than zero. Setting it to zero removes the line from current
+  contents but retains its history (R19b).
   Non-variable products are ordered in whole units; variable products in multiples of 0.001, with no other
   minimum or step.
 - **R10** A line keeps a snapshot of the product as it was when the line was last changed: name, unit,
@@ -182,17 +208,17 @@ Given the vegetable grower is still open, and the baker is closed but no longer 
 When the manager tries to send either order
 Then both are rejected.
 
-**S9 — Overlapping cycles** (R4, R22)
-Given cycle A (pickup Saturday 7th) is settled and H has not picked up yet
-When the manager opens cycle B (pickup Saturday 14th) and H orders in B
-Then completing H's pickup for A charges only A's lines, and H's order in B stays editable.
+**S9 — Overlapping cycles** (R4, R19, R22, R23b)
+Given cycle A is settled with H's basket still draft, and cycle B is open with H's weekly order editable
+When Finance validates H's basket for A and a member later marks it collected
+Then the charge uses only A's basket contents, collection records no extra charge, and B stays editable.
 
-**S37 — Cancel a cycle, fixed pickup weekday** (R4, R4b, R4c)
-Given the pickup weekday is Saturday and cycle A (pickup Saturday 7th) has orders and no producer order sent
+**S37 — Cancel a cycle, fixed pickup weekday** (R4, R4b, R4c, R19b)
+Given the pickup weekday is Saturday and cycle A has weekly orders but no producer order sent
 When the manager cancels cycle A
-Then its orders are discarded and members see it as cancelled
-And once one producer order is sent, cancelling is rejected
-And opening a cycle with pickup on Friday 13th is rejected.
+Then its orders/lines are absent from current contents and totals, retained as history, and members see cancellation
+And independent stock baskets/charges remain unchanged even if attributed to A
+And once a producer order is sent, cancellation is rejected, as is opening a cycle on Friday.
 
 **S38 — Daylight saving** (Time, R5)
 Given the baker's default cutoff is "1 day before, at 02:30"
@@ -223,3 +249,43 @@ Then they see 5 loaves for the baker, with A 2 and B 3.
 Given cycle A had orders and the manager cancelled it
 When the manager opens cycle A
 Then they see it as cancelled, with no totals and no households.
+
+### Product identity and classification
+
+**S65 — A product stays with its producer** (R1a, R1c, R25)
+Given the manager creates stock honey from the beekeeper's record
+When the manager tries to create a product without a producer or move that honey to another producer
+Then both are rejected, even if the honey has never been used
+And correcting the producer requires a new product from the right producer's record.
+
+**S66 — Separate weekly and stock records** (R1a, R3, R25c)
+Given the oil producer participates in an open cycle and has two active oil products,
+one weekly and one stock, with the same name and price
+When a member orders the weekly oil and tries to order the stock oil
+Then only the weekly oil is added; the stock oil is absent from the weekly selector and rejected if submitted
+And the stock oil remains visible in the informational stock catalogue.
+
+**S67 — Only the manager changes an unused classification** (R1, R1b, R25, R25b)
+Given the beekeeper has an unused weekly honey product
+When the beekeeper tries to mark it as stock
+Then it is rejected
+And when the manager marks it as stock, the manager administers it and the beekeeper can only consult it
+And the manager can switch it back while it is still unused, restoring producer administration.
+
+**S68 — First use is not undone by removing lines** (R1b, R1c)
+Given weekly bread once had an order line that was removed, stock honey has an entry and adjustment
+bringing its available quantity back to zero, and stock oil once had a basket line that was removed
+When the manager tries to change any of their classifications and the responsible producer or manager
+tries to delete each product
+Then every attempt is rejected; each product can instead be deactivated.
+
+**S69 — Reception is a first use** (R1b, R1c, R14)
+Given rye bread has been added to a reception but has no household allocations yet
+When the manager tries to mark it as stock or the producer tries to delete it
+Then both are rejected because the product has already been used in reception.
+
+**S70 — Delete only unused products** (R1, R1b, R1c, R25)
+Given the beekeeper has an unused weekly product and the manager has created an unused stock product
+from the beekeeper's record
+When the beekeeper deletes the weekly product and the manager deletes the stock product
+Then both are deleted.

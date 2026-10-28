@@ -9,7 +9,9 @@ no code is written before its spec is accepted.
    A long spec is split into one file per area (`ordering.md`, `pickup.md`…) plus `open-questions.md`;
    `spec.md` keeps the glossary, roles and an index of the areas. `R#` and `S#` stay global.
 3. `NNN-feature/plan.md` — how: domain model, use cases, ports/adapters, persistence, UI routes.
-4. `NNN-feature/tasks.md` — ordered, small tasks, each linked to the `R#` and scenarios it covers.
+4. `NNN-feature/tasks.md` — the canonical registry of ordered, small tasks, each linked to the `R#`
+   and scenarios it covers. Large task sets may put detail in `tasks/<area>.md` and historical evidence
+   in `tasks/baseline.md`; keep one global Tnn sequence and all task rows/dependencies in `tasks.md`.
    Tasks are tracer bullets wherever possible: the first task is the thinnest slice that runs end to
    end through every layer it needs (page, use case, domain, persistence, tests) and stops for review;
    each later task is another vertical slice that reuses and widens that path. A layer-only task
@@ -57,7 +59,7 @@ design principles and the gap analysis there.
 
 | ID  | Feature                         | Status |
 | --- | ------------------------------- | ------ |
-| 001 | [Weekly orders](001-weekly-orders/spec.md) | Spec revised (OQ1–OQ19 resolved) · plan + tasks accepted (2026-10-21) · in progress, status in Linear (Coop) |
+| 001 | [Weekly orders](001-weekly-orders/spec.md) | Spec + plan amended and accepted (2026-10-28): products, Sales baskets and Finance · [split task breakdown accepted](001-weekly-orders/tasks.md) · implementation status in Linear (Coop) |
 | 002 | [Actionable dashboard](002-actionable-dashboard/spec.md) | Accepted (2026-10-27) · T01–T04 tracked in Linear (DRA-201–DRA-204), Backlog · implementation stopped |
 
 ## Roadmap
@@ -73,7 +75,6 @@ An entry gets an `NNN` ID and moves to *Features* when its spec starts. The orde
 | --- | --- | --- |
 | Cooperative fee | A percentage added to the price of every product a household takes, charged at pickup. | Product, Order line, Pickup, Wallet |
 | Work shifts | A manager assigns households to tasks such as reception and pickup, per cycle; members see theirs. | Household, Cycle, Reception, Pickup |
-| Stock sales outside a pickup | Households buy stock products on days other than a pickup. | Stock product, Wallet |
 | Notifications | Members and producers are told about events other than a sent order (R12a). | Account, Cycle, Producer order |
 | Producer confirmation | A producer accepts or adjusts a sent order before delivering. | Producer order, Sent, Reception |
 | Minimum order per producer | A producer order below its minimum is not sent. | Producer order, Cutoff, Participating producer |
