@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { Form, Head, Link } from '@inertiajs/vue3';
+import { Settings } from '@lucide/vue';
+import { trans } from 'laravel-vue-i18n';
 import { computed, shallowRef } from 'vue';
 import CycleController from '@/actions/App/Http/Controllers/Manage/CycleController';
 import CycleParticipantController from '@/actions/App/Http/Controllers/Manage/CycleParticipantController';
@@ -139,17 +141,23 @@ function cutoffLabel(value: string | null) {
                         <Button
                             v-if="!cycle.cancelled && !cycle.closed"
                             variant="outline"
-                            class="min-h-11"
-                            :data-test="`manage-${cycle.id}`"
-                            @click="
-                                openManage(
-                                    cycle,
-                                    cycle.participants[0] ?? null,
-                                    $event,
-                                )
+                            size="icon"
+                            class="size-11"
+                            :aria-label="
+                                trans('Manage cycle for :date', {
+                                    date: dateLabel(cycle.pickupDate),
+                                })
                             "
-                            >Gestiona</Button
+                            :title="
+                                trans('Manage cycle for :date', {
+                                    date: dateLabel(cycle.pickupDate),
+                                })
+                            "
+                            :data-test="`manage-${cycle.id}`"
+                            @click="openManage(cycle, null, $event)"
                         >
+                            <Settings aria-hidden="true" />
+                        </Button>
                     </div>
                 </div>
                 <p
@@ -184,12 +192,25 @@ function cutoffLabel(value: string | null) {
                                 !cycle.closed
                             "
                             variant="outline"
-                            size="sm"
-                            class="min-h-11"
+                            size="icon"
+                            class="size-11"
+                            :aria-label="
+                                trans('Manage :producer · :date', {
+                                    producer: participant.producerName,
+                                    date: dateLabel(cycle.pickupDate),
+                                })
+                            "
+                            :title="
+                                trans('Manage :producer · :date', {
+                                    producer: participant.producerName,
+                                    date: dateLabel(cycle.pickupDate),
+                                })
+                            "
                             :data-test="`manage-${cycle.id}-${participant.producerId}`"
                             @click="openManage(cycle, participant, $event)"
-                            >Gestiona</Button
                         >
+                            <Settings aria-hidden="true" />
+                        </Button>
                     </li>
                 </ul>
                 <details
