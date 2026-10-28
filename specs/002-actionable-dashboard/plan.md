@@ -28,6 +28,10 @@ Each role query returns attention candidates with a stable kind, role, cycle ID,
 
 The controller requests only the role data the `Actor` can access. Every use case still asserts its role/household/producer scope. The manager's focus panel may show one cycle while the combined attention list contains work from later cycles. A manager-only invitation count is supporting context; no pending invitation is inserted into the attention list without a separate rule.
 
+## Login destination
+
+For R11/S14, bind the password, two-factor and passkey login response contracts to application adapters that discard `url.intended` after successful authentication and delegate to the installed package responses. Keep the configured dashboard destination and each response’s existing JSON contract. Test the real password and two-factor endpoints and the resolved passkey response in HTML and JSON. This navigation change has no Application use case or visual change.
+
 ## HTTP and UI
 
 Keep the existing `dashboard` route and `DashboardController`. Replace its ad hoc aggregate props with generated, typed role sections and attention/status/history DTO rows. Use code values for task and status labels, translated in Vue through `lang/`. Preserve existing direct destinations for Orders, Wallet, Products, Cutoff, Cycles, Households, Producers, Stock, Return items, Accounts and Settings.

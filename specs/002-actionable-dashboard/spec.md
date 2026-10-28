@@ -58,6 +58,10 @@ Values reflect current persisted state whenever the dashboard is loaded or navig
 
 The dashboard follows Guixa's accepted visual system and is usable at 375 px, in light and dark appearance and at 200% text. Attention items and chart data remain available by keyboard and as visible text; neither status nor chart meaning depends on color or hover. Interactive targets remain at least 44 × 44 px. New visible copy is translatable and Catalan is the default.
 
+### R11 — Login destination
+
+After successful password, two-factor or passkey authentication, the account goes directly to the dashboard, even when the session contains a previously requested destination. Authentication and email-verification requirements still apply.
+
 ## Acceptance scenarios
 
 **S1 — Combined roles (R1, R5).** Given an account with manager, member and producer access and actionable work in each area, when it opens the dashboard, then it sees one attention list with the correct role labels, each work group once, and the agreed priority order; it also sees each permitted role's context.
@@ -85,6 +89,8 @@ The dashboard follows Guixa's accepted visual system and is usable at 375 px, in
 **S12 — No actionable work (R1, R9).** Given an account with no actionable work, when it opens the dashboard, then it sees a clear caught-up state and its permitted role destinations; absent household or inactive producer access does not create fabricated context.
 
 **S13 — Navigation only (R6, R9).** Given actionable work, when the dashboard is read, then each attention item supplies the existing authorized task destination and no command changes state. A subsequent dashboard read reflects current persisted state.
+
+**S14 — Login destination (R11).** Given an account allowed to log in, with or without a previously requested destination, when it completes password, two-factor or passkey authentication, then its destination is the dashboard. An unsuccessful login does not grant access.
 
 ## Presentation checks
 

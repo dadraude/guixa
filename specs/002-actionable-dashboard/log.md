@@ -80,3 +80,11 @@ A: “yes”
 ## 2026-10-27 · Change
 
 `tasks.md` now links T01–T04 to Linear DRA-201–DRA-204 under the new **Actionable dashboard** milestone in Coop. Native blocking relations are T01 → T02 → T03 → T04, with no parent or contextual links. Readback confirmed each issue is in Backlog without `ready-for-agent`. This records the user's approval to publish and track the tracer sequence; implementation remains stopped as separately instructed.
+
+## 2026-10-28 · Request
+
+> després del login hauríem d'anar directament al dashboard
+
+## 2026-10-28 · Change
+
+Added R11/S14 to `spec.md`, the login response design to `plan.md` and independent T05 to `tasks.md`, following the user’s explicit destination request. Successful login now always targets the dashboard rather than a saved session destination. The existing dashboard-content slices remain separate.
