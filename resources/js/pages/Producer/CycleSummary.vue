@@ -12,7 +12,7 @@ defineProps<{
 <template>
     <Head :title="`Cycle ${summary.pickupDate}`" />
 
-    <div class="pilot-page">
+    <div class="pilot-layout-page pilot-t44-page">
         <Heading
             :title="`Pickup ${summary.pickupDate}`"
             :description="
@@ -24,7 +24,7 @@ defineProps<{
 
         <p
             v-if="summary.products.length === 0"
-            class="pilot-empty-state text-sm text-muted-foreground"
+            class="pilot-layout-notice text-sm text-muted-foreground"
             data-test="no-products"
         >
             {{
@@ -36,12 +36,12 @@ defineProps<{
 
         <ul
             v-else
-            class="pilot-panel pilot-cycle-products divide-y overflow-hidden"
+            class="pilot-layout-panel pilot-cycle-products divide-y overflow-hidden"
         >
             <li
                 v-for="product in summary.products"
                 :key="product.productId"
-                class="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5"
+                class="pilot-list-row flex-col sm:flex-row"
                 :data-test="`product-${product.productId}`"
             >
                 <span class="min-w-0 font-medium break-words">{{
@@ -50,7 +50,7 @@ defineProps<{
 
                 <span
                     v-if="summary.sent"
-                    class="font-semibold tabular-nums"
+                    class="pilot-amount font-semibold"
                     data-test="quantity"
                 >
                     {{ product.quantity }} {{ product.unit }}
@@ -64,7 +64,7 @@ defineProps<{
                             product: product.productId,
                         })
                     "
-                    class="flex flex-wrap items-center gap-3"
+                    class="pilot-action-row"
                 >
                     <input
                         type="hidden"

@@ -21,7 +21,7 @@ defineProps<{
 <template>
     <Head title="Products" />
 
-    <div class="pilot-page">
+    <div class="pilot-layout-page pilot-t44-page">
         <div class="flex flex-wrap items-start justify-between gap-4">
             <Heading
                 title="Products"
@@ -37,7 +37,7 @@ defineProps<{
 
         <p
             v-if="products.length === 0"
-            class="pilot-empty-state text-sm text-muted-foreground"
+            class="pilot-layout-notice text-sm text-muted-foreground"
         >
             No products yet.
         </p>
@@ -101,13 +101,13 @@ defineProps<{
                             {{ product.unit
                             }}<span v-if="product.variable"> (variable)</span>
                         </td>
-                        <td class="py-2 tabular-nums">
+                        <td class="pilot-amount py-2">
                             <span class="pilot-cell-label" aria-hidden="true">{{
                                 trans('Price')
                             }}</span
                             >{{ product.price }} EUR
                         </td>
-                        <td class="py-2">
+                        <td class="pilot-amount py-2">
                             <span class="pilot-cell-label" aria-hidden="true">{{
                                 trans('Containers per unit')
                             }}</span

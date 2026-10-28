@@ -3,6 +3,14 @@ import { describe, expect, it } from 'vite-plus/test';
 // Files already migrated to the plan's layout rules (plan.md "Layout rules").
 // Each slice appends its pages, shell layouts and presentation components.
 export const checkedFiles = [
+    'pages/Dashboard.vue',
+    'pages/Wallet/Statement.vue',
+    'pages/Producer/Cutoff.vue',
+    'pages/Producer/CycleSummary.vue',
+    'pages/Producer/Products/Index.vue',
+    'pages/Producer/Products/Create.vue',
+    'pages/Producer/Products/Edit.vue',
+    'components/StockProductFields.vue',
     'pages/Orders/Index.vue',
     'pages/Orders/Edit.vue',
     'components/orders/CycleCard.vue',

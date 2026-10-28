@@ -83,6 +83,7 @@ describe('dashboard presentation', () => {
 
         expect(html).toContain('Saldo');
         expect(html).toContain('recollida');
+        expect(html).toContain('text-lg font-semibold');
     });
 
     it('shows manager summary for a manager', async () => {
@@ -111,5 +112,6 @@ describe('dashboard presentation', () => {
         expect(html).toContain('Cooperativa');
         expect(html).toContain('Cicles');
         expect(html).toContain('Comptes');
+        expect(html.match(/text-lg font-semibold/g)).toHaveLength(2);
     });
 });

@@ -47,5 +47,6 @@ describe('producer product mobile row labels', () => {
         expect(html).toContain('3.50 EUR');
         expect(html).toContain('aria-label="Desactiva: Pa de pagès"');
         expect(html).toContain('pilot-table-actions');
+        expect(html.match(/<td class="pilot-amount py-2"/g)).toHaveLength(2);
     });
 });
