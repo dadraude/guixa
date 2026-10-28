@@ -74,7 +74,7 @@ it('rejects a pickup weekday outside Monday to Sunday (R4c)', function (mixed $w
 
 it('opens a cycle with its participants and shows its cutoffs (R4, R4a, R5, S6)', function () {
     CarbonImmutable::setTestNow('2026-10-28T22:38:00+00:00');
-    $this->app->instance(Clock::class, new FrozenClock('2026-10-28T22:38:00+00:00'));
+    $this->app->instance(Clock::class, new FrozenClock('2026-10-28T22:38:00+00:00', config('guixa.timezone')));
     pickupOnSaturdays();
     $baker = cyclesBaker();
     $date = upcoming();
