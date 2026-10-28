@@ -2,8 +2,8 @@
 
 namespace Guixa\Membership\Infrastructure\Mail;
 
-use DateTimeImmutable;
 use Carbon\CarbonImmutable;
+use DateTimeImmutable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
