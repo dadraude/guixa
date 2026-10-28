@@ -71,7 +71,10 @@ export function measureLayout({
             }
         }
         for (
-            let ancestor = element.parentElement;
+            // A modal lives in the top layer and escapes its DOM ancestors' clipping.
+            let ancestor = element.matches(':modal')
+                ? null
+                : element.parentElement;
             ancestor;
             ancestor = ancestor.parentElement
         ) {
@@ -92,6 +95,7 @@ export function measureLayout({
                 )
                     failures.push(`Vertically clipped: ${name}`);
             }
+            if (ancestor.matches(':modal')) break;
         }
     }
     return {
@@ -123,7 +127,13 @@ export function measureFocus(selectors) {
     );
     if (!hit || (hit !== element && !element.contains(hit)))
         failures.push('Focused control clipped or covered');
-    if (!element.matches(':focus-visible'))
+    // Chrome's native picker button can own focus while the input remains activeElement.
+    const nativePickerFocus =
+        element.matches("input:is([type='date'],[type='time']):focus-within") &&
+        style.outlineStyle !== 'none' &&
+        parseFloat(style.outlineWidth) > 0 &&
+        !['transparent', 'rgba(0, 0, 0, 0)'].includes(style.outlineColor);
+    if (!element.matches(':focus-visible') && !nativePickerFocus)
         failures.push('Keyboard focus not focus-visible');
     if (style.outlineStyle === 'none' && style.boxShadow === 'none')
         failures.push(

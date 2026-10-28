@@ -138,5 +138,7 @@
     "Log in": "Inicia sessió",
     "Your work, organized": "La feina, ben organitzada",
     "Pickups": "Recollides",
-    "Next pickup": "Propera recollida"
+    "Next pickup": "Propera recollida",
+    "Manage cycle for :date": "Gestiona el cicle del :date",
+    "Manage :producer · :date": "Gestiona :producer · :date"
 }

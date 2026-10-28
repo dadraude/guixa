@@ -116,15 +116,35 @@ void createInertiaApp({
     restoreFixtureUrl();
     window.setTimeout(restoreFixtureUrl, 100);
     window.setTimeout(restoreFixtureUrl, 500);
-    if (state !== 'dialog' && state !== 'drawer') return;
+    if (
+        ![
+            'dialog',
+            'drawer',
+            'cycle-management',
+            'producer-management',
+        ].includes(state ?? '')
+    )
+        return;
     const openRequestedState = () => {
         const trigger = document.querySelector<HTMLButtonElement>(
-            state === 'dialog'
-                ? '[data-test="open-create-cycle"]'
-                : 'button[data-sidebar="trigger"]',
+            state === 'cycle-management'
+                ? '[data-test="manage-cycle-1"]'
+                : state === 'producer-management'
+                  ? '[data-test="manage-cycle-1-producer-1"]'
+                  : state === 'dialog'
+                    ? '[data-test="open-create-cycle"]'
+                    : 'button[data-sidebar="trigger"]',
         );
         if (!trigger) return false;
         trigger.click();
+        if (state === 'cycle-management') {
+            window.setTimeout(() => {
+                const details = document.querySelector<HTMLDetailsElement>(
+                    'dialog[open] details',
+                );
+                if (details) details.open = true;
+            }, 50);
+        }
         return true;
     };
     if (openRequestedState()) return;

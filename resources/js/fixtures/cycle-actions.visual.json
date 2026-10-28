@@ -1,0 +1,136 @@
+{
+    "baseUrl": "http://127.0.0.1:5193",
+    "rootFontPx": 16,
+    "darkSelector": "html.dark",
+    "matrix": {
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark"],
+        "text": [100, 200]
+    },
+    "views": [
+        {
+            "id": "manager-cycles",
+            "path": "/visual-reference-pilot.html",
+            "query": {
+                "screen": "cycles"
+            },
+            "root": ".reference-style",
+            "panels": ".pilot-manager-page, [data-sidebar='sidebar']",
+            "content": "h1,h2,label,input,a,summary,button:not([data-sidebar='trigger']):not([id^='reka-dropdown-menu-trigger']),[data-visual-text]",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "button[data-sidebar='trigger']",
+                "[data-test='open-create-cycle']",
+                "[data-test='summary-cycle-1']",
+                "[data-test='manage-cycle-1']",
+                "[data-test=\"manage-cycle-1-producer-1\"]"
+            ],
+            "states": [
+                {
+                    "id": "populated",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "long-content",
+                    "query": {
+                        "state": "long"
+                    },
+                    "cases": [
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "cycle-management",
+                    "query": {
+                        "state": "cycle-management"
+                    },
+                    "ready": "dialog[open]",
+                    "settled": ["dialog[open]"],
+                    "checks": {
+                        "panels": "dialog[open]",
+                        "content": "dialog[open] h2,dialog[open] p,dialog[open] label,dialog[open] input,dialog[open] button,dialog[open] summary",
+                        "focus": ["[data-test=\"cancel-cycle-1\"]"],
+                        "root": "body"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "producer-management",
+                    "query": {
+                        "state": "producer-management"
+                    },
+                    "ready": "dialog[open]",
+                    "settled": ["dialog[open]"],
+                    "checks": {
+                        "panels": "dialog[open]",
+                        "content": "dialog[open] h2,dialog[open] p,dialog[open] label,dialog[open] input,dialog[open] button,dialog[open] summary",
+                        "focus": [
+                            "#cutoff-date",
+                            "#cutoff-time",
+                            "[data-test=\"set-cutoff\"]"
+                        ],
+                        "root": "body"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

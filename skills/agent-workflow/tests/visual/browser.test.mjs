@@ -102,3 +102,66 @@ void test('detects focused controls hidden by clipping or an overlay', async () 
     );
     assert.deepEqual(shown.failures, []);
 });
+void test('modal dialogs escape clipping ancestors while their own clipping is checked', async () => {
+    await render(
+        '.panel{width:80px;overflow:hidden}dialog{width:280px;padding:16px}dialog p{margin:0;font-size:16px}',
+        '<dialog><p>Manage cycle</p></dialog>',
+    );
+    await browser.evaluate('document.querySelector("dialog").showModal()');
+    const modalOptions = {
+        root: 'body',
+        panels: 'dialog[open]',
+        content: 'dialog[open] p',
+    };
+    const result = await browser.evaluate(
+        `(${measureLayout.toString()})(${JSON.stringify(modalOptions)})`,
+    );
+    assert.deepEqual(result.failures, []);
+    await browser.evaluate(
+        'document.querySelector("dialog p").style.width="700px"',
+    );
+    const clipped = await browser.evaluate(
+        `(${measureLayout.toString()})(${JSON.stringify(modalOptions)})`,
+    );
+    assert.ok(
+        clipped.failures.some((failure) =>
+            /clipped|Outside|escapes/.test(failure),
+        ),
+    );
+});
+void test('native date subcontrols retain a visible focus-within outline at every Tab stop', async () => {
+    await render(
+        'input:focus-within{outline:3px solid blue}',
+        '<input id="date" type="date"><button>Save</button>',
+    );
+    let nativeStops = 0;
+    for (let step = 0; step < 6; step++) {
+        for (const type of ['keyDown', 'keyUp']) {
+            await browser.send('Input.dispatchKeyEvent', {
+                type,
+                key: 'Tab',
+                code: 'Tab',
+                windowsVirtualKeyCode: 9,
+            });
+        }
+        const state = await browser.evaluate(
+            `({ native:document.activeElement.id==='date' && !document.activeElement.matches(':focus-visible'), result:(${measureFocus.toString()})(['#date']) })`,
+        );
+        if (!state.native) continue;
+        nativeStops++;
+        assert.deepEqual(state.result.failures, []);
+        await browser.evaluate(
+            'document.querySelector("#date").style.outline="none"',
+        );
+        const invisible = await browser.evaluate(
+            `(${measureFocus.toString()})(['#date'])`,
+        );
+        assert.ok(
+            invisible.failures.includes('Keyboard focus not focus-visible'),
+        );
+        await browser.evaluate(
+            'document.querySelector("#date").style.removeProperty("outline")',
+        );
+    }
+    assert.ok(nativeStops > 0, 'Must exercise a native picker subcontrol');
+});

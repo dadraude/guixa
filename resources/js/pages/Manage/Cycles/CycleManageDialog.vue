@@ -206,6 +206,7 @@ const target = computed(() => ({
                         Tanca ara
                     </button>
                     <button
+                        v-if="!participant"
                         type="button"
                         class="manager-button manager-button-secondary"
                         :data-test="`cancel-${cycle.id}`"
