@@ -88,3 +88,32 @@ A: “yes”
 ## 2026-10-28 · Change
 
 Added R11/S14 to `spec.md`, the login response design to `plan.md` and independent T05 to `tasks.md`, following the user’s explicit destination request. Successful login now always targets the dashboard rather than a saved session destination. The existing dashboard-content slices remain separate.
+
+## 2026-10-28 · Change
+
+`spec.md` R1–R3/R6/R7/R9 and S1/S5/S6/S8, `plan.md` read models/time/access/verification, and
+`tasks.md` T02/T03: align the dashboard with the already accepted feature-001 Sales amendment.
+Sales summaries replace Order::pickup()/PickupStatus sources; validation and collection are
+separate, drafts are preparation, pending validated baskets survive closed cycles and include
+cycleless/attributed supplements, and no date triggers not-collected/abandonment. Weekly-base
+progress excludes independent supplements; effective full reversal clears pending collection.
+Member reads enforce current household access; Finance sees only its existing authorized Sales
+context and destinations, with no manager cycle/reception/history rights. Mixed roles deduplicate
+the same basket. The four-cycle participation chart and counts-only/no-alert behavior stay intact.
+
+DRA-202/DRA-203 retain their original tracer prerequisites and contextual T61/DRA-216 links.
+Their descriptions are synchronized, while all four 002 issues stay Backlog without ready-for-agent
+and implementation stays stopped. No application, polling, write shortcut or new permission is
+introduced. This documentary compatibility update uses the test-first exception; implementation
+must supply the stated meaningful scenario/access tests and rendered evidence later.
+Why: the user requested “després comprova la part del dashboard si cal actualitzar-la també”;
+001's accepted R23a/R23b/R24/R24a/R24b and T59–T61 already require the Sales data-source cutover.
+
+## 2026-10-28 · Change
+
+`spec.md`, `plan.md` and `tasks.md`: preserve origin/main's independently merged login-destination
+R11/S14/T05 alongside the Sales compatibility alignment. The dashboard therefore has 11 requirements
+and 14 scenarios; the original four content issues remain stopped and the independent login change
+is not reimplemented or republished as a new Linear ticket. All upstream and amendment log entries
+retain their exact bytes.
+Why: reconcile the authorized documentation PR with the existing login-to-dashboard change in main.
