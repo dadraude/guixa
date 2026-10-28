@@ -32,6 +32,22 @@ class AuthenticationTest extends TestCase
         $response->assertRedirect(route('dashboard', absolute: false));
     }
 
+    public function test_login_goes_directly_to_dashboard_instead_of_the_saved_destination(): void
+    {
+        $user = User::factory()->manager()->create();
+
+        $this->get(route('manage.cycles.index'))->assertRedirect(route('login'));
+
+        $response = $this->post(route('login.store'), [
+            'email' => $user->email,
+            'password' => 'password',
+        ]);
+
+        $this->assertAuthenticatedAs($user);
+        $response->assertRedirect(route('dashboard', absolute: false));
+        $response->assertSessionMissing('url.intended');
+    }
+
     public function test_users_with_two_factor_enabled_are_redirected_to_two_factor_challenge()
     {
         $this->skipUnlessFortifyHas(Features::twoFactorAuthentication());

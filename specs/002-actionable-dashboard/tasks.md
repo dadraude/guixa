@@ -32,3 +32,7 @@ Each task is a reviewable vertical slice through authorized Application reads, H
 - **T04:** Application tests count distinct ordering households in exactly the four latest closed, non-cancelled cycles, including zero-line, allocation-only and later-delivery cases. Vue checks confirm every bar's date/count/list/link, the insufficient-history explanation, and absence of target or low-participation text. The final role/viewport visual manifest and focused checks pass; page idle time causes no background request.
 
 For each slice, generate the TypeScript DTOs, run focused PHP/Vue tests, typecheck, format and architecture checks, then inspect measured layout and the shared visual report. The full suite and CI remain the pull-request gate. These tasks do not authorize publishing Linear tickets or deploying a change.
+
+## Login destination follow-up
+
+- **T05 (R11, S14):** Route successful password, two-factor and passkey logins directly to the dashboard, clearing a previously requested destination. Done when focused HTTP/response tests cover each login method, existing authentication checks pass, and JSON contracts are preserved. This independent navigation change has no dependency on T01–T04 and no visual changes.
