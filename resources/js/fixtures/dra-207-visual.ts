@@ -162,7 +162,9 @@ void createInertiaApp({
     if (window.matchMedia('(max-width: 767px)').matches) {
         const toggle = await waitFor('button[data-sidebar="trigger"]');
         toggle.click();
-        await waitFor('a[href="/manage/stock"]');
+        await waitFor(
+            '[data-sidebar="sidebar"][data-mobile="true"] a[href="/manage/stock"]',
+        );
         toggle.click();
         for (let attempt = 0; attempt < 100; attempt++) {
             if (
