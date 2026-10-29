@@ -16,7 +16,8 @@ no code is written before its spec is accepted.
    end through every layer it needs (page, use case, domain, persistence, tests) and stops for review;
    each later task is another vertical slice that reuses and widens that path. A layer-only task
    (only the schema, only the tokens) is used only when no vertical slice can be delivered, and its
-   row says why.
+   row says why. Apply the shared [task-quality and slicing rules](../skills/agent-workflow/references/planning.md#task-quality-invest)
+   to every new task breakdown.
 
 Alongside them, `NNN-feature/log.md` keeps the why. It is append-only: entries are never edited or
 removed, so the reasoning survives after the spec is rewritten. Each entry is dated and is one of:

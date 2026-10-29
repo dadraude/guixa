@@ -29,12 +29,34 @@ an answer, amend the spec or issue a publishable draft for that scope. An indepe
 be drafted if it still delivers a useful result; disclose the deferred scope and why. Recheck affected
 evidence after a source, scope or dependency change.
 
+## Task quality (INVEST)
+
+Every new executable task and ticket must be:
+
+- **Independent:** mergeable without waiting on unfinished tasks. Name unavoidable prerequisites and
+  the merged result required before the successor is ready.
+- **Valuable:** delivers a result a user or tester can observe.
+- **Small:** one PR, ideally under about 400 lines of diff, with code, tests and docs together.
+  Estimate scope; split oversized work into useful vertical slices or explain a justified exception.
+- **Testable:** includes spec-derived acceptance criteria and requirement/scenario refs, expressed as
+  concrete Given/When/Then observations in the handoff below.
+
+For AI agents, scope each vertical task so one implementer can understand, deliver and verify it.
+
 ## Slice and explain the batch
 
 Start the proposed breakdown with a short architecture overview: the source-backed pathway, what
 already works and the first missing behavior to establish. The first executable task is the smallest
 reviewable end-to-end result; later tasks reuse it only where they actually depend on it. If the
 path already exists, do not schedule a duplicate bootstrap or renumber existing tasks to add task zero.
+
+For a big new project, start with a **walking skeleton**, including CI/CD, deployment and a check
+of the deployed result, to expose architecture problems early. Reuse existing delivery paths;
+planning does not authorize deployment. Group feature slices under one native epic tracking the
+outcome; reuse existing epics and respect parent/inheritance constraints.
+
+Use feature flags to merge unfinished slices safely to main. Record the flag, safe default, off/on
+acceptance checks and rollout/removal owner or task. Testers must be able to demonstrate the slice.
 
 Keep each task within one fresh implementer's context, including its required source excerpts and
 verification. A task that needs several unrelated paths or cannot state a bounded observable result
@@ -65,6 +87,7 @@ Scale detail to the task; use Not applicable with a reason where a concern is ab
 - **Done when:** concrete Given/When/Then observations and focused tests/checks with expected results.
   For persistence-dependent behavior, verify write/read through the real adapter; for UI behavior,
   identify the visible result and required visual evidence. Planned checks are not passing results.
+- **Size and rollout:** estimated diff size, justified exceptions and any flag details listed above.
 - **Limits and allocation:** explicit out-of-scope limits. If this task covers only part of a source
   requirement, identify that part, the remainder's owner and the task/dependency that completes it.
   Do not exclude required permissions, validation or failure behavior to make a slice look smaller.
@@ -77,6 +100,7 @@ from links alone. A source change requires reconciliation of affected drafts bef
 ## Check before presenting
 
 - Readiness evidence still matches the proposed scope and source versions.
+- Task quality and batch slicing meet the rules above; rework failures before presenting.
 - Each executable task maps to the canonical registry and has a bounded outcome and verifiable Done
   when. Planned paths and partial requirement coverage are explicit.
 - Every scoped requirement/scenario has an owner, or is explicitly deferred with the reason. A shared
