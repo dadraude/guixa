@@ -62,7 +62,7 @@ function deleteUnused(product: App.Http.ProductRow) {
                 {{ trans('Save') }}
             </Button>
         </Form>
-        <div class="pilot-layout-panel mt-5 max-w-xl">
+        <div class="pilot-layout-panel mt-4 max-w-xl">
             <InputError :message="actionError" role="alert" />
             <ProductAdministrationActions
                 :name="product.name"

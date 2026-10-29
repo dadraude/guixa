@@ -173,7 +173,12 @@ it('removes a stock line (R20)', function () {
 
     $this->actingAs($manager)->delete("/manage/cycles/{$cycleId}/pickups/{$households['A']}/stock-lines/{$honey}")->assertRedirect();
 
-    expect(DB::table('order_stock_lines')->count())->toBe(0);
+    $this->actingAs($manager)->get("/manage/cycles/{$cycleId}/pickups/{$households['A']}")
+        ->assertInertia(fn (Assert $page) => $page->has('pickup.stockLines', 0)->where('pickup.totalCents', 1400));
+    $this->actingAs($manager)->get("/manage/cycles/{$cycleId}/pickups")
+        ->assertInertia(fn (Assert $page) => $page->where('pickups.0.totalCents', 1400));
+    expect(DB::table('order_stock_lines')->whereNull('removed_at')->count())->toBe(0);
+    expect(DB::table('order_stock_lines')->where('stock_product_id', $honey)->whereNotNull('removed_at')->count())->toBe(1);
 });
 
 it('adds and removes returned items, crediting them in the total (R20a, S41)', function () {

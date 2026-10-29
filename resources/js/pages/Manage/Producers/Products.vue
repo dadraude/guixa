@@ -74,8 +74,8 @@ defineOptions({
             {{ trans('No products for this producer yet.') }}
         </p>
         <ul v-else class="pilot-list">
-            <li v-for="product in products" :key="product.id" class="space-y-3">
-                <div class="flex flex-wrap items-start justify-between gap-3">
+            <li v-for="product in products" :key="product.id" class="space-y-4">
+                <div class="flex flex-wrap items-start justify-between gap-4">
                     <div class="min-w-0">
                         <h2 class="font-semibold break-words">
                             {{ product.name }}
@@ -121,7 +121,7 @@ defineOptions({
         <Button
             as-child
             variant="outline"
-            class="mt-5 h-auto min-h-11 max-w-full min-w-0 py-2 text-center break-words whitespace-normal"
+            class="mt-4 h-auto min-h-11 max-w-full min-w-0 py-2 text-center break-words whitespace-normal"
         >
             <Link :href="ProducerProductController.index(producer.id)">{{
                 trans('Refresh products')

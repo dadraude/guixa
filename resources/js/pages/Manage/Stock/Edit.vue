@@ -99,7 +99,7 @@ function deleteUnused(product: App.Http.StockProductRow) {
                 {{ trans('Save') }}
             </Button>
         </Form>
-        <div class="mt-6 border-t pt-5">
+        <div class="mt-6 border-t pt-4">
             <InputError :message="actionError" role="alert" />
             <ProductAdministrationActions
                 :name="product.name"

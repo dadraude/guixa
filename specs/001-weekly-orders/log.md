@@ -2404,3 +2404,18 @@ link under the sticky breadcrumb at 1024 px/200% text. The link now has enough s
 focused bounds and hit target to clear that header. A direct Tab path measured the corrected focus;
 the final full runner must still bind the result to the amended commit. Comparable Manager heading
 actions and the other rejected-action pages were inventoried in the full run, with no failure there.
+
+
+## 2026-10-29 · CI contract correction
+
+The first published CI run found four off-grid spacing utilities introduced on the producer edit,
+Manager stock edit, Manager producer catalogue and shared product-action surfaces. Those utilities
+now use the existing spacing grid. The layout rule covers both newly added presentation surfaces,
+so future spacing drift on the Manager catalogue and shared action dialog is checked with the
+already migrated pages.
+
+Three existing HTTP assertions expected successful weekly or temporary pickup stock-line removal
+to erase the database rows. They now assert that the current order, member cycle count, pickup and
+pickup total exclude the removed lines while their historical rows retain `removed_at`. Assertions
+for rejected writes still require no committed reference. This reconciles the HTTP contract with
+the accepted T53 history rule; the product behaviour is unchanged.

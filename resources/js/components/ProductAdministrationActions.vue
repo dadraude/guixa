@@ -29,7 +29,7 @@ function confirm() {
 </script>
 
 <template>
-    <div class="space-y-3">
+    <div class="space-y-4">
         <p v-if="used" class="text-sm text-muted-foreground">
             {{
                 trans(
@@ -87,7 +87,7 @@ function confirm() {
                           )
                 }}
             </p>
-            <div class="mt-5 flex flex-wrap justify-end gap-2">
+            <div class="mt-4 flex flex-wrap justify-end gap-2">
                 <Button
                     type="button"
                     variant="outline"
