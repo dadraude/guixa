@@ -44,6 +44,36 @@ for principles and architecture, and [`specs/README.md`](specs/README.md) for ho
     Open the invitation email in Mailpit (<http://localhost:8025>) and follow the link to set up the account.
     From there, the manager invites the rest of the members from the app.
 
+## Demo data
+
+For a local demo, run migrations and the default seeder:
+
+```sh
+php artisan migrate
+php artisan db:seed
+```
+
+`DatabaseSeeder` calls `DemoSeeder`, which is available only in `local` and `testing`.
+All demo accounts use the password `demo-password` and are already activated and verified.
+
+| Role              | Account                                                                                          |
+| ----------------- | ------------------------------------------------------------------------------------------------ |
+| Manager           | `gestora@demo.guixa.test`                                                                        |
+| Household members | `anna@demo.guixa.test`, `biel@demo.guixa.test`, `carla@demo.guixa.test`, `david@demo.guixa.test` |
+| Producers         | `hort@demo.guixa.test`, `forn@demo.guixa.test`, `formatgeria@demo.guixa.test`                    |
+
+The demo creates four households, three producers, six weekly products, two stock products,
+opening wallet balances and stock entries. Each household has an order in three upcoming cycles:
+
+- The earliest cycle is ready for pickup, with one completed pickup and three pending.
+- The next cycle has sent producer orders and a partially prepared reception.
+- The last cycle is open for members to edit their orders.
+
+Dates follow the cooperative's timezone and configured pickup weekday (Thursday when none is set),
+skipping dates already occupied by live cycles. Demo setup sends no invitation or order emails.
+Creation is transactional, and rerunning the seeder leaves the existing demo and any manual edits
+intact. Existing application data is preserved. To start the demo over, use a separate empty database.
+
 ## Tests and checks
 
 ```sh
