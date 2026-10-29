@@ -150,7 +150,9 @@ trait ProductRepositoryContract
         $repository->add(Product::create($repository->nextId(), $second, 'apple', 'kg', Money::ofCents(100), false, null, stock: true));
         $repository->add($this->product($repository, $first, 'Bread'));
 
-        $this->assertSame(['apple', 'Zucchini'], array_map(fn (Product $product) => $product->name(), $repository->listStock()));
+        $products = $repository->listStock();
+        $this->assertTrue(array_is_list($products));
+        $this->assertSame(['apple', 'Zucchini'], array_map(fn (Product $product) => $product->name(), $products));
     }
 
     #[Test]

@@ -66,9 +66,11 @@ final class EloquentProductRepository implements ProductRepository
 
     public function listStock(): array
     {
-        return ProductModel::query()->where('stock', true)
+        $items = ProductModel::query()->where('stock', true)
             ->orderByRaw('lower(name)')->orderBy('id')->get()
             ->map(fn (ProductModel $model) => $this->toDomain($model))->all();
+
+        return array_values($items);
     }
 
     private function toDomain(ProductModel $model): Product
