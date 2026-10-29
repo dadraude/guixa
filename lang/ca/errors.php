@@ -55,6 +55,8 @@ return [
     'ProducerOrderNotSent' => 'La comanda d’aquest productor encara no s’ha enviat i no té recepció.',
     'ProducerStillOpen' => 'El termini d’aquest productor encara és obert i no es pot enviar la comanda.',
     'ProductAlreadyOrdered' => 'Aquest producte ja s’ha demanat i és present a la recepció.',
+    'ProductHasStockUse' => 'No es poden canviar la unitat ni la condició de quantitat variable després d’utilitzar l’estoc.',
+    'ProductUsed' => 'Un producte que ja s’ha utilitzat no es pot reclassificar ni eliminar.',
     'ProductHasUnsettledLines' => 'No es poden canviar la unitat ni la condició de preu variable mentre el producte tingui línies en un cicle pendent de liquidació.',
     'ProductNotFound' => 'No s’ha trobat aquest producte.',
     'ProductNotInPickup' => 'Aquesta recollida no té cap línia d’aquest producte.',

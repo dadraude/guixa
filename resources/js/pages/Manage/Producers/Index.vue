@@ -4,6 +4,7 @@ import { trans } from 'laravel-vue-i18n';
 import ProducerAccountController from '@/actions/App/Http/Controllers/Manage/ProducerAccountController';
 import ProducerController from '@/actions/App/Http/Controllers/Manage/ProducerController';
 import StockProductController from '@/actions/App/Http/Controllers/Manage/StockProductController';
+import ProducerProductController from '@/actions/App/Http/Controllers/Manage/ProducerProductController';
 import Heading from '@/components/Heading.vue';
 import InputError from '@/components/InputError.vue';
 import StatusIndicator from '@/components/StatusIndicator.vue';
@@ -123,18 +124,40 @@ const daysLabel = (days: number) =>
                     </span>
                 </div>
 
-                <Button as-child variant="outline" class="min-h-11 self-start">
-                    <Link
-                        :href="StockProductController.create(producer.id)"
-                        :aria-label="
-                            trans('Add stock product for :name', {
-                                name: producer.name,
-                            })
-                        "
+                <div class="flex flex-wrap gap-2">
+                    <Button
+                        as-child
+                        variant="outline"
+                        class="h-auto min-h-11 max-w-full min-w-0 self-start py-2 text-center break-words whitespace-normal"
                     >
-                        {{ trans('Add stock product') }}
-                    </Link>
-                </Button>
+                        <Link
+                            :href="ProducerProductController.index(producer.id)"
+                            :aria-label="
+                                trans('View products of :name', {
+                                    name: producer.name,
+                                })
+                            "
+                        >
+                            {{ trans('View products') }}
+                        </Link>
+                    </Button>
+                    <Button
+                        as-child
+                        variant="outline"
+                        class="h-auto min-h-11 max-w-full min-w-0 self-start py-2 text-center break-words whitespace-normal"
+                    >
+                        <Link
+                            :href="StockProductController.create(producer.id)"
+                            :aria-label="
+                                trans('Add stock product for :name', {
+                                    name: producer.name,
+                                })
+                            "
+                        >
+                            {{ trans('Add stock product') }}
+                        </Link>
+                    </Button>
+                </div>
 
                 <p
                     v-if="producer.accountEmail !== null"

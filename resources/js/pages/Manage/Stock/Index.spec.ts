@@ -28,7 +28,7 @@ vi.mock('@inertiajs/vue3', () => ({
 }));
 
 describe('manager list presentation', () => {
-    it('renders 20 compact stock rows and a six-column desktop table', async () => {
+    it('renders 20 reflowable stock rows and a six-column desktop table', async () => {
         const products = Array.from({ length: 20 }, (_, index) => ({
             id: `stock-${index}`,
             producerId: 'producer-1',
@@ -43,7 +43,9 @@ describe('manager list presentation', () => {
         const app = createSSRApp(StockIndex, { products });
         installTranslations(app);
         const html = await renderToString(app);
-        expect(html.match(/min-h-16 min-w-0 flex-1/g) ?? []).toHaveLength(20);
+        expect(
+            html.match(/min-h-16 w-full min-w-0 flex-wrap/g) ?? [],
+        ).toHaveLength(20);
         expect(html).toContain('manager-stock-table');
         expect(html).toContain('Cerca productes');
         expect(html).toContain('aria-label="Reactiva: Producte 0"');

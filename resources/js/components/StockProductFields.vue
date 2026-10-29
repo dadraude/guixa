@@ -10,6 +10,7 @@ defineProps<{
         'name' | 'unit' | 'price' | 'variable' | 'containersPerUnit'
     >;
     errors: Partial<Record<string, string>>;
+    lockStockUnit?: boolean;
 }>();
 </script>
 
@@ -35,8 +36,19 @@ defineProps<{
             name="unit"
             :default-value="product?.unit"
             required
+            :readonly="lockStockUnit"
+            :aria-describedby="
+                lockStockUnit ? 'stock-unit-lock-hint' : undefined
+            "
             :placeholder="trans('jar, kg, bottle')"
         />
+        <p
+            v-if="lockStockUnit"
+            id="stock-unit-lock-hint"
+            class="text-sm text-muted-foreground"
+        >
+            {{ trans('Unit and variable quantity are fixed after stock use.') }}
+        </p>
         <InputError :message="errors.unit" />
     </div>
 
@@ -54,13 +66,21 @@ defineProps<{
     </div>
 
     <div class="flex items-center gap-2">
-        <input type="hidden" name="variable" value="0" />
+        <input
+            type="hidden"
+            name="variable"
+            :value="lockStockUnit && product?.variable ? '1' : '0'"
+        />
         <input
             id="variable"
             type="checkbox"
             name="variable"
             value="1"
             :checked="product?.variable ?? false"
+            :disabled="lockStockUnit"
+            :aria-describedby="
+                lockStockUnit ? 'stock-unit-lock-hint' : undefined
+            "
         />
         <Label for="variable">{{
             trans('Sold by variable quantity (weight or volume)')

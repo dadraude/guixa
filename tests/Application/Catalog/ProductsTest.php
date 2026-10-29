@@ -180,3 +180,9 @@ it('keeps product management to producers, not managers or members (R1, R2)', fu
     'manager' => fn () => Actor::manager('00000000-0000-7000-8000-00000000000a'),
     'member' => fn () => Actor::memberOf('00000000-0000-7000-8000-00000000000b', 'h1'),
 ]);
+
+it('locks a weekly product before checking its unsettled-line edit guard (R1, S5)', function () {
+    $id = ($this->world->createProduct)($this->bakerActor, $this->baker, 'Bread', 'loaf', 350, false, null);
+    ($this->world->updateProduct)($this->bakerActor, $id, 'Bread', 'loaf', 350, false, null);
+    expect($this->world->products->locked)->toContain($id);
+});

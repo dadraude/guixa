@@ -22,6 +22,41 @@ trait ProductRepositoryContract
     }
 
     #[Test]
+    public function it_reclassifies_only_the_mode_and_deletes_an_unused_record(): void
+    {
+        $repository = $this->repository();
+        $producerId = $this->newProducerId();
+        $product = $this->product($repository, $producerId);
+        $repository->add($product);
+        $repository->setClassification($product->id, true);
+        $changed = $repository->get($product->id);
+        $this->assertTrue($changed->isStock());
+        $this->assertSame($producerId, $changed->producerId);
+        $this->assertSame('Bread', $changed->name());
+        $repository->setClassification($product->id, false);
+        $this->assertFalse($repository->get($product->id)->isStock());
+        $repository->delete($product->id);
+        $this->assertNull($repository->get($product->id));
+    }
+
+    #[Test]
+    public function a_stale_administration_save_cannot_restore_a_previous_classification(): void
+    {
+        $repository = $this->repository();
+        $product = $this->product($repository, $this->newProducerId());
+        $repository->add($product);
+        $stale = $repository->get($product->id);
+        $repository->setClassification($product->id, true);
+        $stale->deactivate();
+        try {
+            $repository->add($stale);
+            $this->fail('A stale administration save must not restore the previous classification.');
+        } catch (LogicException) {
+            $this->assertTrue($repository->get($product->id)->isStock());
+        }
+    }
+
+    #[Test]
     public function it_generates_distinct_uuid_v7_ids(): void
     {
         $repository = $this->repository();

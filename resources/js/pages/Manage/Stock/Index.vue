@@ -47,7 +47,10 @@ function editProduct(product: App.Http.StockLevelRow, event: MouseEvent) {
                 :title="trans('Stock')"
                 :description="trans('Products for pickup.')"
             />
-            <Button as-child class="min-h-11">
+            <Button
+                as-child
+                class="h-auto min-h-11 max-w-full min-w-0 py-2 text-center break-words whitespace-normal"
+            >
                 <Link :href="ProducerController.index()">
                     <Plus aria-hidden="true" />
                     {{ trans('Choose a producer to add stock') }}
@@ -100,7 +103,7 @@ function editProduct(product: App.Http.StockLevelRow, event: MouseEvent) {
                 <li
                     v-for="product in filteredProducts"
                     :key="product.id"
-                    class="flex min-w-0 items-center gap-4"
+                    class="flex min-w-0 flex-wrap items-center gap-4 sm:flex-nowrap"
                 >
                     <Form
                         v-bind="
@@ -126,13 +129,13 @@ function editProduct(product: App.Http.StockLevelRow, event: MouseEvent) {
                     </Form>
                     <button
                         type="button"
-                        class="flex min-h-16 min-w-0 flex-1 items-center justify-between gap-4 py-2 text-left"
+                        class="flex min-h-16 w-full min-w-0 flex-wrap items-center justify-between gap-2 py-2 text-left sm:flex-1 sm:flex-nowrap sm:gap-4"
                         :aria-label="
                             trans('Edit :name', { name: product.name })
                         "
                         @click="editProduct(product, $event)"
                     >
-                        <span class="min-w-0">
+                        <span class="min-w-0 flex-1 basis-full sm:basis-auto">
                             <span class="block font-medium break-words">{{
                                 product.name
                             }}</span>

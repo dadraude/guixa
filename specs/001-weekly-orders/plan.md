@@ -207,6 +207,7 @@ reads them afterwards, in a new statement, so a waiting transaction sees the oth
 | `ChangeProductClassification` | Manager; unused only; never changes producer |
 | `DeleteUnusedProduct` | Current administrator; history check under lock |
 | `ListProducerProducts` | Own producer; editable weekly records, read-only stock records with current availability |
+| `ListProductsOfProducer`, `IsProductUsed`, `GetProductProducer` | Manager catalogue read across both modes, retained-use flag for allowed actions and producer context |
 | `ListProducerStockProducts` | Manager; products created from that producer's record |
 | `GetOrderableProduct`, `ListOrderableProducts` | Internal; active weekly products of active producers only |
 | `ListProducerProductsForReception` | Internal; weekly products including inactive records/producers; never stock |
@@ -531,6 +532,7 @@ All route middleware is backed by Application Actor checks; member-owned ids are
 | `POST .../validation`, `PUT .../collection`, `POST .../corrections` | `ValidateBasket`, `MarkBasketCollected`, `CorrectBasket`; distinct actions with distinct effects |
 | `POST .../cancellation`, `POST .../collection-corrections` | Cancel a stock draft / justified staff correction of collection state |
 | `/finance/households/{household}/wallet` and receipt/correction posts | Reuse `Wallet/Statement` and confirmed top-up/correction forms, gated Finance/Manager |
+| `/manage/producers/{producer}/products` | Manager catalogue page listing both modes and their allowed actions; entry from producer administration |
 | `/manage/producers/{producer}/products/...` | Stock product creation/edit/deactivate/reactivate/unused-delete from producer context; Manager only |
 | `/producer/products/...` | Own weekly administration and read-only own stock with quantities; no stock-mode change by producer |
 | `/manage/products/{product}/classification` | Manager-only unused-mode change; no producer reassignment |

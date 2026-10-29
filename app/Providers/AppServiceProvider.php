@@ -7,8 +7,10 @@ use Guixa\Catalog\Domain\ProducerAccess;
 use Guixa\Catalog\Domain\ProducerCycles;
 use Guixa\Catalog\Domain\ProducerRepository;
 use Guixa\Catalog\Domain\ProductRepository;
+use Guixa\Catalog\Domain\ProductUsage;
 use Guixa\Catalog\Infrastructure\Membership\MembershipProducerAccess;
 use Guixa\Catalog\Infrastructure\Ordering\OrderingProducerCycles;
+use Guixa\Catalog\Infrastructure\Ordering\RetainedProductUsage;
 use Guixa\Catalog\Infrastructure\Persistence\EloquentProducerRepository;
 use Guixa\Catalog\Infrastructure\Persistence\EloquentProductRepository;
 use Guixa\Membership\Domain\AccountPasswords;
@@ -99,6 +101,7 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->bind(ProducerRepository::class, EloquentProducerRepository::class);
         $this->app->bind(ProductRepository::class, EloquentProductRepository::class);
+        $this->app->bind(ProductUsage::class, RetainedProductUsage::class);
         $this->app->bind(ProducerCycles::class, OrderingProducerCycles::class);
         $this->app->bind(ProducerAccess::class, MembershipProducerAccess::class);
 

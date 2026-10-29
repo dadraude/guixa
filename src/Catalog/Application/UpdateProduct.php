@@ -6,6 +6,7 @@ use Guixa\Catalog\Domain\Error\ProductNotFound;
 use Guixa\Catalog\Domain\ProducerCycles;
 use Guixa\Catalog\Domain\ProductRepository;
 use Guixa\Shared\Application\Actor;
+use Guixa\Shared\Application\TransactionRunner;
 use Guixa\Shared\Domain\Error\NotAllowed;
 use Guixa\Shared\Domain\Money;
 
@@ -14,6 +15,7 @@ final class UpdateProduct
     public function __construct(
         private readonly ProductRepository $products,
         private readonly ProducerCycles $cycles,
+        private readonly TransactionRunner $transactions,
     ) {}
 
     public function __invoke(
@@ -25,14 +27,14 @@ final class UpdateProduct
         bool $variable,
         ?string $containersPerUnit,
     ): void {
-        $product = $this->products->get($id) ?? throw ProductNotFound::withId($id);
-        $actor->assertProducerOf($product->producerId);
-
-        if ($product->isStock()) {
-            throw NotAllowed::notYours('stock product');
-        }
-
-        $product->change($name, $unit, Money::ofCents($priceCents), $variable, $containersPerUnit, $this->cycles->hasUnsettledLines($id));
-        $this->products->add($product);
+        $this->transactions->run(function () use ($actor, $id, $name, $unit, $priceCents, $variable, $containersPerUnit): void {
+            $product = $this->products->getForUpdate($id) ?? throw ProductNotFound::withId($id);
+            $actor->assertProducerOf($product->producerId);
+            if ($product->isStock()) {
+                throw NotAllowed::notYours('stock product');
+            }
+            $product->change($name, $unit, Money::ofCents($priceCents), $variable, $containersPerUnit, $this->cycles->hasUnsettledLines($id));
+            $this->products->add($product);
+        });
     }
 }

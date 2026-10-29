@@ -54,6 +54,20 @@ final class EloquentOrderRepositoryTest extends TestCase
     }
 
     #[Test]
+    public function history_foreign_keys_prevent_deleting_an_order_that_references_a_product(): void
+    {
+        $cycle = $this->openCycle();
+        $repository = $this->repository();
+        $order = $repository->lockFor(self::CYCLE, self::HOUSEHOLD);
+        $order->setLine($this->product(self::BREAD, 'Loaf', 350), Quantity::fromString('1'), $cycle, $repository->nextId(), self::ANNA, $this->madrid('2026-10-22 10:00'));
+        $repository->add($order);
+        $order->removeLine(self::BREAD, $cycle, $this->madrid('2026-10-22 10:01'));
+        $repository->add($order);
+
+        $this->assertThrows(fn () => DB::table('orders')->where('id', $order->id)->delete(), QueryException::class);
+    }
+
+    #[Test]
     public function the_database_refuses_a_second_order_for_one_household_and_cycle(): void
     {
         $this->referencedRowsExist();

@@ -37,6 +37,16 @@ final class EloquentProductRepository implements ProductRepository
         ]);
     }
 
+    public function setClassification(string $id, bool $stock): void
+    {
+        ProductModel::query()->whereKey($id)->update(['stock' => $stock]);
+    }
+
+    public function delete(string $id): void
+    {
+        ProductModel::query()->whereKey($id)->delete();
+    }
+
     public function get(string $id): ?Product
     {
         $model = ProductModel::query()->find($id);

@@ -22,6 +22,11 @@ final class InMemoryStockMovementRepository extends InMemoryRepository implement
         return $movements;
     }
 
+    public function hasProductReference(string $stockProductId): bool
+    {
+        return $this->forProduct($stockProductId) !== [];
+    }
+
     public function available(string $stockProductId): SignedQuantity
     {
         return $this->availableByProduct()[$stockProductId] ?? SignedQuantity::ofThousandths(0);

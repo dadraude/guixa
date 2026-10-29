@@ -193,6 +193,18 @@ export type ProducerOptionRow = {
 readonly id: string,
 readonly name: string,
 };
+export type ProducerProductRow = {
+readonly id: string,
+readonly producerId: string,
+readonly name: string,
+readonly unit: string,
+readonly price: string,
+readonly variable: boolean,
+readonly containersPerUnit: string | null,
+readonly active: boolean,
+readonly stock: boolean,
+readonly used: boolean,
+};
 export type ProducerProductTotalRow = {
 readonly productId: string,
 readonly name: string,

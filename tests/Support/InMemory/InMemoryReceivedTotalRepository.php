@@ -13,6 +13,17 @@ final class InMemoryReceivedTotalRepository extends InMemoryRepository implement
         $this->save($total);
     }
 
+    public function hasProductReference(string $productId): bool
+    {
+        foreach ($this->all() as $total) {
+            if ($total->productId === $productId) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public function ofProducer(string $cycleId, string $producerId): array
     {
         $totals = [];

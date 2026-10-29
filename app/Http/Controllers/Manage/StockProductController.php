@@ -9,7 +9,9 @@ use App\Http\StockLevelRow;
 use App\Http\StockProductRow;
 use Guixa\Catalog\Application\CreateStockProduct;
 use Guixa\Catalog\Application\DeactivateStockProduct;
+use Guixa\Catalog\Application\DeleteUnusedProduct;
 use Guixa\Catalog\Application\GetProducer;
+use Guixa\Catalog\Application\IsProductUsed;
 use Guixa\Catalog\Application\ListStockProducts;
 use Guixa\Catalog\Application\ReactivateStockProduct;
 use Guixa\Catalog\Application\UpdateStockProduct;
@@ -51,12 +53,12 @@ class StockProductController extends Controller
         return to_route('manage.stock.index');
     }
 
-    public function edit(string $producer, string $stockProduct, ListStockProducts $list): Response
+    public function edit(string $producer, string $stockProduct, ListStockProducts $list, IsProductUsed $used): Response
     {
         $product = collect($list())->firstWhere('id', $stockProduct);
         abort_if($product === null || $product->producerId !== $producer, 404);
 
-        return Inertia::render('Manage/Stock/Edit', ['product' => StockProductRow::from($product)]);
+        return Inertia::render('Manage/Stock/Edit', ['product' => StockProductRow::from($product), 'used' => $used($stockProduct)]);
     }
 
     public function update(string $producer, string $stockProduct, StockProductRequest $request, Actor $actor, UpdateStockProduct $update): RedirectResponse
@@ -80,6 +82,15 @@ class StockProductController extends Controller
         $deactivate($actor, $producer, $stockProduct);
 
         return to_route('manage.stock.index');
+    }
+
+    public function deleteUnused(string $producer, string $stockProduct, Actor $actor, DeleteUnusedProduct $delete, ListStockProducts $list): RedirectResponse
+    {
+        $product = collect($list())->firstWhere('id', $stockProduct);
+        abort_if($product === null || $product->producerId !== $producer, 404);
+        $delete($actor, $stockProduct);
+
+        return to_route('manage.producer-products.index', ['producer' => $producer]);
     }
 
     public function reactivate(string $producer, string $stockProduct, Actor $actor, ReactivateStockProduct $reactivate): RedirectResponse

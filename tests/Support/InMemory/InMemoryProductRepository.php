@@ -9,6 +9,9 @@ use LogicException;
 /** @extends InMemoryRepository<Product> */
 final class InMemoryProductRepository extends InMemoryRepository implements ProductRepository
 {
+    /** @var list<string> */
+    public array $locked = [];
+
     public function add(Product $product): void
     {
         $existing = $this->get($product->id);
@@ -19,6 +22,23 @@ final class InMemoryProductRepository extends InMemoryRepository implements Prod
         $this->save($product);
     }
 
+    public function setClassification(string $id, bool $stock): void
+    {
+        $product = $this->get($id);
+        if ($product === null) {
+            return;
+        }
+        $this->save(Product::restore(
+            $product->id, $product->producerId, $product->name(), $product->unit(), $product->price(),
+            $product->isVariable(), $product->containersPerUnit(), $product->isActive(), $stock,
+        ));
+    }
+
+    public function delete(string $id): void
+    {
+        $this->remove($id);
+    }
+
     public function get(string $id): ?Product
     {
         return $this->find($id);
@@ -26,6 +46,8 @@ final class InMemoryProductRepository extends InMemoryRepository implements Prod
 
     public function getForUpdate(string $id): ?Product
     {
+        $this->locked[] = $id;
+
         return $this->get($id);
     }
 

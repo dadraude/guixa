@@ -9,8 +9,29 @@ use Guixa\Ordering\Domain\PickupStatus;
 /** @extends InMemoryRepository<Order> */
 final class InMemoryOrderRepository extends InMemoryRepository implements OrderRepository
 {
+    /** @var array<string, true> */
+    private array $weeklyHistory = [];
+
+    /** @var array<string, true> */
+    private array $stockHistory = [];
+
     public function add(Order $order): void
     {
+        $previous = $this->find($order->id);
+        if ($previous !== null) {
+            $currentLineIds = array_column($order->lines(), 'id');
+            foreach ($previous->lines() as $line) {
+                if (! in_array($line->id, $currentLineIds, true)) {
+                    $this->weeklyHistory[$line->productId] = true;
+                }
+            }
+            $currentStockIds = array_column($order->stockLines(), 'id');
+            foreach ($previous->stockLines() as $line) {
+                if (! in_array($line->id, $currentStockIds, true)) {
+                    $this->stockHistory[$line->stockProductId] = true;
+                }
+            }
+        }
         $this->save($order);
     }
 
@@ -18,6 +39,12 @@ final class InMemoryOrderRepository extends InMemoryRepository implements OrderR
     {
         foreach ($this->all() as $order) {
             if ($order->cycleId === $cycleId) {
+                foreach ($order->lines() as $line) {
+                    $this->weeklyHistory[$line->productId] = true;
+                }
+                foreach ($order->stockLines() as $line) {
+                    $this->stockHistory[$line->stockProductId] = true;
+                }
                 $this->remove($order->id);
                 unset($this->notDelivered[$order->id]);
             }
@@ -94,6 +121,36 @@ final class InMemoryOrderRepository extends InMemoryRepository implements OrderR
         $this->save($order);
 
         return $order;
+    }
+
+    public function hasWeeklyReference(string $productId): bool
+    {
+        if (isset($this->weeklyHistory[$productId])) {
+            return true;
+        }
+        foreach ($this->all() as $order) {
+            if ($order->hasLine($productId)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function hasStockReference(string $productId): bool
+    {
+        if (isset($this->stockHistory[$productId])) {
+            return true;
+        }
+        foreach ($this->all() as $order) {
+            foreach ($order->stockLines() as $line) {
+                if ($line->stockProductId === $productId) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /** Nothing in memory settles a cycle yet, so every line counts. */
