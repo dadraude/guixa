@@ -25,6 +25,7 @@
             "states": [
                 {
                     "id": "populated",
+                    "ready": "body[data-visual-ready=\"populated\"]",
                     "cases": [
                         {
                             "width": 375,
@@ -115,6 +116,7 @@
             "states": [
                 {
                     "id": "populated",
+                    "ready": "body[data-visual-ready=\"populated\"]",
                     "cases": [
                         {
                             "width": 375,
@@ -224,6 +226,7 @@
             "states": [
                 {
                     "id": "populated",
+                    "ready": "body[data-visual-ready=\"populated\"]",
                     "cases": [
                         {
                             "width": 375,
@@ -362,6 +365,7 @@
             "states": [
                 {
                     "id": "populated",
+                    "ready": "body[data-visual-ready=\"populated\"]",
                     "cases": [
                         {
                             "width": 375,
@@ -452,6 +456,7 @@
             "states": [
                 {
                     "id": "populated",
+                    "ready": "body[data-visual-ready=\"populated\"]",
                     "cases": [
                         {
                             "width": 375,
