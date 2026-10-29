@@ -1,0 +1,4238 @@
+{
+    "rootFontPx": 16,
+    "darkSelector": "html.dark",
+    "matrix": {
+        "widths": [
+            375,
+            1024,
+            1280
+        ],
+        "modes": [
+            "light",
+            "dark",
+            "system-light",
+            "system-dark"
+        ],
+        "text": [
+            100,
+            200
+        ]
+    },
+    "baseUrl": "http://127.0.0.1:5197",
+    "views": [
+        {
+            "id": "manage-accounts-index",
+            "path": "/visual-dra-205.html",
+            "query": {
+                "page": "Manage/Accounts/Index",
+                "role": "manager",
+                "route": "/manage/accounts"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": [
+                "16px Nunito Variable"
+            ],
+            "focus": [
+                "button[data-sidebar=\"trigger\"]",
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "empty",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"empty\"]",
+                    "checks": {
+                        "panels": "#main-content .pilot-layout-notice",
+                        "focus": [
+                            "button[data-sidebar=\"trigger\"]"
+                        ]
+                    }
+                },
+                {
+                    "id": "error",
+                    "query": {
+                        "state": "error"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"error\"]"
+                },
+                {
+                    "id": "long-content",
+                    "query": {
+                        "state": "long-content"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"long-content\"]"
+                },
+                {
+                    "id": "pending-invitation",
+                    "query": {
+                        "state": "pending-invitation"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"pending-invitation\"]"
+                },
+                {
+                    "id": "drawer-open",
+                    "query": {
+                        "drawer": "1"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"drawer-open\"]",
+                    "checks": {
+                        "root": "[data-sidebar=\"sidebar\"][data-mobile=\"true\"]",
+                        "panels": "[data-sidebar=\"sidebar\"][data-mobile=\"true\"]",
+                        "content": "[data-sidebar=\"sidebar\"][data-mobile=\"true\"] nav a,[data-sidebar=\"sidebar\"][data-mobile=\"true\"] nav button",
+                        "focus": [
+                            "[data-visual-drawer-focus-first]",
+                            "[data-visual-drawer-focus-last]"
+                        ]
+                    },
+                    "settled": [
+                        "[data-sidebar=\"sidebar\"][data-mobile=\"true\"]"
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "manage-cycles-index",
+            "path": "/visual-dra-205.html",
+            "query": {
+                "page": "Manage/Cycles/Index",
+                "role": "manager",
+                "route": "/manage/cycles"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": [
+                "16px Nunito Variable"
+            ],
+            "focus": [
+                "button[data-sidebar=\"trigger\"]",
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "empty",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"empty\"]",
+                    "checks": {
+                        "panels": "#main-content .pilot-layout-notice"
+                    }
+                },
+                {
+                    "id": "long-content",
+                    "query": {
+                        "state": "long-content"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"long-content\"]"
+                },
+                {
+                    "id": "create-dialog",
+                    "query": {
+                        "state": "create-dialog"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"create-dialog\"]",
+                    "checks": {
+                        "focus": [
+                            "dialog[open] button[aria-label=\"Tanca el diàleg\"]",
+                            "[data-visual-overlay-focus-first]",
+                            "[data-visual-overlay-focus-last]"
+                        ],
+                        "root": "dialog[open]",
+                        "panels": "dialog[open]",
+                        "content": "h1,h2,h3,p,label,input,textarea,button,a,[role=\"dialog-description\"]"
+                    },
+                    "settled": [
+                        "dialog[open]"
+                    ]
+                },
+                {
+                    "id": "manage-dialog",
+                    "query": {
+                        "state": "manage-dialog"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"manage-dialog\"]",
+                    "checks": {
+                        "focus": [
+                            "dialog[open] button[aria-label=\"Tanca el diàleg\"]",
+                            "[data-visual-overlay-focus-first]",
+                            "[data-visual-overlay-focus-last]"
+                        ],
+                        "root": "dialog[open]",
+                        "panels": "dialog[open]",
+                        "content": "h1,h2,h3,p,label,input,textarea,button,a,[role=\"dialog-description\"]"
+                    },
+                    "settled": [
+                        "dialog[open]"
+                    ]
+                },
+                {
+                    "id": "create-no-weekday",
+                    "query": {
+                        "state": "create-no-weekday"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"create-no-weekday\"]",
+                    "checks": {
+                        "root": "dialog[open]",
+                        "panels": "dialog[open]",
+                        "content": "h1,h2,h3,p,label,input,textarea,button,a,[role=\"dialog-description\"]",
+                        "focus": [
+                            "dialog[open] button[aria-label=\"Tanca el diàleg\"]",
+                            "[data-visual-overlay-focus-first]",
+                            "[data-visual-overlay-focus-last]"
+                        ]
+                    },
+                    "settled": [
+                        "dialog[open]"
+                    ]
+                },
+                {
+                    "id": "manage-cutoff",
+                    "query": {
+                        "state": "manage-cutoff"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"manage-cutoff\"]",
+                    "checks": {
+                        "root": "dialog[open]",
+                        "panels": "dialog[open]",
+                        "content": "h1,h2,h3,p,label,input,textarea,button,a,[role=\"dialog-description\"]",
+                        "focus": [
+                            "dialog[open] button[aria-label=\"Tanca el diàleg\"]",
+                            "[data-visual-overlay-focus-first]",
+                            "[data-visual-overlay-focus-last]"
+                        ]
+                    },
+                    "settled": [
+                        "dialog[open]"
+                    ]
+                },
+                {
+                    "id": "manage-close-confirm",
+                    "query": {
+                        "state": "manage-close-confirm"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"manage-close-confirm\"]",
+                    "checks": {
+                        "root": "dialog[open]",
+                        "panels": "dialog[open]",
+                        "content": "h1,h2,h3,p,label,input,textarea,button,a,[role=\"dialog-description\"]",
+                        "focus": [
+                            "dialog[open] button[aria-label=\"Tanca el diàleg\"]",
+                            "[data-visual-overlay-focus-first]",
+                            "[data-visual-overlay-focus-last]"
+                        ]
+                    },
+                    "settled": [
+                        "dialog[open]"
+                    ]
+                },
+                {
+                    "id": "manage-cancel-confirm",
+                    "query": {
+                        "state": "manage-cancel-confirm"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"manage-cancel-confirm\"]",
+                    "checks": {
+                        "root": "dialog[open]",
+                        "panels": "dialog[open]",
+                        "content": "h1,h2,h3,p,label,input,textarea,button,a,[role=\"dialog-description\"]",
+                        "focus": [
+                            "dialog[open] button[aria-label=\"Tanca el diàleg\"]",
+                            "[data-visual-overlay-focus-first]",
+                            "[data-visual-overlay-focus-last]"
+                        ]
+                    },
+                    "settled": [
+                        "dialog[open]"
+                    ]
+                },
+                {
+                    "id": "closed-cycle",
+                    "query": {
+                        "state": "closed-cycle"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"closed-cycle\"]"
+                },
+                {
+                    "id": "cancelled-cycle",
+                    "query": {
+                        "state": "cancelled-cycle"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"cancelled-cycle\"]"
+                },
+                {
+                    "id": "reduced-motion",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "reducedMotion": true
+                }
+            ]
+        },
+        {
+            "id": "manage-cycles-show",
+            "path": "/visual-dra-205.html",
+            "query": {
+                "page": "Manage/Cycles/Show",
+                "role": "manager",
+                "route": "/manage/cycles/cycle-1"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": [
+                "16px Nunito Variable"
+            ],
+            "focus": [
+                "button[data-sidebar=\"trigger\"]"
+            ],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "empty",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"empty\"]"
+                },
+                {
+                    "id": "long-content",
+                    "query": {
+                        "state": "long-content"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"long-content\"]"
+                },
+                {
+                    "id": "cancelled-cycle",
+                    "query": {
+                        "state": "cancelled-cycle"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"cancelled-cycle\"]"
+                }
+            ]
+        },
+        {
+            "id": "manage-households-index",
+            "path": "/visual-dra-205.html",
+            "query": {
+                "page": "Manage/Households/Index",
+                "role": "manager",
+                "route": "/manage/households"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": [
+                "16px Nunito Variable"
+            ],
+            "focus": [
+                "button[data-sidebar=\"trigger\"]",
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "empty",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"empty\"]"
+                },
+                {
+                    "id": "error",
+                    "query": {
+                        "state": "error"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"error\"]"
+                },
+                {
+                    "id": "long-content",
+                    "query": {
+                        "state": "long-content"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"long-content\"]"
+                },
+                {
+                    "id": "settlement-details",
+                    "query": {
+                        "state": "settlement-details"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"settlement-details\"]"
+                }
+            ]
+        },
+        {
+            "id": "manage-households-show",
+            "path": "/visual-dra-205.html",
+            "query": {
+                "page": "Manage/Households/Show",
+                "role": "manager",
+                "route": "/manage/households/household-1"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": [
+                "16px Nunito Variable"
+            ],
+            "focus": [
+                "button[data-sidebar=\"trigger\"]",
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "error",
+                    "query": {
+                        "state": "error"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"error\"]"
+                },
+                {
+                    "id": "long-content",
+                    "query": {
+                        "state": "long-content"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"long-content\"]"
+                },
+                {
+                    "id": "inactive-household",
+                    "query": {
+                        "state": "inactive-household"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"inactive-household\"]"
+                },
+                {
+                    "id": "invitation-pending",
+                    "query": {
+                        "state": "invitation-pending"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"invitation-pending\"]"
+                },
+                {
+                    "id": "invitation-expired",
+                    "query": {
+                        "state": "invitation-expired"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"invitation-expired\"]"
+                }
+            ]
+        },
+        {
+            "id": "manage-pickups-index",
+            "path": "/visual-dra-205.html",
+            "query": {
+                "page": "Manage/Pickups/Index",
+                "role": "manager",
+                "route": "/manage/cycles/cycle-1/pickups"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": [
+                "16px Nunito Variable"
+            ],
+            "focus": [
+                "button[data-sidebar=\"trigger\"]",
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "empty",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"empty\"]"
+                },
+                {
+                    "id": "long-content",
+                    "query": {
+                        "state": "long-content"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"long-content\"]"
+                }
+            ]
+        },
+        {
+            "id": "manage-pickups-show",
+            "path": "/visual-dra-205.html",
+            "query": {
+                "page": "Manage/Pickups/Show",
+                "role": "manager",
+                "route": "/manage/cycles/cycle-1/pickups/household-1"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": [
+                "16px Nunito Variable"
+            ],
+            "focus": [
+                "button[data-sidebar=\"trigger\"]",
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "error",
+                    "query": {
+                        "state": "error"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"error\"]"
+                },
+                {
+                    "id": "completed",
+                    "query": {
+                        "state": "completed"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"completed\"]"
+                },
+                {
+                    "id": "long-content",
+                    "query": {
+                        "state": "long-content"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"long-content\"]"
+                },
+                {
+                    "id": "stock-lines",
+                    "query": {
+                        "state": "stock-lines"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"stock-lines\"]"
+                },
+                {
+                    "id": "return-lines",
+                    "query": {
+                        "state": "return-lines"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"return-lines\"]"
+                }
+            ]
+        },
+        {
+            "id": "manage-producers-index",
+            "path": "/visual-dra-205.html",
+            "query": {
+                "page": "Manage/Producers/Index",
+                "role": "manager",
+                "route": "/manage/producers"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": [
+                "16px Nunito Variable"
+            ],
+            "focus": [
+                "button[data-sidebar=\"trigger\"]",
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "empty",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"empty\"]"
+                },
+                {
+                    "id": "error",
+                    "query": {
+                        "state": "error"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"error\"]"
+                },
+                {
+                    "id": "long-content",
+                    "query": {
+                        "state": "long-content"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"long-content\"]"
+                },
+                {
+                    "id": "pending-invitation",
+                    "query": {
+                        "state": "pending-invitation"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"pending-invitation\"]"
+                }
+            ]
+        },
+        {
+            "id": "manage-reception-show",
+            "path": "/visual-dra-205.html",
+            "query": {
+                "page": "Manage/Reception/Show",
+                "role": "manager",
+                "route": "/manage/cycles/cycle-1/receptions/producer-1"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"]),#main-content [data-test^=\"product-\"] dl dt,#main-content [data-test^=\"product-\"] dl dd,#main-content [data-test=\"adjusted\"],#main-content [data-test=\"unbalanced\"],#main-content [role=\"combobox\"]",
+            "fonts": [
+                "16px Nunito Variable"
+            ],
+            "focus": [
+                "button[data-sidebar=\"trigger\"]",
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "empty",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"empty\"]",
+                    "checks": {
+                        "panels": "#main-content [data-test=\"no-products\"]"
+                    }
+                },
+                {
+                    "id": "error",
+                    "query": {
+                        "state": "error"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"error\"]"
+                },
+                {
+                    "id": "long-content",
+                    "query": {
+                        "state": "long-content"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"long-content\"]"
+                },
+                {
+                    "id": "manual-allocation",
+                    "query": {
+                        "state": "manual-allocation"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"manual-allocation\"]"
+                },
+                {
+                    "id": "received-scope-choice",
+                    "query": {
+                        "state": "received-scope-choice"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"received-scope-choice\"]",
+                    "checks": {
+                        "root": "[role=\"dialog\"]",
+                        "panels": "[data-slot=\"dialog-header\"],[data-slot=\"dialog-title\"],[data-slot=\"dialog-description\"],[data-slot=\"dialog-footer\"],form",
+                        "content": "h1,h2,h3,p,label:not(.sr-only),input,textarea,button:not([data-slot=\"dialog-close\"]),[data-slot=\"dialog-title\"],[data-slot=\"dialog-description\"],.pilot-separator-label",
+                        "focus": [
+                            "[data-visual-overlay-focus-first]",
+                            "[data-visual-overlay-focus-last]"
+                        ]
+                    },
+                    "settled": [
+                        "[role=\"dialog\"]"
+                    ]
+                },
+                {
+                    "id": "received-overwrite",
+                    "query": {
+                        "state": "received-overwrite"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"received-overwrite\"]",
+                    "checks": {
+                        "root": "[role=\"dialog\"]",
+                        "panels": "[data-slot=\"dialog-header\"],[data-slot=\"dialog-title\"],[data-slot=\"dialog-description\"],[data-slot=\"dialog-footer\"],form",
+                        "content": "h1,h2,h3,p,label:not(.sr-only),input,textarea,button:not([data-slot=\"dialog-close\"]),[data-slot=\"dialog-title\"],[data-slot=\"dialog-description\"],.pilot-separator-label",
+                        "focus": [
+                            "[data-visual-overlay-focus-first]",
+                            "[data-visual-overlay-focus-last]"
+                        ]
+                    },
+                    "settled": [
+                        "[role=\"dialog\"]"
+                    ]
+                },
+                {
+                    "id": "adjusted-summary",
+                    "query": {
+                        "adjusted": "1"
+                    },
+                    "ready": "#main-content [data-test^=\"product-\"] dd[data-test=\"delivered\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "unordered-summary",
+                    "query": {
+                        "receptionBranch": "unordered"
+                    },
+                    "ready": "#main-content [data-test^=\"unordered-total-\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "extra-household",
+                    "query": {
+                        "receptionBranch": "extra-household"
+                    },
+                    "ready": "#main-content [data-test^=\"add-allocation-\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "unbalanced-summary",
+                    "query": {
+                        "receptionBranch": "unbalanced"
+                    },
+                    "ready": "#main-content [data-test=\"unbalanced\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "manage-returnitems-create",
+            "path": "/visual-dra-205.html",
+            "query": {
+                "page": "Manage/ReturnItems/Create",
+                "role": "manager",
+                "route": "/manage/return-items/create"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": [
+                "16px Nunito Variable"
+            ],
+            "focus": [
+                "button[data-sidebar=\"trigger\"]",
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "error",
+                    "query": {
+                        "state": "error"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"error\"]"
+                },
+                {
+                    "id": "disabled",
+                    "query": {
+                        "state": "disabled"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"disabled\"]"
+                }
+            ]
+        },
+        {
+            "id": "manage-returnitems-edit",
+            "path": "/visual-dra-205.html",
+            "query": {
+                "page": "Manage/ReturnItems/Edit",
+                "role": "manager",
+                "route": "/manage/return-items/return-1/edit"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": [
+                "16px Nunito Variable"
+            ],
+            "focus": [
+                "button[data-sidebar=\"trigger\"]",
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "error",
+                    "query": {
+                        "state": "error"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"error\"]"
+                },
+                {
+                    "id": "disabled",
+                    "query": {
+                        "state": "disabled"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"disabled\"]"
+                }
+            ]
+        },
+        {
+            "id": "manage-returnitems-index",
+            "path": "/visual-dra-205.html",
+            "query": {
+                "page": "Manage/ReturnItems/Index",
+                "role": "manager",
+                "route": "/manage/return-items"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": [
+                "16px Nunito Variable"
+            ],
+            "focus": [
+                "button[data-sidebar=\"trigger\"]",
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "empty",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"empty\"]",
+                    "checks": {
+                        "panels": "#main-content .pilot-layout-notice"
+                    }
+                },
+                {
+                    "id": "long-content",
+                    "query": {
+                        "state": "long-content"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"long-content\"]"
+                }
+            ]
+        },
+        {
+            "id": "manage-settings",
+            "path": "/visual-dra-205.html",
+            "query": {
+                "page": "Manage/Settings",
+                "role": "manager",
+                "route": "/manage/settings"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": [
+                "16px Nunito Variable"
+            ],
+            "focus": [
+                "button[data-sidebar=\"trigger\"]",
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "error",
+                    "query": {
+                        "state": "error"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"error\"]"
+                },
+                {
+                    "id": "disabled",
+                    "query": {
+                        "state": "disabled"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"disabled\"]"
+                }
+            ]
+        },
+        {
+            "id": "manage-stock-create",
+            "path": "/visual-dra-205.html",
+            "query": {
+                "page": "Manage/Stock/Create",
+                "role": "manager",
+                "route": "/manage/stock/create"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": [
+                "16px Nunito Variable"
+            ],
+            "focus": [
+                "button[data-sidebar=\"trigger\"]",
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "error",
+                    "query": {
+                        "state": "error"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"error\"]"
+                },
+                {
+                    "id": "disabled",
+                    "query": {
+                        "state": "disabled"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"disabled\"]"
+                }
+            ]
+        },
+        {
+            "id": "manage-stock-edit",
+            "path": "/visual-dra-205.html",
+            "query": {
+                "page": "Manage/Stock/Edit",
+                "role": "manager",
+                "route": "/manage/stock/stock-1/edit"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": [
+                "16px Nunito Variable"
+            ],
+            "focus": [
+                "button[data-sidebar=\"trigger\"]",
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "error",
+                    "query": {
+                        "state": "error"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"error\"]"
+                },
+                {
+                    "id": "disabled",
+                    "query": {
+                        "state": "disabled"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"disabled\"]"
+                }
+            ]
+        },
+        {
+            "id": "manage-stock-index",
+            "path": "/visual-dra-205.html",
+            "query": {
+                "page": "Manage/Stock/Index",
+                "role": "manager",
+                "route": "/manage/stock"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": [
+                "16px Nunito Variable"
+            ],
+            "focus": [
+                "button[data-sidebar=\"trigger\"]",
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "empty",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"empty\"]",
+                    "checks": {
+                        "panels": "#main-content .pilot-layout-notice"
+                    }
+                },
+                {
+                    "id": "long-content",
+                    "query": {
+                        "state": "long-content"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"long-content\"]"
+                },
+                {
+                    "id": "edit-dialog",
+                    "query": {
+                        "state": "edit-dialog"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"edit-dialog\"]",
+                    "checks": {
+                        "focus": [
+                            "dialog[open] button[aria-label=\"Tanca el diàleg\"]",
+                            "[data-visual-overlay-focus-first]",
+                            "[data-visual-overlay-focus-last]"
+                        ],
+                        "root": "dialog[open]",
+                        "panels": "dialog[open]",
+                        "content": "h1,h2,h3,p,label,input,textarea,button,a,[role=\"dialog-description\"]"
+                    },
+                    "settled": [
+                        "dialog[open]"
+                    ]
+                },
+                {
+                    "id": "deactivate-confirm",
+                    "query": {
+                        "state": "deactivate-confirm"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"deactivate-confirm\"]",
+                    "checks": {
+                        "root": "dialog[open]",
+                        "panels": "dialog[open]",
+                        "content": "h1,h2,h3,p,label,input,textarea,button,a,[role=\"dialog-description\"]",
+                        "focus": [
+                            "dialog[open] button[aria-label=\"Tanca el diàleg\"]",
+                            "[data-visual-overlay-focus-first]",
+                            "[data-visual-overlay-focus-last]"
+                        ]
+                    },
+                    "settled": [
+                        "dialog[open]"
+                    ]
+                },
+                {
+                    "id": "reactivate-confirm",
+                    "query": {
+                        "state": "reactivate-confirm"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"reactivate-confirm\"]",
+                    "checks": {
+                        "root": "dialog[open]",
+                        "panels": "dialog[open]",
+                        "content": "h1,h2,h3,p,label,input,textarea,button,a,[role=\"dialog-description\"]",
+                        "focus": [
+                            "dialog[open] button[aria-label=\"Tanca el diàleg\"]",
+                            "[data-visual-overlay-focus-first]",
+                            "[data-visual-overlay-focus-last]"
+                        ]
+                    },
+                    "settled": [
+                        "dialog[open]"
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "manage-stock-movements",
+            "path": "/visual-dra-205.html",
+            "query": {
+                "page": "Manage/Stock/Movements",
+                "role": "manager",
+                "route": "/manage/stock/stock-1/movements"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": [
+                "16px Nunito Variable"
+            ],
+            "focus": [
+                "button[data-sidebar=\"trigger\"]",
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "error",
+                    "query": {
+                        "state": "error"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"error\"]"
+                },
+                {
+                    "id": "long-content",
+                    "query": {
+                        "state": "long-content"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"long-content\"]"
+                }
+            ]
+        },
+        {
+            "id": "producer-cutoff",
+            "path": "/visual-dra-205.html",
+            "query": {
+                "page": "Producer/Cutoff",
+                "role": "producer",
+                "route": "/producer/cutoff"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": [
+                "16px Nunito Variable"
+            ],
+            "focus": [
+                "button[data-sidebar=\"trigger\"]",
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "error",
+                    "query": {
+                        "state": "error"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"error\"]"
+                },
+                {
+                    "id": "disabled",
+                    "query": {
+                        "state": "disabled"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"disabled\"]"
+                }
+            ]
+        },
+        {
+            "id": "producer-cyclesummary",
+            "path": "/visual-dra-205.html",
+            "query": {
+                "page": "Producer/CycleSummary",
+                "role": "producer",
+                "route": "/producer/cycles/cycle-1"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": [
+                "16px Nunito Variable"
+            ],
+            "focus": [
+                "button[data-sidebar=\"trigger\"]"
+            ],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "empty",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"empty\"]",
+                    "checks": {
+                        "panels": "#main-content .pilot-layout-notice"
+                    }
+                },
+                {
+                    "id": "long-content",
+                    "query": {
+                        "state": "long-content"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"long-content\"]"
+                },
+                {
+                    "id": "unsent-availability",
+                    "query": {
+                        "state": "unsent-availability"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"unsent-availability\"]",
+                    "checks": {
+                        "focus": [
+                            "button[data-sidebar=\"trigger\"]",
+                            "button[data-test=\"toggle-product-1\"]",
+                            "button[data-test=\"toggle-product-2\"]"
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "producer-products-create",
+            "path": "/visual-dra-205.html",
+            "query": {
+                "page": "Producer/Products/Create",
+                "role": "producer",
+                "route": "/producer/products/create"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": [
+                "16px Nunito Variable"
+            ],
+            "focus": [
+                "button[data-sidebar=\"trigger\"]",
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "error",
+                    "query": {
+                        "state": "error"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"error\"]"
+                },
+                {
+                    "id": "disabled",
+                    "query": {
+                        "state": "disabled"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"disabled\"]"
+                }
+            ]
+        },
+        {
+            "id": "producer-products-edit",
+            "path": "/visual-dra-205.html",
+            "query": {
+                "page": "Producer/Products/Edit",
+                "role": "producer",
+                "route": "/producer/products/product-1/edit"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": [
+                "16px Nunito Variable"
+            ],
+            "focus": [
+                "button[data-sidebar=\"trigger\"]",
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "error",
+                    "query": {
+                        "state": "error"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"error\"]"
+                },
+                {
+                    "id": "disabled",
+                    "query": {
+                        "state": "disabled"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"disabled\"]"
+                }
+            ]
+        },
+        {
+            "id": "producer-products-index",
+            "path": "/visual-dra-205.html",
+            "query": {
+                "page": "Producer/Products/Index",
+                "role": "producer",
+                "route": "/producer/products"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": [
+                "16px Nunito Variable"
+            ],
+            "focus": [
+                "button[data-sidebar=\"trigger\"]",
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "empty",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"empty\"]",
+                    "checks": {
+                        "panels": "#main-content .pilot-layout-notice"
+                    }
+                },
+                {
+                    "id": "long-content",
+                    "query": {
+                        "state": "long-content"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"long-content\"]"
+                },
+                {
+                    "id": "reduced-motion",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "reducedMotion": true
+                },
+                {
+                    "id": "drawer-open",
+                    "query": {
+                        "drawer": "1"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"drawer-open\"]",
+                    "checks": {
+                        "root": "[data-sidebar=\"sidebar\"][data-mobile=\"true\"]",
+                        "panels": "[data-sidebar=\"sidebar\"][data-mobile=\"true\"]",
+                        "content": "[data-sidebar=\"sidebar\"][data-mobile=\"true\"] nav a,[data-sidebar=\"sidebar\"][data-mobile=\"true\"] nav button",
+                        "focus": [
+                            "[data-visual-drawer-focus-first]",
+                            "[data-visual-drawer-focus-last]"
+                        ]
+                    },
+                    "settled": [
+                        "[data-sidebar=\"sidebar\"][data-mobile=\"true\"]"
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "welcome-authenticated",
+            "path": "/visual-dra-205.html",
+            "query": {
+                "page": "Welcome",
+                "authenticated": "1",
+                "route": "/",
+                "role": "manager"
+            },
+            "root": ".reference-style-welcome",
+            "panels": "[data-visual-panel]",
+            "content": "h1,h2,p,a,li",
+            "fonts": [
+                "16px Nunito Variable"
+            ],
+            "focus": [
+                "#welcome-action"
+            ],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "reduced-motion",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "reducedMotion": true
+                }
+            ]
+        },
+        {
+            "id": "welcome-guest-control",
+            "path": "/visual-dra-205.html",
+            "query": {
+                "page": "Welcome",
+                "route": "/"
+            },
+            "root": ".reference-style-welcome",
+            "panels": "[data-visual-panel]",
+            "content": "h1,h2,p,a,li",
+            "fonts": [
+                "16px Nunito Variable"
+            ],
+            "focus": [
+                "#welcome-action"
+            ],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "settings-appearance-manager",
+            "path": "/visual-dra-205.html",
+            "query": {
+                "page": "settings/Appearance",
+                "role": "manager",
+                "route": "/settings/appearance"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": [
+                "16px Nunito Variable"
+            ],
+            "focus": [
+                "button[data-sidebar=\"trigger\"]",
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]",
+                "button[data-test=\"appearance-trigger\"]"
+            ],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "appearance-menu",
+                    "query": {
+                        "state": "appearance-menu"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"appearance-menu\"]",
+                    "checks": {
+                        "focus": [],
+                        "noFocusReason": "The open Reka menu uses ArrowDown roving focus on a menuitemradio; Tab dismisses it. The fixture requires that real focused choice, and the baseline Tabs to the actual appearance trigger.",
+                        "root": "[data-slot=\"dropdown-menu-content\"]",
+                        "panels": "[data-slot=\"dropdown-menu-content\"]",
+                        "content": "[role=\"menuitemradio\"],[role=\"menuitem\"],button,span,p"
+                    },
+                    "settled": [
+                        "[data-slot=\"dropdown-menu-content\"]"
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "dashboard-member",
+            "path": "/visual-dra-205.html",
+            "query": {
+                "page": "Dashboard",
+                "role": "member",
+                "route": "/dashboard"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": [
+                "16px Nunito Variable"
+            ],
+            "focus": [
+                "button[data-sidebar=\"trigger\"]",
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "reduced-motion",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "reducedMotion": true
+                },
+                {
+                    "id": "drawer-open",
+                    "query": {
+                        "drawer": "1"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"drawer-open\"]",
+                    "checks": {
+                        "root": "[data-sidebar=\"sidebar\"][data-mobile=\"true\"]",
+                        "panels": "[data-sidebar=\"sidebar\"][data-mobile=\"true\"]",
+                        "content": "[data-sidebar=\"sidebar\"][data-mobile=\"true\"] nav a,[data-sidebar=\"sidebar\"][data-mobile=\"true\"] nav button",
+                        "focus": [
+                            "[data-visual-drawer-focus-first]",
+                            "[data-visual-drawer-focus-last]"
+                        ]
+                    },
+                    "settled": [
+                        "[data-sidebar=\"sidebar\"][data-mobile=\"true\"]"
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "orders-index",
+            "path": "/visual-dra-205.html",
+            "query": {
+                "page": "Orders/Index",
+                "role": "member",
+                "route": "/"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": [
+                "16px Nunito Variable"
+            ],
+            "focus": [
+                "button[data-sidebar=\"trigger\"]",
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "wallet-statement-member",
+            "path": "/visual-dra-205.html",
+            "query": {
+                "page": "Wallet/Statement",
+                "role": "member",
+                "route": "/wallet"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-wallet-forms .pilot-layout-panel, #main-content .pilot-wallet-table tbody tr, #main-content .pilot-layout-notice, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"]),#main-content [data-visual-text]",
+            "fonts": [
+                "16px Nunito Variable"
+            ],
+            "focus": [
+                "button[data-sidebar=\"trigger\"]"
+            ],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "settings-profile",
+            "path": "/visual-dra-205.html",
+            "query": {
+                "page": "settings/Profile",
+                "role": "member",
+                "route": "/settings/profile"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": [
+                "16px Nunito Variable"
+            ],
+            "focus": [
+                "button[data-sidebar=\"trigger\"]",
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "dashboard-manager",
+            "path": "/visual-dra-205.html",
+            "query": {
+                "page": "Dashboard",
+                "role": "manager",
+                "route": "/dashboard"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": [
+                "16px Nunito Variable"
+            ],
+            "focus": [
+                "button[data-sidebar=\"trigger\"]",
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "dashboard-producer",
+            "path": "/visual-dra-205.html",
+            "query": {
+                "page": "Dashboard",
+                "role": "producer",
+                "route": "/dashboard"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": [
+                "16px Nunito Variable"
+            ],
+            "focus": [
+                "button[data-sidebar=\"trigger\"]",
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "orders-edit",
+            "path": "/visual-dra-205.html",
+            "query": {
+                "page": "Orders/Edit",
+                "role": "member",
+                "route": "/cycles/cycle-1/order"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": [
+                "16px Nunito Variable"
+            ],
+            "focus": [
+                "button[data-sidebar=\"trigger\"]",
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "wallet-statement-manager",
+            "path": "/visual-dra-205.html",
+            "query": {
+                "page": "Wallet/Statement",
+                "role": "manager",
+                "route": "/manage/households/household-1/wallet"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-wallet-forms .pilot-layout-panel, #main-content .pilot-wallet-table tbody tr, #main-content .pilot-layout-notice, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"]),#main-content [data-visual-text]",
+            "fonts": [
+                "16px Nunito Variable"
+            ],
+            "focus": [
+                "button[data-sidebar=\"trigger\"]",
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "settings-appearance-member",
+            "path": "/visual-dra-205.html",
+            "query": {
+                "page": "settings/Appearance",
+                "role": "member",
+                "route": "/settings/appearance"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": [
+                "16px Nunito Variable"
+            ],
+            "focus": [
+                "button[data-sidebar=\"trigger\"]",
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]",
+                "button[data-test=\"appearance-trigger\"]"
+            ],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "settings-appearance-producer",
+            "path": "/visual-dra-205.html",
+            "query": {
+                "page": "settings/Appearance",
+                "role": "producer",
+                "route": "/settings/appearance"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": [
+                "16px Nunito Variable"
+            ],
+            "focus": [
+                "button[data-sidebar=\"trigger\"]",
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]",
+                "button[data-test=\"appearance-trigger\"]"
+            ],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "settings-profile-manager",
+            "path": "/visual-dra-205.html",
+            "query": {
+                "page": "settings/Profile",
+                "role": "manager",
+                "route": "/settings/profile"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": [
+                "16px Nunito Variable"
+            ],
+            "focus": [
+                "button[data-sidebar=\"trigger\"]",
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "settings-profile-producer",
+            "path": "/visual-dra-205.html",
+            "query": {
+                "page": "settings/Profile",
+                "role": "producer",
+                "route": "/settings/profile"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": [
+                "16px Nunito Variable"
+            ],
+            "focus": [
+                "button[data-sidebar=\"trigger\"]",
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "settings-security-member",
+            "path": "/visual-dra-205.html",
+            "query": {
+                "page": "settings/Security",
+                "role": "member",
+                "route": "/settings/security"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": [
+                "16px Nunito Variable"
+            ],
+            "focus": [
+                "button[data-sidebar=\"trigger\"]",
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "settings-security-manager",
+            "path": "/visual-dra-205.html",
+            "query": {
+                "page": "settings/Security",
+                "role": "manager",
+                "route": "/settings/security"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": [
+                "16px Nunito Variable"
+            ],
+            "focus": [
+                "button[data-sidebar=\"trigger\"]",
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "settings-security-producer",
+            "path": "/visual-dra-205.html",
+            "query": {
+                "page": "settings/Security",
+                "role": "producer",
+                "route": "/settings/security"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": [
+                "16px Nunito Variable"
+            ],
+            "focus": [
+                "button[data-sidebar=\"trigger\"]",
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

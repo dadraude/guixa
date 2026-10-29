@@ -98,7 +98,7 @@ const confirm = () => save(true);
         :data-test="`received-form-${product.productId}`"
         @submit.prevent="submit"
     >
-        <div class="grid gap-1">
+        <div class="grid max-w-full min-w-0 grid-cols-1 gap-1">
             <Label :for="`received-${product.productId}`">
                 {{ trans('Received (:unit)', { unit: product.unit }) }}
             </Label>
@@ -106,12 +106,13 @@ const confirm = () => save(true);
                 :id="`received-${product.productId}`"
                 v-model="received"
                 inputmode="decimal"
-                class="w-32"
+                class="w-32 max-w-full"
             />
         </div>
         <Button
             type="submit"
             size="sm"
+            class="h-auto min-h-11 max-w-full whitespace-normal"
             :disabled="processing"
             :data-test="`save-received-${product.productId}`"
         >

@@ -8,11 +8,11 @@ import SettingsLayout from '@/layouts/settings/Layout.vue';
 import { installTranslations } from '@/lib/i18n';
 import { trans } from 'laravel-vue-i18n';
 import { useTwoFactorAuth } from '@/composables/useTwoFactorAuth';
+import { resolveVisualIdentity } from './reference-gates';
 
 const query = new URLSearchParams(window.location.search);
 const fixtureUrl = window.location.href;
 const pageName = query.get('page') ?? 'Dashboard';
-const role = query.get('role') ?? 'member';
 const state = query.get('state') ?? 'default';
 const components = import.meta.glob('../pages/**/*.vue', {
     eager: true,
@@ -389,7 +389,7 @@ const pageProps: Record<string, Record<string, unknown>> = {
 
 const authPage = pageName.startsWith('auth/');
 const welcomePage = pageName === 'Welcome';
-const pageUrl = welcomePage
+const fallbackPageUrl = welcomePage
     ? '/'
     : authPage
       ? `/${pageName.split('/').at(-1)?.toLowerCase()}`
@@ -399,6 +399,11 @@ const pageUrl = welcomePage
               .replace(/\/Index$/, '')
               .replace(/\/Show$/, '/item')
               .toLowerCase()}`;
+const { role, pageUrl, welcomeAuthenticated } = resolveVisualIdentity(
+    pageName,
+    query,
+    fallbackPageUrl,
+);
 const page = {
     component: pageName,
     url: pageUrl,
@@ -409,7 +414,7 @@ const page = {
         errors: {},
         auth: {
             user:
-                authPage || welcomePage
+                authPage || (welcomePage && !welcomeAuthenticated)
                     ? null
                     : {
                           id: accountId,
@@ -420,10 +425,13 @@ const page = {
                           created_at: '2026-10-01T12:00:00Z',
                           updated_at: '2026-10-01T12:00:00Z',
                       },
-            roles: authPage || welcomePage ? [] : [role],
+            roles:
+                authPage || (welcomePage && !welcomeAuthenticated)
+                    ? []
+                    : [role],
         },
         roleAreas:
-            authPage || welcomePage
+            authPage || (welcomePage && !welcomeAuthenticated)
                 ? []
                 : [
                       {
@@ -650,6 +658,25 @@ if (state === 'return-lines' && pageName === 'Manage/Pickups/Show')
             creditCents: 50,
         },
     ];
+if (pageName === 'Manage/Reception/Show') {
+    if (query.get('receptionBranch') === 'unordered') {
+        visualProps.reception.products[0].nobodyOrdered = true;
+        visualProps.reception.products[0].ordered = '0';
+        visualProps.reception.products[0].allocations = [];
+    }
+    if (query.get('receptionBranch') === 'unbalanced') {
+        visualProps.reception.products[0].balanced = false;
+        visualProps.reception.products[0].difference = '12345.000';
+    }
+    if (query.get('receptionBranch') === 'extra-household') {
+        visualProps.households.push({
+            id: 'household-2',
+            name: 'El Roure',
+        });
+    }
+}
+if (query.get('adjusted') === '1' && pageName === 'Manage/Reception/Show')
+    visualProps.reception.products[0].hasAdjustments = true;
 if (state === 'manual-allocation' && pageName === 'Manage/Reception/Show') {
     visualProps.reception.products[0].hasManualAllocations = true;
     visualProps.reception.products[0].allocations[0].byHand = true;
@@ -1376,6 +1403,15 @@ void createInertiaApp({
             document.querySelector('[role="dialog"]'),
             'overlay-focus',
         );
+    if (query.get('drawer') === '1') {
+        const trigger = await waitForElement('button[data-sidebar="trigger"]');
+        trigger.click();
+        const drawer = await waitForElement(
+            '[data-sidebar="sidebar"][data-mobile="true"]',
+        );
+        markFocusableEdges(drawer, 'drawer-focus');
+        document.body.dataset.visualReady = 'drawer-open';
+    }
     const restoreFixtureUrl = () =>
         window.history.replaceState(window.history.state, '', fixtureUrl);
     restoreFixtureUrl();

@@ -2252,3 +2252,75 @@ baseline remains unchanged; current accepted S1–S90 replaces only the supersed
 Both feature logs preserve the complete upstream log prefix and every byte of this amendment's
 existing appended entries. No application source was changed by the documentation integration.
 Why: publish the authorized PR against current main without discarding its merged clarifications.
+
+
+## 2026-10-29 · Deviation
+
+T48–T51 (Reference style refresh): complete the missing manager/producer role-shell evidence
+and authenticated Welcome state in a task-owned fixture/manifest, preserving the accepted rollout
+and historical visual reports. The new coverage retains every declared manager/producer state,
+uses explicit role and public route context, and includes the remaining signed-in shells affected
+by the shared navigation rule. Application and Catalog/Sales behavior is unchanged.
+
+The rendered selected-navigation probe found white text on the light sidebar accent at 4.43037:1,
+below the accepted 4.5:1 contrast threshold. Both existing desktop and portalled-mobile accent
+mixes now use 12% of the same palette surface over brand instead of 16% (calculated 4.83767:1).
+Dark tokens and the accepted visual direction remain unchanged. The focused rendered regression,
+shared visual report and independent review must verify the final committed candidate; this entry
+does not claim their pending results as passed.
+
+Why: the user requested completing the outstanding T48–T51 visual gates with correct roles and
+Welcome authenticated, reusing valid evidence without repeating rollout or interfering with T52.
+The coordinator authorized only the two measured contrast corrections needed by that existing gate.
+The full delivery record is in `docs/visual-checks/2026-10-29-reference-gates-completion.md`.
+No T52 files/worktree, task relations, historical baseline or earlier log entry is changed. This
+independent append is kept separate from the still-open reconciliation PR #250 and must be preserved
+alongside its history when those documentary branches integrate.
+
+
+## 2026-10-29 · Deviation
+
+T50 (Reference style refresh), independent visual review round 1: the reception summary's fixed
+four-column breakpoint let the actual Catalan text ranges for Ordered and Received overlap by
+3.06 px at 1024 px with 200% text, in default/manual-allocation states and both themes. The
+document itself had no horizontal overflow; the inherited visual selector omitted `dt`/`dd`, so
+its earlier geometry result did not establish this summary's acceptance.
+
+The owning `Manage/Reception/Show.vue` summary now uses the existing auto-fit/minmax responsive
+grid approach with an 8 rem metric minimum rather than the viewport-only four-column breakpoint.
+The task fixture's summary coverage and a direct text-range intersection regression must include
+the owning labels/values, the adjusted fourth metric and risky phone/enlarged-text combinations.
+No command, quantity, permission, translation or domain state is changed. Final candidate evidence
+and a fresh independent review follow the correction; previous reports retain their own identity.
+
+Why: completing the user-requested T50 no-clipping visual gate requires resolving this confirmed
+preexisting collision rather than treating a clean page width as sufficient evidence. This bounded
+presentation correction reuses the established responsive grid formula and leaves T52's code and
+worktree untouched. All earlier log entries and the historical baseline are preserved.
+
+
+## 2026-10-29 · Deviation
+
+T50 (Reference style refresh), expanded reception reflow checks: the newly retained 375 px/200%
+cases exposed received-total fields and submit buttons that were 256 px wide inside a 245 px
+product content area. The same mechanism affected the owning page's nobody-ordered form.
+The adjusted and unbalanced status badges also exceeded that content area (484 px and 339 px),
+and the adjusted badge exceeded its 432 px content area at 1024 px/200%.
+
+The existing received-total component and nobody-ordered form now constrain their field grids
+and inputs to the available width; their submit buttons can wrap and grow vertically. Only the
+two variable-text status badge call-sites can wrap within the panel. The shared Badge primitive,
+AllocationRow and AddAllocationForm remain unchanged: their visible control bounds passed the
+same targeted sweep, including the additional-household branch. Requests, emitted values and
+domain decisions remain unchanged. The expanded fixture retains all prior cases and adds these
+real owning branches and risky combinations; final verification must cover the corrected candidate.
+
+Why: the user requested completing the outstanding visual gates, and the profile requires no
+clipping at enlarged text. A page-level overflow pass did not establish content containment.
+These bounded presentation corrections resolve the measured pattern without changing the accepted
+rollout or T52's source/worktree. All earlier log entries and the historical baseline remain intact.
+
+The focused recheck showed the field wrapper itself was bounded but its implicit auto grid track
+still kept the input's 256 px intrinsic width. Both owning field wrappers therefore use the existing
+single-column `grid-cols-1` utility (a zero-minimum fractional track), allowing the label and input
+to shrink inside the 245 px content area. This is part of the same measured containment correction.

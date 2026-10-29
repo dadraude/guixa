@@ -1774,7 +1774,7 @@ html:has(.coop-manager-shell) {
     --sidebar-foreground: var(--palette-surface);
     --sidebar-accent: color-mix(
         in srgb,
-        var(--palette-surface) 16%,
+        var(--palette-surface) 12%,
         var(--palette-brand)
     );
     --sidebar-accent-foreground: var(--palette-surface);
@@ -1806,7 +1806,7 @@ html:has(.reference-style) [data-sidebar='sidebar'][data-mobile='true'] {
     --sidebar-foreground: var(--palette-surface);
     --sidebar-accent: color-mix(
         in srgb,
-        var(--palette-surface) 16%,
+        var(--palette-surface) 12%,
         var(--palette-brand)
     );
     --sidebar-accent-foreground: var(--palette-surface);
