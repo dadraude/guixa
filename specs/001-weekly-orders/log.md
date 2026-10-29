@@ -2435,3 +2435,15 @@ nullsafe calls, static dynamic-helper callers and direct business-model access f
 Exceptions remain limited to the existing resolver reads, framework authentication integration,
 Ordering's unchanged private table parameter and Membership's exact table-free advisory-lock SQL.
 The contract document records the supported syntax and static-analysis limits explicitly.
+
+## 2026-10-29 · Change
+
+The user authorized adding module-contract requirements to the task files and existing Linear tickets
+while keeping IDs, dependencies and statuses unchanged. The shared task execution contract now requires
+manifest/documentation/rejection-test maintenance and the complete architecture suite whenever a slice
+changes interfaces or persistence. T54/DRA-209 registers the delivered Sales query surface;
+T55/DRA-210 declares basket ownership and integration permissions; T59/DRA-214 reconciles contracts
+with the weekly writer cutover; T63/DRA-218 removes retired entries and exceptions with their code.
+Stock retains inventory ownership and Wallet retains ledger ownership. T54 and T55 keep their existing
+independent prerequisites. These are delivery/check clarifications under A11/A12; product requirements,
+the canonical task registry rows and native ticket dependencies/statuses are unchanged.

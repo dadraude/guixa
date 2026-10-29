@@ -35,6 +35,12 @@ Acceptance:
   adapters consumed by Membership and current cycle/member screens. Remove/disable charge-on-collection
   and abandonment endpoints for weekly purchases at cutover. Standalone stock operations do not invoke
   Ordering readiness. Remaining dead ownership is removed in T63; there is no active dual writer.
+- Update `architecture/modules.php` alongside the writer cutover: declare the delivered Sales/Ordering
+  interfaces, permitted callers, dependencies and table ownership; reflect Sales ownership of actuals,
+  validation and collection. Remove superseded integration permissions when their active callers are
+  cut over, including direct Ordering Stock/Wallet permissions no longer used. Stock keeps inventory
+  ownership and Wallet keeps ledger ownership. Retired schema cleanup remains in T63. Update the
+  module-contract documentation and relevant rejection tests, then run `tests/Architecture`.
 
 Verify S78/S89 and S9/S14–S16/S19/S20/S27–S30/S39/S40/S42/S46/S47/S53/S54/S61/S63/S64 plus S88's
 weekly no-contents/revival case. Preserve allocator/tie/overwrite/cutoff regressions instead of rewriting
@@ -154,6 +160,11 @@ Acceptance:
 - Current readers, factories, DTO/types, architecture tests, navigation and documentation use the
   accepted interfaces. Preserve useful regressions with new assertions rather than simply deleting
   tests that reveal missing behavior. No production reset is run.
+- Remove retired exports, caller permissions, dependencies, table ownership entries and scoped
+  exceptions from `architecture/modules.php` in the same change as their source/schema removal.
+  Reconcile the final Catalog/Sales/Ordering interfaces and complete migration-created table ownership
+  with the accepted plan. Update the module-contract documentation and retain rejection tests proving
+  retired access remains forbidden; run the complete `tests/Architecture` suite.
 
 Verify architecture/public route contracts, a fresh isolated schema and affected repository contracts;
 run focused catalogue/weekly/stock/wallet/membership/basket regressions and candidate-bound full CI.

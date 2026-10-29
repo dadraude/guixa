@@ -92,6 +92,11 @@ Acceptance:
   mutation. Batch quantity reads avoid recursive Catalog↔Stock composition or one query per product.
 - Use Sales' query-only `ListStockOffers` surface where planned; do not add an empty basket facade
   or depend on unbuilt purchase commands. T55 later uses the same offers contract.
+- When introducing the Sales query-only surface, register or extend Sales in
+  `architecture/modules.php` with only the delivered read exports, DTOs, permitted callers and
+  dependencies. Keep any required new table ownership explicit; do not predeclare
+  basket tables or purchase commands. Update the module-contract documentation and relevant rejection
+  tests, then run `tests/Architecture`. This adds no dependency on T55.
 
 Verify S73/S74 and S66 visibility with zero stock, inactive producer/product, no cycle, ownership and
 attempted forged mutations. Confirm reading does not write/reserve stock. Exercise the member
