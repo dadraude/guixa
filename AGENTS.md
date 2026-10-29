@@ -20,9 +20,11 @@ Opening an image costs far more tokens than reading numbers. To check a style fi
    JS tool), or `measureLayout`/`measureFocus` from `skills/agent-workflow/scripts/visual/measure.mjs`.
    Compare against the expected values (height, spacing, colour, overflow).
 2. Use `read_page`/`find` for structure and text, never a screenshot.
-3. Let the visual runner (`skills/agent-workflow/references/visual.md`) judge captures by its report;
-   open a PNG only for a failed case or a required human inspection.
+3. Use the visual runner (`skills/agent-workflow/references/visual.md`) in its default measurement mode.
+   Routine review generates and opens no screenshots. Generate a small preview only for a new design
+   direction, an unexplained failure, or an explicit request.
 4. When an image is still needed, `zoom` on the affected region or capture at `scale` 0.3–0.5, once,
    as the final confirmation rather than on every iteration.
 
-This does not lift the visual-review gates: required inspections still happen.
+The review gates use DOM, measurement, interaction and source evidence. Explicit visual-design approval
+remains required where specified; optional previews do not replace behavior or accessibility checks.

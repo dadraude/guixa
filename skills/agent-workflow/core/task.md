@@ -36,28 +36,28 @@ suites belong to CI, not an additional local gate. Run a local build only when a
 or the change specifically needs a build reproduction; record the reason.
 
 Report checked HEAD/base and command/result, not passing logs. On failure, include the failed check
-and at most 40 sanitized output lines; send it to the implementer. Two consecutive failed attempts in
-either stage (local verification or CI) stop the task; local success never resets the CI failure counter.
+and at most 40 sanitized output lines; send it to the implementer. Classify failures and apply the profile's separate budgets using
+[correction budgets and recovery](#correction-budgets-and-recovery); local success never resets a CI failure counter.
 Pending/unavailable evidence is not a passing attempt. Focused
 green covers only that HEAD/base and never means full validation has passed.
 
 For rendered UI changes, apply the [visual pre-review gate](../references/visual.md#pre-review-gate):
 check the [component reuse plan](../references/visual.md#reuse-components-before-building-screens)
 against the diff, compare the manifest to acceptance and the affected page/role/state inventory, require a successful
-shared verifier on the current HEAD/base, and require inspection of distinct layouts/states, changed
-patterns and failures plus focused acceptance checks.
+shared verifier on the current HEAD/base, and require text-based inspection of distinct layouts/states, changed
+patterns and failures plus focused acceptance checks. Generate previews only through the visual workflow's optional path.
 Missing coverage returns to implementation before launching a reviewer; it is not a review round.
 
 ## 4. Independent review
 
 Launch a fresh read-only reviewer using [the reviewer brief](reviewer.md), fixed base and scheduling
 handoff. Aim for one complete review of the prepared candidate. Additional rounds address concrete
-findings or behavioral changes, up to three rounds total including post-integration reviews; never
-reset the counter on rebase.
-Clean proceeds to preparation for publication. Product questions stop. Fixes in rounds 1/2 return to
+findings or behavioral changes, within the profile's substantive review budget including post-integration reviews; never
+reset counters on rebase. Verified mechanical corrections use the separate focused follow-up budget.
+Clean proceeds to preparation for publication. Product questions stop. Fixes while the applicable budget remains return to
 the implementer for the [whole-pattern correction](../references/visual.md#correct-a-defect-pattern)
 when visual findings apply, then focused verification, then a fresh reviewer. Require the instance
-sweep and remaining-gap report before relaunching review. Any unresolved finding after round 3 stops.
+sweep and remaining-gap report before relaunching review. Any unresolved finding at the applicable review limit stops.
 This task-level review does not replace any applicable repository-native review/consent requirement.
 
 ## 5. Prepare publication (no push)
@@ -104,7 +104,8 @@ CI evidence. A green badge or an unrelated/stale run is insufficient.
   busy-poll or run the full suite locally as a substitute. Resume observation when results are available.
 - Failed CI: report `ci-failed` with failed check names and bounded sanitized excerpts. Within the
   existing correction/review budgets, return to the implementer for a focused reproduction and fix.
-  Recheck focused evidence and independently review the changed candidate before another push. Use new
+  Recheck focused evidence and independently review the changed candidate before another push;
+  proven mechanical corrections use focused follow-up review under the separate budget. Use new
   commits on the published branch, never the pre-publication amend/rebase loop. New commits restart CI
   evidence collection.
 
@@ -123,3 +124,43 @@ Preserve the worktree and changes. Post the exact blocker/question on the issue 
 profile's stopped status. A failed
 status update is pending, not a reason to retry publication. Keep the task reservation and report status,
 HEAD/base, checks/review rounds, remote outcomes and the exact decision or missing capability needed.
+
+## Correction budgets and recovery
+
+The project profile supplies limits; retain counters and stable failure mechanisms in the existing
+implementation-owner record using the [state helper](../scripts/state.mjs). Classify before retrying:
+
+- Product: behavior, contracts or acceptance are wrong; count consecutive failures separately for
+  local verification, visual verification and CI. Success resets only that stage's product streak.
+- Harness/infrastructure: a diagnosed selector, readiness, probe, browser or service failure prevented
+  valid evidence. Record diagnosis, fix and focused reproduction before another broad run; use the
+  stage's bounded recovery allowance. An unexplained failure cannot be assumed to be infrastructure.
+- Mechanical: formatting or test wiring preserves production behavior and existing assertions.
+  Prove that classification with the diff and focused checks. Use a fresh independent focused
+  follow-up review; changed behavior/assertions require substantive review.
+
+Record a `recovery` event before each diagnosed non-product correction retry, with its diagnosis and
+focused-correction `evidence`. These attempts use their own bounded stage counter, including successful
+recoveries; they do not consume product failures. An initial harness failure alone does not consume a
+recovery attempt. A failed final allowed recovery stops the task; another attempt beyond the limit is refused.
+Substantive and mechanical review counts remain separate. Repeated failures of the same stage and
+mechanism cannot be relabeled to reset a budget. Missing, pending or stale evidence is never success.
+Budget exhaustion stops the task with preserved evidence; restarting a session or rebasing resets none.
+
+Use `node skills/agent-workflow/scripts/state.mjs OWNER_JSON EVENT_JSON` from the task worktree.
+The coordinator alone writes this record. First send an `initialize` event with admission/recovery
+`evidence` and explicit known `counters`: `substantive`, `mechanical`, `product` and `recovery`
+(stage-keyed objects for the latter two). New tasks explicitly start at zero; unknown legacy counters
+block recovery rather than silently resetting. Optional owner `workflowLimits` initializes profile limits;
+existing pipeline limits/counters are retained. JSON events support `review` (classification
+`substantive|mechanical`, verdict `clean|findings`), `failure|success|recovery` (stage `local|visual|ci`,
+classification `product|harness|infrastructure|mechanical`, stable `mechanism`),
+`disposition` (value and decision `evidence`), `reservations` (paths and ownership `evidence`),
+and `start|end` (stage `implementation|verification|review|ci|decision-wait`).
+Optional `at` is an ISO timestamp; otherwise use current UTC time. A nonzero result may mean the
+record was successfully saved with an exhausted-budget blocker; read it before deciding next action.
+The helper preserves implementation identity and writes atomically. It is recovery evidence, not a lock.
+
+Record stage starts/ends as they occur. Report completed durations, open periods, first-pass CI
+success, review counts and repeated verification; do not invent missing historical timings.
+Assess the next five feature deliveries before claiming a speed improvement.

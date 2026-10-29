@@ -45,10 +45,11 @@ next task. A stopped task holds overlapping work while its changes remain pendin
 While CI runs, wait through the adapter's completion mechanism and continue each pipeline as results
 arrive. When every remaining task waits on the user's merge, report exact PRs and candidate identities
 and stop. Retain every open PR's environment for fixes; resume with current evidence.
-On resume reconstruct reservations from live worktrees and authorized PR evidence, not chat alone.
+On resume reconstruct reservations from live worktrees, retained disposition/ownership evidence and authorized PR evidence, not chat alone.
 Recover each task's recorded implementer identity using [implementation ownership](handoff.md#implementation-ownership);
 resume that worker for corrections instead of dispatching a new implementer.
 
 Return one table: task, outcome (pending-ci/ci-failed/ci-passed/stopped/waiting-integration), PR, review rounds, deviations, retained
-worktree, reserved surfaces and predecessor PRs. Include pending checks and unresolved decisions.
+worktree, reserved surfaces and predecessor PRs. Include pending checks, unresolved decisions and observed stage durations from the retained task record.
+Report missing historical timings explicitly; preserve holds and deferred ownership across sessions.
 A PR is not an integrated task. Do not mark missing proof as passed.

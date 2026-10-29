@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { createServer } from 'node:http';
 import { spawn, execFileSync } from 'node:child_process';
-import { mkdtemp, writeFile, readFile, rm } from 'node:fs/promises';
+import { mkdtemp, writeFile, readFile, rm, readdir } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -18,11 +18,11 @@ void test('CLI captures settled UI, verifies coverage, and rejects changed or mi
         res.end(await readFile(join(cwd, 'index.html')));
     });
     await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
-    const cli = (command) =>
+    const cli = (command, ...flags) =>
         new Promise((resolve, reject) => {
             const process = spawn(
                 globalThis.process.execPath,
-                [runner, command, 'visual.json', 'artifacts', 'HEAD'],
+                [runner, command, 'visual.json', 'artifacts', 'HEAD', ...flags],
                 { cwd },
             );
             let output = '';
@@ -42,6 +42,23 @@ void test('CLI captures settled UI, verifies coverage, and rejects changed or mi
                 widths: [375],
                 modes: ['light', 'system-dark'],
                 text: [100, 200],
+            },
+            renderInputs: {
+                review: 'Fixture closure reviewed for this isolated test',
+                fixtures: ['index.html'],
+                source: [],
+                styles: [],
+                assets: [],
+                configuration: ['visual.json'],
+                dependencies: [],
+                data: [],
+                notApplicable: {
+                    source: 'Inline fixture',
+                    styles: 'Inline fixture',
+                    assets: 'System fonts',
+                    dependencies: 'Dependency-free fixture',
+                    data: 'Inline deterministic data',
+                },
             },
             views: [
                 {
@@ -82,7 +99,78 @@ void test('CLI captures settled UI, verifies coverage, and rejects changed or mi
             ],
             { cwd },
         );
-        const run = await cli('run');
+        const measured = await cli('run');
+        assert.equal(measured.code, 0, measured.output);
+        assert.equal((await cli('verify')).code, 0);
+        const outputs = await readdir(join(cwd, 'artifacts'));
+        assert.ok(
+            !outputs.some(
+                (path) => path.endsWith('.png') || path === 'index.html',
+            ),
+        );
+        const original = await readFile(
+            join(cwd, 'artifacts/report.json'),
+            'utf8',
+        );
+        await writeFile(
+            join(cwd, 'artifacts/report.json'),
+            original.replace('"status": "passed"', '"status": "forged"'),
+        );
+        assert.match(
+            (await cli('verify')).output,
+            /Changed measurement report/,
+        );
+        await writeFile(join(cwd, 'artifacts/report.json'), original);
+        await writeFile(join(cwd, 'notes.md'), 'Evidence notes');
+        execFileSync('git', ['add', 'notes.md'], { cwd });
+        execFileSync(
+            'git',
+            [
+                '-c',
+                'user.name=Workflow Test',
+                '-c',
+                'user.email=workflow@example.invalid',
+                '-c',
+                'commit.gpgsign=false',
+                'commit',
+                '-qm',
+                'Notes only',
+            ],
+            { cwd },
+        );
+        assert.equal((await cli('verify')).code, 0);
+        const proof = JSON.parse(
+            await readFile(join(cwd, 'artifacts/verification.json')),
+        );
+        assert.notEqual(proof.origin.head, proof.candidate.head);
+        assert.equal(
+            await readFile(join(cwd, 'artifacts/report.json'), 'utf8'),
+            original,
+        );
+        const fixtureSource = await readFile(join(cwd, 'index.html'), 'utf8');
+        await writeFile(
+            join(cwd, 'index.html'),
+            fixtureSource + '<!-- render input changed -->',
+        );
+        execFileSync('git', ['add', 'index.html'], { cwd });
+        execFileSync(
+            'git',
+            [
+                '-c',
+                'user.name=Workflow Test',
+                '-c',
+                'user.email=workflow@example.invalid',
+                '-c',
+                'commit.gpgsign=false',
+                'commit',
+                '-qm',
+                'Changed rendering input',
+            ],
+            { cwd },
+        );
+        assert.match((await cli('verify')).output, /Stale/);
+        const caseId = 'wallet--populated--375--light--100';
+        const run = await cli('run', '--capture=' + caseId);
         assert.equal(run.code, 0, run.output);
         const report = JSON.parse(
             await readFile(join(cwd, 'artifacts/report.json')),
@@ -94,6 +182,12 @@ void test('CLI captures settled UI, verifies coverage, and rejects changed or mi
             'utf8',
         );
         assert.ok(gallery.includes(report.cases[0].screenshot));
+        assert.equal(
+            (await readdir(join(cwd, 'artifacts'))).filter((name) =>
+                name.endsWith('.png'),
+            ).length,
+            1,
+        );
         await writeFile(join(cwd, 'index.html'), '<main>Changed</main>');
         assert.match((await cli('verify')).output, /Uncommitted/);
         execFileSync('git', ['restore', 'index.html'], { cwd });

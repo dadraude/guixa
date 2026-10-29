@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { test, before, after } from 'node:test';
 import { openChrome } from '../../scripts/visual/chrome.mjs';
 import { measureLayout, measureFocus } from '../../scripts/visual/measure.mjs';
+import { measureAssertions } from '../../scripts/visual/assertions.mjs';
 let browser;
 before(async () => {
     browser = await openChrome();
@@ -164,4 +165,60 @@ void test('native date subcontrols retain a visible focus-within outline at ever
         );
     }
     assert.ok(nativeStops > 0, 'Must exercise a native picker subcontrol');
+});
+
+void test('measures typography, spacing, targets, DOM state and contrast without captures', async () => {
+    await render(
+        'html{background:white}.panel{background:white;color:black;display:grid;gap:16px}button{min-width:44px;min-height:44px;font-size:1rem}',
+        '<button id="save" aria-expanded="false">Save</button>',
+    );
+    const rules = [
+        {
+            selector: '#save',
+            count: 1,
+            minWidth: 44,
+            minHeight: 44,
+            fontSizeRem: 1,
+            text: 'Save',
+            attributes: { 'aria-expanded': 'false' },
+            contrast: 4.5,
+        },
+        { selector: '.panel', gapRem: 0.5 },
+    ];
+    const measure = (input) =>
+        browser.evaluate(
+            '(' +
+                measureAssertions.toString() +
+                ')(' +
+                JSON.stringify(input) +
+                ')',
+        );
+    const good = await measure(rules);
+    assert.deepEqual(good.failures, []);
+    assert.deepEqual(good.unverified, []);
+    assert.ok(good.results[0].observed[0].contrast >= 4.5);
+    const bad = await measure([
+        {
+            selector: '#save',
+            minWidth: 500,
+            fontSizeRem: 2,
+            text: 'Wrong',
+            attributes: { 'aria-expanded': 'true' },
+        },
+    ]);
+    assert.ok(bad.failures.length >= 4);
+    await browser.evaluate(
+        "document.querySelector('#save').style.backgroundImage='linear-gradient(white,black)'",
+    );
+    assert.ok(
+        (await measure([{ selector: '#save', contrast: 4.5 }])).unverified
+            .length,
+    );
+    assert.ok(
+        (await measure([{ selector: '#save', unknown: 1 }])).unverified.length,
+    );
+    assert.deepEqual(
+        (await measure([{ selector: '.absent', count: 0 }])).failures,
+        [],
+    );
 });

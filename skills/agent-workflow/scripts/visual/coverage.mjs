@@ -1,3 +1,4 @@
+import { reusable } from './evidence.mjs';
 function requireValue(condition, message) {
     if (!condition) throw new Error(message);
 }
@@ -122,8 +123,19 @@ export function expandMatrix(manifest) {
 export function checkCoverage(manifest, report, candidate) {
     const expected = expandMatrix(manifest);
     const errors = [];
+    if (report.schemaVersion !== undefined && report.schemaVersion !== 2)
+        errors.push('Unsupported report schema');
+    if (report.schemaVersion === 2 && !Array.isArray(report.captureIds))
+        errors.push('Missing capture declaration');
     for (const key of ['head', 'base', 'manifestHash', 'harnessHash']) {
-        if (!candidate[key] || report[key] !== candidate[key])
+        if (
+            !candidate[key] ||
+            (report[key] !== candidate[key] &&
+                !(
+                    ['head', 'base'].includes(key) &&
+                    reusable(report, candidate)
+                ))
+        )
             errors.push(`Stale or missing ${key}`);
     }
     const records = new Map();
@@ -139,10 +151,35 @@ export function checkCoverage(manifest, report, candidate) {
             continue;
         }
         if (
-            !/^[a-z0-9-]+\.png$/.test(record.screenshot ?? '') ||
-            !/^[a-f0-9]{64}$/.test(record.sha256 ?? '')
+            (report.schemaVersion !== 2 ||
+                report.captureIds?.includes(item.id) ||
+                record.screenshot !== undefined) &&
+            (!/^[a-z0-9-]+\.png$/.test(record.screenshot ?? '') ||
+                !/^[a-f0-9]{64}$/.test(record.sha256 ?? ''))
         )
             errors.push(`Invalid capture: ${item.id}`);
+        if (report.schemaVersion === 2) {
+            const checks = record.assertions;
+            if (
+                !checks ||
+                checks.failures?.length ||
+                checks.unverified?.length ||
+                !Array.isArray(checks.results) ||
+                checks.results.length !== (item.view.assertions ?? []).length ||
+                checks.results.some(
+                    (result, index) =>
+                        result.index !== index ||
+                        result.selector !==
+                            item.view.assertions[index].selector ||
+                        result.passed !== true,
+                )
+            )
+                errors.push(
+                    'Missing, failed or unverified assertions: ' + item.id,
+                );
+            if (!Array.isArray(record.failures) || record.failures.length)
+                errors.push('Failed measurements: ' + item.id);
+        }
         const m = record.measurements;
         if (
             m?.viewport !== item.width ||
@@ -157,6 +194,13 @@ export function checkCoverage(manifest, report, candidate) {
         )
             errors.push(`Missing keyboard targets: ${item.id}`);
     }
+    if (
+        report.schemaVersion === 2 &&
+        report.captureIds?.some(
+            (id) => !expected.some((item) => item.id === id),
+        )
+    )
+        errors.push('Unknown capture case');
     for (const id of records.keys()) errors.push(`Unexpected case: ${id}`);
     return errors;
 }

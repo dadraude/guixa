@@ -179,3 +179,27 @@ void test('missing captures, measured coverage or keyboard evidence blocks revie
         assert.ok(checkCoverage(manifest, report, candidate).length);
     }
 });
+
+void test('version-2 measurements need no capture but require complete acceptance results', () => {
+    const report = passing();
+    report.schemaVersion = 2;
+    report.captureIds = [];
+    for (const record of report.cases) {
+        delete record.screenshot;
+        delete record.sha256;
+        record.assertions = { results: [], failures: [], unverified: [] };
+        record.failures = [];
+    }
+    assert.deepEqual(checkCoverage(manifest, report, candidate), []);
+    report.cases[0].assertions.unverified.push('Unsupported background');
+    assert.match(
+        checkCoverage(manifest, report, candidate).join('\n'),
+        /unverified/,
+    );
+    report.cases[0].assertions.unverified = [];
+    report.captureIds.push(report.cases[0].id);
+    assert.match(
+        checkCoverage(manifest, report, candidate).join('\n'),
+        /Invalid capture/,
+    );
+});

@@ -1,11 +1,13 @@
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { readFile, writeFile, mkdir, readdir } from 'node:fs/promises';
+import { readFile, writeFile, mkdir, readdir, rm } from 'node:fs/promises';
 import { dirname, resolve, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { expandMatrix, checkCoverage } from './coverage.mjs';
 import { openChrome, waitFor } from './chrome.mjs';
 import { measureLayout, measureFocus } from './measure.mjs';
+import { measureAssertions } from './assertions.mjs';
+import { renderingInputs, digest } from './evidence.mjs';
 
 const hash = (data) => createHash('sha256').update(data).digest('hex');
 const git = (...args) => execFileSync('git', args, { encoding: 'utf8' }).trim();
@@ -37,11 +39,25 @@ async function identity(manifestPath, raw, base) {
         manifestHash: hash(raw),
         harnessHash: hash(Buffer.concat(sources)),
         dirty: !!git('status', '--porcelain', '--untracked-files=no'),
+        renderInputs: renderingInputs(JSON.parse(raw).renderInputs),
     };
 }
 
 async function checkArtifacts(manifest, report, candidate, output) {
     const errors = checkCoverage(manifest, report, candidate);
+    if (report.schemaVersion === 2) {
+        try {
+            const raw = await readFile(resolve(output, 'report.json'));
+            if (
+                (
+                    await readFile(resolve(output, 'report.sha256'), 'utf8')
+                ).trim() !== digest(raw)
+            )
+                errors.push('Changed measurement report');
+        } catch {
+            errors.push('Missing report integrity evidence');
+        }
+    }
     if (candidate.dirty || report.dirty)
         errors.push('Uncommitted tracked changes invalidate review evidence');
     for (const item of report.cases ?? []) {
@@ -59,7 +75,7 @@ async function checkArtifacts(manifest, report, candidate, output) {
     return errors;
 }
 
-async function runCase(browser, manifest, item, output) {
+async function runCase(browser, manifest, item, output, captureIds) {
     const { view, state, width, mode, text, id } = item;
     const url = new URL(view.path, manifest.baseUrl);
     for (const [key, value] of Object.entries({
@@ -134,7 +150,18 @@ async function runCase(browser, manifest, item, output) {
     const measurements = await browser.evaluate(
         `(${measureLayout.toString()})(${JSON.stringify(view)})`,
     );
-    const failures = [...measurements.failures];
+    const assertions = await browser.evaluate(
+        '(' +
+            measureAssertions.toString() +
+            ')(' +
+            JSON.stringify(view.assertions ?? []) +
+            ')',
+    );
+    const failures = [
+        ...measurements.failures,
+        ...assertions.failures,
+        ...assertions.unverified,
+    ];
     if (measurements.viewport !== width) failures.push('Wrong viewport');
     if (observed.text !== text)
         failures.push('Fixture did not apply text enlargement');
@@ -142,22 +169,26 @@ async function runCase(browser, manifest, item, output) {
         failures.push('Fixture did not apply appearance');
     if (observed.reducedMotion !== !!state.reducedMotion)
         failures.push('Wrong motion preference');
-    const screenshot = `${id}.png`;
-    const capture = await browser.send('Page.captureScreenshot', {
-        format: 'png',
-        captureBeyondViewport: true,
-        clip: {
-            x: 0,
-            y: 0,
-            width,
-            height: await browser.evaluate(
-                'Math.max(innerHeight, document.documentElement.scrollHeight)',
-            ),
-            scale: 1,
-        },
-    });
-    const bytes = Buffer.from(capture.data, 'base64');
-    await writeFile(resolve(output, screenshot), bytes);
+    const captureEvidence = {};
+    if (captureIds.includes(id)) {
+        const screenshot = id + '.png';
+        const capture = await browser.send('Page.captureScreenshot', {
+            format: 'png',
+            captureBeyondViewport: true,
+            clip: {
+                x: 0,
+                y: 0,
+                width,
+                height: await browser.evaluate(
+                    'Math.max(innerHeight, document.documentElement.scrollHeight)',
+                ),
+                scale: 1,
+            },
+        });
+        const bytes = Buffer.from(capture.data, 'base64');
+        await writeFile(resolve(output, screenshot), bytes);
+        Object.assign(captureEvidence, { screenshot, sha256: hash(bytes) });
+    }
     const focused = new Set();
     const focusMeasurements = [];
     await browser.evaluate(
@@ -201,8 +232,8 @@ async function runCase(browser, manifest, item, output) {
         id,
         url: url.href,
         status: failures.length ? 'failed' : 'passed',
-        screenshot,
-        sha256: hash(bytes),
+        ...captureEvidence,
+        assertions,
         fonts,
         measurements: {
             ...measurements,
@@ -216,14 +247,22 @@ async function runCase(browser, manifest, item, output) {
 }
 
 async function main() {
-    const [command, manifestName, outputName, base] = process.argv.slice(2);
+    const [command, manifestName, outputName, base, ...flags] =
+        process.argv.slice(2);
+    if (
+        flags.some(
+            (flag) => flag !== '--capture' && !flag.startsWith('--capture='),
+        ) ||
+        (command !== 'run' && flags.length)
+    )
+        throw new Error('Unknown or misplaced capture option');
     if (
         !['plan', 'run', 'verify'].includes(command) ||
         !manifestName ||
         (command !== 'plan' && (!outputName || !base))
     )
         throw new Error(
-            'Usage: node run.mjs plan <manifest.json> | run|verify <manifest.json> <output-directory> <fixed-base-sha>',
+            'Usage: node run.mjs plan <manifest.json> | run|verify <manifest.json> <output-directory> <fixed-base-sha> [--capture[=<case-id>]]',
         );
     const manifestPath = resolve(manifestName);
     const raw = await readFile(manifestPath);
@@ -249,15 +288,59 @@ async function main() {
             output,
         );
         if (errors.length) throw new Error(errors.join('\n'));
+        const report = JSON.parse(
+            await readFile(resolve(output, 'report.json')),
+        );
+        await writeFile(
+            resolve(output, 'verification.json'),
+            JSON.stringify(
+                {
+                    verifiedAt: new Date().toISOString(),
+                    origin: { head: report.head, base: report.base },
+                    candidate: { head: candidate.head, base: candidate.base },
+                    renderInputsHash: candidate.renderInputs?.hash ?? null,
+                    reportHash: digest(
+                        await readFile(resolve(output, 'report.json')),
+                    ),
+                },
+                null,
+                2,
+            ),
+        );
         console.log(
-            `Visual coverage passed: ${cases.length} cases at ${candidate.head}`,
+            'Visual coverage passed: ' +
+                cases.length +
+                ' cases at ' +
+                candidate.head,
         );
         return;
     }
+    const captureIds = flags.includes('--capture')
+        ? cases.map((item) => item.id)
+        : flags.map((flag) => flag.slice('--capture='.length));
+    if (captureIds.some((id) => !cases.some((item) => item.id === id)))
+        throw new Error('Unknown capture case');
     await mkdir(output, { recursive: true });
+    // Only remove artifacts owned by the previous run, never arbitrary user images.
+    if (
+        output === git('rev-parse', '--show-toplevel') ||
+        git('ls-files', '--', output)
+    )
+        throw new Error('Evidence output must not contain tracked source');
+    let previous;
+    try {
+        previous = JSON.parse(await readFile(resolve(output, 'report.json')));
+    } catch {}
+    for (const item of previous?.cases ?? [])
+        if (/^[a-z0-9-]+\\.png$/.test(item.screenshot ?? ''))
+            await rm(resolve(output, item.screenshot), { force: true });
+    for (const name of ['index.html', 'verification.json'])
+        await rm(resolve(output, name), { force: true });
     // Invalidate an earlier success before launching a browser or overwriting any captures.
     const report = {
         ...candidate,
+        schemaVersion: 2,
+        captureIds,
         generatedAt: new Date().toISOString(),
         cases: [],
     };
@@ -265,12 +348,24 @@ async function main() {
         resolve(output, 'report.json'),
         JSON.stringify(report, null, 2),
     );
+    const saveReport = async () => {
+        const bytes = JSON.stringify(report, null, 2);
+        await writeFile(resolve(output, 'report.json'), bytes);
+        await writeFile(resolve(output, 'report.sha256'), digest(bytes));
+    };
+    await saveReport();
     const browser = await openChrome();
     try {
         for (const item of cases) {
             let record;
             try {
-                record = await runCase(browser, manifest, item, output);
+                record = await runCase(
+                    browser,
+                    manifest,
+                    item,
+                    output,
+                    captureIds,
+                );
             } catch (error) {
                 record = {
                     id: item.id,
@@ -282,24 +377,25 @@ async function main() {
             console.log(
                 `${record.status}: ${item.id}${record.failures?.length ? ': ' + record.failures.join('; ') : ''}`,
             );
-            await writeFile(
-                resolve(output, 'report.json'),
-                JSON.stringify(report, null, 2),
-            );
+            await saveReport();
         }
     } finally {
         await browser.close();
     }
-    const cards = report.cases
-        .map(
-            (item) =>
-                `<figure><figcaption>${escapeHtml(item.id)} — ${escapeHtml(item.status)}</figcaption>${item.screenshot ? `<a href="${item.screenshot}"><img loading="lazy" src="${item.screenshot}"></a>` : ''}<pre>${escapeHtml((item.failures ?? []).join('\n'))}</pre></figure>`,
-        )
-        .join('\n');
-    await writeFile(
-        resolve(output, 'index.html'),
-        `<!doctype html><meta charset="utf-8"><title>Visual coverage</title><style>body{font:14px system-ui;margin:24px}main{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}figure{margin:0;min-width:0}img{max-width:100%;max-height:600px;object-fit:contain;object-position:top}pre{white-space:pre-wrap}</style><h1>${escapeHtml(basename(manifestName))}</h1><p>Candidate ${escapeHtml(candidate.head)}</p><main>${cards}</main>`,
-    );
+    if (captureIds.length) {
+        const cards = report.cases
+            .map(
+                (item) =>
+                    `<figure><figcaption>${escapeHtml(item.id)} — ${escapeHtml(item.status)}</figcaption>${item.screenshot ? `<a href="${item.screenshot}"><img loading="lazy" src="${item.screenshot}"></a>` : ''}<pre>${escapeHtml((item.failures ?? []).join('\n'))}</pre></figure>`,
+            )
+            .join('\n');
+        await writeFile(
+            resolve(output, 'index.html'),
+            `<!doctype html><meta charset="utf-8"><title>Visual coverage</title><style>body{font:14px system-ui;margin:24px}main{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}figure{margin:0;min-width:0}img{max-width:100%;max-height:600px;object-fit:contain;object-position:top}pre{white-space:pre-wrap}</style><h1>${escapeHtml(basename(manifestName))}</h1><p>Candidate ${escapeHtml(candidate.head)}</p><main>${cards}</main>`,
+        );
+    }
+    report.completedAt = new Date().toISOString();
+    await saveReport();
     const after = await identity(
         manifestPath,
         await readFile(manifestPath),
@@ -308,7 +404,11 @@ async function main() {
     const errors = await checkArtifacts(manifest, report, after, output);
     if (errors.length) throw new Error(errors.join('\n'));
     console.log(
-        `Visual coverage passed: ${cases.length} cases; gallery: ${output}/index.html`,
+        'Visual coverage passed: ' +
+            cases.length +
+            ' cases; text report: ' +
+            output +
+            '/report.json',
     );
 }
 main().catch((error) => {

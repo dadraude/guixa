@@ -26,17 +26,17 @@ Do not claim that this in-session table is a cross-session lock.
 
 ## Admission rules
 
-| Evidence                                                                     | Action                                                    |
-| ---------------------------------------------------------------------------- | --------------------------------------------------------- |
-| A real prerequisite is unfinished                                            | `blocked-dependency`; do not dispatch.                    |
-| Prerequisite code is not verified in the base, even if the tracker says done | `waiting-integration`.                                    |
-| Files are disjoint and no changing shared contract couples the tasks         | Run concurrently, within the session limit.               |
-| Expected writes overlap, or a shared contract is being changed               | Queue the later task until the predecessor is integrated. |
-| Edit surface or ownership is unknown                                         | `needs-scope`; inspect before dispatch.                   |
+| Evidence                                                                     | Action                                                                                    |
+| ---------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| A real prerequisite is unfinished                                            | `blocked-dependency`; do not dispatch.                                                    |
+| Prerequisite code is not verified in the base, even if the tracker says done | `waiting-integration`.                                                                    |
+| Files are disjoint and no changing shared contract couples the tasks         | Run concurrently, within the session limit.                                               |
+| Expected writes overlap, or a shared contract is being changed               | Queue through integration unless the verified mechanical-overlap exception below applies. |
+| Edit surface or ownership is unknown                                         | `needs-scope`; inspect before dispatch.                                                   |
 
-Keep each task's code, tests and required spec updates together. A shared artifact has one active owner;
+Keep each task's code, tests and required spec updates together. A shared behavioral artifact has one active owner;
 serialize its writers through integration instead of splitting code and documentation into independent
-deliveries. Do not silently transfer ownership, discard another task's edits, or use last-writer-wins.
+deliveries. Apply only the bounded mechanical-overlap exception below. Do not silently transfer ownership, discard another task's edits, or use last-writer-wins.
 Stacked branches are an explicitly agreed alternative, not an automatic fallback.
 
 ## Handoff and scope changes
@@ -66,3 +66,23 @@ Use [the task pipeline](task.md) as the authority for candidate preparation, foc
 review, publication and candidate-bound CI evidence. Update the handoff base after any integration change;
 never reuse stale results. Regenerate affected derived files rather than hand-merging or blindly
 concatenating routes/imports. Report later PR conflicts as integration follow-ups, not as done.
+
+## Verified mechanical overlap
+
+An overlap can be admitted only when current diffs prove the behavior and source contracts are
+independent and an integration owner is recorded. Unknown coverage keeps the normal reservation.
+
+- Translation JSON: all existing keys and values are preserved; both changes only add disjoint keys.
+  Verify all relevant locale files and required key use, not only a clean textual merge. The exported
+  `compatibleTranslations(base, left, right)` helper in [state.mjs](../scripts/state.mjs) checks flat
+  string dictionaries; nested/unknown formats stay reserved. The same key, changed values or removals
+  retain exclusive ownership.
+- Generated outputs: establish disjoint authoritative source edits and unchanged shared contracts,
+  with the exact generator and one integration owner. Keep each task's generated results; integrate
+  serially and regenerate from the combined source. Never hand-merge or concatenate derived files.
+  A lockfile or behavioral interface is not mechanically independent merely because it is generated.
+
+Before each publication/integration, recheck peer diffs and ownership, serialize combination, and
+validate the combined candidate's focused tests and generators. Refresh evidence and current CI as
+usual. A discovered key/contract conflict returns later work to queued without discarding it.
+Do not relax reservations for routes, shared behavior, requirements or append-only records.

@@ -31,7 +31,7 @@ Report command/status, candidate identity and failures; successful logs stay out
 bounded, sanitized failure excerpts only when diagnosing a failure; retain log/run references.
 
 For UI work, include the [visual contract](../references/visual.md) only for the implementer, reviewer
-and any visual check runner. Pass the declared matrix/inventory, manifest, current report/gallery and
+and any visual check runner. Pass the declared matrix/inventory, manifest, current text report, optional previews and
 selected case count/rationale plus focused acceptance results. Fix handoffs carry the accumulated
 finding ledger and pattern sweep, not just the most recent defect. Keep the actual total review count
 through publication and CI corrections.
@@ -59,4 +59,9 @@ worker cannot continue writing. Only genuine unavailability permits a replacemen
 old/new identities and full handoff before the replacement writes. Carry over the component decisions,
 actual diff, scope, HEAD/base, evidence, findings and all counters. If identity or write ownership cannot
 be established safely, stop the affected task. Never silently create a replacement after a timeout.
+Extend the existing owner record with the task pipeline's disposition/evidence, reservations/evidence,
+stable failure classifications, separate counters and stage periods. Preserve these fields on every
+identity or handoff update; recover them before continuing. Active/deferred work retains ownership;
+explicitly superseded/abandoned work releases reservations only after verifying the previous worker
+cannot keep writing. Preserve user holds. Unknown historical values stay unknown, never reset to zero.
 The owner record is recovery evidence, not a cross-process lock or permission to bypass admission.

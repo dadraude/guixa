@@ -11,14 +11,16 @@ new deviation log entries at the exact paths/sections in the handoff.
 
 For UI changes, load the [visual review handoff](../references/visual.md#review-handoff). Require the
 component plan with reuse/extension paths and reasons for new components, manifest/inventory,
-coverage result and gallery, acceptance-specific checks, and prior finding/pattern
+coverage result and compact text report, acceptance-specific checks, and prior finding/pattern
 ledger. Compare the selected cases with acceptance and the shared-pattern inventory; missing
-baseline, unique state or justified risk coverage is a blocker. Inspect distinct layouts/states,
-changed-pattern captures and failures without manually reopening equivalent passing images. Flag
+baseline, unique state or justified risk coverage is a blocker. Inspect DOM/measurement evidence for distinct layouts/states,
+changed patterns and failures. Routine review generates/opens no screenshots; the visual reference defines optional previews. Flag
 duplicated components, page-specific reimplementations of existing patterns, or bypassed semantic
 tokens as reuse-contract findings. Return the complete finding batch and any uninspected areas; do
 not end a visual sweep after its first defect. Reuse verified unchanged evidence on follow-up rounds
-while checking the impact of the correction across the whole affected pattern.
+while checking the impact of the correction across the whole affected pattern. Measurable findings need
+regression probes and a complete instance sweep before another review. A focused mechanical follow-up
+must establish unchanged production behavior and assertions; otherwise use substantive review.
 
 Check the whole diff for:
 
