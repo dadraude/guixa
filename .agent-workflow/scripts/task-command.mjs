@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, statSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
@@ -7,17 +7,14 @@ function settings(text) {
     return Object.fromEntries(
         text
             .split(/\r?\n/)
-            .filter((line) => /^\s*[A-Z_]+\s*=/.test(line))
-            .map((line) => {
-                const split = line.indexOf('=');
-                return [
-                    line.slice(0, split).trim(),
-                    line
-                        .slice(split + 1)
-                        .trim()
-                        .replace(/^(['"])(.*)\1$/, '$2'),
-                ];
-            }),
+            .map((line) =>
+                line.match(/^\s*(?:export\s+)?(['"]?)([A-Z_]+)\1\s*=(.*)$/),
+            )
+            .filter(Boolean)
+            .map((match) => [
+                match[2],
+                match[3].trim().replace(/^(['"])(.*)\1$/, '$2'),
+            ]),
     );
 }
 export function taskEnvironment(
@@ -32,15 +29,21 @@ export function taskEnvironment(
     const permitted = (value) =>
         value === database ||
         new RegExp('^' + database + '_test_[0-9]+$').test(value);
-    const validate = (values) => {
-        if (values.DB_DATABASE && !permitted(values.DB_DATABASE))
+    const validate = (values, { effective = false } = {}) => {
+        const overrides = (name) =>
+            effective ? Object.hasOwn(values, name) : Boolean(values[name]);
+        if (overrides('DB_DATABASE') && !permitted(values.DB_DATABASE))
             throw new Error('Unsafe task database override');
         if (values.DB_URL || values.DATABASE_URL)
             throw new Error('Database URL overrides are not supported');
-        if (values.DB_CONNECTION && values.DB_CONNECTION !== 'pgsql')
+        if (overrides('DB_CONNECTION') && values.DB_CONNECTION !== 'pgsql')
             throw new Error('Unexpected task database connection');
+        if (Object.hasOwn(values, 'APP_BASE_PATH'))
+            throw new Error('Custom application base path is not supported');
         if (values.APP_CONFIG_CACHE)
             throw new Error('Custom cached configuration is not supported');
+        if (effective && overrides('APP_ENV') && values.APP_ENV !== 'testing')
+            throw new Error('Unexpected task environment override');
     };
     validate(inherited);
     for (const name of ['.env', '.env.testing']) {
@@ -59,24 +62,39 @@ export function taskEnvironment(
         )
     )
         throw new Error('Command configuration overrides are not permitted');
-    const xml = resolve(cwd, 'phpunit.xml');
-    if (existsSync(xml)) {
-        for (const tag of readFileSync(xml, 'utf8').match(
-            /<(?:env|server)\b[^>]*>/g,
+    const configurations = [
+        'phpunit.xml',
+        'phpunit.dist.xml',
+        'phpunit.xml.dist',
+    ]
+        .map((name) => resolve(cwd, name))
+        .filter((path) => statSync(path, { throwIfNoEntry: false })?.isFile());
+    for (const xml of configurations) {
+        const source = readFileSync(xml, 'utf8');
+        if (/<!DOCTYPE\b|<!ENTITY\b/i.test(source))
+            throw new Error(
+                'XML declarations and indirection are not supported',
+            );
+        for (const tag of source.match(
+            /<(?:env|server)\b(?:[^"'<>]|"[^"]*"|'[^']*')*>/g,
         ) ?? []) {
             const fields = Object.fromEntries(
-                [...tag.matchAll(/(\w+)\s*=\s*(['"])(.*?)\2/g)].map((m) => [
-                    m[1],
-                    m[3],
-                ]),
+                [
+                    ...tag.matchAll(/\s+([\w:.-]+)\s*=\s*(['"])([\s\S]*?)\2/g),
+                ].map((m) => [m[1], m[3]]),
             );
+            if (fields.name?.includes('&') || fields.force?.includes('&'))
+                throw new Error(
+                    'Encoded XML setting controls are not supported',
+                );
             if (
                 tag.startsWith('<server') ||
                 fields.name === 'APP_CONFIG_CACHE' ||
-                fields.force === 'true' ||
+                fields.name === 'APP_BASE_PATH' ||
+                fields.force?.toLowerCase() === 'true' ||
                 fields.force === '1'
             )
-                validate({ [fields.name]: fields.value });
+                validate({ [fields.name]: fields.value }, { effective: true });
         }
     }
     return {

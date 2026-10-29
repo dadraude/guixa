@@ -6,6 +6,7 @@ import {
     writeFileSync,
     rmSync,
     existsSync,
+    symlinkSync,
 } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -403,6 +404,354 @@ void test('PHPUnit server values always validate while overwritten unforced env 
         assert.throws(
             () => taskEnvironment('208', f.cwd, {}),
             /cached configuration/,
+        );
+    } finally {
+        f.clean();
+    }
+});
+
+void test('dotenv exported and quoted isolation overrides are validated in both environment files', () => {
+    const f = fixture();
+    try {
+        const unsafe = [
+            ['APP_CONFIG_CACHE', 'other.php', /cached configuration/],
+            ['DB_URL', 'postgres://private-password@localhost/guixa', /URL/],
+            [
+                'DATABASE_URL',
+                'postgres://private-password@localhost/guixa',
+                /URL/,
+            ],
+            ['DB_DATABASE', 'guixa', /Unsafe/],
+            ['DB_CONNECTION', 'sqlite', /connection/],
+        ];
+        for (const path of ['.env', '.env.testing']) {
+            for (const [name, value, message] of unsafe) {
+                for (const key of [name, `'${name}'`, `"${name}"`]) {
+                    for (const prefix of ['', 'export ', '  export\t']) {
+                        f.write(path, `${prefix}${key} = "${value}"\n`);
+                        assert.throws(
+                            () => taskEnvironment('208', f.cwd, {}),
+                            message,
+                        );
+                    }
+                }
+            }
+            f.write(
+                path,
+                'export APP_NAME="Isolated fixture"\nexport DB_DATABASE="guixa_test_dra208"\n',
+            );
+            assert.equal(
+                taskEnvironment('208', f.cwd, {}).DB_DATABASE,
+                'guixa_test_dra208',
+            );
+            rmSync(join(f.cwd, path));
+        }
+    } finally {
+        f.clean();
+    }
+});
+
+void test('all PHPUnit and artisan default configuration files validate conservatively', () => {
+    const f = fixture();
+    const names = ['phpunit.xml', 'phpunit.dist.xml', 'phpunit.xml.dist'];
+    try {
+        for (const name of names)
+            f.write(
+                name,
+                '<phpunit><php><env name="DB_DATABASE" value="guixa"/></php></phpunit>',
+            );
+        for (const path of names) {
+            for (const [name, value, message] of [
+                ['DB_DATABASE', 'guixa', /Unsafe/],
+                ['DB_CONNECTION', 'sqlite', /connection/],
+                [
+                    'DB_URL',
+                    'postgres://private-password@localhost/guixa',
+                    /URL/,
+                ],
+                ['APP_CONFIG_CACHE', 'other.php', /cached configuration/],
+                ['APP_ENV', 'production', /environment/],
+                ['APP_BASE_PATH', '/other/application', /base path/],
+            ]) {
+                f.write(
+                    path,
+                    `<phpunit><php><env name="${name}" value="${value}" force="TRUE"/></php></phpunit>`,
+                );
+                assert.throws(() => taskEnvironment('208', f.cwd, {}), message);
+            }
+            f.write(
+                path,
+                '<phpunit><php><env name="DB_DATABASE" value="guixa"/></php></phpunit>',
+            );
+            assert.equal(
+                taskEnvironment('208', f.cwd, {}).DB_DATABASE,
+                'guixa_test_dra208',
+            );
+        }
+        for (const name of names) rmSync(join(f.cwd, name), { force: true });
+        mkdirSync(join(f.cwd, 'phpunit.xml'));
+        f.write(
+            'phpunit.dist.xml',
+            '<phpunit><php><env name="DB_DATABASE" value="guixa" force="true"/></php></phpunit>',
+        );
+        assert.throws(() => taskEnvironment('208', f.cwd, {}), /Unsafe/);
+    } finally {
+        f.clean();
+    }
+});
+
+void test('effective XML overrides reject missing or empty database and connection values while empty URLs stay safe', () => {
+    const f = fixture();
+    try {
+        for (const [tag, force] of [
+            ['server', ''],
+            ['server', ' force="false"'],
+            ['env', ' force="true"'],
+            ['env', ' force="TRUE"'],
+            ['env', ' force="TrUe"'],
+            ['env', ' force="1"'],
+        ]) {
+            for (const [name, message] of [
+                ['DB_DATABASE', /Unsafe/],
+                ['DB_CONNECTION', /connection/],
+            ]) {
+                for (const value of [' value=""', '']) {
+                    f.write(
+                        'phpunit.xml',
+                        `<phpunit><php><${tag} name="${name}"${value}${force}/></php></phpunit>`,
+                    );
+                    assert.throws(
+                        () => taskEnvironment('208', f.cwd, {}),
+                        message,
+                    );
+                }
+            }
+            f.write(
+                'phpunit.xml',
+                `<phpunit><php><${tag} name="DB_URL" value=""${force}/><${tag} name="DATABASE_URL" value=""${force}/></php></phpunit>`,
+            );
+            assert.equal(
+                taskEnvironment('208', f.cwd, {}).DB_DATABASE,
+                'guixa_test_dra208',
+            );
+        }
+        f.write(
+            'phpunit.xml',
+            '<phpunit><php><env name="DB_DATABASE" value=""/><env name="DB_CONNECTION" value=""/></php></phpunit>',
+        );
+        const env = taskEnvironment('208', f.cwd, {});
+        assert.equal(env.DB_DATABASE, 'guixa_test_dra208');
+        assert.equal(env.DB_CONNECTION, 'pgsql');
+        assert.equal(
+            taskEnvironment('208', f.cwd, {
+                DB_DATABASE: '',
+                DB_CONNECTION: '',
+            }).DB_DATABASE,
+            'guixa_test_dra208',
+        );
+    } finally {
+        f.clean();
+    }
+});
+
+void test('effective XML APP_ENV cannot select an unchecked dotenv file', () => {
+    const f = fixture();
+    try {
+        f.write('.env.production', 'export APP_CONFIG_CACHE=other.php\n');
+        for (const [tag, force] of [
+            ['server', ''],
+            ['server', ' force="false"'],
+            ['env', ' force="true"'],
+            ['env', ' force="TRUE"'],
+            ['env', ' force="TrUe"'],
+            ['env', ' force="1"'],
+        ]) {
+            for (const value of [' value="production"', ' value=""', '']) {
+                f.write(
+                    'phpunit.xml',
+                    `<phpunit><php><${tag} name="APP_ENV"${value}${force}/></php></phpunit>`,
+                );
+                assert.throws(
+                    () => taskEnvironment('208', f.cwd, {}),
+                    /environment/,
+                );
+            }
+            f.write(
+                'phpunit.xml',
+                `<phpunit><php><${tag} name="APP_ENV" value="testing"${force}/></php></phpunit>`,
+            );
+            assert.equal(taskEnvironment('208', f.cwd, {}).APP_ENV, 'testing');
+        }
+        f.write(
+            'phpunit.xml',
+            '<phpunit><php><env name="APP_ENV" value="production"/></php></phpunit>',
+        );
+        assert.equal(taskEnvironment('208', f.cwd, {}).APP_ENV, 'testing');
+    } finally {
+        f.clean();
+    }
+});
+
+void test('renamed contracts retain source mappings and fingerprint both endpoints', () => {
+    const f = fixture();
+    try {
+        f.git('mv', 'src/Contract.php', 'src/Renamed.php');
+        const declaration = {
+            tests: [],
+            changedContracts: [
+                {
+                    name: 'Contract',
+                    path: 'src/Contract.php',
+                    evidence: 'Renamed contract consumers inspected',
+                    consumers: ['tests/ExistingTest.php'],
+                },
+            ],
+        };
+        const renamed = checkPlan(f.cwd, f.base, declaration);
+        assert.deepEqual(renamed.changed, [
+            'src/Contract.php',
+            'src/Renamed.php',
+        ]);
+        assert.deepEqual(renamed.removed, ['src/Contract.php']);
+        assert.deepEqual(renamed.formatting.selected, ['src/Renamed.php']);
+        assert.deepEqual(renamed.tests, ['tests/ExistingTest.php']);
+        assert.ok(
+            renamed.commands.every(
+                (args) => !args.includes('src/Contract.php'),
+            ),
+        );
+        assert.ok(
+            renamed.commands.some((args) => args.includes('src/Renamed.php')),
+        );
+        f.write('src/Renamed.php', '<?php // changed renamed contract');
+        assert.notEqual(
+            checkPlan(f.cwd, f.base, declaration).inputHash,
+            renamed.inputHash,
+        );
+        f.write('src/Contract.php', '');
+        assert.notEqual(
+            checkPlan(f.cwd, f.base, declaration).inputHash,
+            renamed.inputHash,
+        );
+    } finally {
+        f.clean();
+    }
+});
+
+void test('tracked file type changes remain in candidate checks', () => {
+    const f = fixture();
+    try {
+        f.write('tests/LinkTest.php', '<?php // original test file');
+        f.git('add', '.');
+        f.git(
+            '-c',
+            'commit.gpgsign=false',
+            'commit',
+            '-qm',
+            'File type fixture',
+        );
+        const base = f.git('rev-parse', 'HEAD');
+        rmSync(join(f.cwd, 'tests/LinkTest.php'));
+        symlinkSync('ExistingTest.php', join(f.cwd, 'tests/LinkTest.php'));
+        const plan = checkPlan(f.cwd, base, {
+            tests: [],
+            changedContracts: [],
+            noContractChangesReason: 'Fixture replaces a test with a symlink',
+        });
+        assert.deepEqual(plan.changed, ['tests/LinkTest.php']);
+        assert.deepEqual(plan.tests, ['tests/LinkTest.php']);
+        assert.deepEqual(plan.formatting.selected, ['tests/LinkTest.php']);
+    } finally {
+        f.clean();
+    }
+});
+
+void test('application base redirects are rejected from inherited, dotenv and all XML override types', () => {
+    const f = fixture();
+    try {
+        for (const value of ['/other/application', '']) {
+            assert.throws(
+                () => taskEnvironment('208', f.cwd, { APP_BASE_PATH: value }),
+                /base path/,
+            );
+            for (const path of ['.env', '.env.testing']) {
+                f.write(path, `export APP_BASE_PATH="${value}"\n`);
+                assert.throws(
+                    () => taskEnvironment('208', f.cwd, {}),
+                    /base path/,
+                );
+                rmSync(join(f.cwd, path));
+            }
+            for (const [tag, force] of [
+                ['server', ''],
+                ['server', ' force="false"'],
+                ['env', ''],
+                ['env', ' force="false"'],
+                ['env', ' force="TRUE"'],
+            ]) {
+                f.write(
+                    'phpunit.xml',
+                    `<phpunit><php><${tag} name="APP_BASE_PATH" value="${value}"${force}/></php></phpunit>`,
+                );
+                assert.throws(
+                    () => taskEnvironment('208', f.cwd, {}),
+                    /base path/,
+                );
+            }
+            rmSync(join(f.cwd, 'phpunit.xml'));
+        }
+    } finally {
+        f.clean();
+    }
+});
+
+void test('encoded XML control names, encoded force and declaration indirection fail closed', () => {
+    const f = fixture();
+    try {
+        for (const [name, value] of [
+            ['DB_DATA&#66;ASE', 'guixa'],
+            ['DB_DATA&#x42;ASE', 'guixa'],
+            ['APP_CONFIG_CAC&#72;E', 'other.php'],
+            ['APP_BASE_PA&#84;H', '/other/application'],
+            ['APP_E&#78;V', 'production'],
+        ]) {
+            for (const [tag, force] of [
+                ['server', ''],
+                ['env', ''],
+                ['env', ' force="true"'],
+            ]) {
+                f.write(
+                    'phpunit.xml',
+                    `<phpunit><php><${tag} name="${name}" value="${value}"${force}/></php></phpunit>`,
+                );
+                assert.throws(
+                    () => taskEnvironment('208', f.cwd, {}),
+                    /Encoded XML/,
+                );
+            }
+        }
+        for (const force of ['tr&#117;e', '&#84;RUE']) {
+            f.write(
+                'phpunit.xml',
+                `<phpunit><php><env name="DB_DATABASE" value="guixa" force="${force}"/></php></phpunit>`,
+            );
+            assert.throws(
+                () => taskEnvironment('208', f.cwd, {}),
+                /Encoded XML/,
+            );
+        }
+        f.write(
+            'phpunit.xml',
+            '<!DOCTYPE phpunit [<!ENTITY setting "APP_CONFIG_CACHE">]><phpunit><php><env name="&setting;" value="other.php"/></php></phpunit>',
+        );
+        assert.throws(() => taskEnvironment('208', f.cwd, {}), /indirection/);
+        f.write(
+            'phpunit.xml',
+            '<phpunit><php><env name="DB_DATABASE" value="guixa" force="FALSE"/><env name="APP_ENV" value="production"/></php></phpunit>',
+        );
+        assert.equal(
+            taskEnvironment('208', f.cwd, {}).DB_DATABASE,
+            'guixa_test_dra208',
         );
     } finally {
         f.clean();

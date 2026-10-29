@@ -37,14 +37,7 @@ export function checkPlan(cwd, base, plan) {
     }).trim();
     const changed = [
         ...new Set([
-            ...gitPaths(
-                cwd,
-                'diff',
-                '--name-only',
-                '-z',
-                '--diff-filter=ACDMR',
-                base,
-            ),
+            ...gitPaths(cwd, 'diff', '--name-only', '-z', '--no-renames', base),
             ...gitPaths(
                 cwd,
                 'ls-files',
