@@ -34,10 +34,33 @@ Why: <reason, or the OQ / conversation that decided it>.
 
 Done when every document edit in the diff has its entry.
 
-## 3. Close a task
+## 3. Plan and break down accepted scope
+
+After the spec is accepted, use the readiness checks in
+[planning evidence and handoffs](../../../skills/agent-workflow/references/planning.md) before writing
+the technical plan or task breakdown. Use the current accepted spec, constitution and relevant design
+sources; check implementation paths using the repository's discovery rules. Missing product decisions
+return to the spec/OQs; missing technical contracts belong in the proposed plan. Do not mark dependent
+tasks ready until the necessary decisions are accepted.
+
+Present `plan.md` for the user's OK before editing `tasks.md`. Once the plan is accepted, use the
+reference's slicing, handoff and coverage checks within the canonical task registry and linked task
+details. Preserve feature-global IDs and existing approvals; include the source-backed architecture
+overview, bounded outcomes, partial requirement allocations and genuine dependency reasons. Log each
+document change as above. Report the frontier separately from authorization to implement.
+
+Task approval does not authorize implementation or ticket publication. For requested ticket drafting
+or publication, follow the [shared tickets process](../../../skills/agent-workflow/core/tickets.md)
+with the runtime adapter and project profile; do not publish as a side effect of editing these docs.
+
+## 4. Close a task
 
 Before opening a task's PR (its Linear issue tracks the status), compare the code against `plan.md`
-and every `R#` and scenario the task links. Write each mismatch back to the document it contradicts and log it as a
-**Deviation**.
+and the task's allocated acceptance scope for every linked `R#` and scenario. If a requirement is
+shared, verify this task's part and the named owner/dependency for the remainder; do not claim the
+whole requirement complete or record its planned remainder as a deviation. Carry that allocation in
+implementer and reviewer handoffs. Write actual mismatches back to the affected document and log a
+**Deviation**; a behavior change still needs the user's decision.
 
-Done when every linked `R#` and scenario matches the code and its tests pass.
+Done when the allocated acceptance scope matches the code, its tests pass and any remainder retains
+an explicit owner.

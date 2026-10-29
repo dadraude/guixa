@@ -40,6 +40,15 @@ To add a runtime, implement capability mappings in an adapter and a thin entrypo
 core or claim that every AI chat service can run it: it needs repository access, required execution
 and delegation capabilities, and authorized connectors. Keep explicit-only invocation in its metadata.
 
+## Planning
+
+Ticket drafting uses [planning evidence and handoffs](references/planning.md): current readiness
+checks, bounded acceptance/contract excerpts, partial requirement allocation and an explicit dependency
+frontier. Projects can reuse it while authoring canonical plans/tasks through their own document
+approval flow. The source documents remain authoritative; draft approval and publication permission
+stay separate. These checks adapt ideas from the supplied `plan-work` skill without adopting its
+project-specific registries, mandatory database/UI loop or tracker tooling.
+
 ## Verification and context ownership
 
 The implementer proves focused RED/GREEN; the coordinator reuses matching evidence rather than
