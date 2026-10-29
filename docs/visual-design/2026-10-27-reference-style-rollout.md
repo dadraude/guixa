@@ -1,6 +1,6 @@
 # Reference style across Guixa
 
-**Status:** In progress, 2026-10-27. After viewing the merged T47 pilot, the user asked to remove the repeated page title, put breadcrumbs at the top, and apply the same visual language to every page. This extends the original pilot to all 37 route views, including Welcome. The change remains presentational; routes, permissions, props, validation, and domain behavior stay as they are.
+**Status:** Implementation integrated in PR #240 (`7f95324`); T48–T51 closure evidence remains incomplete as verified on 2026-10-29. See the [reconciliation and exact remaining gates](../visual-checks/2026-10-29-t47-t51-reconciliation.md). Historical rollout request, 2026-10-27: After viewing the merged T47 pilot, the user asked to remove the repeated page title, put breadcrumbs at the top, and apply the same visual language to every page. This extends the original pilot to all 37 route views, including Welcome. The change remains presentational; routes, permissions, props, validation, and domain behavior stay as they are.
 
 ## Route inventory
 

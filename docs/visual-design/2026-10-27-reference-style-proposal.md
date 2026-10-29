@@ -2,6 +2,8 @@
 
 **Status:** Approved for a staged rollout, 2026-10-27. T47 was merged. After reviewing it, the user requested the [all-page continuation](2026-10-27-reference-style-rollout.md), including the public Welcome page and a simplified breadcrumb/header hierarchy. This is a presentation change to the accepted visual identity in `specs/001-weekly-orders/plan.md`. It does not change the weekly-orders requirements or scenarios. T45 is merged; separate T44/T46 layout work must be reconciled if it lands before the continuation merges.
 
+The [2026-10-29 evidence reconciliation](../visual-checks/2026-10-29-t47-t51-reconciliation.md) confirms the integrated, approved T47 pilot and integrated #240 rollout. It records the remaining T48–T51 role/state verification gates; the accepted pilot direction does not need approval again.
+
 ## Intent
 
 Use the four screenshots supplied on 2026-10-27 as references for the **shape and hierarchy** of the signed-in application: a clear navigation rail, a warm canvas, large page titles, calm white panels, compact data summaries, and readable status treatments. Keep Guixa's identity and actual workflows. The screenshots' Common Ground name, record counts, sample orders, golden button, and page names are example content, not Guixa requirements.

@@ -185,3 +185,31 @@ Repository source links target `docs/product-producer-stock`; review that branch
 They do not imply that `main` already contains the amendment. No merge or application implementation
 is authorized here. The historical baseline remains byte-identical. The dashboard compatibility
 alignment is recorded in [feature 002](../002-actionable-dashboard/tasks.md).
+
+
+## Reference-style delivery reconciliation — 2026-10-29
+
+The [verified integration/evidence record](../../docs/visual-checks/2026-10-29-t47-t51-reconciliation.md)
+reconciles T47–T51 against `origin/main` at `1a9a41a`. PRs #239/#240 already deliver the pilot
+and combined rollout. T44/#243 and T46/#242 are integrated; their approvals and layout work
+remain valid. PR #248 is merged, and #249 is now also merged with main CI passing. Earlier
+publication notes above describe their publication-time state.
+
+| Task | Implementation and integration | Reconciled tracker state | Remaining closure gate |
+| --- | --- | --- | --- |
+| T47 / DRA-219 | Pilot #239; breadcrumb regression #240; continuation approved | Done | None for the accepted pilot delivery |
+| T48 / DRA-220 | Combined #240; T44/#243 and T36/#245 retained | Backlog; integrated implementation | Final producer-role shell/state coverage; preserve valid member/dashboard/wallet evidence |
+| T49 / DRA-221 | Combined #240 on T45/#230; T36/#245 retained | Backlog; integrated implementation | Explicit manager-role coverage for eight directory/form routes and owning states |
+| T50 / DRA-222 | Combined #240; T36/#245 owning overlays retained | Backlog; integrated implementation | Explicit manager-role coverage for seven workflow routes and affected overlays |
+| T51 / DRA-223 | Combined #240; T46/#242 and T36/#245 retained | Backlog; integrated implementation | Authenticated Welcome state; explicit retained settings-role evidence in final handoff |
+
+The 19/164/85/192/514-case retained reports passed historical artifact-integrity and declared
+coverage checks. They are not relabelled as current-HEAD browser verification. T36's manager
+and producer views omit the role query and default to member navigation; Welcome is guest-only.
+See the linked record for exact routes, candidates/bases, tests, approvals and bounded follow-up.
+These evidence gaps do not authorize repeating the redesign.
+
+Descriptions record the reconciliation; only T47 changes status. Fields and native relations
+outside that authorized tracking update remain intact. T33 stays Todo with all 18 blockers;
+T48/T50/T51 remain closure gates. The historical baseline remains byte-identical. No T52 work,
+feature closure, deployment or PR merge is performed by this reconciliation.
