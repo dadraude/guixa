@@ -2419,3 +2419,19 @@ to erase the database rows. They now assert that the current order, member cycle
 pickup total exclude the removed lines while their historical rows retain `removed_at`. Assertions
 for rejected writes still require no committed reference. This reconciles the HTTP contract with
 the accepted T53 history rule; the product behaviour is unchanged.
+
+## 2026-10-29 · Deviation
+
+The module-contract baseline adds constitution rules A11/A12 and an executable registry of current
+module exports, permitted callers, dependencies and migration-created table owners. The plan's
+Bootstrap and Testing sections now reference those checks and the current-contract document.
+Sales registration and the transfer of pickup ownership remain part of the accepted T52–T63 slices;
+this tooling change does not deliver or reorder them, alter business behavior or change schema.
+
+Fresh review found that callback writes could pass the Actor resolver's read-only exception, a
+reassigned dynamic-table parameter could bypass call-site ownership checks, and variable SQL on an
+assigned connection could escape declaration checks. Rejection fixtures now cover those cases,
+nullsafe calls, static dynamic-helper callers and direct business-model access from host code.
+Exceptions remain limited to the existing resolver reads, framework authentication integration,
+Ordering's unchanged private table parameter and Membership's exact table-free advisory-lock SQL.
+The contract document records the supported syntax and static-analysis limits explicitly.

@@ -77,6 +77,19 @@ iterating over every context. A rule change edits this list first.
 - **A10 — Actors come from the entry point.** Outside `src/Shared`, nothing in `src/` or `app/` builds
   an `Actor`; it arrives from `ActorResolver` at the user entry point. A context that needs another
   context's data calls an internal query that takes no actor, instead of forging one.
+- **A11 — Declared modules and exports.** `architecture/modules.php` records the current modules,
+  their allowed dependencies and exact integration exports with permitted caller modules. Foreign
+  references in `src/` must use these exports through Infrastructure; Shared's declared Domain and
+  Application contracts remain available through inward dependencies. Application helpers are private
+  unless explicitly exported. HTTP/bootstrap access continues to follow A5/A6/A10.
+- **A12 — Table ownership.** Every table created by migrations has exactly one declared owner.
+  Runtime PHP in `src/`, `app/` and `routes/` may access a table only from its owner's Infrastructure,
+  or through a named, scoped exception in the manifest. Literal query-builder tables, joins and model
+  mappings are checked statically. Dynamic table selection and raw SQL require explicit reviewed
+  declarations; exceptions must not silently authorize additional tables or writes.
+
+The [current module contract](../docs/architecture/modules.md) explains the manifest, existing
+exceptions, check coverage and the transition to the separately planned Sales module.
 
 ## Principles
 
