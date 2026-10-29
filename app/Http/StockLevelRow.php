@@ -11,6 +11,7 @@ final readonly class StockLevelRow
 {
     public function __construct(
         public string $id,
+        public string $producerId,
         public string $name,
         public string $unit,
         public string $price,
@@ -24,6 +25,7 @@ final readonly class StockLevelRow
     {
         return new self(
             $level->id,
+            $level->producerId,
             $level->name,
             $level->unit,
             EuroAmount::format($level->priceCents),

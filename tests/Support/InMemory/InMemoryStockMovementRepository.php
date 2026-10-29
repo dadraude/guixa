@@ -27,11 +27,6 @@ final class InMemoryStockMovementRepository extends InMemoryRepository implement
         return $this->availableByProduct()[$stockProductId] ?? SignedQuantity::ofThousandths(0);
     }
 
-    public function availableForUpdate(string $stockProductId): SignedQuantity
-    {
-        return $this->available($stockProductId);
-    }
-
     public function availableByProduct(): array
     {
         $totals = [];

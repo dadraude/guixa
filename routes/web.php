@@ -61,14 +61,19 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware(['auth', 'verified', 'role:manager'])->prefix('manage')->name('manage.')->group(function () {
-    Route::resource('stock', StockProductController::class)
-        ->parameters(['stock' => 'stockProduct'])
-        ->except(['show'])
-        ->whereUuid('stockProduct')
-        ->names('stock');
-    Route::put('stock/{stockProduct}/reactivation', [StockProductController::class, 'reactivate'])
-        ->whereUuid('stockProduct')
-        ->name('stock.reactivate');
+    Route::get('producers/{producer}/products/create', [StockProductController::class, 'create'])
+        ->whereUuid('producer')->name('stock.create');
+    Route::post('producers/{producer}/products', [StockProductController::class, 'store'])
+        ->whereUuid('producer')->name('stock.store');
+    Route::get('stock', [StockProductController::class, 'index'])->name('stock.index');
+    Route::get('producers/{producer}/products/{stockProduct}/edit', [StockProductController::class, 'edit'])
+        ->whereUuid(['producer', 'stockProduct'])->name('stock.edit');
+    Route::put('producers/{producer}/products/{stockProduct}', [StockProductController::class, 'update'])
+        ->whereUuid(['producer', 'stockProduct'])->name('stock.update');
+    Route::delete('producers/{producer}/products/{stockProduct}', [StockProductController::class, 'destroy'])
+        ->whereUuid(['producer', 'stockProduct'])->name('stock.destroy');
+    Route::put('producers/{producer}/products/{stockProduct}/reactivation', [StockProductController::class, 'reactivate'])
+        ->whereUuid(['producer', 'stockProduct'])->name('stock.reactivate');
     Route::get('stock/{stockProduct}/movements', [StockMovementController::class, 'show'])
         ->whereUuid('stockProduct')
         ->name('stock.movements.show');

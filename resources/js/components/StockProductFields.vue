@@ -5,7 +5,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
 defineProps<{
-    product?: App.Http.StockProductRow;
+    product?: Pick<
+        App.Http.StockProductRow,
+        'name' | 'unit' | 'price' | 'variable' | 'containersPerUnit'
+    >;
     errors: Partial<Record<string, string>>;
 }>();
 </script>

@@ -37,4 +37,9 @@ final class ReceptionLoader
 
         return new LoadedReception($reception, $orders, $catalog, $marksByOrder);
     }
+
+    public function lockWeekly(string $productId): ?ValueObject\OrderableProduct
+    {
+        return $this->catalog->lockWeekly($productId);
+    }
 }

@@ -5,6 +5,7 @@ namespace Guixa\Catalog\Application;
 use Guixa\Catalog\Domain\Error\ProductNotFound;
 use Guixa\Catalog\Domain\ProductRepository;
 use Guixa\Shared\Application\Actor;
+use Guixa\Shared\Domain\Error\NotAllowed;
 
 final class ReactivateProduct
 {
@@ -14,6 +15,10 @@ final class ReactivateProduct
     {
         $product = $this->products->get($id) ?? throw ProductNotFound::withId($id);
         $actor->assertProducerOf($product->producerId);
+
+        if ($product->isStock()) {
+            throw NotAllowed::notYours('stock product');
+        }
 
         $product->reactivate();
         $this->products->add($product);

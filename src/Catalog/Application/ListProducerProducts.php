@@ -15,7 +15,7 @@ final class ListProducerProducts
     {
         $actor->assertProducerOf($producerId);
 
-        return array_map(
+        return array_values(array_map(
             fn (Product $product) => new ProductData(
                 $product->id,
                 $product->name(),
@@ -25,7 +25,7 @@ final class ListProducerProducts
                 $product->containersPerUnit()?->toString(),
                 $product->isActive(),
             ),
-            $this->products->listByProducer($producerId),
-        );
+            array_filter($this->products->listByProducer($producerId), fn (Product $product) => ! $product->isStock()),
+        ));
     }
 }

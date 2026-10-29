@@ -51,11 +51,11 @@ use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Money;
 use Guixa\Stock\Application\GetReturnItem;
 use Guixa\Stock\Application\GetStockOffer;
+use Guixa\Stock\Application\LockStockOffer;
 use Guixa\Stock\Application\RecordStockEntry;
 use Guixa\Stock\Application\SellStock;
 use Guixa\Stock\Domain\ReturnItem;
 use Guixa\Stock\Domain\StockLedger;
-use Guixa\Stock\Domain\StockProduct;
 use Guixa\Wallet\Application\ChargeForPickup;
 use Guixa\Wallet\Application\RecordCorrection;
 use Guixa\Wallet\Application\RecordTopUp;
@@ -250,7 +250,10 @@ final class OrderingWorld
         $this->stockProducts = new InMemoryStockProductRepository;
         $this->stockMovements = new InMemoryStockMovementRepository;
         $this->returnItems = new InMemoryReturnItemRepository;
-        $stockCatalog = new StockModuleStockCatalog(new GetStockOffer($this->stockProducts, $this->stockMovements));
+        $stockCatalog = new StockModuleStockCatalog(
+            new GetStockOffer($this->stockProducts, $this->stockMovements),
+            new LockStockOffer($this->stockProducts, $this->stockMovements),
+        );
         $returnItemCatalog = new StockModuleReturnItemCatalog(new GetReturnItem($this->returnItems));
         $this->recordStockEntry = new RecordStockEntry($this->stockProducts, $this->stockMovements, new StockLedger($this->stockMovements), $transactions, $this->clock);
         $pickups = new PickupLocker($this->cycles, $this->orders);
@@ -284,7 +287,7 @@ final class OrderingWorld
     /** @return string the new stock product's id, with `$available` on hand */
     public function stockProduct(string $name, int $priceCents, string $available, bool $variable = false, string $unit = 'jar', ?string $containersPerUnit = null): string
     {
-        $product = StockProduct::create($this->stockProducts->nextId(), $name, $unit, Money::ofCents($priceCents), $variable, $containersPerUnit);
+        $product = $this->stockProducts->create($name, $unit, Money::ofCents($priceCents), $variable, $containersPerUnit);
         $this->stockProducts->add($product);
         ($this->recordStockEntry)($this->manager, $product->id, $available, null);
 
@@ -293,9 +296,7 @@ final class OrderingWorld
 
     public function deactivateStockProduct(string $id): void
     {
-        $product = $this->stockProducts->get($id);
-        $product->deactivate();
-        $this->stockProducts->add($product);
+        $this->stockProducts->deactivate($id);
     }
 
     /** @return string the new return item's id */

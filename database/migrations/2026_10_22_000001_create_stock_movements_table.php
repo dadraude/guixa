@@ -12,7 +12,7 @@ return new class extends Migration
         // order_id has no foreign key yet (its table arrives with the Ordering tasks); cycle_id gets one in the cycles migration.
         Schema::create('stock_movements', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignUuid('stock_product_id')->constrained('stock_products');
+            $table->uuid('stock_product_id');
             $table->string('type');
             $table->decimal('quantity', 12, 3);
             $table->timestampTz('occurred_at');

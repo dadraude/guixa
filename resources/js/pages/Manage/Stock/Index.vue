@@ -3,6 +3,7 @@ import { Form, Head, Link } from '@inertiajs/vue3';
 import { computed, shallowRef } from 'vue';
 import { History, Pencil, Plus } from '@lucide/vue';
 import StockProductController from '@/actions/App/Http/Controllers/Manage/StockProductController';
+import ProducerController from '@/actions/App/Http/Controllers/Manage/ProducerController';
 import StockMovementController from '@/actions/App/Http/Controllers/Manage/StockMovementController';
 import StockEditDialog from './StockEditDialog.vue';
 import Heading from '@/components/Heading.vue';
@@ -47,9 +48,9 @@ function editProduct(product: App.Http.StockLevelRow, event: MouseEvent) {
                 :description="trans('Products for pickup.')"
             />
             <Button as-child class="min-h-11">
-                <Link :href="StockProductController.create()">
+                <Link :href="ProducerController.index()">
                     <Plus aria-hidden="true" />
-                    {{ trans('Add a product') }}
+                    {{ trans('Choose a producer to add stock') }}
                 </Link>
             </Button>
         </div>
@@ -104,12 +105,14 @@ function editProduct(product: App.Http.StockLevelRow, event: MouseEvent) {
                     <Form
                         v-bind="
                             product.active
-                                ? StockProductController.destroy.form(
-                                      product.id,
-                                  )
-                                : StockProductController.reactivate.form(
-                                      product.id,
-                                  )
+                                ? StockProductController.destroy.form({
+                                      producer: product.producerId,
+                                      stockProduct: product.id,
+                                  })
+                                : StockProductController.reactivate.form({
+                                      producer: product.producerId,
+                                      stockProduct: product.id,
+                                  })
                         "
                         v-slot="{ processing }"
                         class="pilot-status-switch-form shrink-0"
@@ -188,10 +191,18 @@ function editProduct(product: App.Http.StockLevelRow, event: MouseEvent) {
                                     v-bind="
                                         product.active
                                             ? StockProductController.destroy.form(
-                                                  product.id,
+                                                  {
+                                                      producer:
+                                                          product.producerId,
+                                                      stockProduct: product.id,
+                                                  },
                                               )
                                             : StockProductController.reactivate.form(
-                                                  product.id,
+                                                  {
+                                                      producer:
+                                                          product.producerId,
+                                                      stockProduct: product.id,
+                                                  },
                                               )
                                     "
                                     v-slot="{ processing }"

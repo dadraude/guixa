@@ -56,6 +56,7 @@ trait StockMovementRepositoryContract
         [$entry, $adjustment, $sale] = $repository->forProduct($productId);
 
         $this->assertSame(MovementType::Entry, $entry->type);
+        $this->assertSame($productId, $entry->stockProductId);
         $this->assertSame('10.000', $entry->quantity->toString());
         $this->assertSame('bought from X', $entry->note);
         $this->assertSame(self::ACCOUNT, $entry->recordedBy);
@@ -63,10 +64,12 @@ trait StockMovementRepositoryContract
         $this->assertNull($entry->cycleId);
         $this->assertNull($entry->orderId);
         $this->assertSame(MovementType::Adjustment, $adjustment->type);
+        $this->assertSame($productId, $adjustment->stockProductId);
         $this->assertSame('-1.500', $adjustment->quantity->toString());
         $this->assertSame('broken jar', $adjustment->note);
         $this->assertSame($cycleId, $adjustment->cycleId);
         $this->assertSame(MovementType::Sale, $sale->type);
+        $this->assertSame($productId, $sale->stockProductId);
         $this->assertSame('-2.000', $sale->quantity->toString());
         $this->assertNull($sale->note);
         $this->assertSame($orderId, $sale->orderId);
@@ -96,7 +99,6 @@ trait StockMovementRepositoryContract
         $repository->add(StockMovement::sale($repository->nextId(), $productId, Quantity::fromString('0.500'), new DateTimeImmutable('2026-10-22T12:00:00+00:00'), self::ACCOUNT, '0198f0a0-0000-7000-8000-0000000000d1'));
 
         $this->assertSame('8.250', $repository->available($productId)->toString());
-        $this->assertSame('8.250', $repository->availableForUpdate($productId)->toString());
     }
 
     #[Test]
@@ -106,7 +108,6 @@ trait StockMovementRepositoryContract
         $productId = $this->stockProductId();
 
         $this->assertSame('0.000', $repository->available($productId)->toString());
-        $this->assertSame('0.000', $repository->availableForUpdate($productId)->toString());
         $this->assertArrayNotHasKey($productId, $repository->availableByProduct());
     }
 
@@ -135,7 +136,6 @@ trait StockMovementRepositoryContract
         $repository->add($this->entry($repository, $productId, '9999999.999'));
 
         $this->assertSame('19999999.998', $repository->available($productId)->toString());
-        $this->assertSame('19999999.998', $repository->availableForUpdate($productId)->toString());
         $this->assertSame('19999999.998', $repository->availableByProduct()[$productId]->toString());
     }
 }

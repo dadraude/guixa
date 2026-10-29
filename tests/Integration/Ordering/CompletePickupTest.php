@@ -30,7 +30,7 @@ final class CompletePickupTest extends TestCase
 
     protected function tearDown(): void
     {
-        foreach (['received_totals', 'order_pickup_adjustments', 'wallet_movements', 'stock_movements', 'order_stock_lines', 'order_lines', 'orders', 'cycle_producers', 'cycles', 'stock_products', 'households', 'users', 'products', 'producers'] as $table) {
+        foreach (['received_totals', 'order_pickup_adjustments', 'wallet_movements', 'stock_movements', 'order_stock_lines', 'order_lines', 'orders', 'cycle_producers', 'cycles', 'households', 'users', 'products', 'producers'] as $table) {
             DB::table($table)->delete();
         }
 
@@ -262,7 +262,9 @@ final class CompletePickupTest extends TestCase
     private function stockProduct(string $name, string $available): string
     {
         $id = (string) Str::uuid7();
-        DB::table('stock_products')->insert(['id' => $id, 'name' => $name, 'unit' => 'jar', 'price_cents' => 600, 'variable' => false, 'active' => true]);
+        $producerId = (string) Str::uuid7();
+        DB::table('producers')->insert(['id' => $producerId, 'name' => 'Stock supplier', 'active' => true, 'cutoff_days_before' => 3, 'cutoff_time' => '20:00']);
+        DB::table('products')->insert(['id' => $id, 'producer_id' => $producerId, 'stock' => true, 'name' => $name, 'unit' => 'jar', 'price_cents' => 600, 'variable' => false, 'active' => true]);
         DB::table('stock_movements')->insert([
             'id' => (string) Str::uuid7(), 'stock_product_id' => $id, 'type' => 'entry', 'quantity' => $available,
             'occurred_at' => now(), 'recorded_by' => (string) DB::table('users')->value('id'),

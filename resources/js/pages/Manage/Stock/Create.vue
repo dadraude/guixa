@@ -8,22 +8,26 @@ import { Button } from '@/components/ui/button';
 
 defineOptions({
     layout: {
-        breadcrumbs: [
-            { title: 'Stock', href: StockProductController.index() },
-            { title: 'New product', href: StockProductController.create() },
-        ],
+        breadcrumbs: [{ title: 'Stock', href: StockProductController.index() }],
     },
 });
+
+defineProps<{ producer: App.Http.ProducerRow }>();
 </script>
 
 <template>
     <Head :title="trans('New stock product')" />
 
     <div class="pilot-page pilot-layout-page pilot-manager-page max-w-xl">
-        <Heading :title="trans('New stock product')" />
+        <Heading
+            :title="trans('New stock product')"
+            :description="
+                trans('Supplying producer: :name', { name: producer.name })
+            "
+        />
 
         <Form
-            v-bind="StockProductController.store.form()"
+            v-bind="StockProductController.store.form(producer.id)"
             class="space-y-6"
             v-slot="{ errors, processing }"
         >

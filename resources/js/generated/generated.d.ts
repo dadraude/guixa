@@ -285,6 +285,7 @@ readonly href: string,
 };
 export type StockLevelRow = {
 readonly id: string,
+readonly producerId: string,
 readonly name: string,
 readonly unit: string,
 readonly price: string,
@@ -295,6 +296,7 @@ readonly available: string,
 };
 export type StockProductRow = {
 readonly id: string,
+readonly producerId: string,
 readonly name: string,
 readonly unit: string,
 readonly price: string,

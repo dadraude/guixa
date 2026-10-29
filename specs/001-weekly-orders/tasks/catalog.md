@@ -36,6 +36,12 @@ ports, fresh referencing migrations, producer-context Manager routes and existin
 (`StockProductFields`, `Producer/Products`, `Manage/Stock`). Test the actual creation→stock-view
 path with Catalan copy and the required narrow/desktop visual cases.
 
+Implementation (DRA-207): Manager stock metadata actions use
+`/manage/producers/{producer}/products/...`, with producer identity checked on every action;
+the stock index and movement ledger remain under `/manage/stock/...`. Stock reads and locks
+Catalog Product through its own port; Catalog alone persists product metadata. The
+[visual check](../../../docs/visual-checks/dra-207.md) covers the five affected Manager views.
+
 ## T53
 
 **Retained history and protected catalogue edits.** Deliver unused-only reclassification/deletion

@@ -6,6 +6,7 @@ use Guixa\Catalog\Infrastructure\Persistence\ProductModel;
 use Guixa\Shared\Domain\Role;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Inertia\Inertia;
 use Inertia\Testing\AssertableInertia as Assert;
 
 function catalogProducer(string $name = 'Baker'): ProducerModel
@@ -64,6 +65,24 @@ it('lists only the own products with the price as a decimal string (R1, R2, S57)
             ->where('products.0.price', '3.50')
             ->where('products.0.containersPerUnit', '2.000')
             ->where('products.0.active', true));
+});
+
+it('serializes weekly producer products as a list when stock sorts between them (R2, S66)', function () {
+    $producer = catalogProducer();
+    productOf($producer, ['name' => 'Apple stock', 'stock' => true]);
+    productOf($producer, ['name' => 'Banana weekly']);
+    productOf($producer, ['name' => 'Cherry stock', 'stock' => true]);
+    productOf($producer, ['name' => 'Date weekly']);
+
+    $this->actingAs(accountOfProducer($producer))->get('/producer/products')->assertOk();
+    $response = $this->withHeaders(['X-Inertia' => 'true', 'X-Inertia-Version' => Inertia::getVersion()])
+        ->get('/producer/products');
+
+    $response->assertOk();
+    expect($response->json('component'))->toBe('Producer/Products/Index')
+        ->and($response->json('props.products'))->toBeArray()
+        ->and(array_is_list($response->json('props.products')))->toBeTrue()
+        ->and(array_column($response->json('props.products'), 'name'))->toBe(['Banana weekly', 'Date weekly']);
 });
 
 it('creates a product for the signed-in producer and redirects to the list (R1)', function () {
