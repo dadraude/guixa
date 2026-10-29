@@ -19,6 +19,7 @@ import {
 import type { LucideIcon } from '@lucide/vue';
 import { computed } from 'vue';
 import OrderController from '@/actions/App/Http/Controllers/OrderController';
+import StockController from '@/actions/App/Http/Controllers/StockController';
 import AccountController from '@/actions/App/Http/Controllers/Manage/AccountController';
 import CycleController from '@/actions/App/Http/Controllers/Manage/CycleController';
 import HouseholdController from '@/actions/App/Http/Controllers/Manage/HouseholdController';
@@ -46,6 +47,7 @@ const producerItems: NavItem[] = [
 
 const memberItems: NavItem[] = [
     { title: 'Orders', href: OrderController.index(), icon: CalendarDays },
+    { title: 'Stock catalogue', href: StockController.index(), icon: Package },
     { title: 'Wallet', href: WalletController.show(), icon: Wallet },
 ];
 

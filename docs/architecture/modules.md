@@ -5,15 +5,13 @@ rules and persistence. [`architecture/modules.php`](../../architecture/modules.p
 registry of the **current implementation**. Architecture tests consume it directly; it is not runtime
 configuration. The [constitution](../../specs/constitution.md) remains the source of architecture rules.
 
-This change records and enforces the existing design. It does not move business rules, change schema,
-change permissions, introduce Sales, or alter any product requirement. Documentation and manifest
-configuration have no executable product behavior and are exempt from production TDD; the checker
-itself was developed with failing rejection examples before enforcement was implemented.
+This registry records the current implementation. T54 adds Sales only for read-only stock offers;
+it has no basket tables or purchase commands. Manifest changes are checked by architecture tests.
 
 ## Ownership and allowed dependencies
 
 Dependencies name the targets a module may call through declared exports. They do not grant access
-to a target's entire Application namespace. Shared is a kernel; the other five entries are business
+to a target's entire Application namespace. Shared is a kernel; the other six entries are business
 modules. `Platform` below names framework persistence ownership, not a `src/Platform` module.
 
 | Module     | Owns today                                                                                                    | Allowed dependencies                       |
@@ -21,6 +19,7 @@ modules. `Platform` below names framework persistence ownership, not a `src/Plat
 | Catalog    | Producers; all product identity, metadata, classification and administration                                  | Membership, Ordering, Stock, Shared        |
 | Membership | Accounts, households, roles, invitations and household lifecycle                                              | Catalog, Ordering, Wallet, Shared          |
 | Ordering   | Weekly demand, cycles, cutoffs, producer orders, reception, allocation, and the current pickup/sale lifecycle | Catalog, Membership, Stock, Wallet, Shared |
+| Sales      | Read-only stock offers for member discovery and future sales                                                  | Catalog, Stock, Shared                     |
 | Stock      | Return items, append-only stock movements and availability                                                    | Catalog, Shared                            |
 | Wallet     | Append-only household money movements, balances, top-ups and corrections                                      | Shared                                     |
 | Shared     | Money, Quantity, Clock, Actor and transaction contracts                                                       | None                                       |
@@ -46,11 +45,13 @@ else in a module is private to that module for integration purposes, even when P
 | Catalog → Membership     | GetProducer                                                                                                            | ProducerData                                 |
 | Catalog → Ordering       | GetProducerCutoffRule, GetOrderableProduct, ListOrderableProducts, ListProducerProductsForReception, LockWeeklyProduct | ProducerCutoffRuleData, OrderableProductData |
 | Catalog → Stock          | GetStockProduct, ListStockProducts, LockStockProduct                                                                   | StockProductData                             |
+| Catalog → Sales          | ListStockOfferProducts                                                                                                 | StockOfferProductData                        |
 | Membership → Catalog     | RestoreProducerRole, SuspendProducerRole                                                                               | —                                            |
 | Membership → Ordering    | GetHouseholds, GetProducerAccountEmail                                                                                 | HouseholdData                                |
 | Ordering → Catalog       | CheckProductUsage, HasUnsettledLines, StopParticipatingWhereNotSent                                                    | —                                            |
 | Ordering → Membership    | ReadPendingPickups                                                                                                     | PendingPickupData                            |
-| Stock → Catalog          | CheckProductUsage                                                                                                      | —                                            |
+| Stock → Catalog          | CheckProductUsage, GetAvailableQuantities                                                                              | —                                            |
+| Stock → Sales            | GetAvailableQuantities                                                                                                 | —                                            |
 | Stock → Ordering         | GetReturnItem, GetStockOffer, LockStockOffer, SellStock                                                                | ReturnItemData, StockLevelData               |
 | Wallet → Membership      | ReadHouseholdBalance                                                                                                   | —                                            |
 | Wallet → Ordering        | ChargeForPickup, RecordCorrection, RecordTopUp                                                                         | —                                            |
@@ -166,8 +167,8 @@ When changing a module contract:
 ## Planned Sales transition
 
 The [accepted plan](../../specs/001-weekly-orders/plan.md#bounded-contexts) already separates Ordering's
-weekly demand from Sales baskets, validation and collection. The current registry deliberately has
-no Sales module, Finance role or future tables. The existing T52–T63 tasks own that transition.
+weekly demand from Sales baskets, validation and collection. The current registry contains only
+Sales' read-only discovery query; it has no Finance role, basket operation or future table.
 
 Each delivered slice updates the registry and its tests alongside the code. When Sales becomes the
 sale owner, move its exports, table ownership and Stock/Wallet dependencies explicitly, then remove

@@ -13,7 +13,18 @@ describe('shared app navigation', () => {
         expect(manager.map((item) => item.title)).toContain('Stock');
         expect(manager.map((item) => item.title)).not.toContain('Wallet');
         expect(member.map((item) => item.title)).toContain('Wallet');
+        expect(member.map((item) => item.title)).toContain('Stock catalogue');
         expect(member.map((item) => item.title)).not.toContain('Stock');
+        expect(
+            navigationItemsFor([{ role: 'producer' }]).map(
+                (item) => item.title,
+            ),
+        ).not.toContain('Stock catalogue');
+        expect(
+            navigationItemsFor([{ role: 'producer' }, { role: 'member' }]).map(
+                (item) => item.title,
+            ),
+        ).toContain('Stock catalogue');
     });
 
     it('groups destinations into role-appropriate sections without duplicates', () => {
@@ -35,7 +46,7 @@ describe('shared app navigation', () => {
             sections.map((section) => section.items.map((item) => item.title)),
         ).toEqual([
             ['Dashboard'],
-            ['Orders', 'Wallet'],
+            ['Orders', 'Stock catalogue', 'Wallet'],
             ['Cycles', 'Households'],
             ['Producers', 'Stock', 'Return items'],
             ['Accounts', 'Settings'],
@@ -46,7 +57,7 @@ describe('shared app navigation', () => {
             { role: 'manager' },
             { role: 'producer' },
         ]).map((item) => item.title);
-        expect(titles).toHaveLength(12);
+        expect(titles).toHaveLength(13);
         expect(new Set(titles).size).toBe(titles.length);
     });
 

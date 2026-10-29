@@ -16,6 +16,7 @@ defineOptions({
 
 defineProps<{
     products: App.Http.ProductRow[];
+    stockProducts?: App.Http.ProducerStockRow[];
 }>();
 </script>
 
@@ -36,6 +37,9 @@ defineProps<{
             </Button>
         </div>
 
+        <h2 class="pilot-heading text-lg font-semibold">
+            {{ trans('Weekly products') }}
+        </h2>
         <p
             v-if="products.length === 0"
             class="pilot-layout-notice text-sm text-muted-foreground"
@@ -147,5 +151,63 @@ defineProps<{
                 </tbody>
             </table>
         </div>
+
+        <section aria-labelledby="producer-stock-title">
+            <h2
+                id="producer-stock-title"
+                class="pilot-heading text-lg font-semibold"
+            >
+                {{ trans('Stock products') }}
+            </h2>
+            <p class="mb-4 text-sm text-muted-foreground">
+                {{ trans('Your stock products are read-only.') }}
+            </p>
+            <p
+                v-if="!stockProducts?.length"
+                class="pilot-layout-notice text-sm text-muted-foreground"
+                data-test="producer-stock-empty"
+            >
+                {{ trans('No stock products yet.') }}
+            </p>
+            <ul v-else class="divide-y border-y">
+                <li
+                    v-for="stock in stockProducts"
+                    :key="stock.id"
+                    class="grid min-w-0 gap-2 py-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
+                    data-test="producer-stock-product"
+                >
+                    <div class="min-w-0">
+                        <h3 class="font-medium break-words">
+                            {{ stock.name }}
+                        </h3>
+                        <p class="text-sm text-muted-foreground">
+                            {{ stock.unit }} · {{ formatMoney(stock.price) }}
+                        </p>
+                    </div>
+                    <div
+                        class="flex flex-wrap items-center gap-2 sm:justify-end"
+                    >
+                        <span class="tabular-nums">
+                            {{ formatQuantity(stock.available) }}
+                            {{ stock.unit }}
+                        </span>
+                        <span
+                            v-if="!stock.active"
+                            class="text-sm text-muted-foreground"
+                            data-test="producer-stock-inactive"
+                        >
+                            {{ trans('Inactive') }}
+                        </span>
+                        <span
+                            v-else-if="Number(stock.available) === 0"
+                            class="text-sm text-muted-foreground"
+                            data-test="producer-stock-sold-out"
+                        >
+                            {{ trans('Sold out') }}
+                        </span>
+                    </div>
+                </li>
+            </ul>
+        </section>
     </div>
 </template>

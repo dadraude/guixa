@@ -221,6 +221,14 @@ readonly cutoffTime: string,
 readonly accountEmail: string | null,
 readonly accountInvitationPending: boolean,
 };
+export type ProducerStockRow = {
+readonly id: string,
+readonly name: string,
+readonly unit: string,
+readonly price: string,
+readonly active: boolean,
+readonly available: string,
+};
 export type ProducerTotalsRow = {
 readonly producerId: string,
 readonly producerName: string,
@@ -305,6 +313,16 @@ readonly variable: boolean,
 readonly containersPerUnit: string | null,
 readonly active: boolean,
 readonly available: string,
+};
+export type StockOfferRow = {
+readonly id: string,
+readonly producerId: string,
+readonly producerName: string,
+readonly name: string,
+readonly unit: string,
+readonly price: string,
+readonly available: string,
+readonly soldOut: boolean,
 };
 export type StockProductRow = {
 readonly id: string,

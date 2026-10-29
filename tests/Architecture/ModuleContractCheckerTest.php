@@ -41,6 +41,23 @@ it('restricts an export to its declared callers', function () {
         ->toContain('ReadHouseholdBalance is not exported to Ordering');
 });
 
+it('keeps Sales discovery limited to its delivered read exports', function () {
+    $checker = new ModuleContract(require dirname(__DIR__, 2).'/architecture/modules.php');
+
+    expect($checker->violations(
+        'src/Sales/Infrastructure/Catalog/Adapter.php',
+        '<?php new \Guixa\Catalog\Application\ListStockOfferProducts;',
+    ))->toBe([])
+        ->and(implode("\n", $checker->violations(
+            'src/Sales/Infrastructure/Catalog/Adapter.php',
+            '<?php new \Guixa\Catalog\Application\CreateStockProduct;',
+        )))->toContain('CreateStockProduct is not exported to Sales')
+        ->and(implode("\n", $checker->violations(
+            'src/Ordering/Infrastructure/Catalog/Adapter.php',
+            '<?php new \Guixa\Catalog\Application\ListStockOfferProducts;',
+        )))->toContain('ListStockOfferProducts is not exported to Ordering');
+});
+
 it('does not allow foreign exports directly in Application', function () {
     $checker = new ModuleContract(require dirname(__DIR__, 2).'/architecture/modules.php');
     expect(implode("\n", $checker->violations('src/Ordering/Application/Adapter.php', '<?php new \Guixa\Catalog\Application\GetOrderableProduct;')))

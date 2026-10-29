@@ -73,6 +73,16 @@ describe('pilot theme page selection', () => {
         expect(wrapper.get('[data-pilot]').attributes('data-pilot')).toBe(
             'true',
         );
+        page.component = 'Stock/Index';
+        await nextTick();
+        expect(wrapper.get('[data-pilot]').attributes('data-pilot')).toBe(
+            'true',
+        );
+        page.component = 'Welcome';
+        await nextTick();
+        expect(wrapper.get('[data-pilot]').attributes('data-pilot')).toBe(
+            'false',
+        );
         wrapper.unmount();
     });
 
@@ -81,6 +91,7 @@ describe('pilot theme page selection', () => {
         ['Orders/Edit', true],
         ['Dashboard', true],
         ['Wallet/Statement', true],
+        ['Stock/Index', true],
         ['Producer/Cutoff', true],
         ['Producer/CycleSummary', true],
         ['Producer/Products/Index', true],
