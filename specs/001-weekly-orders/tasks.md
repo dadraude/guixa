@@ -41,6 +41,11 @@ The index remains at `specs/001-weekly-orders/tasks.md`, matching the workflow's
 - Done means the slice's meaningful assertions, repository/transaction/authorization checks, focused
   regressions, applicable architecture/static checks and required UI evidence pass; use candidate-bound
   CI for the full suite. Naming an R#/S# in a test alone is insufficient. Log deviations before its PR.
+- When a slice changes module interfaces or persistence, update `architecture/modules.php`,
+  the [module-contract documentation](../../docs/architecture/modules.md) and relevant rejection tests;
+  run the complete `tests/Architecture` suite. Declare only delivered exports, permitted callers,
+  dependencies and table ownership. Add a rejection case for any new checker syntax or exception;
+  keep exceptions narrow and do not register future behavior early. A11/A12 apply to each slice.
 
 Retained T36 clarification from integrated DRA-205: all applicable static user-facing text,
 including original Catalan literals, titles, breadcrumbs, placeholders, accessible labels, mail and

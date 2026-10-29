@@ -29,6 +29,12 @@ Acceptance:
 - Wallet statements identify the basket and optional cycle; source indexes admit multiple purchases
   for the same household. Add Sales architecture/repository contracts. Keep the old weekly writer
   isolated until T59; never expose old and new writers for the same weekly purchase.
+- Register or extend Sales in `architecture/modules.php` with its delivered basket table ownership,
+  exact integration exports/DTOs, permitted callers and dependencies, including the Stock/Wallet
+  permissions needed by this tracer. Preserve Ordering permissions still required by the isolated
+  weekly flow until T59; Stock keeps inventory ownership and Wallet keeps ledger ownership. Update
+  the module-contract documentation and relevant rejection tests, then run `tests/Architecture`.
+  This adds no dependency on T54.
 
 Verify S18/S21/S22/S45/S79/S81, Sales history in S87 and S72's unit/variable guard after removed/cancelled basket use. Repository tests cover active-line uniqueness,
 archived references, immutable snapshot reload and sale/charge source uniqueness. PostgreSQL integration

@@ -25,7 +25,7 @@ schema directly, without a legacy import, data backfill or compatibility layer.
 - Laravel 13 **Vue starter kit** (Inertia 3 + Vue 3 + TS + Vite, Tailwind 4 + shadcn-vue, Fortify auth). Public registration disabled.
 - Postgres via `DB_CONNECTION=pgsql`; a separate `guixa_test` database for integration tests.
 - `composer.json` autoloads `Guixa\` → `src/`.
-- Dev tooling: `spatie/laravel-typescript-transformer`, Pest arch tests (A1–A8), Oxlint rules (A9), Vitest,
+- Dev tooling: `spatie/laravel-typescript-transformer`, Pest arch tests (A1–A8, A10–A12), Oxlint rules (A9), Vitest,
   Pint, Larastan, Oxfmt. Vite+ (`vp`) runs Oxlint, Oxfmt and Vitest.
 - GitHub Actions workflow on pull requests: Pint `--test`, Larastan, `vp check` (Oxlint + Oxfmt), vue-tsc,
   Pest against a Postgres service, Vitest.
@@ -1024,9 +1024,14 @@ for CI's full validation.
 | Application | **Every scenario S1–S90**, with in-memory repositories and `FrozenClock` | `tests/Application/<Context>` |
 | Infrastructure | Each Eloquent repository against `guixa_test` (constraints, locks, numeric mapping) | `tests/Integration` |
 | HTTP | Role gates, wiring, `assertInertia` props, error → 422 and `NotAllowed` → 403 mapping | `tests/Feature` |
-| Architecture | A1–A10, automatically including Sales | `tests/Architecture` |
+| Architecture | A1–A12 (A9 through Oxlint); explicitly register Sales contracts as its slices land | `tests/Architecture` |
 | Translations | Every key used in PHP (`__()`, `trans()`) and Vue (`trans()`, `$t`), and every domain error class, has a `ca` translation | `tests/Architecture` |
 | Frontend | Display totals, A9 via Oxlint | `resources/js/**/*.spec.ts` |
+
+The [current module registry](../../docs/architecture/modules.md) records the implemented pre-Sales
+ownership and integration exports. A11/A12 check the manifest, module references and table access
+without a database. T52–T63 update those declarations alongside the delivered slices and remove
+superseded Ordering ownership at the planned cutover; this baseline does not implement that transition.
 
 In-memory repositories live in `tests/Support/InMemory` and must pass the same contract tests
 as the Eloquent ones, so the Application tests stay trustworthy. Each port has one

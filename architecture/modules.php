@@ -1,0 +1,142 @@
+<?php
+
+// Current implementation contracts, not the future Sales design. See docs/architecture/modules.md.
+return [
+    'modules' => [
+        'Catalog' => [
+            'owns' => 'Producers and all product identity, metadata, classification and administration.',
+            'dependencies' => ['Membership', 'Ordering', 'Shared', 'Stock'],
+            'exports' => [
+                'Application\GetProducer' => ['Membership'],
+                'Application\ProducerData' => ['Membership'],
+                'Application\GetProducerCutoffRule' => ['Ordering'],
+                'Application\ProducerCutoffRuleData' => ['Ordering'],
+                'Application\GetOrderableProduct' => ['Ordering'],
+                'Application\ListOrderableProducts' => ['Ordering'],
+                'Application\ListProducerProductsForReception' => ['Ordering'],
+                'Application\LockWeeklyProduct' => ['Ordering'],
+                'Application\OrderableProductData' => ['Ordering'],
+                'Application\GetStockProduct' => ['Stock'],
+                'Application\ListStockProducts' => ['Stock'],
+                'Application\LockStockProduct' => ['Stock'],
+                'Application\StockProductData' => ['Stock'],
+            ],
+        ],
+        'Membership' => [
+            'owns' => 'Accounts, households, roles, invitations and household lifecycle.',
+            'dependencies' => ['Catalog', 'Ordering', 'Shared', 'Wallet'],
+            'exports' => [
+                'Application\RestoreProducerRole' => ['Catalog'],
+                'Application\SuspendProducerRole' => ['Catalog'],
+                'Application\GetHouseholds' => ['Ordering'],
+                'Application\HouseholdData' => ['Ordering'],
+                'Application\GetProducerAccountEmail' => ['Ordering'],
+            ],
+        ],
+        'Ordering' => [
+            'owns' => 'Weekly demand, cycles, reception, allocation and the current pickup/sale lifecycle.',
+            'dependencies' => ['Catalog', 'Membership', 'Shared', 'Stock', 'Wallet'],
+            'exports' => [
+                'Application\CheckProductUsage' => ['Catalog'],
+                'Application\HasUnsettledLines' => ['Catalog'],
+                'Application\StopParticipatingWhereNotSent' => ['Catalog'],
+                'Application\PendingPickupData' => ['Membership'],
+                'Application\ReadPendingPickups' => ['Membership'],
+            ],
+        ],
+        'Shared' => [
+            'owns' => 'Shared values, actor contracts, clock and transaction abstractions.',
+            'dependencies' => [],
+            'exports' => [
+                'Application\Actor' => ['Catalog', 'Membership', 'Ordering', 'Stock', 'Wallet'],
+                'Application\ActorResolver' => ['Catalog', 'Membership', 'Ordering', 'Stock', 'Wallet'],
+                'Application\TransactionRunner' => ['Catalog', 'Membership', 'Ordering', 'Stock', 'Wallet'],
+                'Domain\Clock' => ['Catalog', 'Membership', 'Ordering', 'Stock', 'Wallet'],
+                'Domain\Money' => ['Catalog', 'Membership', 'Ordering', 'Stock', 'Wallet'],
+                'Domain\Quantity' => ['Catalog', 'Membership', 'Ordering', 'Stock', 'Wallet'],
+                'Domain\LocalTime' => ['Catalog', 'Membership', 'Ordering', 'Stock', 'Wallet'],
+                'Domain\Role' => ['Catalog', 'Membership', 'Ordering', 'Stock', 'Wallet'],
+                'Domain\Error\InvalidLocalTime' => ['Catalog', 'Membership', 'Ordering', 'Stock', 'Wallet'],
+                'Domain\Error\InvalidQuantity' => ['Catalog', 'Membership', 'Ordering', 'Stock', 'Wallet'],
+                'Domain\Error\NotAllowed' => ['Catalog', 'Membership', 'Ordering', 'Stock', 'Wallet'],
+            ],
+        ],
+        'Stock' => [
+            'owns' => 'Return items, append-only inventory movements and available quantities.',
+            'dependencies' => ['Catalog', 'Shared'],
+            'exports' => [
+                'Application\CheckProductUsage' => ['Catalog'],
+                'Application\GetReturnItem' => ['Ordering'],
+                'Application\ReturnItemData' => ['Ordering'],
+                'Application\GetStockOffer' => ['Ordering'],
+                'Application\LockStockOffer' => ['Ordering'],
+                'Application\StockLevelData' => ['Ordering'],
+                'Application\SellStock' => ['Ordering'],
+            ],
+        ],
+        'Wallet' => [
+            'owns' => 'Append-only household money movements, balances, top-ups and corrections.',
+            'dependencies' => ['Shared'],
+            'exports' => [
+                'Application\ReadHouseholdBalance' => ['Membership'],
+                'Application\ChargeForPickup' => ['Ordering'],
+                'Application\RecordCorrection' => ['Ordering'],
+                'Application\RecordTopUp' => ['Ordering'],
+            ],
+        ],
+    ],
+    'tables' => [
+        'users' => 'Membership',
+        'account_roles' => 'Membership',
+        'households' => 'Membership',
+        'invitations' => 'Membership',
+        'producers' => 'Catalog',
+        'products' => 'Catalog',
+        'cooperative_settings' => 'Ordering',
+        'cycles' => 'Ordering',
+        'cycle_producers' => 'Ordering',
+        'orders' => 'Ordering',
+        'order_lines' => 'Ordering',
+        'product_unavailabilities' => 'Ordering',
+        'received_totals' => 'Ordering',
+        'order_stock_lines' => 'Ordering',
+        'order_return_lines' => 'Ordering',
+        'order_pickup_adjustments' => 'Ordering',
+        'return_items' => 'Stock',
+        'stock_movements' => 'Stock',
+        'wallet_movements' => 'Wallet',
+        'password_reset_tokens' => 'Platform',
+        'sessions' => 'Platform',
+        'cache' => 'Platform',
+        'cache_locks' => 'Platform',
+        'jobs' => 'Platform',
+        'job_batches' => 'Platform',
+        'failed_jobs' => 'Platform',
+        'passkeys' => 'Platform',
+    ],
+    'table_exceptions' => [
+        'src/Shared/Infrastructure/DatabaseActorResolver.php' => [
+            'tables' => ['users', 'account_roles'],
+            'access' => 'read',
+            'reason' => 'Existing entry-point actor resolution reads Membership identity and roles (A10).',
+        ],
+        'app/Models/User.php' => [
+            'tables' => ['users'],
+            'access' => 'write',
+            'reason' => 'Existing Fortify authentication model; the explicit Eloquent exception in A6.',
+        ],
+    ],
+    'dynamic_tables' => [
+        'src/Ordering/Infrastructure/Persistence/EloquentOrderRepository.php' => [
+            'rowsOf' => [
+                'parameter' => 'table',
+                'reason' => 'Private helper with an unchanged table parameter and literal table names at every call site.',
+            ],
+        ],
+    ],
+    'sql_exceptions' => [
+        'src/Membership/Infrastructure/Persistence/DatabaseHouseholdRepository.php' => [
+            'select pg_advisory_xact_lock(191983, 1)' => 'Serializes Membership changes without reading or writing a table.',
+        ],
+    ],
+];

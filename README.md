@@ -3,7 +3,8 @@
 Management app for a food consumer cooperative. One installation serves one cooperative.
 
 Stack: Laravel 13 (PHP 8.5), Inertia 3 + Vue 3, PostgreSQL. See [`specs/constitution.md`](specs/constitution.md)
-for principles and architecture, and [`specs/README.md`](specs/README.md) for how features are specified.
+for principles and architecture, [current module contracts](docs/architecture/modules.md) for enforced
+module interfaces and table ownership, and [`specs/README.md`](specs/README.md) for how features are specified.
 
 ## Requirements
 

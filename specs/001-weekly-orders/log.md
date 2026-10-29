@@ -2419,3 +2419,31 @@ to erase the database rows. They now assert that the current order, member cycle
 pickup total exclude the removed lines while their historical rows retain `removed_at`. Assertions
 for rejected writes still require no committed reference. This reconciles the HTTP contract with
 the accepted T53 history rule; the product behaviour is unchanged.
+
+## 2026-10-29 · Deviation
+
+The module-contract baseline adds constitution rules A11/A12 and an executable registry of current
+module exports, permitted callers, dependencies and migration-created table owners. The plan's
+Bootstrap and Testing sections now reference those checks and the current-contract document.
+Sales registration and the transfer of pickup ownership remain part of the accepted T52–T63 slices;
+this tooling change does not deliver or reorder them, alter business behavior or change schema.
+
+Fresh review found that callback writes could pass the Actor resolver's read-only exception, a
+reassigned dynamic-table parameter could bypass call-site ownership checks, and variable SQL on an
+assigned connection could escape declaration checks. Rejection fixtures now cover those cases,
+nullsafe calls, static dynamic-helper callers and direct business-model access from host code.
+Exceptions remain limited to the existing resolver reads, framework authentication integration,
+Ordering's unchanged private table parameter and Membership's exact table-free advisory-lock SQL.
+The contract document records the supported syntax and static-analysis limits explicitly.
+
+## 2026-10-29 · Change
+
+The user authorized adding module-contract requirements to the task files and existing Linear tickets
+while keeping IDs, dependencies and statuses unchanged. The shared task execution contract now requires
+manifest/documentation/rejection-test maintenance and the complete architecture suite whenever a slice
+changes interfaces or persistence. T54/DRA-209 registers the delivered Sales query surface;
+T55/DRA-210 declares basket ownership and integration permissions; T59/DRA-214 reconciles contracts
+with the weekly writer cutover; T63/DRA-218 removes retired entries and exceptions with their code.
+Stock retains inventory ownership and Wallet retains ledger ownership. T54 and T55 keep their existing
+independent prerequisites. These are delivery/check clarifications under A11/A12; product requirements,
+the canonical task registry rows and native ticket dependencies/statuses are unchanged.
