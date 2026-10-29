@@ -2,21 +2,9 @@
     "rootFontPx": 16,
     "darkSelector": "html.dark",
     "matrix": {
-        "widths": [
-            375,
-            1024,
-            1280
-        ],
-        "modes": [
-            "light",
-            "dark",
-            "system-light",
-            "system-dark"
-        ],
-        "text": [
-            100,
-            200
-        ]
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark", "system-light", "system-dark"],
+        "text": [100, 200]
     },
     "baseUrl": "http://127.0.0.1:5197",
     "views": [
@@ -31,9 +19,7 @@
             "root": ".reference-style",
             "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
             "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
-            "fonts": [
-                "16px Nunito Variable"
-            ],
+            "fonts": ["16px Nunito Variable"],
             "focus": [
                 "button[data-sidebar=\"trigger\"]",
                 "[data-visual-page-focus-first]",
@@ -95,9 +81,7 @@
                     "ready": "body[data-visual-ready=\"empty\"]",
                     "checks": {
                         "panels": "#main-content .pilot-layout-notice",
-                        "focus": [
-                            "button[data-sidebar=\"trigger\"]"
-                        ]
+                        "focus": ["button[data-sidebar=\"trigger\"]"]
                     }
                 },
                 {
@@ -201,9 +185,7 @@
             "root": ".reference-style",
             "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
             "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
-            "fonts": [
-                "16px Nunito Variable"
-            ],
+            "fonts": ["16px Nunito Variable"],
             "focus": [
                 "button[data-sidebar=\"trigger\"]",
                 "[data-visual-page-focus-first]",
@@ -314,9 +296,7 @@
                         "panels": "dialog[open]",
                         "content": "h1,h2,h3,p,label,input,textarea,button,a,[role=\"dialog-description\"]"
                     },
-                    "settled": [
-                        "dialog[open]"
-                    ]
+                    "settled": ["dialog[open]"]
                 },
                 {
                     "id": "manage-dialog",
@@ -346,9 +326,7 @@
                         "panels": "dialog[open]",
                         "content": "h1,h2,h3,p,label,input,textarea,button,a,[role=\"dialog-description\"]"
                     },
-                    "settled": [
-                        "dialog[open]"
-                    ]
+                    "settled": ["dialog[open]"]
                 },
                 {
                     "id": "create-no-weekday",
@@ -378,9 +356,7 @@
                             "[data-visual-overlay-focus-last]"
                         ]
                     },
-                    "settled": [
-                        "dialog[open]"
-                    ]
+                    "settled": ["dialog[open]"]
                 },
                 {
                     "id": "manage-cutoff",
@@ -410,9 +386,7 @@
                             "[data-visual-overlay-focus-last]"
                         ]
                     },
-                    "settled": [
-                        "dialog[open]"
-                    ]
+                    "settled": ["dialog[open]"]
                 },
                 {
                     "id": "manage-close-confirm",
@@ -442,9 +416,7 @@
                             "[data-visual-overlay-focus-last]"
                         ]
                     },
-                    "settled": [
-                        "dialog[open]"
-                    ]
+                    "settled": ["dialog[open]"]
                 },
                 {
                     "id": "manage-cancel-confirm",
@@ -474,9 +446,7 @@
                             "[data-visual-overlay-focus-last]"
                         ]
                     },
-                    "settled": [
-                        "dialog[open]"
-                    ]
+                    "settled": ["dialog[open]"]
                 },
                 {
                     "id": "closed-cycle",
@@ -540,12 +510,8 @@
             "root": ".reference-style",
             "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
             "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
-            "fonts": [
-                "16px Nunito Variable"
-            ],
-            "focus": [
-                "button[data-sidebar=\"trigger\"]"
-            ],
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["button[data-sidebar=\"trigger\"]"],
             "states": [
                 {
                     "id": "default",
@@ -652,9 +618,7 @@
             "root": ".reference-style",
             "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
             "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
-            "fonts": [
-                "16px Nunito Variable"
-            ],
+            "fonts": ["16px Nunito Variable"],
             "focus": [
                 "button[data-sidebar=\"trigger\"]",
                 "[data-visual-page-focus-first]",
@@ -785,9 +749,7 @@
             "root": ".reference-style",
             "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
             "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
-            "fonts": [
-                "16px Nunito Variable"
-            ],
+            "fonts": ["16px Nunito Variable"],
             "focus": [
                 "button[data-sidebar=\"trigger\"]",
                 "[data-visual-page-focus-first]",
@@ -937,9 +899,7 @@
             "root": ".reference-style",
             "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
             "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
-            "fonts": [
-                "16px Nunito Variable"
-            ],
+            "fonts": ["16px Nunito Variable"],
             "focus": [
                 "button[data-sidebar=\"trigger\"]",
                 "[data-visual-page-focus-first]",
@@ -1032,9 +992,7 @@
             "root": ".reference-style",
             "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
             "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
-            "fonts": [
-                "16px Nunito Variable"
-            ],
+            "fonts": ["16px Nunito Variable"],
             "focus": [
                 "button[data-sidebar=\"trigger\"]",
                 "[data-visual-page-focus-first]",
@@ -1184,9 +1142,7 @@
             "root": ".reference-style",
             "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
             "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
-            "fonts": [
-                "16px Nunito Variable"
-            ],
+            "fonts": ["16px Nunito Variable"],
             "focus": [
                 "button[data-sidebar=\"trigger\"]",
                 "[data-visual-page-focus-first]",
@@ -1317,9 +1273,7 @@
             "root": ".reference-style",
             "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
             "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"]),#main-content [data-test^=\"product-\"] dl dt,#main-content [data-test^=\"product-\"] dl dd,#main-content [data-test=\"adjusted\"],#main-content [data-test=\"unbalanced\"],#main-content [role=\"combobox\"]",
-            "fonts": [
-                "16px Nunito Variable"
-            ],
+            "fonts": ["16px Nunito Variable"],
             "focus": [
                 "button[data-sidebar=\"trigger\"]",
                 "[data-visual-page-focus-first]",
@@ -1532,9 +1486,7 @@
                             "[data-visual-overlay-focus-last]"
                         ]
                     },
-                    "settled": [
-                        "[role=\"dialog\"]"
-                    ]
+                    "settled": ["[role=\"dialog\"]"]
                 },
                 {
                     "id": "received-overwrite",
@@ -1568,9 +1520,7 @@
                             "[data-visual-overlay-focus-last]"
                         ]
                     },
-                    "settled": [
-                        "[role=\"dialog\"]"
-                    ]
+                    "settled": ["[role=\"dialog\"]"]
                 },
                 {
                     "id": "adjusted-summary",
@@ -1751,9 +1701,7 @@
             "root": ".reference-style",
             "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
             "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
-            "fonts": [
-                "16px Nunito Variable"
-            ],
+            "fonts": ["16px Nunito Variable"],
             "focus": [
                 "button[data-sidebar=\"trigger\"]",
                 "[data-visual-page-focus-first]",
@@ -1846,9 +1794,7 @@
             "root": ".reference-style",
             "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
             "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
-            "fonts": [
-                "16px Nunito Variable"
-            ],
+            "fonts": ["16px Nunito Variable"],
             "focus": [
                 "button[data-sidebar=\"trigger\"]",
                 "[data-visual-page-focus-first]",
@@ -1941,9 +1887,7 @@
             "root": ".reference-style",
             "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
             "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
-            "fonts": [
-                "16px Nunito Variable"
-            ],
+            "fonts": ["16px Nunito Variable"],
             "focus": [
                 "button[data-sidebar=\"trigger\"]",
                 "[data-visual-page-focus-first]",
@@ -2039,9 +1983,7 @@
             "root": ".reference-style",
             "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
             "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
-            "fonts": [
-                "16px Nunito Variable"
-            ],
+            "fonts": ["16px Nunito Variable"],
             "focus": [
                 "button[data-sidebar=\"trigger\"]",
                 "[data-visual-page-focus-first]",
@@ -2134,9 +2076,7 @@
             "root": ".reference-style",
             "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
             "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
-            "fonts": [
-                "16px Nunito Variable"
-            ],
+            "fonts": ["16px Nunito Variable"],
             "focus": [
                 "button[data-sidebar=\"trigger\"]",
                 "[data-visual-page-focus-first]",
@@ -2229,9 +2169,7 @@
             "root": ".reference-style",
             "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
             "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
-            "fonts": [
-                "16px Nunito Variable"
-            ],
+            "fonts": ["16px Nunito Variable"],
             "focus": [
                 "button[data-sidebar=\"trigger\"]",
                 "[data-visual-page-focus-first]",
@@ -2324,9 +2262,7 @@
             "root": ".reference-style",
             "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
             "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
-            "fonts": [
-                "16px Nunito Variable"
-            ],
+            "fonts": ["16px Nunito Variable"],
             "focus": [
                 "button[data-sidebar=\"trigger\"]",
                 "[data-visual-page-focus-first]",
@@ -2437,9 +2373,7 @@
                         "panels": "dialog[open]",
                         "content": "h1,h2,h3,p,label,input,textarea,button,a,[role=\"dialog-description\"]"
                     },
-                    "settled": [
-                        "dialog[open]"
-                    ]
+                    "settled": ["dialog[open]"]
                 },
                 {
                     "id": "deactivate-confirm",
@@ -2469,9 +2403,7 @@
                             "[data-visual-overlay-focus-last]"
                         ]
                     },
-                    "settled": [
-                        "dialog[open]"
-                    ]
+                    "settled": ["dialog[open]"]
                 },
                 {
                     "id": "reactivate-confirm",
@@ -2501,9 +2433,7 @@
                             "[data-visual-overlay-focus-last]"
                         ]
                     },
-                    "settled": [
-                        "dialog[open]"
-                    ]
+                    "settled": ["dialog[open]"]
                 }
             ]
         },
@@ -2518,9 +2448,7 @@
             "root": ".reference-style",
             "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
             "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
-            "fonts": [
-                "16px Nunito Variable"
-            ],
+            "fonts": ["16px Nunito Variable"],
             "focus": [
                 "button[data-sidebar=\"trigger\"]",
                 "[data-visual-page-focus-first]",
@@ -2613,9 +2541,7 @@
             "root": ".reference-style",
             "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
             "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
-            "fonts": [
-                "16px Nunito Variable"
-            ],
+            "fonts": ["16px Nunito Variable"],
             "focus": [
                 "button[data-sidebar=\"trigger\"]",
                 "[data-visual-page-focus-first]",
@@ -2708,12 +2634,8 @@
             "root": ".reference-style",
             "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
             "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
-            "fonts": [
-                "16px Nunito Variable"
-            ],
-            "focus": [
-                "button[data-sidebar=\"trigger\"]"
-            ],
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["button[data-sidebar=\"trigger\"]"],
             "states": [
                 {
                     "id": "default",
@@ -2830,9 +2752,7 @@
             "root": ".reference-style",
             "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
             "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
-            "fonts": [
-                "16px Nunito Variable"
-            ],
+            "fonts": ["16px Nunito Variable"],
             "focus": [
                 "button[data-sidebar=\"trigger\"]",
                 "[data-visual-page-focus-first]",
@@ -2925,9 +2845,7 @@
             "root": ".reference-style",
             "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
             "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
-            "fonts": [
-                "16px Nunito Variable"
-            ],
+            "fonts": ["16px Nunito Variable"],
             "focus": [
                 "button[data-sidebar=\"trigger\"]",
                 "[data-visual-page-focus-first]",
@@ -3020,9 +2938,7 @@
             "root": ".reference-style",
             "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
             "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
-            "fonts": [
-                "16px Nunito Variable"
-            ],
+            "fonts": ["16px Nunito Variable"],
             "focus": [
                 "button[data-sidebar=\"trigger\"]",
                 "[data-visual-page-focus-first]",
@@ -3161,12 +3077,8 @@
             "root": ".reference-style-welcome",
             "panels": "[data-visual-panel]",
             "content": "h1,h2,p,a,li",
-            "fonts": [
-                "16px Nunito Variable"
-            ],
-            "focus": [
-                "#welcome-action"
-            ],
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["#welcome-action"],
             "states": [
                 {
                     "id": "default",
@@ -3226,12 +3138,8 @@
             "root": ".reference-style-welcome",
             "panels": "[data-visual-panel]",
             "content": "h1,h2,p,a,li",
-            "fonts": [
-                "16px Nunito Variable"
-            ],
-            "focus": [
-                "#welcome-action"
-            ],
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["#welcome-action"],
             "states": [
                 {
                     "id": "default",
@@ -3261,9 +3169,7 @@
             "root": ".reference-style",
             "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
             "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
-            "fonts": [
-                "16px Nunito Variable"
-            ],
+            "fonts": ["16px Nunito Variable"],
             "focus": [
                 "button[data-sidebar=\"trigger\"]",
                 "[data-visual-page-focus-first]",
@@ -3331,9 +3237,7 @@
                         "panels": "[data-slot=\"dropdown-menu-content\"]",
                         "content": "[role=\"menuitemradio\"],[role=\"menuitem\"],button,span,p"
                     },
-                    "settled": [
-                        "[data-slot=\"dropdown-menu-content\"]"
-                    ]
+                    "settled": ["[data-slot=\"dropdown-menu-content\"]"]
                 }
             ]
         },
@@ -3348,9 +3252,7 @@
             "root": ".reference-style",
             "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
             "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
-            "fonts": [
-                "16px Nunito Variable"
-            ],
+            "fonts": ["16px Nunito Variable"],
             "focus": [
                 "button[data-sidebar=\"trigger\"]",
                 "[data-visual-page-focus-first]",
@@ -3447,9 +3349,7 @@
             "root": ".reference-style",
             "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
             "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
-            "fonts": [
-                "16px Nunito Variable"
-            ],
+            "fonts": ["16px Nunito Variable"],
             "focus": [
                 "button[data-sidebar=\"trigger\"]",
                 "[data-visual-page-focus-first]",
@@ -3504,12 +3404,8 @@
             "root": ".reference-style",
             "panels": "#main-content .pilot-wallet-forms .pilot-layout-panel, #main-content .pilot-wallet-table tbody tr, #main-content .pilot-layout-notice, [data-sidebar=\"sidebar\"]",
             "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"]),#main-content [data-visual-text]",
-            "fonts": [
-                "16px Nunito Variable"
-            ],
-            "focus": [
-                "button[data-sidebar=\"trigger\"]"
-            ],
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["button[data-sidebar=\"trigger\"]"],
             "states": [
                 {
                     "id": "default",
@@ -3559,9 +3455,7 @@
             "root": ".reference-style",
             "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
             "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
-            "fonts": [
-                "16px Nunito Variable"
-            ],
+            "fonts": ["16px Nunito Variable"],
             "focus": [
                 "button[data-sidebar=\"trigger\"]",
                 "[data-visual-page-focus-first]",
@@ -3616,9 +3510,7 @@
             "root": ".reference-style",
             "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
             "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
-            "fonts": [
-                "16px Nunito Variable"
-            ],
+            "fonts": ["16px Nunito Variable"],
             "focus": [
                 "button[data-sidebar=\"trigger\"]",
                 "[data-visual-page-focus-first]",
@@ -3673,9 +3565,7 @@
             "root": ".reference-style",
             "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
             "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
-            "fonts": [
-                "16px Nunito Variable"
-            ],
+            "fonts": ["16px Nunito Variable"],
             "focus": [
                 "button[data-sidebar=\"trigger\"]",
                 "[data-visual-page-focus-first]",
@@ -3730,9 +3620,7 @@
             "root": ".reference-style",
             "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
             "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
-            "fonts": [
-                "16px Nunito Variable"
-            ],
+            "fonts": ["16px Nunito Variable"],
             "focus": [
                 "button[data-sidebar=\"trigger\"]",
                 "[data-visual-page-focus-first]",
@@ -3787,9 +3675,7 @@
             "root": ".reference-style",
             "panels": "#main-content .pilot-wallet-forms .pilot-layout-panel, #main-content .pilot-wallet-table tbody tr, #main-content .pilot-layout-notice, [data-sidebar=\"sidebar\"]",
             "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"]),#main-content [data-visual-text]",
-            "fonts": [
-                "16px Nunito Variable"
-            ],
+            "fonts": ["16px Nunito Variable"],
             "focus": [
                 "button[data-sidebar=\"trigger\"]",
                 "[data-visual-page-focus-first]",
@@ -3844,9 +3730,7 @@
             "root": ".reference-style",
             "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
             "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
-            "fonts": [
-                "16px Nunito Variable"
-            ],
+            "fonts": ["16px Nunito Variable"],
             "focus": [
                 "button[data-sidebar=\"trigger\"]",
                 "[data-visual-page-focus-first]",
@@ -3902,9 +3786,7 @@
             "root": ".reference-style",
             "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
             "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
-            "fonts": [
-                "16px Nunito Variable"
-            ],
+            "fonts": ["16px Nunito Variable"],
             "focus": [
                 "button[data-sidebar=\"trigger\"]",
                 "[data-visual-page-focus-first]",
@@ -3960,9 +3842,7 @@
             "root": ".reference-style",
             "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
             "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
-            "fonts": [
-                "16px Nunito Variable"
-            ],
+            "fonts": ["16px Nunito Variable"],
             "focus": [
                 "button[data-sidebar=\"trigger\"]",
                 "[data-visual-page-focus-first]",
@@ -4017,9 +3897,7 @@
             "root": ".reference-style",
             "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
             "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
-            "fonts": [
-                "16px Nunito Variable"
-            ],
+            "fonts": ["16px Nunito Variable"],
             "focus": [
                 "button[data-sidebar=\"trigger\"]",
                 "[data-visual-page-focus-first]",
@@ -4074,9 +3952,7 @@
             "root": ".reference-style",
             "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
             "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
-            "fonts": [
-                "16px Nunito Variable"
-            ],
+            "fonts": ["16px Nunito Variable"],
             "focus": [
                 "button[data-sidebar=\"trigger\"]",
                 "[data-visual-page-focus-first]",
@@ -4131,9 +4007,7 @@
             "root": ".reference-style",
             "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
             "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
-            "fonts": [
-                "16px Nunito Variable"
-            ],
+            "fonts": ["16px Nunito Variable"],
             "focus": [
                 "button[data-sidebar=\"trigger\"]",
                 "[data-visual-page-focus-first]",
@@ -4188,9 +4062,7 @@
             "root": ".reference-style",
             "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
             "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
-            "fonts": [
-                "16px Nunito Variable"
-            ],
+            "fonts": ["16px Nunito Variable"],
             "focus": [
                 "button[data-sidebar=\"trigger\"]",
                 "[data-visual-page-focus-first]",
