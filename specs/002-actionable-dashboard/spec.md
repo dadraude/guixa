@@ -1,6 +1,6 @@
 # 002 — Actionable dashboard
 
-Status: Accepted (2026-10-27); aligned on 2026-10-28 with the accepted feature-001 Sales amendment. The [discovery record](../../docs/ux-discovery/2026-10-27-dashboard-discovery.md) contains the request, code evidence and the user's answers.
+**Status: Retired (2026-10-29).** R1–R10 and S1–S13 below are historical product decisions, not executable requirements or authorization for dashboard-content implementation. T01–T04 are canceled. Preserve the original [request and decision log](log.md) and [discovery record](../../docs/ux-discovery/2026-10-27-dashboard-discovery.md). A new dashboard spec may be considered only after feature 001 is complete and the user makes a new decision. This retirement does not undo the independently shipped T05/R11 login-to-dashboard behavior or feature 001 T61's basic dashboard summary responsibility. The historical spec was accepted on 2026-10-27 and aligned with feature 001 Sales on 2026-10-28.
 
 The signed-in dashboard should answer what each person needs to do now. A manager sees cycle work and pending baskets, a member sees their ordering and basket-collection context, and a producer sees delivery and cutoff context. Finance sees only its permitted basket context and destinations. People with several roles see one ordered attention list without repeated work. Charts clarify the current cycle and show recent household ordering counts; they do not invent an alarm about low participation.
 

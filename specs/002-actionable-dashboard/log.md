@@ -117,3 +117,11 @@ and 14 scenarios; the original four content issues remain stopped and the indepe
 is not reimplemented or republished as a new Linear ticket. All upstream and amendment log entries
 retain their exact bytes.
 Why: reconcile the authorized documentation PR with the existing login-to-dashboard change in main.
+
+## 2026-10-29 · Request
+
+> Yes, retire 002 and abandon the dashboard implementation, but keep the request and discovery notes. Then continue with the compatible 001 tasks.
+
+## 2026-10-29 · Change
+
+Retired `spec.md`, `plan.md` and `tasks.md` as non-executable historical records and marked feature 002 retired in `specs/README.md`. T01–T04 and DRA-201–DRA-204 are canceled; their existing issue relations and historical source links remain. The dashboard implementation draft is abandoned and retained separately for possible historical recovery, not resumed. Preserve the original request above and the unchanged [discovery record](../../docs/ux-discovery/2026-10-27-dashboard-discovery.md). A new dashboard spec requires feature 001 to finish and a new user decision. The independently shipped T05/R11 login-to-dashboard behavior and feature 001 T61 basic dashboard summary responsibility remain in force. This retirement makes no application-code change.
