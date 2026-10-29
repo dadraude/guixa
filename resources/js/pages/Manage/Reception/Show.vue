@@ -238,7 +238,12 @@ const addProduct = computed(() =>
                 >
                     {{ trans('Balanced') }}
                 </Badge>
-                <Badge v-else variant="destructive" data-test="unbalanced">
+                <Badge
+                    v-else
+                    variant="destructive"
+                    class="max-w-full min-w-0 break-words whitespace-normal"
+                    data-test="unbalanced"
+                >
                     {{
                         trans('Unbalanced by :quantity :unit', {
                             quantity: formatQuantity(product.difference),
@@ -249,13 +254,16 @@ const addProduct = computed(() =>
                 <Badge
                     v-if="product.hasAdjustments"
                     variant="outline"
+                    class="max-w-full min-w-0 break-words whitespace-normal"
                     data-test="adjusted"
                 >
                     {{ trans('Adjusted at pickup: this blocks nothing') }}
                 </Badge>
             </div>
 
-            <dl class="grid grid-cols-2 gap-2 text-sm sm:grid-cols-4">
+            <dl
+                class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,8rem),1fr))] gap-2 text-sm"
+            >
                 <div>
                     <dt class="text-muted-foreground">
                         {{ trans('Ordered') }}
@@ -306,7 +314,7 @@ const addProduct = computed(() =>
                     name="product_id"
                     :value="product.productId"
                 />
-                <div class="grid gap-1">
+                <div class="grid max-w-full min-w-0 grid-cols-1 gap-1">
                     <label
                         class="text-sm"
                         :for="`unordered-received-${product.productId}`"
@@ -322,10 +330,15 @@ const addProduct = computed(() =>
                         name="received"
                         inputmode="decimal"
                         :default-value="product.received"
-                        class="w-32"
+                        class="w-32 max-w-full"
                     />
                 </div>
-                <Button type="submit" size="sm" :disabled="saving">
+                <Button
+                    type="submit"
+                    size="sm"
+                    class="h-auto min-h-11 max-w-full whitespace-normal"
+                    :disabled="saving"
+                >
                     {{ trans('Set received total') }}
                 </Button>
             </Form>
