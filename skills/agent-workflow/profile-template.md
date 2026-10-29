@@ -19,23 +19,23 @@ Ask first:
 
 ## Identities and paths
 
-| Setting                                   | Value                                                                                          |
-| ----------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| Tracker                                   | <tool; workspace, team, project>                                                               |
-| Eligible statuses / dependency completion | <statuses> / <status>                                                                          |
-| Active / stopped status                   | <status> / <status>                                                                            |
-| Issue key                                 | <e.g. `ABC-NN`>                                                                                |
-| Executable task                           | <task ID pattern and where task rows live; title format>                                       |
-| Ready label                               | <label>, executable mapped leaves only                                                         |
-| Relation fields                           | <native parent, blocking and related fields>                                                   |
-| Codex entrypoint prefix                   | <prefix>                                                                                       |
-| Remote / base                             | <remote> / <branch>                                                                            |
-| Task branch                               | <pattern>                                                                                      |
-| Worktree root                             | <path>                                                                                         |
-| Task worktree                             | <path>                                                                                         |
-| Implementation owner record               | <ignored task-local file retaining runtime/host, implementer ID and handoff until integration> |
-| Test database                             | <name pattern, or none>                                                                        |
-| Limits                                    | <pipelines in flight; review rounds; failed attempts>                                          |
+| Setting                                   | Value                                                                                                                               |
+| ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| Tracker                                   | <tool; workspace, team, project>                                                                                                    |
+| Eligible statuses / dependency completion | <statuses> / <status>                                                                                                               |
+| Active / stopped status                   | <status> / <status>                                                                                                                 |
+| Issue key                                 | <e.g. `ABC-NN`>                                                                                                                     |
+| Executable task                           | <task ID pattern and where task rows live; title format>                                                                            |
+| Ready label                               | <label>, executable mapped leaves only                                                                                              |
+| Relation fields                           | <native parent, blocking and related fields>                                                                                        |
+| Codex entrypoint prefix                   | <prefix>                                                                                                                            |
+| Remote / base                             | <remote> / <branch>                                                                                                                 |
+| Task branch                               | <pattern>                                                                                                                           |
+| Worktree root                             | <path>                                                                                                                              |
+| Task worktree                             | <path>                                                                                                                              |
+| Implementation owner record               | <ignored task-local file retaining runtime/host, implementer ID and handoff until integration>                                      |
+| Test database                             | <name pattern, or none>                                                                                                             |
+| Limits                                    | <pipelines; substantive reviews; mechanical follow-up reviews; consecutive product failures per stage; recovery attempts per stage> |
 
 <How to resolve paths and the runtime environment for workers.>
 
@@ -55,14 +55,22 @@ Every dispatch sets its role's model explicitly; a worker never inherits the coo
 
 ## Commands
 
-<Worker command prefix and isolation rules.>
+<Worker command prefix and pre-execution database/configuration guard. Invoke executables with argv,
+not shell strings; establish effective isolated settings before install hooks, tests or app commands.>
 
-| Operation                 | Command in the task worktree |
-| ------------------------- | ---------------------------- |
-| Setup                     | <command>                    |
-| Focused test              | <command>                    |
-| Focused checks            | <rule>                       |
-| Full validation (CI only) | <workflow and commands>      |
+| Operation                 | Command in the task worktree                                                                   |
+| ------------------------- | ---------------------------------------------------------------------------------------------- |
+| Setup                     | <command>                                                                                      |
+| Focused test              | <command>                                                                                      |
+| Focused checks            | <diff-derived formatting/test helper; changed-contract consumer mappings; explicit exclusions> |
+| Full validation (CI only) | <workflow and commands>                                                                        |
+
+<Default UI review uses measurement/DOM/interaction reports. Previews are reserved for new design,
+unexplained failures or user requests. Reuse visual evidence only with reviewed, unchanged rendering
+inputs and current verification; full application CI remains candidate-bound.>
+
+<Retain separate budgets, failure mechanisms, task disposition/reservations and stage timestamps in
+the implementation-owner record; initialize the shared state helper with profile limits.>
 
 <Cleanup after verified integration: worktree removal and any project cleanup script under
 `.agent-workflow/scripts/`.>

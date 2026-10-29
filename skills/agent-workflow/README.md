@@ -27,7 +27,8 @@ reload its skills or start a fresh session; do not claim discovery from the regi
 ## Guarantees
 
 - One coordinator per feature across all runtimes; worktree isolation is not a distributed lock.
-- Shared-file/contract reservations last through verified integration, including after PR opening.
+- Behavioral file/contract reservations last through verified integration. Verified disjoint translation
+  additions or independent generated outputs use controlled, serial integration.
 - One retained implementer owns each task through corrections and CI; independent reviewers are fresh.
 - Isolated task databases and focused rechecking after a base change remain required.
 - Local checks cover the changed behavior; full build/lint/types/tests run in CI after publication.
@@ -86,12 +87,17 @@ or base, merge-ref identity, missing publication/update permission, and each rol
 Instruction-only changes have no executable application behavior for RED/GREEN; structural tests
 and independent scenario walkthroughs are the proportional checks, not the full CI suite locally.
 
-The shared visual harness has dependency-free Node tests and real-browser regression fixtures:
+The shared visual harness defaults to compact measurement reports; captures are optional. It has
+dependency-free Node tests and real-browser regression fixtures:
 
 ```sh
-node --test skills/agent-workflow/tests/visual/coverage.test.mjs
+node --test skills/agent-workflow/tests/*.test.mjs skills/agent-workflow/tests/visual/coverage.test.mjs
 CHROME_BIN="/path/to/installed/chrome" node --test skills/agent-workflow/tests/visual/*.test.mjs
 ```
+
+Project helper regressions: `node --test .agent-workflow/tests/*.test.mjs`. Also walk through classified
+retries, exhausted budgets, resumed owner records, user holds, translation-key conflicts and generated
+output regeneration using both adapters. Routine review must complete without opening an image.
 
 Browser fixtures run in temporary directories with an isolated browser profile; they do not use the
 application or its database. A missing browser is a failed prerequisite, not a silently skipped check.

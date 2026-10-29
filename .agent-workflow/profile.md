@@ -1,6 +1,9 @@
 # Guixa execution profile
 
-Read this profile once in the coordinator and pass resolved values to workers. Its standing
+Read this profile once in the coordinator and pass resolved values to workers.
+Delegate bounded internal discovery, execution and observation through the existing roles; keep the
+main session's context to decisions, identities, scope, concise evidence and blockers. Follow the
+[role-scoped handoff](../skills/agent-workflow/core/handoff.md) for isolated briefs and artifact returns. Its standing
 authorization is the single source of permission for workflow operations.
 
 ## Standing authorization
@@ -28,23 +31,23 @@ Ask first:
 
 ## Identities and paths
 
-| Setting                                   | Value                                                                                                                         |
-| ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| Tracker                                   | Linear; workspace URL slug `draude`, team `DRA`, project `Coop`                                                               |
-| Eligible statuses / dependency completion | `Backlog`, `Todo` / `Done`                                                                                                    |
-| Active / stopped status                   | `In Progress` / `Todo`                                                                                                        |
-| Issue key                                 | `DRA-NN`                                                                                                                      |
-| Executable task                           | `Tnn` title prefix matching a row in `specs/*/tasks.md`; title format `Tnn — Title`                                           |
-| Ready label                               | `ready-for-agent`, executable mapped leaves only                                                                              |
-| Relation fields                           | `parentId`, `blockedBy`/`blocks`, `relatedTo` on `save_issue`, where exposed                                                  |
-| Codex entrypoint prefix                   | `agent-workflow` (`$agent-workflow-implement-session`, `$agent-workflow-implement-task DRA-NN`, `$agent-workflow-to-tickets`) |
-| Remote / base                             | `origin` / `main`                                                                                                             |
-| Task branch                               | `feature/dra-NN-<3-6 title words>`; `chore/` for tooling, test support or CI; `docs/` for documents only                      |
-| Worktree root                             | Sibling of the selected repository: `<repo-parent>/<repo-name>-worktrees`                                                     |
-| Task worktree                             | `<worktree-root>/dra-NN`                                                                                                      |
-| Implementation owner record               | `<worktree>/.agent-workflow/implementation-owner.json` (ignored runtime state; retain until integration)                      |
-| Test database                             | `guixa_test_draNN`; parallel workers may add `_test_N`                                                                        |
-| Limits                                    | 3 task pipelines in flight; 3 review rounds; stop after 2 consecutive failed attempts per validation stage                    |
+| Setting                                   | Value                                                                                                                                       |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| Tracker                                   | Linear; workspace URL slug `draude`, team `DRA`, project `Coop`                                                                             |
+| Eligible statuses / dependency completion | `Backlog`, `Todo` / `Done`                                                                                                                  |
+| Active / stopped status                   | `In Progress` / `Todo`                                                                                                                      |
+| Issue key                                 | `DRA-NN`                                                                                                                                    |
+| Executable task                           | `Tnn` title prefix matching a row in `specs/*/tasks.md`; title format `Tnn — Title`                                                         |
+| Ready label                               | `ready-for-agent`, executable mapped leaves only                                                                                            |
+| Relation fields                           | `parentId`, `blockedBy`/`blocks`, `relatedTo` on `save_issue`, where exposed                                                                |
+| Codex entrypoint prefix                   | `agent-workflow` (`$agent-workflow-implement-session`, `$agent-workflow-implement-task DRA-NN`, `$agent-workflow-to-tickets`)               |
+| Remote / base                             | `origin` / `main`                                                                                                                           |
+| Task branch                               | `feature/dra-NN-<3-6 title words>`; `chore/` for tooling, test support or CI; `docs/` for documents only                                    |
+| Worktree root                             | Sibling of the selected repository: `<repo-parent>/<repo-name>-worktrees`                                                                   |
+| Task worktree                             | `<worktree-root>/dra-NN`                                                                                                                    |
+| Implementation owner record               | `<worktree>/.agent-workflow/implementation-owner.json` (ignored runtime state; retain until integration)                                    |
+| Test database                             | `guixa_test_draNN`; parallel workers may add `_test_N`                                                                                      |
+| Limits                                    | 3 pipelines; 3 substantive reviews; 2 mechanical follow-up reviews; 2 consecutive product failures per stage; 2 recovery attempts per stage |
 
 Resolve `REPO_ROOT` as the main checkout, the parent of
 `git rev-parse --path-format=absolute --git-common-dir`, so a coordinator started inside a worktree
@@ -86,12 +89,12 @@ Linear rules the ticket gates rely on:
 Each worker command sets its own cwd and environment; never rely on shell state from a previous call:
 
 ```sh
-cd "$WORKTREE" && PATH="$WORKTREE_ROOT/.bin:$PATH" PGTZ=UTC DB_DATABASE="$TEST_DB" <command>
+cd "$WORKTREE" && PATH="$WORKTREE_ROOT/.bin:$PATH" node .agent-workflow/scripts/task-command.mjs "$NN" -- <executable> <arguments>
 ```
 
 Before setup, privately copy `$REPO_ROOT/.env` to the new task worktree, replace its `DB_DATABASE`
 with `TEST_DB`, and verify the replacement without logging credentials. Never change the source `.env`.
-All setup, tests and artisan commands use the worktree prefix above; the user's `guixa` database and
+All setup, tests and artisan commands use the guarded worktree prefix above; the user's `guixa` database and
 shared `guixa_test` are not task databases. If isolated database configuration cannot be verified, stop.
 
 | Operation                 | Command in the task worktree                                                                                                                                                                           |
@@ -111,10 +114,28 @@ domain or overlay state on its owning page at its riskiest width/text/theme, exp
 Include controls below the first viewport. Add system appearance, reduced motion and fallback-font
 cases where applicable. Preserve the plan/constitution contrast, 44 px target and no-clipping
 requirements. Record the selected combinations and rationale before implementation. Store the task
-manifest with its committed fixture; keep generated reports/gallery in an untracked task artifact
-directory. Use one shared coverage run per candidate entering review; reuse evidence while HEAD/base
-remain unchanged and run focused probes while implementing.
+manifest with its committed fixture; keep generated text reports and optional previews in an untracked
+task artifact directory. Routine review uses measurements without captures. Generate a small preview
+only for a new design direction, unexplained failure or explicit request. Use the shared verifier's
+reviewed rendering-input proof to reuse unchanged evidence across commits; otherwise rerun. Focused
+application checks and current CI retain their candidate requirements.
 Select existing tests of changed contracts even when their test files were not edited.
+
+Use `node .agent-workflow/scripts/check-task.mjs NN FIXED_BASE_SHA CHECK_PLAN_JSON --plan` to inspect
+the diff-derived check selection; omit `--plan` to execute it in the guarded environment. The ignored
+task-local check plan has `tests` (exact executable test paths), `changedContracts` (each with
+`name`, changed `path`, source/discovery `evidence` and existing `consumers` test paths), or an empty
+contract list plus `noContractChangesReason`. The coordinator checks discovery completeness; the
+helper cannot infer every dynamic consumer. Missing consumer mappings block readiness. Changed
+executable tests are always included. Formatter exclusions from the checked-in Vite format config
+are reported, preserving append-only specs and generated files; unsupported types need their own
+structural check. Retain the helper's JSON selection/results bound to HEAD/base in task artifacts.
+Do not put the check plan or outputs into tracked deliverables.
+
+The task-command wrapper rejects unsafe environment/file/XML database overrides, DB URLs and cached
+configuration before launching a child. Use its required argv form, not shell command strings.
+Prepare the isolated task env first; never pass shared application credentials or unsafe DB overrides
+to work around a refusal. Split setup commands into separate guarded invocations.
 
 Verify selector syntax from the installed runner before execution; do not guess a command or silently
 expand it to a full local suite. For changes without executable behavior, record the test-first exception

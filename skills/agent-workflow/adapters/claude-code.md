@@ -19,7 +19,10 @@ review or invent a model. No nested delegation, even when the host would allow i
 Cap parallelism by both the project limit and live host capacity.
 
 Use [role-scoped handoffs](../core/handoff.md) with explicit relevant paths/sections and resolved settings,
-not the whole profile, adapter or transcript. A resumed writer
+not the whole profile, adapter or transcript. Keep briefs self-contained and use only documented
+context controls exposed by the host; do not assume a Codex-style fork option exists. Reuse returned
+agent/task IDs with the supported resume mechanism for related internal work, preserving the assigned
+implementation owner. Internal subtasks use these workers, never new user-owned chats. A resumed writer
 is not an independent reviewer. Missing required delegation/reviewer capability stops the affected
 implementation before mutation; ticket drafting alone does not require delegation.
 
