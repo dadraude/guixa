@@ -162,3 +162,39 @@ void test('missing historical counters cannot be silently initialized or reset',
         /initialized again/,
     );
 });
+
+void test('a successful recovered validation breaks only that stage product failure streak', () => {
+    let owner = initialize();
+    owner = applyEvent(owner, {
+        ...failure('product', 'assertion'),
+        stage: 'ci',
+    });
+    owner = applyEvent(owner, {
+        ...failure('product', 'assertion'),
+        stage: 'local',
+    });
+    owner = applyEvent(owner, {
+        ...failure('infrastructure', 'service'),
+        stage: 'local',
+    });
+    owner = applyEvent(owner, {
+        ...failure('infrastructure', 'service'),
+        type: 'recovery',
+        stage: 'local',
+        evidence: 'Service restarted; focused prerequisite passed',
+    });
+    owner = applyEvent(owner, {
+        type: 'success',
+        classification: 'infrastructure',
+        mechanism: 'service',
+        stage: 'local',
+    });
+    assert.equal(owner.pipeline.counters.product.local, 0);
+    assert.equal(owner.pipeline.counters.product.ci, 1);
+    assert.equal(owner.pipeline.counters.recovery.local, 1);
+    owner = applyEvent(owner, {
+        ...failure('product', 'assertion'),
+        stage: 'local',
+    });
+    assert.equal(owner.pipeline.blocker, undefined);
+});

@@ -3,6 +3,10 @@ export function measureAssertions(assertions = []) {
     const results = [],
         failures = [],
         unverified = [];
+    const pixels = (value) =>
+        /^-?[0-9]+(?:\.[0-9]+)?px$/.test(value)
+            ? Number.parseFloat(value)
+            : NaN;
     const known = [
         'selector',
         'count',
@@ -10,6 +14,8 @@ export function measureAssertions(assertions = []) {
         'minHeight',
         'fontSizeRem',
         'gapRem',
+        'rowGapRem',
+        'columnGapRem',
         'styles',
         'text',
         'attributes',
@@ -79,16 +85,25 @@ export function measureAssertions(assertions = []) {
                 const rem = parseFloat(
                     getComputedStyle(document.documentElement).fontSize,
                 );
+                const rowGapRem = pixels(style.rowGap) / rem;
+                const columnGapRem = pixels(style.columnGap) / rem;
                 const observed = {
                     width: rect.width,
                     height: rect.height,
                     fontSizeRem: parseFloat(style.fontSize) / rem,
-                    gapRem: parseFloat(style.gap) / rem,
+                    rowGapRem,
+                    columnGapRem,
+                    gapRem: rowGapRem === columnGapRem ? rowGapRem : NaN,
                 };
                 if (
-                    ['minWidth', 'minHeight', 'fontSizeRem', 'gapRem'].some(
-                        (key) => rule[key] !== undefined,
-                    ) &&
+                    [
+                        'minWidth',
+                        'minHeight',
+                        'fontSizeRem',
+                        'gapRem',
+                        'rowGapRem',
+                        'columnGapRem',
+                    ].some((key) => rule[key] !== undefined) &&
                     !shown(node)
                 )
                     record.failures.push('Measured element is hidden');
@@ -97,6 +112,8 @@ export function measureAssertions(assertions = []) {
                     ['minHeight', rect.height],
                     ['fontSizeRem', observed.fontSizeRem],
                     ['gapRem', observed.gapRem],
+                    ['rowGapRem', observed.rowGapRem],
+                    ['columnGapRem', observed.columnGapRem],
                 ]) {
                     if (rule[key] === undefined) continue;
                     if (!Number.isFinite(rule[key]) || !Number.isFinite(actual))

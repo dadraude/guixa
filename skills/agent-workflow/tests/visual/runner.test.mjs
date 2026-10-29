@@ -188,6 +188,23 @@ void test('CLI captures settled UI, verifies coverage, and rejects changed or mi
             ).length,
             1,
         );
+        await writeFile(
+            join(cwd, 'artifacts/unrelated.png'),
+            'User-owned artifact',
+        );
+        const textOnly = await cli('run');
+        assert.equal(textOnly.code, 0, textOnly.output);
+        assert.deepEqual(
+            (await readdir(join(cwd, 'artifacts'))).filter((name) =>
+                name.endsWith('.png'),
+            ),
+            ['unrelated.png'],
+        );
+        assert.ok(
+            !(await readdir(join(cwd, 'artifacts'))).includes('index.html'),
+        );
+        await rm(join(cwd, 'artifacts/unrelated.png'));
+        assert.equal((await cli('run', '--capture=' + caseId)).code, 0);
         await writeFile(join(cwd, 'index.html'), '<main>Changed</main>');
         assert.match((await cli('verify')).output, /Uncommitted/);
         execFileSync('git', ['restore', 'index.html'], { cwd });

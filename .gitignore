@@ -68,3 +68,6 @@ yarn-error.log
 
 # Retained implementation identity; local to each task worktree.
 /.agent-workflow/implementation-owner.json
+/.agent-workflow/implementation-owner.json.tmp
+/skills/agent-workflow/tests/__pycache__/
+/.agent-workflow/tests/__pycache__/

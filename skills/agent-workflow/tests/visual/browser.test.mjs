@@ -222,3 +222,31 @@ void test('measures typography, spacing, targets, DOM state and contrast without
         [],
     );
 });
+
+void test('gap assertions check both axes and leave unresolved percentages unverified', async () => {
+    await render('.panel{display:grid;gap:8px 32px}', '<button>Save</button>');
+    const measure = (rules) =>
+        browser.evaluate(
+            '(' +
+                measureAssertions.toString() +
+                ')(' +
+                JSON.stringify(rules) +
+                ')',
+        );
+    const mixed = await measure([{ selector: '.panel', gapRem: 0.25 }]);
+    assert.equal(mixed.results[0].passed, false);
+    assert.ok(mixed.unverified.length);
+    assert.deepEqual(
+        (
+            await measure([
+                { selector: '.panel', rowGapRem: 0.25, columnGapRem: 1 },
+            ])
+        ).failures,
+        [],
+    );
+    await browser.evaluate("document.querySelector('.panel').style.gap='10%'");
+    assert.ok(
+        (await measure([{ selector: '.panel', gapRem: 0.3125 }])).unverified
+            .length,
+    );
+});

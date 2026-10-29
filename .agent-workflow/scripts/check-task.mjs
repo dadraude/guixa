@@ -42,7 +42,7 @@ export function checkPlan(cwd, base, plan) {
                 'diff',
                 '--name-only',
                 '-z',
-                '--diff-filter=ACMR',
+                '--diff-filter=ACDMR',
                 base,
             ),
             ...gitPaths(
@@ -54,6 +54,8 @@ export function checkPlan(cwd, base, plan) {
             ),
         ]),
     ].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
+    const existing = changed.filter((path) => existsSync(resolve(cwd, path)));
+    const removed = changed.filter((path) => !existing.includes(path));
     if (!Array.isArray(plan.changedContracts) || !Array.isArray(plan.tests))
         throw new Error('Declare changedContracts and focused tests');
     if (!plan.changedContracts.length && !plan.noContractChangesReason?.trim())
@@ -73,7 +75,7 @@ export function checkPlan(cwd, base, plan) {
             throw new Error('Contract path must occur in the diff');
         contract.consumers.forEach((path) => tests.add(path));
     }
-    changed.filter(executableTest).forEach((path) => tests.add(path));
+    existing.filter(executableTest).forEach((path) => tests.add(path));
     for (const path of tests) {
         if (
             typeof path !== 'string' ||
@@ -95,15 +97,15 @@ export function checkPlan(cwd, base, plan) {
     );
     const supported =
         /\.(?:[cm]?jsx?|tsx?|vue|jsonc?|mdx?|html|ya?ml|css|scss)$/;
-    const excluded = changed.filter(
+    const excluded = existing.filter(
         (path) =>
             supported.test(path) &&
             exclusions.some((pattern) => glob(path, pattern)),
     );
-    const formatted = changed.filter(
+    const formatted = existing.filter(
         (path) => supported.test(path) && !excluded.includes(path),
     );
-    const php = changed.filter((path) => path.endsWith('.php'));
+    const php = existing.filter((path) => path.endsWith('.php'));
     const commands = [];
     if (formatted.length)
         commands.push([
@@ -150,7 +152,11 @@ export function checkPlan(cwd, base, plan) {
     const fingerprint = createHash('sha256');
     for (const path of changed) {
         fingerprint.update(path + '\0');
-        fingerprint.update(readFileSync(resolve(cwd, path)));
+        if (removed.includes(path)) fingerprint.update('removed\0');
+        else {
+            fingerprint.update('file\0');
+            fingerprint.update(readFileSync(resolve(cwd, path)));
+        }
     }
     return {
         inputHash: fingerprint.digest('hex'),
@@ -165,11 +171,12 @@ export function checkPlan(cwd, base, plan) {
         }).trim(),
         base,
         changed,
+        removed,
         tests: [...tests].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0)),
         formatting: {
             selected: [...formatted, ...php],
             excluded,
-            unsupported: changed.filter(
+            unsupported: existing.filter(
                 (path) => !supported.test(path) && !path.endsWith('.php'),
             ),
         },

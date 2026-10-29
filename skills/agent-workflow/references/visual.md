@@ -50,7 +50,7 @@ prerequisite. The fixture must apply the requested appearance, text enlargement 
 - State `checks` can override view selectors/assertions for its owning state.
 - Optional `assertions` is an array of rules, each with a CSS `selector` and one or more expectations:
   `count` (including zero), `text` (exact trimmed text), `attributes` (exact values; null means absent),
-  `styles` (CSS property/value pairs), `fontSizeRem`, `gapRem`, `minWidth`/`minHeight` (CSS pixels), or
+  `styles` (CSS property/value pairs), `fontSizeRem`, `gapRem` (both axes; distinct gaps use `rowGapRem`/`columnGapRem`), `minWidth`/`minHeight` (CSS pixels), or
   `contrast` (minimum ratio). All matching nodes must satisfy the expectations. Rem expectations
   scale with enlarged text. Use selectors covering every instance of a repeated acceptance pattern.
 

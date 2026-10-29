@@ -21,9 +21,12 @@ Never translate another provider's model name into a guessed model ID. Use only 
 model/reasoning options and thread budget. No nested delegation.
 
 Use [role-scoped handoffs](../core/handoff.md), supplying relevant source paths/sections and resolved
-configuration rather than the full profile, adapter or inherited chat/MCP access. A reviewer must be a fresh independent worker, not the writer
-with a different label. If required delegation is unavailable, stop the affected implementation before
-mutation. A read-only ticket draft does not require a subagent merely to compensate for that absence.
+configuration rather than the full profile, adapter or inherited chat/MCP access. Prefer
+`fork_turns="none"` with a self-contained brief to keep unrelated conversation out of worker context.
+Retain worker IDs and resume/message the same suitable worker for related internal work; preserve the
+assigned implementation owner. Use collaboration workers for subtasks, never user-owned chats.
+A reviewer must be a fresh independent worker, not the writer with a different label. If required
+delegation is unavailable, stop the affected implementation before mutation. A read-only ticket draft does not require a subagent merely to compensate for that absence.
 
 Use shell/file tools with explicit cwd/absolute paths. Honor sandbox refusals and the host approval
 mechanism; never weaken permissions or reroute through another tool to bypass a denial. Runtime approval

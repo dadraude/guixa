@@ -121,8 +121,7 @@ export function applyEvent(owner, event) {
                     event.stage +
                     '/' +
                     counter;
-        } else if (counter === 'product')
-            state.counters.product[event.stage] = 0;
+        } else state.counters.product[event.stage] = 0;
     } else if (event.type === 'disposition') {
         if (
             !['active', 'deferred', 'superseded', 'abandoned'].includes(

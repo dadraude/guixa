@@ -39,6 +39,7 @@ function fixture() {
     return {
         cwd,
         write,
+        git,
         base: git('rev-parse', 'HEAD'),
         clean: () => rmSync(cwd, { recursive: true, force: true }),
     };
@@ -218,6 +219,191 @@ void test('safe wrapper preserves argument boundaries and sets the effective tas
             'testing',
             'argument with spaces; $(false)',
         ]);
+    } finally {
+        f.clean();
+    }
+});
+
+void test('deleted contracts retain consumer checks and fingerprint their removal without executing missing files', () => {
+    const f = fixture();
+    try {
+        f.write(
+            'tests/consumer.test.mjs',
+            'import { test } from "node:test"; test("consumer", () => {});',
+        );
+        f.write('deleted.md', 'Removed documentation');
+        f.git('add', '.');
+        f.git('-c', 'commit.gpgsign=false', 'commit', '-qm', 'Deletion inputs');
+        const base = f.git('rev-parse', 'HEAD');
+        for (const path of [
+            'src/Contract.php',
+            'tests/ExistingTest.php',
+            'deleted.md',
+        ])
+            rmSync(join(f.cwd, path));
+        const declaration = {
+            tests: [],
+            changedContracts: [
+                {
+                    name: 'Contract',
+                    path: 'src/Contract.php',
+                    evidence: 'Removal consumers inspected',
+                    consumers: ['tests/consumer.test.mjs'],
+                },
+            ],
+        };
+        const deleted = checkPlan(f.cwd, base, declaration);
+        assert.deepEqual(deleted.changed, [
+            'deleted.md',
+            'src/Contract.php',
+            'tests/ExistingTest.php',
+        ]);
+        assert.deepEqual(deleted.removed, deleted.changed);
+        assert.deepEqual(deleted.tests, ['tests/consumer.test.mjs']);
+        assert.deepEqual(deleted.formatting.selected, []);
+        assert.deepEqual(deleted.commands, [
+            ['node', '--test', 'tests/consumer.test.mjs'],
+        ]);
+        const withoutContracts = checkPlan(f.cwd, base, {
+            tests: [],
+            changedContracts: [],
+            noContractChangesReason: 'Fixture checks deletion inventory',
+        });
+        assert.deepEqual(withoutContracts.changed, deleted.changed);
+        f.write('src/Contract.php', '');
+        const restored = checkPlan(f.cwd, base, declaration);
+        assert.notEqual(restored.inputHash, deleted.inputHash);
+        assert.ok(restored.formatting.selected.includes('src/Contract.php'));
+        assert.deepEqual(restored.removed, [
+            'deleted.md',
+            'tests/ExistingTest.php',
+        ]);
+    } finally {
+        f.clean();
+    }
+});
+
+void test('focused verification detects a deleted contract restored by a consumer check', () => {
+    const f = fixture();
+    try {
+        f.write(
+            'tests/consumer.test.mjs',
+            'import { writeFileSync } from "node:fs"; writeFileSync("src/Contract.php", "<?php // mutated during checks");',
+        );
+        f.git('add', '.');
+        f.git(
+            '-c',
+            'commit.gpgsign=false',
+            'commit',
+            '-qm',
+            'Mutating consumer fixture',
+        );
+        const base = f.git('rev-parse', 'HEAD');
+        rmSync(join(f.cwd, 'src/Contract.php'));
+        f.write(
+            '.git/check-plan.json',
+            JSON.stringify({
+                tests: [],
+                changedContracts: [
+                    {
+                        name: 'Contract',
+                        path: 'src/Contract.php',
+                        evidence: 'Removal consumers inspected',
+                        consumers: ['tests/consumer.test.mjs'],
+                    },
+                ],
+            }),
+        );
+        const env = { ...process.env };
+        for (const key of [
+            'DB_DATABASE',
+            'DB_CONNECTION',
+            'DB_URL',
+            'DATABASE_URL',
+            'APP_CONFIG_CACHE',
+        ])
+            delete env[key];
+        delete env.NODE_TEST_CONTEXT;
+        const result = spawnSync(
+            process.execPath,
+            [
+                fileURLToPath(
+                    new URL('../scripts/check-task.mjs', import.meta.url),
+                ),
+                '208',
+                base,
+                '.git/check-plan.json',
+            ],
+            { cwd: f.cwd, encoding: 'utf8', env },
+        );
+        assert.notEqual(result.status, 0, result.stdout + result.stderr);
+        assert.match(
+            result.stderr,
+            /Candidate changed during focused verification/,
+        );
+        assert.equal(existsSync(join(f.cwd, 'src/Contract.php')), true);
+    } finally {
+        f.clean();
+    }
+});
+
+void test('PHPUnit server values always validate while overwritten unforced env defaults remain valid', () => {
+    const f = fixture();
+    try {
+        const unsafe = [
+            ['DB_DATABASE', 'guixa', /Unsafe/],
+            ['DB_URL', 'postgres://private-password@localhost/guixa', /URL/],
+            [
+                'DATABASE_URL',
+                'postgres://private-password@localhost/guixa',
+                /URL/,
+            ],
+            ['DB_CONNECTION', 'sqlite', /connection/],
+            ['APP_CONFIG_CACHE', 'other.php', /cached configuration/],
+        ];
+        for (const force of [
+            '',
+            ' force="false"',
+            ' force="true"',
+            ' force="1"',
+        ]) {
+            for (const [name, value, message] of unsafe) {
+                f.write(
+                    'phpunit.xml',
+                    `<phpunit><php><server name="${name}" value="${value}"${force}/></php></phpunit>`,
+                );
+                assert.throws(() => taskEnvironment('208', f.cwd, {}), message);
+            }
+            f.write(
+                'phpunit.xml',
+                `<phpunit><php><server name="DB_DATABASE" value="guixa_test_dra208"${force}/><server name="DB_CONNECTION" value="pgsql"${force}/></php></phpunit>`,
+            );
+            assert.equal(
+                taskEnvironment('208', f.cwd, {}).DB_DATABASE,
+                'guixa_test_dra208',
+            );
+        }
+        for (const [name, value] of unsafe.filter(
+            ([name]) => name !== 'APP_CONFIG_CACHE',
+        )) {
+            f.write(
+                'phpunit.xml',
+                `<phpunit><php><env name="${name}" value="${value}"/></php></phpunit>`,
+            );
+            const env = taskEnvironment('208', f.cwd, {});
+            assert.equal(env.DB_DATABASE, 'guixa_test_dra208');
+            assert.equal(env.DB_CONNECTION, 'pgsql');
+            assert.equal(env.DB_URL, '');
+            assert.equal(env.DATABASE_URL, '');
+        }
+        f.write(
+            'phpunit.xml',
+            '<phpunit><php><env name="APP_CONFIG_CACHE" value="other.php"/></php></phpunit>',
+        );
+        assert.throws(
+            () => taskEnvironment('208', f.cwd, {}),
+            /cached configuration/,
+        );
     } finally {
         f.clean();
     }

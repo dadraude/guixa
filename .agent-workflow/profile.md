@@ -1,6 +1,9 @@
 # Guixa execution profile
 
-Read this profile once in the coordinator and pass resolved values to workers. Its standing
+Read this profile once in the coordinator and pass resolved values to workers.
+Delegate bounded internal discovery, execution and observation through the existing roles; keep the
+main session's context to decisions, identities, scope, concise evidence and blockers. Follow the
+[role-scoped handoff](../skills/agent-workflow/core/handoff.md) for isolated briefs and artifact returns. Its standing
 authorization is the single source of permission for workflow operations.
 
 ## Standing authorization

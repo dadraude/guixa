@@ -70,7 +70,12 @@ export function taskEnvironment(
                     m[3],
                 ]),
             );
-            if (fields.force === 'true' || fields.force === '1')
+            if (
+                tag.startsWith('<server') ||
+                fields.name === 'APP_CONFIG_CACHE' ||
+                fields.force === 'true' ||
+                fields.force === '1'
+            )
                 validate({ [fields.name]: fields.value });
         }
     }

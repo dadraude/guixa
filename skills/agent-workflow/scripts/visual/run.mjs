@@ -332,7 +332,7 @@ async function main() {
         previous = JSON.parse(await readFile(resolve(output, 'report.json')));
     } catch {}
     for (const item of previous?.cases ?? [])
-        if (/^[a-z0-9-]+\\.png$/.test(item.screenshot ?? ''))
+        if (/^[a-z0-9-]+\.png$/.test(item.screenshot ?? ''))
             await rm(resolve(output, item.screenshot), { force: true });
     for (const name of ['index.html', 'verification.json'])
         await rm(resolve(output, name), { force: true });
