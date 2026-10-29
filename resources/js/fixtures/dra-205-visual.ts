@@ -71,6 +71,7 @@ const product = {
 };
 const stockProduct = {
     id: stockId,
+    producerId,
     name: 'Arròs',
     unit: 'kg',
     price: '2.50',
@@ -320,6 +321,7 @@ const pageProps: Record<string, Record<string, unknown>> = {
     'Manage/ReturnItems/Edit': { item: returnItem },
     'Manage/ReturnItems/Index': { items: [returnItem] },
     'Manage/Settings': { pickupWeekday: 4 },
+    'Manage/Stock/Create': { producer },
     'Manage/Stock/Edit': { product: stockProduct },
     'Manage/Stock/Index': { products: [stockProduct] },
     'Manage/Stock/Movements': {

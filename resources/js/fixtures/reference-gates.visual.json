@@ -2071,7 +2071,7 @@
             "query": {
                 "page": "Manage/Stock/Create",
                 "role": "manager",
-                "route": "/manage/stock/create"
+                "route": "/manage/producers/producer-1/products/create"
             },
             "root": ".reference-style",
             "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
@@ -2164,7 +2164,7 @@
             "query": {
                 "page": "Manage/Stock/Edit",
                 "role": "manager",
-                "route": "/manage/stock/stock-1/edit"
+                "route": "/manage/producers/producer-1/products/stock-1/edit"
             },
             "root": ".reference-style",
             "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
