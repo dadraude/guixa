@@ -26,10 +26,6 @@ final class SellStock
     /** @param  string  $quantity  A quantity greater than zero, with at most 3 decimals. */
     public function __invoke(Actor $actor, string $stockProductId, string $quantity, string $orderId): void
     {
-        if ($this->products->get($stockProductId) === null) {
-            throw StockProductNotFound::withId($stockProductId);
-        }
-
         $movement = StockMovement::sale(
             $this->movements->nextId(),
             $stockProductId,
@@ -39,6 +35,12 @@ final class SellStock
             $orderId,
         );
 
-        $this->transactions->run(fn () => $this->ledger->record($movement));
+        $this->transactions->run(function () use ($stockProductId, $movement): void {
+            if ($this->products->lock($stockProductId) === null) {
+                throw StockProductNotFound::withId($stockProductId);
+            }
+
+            $this->ledger->record($movement);
+        });
     }
 }

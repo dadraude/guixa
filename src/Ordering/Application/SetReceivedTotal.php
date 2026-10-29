@@ -53,6 +53,7 @@ final class SetReceivedTotal
             $loaded = $this->loader->load($cycle, $producerId);
 
             $product = $loaded->reception->product($productId) ?? throw ProductNotInReception::withId($productId);
+            $this->loader->lockWeekly($productId) ?? throw ProductNotInReception::withId($productId);
             $product->assertInStep($total);
 
             $frozenHouseholds = [];

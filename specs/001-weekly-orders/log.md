@@ -2324,3 +2324,22 @@ The focused recheck showed the field wrapper itself was bounded but its implicit
 still kept the input's 256 px intrinsic width. Both owning field wrappers therefore use the existing
 single-column `grid-cols-1` utility (a zero-minimum fractional track), allowing the label and input
 to shrink inside the 245 px content area. This is part of the same measured containment correction.
+## 2026-10-29 · Change
+
+`plan.md` (Reference style refresh), `tasks.md` (T47–T51 delivery reconciliation), reference-style
+proposal/rollout status, and `docs/visual-checks/2026-10-29-t47-t51-reconciliation.md`: reconcile
+accepted pilot/rollout against integrated `origin/main` at `1a9a41a`. PRs #239/#240, T44/#243,
+T46/#242 and T36/#245 are integrated; #248/#249 are merged and main CI passed at `1a9a41a`.
+The original continuation approval was consulted and preserved. Five retained report sets
+(19/164/85/192/514 cases) passed historical manifest/runner/capture integrity and declared
+coverage checks, without claiming a current-HEAD browser run. T47/DRA-219 is reconciled to Done;
+T48–T51 retain Backlog with integrated implementation and exact role/state evidence gaps recorded.
+T36's fixture defaults manager/producer views to member navigation, and Welcome lacks an
+authenticated state. These are verification gaps, not a mandate to repeat rollout or confirmed
+production defects.
+
+Why: the user requested reconciliation with actual code, integration and existing visual evidence,
+preserving accepted work and declaring missing gates. This is plan-only tracking; no R#/S#,
+application behavior, fixture, schema or baseline changes. Historical baseline and all earlier
+log entries stay byte-identical. T33 remains Todo with 18 native blockers and feature 001 stays
+open. No T52–T63 implementation, deployment, new ticket/relation, reparenting or PR merge occurs.

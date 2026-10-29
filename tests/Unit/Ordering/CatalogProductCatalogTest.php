@@ -1,11 +1,17 @@
 <?php
 
+use Guixa\Catalog\Application\LockWeeklyProduct;
 use Guixa\Ordering\Infrastructure\Catalog\CatalogProductCatalog;
 use Tests\Support\Catalog\CatalogWorld;
 
 beforeEach(function () {
     $this->world = new CatalogWorld;
-    $this->catalog = new CatalogProductCatalog($this->world->getOrderableProduct, $this->world->listOrderableProducts, $this->world->listProducerProductsForReception);
+    $this->catalog = new CatalogProductCatalog(
+        $this->world->getOrderableProduct,
+        $this->world->listOrderableProducts,
+        $this->world->listProducerProductsForReception,
+        new LockWeeklyProduct($this->world->products),
+    );
     $this->producerId = ($this->world->createProducer)($this->world->manager, 'Baker', 3, '20:00');
     $this->producer = $this->world->producerActor($this->producerId);
     $this->add = fn (string $name, int $cents = 350, bool $variable = false, ?string $containers = null) => ($this->world->createProduct)(

@@ -1,19 +1,24 @@
 <?php
 
-namespace Guixa\Stock\Application;
+namespace Guixa\Catalog\Application;
 
+use Guixa\Catalog\Domain\Error\ProducerNotFound;
+use Guixa\Catalog\Domain\ProducerRepository;
+use Guixa\Catalog\Domain\Product;
+use Guixa\Catalog\Domain\ProductRepository;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Money;
-use Guixa\Stock\Domain\StockProduct;
-use Guixa\Stock\Domain\StockProductRepository;
 
 final class CreateStockProduct
 {
-    public function __construct(private readonly StockProductRepository $products) {}
+    public function __construct(
+        private readonly ProductRepository $products,
+        private readonly ProducerRepository $producers,
+    ) {}
 
-    /** @return string the new stock product's id */
     public function __invoke(
         Actor $actor,
+        string $producerId,
         string $name,
         string $unit,
         int $priceCents,
@@ -22,13 +27,19 @@ final class CreateStockProduct
     ): string {
         $actor->assertManager();
 
-        $product = StockProduct::create(
+        if ($this->producers->get($producerId) === null) {
+            throw ProducerNotFound::withId($producerId);
+        }
+
+        $product = Product::create(
             $this->products->nextId(),
+            $producerId,
             $name,
             $unit,
             Money::ofCents($priceCents),
             $variable,
             $containersPerUnit,
+            stock: true,
         );
         $this->products->add($product);
 

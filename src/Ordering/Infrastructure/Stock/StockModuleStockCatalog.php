@@ -8,11 +8,16 @@ use Guixa\Ordering\Domain\ValueObject\StockOffer;
 use Guixa\Shared\Domain\Money;
 use Guixa\Shared\Domain\Quantity;
 use Guixa\Stock\Application\GetStockOffer;
+use Guixa\Stock\Application\LockStockOffer;
+use Guixa\Stock\Application\StockLevelData;
 
 /** Answers Ordering's questions about stock products through Stock's use cases (A4). */
 final class StockModuleStockCatalog implements StockCatalog
 {
-    public function __construct(private readonly GetStockOffer $getStockOffer) {}
+    public function __construct(
+        private readonly GetStockOffer $getStockOffer,
+        private readonly LockStockOffer $lockStockOffer,
+    ) {}
 
     public function offer(string $stockProductId): ?StockOffer
     {
@@ -23,6 +28,22 @@ final class StockModuleStockCatalog implements StockCatalog
             return null;
         }
 
+        return $this->translate($product);
+    }
+
+    public function lockOffer(string $stockProductId): ?StockOffer
+    {
+        try {
+            $product = ($this->lockStockOffer)($stockProductId);
+        } catch (DomainException) {
+            return null;
+        }
+
+        return $this->translate($product);
+    }
+
+    private function translate(StockLevelData $product): StockOffer
+    {
         return new StockOffer(
             $product->id,
             $product->name,

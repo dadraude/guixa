@@ -11,6 +11,12 @@ interface ProductRepository
 
     public function get(string $id): ?Product;
 
+    /** Locks the Catalog product row for the surrounding transaction. */
+    public function getForUpdate(string $id): ?Product;
+
     /** @return list<Product> of one producer, ordered by name, then id */
     public function listByProducer(string $producerId): array;
+
+    /** @return list<Product> stock products ordered by name, then id */
+    public function listStock(): array;
 }

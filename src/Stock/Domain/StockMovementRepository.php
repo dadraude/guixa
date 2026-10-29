@@ -16,12 +16,6 @@ interface StockMovementRepository
 
     public function available(string $stockProductId): SignedQuantity;
 
-    /**
-     * Locks the stock product until the surrounding transaction ends and returns its available stock,
-     * so a check followed by `add` cannot race another one (R27).
-     */
-    public function availableForUpdate(string $stockProductId): SignedQuantity;
-
     /** @return array<string, SignedQuantity> available stock by stock product id; products without movements are absent */
     public function availableByProduct(): array;
 }

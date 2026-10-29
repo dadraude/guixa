@@ -13,5 +13,6 @@ final readonly class StockLevelData
         public ?string $containersPerUnit,
         public bool $active,
         public string $available,
+        public string $producerId = '',
     ) {}
 }

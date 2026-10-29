@@ -27,10 +27,6 @@ final class RecordStockAdjustment
     {
         $actor->assertManager();
 
-        if ($this->products->get($stockProductId) === null) {
-            throw StockProductNotFound::withId($stockProductId);
-        }
-
         $movement = StockMovement::adjustment(
             $this->movements->nextId(),
             $stockProductId,
@@ -41,6 +37,12 @@ final class RecordStockAdjustment
             $cycleId,
         );
 
-        $this->transactions->run(fn () => $this->ledger->record($movement));
+        $this->transactions->run(function () use ($stockProductId, $movement): void {
+            if ($this->products->lock($stockProductId) === null) {
+                throw StockProductNotFound::withId($stockProductId);
+            }
+
+            $this->ledger->record($movement);
+        });
     }
 }

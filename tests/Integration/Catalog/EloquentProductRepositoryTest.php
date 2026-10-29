@@ -2,9 +2,11 @@
 
 namespace Tests\Integration\Catalog;
 
+use Guixa\Catalog\Domain\Product;
 use Guixa\Catalog\Domain\ProductRepository;
 use Guixa\Catalog\Infrastructure\Persistence\EloquentProductRepository;
 use Guixa\Catalog\Infrastructure\Persistence\ProducerModel;
+use Guixa\Shared\Domain\Money;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -28,6 +30,21 @@ final class EloquentProductRepositoryTest extends TestCase
         return ProducerModel::query()->create([
             'name' => 'Baker', 'active' => true, 'cutoff_days_before' => 3, 'cutoff_time' => '20:00',
         ])->id;
+    }
+
+    #[Test]
+    public function it_round_trips_a_stock_product_identity_and_mode_through_catalog(): void
+    {
+        $repository = $this->repository();
+        $producerId = $this->newProducerId();
+        $product = Product::create($repository->nextId(), $producerId, 'Honey', 'jar', Money::ofCents(650), false, null, stock: true);
+
+        $repository->add($product);
+
+        $reloaded = $repository->get($product->id);
+        $this->assertSame($product->id, $reloaded->id);
+        $this->assertSame($producerId, $reloaded->producerId);
+        $this->assertTrue($reloaded->isStock());
     }
 
     #[Test]

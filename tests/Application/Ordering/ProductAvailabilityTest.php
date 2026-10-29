@@ -49,6 +49,21 @@ it('marks the line in the cycle where the product is unavailable and leaves the 
         ->and(($this->marked)($this->cycleB))->toBe([$this->jam => false]);
 });
 
+it('locks the weekly Catalog product before marking cycle availability (R1b, R3c)', function () {
+    ($this->available)($this->cycleA, false);
+
+    expect($this->world->catalog->locked)->toContain($this->jam);
+});
+
+it('rejects cycle availability for a stock ID of the same producer without saving a mark (R3c, S66)', function () {
+    $stockId = $this->world->catalog->offerStock(OrderingWorld::BAKER, 'Stock jam', 'jar', 450);
+
+    expect(fn () => ($this->world->setProductAvailability)($this->baker, $this->cycleA, $stockId, false))
+        ->toThrow(ProductNotOrderable::class)
+        ->and($this->world->availability->unavailableIn($this->cycleA))->toBe([])
+        ->and(($this->order)($this->cycleA)->producers[0]->products)->toHaveCount(1);
+});
+
 it('lifts the mark when the product becomes available again before the order is sent (R3b, S48)', function () {
     ($this->orderJam)($this->cycleA);
     ($this->available)($this->cycleA, false);

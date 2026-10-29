@@ -27,7 +27,12 @@ defineProps<{
         <Heading :title="trans('Edit :name', { name: product.name })" />
 
         <Form
-            v-bind="StockProductController.update.form(product.id)"
+            v-bind="
+                StockProductController.update.form({
+                    producer: product.producerId,
+                    stockProduct: product.id,
+                })
+            "
             class="space-y-6"
             v-slot="{ errors, processing }"
         >

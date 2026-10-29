@@ -7,7 +7,6 @@ use Guixa\Stock\Domain\MovementType;
 use Guixa\Stock\Domain\StockMovement;
 use Guixa\Stock\Domain\StockMovementRepository;
 use Guixa\Stock\Domain\ValueObject\SignedQuantity;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 final class EloquentStockMovementRepository implements StockMovementRepository
@@ -53,13 +52,6 @@ final class EloquentStockMovementRepository implements StockMovementRepository
             ->value('total');
 
         return $this->sum($total);
-    }
-
-    public function availableForUpdate(string $stockProductId): SignedQuantity
-    {
-        DB::table('stock_products')->where('id', $stockProductId)->lockForUpdate()->first();
-
-        return $this->available($stockProductId);
     }
 
     public function availableByProduct(): array

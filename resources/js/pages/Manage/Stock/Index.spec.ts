@@ -10,15 +10,19 @@ vi.mock('@inertiajs/vue3', () => ({
     Head: () => null,
     Link: defineComponent({
         setup:
-            (_, { slots }) =>
+            (_, { attrs, slots }) =>
             () =>
-                h('a', slots.default?.()),
+                h('a', attrs, slots.default?.()),
     }),
     Form: defineComponent({
         setup:
-            (_, { slots }) =>
+            (_, { attrs, slots }) =>
             () =>
-                h('form', slots.default?.({ errors: {}, processing: false })),
+                h(
+                    'form',
+                    attrs,
+                    slots.default?.({ errors: {}, processing: false }),
+                ),
     }),
     router: { put: vi.fn(), delete: vi.fn() },
 }));
@@ -27,6 +31,7 @@ describe('manager list presentation', () => {
     it('renders 20 compact stock rows and a six-column desktop table', async () => {
         const products = Array.from({ length: 20 }, (_, index) => ({
             id: `stock-${index}`,
+            producerId: 'producer-1',
             name: `Producte ${index}`,
             unit: 'pot',
             variable: false,
@@ -45,6 +50,10 @@ describe('manager list presentation', () => {
         expect(html).toContain('aria-label="Desactiva: Producte 1"');
         expect(html).toContain('aria-label="Edita Producte 0"');
         expect(html).toContain('aria-label="Moviments: Producte 0"');
+        expect(html).toContain(
+            '/manage/producers/producer-1/products/stock-0/reactivation',
+        );
+        expect(html).toContain('/manage/producers/producer-1/products/stock-1');
         expect(html).toContain('<dialog');
     });
 

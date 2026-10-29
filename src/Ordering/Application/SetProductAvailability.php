@@ -30,6 +30,13 @@ final class SetProductAvailability
             // Shared lock on the cycle: a send cannot slip in while the mark changes (R3c).
             $cycle = $this->cycles->getForShare($cycleId) ?? throw CycleNotFound::withId($cycleId);
 
+            $this->catalog->lockWeekly($productId) ?? throw ProductNotOrderable::withId($productId);
+            $current = $this->catalog->orderable($productId) ?? throw ProductNotOrderable::withId($productId);
+
+            if ($current->producerId !== $product->producerId) {
+                throw ProductNotOrderable::withId($productId);
+            }
+
             if ($cycle->isSent($product->producerId)) {
                 throw ProducerOrderSent::withId($cycleId, $product->producerId);
             }

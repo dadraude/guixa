@@ -16,6 +16,7 @@ const line = {
 const options = [
     {
         id: 'honey',
+        producerId: 'beekeeper',
         name: 'Honey',
         unit: 'jar',
         price: '6.00',
@@ -26,6 +27,7 @@ const options = [
     },
     {
         id: 'cheese',
+        producerId: 'dairy',
         name: 'Cheese',
         unit: 'kg',
         price: '20.00',

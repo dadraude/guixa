@@ -41,6 +41,8 @@ final class AddUnorderedProduct
 
             $product = $loaded->catalog[$productId] ?? throw ProductNotOrderable::withId($productId);
 
+            $this->loader->lockWeekly($productId) ?? throw ProductNotOrderable::withId($productId);
+
             if (! $product->variable && ! $total->isWhole()) {
                 throw FractionalQuantityNotAllowed::forUnit($product->name, $total->toString());
             }

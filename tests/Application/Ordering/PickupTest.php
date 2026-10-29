@@ -263,6 +263,16 @@ it('does not flag a line as adjusted when the delivered quantity is typed back t
 
 // R20, S17 — stock lines
 
+it('locks the Catalog stock product before adding it to a pickup (R1b, S76)', function () {
+    ($this->settle)();
+    $honey = $this->world->stockProduct('Honey', 600, '5');
+    $this->world->stockProducts->locked = [];
+
+    ($this->world->addStockToPickup)($this->world->manager, $this->cycleId, PICKUP_A, $honey, '2');
+
+    expect($this->world->stockProducts->locked)->toContain($honey);
+});
+
 it('adds stock to a pickup with a snapshot of the product, and the total includes it (R20, S16)', function () {
     ($this->settle)();
     $honey = $this->world->stockProduct('Honey', 600, '5');
@@ -303,7 +313,7 @@ it('adds to the quantity of a stock product already on the pickup, checks the co
     $add = fn (string $quantity) => ($this->world->addStockToPickup)($this->world->manager, $this->cycleId, PICKUP_A, $honey, $quantity);
 
     $add('2');
-    $this->world->stockProducts->get($honey)->change('Honey', 'jar', Money::ofCents(900), false, null);
+    $this->world->stockProducts->change($honey, 'Honey', 'jar', Money::ofCents(900), false, null);
     $add('2');
     $line = ($this->pickup)()->stockLines;
 
@@ -498,7 +508,7 @@ it('keeps the containers per unit and the price of a stock line after the produc
     $cheese = $this->world->stockProduct('Cheese', 204, '5', variable: true, unit: 'kg', containersPerUnit: '2');
 
     ($this->world->addStockToPickup)($this->world->manager, $this->cycleId, PICKUP_A, $cheese, '0.125');
-    $this->world->stockProducts->get($cheese)->change('Cheese', 'kg', Money::ofCents(999), true, '5');
+    $this->world->stockProducts->change($cheese, 'Cheese', 'kg', Money::ofCents(999), true, '5');
     ($this->world->addStockToPickup)($this->world->manager, $this->cycleId, PICKUP_A, $cheese, '0.125');
 
     $stored = $this->world->orders->ofHousehold($this->cycleId, PICKUP_A)->stockLines()[0];

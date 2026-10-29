@@ -10,11 +10,24 @@ use Illuminate\Support\Str;
 
 final class FakeProductCatalog implements ProductCatalog
 {
+    /** @var list<string> */
+    public array $locked = [];
+
+    public function lockWeekly(string $productId): ?OrderableProduct
+    {
+        $this->locked[] = $productId;
+
+        return $this->orderable[$productId] ?? $this->deactivated[$productId] ?? null;
+    }
+
     /** @var array<string, OrderableProduct> */
     private array $orderable = [];
 
     /** @var array<string, OrderableProduct> */
     private array $deactivated = [];
+
+    /** @var array<string, OrderableProduct> Catalog stock records, excluded from weekly operations. */
+    private array $stock = [];
 
     /** @return string the new product's id */
     public function offer(string $producerId, string $name, string $unit, int $priceCents, bool $variable, ?string $containersPerUnit = null): string
@@ -24,6 +37,14 @@ final class FakeProductCatalog implements ProductCatalog
             $id, $producerId, $name, $unit, Money::ofCents($priceCents), $variable,
             $containersPerUnit === null ? null : Quantity::fromString($containersPerUnit),
         );
+
+        return $id;
+    }
+
+    public function offerStock(string $producerId, string $name, string $unit, int $priceCents): string
+    {
+        $id = (string) Str::uuid7();
+        $this->stock[$id] = new OrderableProduct($id, $producerId, $name, $unit, Money::ofCents($priceCents), false, null);
 
         return $id;
     }
