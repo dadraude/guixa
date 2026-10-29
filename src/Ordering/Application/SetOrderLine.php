@@ -42,6 +42,7 @@ final class SetOrderLine
             if ($ordered->isZero()) {
                 $order->removeLine($productId, $cycle, $now);
             } else {
+                $this->catalog->lockWeekly($productId) ?? throw ProductNotOrderable::withId($productId);
                 $product = $this->catalog->orderable($productId) ?? throw ProductNotOrderable::withId($productId);
 
                 if (in_array($productId, $this->availability->unavailableIn($cycleId), true)) {

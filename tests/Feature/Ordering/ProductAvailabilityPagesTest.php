@@ -2,6 +2,7 @@
 
 use App\Models\User;
 use Guixa\Catalog\Infrastructure\Persistence\ProducerModel;
+use Guixa\Catalog\Infrastructure\Persistence\ProductModel;
 use Guixa\Shared\Domain\Role;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -42,6 +43,22 @@ it('marks an own product unavailable in a cycle and available again (R3c, S48)',
 
     $this->actingAs($account)->put($uri, ['available' => true])->assertRedirect();
     expect(DB::table('product_unavailabilities')->count())->toBe(0);
+});
+
+it('rejects a stock Catalog ID of the same producer for cycle availability (R3c, S66)', function () {
+    [$account, $cycleId, $weeklyId] = availabilityFixture();
+    $producerId = DB::table('products')->where('id', $weeklyId)->value('producer_id');
+    $stock = ProductModel::query()->create([
+        'producer_id' => $producerId, 'stock' => true, 'name' => 'Stock jam', 'unit' => 'jar',
+        'price_cents' => 450, 'variable' => false, 'active' => true,
+    ]);
+
+    $this->actingAs($account)->put("/producer/cycles/{$cycleId}/products/{$stock->id}/availability", ['available' => false])
+        ->assertSessionHasErrors('domain');
+    expect(DB::table('product_unavailabilities')->count())->toBe(0);
+
+    $this->actingAs($account)->put("/producer/cycles/{$cycleId}/products/{$weeklyId}/availability", ['available' => false])->assertRedirect();
+    expect(DB::table('product_unavailabilities')->pluck('product_id')->all())->toBe([$weeklyId]);
 });
 
 it('validates that availability is given (R3c)', function () {

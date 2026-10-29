@@ -6,6 +6,7 @@ use Guixa\Catalog\Domain\Error\ProductNotFound;
 use Guixa\Catalog\Domain\ProducerCycles;
 use Guixa\Catalog\Domain\ProductRepository;
 use Guixa\Shared\Application\Actor;
+use Guixa\Shared\Domain\Error\NotAllowed;
 use Guixa\Shared\Domain\Money;
 
 final class UpdateProduct
@@ -26,6 +27,10 @@ final class UpdateProduct
     ): void {
         $product = $this->products->get($id) ?? throw ProductNotFound::withId($id);
         $actor->assertProducerOf($product->producerId);
+
+        if ($product->isStock()) {
+            throw NotAllowed::notYours('stock product');
+        }
 
         $product->change($name, $unit, Money::ofCents($priceCents), $variable, $containersPerUnit, $this->cycles->hasUnsettledLines($id));
         $this->products->add($product);

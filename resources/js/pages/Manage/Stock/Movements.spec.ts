@@ -22,6 +22,7 @@ describe('stock adjustment cycle selection', () => {
             props: {
                 product: {
                     id: 'honey',
+                    producerId: 'beekeeper',
                     name: 'Honey',
                     unit: 'jar',
                     price: '6.50',

@@ -3,16 +3,18 @@
 namespace App\Http\Controllers\Manage;
 
 use App\Http\Controllers\Controller;
+use App\Http\ProducerRow;
 use App\Http\Requests\Manage\StockProductRequest;
 use App\Http\StockLevelRow;
 use App\Http\StockProductRow;
+use Guixa\Catalog\Application\CreateStockProduct;
+use Guixa\Catalog\Application\DeactivateStockProduct;
+use Guixa\Catalog\Application\GetProducer;
+use Guixa\Catalog\Application\ListStockProducts;
+use Guixa\Catalog\Application\ReactivateStockProduct;
+use Guixa\Catalog\Application\UpdateStockProduct;
 use Guixa\Shared\Application\Actor;
-use Guixa\Stock\Application\CreateStockProduct;
-use Guixa\Stock\Application\DeactivateStockProduct;
 use Guixa\Stock\Application\ListStock;
-use Guixa\Stock\Application\ListStockProducts;
-use Guixa\Stock\Application\ReactivateStockProduct;
-use Guixa\Stock\Application\UpdateStockProduct;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -26,15 +28,19 @@ class StockProductController extends Controller
         ]);
     }
 
-    public function create(): Response
+    public function create(string $producer, GetProducer $getProducer): Response
     {
-        return Inertia::render('Manage/Stock/Create');
+        $record = $getProducer($producer);
+        abort_if($record === null, 404);
+
+        return Inertia::render('Manage/Stock/Create', ['producer' => ProducerRow::from($record, null)]);
     }
 
-    public function store(StockProductRequest $request, Actor $actor, CreateStockProduct $create): RedirectResponse
+    public function store(string $producer, StockProductRequest $request, Actor $actor, CreateStockProduct $create): RedirectResponse
     {
         $create(
             $actor,
+            $producer,
             $request->string('name')->toString(),
             $request->string('unit')->toString(),
             $request->priceCents(),
@@ -45,18 +51,19 @@ class StockProductController extends Controller
         return to_route('manage.stock.index');
     }
 
-    public function edit(string $stockProduct, Actor $actor, ListStockProducts $list): Response
+    public function edit(string $producer, string $stockProduct, ListStockProducts $list): Response
     {
-        $product = collect($list($actor))->firstWhere('id', $stockProduct);
-        abort_if($product === null, 404);
+        $product = collect($list())->firstWhere('id', $stockProduct);
+        abort_if($product === null || $product->producerId !== $producer, 404);
 
         return Inertia::render('Manage/Stock/Edit', ['product' => StockProductRow::from($product)]);
     }
 
-    public function update(string $stockProduct, StockProductRequest $request, Actor $actor, UpdateStockProduct $update): RedirectResponse
+    public function update(string $producer, string $stockProduct, StockProductRequest $request, Actor $actor, UpdateStockProduct $update): RedirectResponse
     {
         $update(
             $actor,
+            $producer,
             $stockProduct,
             $request->string('name')->toString(),
             $request->string('unit')->toString(),
@@ -68,16 +75,16 @@ class StockProductController extends Controller
         return to_route('manage.stock.index');
     }
 
-    public function destroy(string $stockProduct, Actor $actor, DeactivateStockProduct $deactivate): RedirectResponse
+    public function destroy(string $producer, string $stockProduct, Actor $actor, DeactivateStockProduct $deactivate): RedirectResponse
     {
-        $deactivate($actor, $stockProduct);
+        $deactivate($actor, $producer, $stockProduct);
 
         return to_route('manage.stock.index');
     }
 
-    public function reactivate(string $stockProduct, Actor $actor, ReactivateStockProduct $reactivate): RedirectResponse
+    public function reactivate(string $producer, string $stockProduct, Actor $actor, ReactivateStockProduct $reactivate): RedirectResponse
     {
-        $reactivate($actor, $stockProduct);
+        $reactivate($actor, $producer, $stockProduct);
 
         return to_route('manage.stock.index');
     }

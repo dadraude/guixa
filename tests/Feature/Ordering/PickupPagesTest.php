@@ -134,7 +134,7 @@ it('shows a member the pickup of their household once the cycle is settled, with
 function stockAndReturnFixture(string $available = '5'): array
 {
     $honey = (string) Str::uuid7();
-    DB::table('stock_products')->insert(['id' => $honey, 'name' => 'Honey', 'unit' => 'jar', 'price_cents' => 600, 'variable' => false, 'active' => true]);
+    DB::table('products')->insert(['id' => $honey, 'producer_id' => DB::table('producers')->value('id'), 'stock' => true, 'name' => 'Honey', 'unit' => 'jar', 'price_cents' => 600, 'variable' => false, 'active' => true]);
     DB::table('stock_movements')->insert([
         'id' => (string) Str::uuid7(), 'stock_product_id' => $honey, 'type' => 'entry', 'quantity' => $available,
         'occurred_at' => now(), 'recorded_by' => (string) Str::uuid7(),
@@ -202,7 +202,7 @@ it('keeps stock and return line changes to managers (R20, R20a)', function () {
 it('shows the stock and return lines with the products and items a manager can add (R20, R20a)', function () {
     [$cycleId, , $households, $manager] = pickupFixture();
     [$honey, $jar] = stockAndReturnFixture();
-    DB::table('stock_products')->insert(['id' => (string) Str::uuid7(), 'name' => 'Old honey', 'unit' => 'jar', 'price_cents' => 100, 'variable' => false, 'active' => false]);
+    DB::table('products')->insert(['id' => (string) Str::uuid7(), 'producer_id' => DB::table('producers')->value('id'), 'stock' => true, 'name' => 'Old honey', 'unit' => 'jar', 'price_cents' => 100, 'variable' => false, 'active' => false]);
     $base = "/manage/cycles/{$cycleId}/pickups/{$households['A']}";
     $this->actingAs($manager)->post("{$base}/stock-lines", ['stock_product_id' => $honey, 'stock_quantity' => '2']);
     $this->actingAs($manager)->post("{$base}/return-lines", ['return_item_id' => $jar, 'return_quantity' => '4']);

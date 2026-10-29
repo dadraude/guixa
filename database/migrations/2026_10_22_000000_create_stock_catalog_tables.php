@@ -9,19 +9,6 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('stock_products', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->string('name');
-            $table->string('unit');
-            $table->integer('price_cents');
-            $table->boolean('variable');
-            $table->decimal('containers_per_unit', 10, 3)->nullable();
-            $table->boolean('active')->default(true);
-        });
-
-        DB::statement('ALTER TABLE stock_products ADD CONSTRAINT stock_products_price_not_negative CHECK (price_cents >= 0)');
-        DB::statement('ALTER TABLE stock_products ADD CONSTRAINT stock_products_containers_per_unit_positive CHECK (containers_per_unit > 0)');
-
         Schema::create('return_items', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('name');
@@ -35,6 +22,5 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('return_items');
-        Schema::dropIfExists('stock_products');
     }
 };

@@ -31,6 +31,7 @@ final class ListStock
                 $product->containersPerUnit()?->toString(),
                 $product->isActive(),
                 ($available[$product->id] ?? SignedQuantity::ofThousandths(0))->toString(),
+                $product->producerId,
             ),
             $this->products->list(),
         );

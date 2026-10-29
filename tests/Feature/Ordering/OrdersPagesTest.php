@@ -1,6 +1,7 @@
 <?php
 
 use Carbon\CarbonImmutable;
+use Guixa\Catalog\Infrastructure\Persistence\ProductModel;
 use Guixa\Shared\Domain\Role;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -36,6 +37,26 @@ it('shows the order with what each participating producer offers (R3, R7, S4)', 
             ->where('order.lines.0.name', 'Loaf')
             ->where('order.lines.0.price', '3.50')
             ->where('order.lines.0.quantity', '2.000'));
+});
+
+it('excludes and rejects a same-producer stock Catalog ID from the weekly order (R3, S66)', function () {
+    [$cycleId, $baker, $loaf] = cycleWithBaker();
+    $stock = ProductModel::query()->create([
+        'producer_id' => $baker->id, 'stock' => true, 'name' => 'Stock loaf', 'unit' => 'loaf',
+        'price_cents' => 350, 'variable' => false, 'active' => true,
+    ]);
+    $member = accountWith(Role::Member);
+    $this->actingAs($member)->get("/cycles/{$cycleId}/order")
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('order.producers.0.products.0.id', $loaf)
+            ->has('order.producers.0.products', 1));
+
+    $this->actingAs($member)->put("/cycles/{$cycleId}/order/lines/{$stock->id}", ['quantity' => '1'])
+        ->assertSessionHasErrors('domain');
+    expect(DB::table('order_lines')->where('product_id', $stock->id)->count())->toBe(0);
+
+    $this->actingAs($member)->put("/cycles/{$cycleId}/order/lines/{$loaf}", ['quantity' => '1'])->assertRedirect();
+    expect(DB::table('order_lines')->pluck('product_id')->all())->toBe([$loaf]);
 });
 
 it('lets another member of the household see and change the same order (R7, S4)', function () {

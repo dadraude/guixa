@@ -12,7 +12,7 @@ return new class extends Migration
         Schema::create('order_stock_lines', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignUuid('order_id')->constrained('orders')->cascadeOnDelete();
-            $table->foreignUuid('stock_product_id')->constrained('stock_products');
+            $table->foreignUuid('stock_product_id')->constrained('products');
             $table->string('name');
             $table->string('unit');
             $table->integer('unit_price_cents');

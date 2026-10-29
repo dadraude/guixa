@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { Form, Head } from '@inertiajs/vue3';
+import { Form, Head, Link } from '@inertiajs/vue3';
 import { trans } from 'laravel-vue-i18n';
 import ProducerAccountController from '@/actions/App/Http/Controllers/Manage/ProducerAccountController';
 import ProducerController from '@/actions/App/Http/Controllers/Manage/ProducerController';
+import StockProductController from '@/actions/App/Http/Controllers/Manage/StockProductController';
 import Heading from '@/components/Heading.vue';
 import InputError from '@/components/InputError.vue';
 import StatusIndicator from '@/components/StatusIndicator.vue';
@@ -121,6 +122,19 @@ const daysLabel = (days: number) =>
                         }}
                     </span>
                 </div>
+
+                <Button as-child variant="outline" class="min-h-11 self-start">
+                    <Link
+                        :href="StockProductController.create(producer.id)"
+                        :aria-label="
+                            trans('Add stock product for :name', {
+                                name: producer.name,
+                            })
+                        "
+                    >
+                        {{ trans('Add stock product') }}
+                    </Link>
+                </Button>
 
                 <p
                     v-if="producer.accountEmail !== null"

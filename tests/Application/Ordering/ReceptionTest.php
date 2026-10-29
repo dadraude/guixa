@@ -75,6 +75,60 @@ beforeEach(function () {
 
 // R14 — opening the reception
 
+it('locks the Catalog product before adding an unordered reception reference (R1b, S77)', function () {
+    ($this->send)();
+    ($this->addUnordered)($this->rye, '1');
+
+    expect($this->world->catalog->locked)->toContain($this->rye);
+});
+
+it('locks the Catalog product before recording a received total (R1b, S77)', function () {
+    ($this->orderBreadLikeS10)();
+    $this->world->catalog->locked = [];
+
+    ($this->setReceived)($this->bread, '20');
+
+    expect($this->world->catalog->locked)->toContain($this->bread);
+});
+
+it('locks the Catalog product before allocating a new reception line (R1b, S77)', function () {
+    ($this->orderBreadLikeS10)();
+    $this->world->catalog->locked = [];
+
+    ($this->allocate)($this->bread, 'D', '1');
+
+    expect($this->world->catalog->locked)->toContain($this->bread);
+});
+
+it('rejects an unordered stock ID of the sent producer without a received total (R14, S77)', function () {
+    ($this->send)();
+    $stockId = $this->world->catalog->offerStock(OrderingWorld::BAKER, 'Stock honey', 'jar', 650);
+
+    expect(fn () => ($this->addUnordered)($stockId, '1'))->toThrow(ProductNotOrderable::class)
+        ->and($this->world->receivedTotals->ofProducer($this->cycleId, OrderingWorld::BAKER))->toBe([])
+        ->and(collect(($this->reception)()->unorderedOptions)->pluck('productId')->all())->not->toContain($stockId);
+});
+
+it('rejects a received total for a stock ID of the sent producer without altering reception (R15, S77)', function () {
+    ($this->orderBreadLikeS10)();
+    $stockId = $this->world->catalog->offerStock(OrderingWorld::BAKER, 'Stock honey', 'jar', 650);
+    $before = $this->world->receivedTotals->ofProducer($this->cycleId, OrderingWorld::BAKER);
+
+    expect(fn () => ($this->setReceived)($stockId, '1'))->toThrow(ProductNotInReception::class)
+        ->and($this->world->receivedTotals->ofProducer($this->cycleId, OrderingWorld::BAKER))->toBe($before)
+        ->and(($this->product)($stockId))->toBeNull();
+});
+
+it('rejects allocation of a stock ID to an active household without creating an order line (R16, S77)', function () {
+    ($this->orderBreadLikeS10)();
+    $stockId = $this->world->catalog->offerStock(OrderingWorld::BAKER, 'Stock honey', 'jar', 650);
+    $before = $this->world->orders->ofCycle($this->cycleId);
+
+    expect(fn () => ($this->allocate)($stockId, 'D', '1'))->toThrow(ProductNotInReception::class)
+        ->and($this->world->orders->ofCycle($this->cycleId))->toEqual($before)
+        ->and(($this->product)($stockId))->toBeNull();
+});
+
 it('shows the ordered total, a received total equal to it and each household allocated what it ordered (R14, R17)', function () {
     ($this->orderBreadLikeS10)();
 

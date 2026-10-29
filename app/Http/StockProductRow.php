@@ -2,7 +2,7 @@
 
 namespace App\Http;
 
-use Guixa\Stock\Application\StockProductData;
+use Guixa\Catalog\Application\StockProductData;
 use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 
 /** A stock product as the manage pages show it; the price is in euros, like the form field. */
@@ -11,6 +11,7 @@ final readonly class StockProductRow
 {
     public function __construct(
         public string $id,
+        public string $producerId,
         public string $name,
         public string $unit,
         public string $price,
@@ -23,6 +24,7 @@ final readonly class StockProductRow
     {
         return new self(
             $product->id,
+            $product->producerId,
             $product->name,
             $product->unit,
             EuroAmount::format($product->priceCents),

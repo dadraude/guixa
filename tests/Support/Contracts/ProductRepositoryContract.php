@@ -5,6 +5,7 @@ namespace Tests\Support\Contracts;
 use Guixa\Catalog\Domain\Product;
 use Guixa\Catalog\Domain\ProductRepository;
 use Guixa\Shared\Domain\Money;
+use LogicException;
 use PHPUnit\Framework\Attributes\Test;
 
 /** Behaviour every ProductRepository promises; see ProbeNoteRepositoryContract for how it is shared. */
@@ -119,5 +120,57 @@ trait ProductRepositoryContract
 
         $this->assertSame(['apple pie', 'Bread', 'Rye'], $names);
         $this->assertSame([], $repository->listByProducer($this->newProducerId()));
+    }
+
+    #[Test]
+    public function it_keeps_stock_and_weekly_variants_as_distinct_catalog_ids_with_one_producer(): void
+    {
+        $repository = $this->repository();
+        $producerId = $this->newProducerId();
+        $weekly = $this->product($repository, $producerId, 'Honey');
+        $stock = Product::create($repository->nextId(), $producerId, 'Honey', 'jar', Money::ofCents(650), false, '2.000', stock: true);
+        $repository->add($weekly);
+        $repository->add($stock);
+
+        $this->assertNotSame($weekly->id, $stock->id);
+        $this->assertSame($producerId, $repository->get($stock->id)?->producerId);
+        $this->assertFalse($repository->get($weekly->id)?->isStock());
+        $this->assertTrue($repository->get($stock->id)?->isStock());
+        $this->assertSame('jar', $repository->getForUpdate($stock->id)?->unit());
+        $this->assertSame([$stock->id], array_map(fn (Product $item) => $item->id, $repository->listStock()));
+    }
+
+    #[Test]
+    public function it_lists_stock_only_by_name_across_producers(): void
+    {
+        $repository = $this->repository();
+        $first = $this->newProducerId();
+        $second = $this->newProducerId();
+        $repository->add(Product::create($repository->nextId(), $first, 'Zucchini', 'kg', Money::ofCents(100), false, null, stock: true));
+        $repository->add(Product::create($repository->nextId(), $second, 'apple', 'kg', Money::ofCents(100), false, null, stock: true));
+        $repository->add($this->product($repository, $first, 'Bread'));
+
+        $this->assertSame(['apple', 'Zucchini'], array_map(fn (Product $product) => $product->name(), $repository->listStock()));
+    }
+
+    #[Test]
+    public function it_does_not_reassign_a_saved_product_to_another_producer_or_mode(): void
+    {
+        $repository = $this->repository();
+        $producerId = $this->newProducerId();
+        $otherProducerId = $this->newProducerId();
+        $original = $this->product($repository, $producerId);
+        $repository->add($original);
+
+        foreach ([[$otherProducerId, false], [$producerId, true]] as [$candidateProducerId, $stock]) {
+            try {
+                $repository->add(Product::restore($original->id, $candidateProducerId, 'Other', 'jar', Money::ofCents(600), false, null, true, $stock));
+                $this->fail('A saved product accepted a changed producer or mode.');
+            } catch (LogicException) {
+                $this->assertSame($producerId, $repository->get($original->id)?->producerId);
+                $this->assertFalse($repository->get($original->id)?->isStock());
+                $this->assertSame('Bread', $repository->get($original->id)?->name());
+            }
+        }
     }
 }

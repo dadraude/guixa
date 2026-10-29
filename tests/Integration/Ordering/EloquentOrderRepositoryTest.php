@@ -43,7 +43,7 @@ final class EloquentOrderRepositoryTest extends TestCase
         }
 
         foreach ([self::HONEY, self::CHEESE] as $id) {
-            DB::table('stock_products')->insertOrIgnore(['id' => $id, 'name' => "Stock {$id}", 'unit' => 'unit', 'price_cents' => 100, 'variable' => false, 'active' => true]);
+            DB::table('products')->insertOrIgnore(['id' => $id, 'producer_id' => self::BAKER, 'stock' => true, 'name' => "Stock {$id}", 'unit' => 'unit', 'price_cents' => 100, 'variable' => false, 'active' => true]);
         }
 
         DB::table('return_items')->insertOrIgnore(['id' => self::JAR, 'name' => 'Glass jar', 'amount_cents' => 50, 'active' => true]);

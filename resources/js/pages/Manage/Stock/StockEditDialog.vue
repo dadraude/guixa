@@ -80,12 +80,18 @@ function changeStatus() {
     };
     if (props.product.active) {
         router.delete(
-            StockProductController.destroy.url(props.product.id),
+            StockProductController.destroy.url({
+                producer: props.product.producerId,
+                stockProduct: props.product.id,
+            }),
             options,
         );
     } else {
         router.put(
-            StockProductController.reactivate.url(props.product.id),
+            StockProductController.reactivate.url({
+                producer: props.product.producerId,
+                stockProduct: props.product.id,
+            }),
             {},
             options,
         );

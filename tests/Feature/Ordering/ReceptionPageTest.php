@@ -1,6 +1,7 @@
 <?php
 
 use Guixa\Catalog\Infrastructure\Persistence\ProducerModel;
+use Guixa\Catalog\Infrastructure\Persistence\ProductModel;
 use Guixa\Shared\Domain\Role;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -53,6 +54,30 @@ it('shows the products with their totals, the households and the products that c
             ->where('reception.unorderedOptions.0.productId', $rye)
             ->where('households.2.id', $households['D'])
             ->where('households.2.name', 'Household D'));
+});
+
+it('excludes and rejects a same-producer stock Catalog ID from sent reception writes (R14-R16, S77)', function () {
+    [$cycleId, $producerId, $loaf, $rye, $households, $manager] = receptionFixture();
+    $stock = ProductModel::query()->create([
+        'producer_id' => $producerId, 'stock' => true, 'name' => 'Stock honey', 'unit' => 'jar',
+        'price_cents' => 650, 'variable' => false, 'active' => true,
+    ]);
+    $uri = "/manage/cycles/{$cycleId}/receptions/{$producerId}";
+
+    $this->actingAs($manager)->get($uri)->assertInertia(fn (Assert $page) => $page
+        ->has('reception.unorderedOptions', 1)
+        ->where('reception.unorderedOptions.0.productId', $rye));
+    $this->actingAs($manager)->post("{$uri}/products", ['product_id' => $stock->id, 'received' => '1'])
+        ->assertSessionHasErrors('domain');
+    $this->actingAs($manager)->put("{$uri}/products/{$stock->id}/received", ['received' => '1'])
+        ->assertSessionHasErrors('domain');
+    $this->actingAs($manager)->put("{$uri}/products/{$stock->id}/allocations/{$households['D']}", ['quantity' => '1'])
+        ->assertSessionHasErrors('domain');
+    expect(DB::table('received_totals')->where('product_id', $stock->id)->count())->toBe(0)
+        ->and(DB::table('order_lines')->where('product_id', $stock->id)->count())->toBe(0);
+
+    $this->actingAs($manager)->post("{$uri}/products", ['product_id' => $rye, 'received' => '1'])->assertRedirect();
+    expect(DB::table('received_totals')->where('product_id', $rye)->count())->toBe(1);
 });
 
 it('answers 404 for an unknown cycle, a producer not in it or an order that is not sent (R14)', function () {

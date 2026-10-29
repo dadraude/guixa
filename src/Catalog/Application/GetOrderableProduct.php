@@ -20,7 +20,7 @@ final class GetOrderableProduct
     {
         $product = $this->products->get($productId);
 
-        if ($product === null || ! $product->isActive()) {
+        if ($product === null || $product->isStock() || ! $product->isActive()) {
             return null;
         }
 

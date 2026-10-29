@@ -43,6 +43,7 @@ final class SetAllocation
             $loaded = $this->loader->load($cycle, $producerId);
 
             $product = $loaded->reception->product($productId) ?? throw ProductNotInReception::withId($productId);
+            $this->loader->lockWeekly($productId) ?? throw ProductNotInReception::withId($productId);
             $product->assertInStep($allocated);
 
             $household = $this->households->find([$householdId])[$householdId] ?? throw HouseholdNotFound::withId($householdId);

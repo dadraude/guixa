@@ -5,6 +5,7 @@ namespace Guixa\Ordering\Infrastructure\Catalog;
 use Guixa\Catalog\Application\GetOrderableProduct;
 use Guixa\Catalog\Application\ListOrderableProducts;
 use Guixa\Catalog\Application\ListProducerProductsForReception;
+use Guixa\Catalog\Application\LockWeeklyProduct;
 use Guixa\Catalog\Application\OrderableProductData;
 use Guixa\Ordering\Domain\ProductCatalog;
 use Guixa\Ordering\Domain\ValueObject\OrderableProduct;
@@ -18,7 +19,15 @@ final class CatalogProductCatalog implements ProductCatalog
         private readonly GetOrderableProduct $getOrderableProduct,
         private readonly ListOrderableProducts $listOrderableProducts,
         private readonly ListProducerProductsForReception $listProducerProductsForReception,
+        private readonly LockWeeklyProduct $lockWeeklyProduct,
     ) {}
+
+    public function lockWeekly(string $productId): ?OrderableProduct
+    {
+        $product = ($this->lockWeeklyProduct)($productId);
+
+        return $product === null ? null : $this->translate($product);
+    }
 
     public function orderable(string $productId): ?OrderableProduct
     {

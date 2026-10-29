@@ -1,33 +1,114 @@
 <?php
 
+use Guixa\Catalog\Infrastructure\Persistence\ProducerModel;
+use Guixa\Catalog\Infrastructure\Persistence\ProductModel;
 use Guixa\Shared\Domain\Role;
-use Guixa\Stock\Infrastructure\Persistence\StockProductModel;
 use Illuminate\Support\Facades\DB;
 use Inertia\Testing\AssertableInertia as Assert;
 
-function honey(array $overrides = []): StockProductModel
+function stockProducer(): ProducerModel
 {
-    return StockProductModel::query()->create([
+    return ProducerModel::query()->create(['name' => 'Beekeeper', 'active' => true, 'cutoff_days_before' => 3, 'cutoff_time' => '20:00']);
+}
+
+function honey(array $overrides = []): ProductModel
+{
+    return ProductModel::query()->create([
+        'producer_id' => stockProducer()->id, 'stock' => true,
         'name' => 'Honey', 'unit' => 'jar', 'price_cents' => 650, 'variable' => false,
         'containers_per_unit' => '2.000', 'active' => true, ...$overrides,
     ]);
 }
 
+function stockCreatePath(): string
+{
+    return '/manage/producers/'.stockProducer()->id.'/products';
+}
+
+function stockProductPath(ProductModel $product): string
+{
+    return "/manage/producers/{$product->producer_id}/products/{$product->id}";
+}
+
+it('records inventory against the same Catalog product created for a producer (R1a, R26, S71)', function () {
+    $producer = ProducerModel::query()->create(['name' => 'Beekeeper', 'active' => true, 'cutoff_days_before' => 3, 'cutoff_time' => '20:00']);
+    $product = ProductModel::query()->create([
+        'producer_id' => $producer->id, 'name' => 'Honey', 'unit' => 'jar', 'price_cents' => 650,
+        'variable' => false, 'active' => true, 'stock' => true,
+    ]);
+
+    $this->actingAs(accountWith(Role::Manager))
+        ->post("/manage/stock/{$product->id}/entries", ['quantity' => '5'])
+        ->assertRedirect("/manage/stock/{$product->id}/movements");
+
+    expect(DB::table('stock_movements')->where('stock_product_id', $product->id)->count())->toBe(1);
+});
+
+it('rejects weekly Catalog IDs at inventory entry and adjustment without movements (R26, R27, S76)', function () {
+    $product = ProductModel::query()->create([
+        'producer_id' => stockProducer()->id, 'name' => 'Weekly oil', 'unit' => 'bottle',
+        'price_cents' => 650, 'variable' => false, 'active' => true, 'stock' => false,
+    ]);
+    $manager = accountWith(Role::Manager);
+
+    $this->actingAs($manager)->from('/manage/stock')->post("/manage/stock/{$product->id}/entries", ['quantity' => '5'])
+        ->assertSessionHasErrors('domain');
+    $this->actingAs($manager)->from('/manage/stock')->post("/manage/stock/{$product->id}/adjustments", ['quantity' => '1', 'note' => 'count'])
+        ->assertSessionHasErrors('domain');
+    expect(DB::table('stock_movements')->count())->toBe(0);
+});
+
+it('creates stock from the producer record and shows that Catalog ID in stock administration (S65, S71)', function () {
+    $producer = ProducerModel::query()->create(['name' => 'Beekeeper', 'active' => true, 'cutoff_days_before' => 3, 'cutoff_time' => '20:00']);
+    $other = ProducerModel::query()->create(['name' => 'Oil producer', 'active' => true, 'cutoff_days_before' => 3, 'cutoff_time' => '20:00']);
+    $manager = accountWith(Role::Manager);
+
+    $this->actingAs($manager)->get("/manage/producers/{$producer->id}/products/create")
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page->component('Manage/Stock/Create')
+            ->where('producer.id', $producer->id)->where('producer.name', 'Beekeeper'));
+    $this->actingAs($manager)->post("/manage/producers/{$producer->id}/products", [
+        'producer_id' => $other->id, 'name' => 'Honey', 'unit' => 'jar', 'price' => '6.50', 'variable' => false,
+    ])->assertRedirect('/manage/stock');
+
+    $product = ProductModel::query()->where('name', 'Honey')->firstOrFail();
+    expect($product->producer_id)->toBe($producer->id)->and($product->stock)->toBeTrue();
+    $this->actingAs($manager)->get('/manage/stock')->assertInertia(fn (Assert $page) => $page
+        ->component('Manage/Stock/Index')->where('products.0.id', $product->id));
+});
+
+it('edits stock only through its supplying producer context (R1a, S65, S71)', function () {
+    $product = honey();
+    $other = stockProducer();
+    $manager = accountWith(Role::Manager);
+    $own = "/manage/producers/{$product->producer_id}/products/{$product->id}";
+    $wrong = "/manage/producers/{$other->id}/products/{$product->id}";
+
+    $this->actingAs($manager)->get($own.'/edit')->assertOk();
+    $this->actingAs($manager)->get($wrong.'/edit')->assertNotFound();
+    $this->actingAs($manager)->from($wrong.'/edit')
+        ->put($wrong, ['name' => 'Moved', 'unit' => 'jar', 'price' => '6.50', 'variable' => false])
+        ->assertRedirect($wrong.'/edit')->assertSessionHasErrors('domain');
+    expect($product->refresh()->producer_id)->toBe($product->producer_id)
+        ->and($product->name)->toBe('Honey');
+});
+
 it('keeps the stock pages to managers', function (string $method, string $uri) {
     $product = honey();
     $uri = str_replace('{id}', $product->id, $uri);
+    $uri = str_replace('{producer}', $product->producer_id, $uri);
 
     $this->{$method}($uri)->assertRedirect(route('login'));
     $this->actingAs(accountWith(Role::Member, Role::Producer))->{$method}($uri)->assertForbidden();
 })->with([
     ['get', '/manage/stock'],
-    ['get', '/manage/stock/create'],
-    ['post', '/manage/stock'],
-    ['get', '/manage/stock/{id}/edit'],
-    ['put', '/manage/stock/{id}'],
-    ['delete', '/manage/stock/{id}'],
+    ['get', '/manage/producers/{producer}/products/create'],
+    ['post', '/manage/producers/{producer}/products'],
+    ['get', '/manage/producers/{producer}/products/{id}/edit'],
+    ['put', '/manage/producers/{producer}/products/{id}'],
+    ['delete', '/manage/producers/{producer}/products/{id}'],
     ['put', '/manage/stock/{id}/available'],
-    ['put', '/manage/stock/{id}/reactivation'],
+    ['put', '/manage/producers/{producer}/products/{id}/reactivation'],
 ]);
 
 it('lists the stock products with their price as a decimal string (R25)', function () {
@@ -45,12 +126,12 @@ it('lists the stock products with their price as a decimal string (R25)', functi
 
 it('creates a stock product from euros and redirects to the list (R25)', function () {
     $this->actingAs(accountWith(Role::Manager))
-        ->post('/manage/stock', [
+        ->post(stockCreatePath(), [
             'name' => 'Honey', 'unit' => 'jar', 'price' => '6.50', 'variable' => false, 'containers_per_unit' => '2',
         ])
         ->assertRedirect('/manage/stock');
 
-    $product = StockProductModel::query()->firstOrFail();
+    $product = ProductModel::query()->firstOrFail();
     expect($product->price_cents)->toBe(650)
         ->and($product->containers_per_unit)->toBe('2.000')
         ->and($product->active)->toBeTrue();
@@ -58,36 +139,38 @@ it('creates a stock product from euros and redirects to the list (R25)', functio
 
 it('accepts a comma as the decimal separator and a free price', function () {
     $this->actingAs(accountWith(Role::Manager))
-        ->post('/manage/stock', ['name' => 'Sample', 'unit' => 'piece', 'price' => '0', 'variable' => true])
+        ->post(stockCreatePath(), ['name' => 'Sample', 'unit' => 'piece', 'price' => '0', 'variable' => true])
         ->assertRedirect('/manage/stock');
     $this->actingAs(accountWith(Role::Manager))
-        ->post('/manage/stock', ['name' => 'Oil', 'unit' => 'l', 'price' => '9,5', 'variable' => true])
+        ->post(stockCreatePath(), ['name' => 'Oil', 'unit' => 'l', 'price' => '9,5', 'variable' => true])
         ->assertRedirect('/manage/stock');
 
-    expect(StockProductModel::query()->orderBy('name')->pluck('price_cents')->all())->toBe([950, 0]);
+    expect(ProductModel::query()->orderBy('name')->pluck('price_cents')->all())->toBe([950, 0]);
 });
 
 it('shows the domain error when the price is negative (R25)', function () {
+    $createPath = stockCreatePath();
     $this->actingAs(accountWith(Role::Manager))
-        ->from('/manage/stock/create')
-        ->post('/manage/stock', ['name' => 'Honey', 'unit' => 'jar', 'price' => '-1.00', 'variable' => false])
-        ->assertRedirect('/manage/stock/create')
+        ->from($createPath.'/create')
+        ->post($createPath, ['name' => 'Honey', 'unit' => 'jar', 'price' => '-1.00', 'variable' => false])
+        ->assertRedirect($createPath.'/create')
         ->assertSessionHasErrors('domain');
 
-    expect(StockProductModel::query()->count())->toBe(0);
+    expect(ProductModel::query()->count())->toBe(0);
 });
 
 it('rejects a malformed price before reaching the use case', function () {
+    $createPath = stockCreatePath();
     $this->actingAs(accountWith(Role::Manager))
-        ->from('/manage/stock/create')
-        ->post('/manage/stock', ['name' => 'Honey', 'unit' => 'jar', 'price' => 'abc', 'variable' => false])
+        ->from($createPath.'/create')
+        ->post($createPath, ['name' => 'Honey', 'unit' => 'jar', 'price' => 'abc', 'variable' => false])
         ->assertSessionHasErrors('price');
 });
 
 it('shows the edit form of a stock product', function () {
     $product = honey();
 
-    $this->actingAs(accountWith(Role::Manager))->get("/manage/stock/{$product->id}/edit")
+    $this->actingAs(accountWith(Role::Manager))->get(stockProductPath($product).'/edit')
         ->assertInertia(fn (Assert $page) => $page
             ->component('Manage/Stock/Edit')
             ->where('product.id', $product->id)
@@ -104,7 +187,7 @@ it('updates a stock product (R25)', function () {
     $product = honey();
 
     $this->actingAs(accountWith(Role::Manager))
-        ->put("/manage/stock/{$product->id}", [
+        ->put(stockProductPath($product), [
             'name' => 'Wild honey', 'unit' => 'kg', 'price' => '12', 'variable' => true, 'containers_per_unit' => null,
         ])
         ->assertRedirect('/manage/stock');
@@ -119,7 +202,7 @@ it('updates a stock product (R25)', function () {
 it('deactivates a stock product (R25)', function () {
     $product = honey();
 
-    $this->actingAs(accountWith(Role::Manager))->delete("/manage/stock/{$product->id}")->assertRedirect('/manage/stock');
+    $this->actingAs(accountWith(Role::Manager))->delete(stockProductPath($product))->assertRedirect('/manage/stock');
 
     expect($product->refresh()->active)->toBeFalse();
 });
@@ -128,7 +211,7 @@ it('reactivates a stock product from the manager list', function () {
     $product = honey(['active' => false]);
 
     $this->actingAs(accountWith(Role::Manager))
-        ->put("/manage/stock/{$product->id}/reactivation")
+        ->put(stockProductPath($product).'/reactivation')
         ->assertRedirect('/manage/stock');
 
     expect($product->refresh()->active)->toBeTrue();
@@ -159,36 +242,38 @@ it('rejects an invalid absolute stock count', function () {
 });
 
 it('answers 404 to a stock product id that is not a UUID', function (string $method, string $uri) {
+    $uri = str_replace('{producer}', stockProducer()->id, $uri);
     $this->actingAs(accountWith(Role::Manager))->{$method}($uri, [
         'name' => 'Honey', 'unit' => 'jar', 'price' => '1', 'variable' => false,
     ])->assertNotFound();
 })->with([
-    ['get', '/manage/stock/not-a-uuid/edit'],
-    ['put', '/manage/stock/not-a-uuid'],
-    ['delete', '/manage/stock/not-a-uuid'],
+    ['get', '/manage/producers/{producer}/products/not-a-uuid/edit'],
+    ['put', '/manage/producers/{producer}/products/not-a-uuid'],
+    ['delete', '/manage/producers/{producer}/products/not-a-uuid'],
     ['put', '/manage/stock/not-a-uuid/available'],
-    ['put', '/manage/stock/not-a-uuid/reactivation'],
+    ['put', '/manage/producers/{producer}/products/not-a-uuid/reactivation'],
 ]);
 
 it('accepts a comma as the decimal separator of containers per unit', function () {
     $this->actingAs(accountWith(Role::Manager))
-        ->post('/manage/stock', [
+        ->post(stockCreatePath(), [
             'name' => 'Honey', 'unit' => 'jar', 'price' => '1', 'variable' => false, 'containers_per_unit' => '2,5',
         ])
         ->assertRedirect('/manage/stock');
 
-    expect(StockProductModel::query()->firstOrFail()->containers_per_unit)->toBe('2.500');
+    expect(ProductModel::query()->firstOrFail()->containers_per_unit)->toBe('2.500');
 });
 
 it('shows a malformed containers per unit under its field', function () {
+    $createPath = stockCreatePath();
     $this->actingAs(accountWith(Role::Manager))
-        ->from('/manage/stock/create')
-        ->post('/manage/stock', [
+        ->from($createPath.'/create')
+        ->post($createPath, [
             'name' => 'Honey', 'unit' => 'jar', 'price' => '1', 'variable' => false, 'containers_per_unit' => 'two',
         ])
         ->assertSessionHasErrors('containers_per_unit');
 
-    expect(StockProductModel::query()->count())->toBe(0);
+    expect(ProductModel::query()->count())->toBe(0);
 });
 
 it('keeps the stock movement pages to managers (R26, R27)', function (string $method, string $uri) {

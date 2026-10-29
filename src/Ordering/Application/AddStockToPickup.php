@@ -28,7 +28,7 @@ final class AddStockToPickup
 
         $this->transactions->run(function () use ($cycleId, $householdId, $stockProductId, $quantity) {
             $order = $this->pickups->lock($cycleId, $householdId);
-            $offer = $this->stock->offer($stockProductId) ?? throw StockProductNotFound::withId($stockProductId);
+            $offer = $this->stock->lockOffer($stockProductId) ?? throw StockProductNotFound::withId($stockProductId);
 
             $order->addStock($offer, $quantity, $this->orders->nextId());
             $this->orders->add($order);
