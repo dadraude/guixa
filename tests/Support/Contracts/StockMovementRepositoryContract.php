@@ -29,6 +29,18 @@ trait StockMovementRepositoryContract
     }
 
     #[Test]
+    public function it_recognizes_permanent_use_after_movements_net_to_zero(): void
+    {
+        $repository = $this->repository();
+        $productId = $this->stockProductId();
+        $this->assertFalse($repository->hasProductReference($productId));
+        $repository->add($this->entry($repository, $productId, '1'));
+        $repository->add(StockMovement::adjustment($repository->nextId(), $productId, SignedQuantity::fromString('-1'), new DateTimeImmutable('2026-10-22T11:00:00+00:00'), self::ACCOUNT, 'returned', null));
+        $this->assertSame('0.000', $repository->available($productId)->toString());
+        $this->assertTrue($repository->hasProductReference($productId));
+    }
+
+    #[Test]
     public function it_generates_distinct_uuid_v7_ids(): void
     {
         $repository = $this->repository();

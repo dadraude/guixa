@@ -1,14 +1,20 @@
 <?php
 
+use Guixa\Catalog\Application\ChangeProductClassification;
 use Guixa\Catalog\Application\CreateStockProduct;
 use Guixa\Catalog\Application\DeactivateStockProduct;
+use Guixa\Catalog\Application\DeleteUnusedProduct;
+use Guixa\Catalog\Application\IsProductUsed;
+use Guixa\Catalog\Application\ListProductsOfProducer;
 use Guixa\Catalog\Application\ListStockProducts;
 use Guixa\Catalog\Application\ReactivateStockProduct;
 use Guixa\Catalog\Application\UpdateStockProduct;
 use Guixa\Catalog\Domain\Error\InvalidContainersPerUnit;
 use Guixa\Catalog\Domain\Error\InvalidPrice;
 use Guixa\Catalog\Domain\Error\ProducerNotFound;
+use Guixa\Catalog\Domain\Error\ProductHasStockUse;
 use Guixa\Catalog\Domain\Error\ProductNotFound;
+use Guixa\Catalog\Domain\Error\ProductUsed;
 use Guixa\Shared\Domain\Error\NotAllowed;
 use Tests\Support\Catalog\CatalogWorld;
 
@@ -30,7 +36,7 @@ it('lets a manager administer only stock records while keeping producer identity
     $producerId = ($world->createProducer)($world->manager, 'Beekeeper', 3, '20:00');
     $weeklyId = ($world->createProduct)($world->producerActor($producerId), $producerId, 'Honey', 'jar', 500, false, null);
     $stockId = (new CreateStockProduct($world->products, $world->producers))($world->manager, $producerId, 'Honey', 'jar', 650, false, null);
-    $update = new UpdateStockProduct($world->products);
+    $update = new UpdateStockProduct($world->products, $world->usage, $world->transactions);
 
     $update($world->manager, $producerId, $stockId, 'Raw honey', 'kg', 1200, true, '2.000');
 
@@ -102,8 +108,8 @@ it('lets only a manager deactivate and reactivate stock, including an inactive p
     $producerId = ($world->createProducer)($world->manager, 'Beekeeper', 3, '20:00');
     $stockId = (new CreateStockProduct($world->products, $world->producers))($world->manager, $producerId, 'Honey', 'jar', 650, false, null);
     ($world->deactivateProducer)($world->manager, $producerId);
-    $deactivate = new DeactivateStockProduct($world->products);
-    $reactivate = new ReactivateStockProduct($world->products);
+    $deactivate = new DeactivateStockProduct($world->products, $world->transactions);
+    $reactivate = new ReactivateStockProduct($world->products, $world->transactions);
 
     $deactivate($world->manager, $producerId, $stockId);
     expect($world->products->get($stockId)->isActive())->toBeFalse()
@@ -121,4 +127,89 @@ it('rejects invalid stock price and containers without creating a product (R25)'
     expect(fn () => $create($world->manager, $producerId, 'Honey', 'jar', -1, false, null))->toThrow(InvalidPrice::class)
         ->and(fn () => $create($world->manager, $producerId, 'Honey', 'jar', 650, false, '0'))->toThrow(InvalidContainersPerUnit::class)
         ->and($world->products->listStock())->toBe([]);
+});
+
+it('lets only a manager reclassify an unused product and transfers administration (R1b, S67)', function () {
+    $world = new CatalogWorld;
+    $producerId = ($world->createProducer)($world->manager, 'Beekeeper', 3, '20:00');
+    $weeklyId = ($world->createProduct)($world->producerActor($producerId), $producerId, 'Honey', 'jar', 500, false, null);
+    $change = new ChangeProductClassification($world->products, $world->usage, $world->transactions);
+
+    expect(fn () => $change($world->producerActor($producerId), $weeklyId, true))->toThrow(NotAllowed::class);
+    $change($world->manager, $weeklyId, true);
+    expect($world->products->get($weeklyId)->isStock())->toBeTrue()
+        ->and(fn () => ($world->updateProduct)($world->producerActor($producerId), $weeklyId, 'Changed', 'jar', 500, false, null))->toThrow(NotAllowed::class);
+    $change($world->manager, $weeklyId, false);
+    expect($world->products->get($weeklyId)->isStock())->toBeFalse();
+});
+
+it('deletes only unused products through their current administrator (R1c, S70)', function () {
+    $world = new CatalogWorld;
+    $producerId = ($world->createProducer)($world->manager, 'Beekeeper', 3, '20:00');
+    $producer = $world->producerActor($producerId);
+    $weeklyId = ($world->createProduct)($producer, $producerId, 'Bread', 'loaf', 350, false, null);
+    $stockId = (new CreateStockProduct($world->products, $world->producers))($world->manager, $producerId, 'Honey', 'jar', 650, false, null);
+    $delete = new DeleteUnusedProduct($world->products, $world->usage, $world->transactions);
+
+    expect(fn () => $delete($world->manager, $weeklyId))->toThrow(NotAllowed::class)
+        ->and(fn () => $delete($producer, $stockId))->toThrow(NotAllowed::class);
+    $delete($producer, $weeklyId);
+    $delete($world->manager, $stockId);
+    expect($world->products->get($weeklyId))->toBeNull()
+        ->and($world->products->get($stockId))->toBeNull();
+});
+
+it('retained use prevents mode change and deletion but permits deactivation (R1b, R1c, S68)', function () {
+    $world = new CatalogWorld;
+    $producerId = ($world->createProducer)($world->manager, 'Beekeeper', 3, '20:00');
+    $producer = $world->producerActor($producerId);
+    $weeklyId = ($world->createProduct)($producer, $producerId, 'Bread', 'loaf', 350, false, null);
+    $world->usage->any[$weeklyId] = true;
+    $change = new ChangeProductClassification($world->products, $world->usage, $world->transactions);
+    $delete = new DeleteUnusedProduct($world->products, $world->usage, $world->transactions);
+
+    expect(fn () => $change($world->manager, $weeklyId, true))->toThrow(ProductUsed::class)
+        ->and(fn () => $delete($producer, $weeklyId))->toThrow(ProductUsed::class);
+    ($world->deactivateProduct)($producer, $weeklyId);
+    expect($world->products->get($weeklyId)->isActive())->toBeFalse();
+});
+
+it('keeps stock unit and variable flag fixed after historical stock use (R25a, S72)', function () {
+    $world = new CatalogWorld;
+    $producerId = ($world->createProducer)($world->manager, 'Beekeeper', 3, '20:00');
+    $stockId = (new CreateStockProduct($world->products, $world->producers))($world->manager, $producerId, 'Honey', 'jar', 650, false, null);
+    $world->usage->stock[$stockId] = true;
+    $update = new UpdateStockProduct($world->products, $world->usage, $world->transactions);
+
+    expect(fn () => $update($world->manager, $producerId, $stockId, 'Honey', 'kg', 650, false, null))->toThrow(ProductHasStockUse::class)
+        ->and(fn () => $update($world->manager, $producerId, $stockId, 'Honey', 'jar', 650, true, null))->toThrow(ProductHasStockUse::class);
+    $update($world->manager, $producerId, $stockId, 'Raw honey', ' jar ', 700, false, '2');
+    expect($world->products->get($stockId)->name())->toBe('Raw honey')
+        ->and($world->products->get($stockId)->unit())->toBe('jar');
+});
+
+it('shows a manager both modes and whether each product has any retained use (R1b, S67, S68)', function () {
+    $world = new CatalogWorld;
+    $producerId = ($world->createProducer)($world->manager, 'Beekeeper', 3, '20:00');
+    $weeklyId = ($world->createProduct)($world->producerActor($producerId), $producerId, 'Bread', 'loaf', 350, false, null);
+    $stockId = (new CreateStockProduct($world->products, $world->producers))($world->manager, $producerId, 'Honey', 'jar', 650, false, null);
+    $world->usage->any[$weeklyId] = true;
+    $list = new ListProductsOfProducer($world->products, $world->usage);
+
+    $rows = $list($world->manager, $producerId);
+    expect(collect($rows)->firstWhere('id', $weeklyId)->stock)->toBeFalse()
+        ->and(collect($rows)->firstWhere('id', $weeklyId)->used)->toBeTrue()
+        ->and(collect($rows)->firstWhere('id', $stockId)->stock)->toBeTrue()
+        ->and(collect($rows)->firstWhere('id', $stockId)->used)->toBeFalse()
+        ->and(fn () => $list($world->producerActor($producerId), $producerId))->toThrow(NotAllowed::class);
+});
+
+it('answers whether a product has any retained use for administration controls (R1b)', function () {
+    $world = new CatalogWorld;
+    $producerId = ($world->createProducer)($world->manager, 'Beekeeper', 3, '20:00');
+    $id = ($world->createProduct)($world->producerActor($producerId), $producerId, 'Bread', 'loaf', 350, false, null);
+    $query = new IsProductUsed($world->usage);
+    expect($query($id))->toBeFalse();
+    $world->usage->any[$id] = true;
+    expect($query($id))->toBeTrue();
 });

@@ -36,6 +36,8 @@ export const checkedFiles = [
     'pages/Manage/Households/Index.vue',
     'pages/Manage/Households/Show.vue',
     'pages/Manage/Producers/Index.vue',
+    'pages/Manage/Producers/Products.vue',
+    'components/ProductAdministrationActions.vue',
     'pages/Manage/Cycles/Index.vue',
     'pages/Manage/Cycles/Show.vue',
     'pages/Manage/Settings.vue',

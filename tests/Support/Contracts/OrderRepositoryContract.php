@@ -86,6 +86,50 @@ trait OrderRepositoryContract
     }
 
     #[Test]
+    public function it_retains_removed_line_use_and_readds_with_a_new_identity_and_time(): void
+    {
+        $cycle = $this->openCycle();
+        $repository = $this->repository();
+        $firstTime = $this->madrid('2026-10-22 10:00');
+        $secondTime = $this->madrid('2026-10-22 10:01');
+        $order = $repository->lockFor(self::CYCLE, self::HOUSEHOLD);
+        $order->setLine($this->product(self::BREAD, 'Loaf', 350), Quantity::fromString('2'), $cycle, $repository->nextId(), self::ANNA, $firstTime);
+        $repository->add($order);
+        $firstId = $repository->ofHousehold(self::CYCLE, self::HOUSEHOLD)->lines()[0]->id;
+        $order = $repository->lockFor(self::CYCLE, self::HOUSEHOLD);
+        $order->removeLine(self::BREAD, $cycle, $secondTime);
+        $repository->add($order);
+
+        $this->assertSame([], $repository->ofHousehold(self::CYCLE, self::HOUSEHOLD)->lines());
+        $this->assertTrue($repository->hasWeeklyReference(self::BREAD));
+        $this->assertFalse($repository->hasUnsettledLinesOf(self::BREAD));
+
+        $order = $repository->lockFor(self::CYCLE, self::HOUSEHOLD);
+        $order->setLine($this->product(self::BREAD, 'Loaf', 350), Quantity::fromString('1'), $cycle, $repository->nextId(), self::ANNA, $secondTime);
+        $repository->add($order);
+        $newLine = $repository->ofHousehold(self::CYCLE, self::HOUSEHOLD)->lines()[0];
+        $this->assertNotSame($firstId, $newLine->id);
+        $this->assertSame($secondTime->getTimestamp(), $newLine->createdAt->getTimestamp());
+    }
+
+    #[Test]
+    public function it_retains_cancelled_cycle_references_without_current_orders(): void
+    {
+        $cycle = $this->openCycle();
+        $repository = $this->repository();
+        $order = $repository->lockFor(self::CYCLE, self::HOUSEHOLD);
+        $order->setLine($this->product(self::BREAD, 'Loaf', 350), Quantity::fromString('1'), $cycle, $repository->nextId(), self::ANNA, $this->madrid('2026-10-22 10:00'));
+        $repository->add($order);
+        $repository->deleteOfCycle(self::CYCLE);
+
+        $this->assertNull($repository->ofHousehold(self::CYCLE, self::HOUSEHOLD));
+        $this->assertSame([], $repository->ofCycle(self::CYCLE));
+        $this->assertSame([], $repository->lineCountsOfHousehold(self::HOUSEHOLD));
+        $this->assertFalse($repository->hasUnsettledLinesOf(self::BREAD));
+        $this->assertTrue($repository->hasWeeklyReference(self::BREAD));
+    }
+
+    #[Test]
     public function it_generates_distinct_uuid_v7_ids(): void
     {
         $repository = $this->repository();
@@ -367,7 +411,7 @@ trait OrderRepositoryContract
     }
 
     #[Test]
-    public function it_deletes_every_order_of_a_cycle_with_its_lines(): void
+    public function it_excludes_cancelled_orders_and_keeps_their_line_references(): void
     {
         $cycle = $this->openCycle();
         $repository = $this->repository();
@@ -383,7 +427,8 @@ trait OrderRepositoryContract
 
         $this->assertNull($repository->ofHousehold(self::CYCLE, self::HOUSEHOLD));
         $this->assertNull($repository->ofHousehold(self::CYCLE, self::OTHER_HOUSEHOLD));
-        $this->assertNotSame($other->id, $repository->lockFor(self::CYCLE, self::OTHER_HOUSEHOLD)->id);
+        $this->assertSame([], $repository->ofCycle(self::CYCLE));
+        $this->assertTrue($repository->hasWeeklyReference(self::BREAD));
     }
 
     #[Test]
@@ -458,6 +503,8 @@ trait OrderRepositoryContract
         $again = $repository->ofHousehold(self::CYCLE, self::HOUSEHOLD);
         $this->assertSame(['3.000'], array_map(fn ($line) => $line->quantity->toString(), $again->stockLines()));
         $this->assertSame([], $again->returnLines());
+        $this->assertTrue($repository->hasStockReference(self::CHEESE));
+        $this->assertTrue($repository->hasStockReference(self::HONEY));
     }
 
     #[Test]

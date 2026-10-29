@@ -14,6 +14,9 @@ interface StockMovementRepository
     /** @return list<StockMovement> oldest first */
     public function forProduct(string $stockProductId): array;
 
+    /** Any movement is permanent first-use evidence, even when net quantity is zero. */
+    public function hasProductReference(string $stockProductId): bool;
+
     public function available(string $stockProductId): SignedQuantity;
 
     /** @return array<string, SignedQuantity> available stock by stock product id; products without movements are absent */

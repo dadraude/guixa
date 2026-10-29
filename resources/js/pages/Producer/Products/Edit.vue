@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { trans } from 'laravel-vue-i18n';
-import { Form, Head } from '@inertiajs/vue3';
+import { Form, Head, router } from '@inertiajs/vue3';
+import { shallowRef } from 'vue';
+import ProductAdministrationActions from '@/components/ProductAdministrationActions.vue';
+import InputError from '@/components/InputError.vue';
 import ProductController from '@/actions/App/Http/Controllers/Producer/ProductController';
 import Heading from '@/components/Heading.vue';
 import StockProductFields from '@/components/StockProductFields.vue';
@@ -17,7 +20,25 @@ defineOptions({
 
 defineProps<{
     product: App.Http.ProductRow;
+    used: boolean;
 }>();
+const actionError = shallowRef('');
+const actionProcessing = shallowRef(false);
+function deleteUnused(product: App.Http.ProductRow) {
+    router.delete(ProductController.deleteUnused.url(product.id), {
+        onStart: () => {
+            actionProcessing.value = true;
+            actionError.value = '';
+        },
+        onFinish: () => {
+            actionProcessing.value = false;
+        },
+        onError: (errors) => {
+            actionError.value =
+                errors.domain ?? trans('Could not delete the product.');
+        },
+    });
+}
 </script>
 
 <template>
@@ -41,5 +62,16 @@ defineProps<{
                 {{ trans('Save') }}
             </Button>
         </Form>
+        <div class="pilot-layout-panel mt-4 max-w-xl">
+            <InputError :message="actionError" role="alert" />
+            <ProductAdministrationActions
+                :name="product.name"
+                :stock="false"
+                :used="used"
+                :can-delete="true"
+                :processing="actionProcessing"
+                @delete="deleteUnused(product)"
+            />
+        </div>
     </div>
 </template>

@@ -23,6 +23,11 @@ final class EloquentReceivedTotalRepository implements ReceivedTotalRepository
         );
     }
 
+    public function hasProductReference(string $productId): bool
+    {
+        return DB::table('received_totals')->where('product_id', $productId)->exists();
+    }
+
     public function ofProducer(string $cycleId, string $producerId): array
     {
         return DB::table('received_totals')

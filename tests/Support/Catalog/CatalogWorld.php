@@ -22,6 +22,7 @@ use Guixa\Shared\Application\Actor;
 use Tests\Support\FrozenClock;
 use Tests\Support\InMemory\FakeProducerAccess;
 use Tests\Support\InMemory\FakeProducerCycles;
+use Tests\Support\InMemory\FakeProductUsage;
 use Tests\Support\InMemory\ImmediateTransactionRunner;
 use Tests\Support\InMemory\InMemoryProducerRepository;
 use Tests\Support\InMemory\InMemoryProductRepository;
@@ -36,6 +37,10 @@ final class CatalogWorld
     public readonly InMemoryProductRepository $products;
 
     public readonly FakeProducerCycles $cycles;
+
+    public readonly FakeProductUsage $usage;
+
+    public readonly ImmediateTransactionRunner $transactions;
 
     public readonly FakeProducerAccess $access;
 
@@ -81,6 +86,8 @@ final class CatalogWorld
         $this->cycles = new FakeProducerCycles;
         $this->access = new FakeProducerAccess;
         $transactions = new ImmediateTransactionRunner;
+        $this->transactions = $transactions;
+        $this->usage = new FakeProductUsage;
 
         $this->createProducer = new CreateProducer($this->producers);
         $this->deactivateProducer = new DeactivateProducer($this->producers, $this->access, $this->cycles, $transactions);
@@ -91,9 +98,9 @@ final class CatalogWorld
         $this->getDefaultCutoff = new GetDefaultCutoff($this->producers);
 
         $this->createProduct = new CreateProduct($this->products);
-        $this->updateProduct = new UpdateProduct($this->products, $this->cycles);
-        $this->deactivateProduct = new DeactivateProduct($this->products);
-        $this->reactivateProduct = new ReactivateProduct($this->products);
+        $this->updateProduct = new UpdateProduct($this->products, $this->cycles, $transactions);
+        $this->deactivateProduct = new DeactivateProduct($this->products, $this->transactions);
+        $this->reactivateProduct = new ReactivateProduct($this->products, $this->transactions);
         $this->listProducerProducts = new ListProducerProducts($this->products);
         $this->getOrderableProduct = new GetOrderableProduct($this->products, $this->producers);
         $this->listOrderableProducts = new ListOrderableProducts($this->products, $this->producers);

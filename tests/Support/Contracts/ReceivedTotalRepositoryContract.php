@@ -38,6 +38,18 @@ trait ReceivedTotalRepositoryContract
     }
 
     #[Test]
+    public function it_retains_a_product_reference_even_when_received_quantity_is_zero(): void
+    {
+        $this->referencedRowsExist();
+        $repository = $this->repository();
+        $this->assertFalse($repository->hasProductReference(self::BREAD));
+        $repository->set($this->total(self::CYCLE_A, self::BAKER, self::BREAD, '2'));
+        $repository->set($this->total(self::CYCLE_A, self::BAKER, self::BREAD, '0'));
+        $this->assertTrue($repository->hasProductReference(self::BREAD));
+        $this->assertFalse($repository->hasProductReference(self::APPLES));
+    }
+
+    #[Test]
     public function it_has_no_totals_until_one_is_recorded(): void
     {
         $this->referencedRowsExist();

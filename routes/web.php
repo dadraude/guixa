@@ -21,6 +21,8 @@ use App\Http\Controllers\Manage\PickupReturnController;
 use App\Http\Controllers\Manage\PickupStockController;
 use App\Http\Controllers\Manage\ProducerAccountController;
 use App\Http\Controllers\Manage\ProducerController;
+use App\Http\Controllers\Manage\ProducerProductController;
+use App\Http\Controllers\Manage\ProductClassificationController;
 use App\Http\Controllers\Manage\ReceptionAllocationController;
 use App\Http\Controllers\Manage\ReceptionController;
 use App\Http\Controllers\Manage\ReceptionDistributionController;
@@ -61,6 +63,10 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware(['auth', 'verified', 'role:manager'])->prefix('manage')->name('manage.')->group(function () {
+    Route::get('producers/{producer}/products', [ProducerProductController::class, 'index'])
+        ->whereUuid('producer')->name('producer-products.index');
+    Route::put('products/{product}/classification', [ProductClassificationController::class, 'update'])
+        ->whereUuid('product')->name('products.classification.update');
     Route::get('producers/{producer}/products/create', [StockProductController::class, 'create'])
         ->whereUuid('producer')->name('stock.create');
     Route::post('producers/{producer}/products', [StockProductController::class, 'store'])
@@ -72,6 +78,8 @@ Route::middleware(['auth', 'verified', 'role:manager'])->prefix('manage')->name(
         ->whereUuid(['producer', 'stockProduct'])->name('stock.update');
     Route::delete('producers/{producer}/products/{stockProduct}', [StockProductController::class, 'destroy'])
         ->whereUuid(['producer', 'stockProduct'])->name('stock.destroy');
+    Route::delete('producers/{producer}/products/{stockProduct}/unused', [StockProductController::class, 'deleteUnused'])
+        ->whereUuid(['producer', 'stockProduct'])->name('stock.unused.destroy');
     Route::put('producers/{producer}/products/{stockProduct}/reactivation', [StockProductController::class, 'reactivate'])
         ->whereUuid(['producer', 'stockProduct'])->name('stock.reactivate');
     Route::get('stock/{stockProduct}/movements', [StockMovementController::class, 'show'])
@@ -207,6 +215,8 @@ Route::middleware(['auth', 'verified', 'role:producer'])->prefix('producer')->na
         ->except(['show'])
         ->whereUuid('product')
         ->names('products');
+    Route::delete('products/{product}/unused', [ProductController::class, 'deleteUnused'])
+        ->whereUuid('product')->name('products.unused.destroy');
     Route::put('products/{product}/reactivation', [ProductController::class, 'reactivate'])
         ->whereUuid('product')
         ->name('products.reactivate');

@@ -43,8 +43,9 @@ final class EloquentOrderRepository implements OrderRepository
         $lines = $order->lines();
         DB::table('order_lines')
             ->where('order_id', $order->id)
+            ->whereNull('removed_at')
             ->whereNotIn('id', array_map(fn (OrderLine $line) => $line->id, $lines))
-            ->delete();
+            ->update(['removed_at' => now()]);
 
         if ($lines === []) {
             return;
@@ -68,6 +69,7 @@ final class EloquentOrderRepository implements OrderRepository
                 'delivered_quantity' => $line->delivered?->toString(),
                 'created_at' => $line->createdAt->format('Y-m-d\TH:i:s.uP'),
                 'added_by' => $line->addedBy,
+                'removed_at' => null,
             ], $lines),
             ['id'],
             ['product_name', 'unit', 'unit_price_cents', 'variable', 'containers_per_unit', 'ordered_quantity', 'allocated_quantity', 'allocated_by_hand', 'dropped', 'delivered_quantity'],
@@ -99,8 +101,9 @@ final class EloquentOrderRepository implements OrderRepository
         $lines = $order->stockLines();
         DB::table('order_stock_lines')
             ->where('order_id', $order->id)
+            ->whereNull('removed_at')
             ->whereNotIn('id', array_map(fn (StockLine $line) => $line->id, $lines))
-            ->delete();
+            ->update(['removed_at' => now()]);
 
         if ($lines === []) {
             return;
@@ -117,6 +120,7 @@ final class EloquentOrderRepository implements OrderRepository
                 'variable' => $line->variable,
                 'containers_per_unit' => $line->containersPerUnit?->toString(),
                 'quantity' => $line->quantity->toString(),
+                'removed_at' => null,
             ], $lines),
             ['id'],
             ['quantity'],
@@ -151,7 +155,7 @@ final class EloquentOrderRepository implements OrderRepository
 
     public function deleteOfCycle(string $cycleId): void
     {
-        DB::table('orders')->where('cycle_id', $cycleId)->delete();
+        DB::table('orders')->where('cycle_id', $cycleId)->update(['cancelled_at' => now()]);
     }
 
     public function markNotDelivered(string $orderId, array $productIds): void
@@ -159,6 +163,7 @@ final class EloquentOrderRepository implements OrderRepository
         DB::table('order_lines')
             ->where('order_id', $orderId)
             ->whereIn('product_id', $productIds)
+            ->whereNull('removed_at')
             ->update(['not_delivered' => true]);
     }
 
@@ -167,6 +172,7 @@ final class EloquentOrderRepository implements OrderRepository
         $rows = DB::table('order_lines')
             ->where('order_id', $orderId)
             ->where('not_delivered', true)
+            ->whereNull('removed_at')
             ->orderBy('product_id')
             ->get(['product_id'])
             ->all();
@@ -176,14 +182,14 @@ final class EloquentOrderRepository implements OrderRepository
 
     public function ofHousehold(string $cycleId, string $householdId): ?Order
     {
-        $row = DB::table('orders')->where('cycle_id', $cycleId)->where('household_id', $householdId)->first();
+        $row = DB::table('orders')->where('cycle_id', $cycleId)->where('household_id', $householdId)->whereNull('cancelled_at')->first();
 
         return $row === null ? null : $this->toDomain($row);
     }
 
     public function ofCycle(string $cycleId): array
     {
-        $rows = array_values(DB::table('orders')->where('cycle_id', $cycleId)->get()->all());
+        $rows = array_values(DB::table('orders')->where('cycle_id', $cycleId)->whereNull('cancelled_at')->get()->all());
 
         if ($rows === []) {
             return [];
@@ -191,13 +197,14 @@ final class EloquentOrderRepository implements OrderRepository
 
         $linesByOrder = DB::table('order_lines')
             ->whereIn('order_id', array_map(fn (stdClass $row) => $row->id, $rows))
+            ->whereNull('removed_at')
             ->orderBy('created_at')
             ->orderBy('id')
             ->get()
             ->groupBy('order_id');
 
         $orderIds = array_map(fn (stdClass $row) => $row->id, $rows);
-        $stockByOrder = DB::table('order_stock_lines')->whereIn('order_id', $orderIds)->orderBy('id')->get()->groupBy('order_id');
+        $stockByOrder = DB::table('order_stock_lines')->whereIn('order_id', $orderIds)->whereNull('removed_at')->orderBy('id')->get()->groupBy('order_id');
         $returnsByOrder = DB::table('order_return_lines')->whereIn('order_id', $orderIds)->orderBy('id')->get()->groupBy('order_id');
         $adjustmentsByOrder = DB::table('order_pickup_adjustments')->whereIn('order_id', $orderIds)->orderBy('recorded_at')->orderBy('id')->get()->groupBy('order_id');
 
@@ -216,6 +223,8 @@ final class EloquentOrderRepository implements OrderRepository
         return DB::table('orders')
             ->join('order_lines', 'order_lines.order_id', '=', 'orders.id')
             ->where('orders.household_id', $householdId)
+            ->whereNull('orders.cancelled_at')
+            ->whereNull('order_lines.removed_at')
             ->where('order_lines.ordered_quantity', '>', 0)
             ->groupBy('orders.cycle_id')
             ->selectRaw('orders.cycle_id, count(*) as line_count')
@@ -228,6 +237,7 @@ final class EloquentOrderRepository implements OrderRepository
     {
         return array_values(DB::table('orders')
             ->where('household_id', $householdId)
+            ->whereNull('cancelled_at')
             ->where('pickup_status', PickupStatus::Pending->value)
             ->pluck('cycle_id')
             ->map(fn ($cycleId): string => (string) $cycleId)
@@ -244,12 +254,24 @@ final class EloquentOrderRepository implements OrderRepository
         return $this->toDomain($row);
     }
 
+    public function hasWeeklyReference(string $productId): bool
+    {
+        return DB::table('order_lines')->where('product_id', $productId)->exists();
+    }
+
+    public function hasStockReference(string $productId): bool
+    {
+        return DB::table('order_stock_lines')->where('stock_product_id', $productId)->exists();
+    }
+
     public function hasUnsettledLinesOf(string $productId): bool
     {
         return DB::table('order_lines')
             ->join('orders', 'orders.id', '=', 'order_lines.order_id')
             ->join('cycles', 'cycles.id', '=', 'orders.cycle_id')
             ->where('order_lines.product_id', $productId)
+            ->whereNull('orders.cancelled_at')
+            ->whereNull('order_lines.removed_at')
             ->whereNull('cycles.settled_at')
             ->exists();
     }
@@ -264,6 +286,7 @@ final class EloquentOrderRepository implements OrderRepository
     {
         $lineRows ??= DB::table('order_lines')
             ->where('order_id', $row->id)
+            ->whereNull('removed_at')
             ->orderBy('created_at')
             ->orderBy('id')
             ->get()
@@ -319,7 +342,7 @@ final class EloquentOrderRepository implements OrderRepository
     /** @return list<stdClass> */
     private function rowsOf(string $table, string $orderId): array
     {
-        return array_values(DB::table($table)->where('order_id', $orderId)->orderBy('id')->get()->all());
+        return array_values(DB::table($table)->where('order_id', $orderId)->when(in_array($table, ['order_stock_lines'], true), fn ($query) => $query->whereNull('removed_at'))->orderBy('id')->get()->all());
     }
 
     /**

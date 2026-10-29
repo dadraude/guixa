@@ -2343,3 +2343,79 @@ preserving accepted work and declaring missing gates. This is plan-only tracking
 application behavior, fixture, schema or baseline changes. Historical baseline and all earlier
 log entries stay byte-identical. T33 remains Todo with 18 native blockers and feature 001 stays
 open. No T52–T63 implementation, deployment, new ticket/relation, reparenting or PR merge occurs.
+
+
+## 2026-10-29 · Deviation
+
+T53 (Retained history and protected catalogue): the existing Manager stock index lists only
+stock products. An unused weekly product therefore had no Manager-owned path to the
+weekly-to-stock classification action. A Manager producer-products page now lists both modes
+from the producer record and exposes classification only for unused records. It links to
+stock editing for stock records; weekly editing and deletion remain producer-owned unless
+the actor separately holds that producer role. Both classification directions return to
+this page so the transferred administrator and permitted next action remain clear. The
+Catalog application supplies this read and retained-use flag without granting Manager
+general weekly administration. The route and application-query map in `plan.md` records
+this access path. This is a page and navigation addition within the accepted R1b/R1c
+permissions, not a product rule change.
+
+The pre-Sales Ordering schema still contains temporary pickup stock lines. T53 retains
+their removed and zeroed references for classification and stock unit protection until
+the accepted Sales split replaces that table. Current reads, totals and claims filter the
+archived rows. Product use is derived from Ordering/reception and Stock histories only
+at this phase; Sales adds its references in T55. No usage marker or parallel ledger is
+introduced.
+
+The DRA-208 visual fixture covers eight affected pages and 88 declared cases using the
+actual page components, existing shells, fields, buttons and dialogs. Exploratory
+measurements found Manager action links exceeding their content area at 375 px/200%
+and an overlay heading exceeding its 151 px text area. Shared action call sites now
+wrap; the confirmation title uses the existing short translated action label while its
+body retains the explanation. All 28 distinct fixture states passed a first-case
+geometry recheck. Final committed-HEAD visual and keyboard evidence will be generated
+after candidate base alignment; this entry does not claim that pending gate as passed.
+
+
+## 2026-10-29 · Deviation
+
+T53/DRA-208 independent review round 1: four pre-existing activation commands still read an
+unlocked Product and saved a full snapshot. A concurrent unused delete could be undone by a
+stale activation save, and an intervening stock unit change followed by first stock use could
+be reverted by a stale stock activation. All four weekly/stock deactivate/reactivate commands
+now share the product transaction lock, reload the current row, recheck current-mode authority
+and change only active state from the current snapshot. Public cross-connection tests prove
+waiting and the final absence of deleted products or preservation of a newly protected unit.
+The earlier stale-mode repository guard alone did not cover same-mode metadata overwrite.
+
+Cycle unavailability marks are scheduling metadata, not product-use history. The fresh schema
+now cascades a product delete through those marks so an otherwise unused weekly product can
+be deleted before or after classification. Retained order, reception and stock-history FKs
+continue protecting used products; no usage marker or product-spec rule changes are added.
+
+The visual fixture now drives the actual classification and unused-delete callbacks through
+rejected Inertia responses on all three owning pages, adding eight cases to the original
+88-case manifest. Action errors display in alert regions and the shared verifier checks
+geometry and keyboard focus. The new final committed-HEAD report replaces the older 88-case
+evidence after the correction is committed.
+
+The first expanded 96-case browser run exposed one additional focus-scroll pattern on the Manager
+producer-products page: after a rejected action, keyboard wraparound brought the heading's add-stock
+link under the sticky breadcrumb at 1024 px/200% text. The link now has enough scroll margin for its
+focused bounds and hit target to clear that header. A direct Tab path measured the corrected focus;
+the final full runner must still bind the result to the amended commit. Comparable Manager heading
+actions and the other rejected-action pages were inventoried in the full run, with no failure there.
+
+
+## 2026-10-29 · CI contract correction
+
+The first published CI run found four off-grid spacing utilities introduced on the producer edit,
+Manager stock edit, Manager producer catalogue and shared product-action surfaces. Those utilities
+now use the existing spacing grid. The layout rule covers both newly added presentation surfaces,
+so future spacing drift on the Manager catalogue and shared action dialog is checked with the
+already migrated pages.
+
+Three existing HTTP assertions expected successful weekly or temporary pickup stock-line removal
+to erase the database rows. They now assert that the current order, member cycle count, pickup and
+pickup total exclude the removed lines while their historical rows retain `removed_at`. Assertions
+for rejected writes still require no committed reference. This reconciles the HTTP contract with
+the accepted T53 history rule; the product behaviour is unchanged.

@@ -391,3 +391,36 @@ it('rejects an adjustment that names a cycle that does not exist (R27)', functio
 
     expect(DB::table('stock_movements')->count())->toBe(1);
 });
+
+it('shows permanent stock unit protection after a movement and still accepts metadata edits (R25a, S72)', function () {
+    $product = honey();
+    $manager = accountWith(Role::Manager);
+    $this->actingAs($manager)->post("/manage/stock/{$product->id}/entries", ['quantity' => '1'])->assertRedirect();
+    $this->actingAs($manager)->get(stockProductPath($product).'/edit')
+        ->assertInertia(fn (Assert $page) => $page->component('Manage/Stock/Edit')->where('used', true));
+
+    $this->actingAs($manager)->from(stockProductPath($product).'/edit')->put(stockProductPath($product), [
+        'name' => 'Raw honey', 'unit' => 'kg', 'price' => '7.00', 'variable' => false,
+    ])->assertSessionHasErrors('domain');
+    expect($product->refresh()->unit)->toBe('jar');
+    $this->actingAs($manager)->put(stockProductPath($product), [
+        'name' => 'Raw honey', 'unit' => 'jar', 'price' => '7.00', 'variable' => false, 'containers_per_unit' => '3',
+    ])->assertRedirect('/manage/stock');
+    expect($product->refresh()->name)->toBe('Raw honey')
+        ->and($product->price_cents)->toBe(700)
+        ->and($product->containers_per_unit)->toBe('3.000');
+});
+
+it('deletes an unused stock record but keeps one with a movement (R1c, S68, S70)', function () {
+    $unused = honey();
+    $used = honey();
+    $manager = accountWith(Role::Manager);
+    $this->actingAs($manager)->post("/manage/stock/{$used->id}/entries", ['quantity' => '1'])->assertRedirect();
+
+    $this->actingAs($manager)->from(stockProductPath($used).'/edit')
+        ->delete(stockProductPath($used).'/unused')->assertSessionHasErrors('domain');
+    $this->actingAs($manager)->delete(stockProductPath($unused).'/unused')
+        ->assertRedirect("/manage/producers/{$unused->producer_id}/products");
+    expect(ProductModel::query()->whereKey($used->id)->exists())->toBeTrue()
+        ->and(ProductModel::query()->whereKey($unused->id)->exists())->toBeFalse();
+});

@@ -11,7 +11,7 @@ return new class extends Migration
         // A row means the producer marked the product unavailable in that cycle (R3c).
         Schema::create('product_unavailabilities', function (Blueprint $table) {
             $table->foreignUuid('cycle_id')->constrained('cycles');
-            $table->foreignUuid('product_id')->constrained('products');
+            $table->foreignUuid('product_id')->constrained('products')->cascadeOnDelete();
             $table->primary(['cycle_id', 'product_id']);
         });
     }

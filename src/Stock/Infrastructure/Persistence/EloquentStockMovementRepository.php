@@ -44,6 +44,11 @@ final class EloquentStockMovementRepository implements StockMovementRepository
         return array_values($movements);
     }
 
+    public function hasProductReference(string $stockProductId): bool
+    {
+        return StockMovementModel::query()->where('stock_product_id', $stockProductId)->exists();
+    }
+
     public function available(string $stockProductId): SignedQuantity
     {
         $total = StockMovementModel::query()

@@ -79,7 +79,12 @@ it('removes a line when the quantity is zero (R9)', function () {
 
     $this->actingAs($anna)->put("/cycles/{$cycleId}/order/lines/{$loaf}", ['quantity' => '0'])->assertRedirect();
 
-    expect(DB::table('order_lines')->count())->toBe(0);
+    $this->actingAs($anna)->get("/cycles/{$cycleId}/order")
+        ->assertInertia(fn (Assert $page) => $page->has('order.lines', 0));
+    $this->actingAs($anna)->get('/')
+        ->assertInertia(fn (Assert $page) => $page->where('cycles.0.lineCount', 0));
+    expect(DB::table('order_lines')->whereNull('removed_at')->count())->toBe(0);
+    expect(DB::table('order_lines')->where('product_id', $loaf)->whereNotNull('removed_at')->count())->toBe(1);
 });
 
 it('shows the domain error for a closed producer and stores nothing (R8, S2)', function () {
@@ -170,7 +175,12 @@ it('marks the line of a deactivated product, which the member removes after the 
 
     $this->actingAs($anna)->delete("/cycles/{$cycleId}/order/lines/{$loaf}")->assertRedirect();
 
-    expect(DB::table('order_lines')->count())->toBe(0);
+    $this->actingAs($anna)->get("/cycles/{$cycleId}/order")
+        ->assertInertia(fn (Assert $page) => $page->has('order.lines', 0));
+    $this->actingAs($anna)->get('/')
+        ->assertInertia(fn (Assert $page) => $page->where('cycles.0.lineCount', 0));
+    expect(DB::table('order_lines')->whereNull('removed_at')->count())->toBe(0);
+    expect(DB::table('order_lines')->where('product_id', $loaf)->whereNotNull('removed_at')->count())->toBe(1);
 });
 
 it('marks a line whose product is unavailable in the cycle and stops offering the product (R3b, R3c, S48)', function () {

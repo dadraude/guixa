@@ -1,0 +1,932 @@
+{
+    "baseUrl": "http://127.0.0.1:5188",
+    "rootFontPx": 16,
+    "darkSelector": "html.dark",
+    "matrix": {
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark"],
+        "text": [100, 200]
+    },
+    "views": [
+        {
+            "id": "manage-producers-index",
+            "path": "/visual-dra-208.html",
+            "query": {
+                "page": "Manage/Producers/Index"
+            },
+            "root": "#main-content",
+            "panels": "#main-content .pilot-layout-panel, #main-content form, #main-content section, #main-content .manager-stock-rows, #main-content .manager-stock-table, #main-content .pilot-list, #main-content .pilot-layout-notice",
+            "content": "#main-content h1,#main-content h2,#main-content h3,#main-content p,#main-content label,#main-content input,#main-content a,#main-content button,#main-content th,#main-content td",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "states": [
+                {
+                    "id": "populated",
+                    "ready": "body[data-visual-ready=\"populated\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "empty",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "ready": "body[data-visual-ready=\"empty\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "long",
+                    "query": {
+                        "state": "long"
+                    },
+                    "ready": "body[data-visual-ready=\"long\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "manage-producers-products",
+            "path": "/visual-dra-208.html",
+            "query": {
+                "page": "Manage/Producers/Products"
+            },
+            "root": "#main-content",
+            "panels": "#main-content .pilot-layout-panel, #main-content form, #main-content section, #main-content .manager-stock-rows, #main-content .manager-stock-table, #main-content .pilot-list, #main-content .pilot-layout-notice",
+            "content": "#main-content h1,#main-content h2,#main-content h3,#main-content p,#main-content label,#main-content input,#main-content a,#main-content button,#main-content th,#main-content td",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "states": [
+                {
+                    "id": "populated",
+                    "ready": "body[data-visual-ready=\"populated\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "empty",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "ready": "body[data-visual-ready=\"empty\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "used-denied",
+                    "query": {
+                        "state": "used-denied"
+                    },
+                    "ready": "body[data-visual-ready=\"used-denied\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "long",
+                    "query": {
+                        "state": "long"
+                    },
+                    "ready": "body[data-visual-ready=\"long\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "confirm-classification",
+                    "query": {
+                        "state": "confirm-classification"
+                    },
+                    "ready": "body[data-visual-ready=\"confirm-classification\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "root": "dialog[open]",
+                        "panels": "dialog[open]",
+                        "content": "dialog[open] h2,dialog[open] p,dialog[open] label,dialog[open] button,dialog[open] a,dialog[open] input",
+                        "focus": [
+                            "[data-visual-overlay-focus-first]",
+                            "[data-visual-overlay-focus-last]"
+                        ]
+                    },
+                    "settled": ["dialog[open]"]
+                },
+                {
+                    "id": "mixed-role",
+                    "query": {
+                        "state": "mixed-role"
+                    },
+                    "ready": "body[data-visual-ready=\"mixed-role\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "action-error-classification",
+                    "query": {
+                        "state": "action-error-classification"
+                    },
+                    "ready": "body[data-visual-ready=\"action-error-classification\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "manage-stock-index",
+            "path": "/visual-dra-208.html",
+            "query": {
+                "page": "Manage/Stock/Index"
+            },
+            "root": "#main-content",
+            "panels": "#main-content .pilot-layout-panel, #main-content form, #main-content section, #main-content .manager-stock-rows, #main-content .manager-stock-table, #main-content .pilot-list, #main-content .pilot-layout-notice",
+            "content": "#main-content h1,#main-content h2,#main-content h3,#main-content p,#main-content label,#main-content input,#main-content a,#main-content button,#main-content th,#main-content td",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "states": [
+                {
+                    "id": "populated",
+                    "ready": "body[data-visual-ready=\"populated\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "empty",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "ready": "body[data-visual-ready=\"empty\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "edit-dialog",
+                    "query": {
+                        "state": "edit-dialog"
+                    },
+                    "ready": "body[data-visual-ready=\"edit-dialog\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "root": "dialog[open]",
+                        "panels": "dialog[open]",
+                        "content": "dialog[open] h2,dialog[open] p,dialog[open] label,dialog[open] button,dialog[open] a,dialog[open] input",
+                        "focus": [
+                            "[data-visual-overlay-focus-first]",
+                            "[data-visual-overlay-focus-last]"
+                        ]
+                    },
+                    "settled": ["dialog[open]"]
+                },
+                {
+                    "id": "long",
+                    "query": {
+                        "state": "long"
+                    },
+                    "ready": "body[data-visual-ready=\"long\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "manage-stock-create",
+            "path": "/visual-dra-208.html",
+            "query": {
+                "page": "Manage/Stock/Create"
+            },
+            "root": "#main-content",
+            "panels": "#main-content .pilot-layout-panel, #main-content form, #main-content section, #main-content .manager-stock-rows, #main-content .manager-stock-table, #main-content .pilot-list, #main-content .pilot-layout-notice",
+            "content": "#main-content h1,#main-content h2,#main-content h3,#main-content p,#main-content label,#main-content input,#main-content a,#main-content button,#main-content th,#main-content td",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "states": [
+                {
+                    "id": "populated",
+                    "ready": "body[data-visual-ready=\"populated\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "error",
+                    "query": {
+                        "state": "error"
+                    },
+                    "ready": "body[data-visual-ready=\"error\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "manage-stock-edit",
+            "path": "/visual-dra-208.html",
+            "query": {
+                "page": "Manage/Stock/Edit"
+            },
+            "root": "#main-content",
+            "panels": "#main-content .pilot-layout-panel, #main-content form, #main-content section, #main-content .manager-stock-rows, #main-content .manager-stock-table, #main-content .pilot-list, #main-content .pilot-layout-notice",
+            "content": "#main-content h1,#main-content h2,#main-content h3,#main-content p,#main-content label,#main-content input,#main-content a,#main-content button,#main-content th,#main-content td",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "states": [
+                {
+                    "id": "populated",
+                    "ready": "body[data-visual-ready=\"populated\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "used-denied",
+                    "query": {
+                        "state": "used-denied"
+                    },
+                    "ready": "body[data-visual-ready=\"used-denied\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "error",
+                    "query": {
+                        "state": "error"
+                    },
+                    "ready": "body[data-visual-ready=\"error\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "confirm-delete",
+                    "query": {
+                        "state": "confirm-delete"
+                    },
+                    "ready": "body[data-visual-ready=\"confirm-delete\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "root": "dialog[open]",
+                        "panels": "dialog[open]",
+                        "content": "dialog[open] h2,dialog[open] p,dialog[open] label,dialog[open] button,dialog[open] a,dialog[open] input",
+                        "focus": [
+                            "[data-visual-overlay-focus-first]",
+                            "[data-visual-overlay-focus-last]"
+                        ]
+                    },
+                    "settled": ["dialog[open]"]
+                },
+                {
+                    "id": "action-error-classification",
+                    "query": {
+                        "state": "action-error-classification"
+                    },
+                    "ready": "body[data-visual-ready=\"action-error-classification\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "action-error-delete",
+                    "query": {
+                        "state": "action-error-delete"
+                    },
+                    "ready": "body[data-visual-ready=\"action-error-delete\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "producer-products-index",
+            "path": "/visual-dra-208.html",
+            "query": {
+                "page": "Producer/Products/Index"
+            },
+            "root": "#main-content",
+            "panels": "#main-content .pilot-layout-panel, #main-content form, #main-content section, #main-content .manager-stock-rows, #main-content .manager-stock-table, #main-content .pilot-list, #main-content .pilot-layout-notice",
+            "content": "#main-content h1,#main-content h2,#main-content h3,#main-content p,#main-content label,#main-content input,#main-content a,#main-content button,#main-content td",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "states": [
+                {
+                    "id": "populated",
+                    "ready": "body[data-visual-ready=\"populated\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "empty",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "ready": "body[data-visual-ready=\"empty\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "long",
+                    "query": {
+                        "state": "long"
+                    },
+                    "ready": "body[data-visual-ready=\"long\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "producer-products-create",
+            "path": "/visual-dra-208.html",
+            "query": {
+                "page": "Producer/Products/Create"
+            },
+            "root": "#main-content",
+            "panels": "#main-content .pilot-layout-panel, #main-content form, #main-content section, #main-content .manager-stock-rows, #main-content .manager-stock-table, #main-content .pilot-list, #main-content .pilot-layout-notice",
+            "content": "#main-content h1,#main-content h2,#main-content h3,#main-content p,#main-content label,#main-content input,#main-content a,#main-content button,#main-content th,#main-content td",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "states": [
+                {
+                    "id": "populated",
+                    "ready": "body[data-visual-ready=\"populated\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "error",
+                    "query": {
+                        "state": "error"
+                    },
+                    "ready": "body[data-visual-ready=\"error\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "producer-products-edit",
+            "path": "/visual-dra-208.html",
+            "query": {
+                "page": "Producer/Products/Edit"
+            },
+            "root": "#main-content",
+            "panels": "#main-content .pilot-layout-panel, #main-content form, #main-content section, #main-content .manager-stock-rows, #main-content .manager-stock-table, #main-content .pilot-list, #main-content .pilot-layout-notice",
+            "content": "#main-content h1,#main-content h2,#main-content h3,#main-content p,#main-content label,#main-content input,#main-content a,#main-content button,#main-content th,#main-content td",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "states": [
+                {
+                    "id": "populated",
+                    "ready": "body[data-visual-ready=\"populated\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "used-denied",
+                    "query": {
+                        "state": "used-denied"
+                    },
+                    "ready": "body[data-visual-ready=\"used-denied\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "error",
+                    "query": {
+                        "state": "error"
+                    },
+                    "ready": "body[data-visual-ready=\"error\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "confirm-delete",
+                    "query": {
+                        "state": "confirm-delete"
+                    },
+                    "ready": "body[data-visual-ready=\"confirm-delete\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "root": "dialog[open]",
+                        "panels": "dialog[open]",
+                        "content": "dialog[open] h2,dialog[open] p,dialog[open] label,dialog[open] button,dialog[open] a,dialog[open] input",
+                        "focus": [
+                            "[data-visual-overlay-focus-first]",
+                            "[data-visual-overlay-focus-last]"
+                        ]
+                    },
+                    "settled": ["dialog[open]"]
+                },
+                {
+                    "id": "action-error-delete",
+                    "query": {
+                        "state": "action-error-delete"
+                    },
+                    "ready": "body[data-visual-ready=\"action-error-delete\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

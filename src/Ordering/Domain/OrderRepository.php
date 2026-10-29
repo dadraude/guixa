@@ -44,6 +44,12 @@ interface OrderRepository
      */
     public function lockFor(string $cycleId, string $householdId): Order;
 
+    /** Whether retained or current weekly lines reference the product. */
+    public function hasWeeklyReference(string $productId): bool;
+
+    /** Whether retained or current temporary pickup stock lines reference the product. */
+    public function hasStockReference(string $productId): bool;
+
     /** Whether any order has a line of this product in a cycle that is not settled (R1). */
     public function hasUnsettledLinesOf(string $productId): bool;
 }
