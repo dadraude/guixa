@@ -97,12 +97,12 @@ with `TEST_DB`, and verify the replacement without logging credentials. Never ch
 All setup, tests and artisan commands use the guarded worktree prefix above; the user's `guixa` database and
 shared `guixa_test` are not task databases. If isolated database configuration cannot be verified, stop.
 
-| Operation                 | Command in the task worktree                                                                                                                                                                           |
-| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Setup                     | `composer install && pnpm install --frozen-lockfile`; build only for a focused-test prerequisite or build reproduction                                                                                 |
-| Focused test              | `php artisan test --filter=<test>` (run serially initially)                                                                                                                                            |
-| Focused checks            | Tests for affected behavior and every changed test file; select frontend files/tests using the installed runner's supported selectors; format all changed supported code/docs; type checks when needed |
-| Full validation (CI only) | `.github/workflows/tests.yml`: `composer setup`, then `composer ci:check`; resolve their current definitions from `composer.json` and `package.json`                                                   |
+| Operation                 | Command in the task worktree                                                                                                                                                                                             |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Setup                     | `composer install && pnpm install --frozen-lockfile`; build only for a focused-test prerequisite or build reproduction                                                                                                   |
+| Focused test              | `php artisan test --filter=<test>` (run serially initially)                                                                                                                                                              |
+| Focused checks            | Tests for affected behavior and every changed test file; select frontend files/tests using the installed runner's supported selectors; format all changed supported code/docs; type checks when needed                   |
+| Full validation (CI only) | `.github/workflows/tests.yml`: selected `frontend`, `backend` and `tooling` jobs plus the always-on `docs` lint/format check; `ci` aggregates their results; resolve commands from the workflow and dependency manifests |
 
 For visual tasks, use the [shared visual workflow](../skills/agent-workflow/references/visual.md).
 The available visual dimensions are 375, 1024 and 1280 px, light/dark, and 100%/200% root text.
@@ -143,9 +143,9 @@ and run relevant structural checks. Never report an omitted check as passed.
 
 The current CI triggers on PRs and pushes to `main`, not a feature-branch push alone. Resolve expected
 checks from the current workflow (currently `ci` in `tests`) plus branch requirements before accepting
-results. This application pipeline does not automatically cover workflow-skill structural tests; run
-the offline checks in `skills/agent-workflow/tests` and `.agent-workflow/tests` locally when these
-instruction documents change.
+results. The `tooling` job covers workflow-skill structural and helper tests for agent-tooling changes. Run
+the focused offline checks in `skills/agent-workflow/tests` and `.agent-workflow/tests` locally when
+these instruction documents change; CI also runs them when `.github/` changes.
 
 The prefix's `PGTZ=UTC` matches CI; a local Europe/Madrid database session can hide timestamp failures.
 Discover affected generators from the repository scripts before regenerating; do not invent a command.
