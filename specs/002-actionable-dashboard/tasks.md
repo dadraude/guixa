@@ -1,8 +1,8 @@
 # 002 — Actionable dashboard · Tasks
 
-Status: Accepted (2026-10-27); aligned with the accepted feature-001 Sales model on 2026-10-28. [Spec](spec.md) and [plan](plan.md) accepted.
+**Status: Retired (2026-10-29).** T01–T04 and DRA-201–DRA-204 are **canceled and non-executable**. The descriptions and dependency chain below are historical; do not dispatch or resume them. A new dashboard spec requires completion of feature 001 and a new user decision. The independently shipped T05/R11 login-to-dashboard behavior and feature 001 T61 basic dashboard summary remain in force. Preserve the [request and decision log](log.md) and [discovery record](../../docs/ux-discovery/2026-10-27-dashboard-discovery.md). This task plan was accepted on 2026-10-27 and aligned with feature 001 Sales on 2026-10-28.
 
-## Linear tracking (2026-10-27)
+## Historical Linear tracking (2026-10-27; canceled 2026-10-29)
 
 Workspace `draude`, team `DRA`, project [Coop](https://linear.app/draude/project/coop-f80f57e1496d), milestone **Actionable dashboard**. Four root issues form a tracer sequence through native blocked-by relations; no parent issue was added. The original publication had no contextual links; 001 T61/DRA-216 now relates to T02/DRA-202 and T03/DRA-203 for Sales-source compatibility, without blocking either. The T01–T04 IDs are scoped to spec 002 and their issue titles include that spec to distinguish them from IDs in spec 001.
 
@@ -13,9 +13,9 @@ Workspace `draude`, team `DRA`, project [Coop](https://linear.app/draude/project
 | T03 | [DRA-203](https://linear.app/draude/issue/DRA-203/t03-dashboard-role-aware-attention-spec-002) | DRA-202 |
 | T04 | [DRA-204](https://linear.app/draude/issue/DRA-204/t04-dashboard-four-cycle-history-spec-002) | DRA-203 |
 
-All four issues are Backlog, unassigned and without `ready-for-agent`. Ticket creation does not authorize implementation. The T01 implementation draft remains stopped in its separate worktree.
+At publication, all four issues were Backlog, unassigned and without `ready-for-agent`. They were canceled on 2026-10-29, with retirement notices and existing relations preserved. The abandoned T01 implementation draft remains available for historical recovery in its separate worktree; it is not an active task.
 
-Each task is a reviewable vertical slice through authorized Application reads, HTTP props, translated Vue presentation, and its focused tests. Keep the existing dashboard route and accepted palette. A task is done when its listed scenarios pass, relevant architecture and type checks stay green, and its changed interface passes the visual and accessibility checks in R10. Record any behavior change in the spec first and any implementation deviation in [log.md](log.md).
+The table and acceptance checks below preserve the original proposed slices for reference only. They confer no implementation authorization.
 
 | ID | Task | Covers | After |
 | --- | --- | --- | --- |
@@ -24,23 +24,23 @@ Each task is a reviewable vertical slice through authorized Application reads, H
 | T03 | Add authorized member, Finance and producer reads within existing 001 capabilities, their role context, and a single deterministic combined attention list with role labels and deduplication. Link to each role's existing order, Sales basket, wallet, cutoff, product and producer-summary screens. Preserve closed-cycle/cycleless pending baskets and current-household access; Finance-only access exposes no manager cycle/history data. Verify absent household/inactive producer states and privacy. | R1, R3, R4, R5, R6, R9, R10; S1, S7, S8, S9, S12, S13 | T02 |
 | T04 | Add the bounded closed-cycle participation read and manager four-cycle bar chart with exact values, visible list and cycle-summary links. Omit the chart with fewer than four closed cycles. Verify no target or low-participation signal and no polling. | R8–R10; S10, S11, S13 | T03 |
 
-## Done when, by slice
+## Historical acceptance checks (not executable)
 
 - **T01:** Application and HTTP tests prove the focus cycle, cancellation/closure exclusion, non-empty manual-send grouping, actual-cutoff language, future-cutoff context, authorized destination and read-only behavior. The first rendered manager slice uses the current shell and passes the shared visual runner at 375 and 1280 px in light/dark.
 - **T02:** Application tests cover one current state per participating producer, scheduler-owned empty orders, reopened orders, weekly-base preparation/validation/collection/no-collection-due counts, closed-cycle/cycleless/supplement pending persistence, effective full reversal, settled-base visibility and later-cycle work. No date creates abandonment; no debt hides pending collection. Both status views expose exact counts in text, including the no-denominator explanation; no color-only meaning or zero-percent empty bar remains. Render the relevant manager states, including 200% text.
 - **T03:** Application tests prove current-household and producer scoping, Finance-only limits, basket-UUID mixed-role deduplication and priority, scheduled-date language, and the auto-saved order wording. HTTP and Vue checks cover role props and deep links. Visual evidence includes member-only, Finance-only, producer-only, mixed-role, empty and long-content states; keyboard flow and 44 px targets pass.
 - **T04:** Application tests count distinct ordering households in exactly the four latest closed, non-cancelled cycles, including zero-line, allocation-only and later-delivery cases. Vue checks confirm every bar's date/count/list/link, the insufficient-history explanation, and absence of target or low-participation text. The final role/viewport visual manifest and focused checks pass; page idle time causes no background request.
 
-For each slice, generate the TypeScript DTOs, run focused PHP/Vue tests, typecheck, format and architecture checks, then inspect measured layout and the shared visual report. The full suite and CI remain the pull-request gate. These tasks do not authorize publishing Linear tickets or deploying a change.
+The original verification plan required generated TypeScript DTOs, focused PHP/Vue tests, typecheck, format and architecture checks, measured layout and a shared visual report. It is retained solely as historical context.
 
-## Login destination follow-up
+## Shipped independent login destination
 
-- **T05 (R11, S14):** Route successful password, two-factor and passkey logins directly to the dashboard, clearing a previously requested destination. Done when focused HTTP/response tests cover each login method, existing authentication checks pass, and JSON contracts are preserved. This independent navigation change has no dependency on T01–T04 and no visual changes.
+- **T05 (R11, S14):** Shipped independently of T01–T04. Successful password, two-factor and passkey logins go directly to the dashboard, clearing a previously requested destination; existing authentication and JSON response contracts remain applicable. Retirement of the dashboard-content tasks does not reverse this behavior.
 
-## Compatibility publication
+## Historical compatibility publication
 
-T02/DRA-202 and T03/DRA-203 descriptions are synchronized with the Sales read contract above.
-Their native prerequisites remain T01 → T02 → T03 → T04; the two contextual T61 links remain.
-No status, assignee, label, parent, milestone or implementation authorization is changed. T01's
-manager sending tracer and T04's counts-only history keep their accepted behavior. Source links
-for the amended scope target `docs/product-producer-stock` until the documentation PR merges.
+At publication, T02/DRA-202 and T03/DRA-203 descriptions were synchronized with the Sales read
+contract above. Their native prerequisites and two contextual T61 links were retained when the
+issues were canceled. The original T01 manager-sending and T04 counts-only scopes remain available
+only as historical context. The amended scope's source links pointed to `docs/product-producer-stock`
+until the documentation PR merged.

@@ -60,7 +60,7 @@ design principles and the gap analysis there.
 | ID  | Feature                         | Status |
 | --- | ------------------------------- | ------ |
 | 001 | [Weekly orders](001-weekly-orders/spec.md) | Spec + plan amended and accepted (2026-10-28): products, Sales baskets and Finance · [split task breakdown accepted](001-weekly-orders/tasks.md) · implementation status in Linear (Coop) |
-| 002 | [Actionable dashboard](002-actionable-dashboard/spec.md) | Accepted (2026-10-27) · T01–T04 tracked in Linear (DRA-201–DRA-204), Backlog · implementation stopped |
+| 002 | [Actionable dashboard](002-actionable-dashboard/spec.md) | **Retired (2026-10-29)** · T01–T04 and DRA-201–DRA-204 canceled; historical request and discovery retained · no dashboard-content work authorized. A new spec needs completion of 001 and a new user decision. The independently shipped login destination (002 T05/R11) and 001 T61 basic dashboard summary remain in force. |
 
 ## Roadmap
 

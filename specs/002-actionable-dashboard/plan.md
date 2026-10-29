@@ -1,6 +1,6 @@
 # 002 — Actionable dashboard · Plan
 
-Status: Accepted (2026-10-27); Sales compatibility alignment recorded on 2026-10-28. Implements [spec.md](spec.md).
+**Status: Retired (2026-10-29).** The dashboard-content design below is historical and must not be implemented from this plan. T01–T04 are canceled. Keep the [request and decision log](log.md) and [discovery record](../../docs/ux-discovery/2026-10-27-dashboard-discovery.md); any new dashboard spec requires completion of feature 001 and a new user decision. The separate, shipped T05/R11 login-to-dashboard change and feature 001 T61 basic dashboard summary remain in force. This plan was accepted on 2026-10-27 and aligned with feature 001 Sales on 2026-10-28.
 
 ## Design boundaries
 
@@ -55,9 +55,9 @@ The repository references `.claude/skills/spec-gaps/SKILL.md`, but that file is 
 ## Feature-001 Sales alignment (2026-10-28)
 
 This is derived from accepted 001 R23a/R23b/R24/R24a/R24b and T59–T61, not a new dashboard
-workflow. Reuse the narrow Sales pending-summary contract delivered by 001 T61/DRA-216. Its
-links to dashboard DRA-202/DRA-203 remain contextual; the existing 002 tracer chain is unchanged.
-Keep all four dashboard issues Backlog without ready-for-agent and keep implementation stopped.
+workflow. The proposed design depended on the narrow Sales pending-summary contract of 001
+T61/DRA-216. Its links to dashboard DRA-202/DRA-203 remain contextual, and the 002 tracer chain
+is retained only in the canceled issues. All four dashboard issues were canceled on 2026-10-29.
 The four-closed-cycle chart remains counts-only, with no target/alert or new Finance access.
 Respect retained-line archive filters when counting positive ordered lines; retained history must
 not resurrect removed lines into the current ordered-household count. No application code is changed
