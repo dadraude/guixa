@@ -1,0 +1,468 @@
+{
+    "baseUrl": "http://127.0.0.1:5189",
+    "rootFontPx": 16,
+    "darkSelector": "html.dark",
+    "matrix": {
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark", "system-light", "system-dark"],
+        "text": [100, 200]
+    },
+    "views": [
+        {
+            "id": "member-stock",
+            "path": "/visual-dra-209.html",
+            "query": {
+                "page": "Stock/Index"
+            },
+            "root": "#main-content",
+            "panels": "#main-content section,#main-content .pilot-layout-notice,#main-content .pilot-product-list",
+            "fonts": ["16px Nunito Variable"],
+            "states": [
+                {
+                    "id": "populated",
+                    "ready": "body[data-visual-ready=\"populated\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".pilot-theme:has(#main-content)",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content .pilot-layout-page",
+                                "count": 1,
+                                "gapRem": 1.5,
+                                "styles": {
+                                    "display": "flex",
+                                    "flex-direction": "column",
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "[data-test=\"stock-offer\"]",
+                                "count": 2,
+                                "gapRem": 0.5
+                            },
+                            {
+                                "selector": "[data-test=\"stock-sold-out\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content form,#main-content button",
+                                "count": 0
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "empty",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "ready": "body[data-visual-ready=\"empty\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".pilot-theme:has(#main-content)",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content .pilot-layout-page",
+                                "count": 1,
+                                "gapRem": 1.5,
+                                "styles": {
+                                    "display": "flex",
+                                    "flex-direction": "column",
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "[data-test=\"stock-offer\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"stock-empty\"]",
+                                "count": 1,
+                                "styles": {
+                                    "padding-top": "32px",
+                                    "background-color": "rgb(47, 52, 48)"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "long",
+                    "query": {
+                        "state": "long"
+                    },
+                    "ready": "body[data-visual-ready=\"long\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".pilot-theme:has(#main-content)",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content .pilot-layout-page",
+                                "count": 1,
+                                "gapRem": 1.5,
+                                "styles": {
+                                    "display": "flex",
+                                    "flex-direction": "column",
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "[data-test=\"stock-offer\"]",
+                                "count": 2,
+                                "gapRem": 0.5
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "member-producer",
+                    "query": {
+                        "state": "member-producer"
+                    },
+                    "ready": "body[data-visual-ready=\"member-producer\"]",
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".pilot-theme:has(#main-content)",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content .pilot-layout-page",
+                                "count": 1,
+                                "gapRem": 1.5,
+                                "styles": {
+                                    "display": "flex",
+                                    "flex-direction": "column",
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "[data-test=\"stock-offer\"]",
+                                "count": 2,
+                                "gapRem": 0.5
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "system-reduced",
+                    "query": {
+                        "state": "system-reduced"
+                    },
+                    "ready": "body[data-visual-ready=\"system-reduced\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "system-light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "system-dark",
+                            "text": 100
+                        }
+                    ],
+                    "reducedMotion": true,
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".pilot-theme:has(#main-content)",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content .pilot-layout-page",
+                                "count": 1,
+                                "gapRem": 1.5,
+                                "styles": {
+                                    "display": "flex",
+                                    "flex-direction": "column",
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "[data-test=\"stock-offer\"]",
+                                "count": 2,
+                                "gapRem": 0.5
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "fallback-font",
+                    "query": {
+                        "state": "fallback-font"
+                    },
+                    "ready": "body[data-visual-ready=\"fallback-font\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "systemFonts": true,
+                        "fonts": ["16px system-ui"],
+                        "assertions": [
+                            {
+                                "selector": ".pilot-theme:has(#main-content)",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content .pilot-layout-page",
+                                "count": 1,
+                                "gapRem": 1.5,
+                                "styles": {
+                                    "display": "flex",
+                                    "flex-direction": "column",
+                                    "font-family": "system-ui"
+                                }
+                            },
+                            {
+                                "selector": "[data-test=\"stock-offer\"]",
+                                "count": 2,
+                                "gapRem": 0.5
+                            }
+                        ]
+                    }
+                }
+            ],
+            "noFocusReason": "Read-only catalogue content contains no controls.",
+            "focus": []
+        },
+        {
+            "id": "producer-products",
+            "path": "/visual-dra-209.html",
+            "query": {
+                "page": "Producer/Products/Index"
+            },
+            "root": "#main-content",
+            "panels": "#main-content section,#main-content .pilot-layout-notice,#main-content .pilot-product-list tbody",
+            "fonts": ["16px Nunito Variable"],
+            "states": [
+                {
+                    "id": "populated",
+                    "ready": "body[data-visual-ready=\"populated\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"producer-stock-product\"]",
+                                "count": 3
+                            },
+                            {
+                                "selector": "[data-test=\"producer-stock-product\"] form,[data-test=\"producer-stock-product\"] button,[data-test=\"producer-stock-product\"] a",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".pilot-product-list",
+                                "count": 1,
+                                "styles": {
+                                    "container-name": "pilot-products"
+                                }
+                            },
+                            {
+                                "selector": ".pilot-product-list tbody tr",
+                                "count": 1
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "populated-desktop",
+                    "query": {
+                        "state": "populated"
+                    },
+                    "ready": "body[data-visual-ready=\"populated\"]",
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "panels": "#main-content section,#main-content .pilot-layout-notice,#main-content .pilot-product-list",
+                        "content": "h1,h2,h3,label,input,select,textarea,button,a,td,th,[data-visual-text]",
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"producer-stock-product\"]",
+                                "count": 3
+                            },
+                            {
+                                "selector": "[data-test=\"producer-stock-product\"] form,[data-test=\"producer-stock-product\"] button,[data-test=\"producer-stock-product\"] a",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".pilot-product-table thead th",
+                                "count": 6
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "stock-empty",
+                    "query": {
+                        "state": "stock-empty"
+                    },
+                    "ready": "body[data-visual-ready=\"stock-empty\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".pilot-product-list",
+                                "count": 1,
+                                "styles": {
+                                    "container-name": "pilot-products"
+                                }
+                            },
+                            {
+                                "selector": ".pilot-product-list tbody tr",
+                                "count": 1
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "empty",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "ready": "body[data-visual-ready=\"empty\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "long",
+                    "query": {
+                        "state": "long"
+                    },
+                    "ready": "body[data-visual-ready=\"long\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".pilot-product-list",
+                                "count": 1,
+                                "styles": {
+                                    "container-name": "pilot-products"
+                                }
+                            },
+                            {
+                                "selector": ".pilot-product-list tbody tr",
+                                "count": 8
+                            }
+                        ]
+                    }
+                }
+            ],
+            "focus": [
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "content": "h1,h2,h3,label,input,select,textarea,button,a,td,[data-visual-text]"
+        }
+    ]
+}

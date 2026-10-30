@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Producer;
 
 use App\Http\Controllers\Controller;
+use App\Http\ProducerStockRow;
 use App\Http\ProductRow;
 use App\Http\Requests\Producer\ProductRequest;
 use Guixa\Catalog\Application\CreateProduct;
@@ -10,6 +11,7 @@ use Guixa\Catalog\Application\DeactivateProduct;
 use Guixa\Catalog\Application\DeleteUnusedProduct;
 use Guixa\Catalog\Application\IsProductUsed;
 use Guixa\Catalog\Application\ListProducerProducts;
+use Guixa\Catalog\Application\ListProducerStockProducts;
 use Guixa\Catalog\Application\ReactivateProduct;
 use Guixa\Catalog\Application\UpdateProduct;
 use Guixa\Shared\Application\Actor;
@@ -19,10 +21,13 @@ use Inertia\Response;
 
 class ProductController extends Controller
 {
-    public function index(Actor $actor, ListProducerProducts $list): Response
+    public function index(Actor $actor, ListProducerProducts $list, ListProducerStockProducts $stock): Response
     {
+        $producerId = $this->producerId($actor);
+
         return Inertia::render('Producer/Products/Index', [
-            'products' => array_map(ProductRow::from(...), $list($actor, $this->producerId($actor))),
+            'products' => array_map(ProductRow::from(...), $list($actor, $producerId)),
+            'stockProducts' => array_map(ProducerStockRow::from(...), $stock($actor, $producerId)),
         ]);
     }
 

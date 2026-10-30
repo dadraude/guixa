@@ -3,6 +3,7 @@ const pilotPages = new Set([
     'Orders/Edit',
     'Dashboard',
     'Wallet/Statement',
+    'Stock/Index',
     'Producer/Cutoff',
     'Producer/CycleSummary',
     'Producer/Products/Index',

@@ -38,6 +38,7 @@ use App\Http\Controllers\Producer\CutoffController;
 use App\Http\Controllers\Producer\CycleController as ProducerCycleController;
 use App\Http\Controllers\Producer\ProductAvailabilityController;
 use App\Http\Controllers\Producer\ProductController;
+use App\Http\Controllers\StockController;
 use App\Http\Controllers\WalletController;
 use Illuminate\Support\Facades\Route;
 
@@ -48,6 +49,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 Route::middleware(['auth', 'verified', 'role:member'])->get('wallet', [WalletController::class, 'show'])->name('wallet.show');
+Route::middleware(['auth', 'verified', 'role:member'])->get('stock', [StockController::class, 'index'])->name('stock.index');
 
 Route::middleware(['auth', 'verified', 'role:member'])->prefix('cycles/{cycle}/order')->whereUuid(['cycle', 'product'])->name('orders.')->group(function () {
     Route::get('/', [OrderController::class, 'edit'])->name('edit');

@@ -2447,3 +2447,18 @@ with the weekly writer cutover; T63/DRA-218 removes retired entries and exceptio
 Stock retains inventory ownership and Wallet retains ledger ownership. T54 and T55 keep their existing
 independent prerequisites. These are delivery/check clarifications under A11/A12; product requirements,
 the canonical task registry rows and native ticket dependencies/statuses are unchanged.
+
+## 2026-10-30 · Deviation
+
+T54/DRA-209 keeps the accepted read-only stock discovery behavior while reconciling its delivered
+interfaces in `plan.md`. The producer products page now composes the existing weekly-only
+`ListProducerProducts` with an own-producer `ListProducerStockProducts` query that includes inactive
+own stock and current availability; the earlier plan assigned that stock query to Manager. Sales
+`ListStockOffers` composes active Catalog stock metadata, including inactive producers, with one
+Stock `GetAvailableQuantities` batch through Sales-owned read ports. The Stock-side
+`ListStockOffers` basket query remains a future interface; existing `GetStockOffer` and
+`GetReturnItem` stay Ordering reads. The quantity export now names both current Catalog and Sales
+consumers. The plan's HTTP table marks the member stock page and producer composition as delivered
+in T54. This is a plan-only interface split: role permissions, product visibility, read-only scope,
+future basket work and product requirements are unchanged. The original historical Request was not
+available to this task; this entry refers to the accepted T54 plan and delivered design only.

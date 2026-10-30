@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vite-plus/test';
 export const checkedFiles = [
     'pages/Dashboard.vue',
     'pages/Wallet/Statement.vue',
+    'pages/Stock/Index.vue',
     'pages/Producer/Cutoff.vue',
     'pages/Producer/CycleSummary.vue',
     'pages/Producer/Products/Index.vue',

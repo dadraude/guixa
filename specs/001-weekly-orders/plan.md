@@ -206,9 +206,10 @@ reads them afterwards, in a new statement, so a waiting transaction sees the oth
 | `CreateProduct`, `UpdateProduct`, `DeactivateProduct`, `ReactivateProduct` | Current catalogue administrator according to mode; producer ownership for weekly records |
 | `ChangeProductClassification` | Manager; unused only; never changes producer |
 | `DeleteUnusedProduct` | Current administrator; history check under lock |
-| `ListProducerProducts` | Own producer; editable weekly records, read-only stock records with current availability |
+| `ListProducerProducts` | Own producer; editable weekly records only in T54 |
+| `ListProducerStockProducts` | Own producer in T54; read-only own stock including inactive records, with current availability |
 | `ListProductsOfProducer`, `IsProductUsed`, `GetProductProducer` | Manager catalogue read across both modes, retained-use flag for allowed actions and producer context |
-| `ListProducerStockProducts` | Manager; products created from that producer's record |
+| `ListStockOfferProducts` | Internal Sales read in T54; active stock metadata including products of inactive producers, without quantity |
 | `GetOrderableProduct`, `ListOrderableProducts` | Internal; active weekly products of active producers only |
 | `ListProducerProductsForReception` | Internal; weekly products including inactive records/producers; never stock |
 | `GetStockProductData`, `ListStockProductData` | Internal metadata queries; mode stock, with producer id/name; stock sale does not require producer active |
@@ -218,6 +219,8 @@ reads them afterwards, in a new statement, so a waiting transaction sees the oth
 
 `StockAvailability` maps product ids to Stock's pure quantity query in one batch; do not query one
 product at a time. The Stock metadata queries above do not call that composition query back.
+The producer products HTTP page composes the weekly-only and own-stock queries. Its stock section
+has no edit actions; Manager's cross-producer catalogue remains a separate interface.
 The product lock is exposed through a Catalog Application interface and a caller-owned port;
 Stock/Sales/Ordering never import the Catalog entity or persistence model.
 
@@ -395,13 +398,17 @@ without financial changes. A full contents reversal leaves no effective goods pe
 | `CorrectBasket`, `CorrectBasketCollection` | Finance/Manager; mandatory reason, append-only history |
 | `ListBaskets`, `GetBasket` | Own household member / Finance / Manager, with restricted actions |
 | `ListPendingCollections`, `ReadPendingCollections` | All for Finance/Manager; own household for members; include closed-cycle and cycleless baskets |
-| `ListStockOffers` | Member or sales staff; active stock including zero, inactive producer allowed; no reservation/edit capability |
+| `ListStockOffers` | T54 Member or Manager; active stock including zero, inactive producer allowed; no reservation/edit capability. Finance sales-staff access belongs to a later slice. |
 | `HasProductHistory`, `ReadOpenHouseholdBaskets`, `ReadWeeklyBasketStates`, `ReadEffectiveWeeklyQuantities`, `ReadContainerCounts` | Internal Catalog/Ordering/Membership queries; include history only where requested |
 
 Pending collection lists are ordered by validation instant, then UUID; monetary movement lists keep
 their existing recorded-time/id ordering. Grouping by an origin cycle never hides a basket because
 that cycle closed. Per-basket container totals sum rounded-up line snapshot counts; per-cycle totals
 include all attributed base/supplementary baskets, with independent baskets counted on their own.
+In T54, `ListStockOffers` composes Catalog's `ListStockOfferProducts` metadata with Stock's
+`GetAvailableQuantities` through Sales-owned read ports. One quantity batch supplies current
+availability, with zero for products without movements. This discovery query has no basket,
+reservation or stock-write dependency; later basket operations remain planned separately.
 
 ## Stock
 
@@ -427,10 +434,12 @@ Catalog's pure internal metadata queries; quantity-only queries never call Catal
 | `CreateReturnItem`, `UpdateReturnItem`, `DeactivateReturnItem`, `ReactivateReturnItem`, `ListReturnItems` | Existing Manager-only administration |
 | `RecordStockEntry`, `RecordStockAdjustment` | Manager; stock mode only; positive entry / non-zero justified adjustment |
 | `ListStock`, `ListStockMovements` | Manager; metadata from Catalog, quantity/history from ledger |
-| `GetStockOffer`, `ListStockOffers`, `GetReturnItem` | Internal Sales queries; snapshot, active state and current available quantity |
+| `GetStockOffer`, `GetReturnItem` | Existing internal Ordering reads for stock/return snapshots; not the T54 discovery composition |
+| Stock-side `ListStockOffers` | Planned later Sales basket query; not the T54 discovery composition |
 | `SellStock` | Internal Sales operation, records the already-authorized actor; locks and checks stock |
 | `CorrectBasketStock` | Internal Sales correction with source/reason; cannot make stock negative |
-| `GetAvailableQuantities`, `HasProductMovements` | Internal quantity/history queries for Catalog |
+| `GetAvailableQuantities` | T54 quantity-only batch query for Catalog and Sales discovery; no Catalog callback |
+| `HasProductMovements` | Internal history query for Catalog |
 
 Sale uniqueness is by basket/product; corrections have their own stable source ids. Product ids
 remain locked in ascending order for multi-product writes. Finance accesses sale/correction use cases
@@ -525,7 +534,7 @@ All route middleware is backed by Application Actor checks; member-owned ids are
 | `/cycles/{cycle}/order` and its line mutations | Existing `Orders/Edit` and SetOrderLine; weekly only, references to base/related baskets; archived lines hidden |
 | `/baskets`, `/baskets/{basket}` | Proposed `Baskets/Index`, `Baskets/Show`; member's own household, ordered-versus-actual content, validation/collection state and global wallet link |
 | `PUT /baskets/{basket}/collection` | Own-household member action; validated basket only; `MarkBasketCollected`, no financial effect |
-| `/stock` | Proposed `Stock/Index`; member read-only stock catalogue, active products incl zero sold out, producer/unit/current price/quantity |
+| `/stock` | T54 `Stock/Index`; member read-only stock catalogue, active products incl zero sold out, producer/unit/current price/quantity |
 | `/finance/baskets`, `/finance/baskets/create`, `/finance/baskets/{basket}` | Proposed `Finance/Baskets/Index`, `Create`, `Show`; Manager or Finance; household selection, draft/validated/pending filters, immutable history |
 | `POST /finance/baskets` | `CreateStockBasket`; active household, optional reference cycle inherited when opened from a collection |
 | `PUT .../lines/{line}`, `POST/DELETE .../stock-lines`, `POST/DELETE .../return-lines` | Draft actual quantities and stock/return contents; archive removals |
@@ -534,7 +543,7 @@ All route middleware is backed by Application Actor checks; member-owned ids are
 | `/finance/households/{household}/wallet` and receipt/correction posts | Reuse `Wallet/Statement` and confirmed top-up/correction forms, gated Finance/Manager |
 | `/manage/producers/{producer}/products` | Manager catalogue page listing both modes and their allowed actions; entry from producer administration |
 | `/manage/producers/{producer}/products/...` | Stock product creation/edit/deactivate/reactivate/unused-delete from producer context; Manager only |
-| `/producer/products/...` | Own weekly administration and read-only own stock with quantities; no stock-mode change by producer |
+| `/producer/products/...` | T54 index composes own weekly administration and read-only own stock with quantities; no stock-mode change by producer |
 | `/manage/products/{product}/classification` | Manager-only unused-mode change; no producer reassignment |
 | `/manage/stock/{product}/movements` and entries/adjustments | Existing inventory administration patterns; Catalog ids, Manager-only general inventory operations |
 | `/manage/accounts/{account}/finance-role` | Grant/remove Finance on the existing account administration page, Manager only |

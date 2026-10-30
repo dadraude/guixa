@@ -584,5 +584,13 @@
     "View products of :name": "Consulta els productes de :name",
     "Weekly and stock products from this producer": "Productes setmanals i d’estoc d’aquest productor",
     "Weekly product": "Producte setmanal",
-    "Change product type?": "Vols canviar el tipus?"
+    "Change product type?": "Vols canviar el tipus?",
+    "Stock catalogue": "Catàleg d’estoc",
+    "Current stock available from the cooperative.": "Estoc disponible actualment a la cooperativa.",
+    "No stock products are available yet.": "Encara no hi ha productes d’estoc disponibles.",
+    "Sold out": "Esgotat",
+    "Weekly products": "Productes setmanals",
+    "Stock products": "Productes d’estoc",
+    "Your stock products are read-only.": "Pots consultar els teus productes d’estoc, però no modificar-los.",
+    "No stock products yet.": "Encara no hi ha productes d’estoc."
 }
