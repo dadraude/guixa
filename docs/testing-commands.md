@@ -33,7 +33,8 @@ application commands. Set an inherited task-specific Redis prefix such as
 guarded application invocation; the wrapper does not set that prefix. Run the
 task's diff-derived `check-task.mjs` plan with
 the fixed base SHA and the mapped contract consumers. The plan selects changed
-tests, formatting, and relevant types; review its selection before execution.
+tests and formatting; review its selection before execution. Run focused type
+analysis separately when the change calls for it. Full CI retains its type checks.
 Use a single PHP test filter or exact test path when diagnosing one case, and
 the installed frontend runner's exact test path for a frontend case. Invoke
 application commands through the guarded wrapper in that worktree.
