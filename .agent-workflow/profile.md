@@ -19,7 +19,7 @@ Pre-authorized:
 - Create and clean up task worktrees, branches and `guixa_test_draNN*` databases.
 - Push the task branch, open its PR against `main`, and push new commits for CI fixes and
   merges of `main` when the PR conflicts.
-- Edit admitted `plan.md`/`tasks.md` and append Deviation entries to `log.md`.
+- Edit admitted `plan.md`/`tasks.md` and create one Deviation file per entry in `history/` (see `specs/README.md#history`).
 
 Ask first:
 
@@ -162,9 +162,10 @@ reported, not retried destructively.
 ## Project conventions
 
 - Read `specs/README.md`, `specs/constitution.md`, the task row, its phase's Done when, and every linked
-  `R#` and scenario. The feature's `plan.md` records design; `log.md` is append-only.
+  `R#` and scenario. The feature's `plan.md` records design; history uses immutable files in `history/`.
+  Consult legacy `log.md` plus all relevant new entries with the history helper before changing a feature.
 - At task close, reconcile code/tests with those documents. Record authorized design mismatches in
-  the affected document and a Deviation log entry; preserve existing log entries byte-for-byte. Missing
+  the affected document and a new Deviation file; preserve existing entries and legacy logs byte-for-byte. Missing
   original Request or a behavior change needs the user's decision, not an invented requirement/log.
 - Use one failing Application test per rule/scenario through the public use case, then implement the
   passing slice. Follow repository TDD instructions when available; do not require a global skill install.
@@ -175,7 +176,8 @@ reported, not retried destructively.
   implementation; extend existing variants before adding components. Repeated patterns need a shared
   component, and a new component needs the concrete gap and inspected alternatives in its task handoff.
 - Shared hotspots: route/provider registration, repository interfaces/implementations, test contracts
-  and fixtures, dependency manifests/locks, `resources/js/generated/`, feature plan/tasks/log.
+  and fixtures, dependency manifests/locks, `resources/js/generated/`, feature plan/tasks and legacy logs. Distinct new `history/` entry files do not share a write surface;
+  reserve their exact new paths, while retaining reservations on any shared spec/plan/task edits.
 - Task commits: one line, no body or attribution, `<type>(<scope>): <description> (DRA-NN)`; preserve
   the existing branch/type convention. PR body: delivered behavior, covered R#/scenarios, review rounds,
   Deviations (or None). Do not add provider attribution.

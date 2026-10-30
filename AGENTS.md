@@ -12,6 +12,17 @@ main checkout stays on `main` and is for reading only.
 
 Done when `git -C <worktree> status` shows the change and the main checkout's `git status` shows none.
 
+## Versioned history
+
+Record each new Request, Q&A, Change or Deviation in its own file under
+`specs/NNN-feature/history/`, using the rules and commands in [specs/README.md](specs/README.md#history).
+Existing `log.md` files are frozen archives: never append, rewrite, split or delete them.
+Before changing a feature, consult both its legacy log and new entries with
+`node .agent-workflow/scripts/history.mjs read NNN-feature`; omit the feature to read all history.
+Create entries with the helper's `add` command, commit them with the change, and pass their exact paths
+in handoffs. Never maintain a shared index or edit an existing entry; corrections get a new entry
+referencing the original. History in other branches is visible only after those changes are integrated.
+
 ## Measure before screenshot
 
 Opening an image costs far more tokens than reading numbers. To check a style fix, measure it as text:

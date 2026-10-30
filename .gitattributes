@@ -10,5 +10,4 @@ CHANGELOG.md export-ignore
 README.md export-ignore
 .github/workflows/browser-tests.yml export-ignore
 
-# log.md is append-only: keep both sides when branches add entries.
-specs/*/log.md merge=union
+# History uses distinct immutable entry files; legacy log.md archives stay frozen.

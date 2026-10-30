@@ -25,7 +25,8 @@ means pause and request coordinator admission before writing it. Do not omit req
    Check formatting on every changed supported source/document file and types where needed; full suites, lint, type analysis and
    build belong to CI. If a focused test requires built assets or another setup step, run that prerequisite
    and record why. Reconcile code with the spec/design
-   under the profile's append-only deviation rules. Product changes require the user's decision before
+   under the profile's immutable history-entry rules; consult legacy and new history using the
+   project's documented reader. Create a separate entry file for each deviation and return its exact path. Product changes require the user's decision before
    editing requirements; design deviations still require admitted document surfaces.
 5. Inspect the diff, commit only the task's authorized code/tests/docs with the configured message,
    and return committed only with green focused evidence bound to HEAD/base. Full validation awaits CI

@@ -7,7 +7,9 @@ not the coordinator's adapter, setup commands or whole profile. Missing source/t
 not a clean result. Request missing inputs; do not infer remote or execution authority.
 
 Read the task/phase acceptance, linked requirements/scenarios, affected design, project standards and
-new deviation log entries at the exact paths/sections in the handoff.
+new deviation history files at the exact paths in the handoff. Consult the project's combined legacy
+and new history when checking earlier decisions. Verify existing entries/archives are unchanged and
+corrections use new files linking their originals.
 
 For UI changes, load the [visual review handoff](../references/visual.md#review-handoff). Require the
 component plan with reuse/extension paths and reasons for new components, manifest/inventory,

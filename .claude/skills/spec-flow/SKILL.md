@@ -1,6 +1,6 @@
 ---
 name: spec-flow
-description: Route a Guixa change through its spec documents and keep the feature's `log.md` current. Use when a bug or change request arrives, when editing a feature's `spec.md`, area files, `plan.md` or `tasks.md`, or before marking a task done.
+description: Route a Guixa change through its spec documents and record each history entry in its own versioned file. Use when a bug or change request arrives, when editing a feature's `spec.md`, area files, `plan.md` or `tasks.md`, or before marking a task done.
 ---
 
 The rules live in `specs/README.md`: the three routes under "Spec flow or direct fix?" and the four
@@ -17,21 +17,38 @@ Done when the user has seen the route.
 
 ## 2. Log
 
-Every edit to a feature's documents and every answered question appends one entry to
-`specs/NNN-feature/log.md`. A direct fix logs nothing.
+Every edit to a feature's documents and every answered question creates a separate entry in
+`specs/NNN-feature/history/`, following [the history contract](../../../specs/README.md#history).
+A direct fix logs nothing.
 
-If `log.md` is missing, create it with a **Request** entry first. Ask the user for the original
-request verbatim; a reconstructed request has no value as a record.
+Before editing, consult the feature's combined legacy and new history:
 
-Append at the end of the file, leaving existing entries byte-identical:
+```sh
+node .agent-workflow/scripts/history.mjs read NNN-feature
+```
+
+Omit the feature argument to consult the entire repository history. Search both formats for relevant
+requirements/tasks, follow corrections and source links, and read the full combined history when
+context is unclear. Existing `log.md` files stay frozen and still count as history. Do not invent a
+missing Request: if neither the archive nor new entries contain it, ask for the original verbatim.
+For a new feature, record that Request as its first entry file.
+
+Prepare the body in a temporary file, then create an exclusive, uniquely named entry:
+
+```sh
+node .agent-workflow/scripts/history.mjs add NNN-feature Change DRA-123 < /tmp/history-body.md
+```
+
+Omit the issue argument when there is none. The helper supplies the UTC timestamp, kind and optional
+issue heading, preserving the body verbatim. A Change body can be:
 
 ```markdown
-## YYYY-MM-DD · Change
-
 R12 (`ordering.md`): <what changed>.
 Why: <reason, or the OQ / conversation that decided it>.
 ```
 
+Commit each printed path with its change. Never edit an existing entry or shared index; record a
+correction in a new file linking the original. Pass exact entry paths to implementers and reviewers.
 Done when every document edit in the diff has its entry.
 
 ## 3. Plan and break down accepted scope

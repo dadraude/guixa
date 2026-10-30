@@ -82,7 +82,14 @@ independent and an integration owner is recorded. Unknown coverage keeps the nor
   serially and regenerate from the combined source. Never hand-merge or concatenate derived files.
   A lockfile or behavioral interface is not mechanically independent merely because it is generated.
 
+- Immutable history files: when the project's history contract uses one uniquely named new file per
+  entry, distinct additions are independent write surfaces. Reserve each exact new path; do not relax
+  reservations on shared requirements, plans or task registries changed alongside those entries.
+  Existing entry edits, shared indexes or a shared append target remain exclusive and must satisfy
+  the project's history rules.
+
 Before each publication/integration, recheck peer diffs and ownership, serialize combination, and
 validate the combined candidate's focused tests and generators. Refresh evidence and current CI as
 usual. A discovered key/contract conflict returns later work to queued without discarding it.
-Do not relax reservations for routes, shared behavior, requirements or append-only records.
+
+Do not relax reservations for routes, shared behavior, requirements or shared append-only targets.
