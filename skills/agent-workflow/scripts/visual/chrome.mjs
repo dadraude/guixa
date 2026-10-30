@@ -37,7 +37,13 @@ export async function openChrome(binary = process.env.CHROME_BIN) {
         const force = setTimeout(() => child.kill('SIGKILL'), 2000);
         await closed;
         clearTimeout(force);
-        await rm(profile, { recursive: true, force: true });
+        // Chrome subprocesses can finish profile writes after the parent exits.
+        await rm(profile, {
+            recursive: true,
+            force: true,
+            maxRetries: 5,
+            retryDelay: 100,
+        });
     };
     try {
         const endpoint = await new Promise((resolve, reject) => {

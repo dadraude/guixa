@@ -47,7 +47,7 @@ Parent status does not gate its children. Do not make a child blocked by its own
 ## Planning gates
 
 Before slicing, apply [planning readiness](../references/planning.md#readiness-before-slicing).
-Use its batch guidance, executable task handoff and draft checks for both source task descriptions
+Use its [task-quality criteria](../references/planning.md#task-quality-invest), batch guidance, handoff and draft checks for both source task descriptions
 and proposed issue bodies. Report missing decisions or artifacts for blocked scope instead of hiding
 them as implementation dependencies. Existing accepted tasks need a current evidence check, not an
 automatic rewrite. Drafting tickets does not authorize changes to the canonical task registry.
