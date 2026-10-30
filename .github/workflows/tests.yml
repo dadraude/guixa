@@ -191,17 +191,15 @@ jobs:
           node-version: '22'
 
       - name: Check CI selection and gate
-        run: python3 -m unittest discover -s .github/scripts -p 'test_*.py'
+        run: python3 .github/scripts/test_commands.py selection
 
       - name: Check workflow contracts
-        run: |
-          python3 -m unittest discover -s skills/agent-workflow/tests
-          python3 -m unittest discover -s .agent-workflow/tests
+        run: python3 .github/scripts/test_commands.py contracts
 
       - name: Check workflow helpers and visual harness
         env:
           CHROME_BIN: /usr/bin/google-chrome
-        run: node --test skills/agent-workflow/tests/*.test.mjs skills/agent-workflow/tests/visual/*.test.mjs .agent-workflow/tests/*.test.mjs
+        run: python3 .github/scripts/test_commands.py helpers
 
   ci:
     if: always()
