@@ -31,7 +31,7 @@ function fixture(t) {
     return { root, script, run };
 }
 
-test('reads every feature with legacy bytes and ordered entries, without a maintained index', (t) => {
+void test('reads every feature with legacy bytes and ordered entries, without a maintained index', (t) => {
     const { root, run } = fixture(t);
     const legacy = '## 2020-01-01 · Request\n\nOriginal ask.  \n';
     writeFileSync(join(root, 'specs/001-first/log.md'), legacy);
@@ -59,7 +59,7 @@ test('reads every feature with legacy bytes and ordered entries, without a maint
     );
 });
 
-test('simultaneous writers create independent entries and preserve verbatim bodies and existing files', async (t) => {
+void test('simultaneous writers create independent entries and preserve verbatim bodies and existing files', async (t) => {
     const { root, script, run } = fixture(t);
     const original = run(['add', '001-first', 'Request'], 'Original request\n');
     const originalBytes = readFileSync(join(root, original.trim()));
@@ -97,7 +97,7 @@ test('simultaneous writers create independent entries and preserve verbatim bodi
     assert.deepEqual(readFileSync(join(root, original.trim())), originalBytes);
 });
 
-test('invalid feature, kind, task and blank entries fail without creating history files', (t) => {
+void test('invalid feature, kind, task and blank entries fail without creating history files', (t) => {
     const { root, run } = fixture(t);
     for (const [args, body] of [
         [['add', '../outside', 'Change'], 'text'],
