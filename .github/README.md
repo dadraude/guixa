@@ -32,3 +32,6 @@ python3 -B -m unittest discover -s .github/scripts -p 'test_*.py'
 
 No application behavior changed; these regression checks and workflow syntax
 validation are the focused checks for this CI refactor.
+
+Dependabot checks Composer, npm and GitHub Actions dependencies weekly. Composer
+minor and patch updates are grouped after a five-day cooldown.
