@@ -77,10 +77,6 @@ intact. Existing application data is preserved. To start the demo over, use a se
 
 ## Tests and checks
 
-```sh
-php artisan test   # Pest, against the guixa_test database (see phpunit.xml)
-pnpm test          # Vitest
-pnpm check         # Oxlint + Oxfmt
-vendor/bin/pint --test
-vendor/bin/phpstan analyse
-```
+Use the [testing and CI reproduction guide](docs/testing.md) for isolated task setup, focused
+selectors, and the current CI checks. Application tests require PostgreSQL and Redis; run them
+through the guarded task environment described there rather than using the shared local database.
