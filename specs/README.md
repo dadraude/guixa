@@ -19,13 +19,57 @@ no code is written before its spec is accepted.
    row says why. Apply the shared [task-quality and slicing rules](../skills/agent-workflow/references/planning.md#task-quality-invest)
    to every new task breakdown.
 
-Alongside them, `NNN-feature/log.md` keeps the why. It is append-only: entries are never edited or
-removed, so the reasoning survives after the spec is rewritten. Each entry is dated and is one of:
+## History
+
+Alongside the documents, `NNN-feature/history/` keeps the why: **one new Markdown file per entry**,
+committed with the change. Entries are immutable once committed; corrections and superseding decisions
+get a new entry linking the original. Never append to or rewrite another entry, maintain a shared
+index, or reserve a sequential filename. Each entry is dated and is one of:
 
 - **Request** — the original ask, verbatim. The first entry of every feature.
 - **Q&A** — a question asked while writing a document and the answer given, verbatim.
 - **Change** — what changed in which document (`R#`, `S#`, plan section, task) and why.
 - **Deviation** — something found while coding that the spec or plan did not anticipate, and how it was resolved.
+
+Existing `NNN-feature/log.md` files remain frozen, byte-for-byte, as legacy archives. Do not split,
+move or delete them: existing links keep working. A feature's complete history is its legacy archive
+(if present) **plus every file in `history/`**. New features start with a Request file in `history/`;
+do not create a new `log.md`. If neither source contains the original Request, ask for it verbatim.
+
+From the task worktree, create an entry from a prepared body file (Node only; no app/database setup):
+
+```sh
+node .agent-workflow/scripts/history.mjs add 001-weekly-orders Change DRA-123 < /tmp/history-body.md
+```
+
+Use `Request`, `Q&A`, `Change` or `Deviation` as the kind (quote `"Q&A"` in shell). Omit the issue
+argument for work without an issue. The helper prints the new path and creates it exclusively with a
+UTC timestamp, issue key (or `no-task`) and UUID; parallel agents never share a target filename.
+The heading records the timestamp and kind, followed by the issue when supplied and the body verbatim.
+Include affected `R#`, `S#`, task/document sections, what changed and why, and decision/source links.
+Requests and Q&A retain the user's wording verbatim. Commit the printed file, not the temporary body.
+Creating an entry does not grant permission to change product requirements.
+
+Consult history before changing a feature or interpreting an earlier decision:
+
+```sh
+# Complete history of one feature: frozen archive first, then new files sorted by filename.
+node .agent-workflow/scripts/history.mjs read 001-weekly-orders
+# Complete repository history, grouped by feature in directory-name order.
+node .agent-workflow/scripts/history.mjs read
+# Locate relevant decisions in both formats, then read the matching entries and their references.
+rg -n --glob 'log.md' --glob '**/history/*.md' 'R20|T25|DRA-123' specs/001-weekly-orders
+```
+
+Reader output includes source paths and never writes a combined file. Within `history/`, UTC filenames sort by creation time; UUIDs break ties, not
+causal order. The legacy archive retains its original order, without attempting to interleave dates.
+A correction must link the entry it supersedes. Search results alone do not establish the current
+rule: follow those links and check the accepted spec/plan. Read the full combined history when asked
+for all history or when context is unclear. No history is stored only in Linear.
+
+The reader sees the current worktree, including uncommitted entries; it cannot see unintegrated peer
+branches or future commits. Refresh from `origin/main` through the normal integration workflow before
+claiming the history is current, and disclose any pending task branches that matter.
 
 Rules:
 

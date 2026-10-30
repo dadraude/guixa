@@ -27,6 +27,8 @@ apply; missing required inputs stop the affected action rather than inviting gue
 | Publisher / CI observer | Task pipeline's publication/CI sections, exact candidate and PR identity, verified authorization, expected CI checks and status/report contract; no implementation history or credentials in prompts.                               |
 
 For code-writing roles, include the profile's Project conventions and only relevant project standards.
+Pass exact new history-entry paths and the project's combined-history reading command; legacy archives
+remain read-only context. Admit unique new entry paths without granting edits to other entries.
 The implementer also receives the full isolation constraints from Commands; resolved values cannot
 weaken those rules. A reviewer needing an extra probe requests its environment/authorization from the
 coordinator rather than inheriting write or remote permissions. Task-specific test prerequisites are
