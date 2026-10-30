@@ -17,10 +17,13 @@ vi.mock('@/layouts/app/AppSidebarLayout.vue', async () => {
     const { defineComponent, h } = await import('vue');
     return {
         default: defineComponent({
-            props: { pilotTheme: Boolean },
+            props: { pilotTheme: Boolean, managerTheme: Boolean },
             setup(props) {
                 return () =>
-                    h('div', { 'data-pilot': String(props.pilotTheme) });
+                    h('div', {
+                        'data-pilot': String(props.pilotTheme),
+                        'data-manager': String(props.managerTheme),
+                    });
             },
         }),
     };
@@ -86,6 +89,34 @@ describe('pilot theme page selection', () => {
         wrapper.unmount();
     });
 
+    it('uses the Manager pilot shell on every independent basket page', async () => {
+        const page = usePage();
+        const wrapper = mount(AppLayout);
+        for (const component of [
+            'Finance/Baskets/Index',
+            'Finance/Baskets/Create',
+            'Finance/Baskets/Show',
+        ]) {
+            page.component = component;
+            await nextTick();
+            expect(wrapper.get('[data-pilot]').attributes('data-pilot')).toBe(
+                'true',
+            );
+            expect(
+                wrapper.get('[data-manager]').attributes('data-manager'),
+            ).toBe('true');
+        }
+        page.component = 'Wallet/Statement';
+        await nextTick();
+        expect(wrapper.get('[data-pilot]').attributes('data-pilot')).toBe(
+            'true',
+        );
+        expect(wrapper.get('[data-manager]').attributes('data-manager')).toBe(
+            'false',
+        );
+        wrapper.unmount();
+    });
+
     it.each([
         ['Orders/Index', true],
         ['Orders/Edit', true],
@@ -114,6 +145,9 @@ describe('pilot theme page selection', () => {
         ['Manage/ReturnItems/Index', true],
         ['Manage/ReturnItems/Create', true],
         ['Manage/ReturnItems/Edit', true],
+        ['Finance/Baskets/Index', true],
+        ['Finance/Baskets/Create', true],
+        ['Finance/Baskets/Show', true],
         ['settings/Appearance', true],
         ['settings/Profile', true],
         ['settings/Security', true],

@@ -4,6 +4,7 @@ namespace Guixa\Wallet\Infrastructure\Persistence;
 
 use DateTimeImmutable;
 use Guixa\Shared\Domain\Money;
+use Guixa\Wallet\Domain\Error\BasketAlreadyCharged;
 use Guixa\Wallet\Domain\Error\PickupAlreadyCharged;
 use Guixa\Wallet\Domain\Movement;
 use Guixa\Wallet\Domain\MovementRepository;
@@ -32,10 +33,15 @@ final class EloquentMovementRepository implements MovementRepository
                 'recorded_by' => $movement->recordedBy,
                 'note' => $movement->note,
                 'cycle_id' => $movement->cycleId,
+                'basket_id' => $movement->basketId,
             ]));
         } catch (UniqueConstraintViolationException $e) {
             if ($movement->isChargeOrCredit() && str_contains($e->getMessage(), 'wallet_movements_one_charge_per_cycle')) {
                 throw PickupAlreadyCharged::create();
+            }
+
+            if ($movement->isChargeOrCredit() && str_contains($e->getMessage(), 'wallet_movements_one_charge_per_basket')) {
+                throw BasketAlreadyCharged::create();
             }
 
             throw $e;
@@ -71,6 +77,7 @@ final class EloquentMovementRepository implements MovementRepository
             $model->recorded_by,
             $model->note,
             $model->cycle_id,
+            $model->basket_id,
         );
     }
 }

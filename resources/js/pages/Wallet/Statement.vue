@@ -3,6 +3,7 @@ import { formatEventDateTime, formatMoney } from '@/lib/locale';
 import { Form, Head, Link } from '@inertiajs/vue3';
 import HouseholdController from '@/actions/App/Http/Controllers/Manage/HouseholdController';
 import HouseholdWalletController from '@/actions/App/Http/Controllers/Manage/HouseholdWalletController';
+import BasketController from '@/actions/App/Http/Controllers/Finance/BasketController';
 import Heading from '@/components/Heading.vue';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
@@ -162,6 +163,9 @@ const typeLabels: Record<string, string> = {
                             <th scope="col" class="py-2">
                                 {{ trans('Note') }}
                             </th>
+                            <th scope="col" class="py-2">
+                                {{ trans('Source') }}
+                            </th>
                             <th scope="col" class="py-2 text-right">
                                 {{ trans('Amount') }}
                             </th>
@@ -195,6 +199,42 @@ const typeLabels: Record<string, string> = {
                                     aria-hidden="true"
                                     >{{ trans('Note') }}</span
                                 >{{ movement.note }}
+                            </td>
+                            <td class="py-2">
+                                <span
+                                    class="pilot-cell-label"
+                                    aria-hidden="true"
+                                    >{{ trans('Source') }}</span
+                                >
+                                <Link
+                                    v-if="household && movement.basketId"
+                                    :href="
+                                        BasketController.show.url({
+                                            basket: movement.basketId,
+                                        })
+                                    "
+                                    class="inline-flex min-h-11 max-w-full items-center break-all underline"
+                                    data-test="basket-source-link"
+                                >
+                                    {{
+                                        trans('Basket: :name', {
+                                            name: movement.basketId,
+                                        })
+                                    }}
+                                </Link>
+                                <span
+                                    v-else-if="movement.basketId"
+                                    data-test="basket-source-text"
+                                    class="break-all"
+                                    >{{
+                                        trans('Basket: :name', {
+                                            name: movement.basketId,
+                                        })
+                                    }}</span
+                                >
+                                <span v-else-if="movement.cycleId">{{
+                                    trans('Cycle')
+                                }}</span>
                             </td>
                             <td class="pilot-amount py-2">
                                 <span

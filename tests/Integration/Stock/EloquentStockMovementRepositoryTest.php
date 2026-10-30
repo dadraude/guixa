@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Stock;
 
+use App\Models\User;
 use Guixa\Catalog\Infrastructure\Persistence\ProducerModel;
 use Guixa\Catalog\Infrastructure\Persistence\ProductModel;
 use Guixa\Shared\Application\Actor;
@@ -34,6 +35,20 @@ final class EloquentStockMovementRepositoryTest extends TestCase
             'producer_id' => $producer->id, 'stock' => true,
             'name' => 'Honey', 'unit' => 'jar', 'price_cents' => 650, 'variable' => false, 'active' => true,
         ])->id;
+    }
+
+    protected function basket(): string
+    {
+        $household = (string) Str::uuid7();
+        $id = (string) Str::uuid7();
+        DB::table('households')->insert(['id' => $household, 'name' => 'Household', 'created_at' => now(), 'updated_at' => now()]);
+        DB::table('baskets')->insert([
+            'id' => $id, 'household_id' => $household, 'household_name' => 'Household',
+            'kind' => 'stock', 'state' => 'draft', 'created_by' => User::factory()->create()->id,
+            'created_at' => now(),
+        ]);
+
+        return $id;
     }
 
     protected function cycleExists(string $cycleId): void

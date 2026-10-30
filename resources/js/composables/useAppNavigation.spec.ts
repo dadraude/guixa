@@ -11,10 +11,12 @@ describe('shared app navigation', () => {
         const member = navigationItemsFor([{ role: 'member' }]);
 
         expect(manager.map((item) => item.title)).toContain('Stock');
+        expect(manager.map((item) => item.title)).toContain('Baskets');
         expect(manager.map((item) => item.title)).not.toContain('Wallet');
         expect(member.map((item) => item.title)).toContain('Wallet');
         expect(member.map((item) => item.title)).toContain('Stock catalogue');
         expect(member.map((item) => item.title)).not.toContain('Stock');
+        expect(member.map((item) => item.title)).not.toContain('Baskets');
         expect(
             navigationItemsFor([{ role: 'producer' }]).map(
                 (item) => item.title,
@@ -47,7 +49,7 @@ describe('shared app navigation', () => {
         ).toEqual([
             ['Dashboard'],
             ['Orders', 'Stock catalogue', 'Wallet'],
-            ['Cycles', 'Households'],
+            ['Cycles', 'Households', 'Baskets'],
             ['Producers', 'Stock', 'Return items'],
             ['Accounts', 'Settings'],
             ['Products', 'Default cutoff'],
@@ -57,7 +59,7 @@ describe('shared app navigation', () => {
             { role: 'manager' },
             { role: 'producer' },
         ]).map((item) => item.title);
-        expect(titles).toHaveLength(13);
+        expect(titles).toHaveLength(14);
         expect(new Set(titles).size).toBe(titles.length);
     });
 
@@ -73,5 +75,8 @@ describe('shared app navigation', () => {
         expect(
             currentNavigationItem(items, '/manage/stockroom'),
         ).toBeUndefined();
+        expect(
+            currentNavigationItem(items, '/finance/baskets/example')?.title,
+        ).toBe('Baskets');
     });
 });

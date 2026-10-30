@@ -2,6 +2,10 @@
 
 use App\Http\Controllers\AcceptInvitationController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Finance\BasketCollectionController;
+use App\Http\Controllers\Finance\BasketController;
+use App\Http\Controllers\Finance\BasketStockController;
+use App\Http\Controllers\Finance\BasketValidationController;
 use App\Http\Controllers\Manage\AccountController;
 use App\Http\Controllers\Manage\AccountDeactivationController;
 use App\Http\Controllers\Manage\AccountHouseholdController;
@@ -50,6 +54,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 Route::middleware(['auth', 'verified', 'role:member'])->get('wallet', [WalletController::class, 'show'])->name('wallet.show');
 Route::middleware(['auth', 'verified', 'role:member'])->get('stock', [StockController::class, 'index'])->name('stock.index');
+
+Route::middleware(['auth', 'verified', 'role:manager'])->prefix('finance/baskets')->name('finance.baskets.')->whereUuid(['basket', 'stockProduct'])->group(function () {
+    Route::get('/', [BasketController::class, 'index'])->name('index');
+    Route::get('create', [BasketController::class, 'create'])->name('create');
+    Route::post('/', [BasketController::class, 'store'])->name('store');
+    Route::get('{basket}', [BasketController::class, 'show'])->name('show');
+    Route::post('{basket}/stock-lines', [BasketStockController::class, 'store'])->name('stock-lines.store');
+    Route::delete('{basket}/stock-lines/{stockProduct}', [BasketStockController::class, 'destroy'])->name('stock-lines.destroy');
+    Route::post('{basket}/validation', [BasketValidationController::class, 'store'])->name('validate');
+    Route::put('{basket}/collection', [BasketCollectionController::class, 'update'])->name('collect');
+    Route::post('{basket}/cancellation', [BasketController::class, 'cancel'])->name('cancel');
+});
 
 Route::middleware(['auth', 'verified', 'role:member'])->prefix('cycles/{cycle}/order')->whereUuid(['cycle', 'product'])->name('orders.')->group(function () {
     Route::get('/', [OrderController::class, 'edit'])->name('edit');

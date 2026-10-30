@@ -1,0 +1,1445 @@
+{
+    "baseUrl": "http://127.0.0.1:5210",
+    "rootFontPx": 16,
+    "darkSelector": "html.dark",
+    "matrix": {
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark"],
+        "text": [100, 200]
+    },
+    "views": [
+        {
+            "id": "baskets-index",
+            "path": "/visual-dra-210.html",
+            "query": {
+                "page": "Finance/Baskets/Index",
+                "role": "manager"
+            },
+            "root": "#main-content",
+            "panels": "#main-content section,#main-content form,#main-content .pilot-list,#main-content .pilot-layout-panel,#main-content .pilot-layout-notice,#main-content table",
+            "content": "#main-content h1,#main-content h2,#main-content h3,#main-content p,#main-content label,#main-content input,#main-content a,#main-content button,#main-content th,#main-content td,#main-content li",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "states": [
+                {
+                    "id": "populated",
+                    "query": {
+                        "state": "populated"
+                    },
+                    "ready": "body[data-visual-ready=\"populated\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".material-app-shell.pilot-theme",
+                                "count": 1,
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content button:not([data-sidebar])",
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"basket-list\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"status-validated\"]",
+                                "count": 1
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "empty",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "ready": "body[data-visual-ready=\"empty\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".material-app-shell.pilot-theme",
+                                "count": 1,
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content button:not([data-sidebar])",
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"empty-baskets\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"basket-list\"]",
+                                "count": 0
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "long",
+                    "query": {
+                        "state": "long"
+                    },
+                    "ready": "body[data-visual-ready=\"long\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".material-app-shell.pilot-theme",
+                                "count": 1,
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content button:not([data-sidebar])",
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"basket-list\"] li",
+                                "count": 8
+                            }
+                        ]
+                    }
+                }
+            ],
+            "assertions": [
+                {
+                    "selector": ".material-app-shell.pilot-theme",
+                    "count": 1,
+                    "styles": {
+                        "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                    }
+                },
+                {
+                    "selector": "#main-content h1",
+                    "count": 1,
+                    "contrast": 4.5
+                }
+            ]
+        },
+        {
+            "id": "baskets-create",
+            "path": "/visual-dra-210.html",
+            "query": {
+                "page": "Finance/Baskets/Create",
+                "role": "manager"
+            },
+            "root": "#main-content",
+            "panels": "#main-content section,#main-content form,#main-content .pilot-list,#main-content .pilot-layout-panel,#main-content .pilot-layout-notice,#main-content table",
+            "content": "#main-content h1,#main-content h2,#main-content h3,#main-content p,#main-content label,#main-content input,#main-content a,#main-content button,#main-content th,#main-content td,#main-content li",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "states": [
+                {
+                    "id": "populated",
+                    "query": {
+                        "state": "populated"
+                    },
+                    "ready": "body[data-visual-ready=\"populated\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".material-app-shell.pilot-theme",
+                                "count": 1,
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content button:not([data-sidebar])",
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"household-select\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"create-basket\"]",
+                                "count": 1
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "empty",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "ready": "body[data-visual-ready=\"empty\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".material-app-shell.pilot-theme",
+                                "count": 1,
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"no-households\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"create-basket\"]",
+                                "count": 0
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "error",
+                    "query": {
+                        "state": "error"
+                    },
+                    "ready": "body[data-visual-ready=\"error\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".material-app-shell.pilot-theme",
+                                "count": 1,
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content button:not([data-sidebar])",
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "#main-content p.text-destructive",
+                                "count": 1
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "processing",
+                    "query": {
+                        "state": "processing"
+                    },
+                    "ready": "body[data-visual-ready=\"processing\"]",
+                    "cases": [
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".material-app-shell.pilot-theme",
+                                "count": 1,
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content button:not([data-sidebar])",
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"create-basket\"]",
+                                "count": 1,
+                                "attributes": {
+                                    "disabled": ""
+                                }
+                            }
+                        ]
+                    }
+                }
+            ],
+            "assertions": [
+                {
+                    "selector": ".material-app-shell.pilot-theme",
+                    "count": 1,
+                    "styles": {
+                        "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                    }
+                },
+                {
+                    "selector": "#main-content h1",
+                    "count": 1,
+                    "contrast": 4.5
+                }
+            ]
+        },
+        {
+            "id": "baskets-show",
+            "path": "/visual-dra-210.html",
+            "query": {
+                "page": "Finance/Baskets/Show",
+                "role": "manager"
+            },
+            "root": "#main-content",
+            "panels": "#main-content section,#main-content form,#main-content .pilot-list,#main-content .pilot-layout-panel,#main-content .pilot-layout-notice,#main-content table",
+            "content": "#main-content h1,#main-content h2,#main-content h3,#main-content p,#main-content label,#main-content input,#main-content a,#main-content button,#main-content th,#main-content td,#main-content li,#main-content dt,#main-content dd",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "states": [
+                {
+                    "id": "populated",
+                    "query": {
+                        "state": "populated"
+                    },
+                    "ready": "body[data-visual-ready=\"populated\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".material-app-shell.pilot-theme",
+                                "count": 1,
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content button:not([data-sidebar])",
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"draft-actions\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"add-stock-form\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"validate-basket\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"basket-balance\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"basket-balance\"] > div:nth-child(1) dd",
+                                "count": 1,
+                                "text": "5,00 €"
+                            },
+                            {
+                                "selector": "[data-test=\"basket-balance\"] > div:nth-child(2) dd",
+                                "count": 1,
+                                "text": "13,00 €"
+                            },
+                            {
+                                "selector": "[data-test=\"basket-balance\"] > div:nth-child(3) dd",
+                                "count": 1,
+                                "text": "-8,00 €"
+                            }
+                        ],
+                        "focus": [
+                            "[data-visual-page-focus-first]",
+                            "[data-test=\"remove-stock-0198f0a0-0000-7000-8000-000000000023\"]",
+                            "[data-test=\"stock-product\"]",
+                            "[data-test=\"stock-quantity\"]",
+                            "[data-test=\"add-stock-form\"] button[type=\"submit\"]",
+                            "[data-test=\"wallet-link\"]",
+                            "[data-visual-page-focus-last]"
+                        ]
+                    }
+                },
+                {
+                    "id": "validated",
+                    "query": {
+                        "state": "validated"
+                    },
+                    "ready": "body[data-visual-ready=\"validated\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".material-app-shell.pilot-theme",
+                                "count": 1,
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content button:not([data-sidebar])",
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"pending-collection\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"collect-basket\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"add-stock-form\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"draft-actions\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"basket-balance\"] > div:nth-child(1) dd",
+                                "count": 1,
+                                "text": "-8,00 €"
+                            },
+                            {
+                                "selector": "[data-test=\"basket-balance\"] > div:nth-child(2) dd",
+                                "count": 1,
+                                "text": "13,00 €"
+                            }
+                        ],
+                        "focus": [
+                            "[data-visual-page-focus-first]",
+                            "[data-test=\"wallet-link\"]",
+                            "[data-test=\"collect-basket\"]"
+                        ]
+                    }
+                },
+                {
+                    "id": "collected",
+                    "query": {
+                        "state": "collected"
+                    },
+                    "ready": "body[data-visual-ready=\"collected\"]",
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".material-app-shell.pilot-theme",
+                                "count": 1,
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"collected\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"add-stock-form\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"draft-actions\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"collect-basket\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"basket-balance\"] > div:nth-child(1) dd",
+                                "count": 1,
+                                "text": "-8,00 €"
+                            },
+                            {
+                                "selector": "[data-test=\"basket-balance\"] > div:nth-child(2) dd",
+                                "count": 1,
+                                "text": "13,00 €"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "error",
+                    "query": {
+                        "state": "error"
+                    },
+                    "ready": "body[data-visual-ready=\"error\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".material-app-shell.pilot-theme",
+                                "count": 1,
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content button:not([data-sidebar])",
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"domain-error\"] p.text-destructive",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"basket-balance\"] > div:nth-child(1) dd",
+                                "count": 1,
+                                "text": "5,00 €"
+                            },
+                            {
+                                "selector": "[data-test=\"basket-balance\"] > div:nth-child(2) dd",
+                                "count": 1,
+                                "text": "13,00 €"
+                            },
+                            {
+                                "selector": "[data-test=\"basket-balance\"] > div:nth-child(3) dd",
+                                "count": 1,
+                                "text": "-8,00 €"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "processing",
+                    "query": {
+                        "state": "processing"
+                    },
+                    "ready": "body[data-visual-ready=\"processing\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".material-app-shell.pilot-theme",
+                                "count": 1,
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content button:not([data-sidebar])",
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"validate-basket\"]",
+                                "count": 1,
+                                "attributes": {
+                                    "disabled": ""
+                                }
+                            },
+                            {
+                                "selector": "[data-test=\"basket-balance\"] > div:nth-child(1) dd",
+                                "count": 1,
+                                "text": "5,00 €"
+                            },
+                            {
+                                "selector": "[data-test=\"basket-balance\"] > div:nth-child(2) dd",
+                                "count": 1,
+                                "text": "13,00 €"
+                            },
+                            {
+                                "selector": "[data-test=\"basket-balance\"] > div:nth-child(3) dd",
+                                "count": 1,
+                                "text": "-8,00 €"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "long",
+                    "query": {
+                        "state": "long"
+                    },
+                    "ready": "body[data-visual-ready=\"long\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".material-app-shell.pilot-theme",
+                                "count": 1,
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content button:not([data-sidebar])",
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"stock-line-0198f0a0-0000-7000-8000-000000000023\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"basket-balance\"] > div:nth-child(1) dd",
+                                "count": 1,
+                                "text": "5,00 €"
+                            },
+                            {
+                                "selector": "[data-test=\"basket-balance\"] > div:nth-child(2) dd",
+                                "count": 1,
+                                "text": "13,00 €"
+                            },
+                            {
+                                "selector": "[data-test=\"basket-balance\"] > div:nth-child(3) dd",
+                                "count": 1,
+                                "text": "-8,00 €"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "collect-processing",
+                    "query": {
+                        "state": "collect-processing"
+                    },
+                    "ready": "body[data-visual-ready=\"collect-processing\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".material-app-shell.pilot-theme",
+                                "count": 1,
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content button:not([data-sidebar])",
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"pending-collection\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"collect-basket\"]",
+                                "count": 1,
+                                "attributes": {
+                                    "disabled": ""
+                                }
+                            },
+                            {
+                                "selector": "[data-test=\"draft-actions\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"basket-balance\"] > div:nth-child(1) dd",
+                                "count": 1,
+                                "text": "-8,00 €"
+                            },
+                            {
+                                "selector": "[data-test=\"basket-balance\"] > div:nth-child(2) dd",
+                                "count": 1,
+                                "text": "13,00 €"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "empty",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "ready": "body[data-visual-ready=\"empty\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".material-app-shell.pilot-theme",
+                                "count": 1,
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"basket-status-draft\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"no-stock-lines\"]",
+                                "count": 1,
+                                "text": "No s’ha afegit cap producte d’estoc a aquesta cistella."
+                            },
+                            {
+                                "selector": "[data-test=\"stock-lines\"] li",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"basket-balance\"] > div:nth-child(2) dd",
+                                "count": 1,
+                                "text": "0,00 €"
+                            },
+                            {
+                                "selector": "[data-test=\"add-stock-form\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"draft-actions\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"collect-basket\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"validate-basket\"]",
+                                "count": 1,
+                                "attributes": {
+                                    "disabled": ""
+                                }
+                            },
+                            {
+                                "selector": "[data-test=\"cancelled\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"basket-balance\"] > div:nth-child(1) dd",
+                                "count": 1,
+                                "text": "5,00 €"
+                            },
+                            {
+                                "selector": "[data-test=\"basket-balance\"] > div:nth-child(3) dd",
+                                "count": 1,
+                                "text": "5,00 €"
+                            }
+                        ],
+                        "focus": [
+                            "[data-visual-page-focus-first]",
+                            "[data-test=\"wallet-link\"]",
+                            "[data-visual-page-focus-last]"
+                        ],
+                        "panels": "#main-content section,#main-content form,#main-content .pilot-layout-panel,#main-content .pilot-layout-notice,#main-content table"
+                    }
+                },
+                {
+                    "id": "cancelled",
+                    "query": {
+                        "state": "cancelled"
+                    },
+                    "ready": "body[data-visual-ready=\"cancelled\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".material-app-shell.pilot-theme",
+                                "count": 1,
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"basket-status-cancelled\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"no-stock-lines\"]",
+                                "count": 1,
+                                "text": "No s’ha afegit cap producte d’estoc a aquesta cistella."
+                            },
+                            {
+                                "selector": "[data-test=\"stock-lines\"] li",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"basket-balance\"] > div:nth-child(2) dd",
+                                "count": 1,
+                                "text": "0,00 €"
+                            },
+                            {
+                                "selector": "[data-test=\"add-stock-form\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"draft-actions\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"collect-basket\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"validate-basket\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"cancelled\"]",
+                                "count": 1,
+                                "text": "Aquest esborrany s’ha cancel·lat."
+                            },
+                            {
+                                "selector": "[data-test=\"basket-balance\"] > div:nth-child(1) dd",
+                                "count": 1,
+                                "text": "5,00 €"
+                            }
+                        ],
+                        "focus": [
+                            "[data-visual-page-focus-first]",
+                            "[data-test=\"wallet-link\"]",
+                            "[data-visual-page-focus-last]"
+                        ],
+                        "panels": "#main-content section,#main-content form,#main-content .pilot-layout-panel,#main-content .pilot-layout-notice,#main-content table"
+                    }
+                }
+            ],
+            "assertions": [
+                {
+                    "selector": ".material-app-shell.pilot-theme",
+                    "count": 1,
+                    "styles": {
+                        "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                    }
+                },
+                {
+                    "selector": "#main-content h1",
+                    "count": 1,
+                    "contrast": 4.5
+                }
+            ]
+        },
+        {
+            "id": "wallet-manager",
+            "path": "/visual-dra-210.html",
+            "query": {
+                "page": "Wallet/Statement",
+                "role": "manager"
+            },
+            "root": "#main-content",
+            "panels": "#main-content .pilot-layout-panel:not(:has(.pilot-wallet-movements)),#main-content .pilot-wallet-table tbody tr,#main-content .pilot-layout-notice",
+            "content": "#main-content h1,#main-content h2,#main-content h3,#main-content p,#main-content label,#main-content input,#main-content a,#main-content button,#main-content td,#main-content .pilot-cell-label",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "states": [
+                {
+                    "id": "populated",
+                    "query": {
+                        "state": "populated"
+                    },
+                    "ready": "body[data-visual-ready=\"populated\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".material-app-shell.pilot-theme",
+                                "count": 1,
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content button:not([data-sidebar])",
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"basket-source-link\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"basket-source-text\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table thead th",
+                                "count": 5
+                            },
+                            {
+                                "selector": "#main-content tbody tr:first-child [data-test=\"basket-source-link\"]",
+                                "count": 1,
+                                "text": "Cistella: 0198f0a0-0000-7000-8000-000000000021"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "empty",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "ready": "body[data-visual-ready=\"empty\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".material-app-shell.pilot-theme",
+                                "count": 1,
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content button:not([data-sidebar])",
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"basket-source-link\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".pilot-wallet-movements",
+                                "count": 0
+                            }
+                        ]
+                    }
+                }
+            ],
+            "assertions": [
+                {
+                    "selector": ".material-app-shell.pilot-theme",
+                    "count": 1,
+                    "styles": {
+                        "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                    }
+                },
+                {
+                    "selector": "#main-content h1",
+                    "count": 1,
+                    "contrast": 4.5
+                }
+            ]
+        },
+        {
+            "id": "wallet-member",
+            "path": "/visual-dra-210.html",
+            "query": {
+                "page": "Wallet/Statement",
+                "role": "member"
+            },
+            "root": "#main-content",
+            "panels": "#main-content .pilot-layout-panel:not(:has(.pilot-wallet-movements)),#main-content .pilot-wallet-table tbody tr,#main-content .pilot-layout-notice",
+            "content": "#main-content h1,#main-content h2,#main-content h3,#main-content p,#main-content label,#main-content input,#main-content a,#main-content button,#main-content td,#main-content .pilot-cell-label",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "states": [
+                {
+                    "id": "populated",
+                    "query": {
+                        "state": "populated"
+                    },
+                    "ready": "body[data-visual-ready=\"populated\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".material-app-shell.pilot-theme",
+                                "count": 1,
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"basket-source-text\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"basket-source-link\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".pilot-wallet-forms",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table thead th",
+                                "count": 5
+                            },
+                            {
+                                "selector": "#main-content tbody tr:first-child [data-test=\"basket-source-text\"]",
+                                "count": 1,
+                                "text": "Cistella: 0198f0a0-0000-7000-8000-000000000021"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "empty",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "ready": "body[data-visual-ready=\"empty\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".material-app-shell.pilot-theme",
+                                "count": 1,
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"basket-source-text\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".pilot-wallet-movements",
+                                "count": 0
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "long",
+                    "query": {
+                        "state": "long"
+                    },
+                    "ready": "body[data-visual-ready=\"long\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".material-app-shell.pilot-theme",
+                                "count": 1,
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"basket-source-text\"]",
+                                "count": 2
+                            },
+                            {
+                                "selector": "[data-test=\"basket-source-link\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content .pilot-wallet-table thead th",
+                                "count": 5
+                            },
+                            {
+                                "selector": "#main-content tbody tr:first-child [data-test=\"basket-source-text\"]",
+                                "count": 1,
+                                "text": "Cistella: 0198f0a0-0000-7000-8000-000000000021"
+                            },
+                            {
+                                "selector": "#main-content tbody tr:nth-child(2) [data-test=\"basket-source-text\"]",
+                                "count": 1,
+                                "text": "Cistella: 0198f0a0-0000-7000-8000-000000000024"
+                            }
+                        ]
+                    }
+                }
+            ],
+            "assertions": [
+                {
+                    "selector": ".material-app-shell.pilot-theme",
+                    "count": 1,
+                    "styles": {
+                        "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                    }
+                },
+                {
+                    "selector": "#main-content h1",
+                    "count": 1,
+                    "contrast": 4.5
+                }
+            ]
+        }
+    ]
+}

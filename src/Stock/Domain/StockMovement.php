@@ -21,6 +21,7 @@ final readonly class StockMovement
         public ?string $note,
         public ?string $cycleId,
         public ?string $orderId,
+        public ?string $basketId = null,
     ) {}
 
     public static function entry(
@@ -81,6 +82,23 @@ final readonly class StockMovement
         );
     }
 
+    public static function basketSale(
+        string $id,
+        string $stockProductId,
+        Quantity $quantity,
+        DateTimeImmutable $occurredAt,
+        string $recordedBy,
+        string $basketId,
+    ): self {
+        if ($quantity->isZero()) {
+            throw InvalidMovementQuantity::saleMustBePositive();
+        }
+
+        return new self($id, $stockProductId, MovementType::Sale,
+            SignedQuantity::fromQuantity($quantity)->negate(), $occurredAt, $recordedBy,
+            null, null, null, $basketId);
+    }
+
     public static function restore(
         string $id,
         string $stockProductId,
@@ -91,8 +109,9 @@ final readonly class StockMovement
         ?string $note,
         ?string $cycleId,
         ?string $orderId,
+        ?string $basketId = null,
     ): self {
-        return new self($id, $stockProductId, $type, $quantity, $occurredAt, $recordedBy, $note, $cycleId, $orderId);
+        return new self($id, $stockProductId, $type, $quantity, $occurredAt, $recordedBy, $note, $cycleId, $orderId, $basketId);
     }
 
     private static function cleanNote(?string $note): ?string

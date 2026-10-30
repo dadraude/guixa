@@ -3,11 +3,13 @@
 namespace Tests\Support\Contracts;
 
 use DateTimeImmutable;
+use DomainException;
 use Guixa\Shared\Domain\Quantity;
 use Guixa\Stock\Domain\MovementType;
 use Guixa\Stock\Domain\StockMovement;
 use Guixa\Stock\Domain\StockMovementRepository;
 use Guixa\Stock\Domain\ValueObject\SignedQuantity;
+use Illuminate\Database\QueryException;
 use PHPUnit\Framework\Attributes\Test;
 
 /** Behaviour every StockMovementRepository promises; see ProbeNoteRepositoryContract for how it is shared. */
@@ -17,6 +19,9 @@ trait StockMovementRepositoryContract
 
     /** An id the repository accepts as a stock product (the database needs a real one). */
     abstract protected function stockProductId(): string;
+
+    /** Create a basket accepted by this adapter. */
+    abstract protected function basket(): string;
 
     /** Lets an adapter that enforces foreign keys create the cycle the tests refer to. */
     protected function cycleExists(string $cycleId): void {}
@@ -149,5 +154,47 @@ trait StockMovementRepositoryContract
 
         $this->assertSame('19999999.998', $repository->available($productId)->toString());
         $this->assertSame('19999999.998', $repository->availableByProduct()[$productId]->toString());
+    }
+
+    #[Test]
+    public function it_keeps_distinct_basket_sales_and_legacy_order_sales_with_their_sources(): void
+    {
+        $repository = $this->repository();
+        $product = $this->stockProductId();
+        $first = $this->basket();
+        $second = $this->basket();
+        $order = '0198f0a0-0000-7000-8000-0000000000d1';
+        $at = new DateTimeImmutable('2026-10-22T10:00:00+00:00');
+        $repository->add(StockMovement::basketSale($repository->nextId(), $product, Quantity::fromString('1'), $at, self::ACCOUNT, $first));
+        $repository->add(StockMovement::basketSale($repository->nextId(), $product, Quantity::fromString('2'), $at->modify('+1 minute'), self::ACCOUNT, $second));
+        $repository->add(StockMovement::sale($repository->nextId(), $product, Quantity::fromString('3'), $at->modify('+2 minutes'), self::ACCOUNT, $order));
+
+        $movements = $repository->forProduct($product);
+        $this->assertSame([$first, $second, null], array_map(fn (StockMovement $movement) => $movement->basketId, $movements));
+        $this->assertSame([null, null, $order], array_map(fn (StockMovement $movement) => $movement->orderId, $movements));
+        $this->assertSame('-6.000', $repository->available($product)->toString());
+    }
+
+    #[Test]
+    public function it_rejects_a_duplicate_basket_sale_for_one_product_but_allows_another_product(): void
+    {
+        $repository = $this->repository();
+        $firstProduct = $this->stockProductId();
+        $secondProduct = $this->stockProductId();
+        $basket = $this->basket();
+        $at = new DateTimeImmutable('2026-10-22T10:00:00+00:00');
+        $repository->add(StockMovement::basketSale($repository->nextId(), $firstProduct, Quantity::fromString('1'), $at, self::ACCOUNT, $basket));
+        $repository->add(StockMovement::basketSale($repository->nextId(), $secondProduct, Quantity::fromString('1'), $at, self::ACCOUNT, $basket));
+
+        $rejected = null;
+        try {
+            $repository->add(StockMovement::basketSale($repository->nextId(), $firstProduct, Quantity::fromString('1'), $at, self::ACCOUNT, $basket));
+        } catch (DomainException|QueryException $exception) {
+            $rejected = $exception;
+        }
+
+        $this->assertNotNull($rejected);
+        $this->assertCount(1, $repository->forProduct($firstProduct));
+        $this->assertCount(1, $repository->forProduct($secondProduct));
     }
 }

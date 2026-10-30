@@ -20,6 +20,7 @@ final readonly class WalletMovementRow
         public string $occurredAt,
         public ?string $note,
         public ?string $cycleId,
+        public ?string $basketId,
     ) {}
 
     public static function from(MovementData $movement): self
@@ -31,6 +32,7 @@ final readonly class WalletMovementRow
             $movement->occurredAt->setTimezone(new DateTimeZone(config('guixa.timezone')))->format('Y-m-d H:i'),
             $movement->note,
             $movement->cycleId,
+            $movement->basketId,
         );
     }
 }

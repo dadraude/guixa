@@ -30,6 +30,7 @@ import StockProductController from '@/actions/App/Http/Controllers/Manage/StockP
 import CutoffController from '@/actions/App/Http/Controllers/Producer/CutoffController';
 import ProductController from '@/actions/App/Http/Controllers/Producer/ProductController';
 import WalletController from '@/actions/App/Http/Controllers/WalletController';
+import BasketController from '@/actions/App/Http/Controllers/Finance/BasketController';
 import { toUrl } from '@/lib/utils';
 import { dashboard } from '@/routes';
 import type { NavItem } from '@/types';
@@ -88,6 +89,11 @@ export function navigationSectionsFor(
                               title: 'Households',
                               href: HouseholdController.index(),
                               icon: Home,
+                          },
+                          {
+                              title: 'Baskets',
+                              href: BasketController.index(),
+                              icon: ShoppingBasket,
                           },
                       ],
                   },
