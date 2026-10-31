@@ -36,8 +36,11 @@ Every new executable task and ticket must be:
 - **Independent:** mergeable without waiting on unfinished tasks. Name unavoidable prerequisites and
   the merged result required before the successor is ready.
 - **Valuable:** delivers a result a user or tester can observe.
-- **Small:** one PR, ideally under about 400 lines of diff, with code, tests and docs together.
-  Estimate scope; split oversized work into useful vertical slices or explain a justified exception.
+- **Small:** one observable outcome with code, tests and docs together. About 400 authored changed
+  lines is a review prompt, not a quota; report generated files/deletions separately and label estimates
+  with uncertainty. Inspect distinct state transitions, changed contracts/adapters and user journeys.
+  Split independent outcomes; for an indivisible invariant, name why a partial merge would be wrong
+  and use early vertical checkpoints. Do not trim permissions, failure cases or tests to hit a number.
 - **Testable:** includes spec-derived acceptance criteria and requirement/scenario refs, expressed as
   concrete Given/When/Then observations in the handoff below.
 
@@ -55,8 +58,10 @@ of the deployed result, to expose architecture problems early. Reuse existing de
 planning does not authorize deployment. Group feature slices under one native epic tracking the
 outcome; reuse existing epics and respect parent/inheritance constraints.
 
-Use feature flags to merge unfinished slices safely to main. Record the flag, safe default, off/on
-acceptance checks and rollout/removal owner or task. Testers must be able to demonstrate the slice.
+Prefer useful intermediate behavior that is safe without a flag. Use a feature flag only when it
+enables a justified independently demonstrable slice; record its safe default, off/on checks and
+rollout/removal owner. Do not introduce shadow writers, provisional product behavior or a flag
+framework merely to force a split. An atomic writer/ownership cutover may remain one larger task.
 
 Keep each task within one fresh implementer's context, including its required source excerpts and
 verification. A task that needs several unrelated paths or cannot state a bounded observable result
@@ -68,6 +73,24 @@ must preserve working behavior, name bounded consumers and order removal after a
 Give every dependency a reason: the result or contract the successor needs. Do not serialize tasks
 because of their numbering, priority or temporary shared-file contention. After prerequisites, prefer
 the available slice that resolves the greatest technical or integration uncertainty.
+
+## Reconcile existing work before reslicing
+
+Read current tracker scope/relations, accepted source and integrated code; identify relevant open
+candidates separately from merged behavior. For each old acceptance item, record retained/delivered
+evidence or its proposed new owner. Existing tests are evidence only for the assertions they contain.
+Do not schedule already-delivered behavior again or silently drop it from regression scope.
+
+Preserve existing IDs and useful task lineage. Narrow an existing task explicitly and allocate the
+removed work to new IDs in the canonical registry; do not renumber the backlog or create duplicate
+parents. Show old-to-new scope and dependency deltas, including downstream/closure consumers.
+Every new dependency names the actual result needed; sequencing and shared-file contention are not
+enough. Keep the current tracker snapshot distinct from the proposed graph until publication.
+
+For each proposed split, answer: what can be demonstrated after the first merge, what remains working,
+and which acceptance owner completes the remainder? If those answers require a product/design change,
+surface that decision. If no safe boundary exists, retain a justified larger task with bounded internal
+checkpoints rather than inventing layer-only or speculative preparation work.
 
 ## Executable task handoff
 
@@ -87,7 +110,11 @@ Scale detail to the task; use Not applicable with a reason where a concern is ab
 - **Done when:** concrete Given/When/Then observations and focused tests/checks with expected results.
   For persistence-dependent behavior, verify write/read through the real adapter; for UI behavior,
   identify the visible result and required visual evidence. Planned checks are not passing results.
-- **Size and rollout:** estimated diff size, justified exceptions and any flag details listed above.
+- **First checkpoint:** one spec-derived public behavioral failure, its passing end-to-end slice and
+  the persisted/rendered observation to inspect before broad implementation. Reuse the available path.
+  This is an implementer/coordinator feedback point, not another user approval or independent review.
+- **Size and rollout:** estimated authored diff range/confidence, changed contracts and state transitions,
+  safe intermediate behavior, justified exceptions and any flag details listed above.
 - **Limits and allocation:** explicit out-of-scope limits. If this task covers only part of a source
   requirement, identify that part, the remainder's owner and the task/dependency that completes it.
   Do not exclude required permissions, validation or failure behavior to make a slice look smaller.
@@ -107,6 +134,11 @@ from links alone. A source change requires reconciliation of affected drafts bef
   criterion is not claimed complete by each partial slice. Out-of-scope text does not contradict it.
 - Blockers resolve to batch tasks or existing issues. There are no missing endpoints, self-links or
   cycles; the order respects dependencies without inventing sequential edges.
+- For changed shared contracts, name the new invariant to exercise in each adapter, not merely test
+  filenames. For UI fixtures, identify exact business values, statuses, identity and action expectations
+  before multiplying geometry cases. Retain final independent review and candidate-bound CI.
+- Existing-task scope deltas conserve acceptance ownership; graph endpoints exist, and new leaves
+  remain reachable from the feature completion gate where one exists.
 - Required behavior, contracts and UI details can be understood from the handoff plus its identified
   source excerpts and implementation, without guessing product decisions.
 

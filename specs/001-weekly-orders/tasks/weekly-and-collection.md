@@ -1,6 +1,6 @@
 # 001 — Weekly integration and collection task details
 
-Part of the [canonical registry](../tasks.md); dependencies live there. Status: **accepted (2026-10-28)**.
+Part of the [canonical registry](../tasks.md); dependencies live there. Status: the revised delivery boundaries below are **proposed (2026-10-31)**; product acceptance is unchanged.
 Authoritative behavior: [spec](../spec.md) and its areas; technical contracts: [plan](../plan.md).
 Every slice includes its affected adapters, tests, translations, UI evidence and document reconciliation.
 Paths in the ownership notes are edit surfaces, not new cross-context domain dependencies.
@@ -46,12 +46,52 @@ Verify S78/S89 and S9/S14–S16/S19/S20/S27–S30/S39/S40/S42/S46/S47/S53/S54/S6
 weekly no-contents/revival case. Preserve allocator/tie/overwrite/cutoff regressions instead of rewriting
 them. Integration proves source-sync versus validation serialization, idempotent settlement/redistribution,
 source uniqueness, weekly rollback, no reopening after closure and one charge despite old endpoint replay.
-T61 finishes the persistent indicators and member collection action; basic pending status remains visible.
+T61 supplies member collection; this cutover verifies its weekly/closed-cycle integration. T67 finishes persistent aggregate indicators; basic pending status remains visible.
 
 Ownership/reuse: Ordering settlement/reopen/read ports, Sales weekly commands/adapters, Membership
 pending-source adapter, old pickup financial-route cutover, reception/member/staff pages and shared
 `DeliveredForm`/`Adjustments` patterns. Exercise the complete reception→draft→validate→closed/pending
 flow through HTTP/UI with distinct validation and collection controls.
+
+
+### T59 delivery checkpoints and size exception
+
+Retain one atomic cutover PR. This is deliberately not called a thin tracer. No new flag, shadow
+financial writer, preview-only product or temporary disabled redistribution is proposed. The current
+`CycleSettlement`, `SetReceivedTotal` and `SetAllocation` use Order pickup/freeze state; replacing only
+settlement or only charging would leave closure/redistribution on a different financial truth.
+
+Before writing, inventory old entrypoints and their replacement consumers: scheduler settlement,
+manual settlement/reopen, both allocation commands, validation, collection, Membership obligations,
+member/staff current reads and architecture permissions. Use exact paths from the candidate base;
+the plan's `SalesBaskets`/`WeeklyBasketSource` are planned interfaces, not existing implementations.
+
+Internal checkpoints with the same owner, before broad final verification:
+
+1. Through public settlement and HTTP, create/reload one uncharged weekly base with original ordered
+   and initial actual quantities. Assert source uniqueness and no ledger write; then validate once,
+   close only when eligible, and collect without a second charge. Include an old-endpoint replay probe.
+2. Reopen/synchronize and exercise drafts-only/all redistribution with one validated pending basket
+   and one draft. Assert exact effective quantities/amounts, immutable originals, no resold stock/returns,
+   negative/no-claim remainder rejection and unchanged-target no-op. Preserve allocator regressions.
+3. Race source sync against validation under the cycle lock; prove rollback, empty/revived sources,
+   scheduler and closed-cycle guards, Membership obligations, current readers and role boundaries.
+   Reconcile the entrypoint inventory before independent review and candidate-bound CI.
+
+These are feedback points inside an unmerged task, not partial releases or extra mandatory independent
+review rounds. A checkpoint must show the behavioral red/green and persisted/rendered values; a test
+count alone does not pass it. If source inspection identifies a genuinely behavior-preserving, useful
+prefactor, propose its exact boundary before splitting; do not invent a preparatory ticket on speculation.
+
+Dependency reasons: T68 supplies effective signed quantity/Wallet corrections and all independent line
+kinds; T66 supplies effective collection history; T23/T30 supply the existing settlement/redistribution
+behavior being replaced. T68 transitively includes T56/T64/T65. T61 is a regression integration when
+available, not a prerequisite for Finance/Manager weekly collection; T61 must also test weekly sources
+if it lands after T59. Pending indicator completion remains T67 after both paths exist.
+
+Size estimate: 1,500–3,000 authored changed lines including tests, low confidence; generated/deleted
+files reported separately. The one-writer invariant justifies this exception, not a generic waiver.
+Checkpoints bound feedback latency; source-specific scope must be reassessed before implementation.
 
 ## T60
 
@@ -83,34 +123,78 @@ Ownership: Sales create-from-collection flow, attribution and count queries/adap
 counts and Finance basket links. Reuse staff list/detail and cycle summary components with no new weekly
 order/session requirement. This supplements the T55 purchase tracer rather than adding a second sale path.
 
+
+First checkpoint: create one supplement from a closed collection via HTTP, validate/collect it, and
+read the exact combined count (S90: 2 + 1 = 3) without reopening. Then prove attribution identity,
+cycleless exclusion, cancellation independence and the PostgreSQL lock interleaving.
+Keep attribution and count integration together: exposing supplementary goods while the established
+container summary omits them would be an incorrect intermediate result. Existing `GetContainerCount`
+and pickup forms are reuse candidates; Sales attribution/count adapters are planned per the plan.
+After T59 for weekly source/current counts and T31 for retained container rules. Rough size 400–800
+authored lines, low confidence; no flag or layer-only task. T67 owns persistent pending badges.
+
 ## T61
 
-**Self-collection and persistent pending indicators.** A current member marks their household's
-validated basket collected; staff and members continue to see pending baskets after the planned date
-and weekly closure.
+**Collect an own-household validated basket.**
 
-Source: [HTTP and pending indication](../plan.md#http--pages), R19a/R23a/R23b/R24/R24b/R35.
+A current member marks their household's validated basket collected from its detail page, reusing
+the staff collection operation without posting another charge or stock sale.
 
-Acceptance:
+Source: [Collection](../plan.md#collection-and-corrections), R19a/R23a/R23b, S82.
 
-- Application and HTTP check current household membership on every own-basket access/action. Only
-  validated baskets may be collected; Finance/Manager may operate all. Record first actor/time,
-  repeat/replay no-op without money/stock writes. Member cannot validate, edit or record receipts.
-- Pending list includes closed-cycle and cycleless baskets, ordered by validation time/UUID; own
-  household for members, all households for staff. Date passing never abandons/refunds/returns goods.
-- Dashboard and basket list show pending indications; cycle list/detail retain a count badge/link after
-  closure, including attributed supplements. Draft means preparation. Collection removes its pending
-  item without reopening/recharging; corrected collection history remains accessible.
-- Replace current Dashboard pending-cycle data with narrow Sales basket summaries and preserve
-  unrelated cards. Feature-002 DRA-202/DRA-203 are context, not prerequisites or a scope expansion.
+Done when:
 
-Verify S82/S83 and S26/S42/S54; include cross-household IDs, changed/unlinked member, closed cycle,
-cycleless purchase, no balance/payment gating, duplicate simultaneous collection and retained first event.
-Measure structural/status/action changes before visual runner review of populated/empty/late/closed
-states, long household/product names and narrow-role navigation.
+- Given a validated own-household basket, when the current member collects it, then the first actor/time
+  are retained. Duplicate simultaneous requests/replay have no additional event or ledger effect.
+  Negative balance and lack of a receipt do not block collection; drafts/cancelled baskets cannot collect.
+- Current membership is checked at Application and HTTP boundaries. Forged household IDs, moved/unlinked
+  members and deactivated accounts lose access; members cannot validate, edit, receive money or correct.
+- The detail control and state update are translated and keyboard accessible; T66's effective collection
+  state/history remains coherent after a staff correction. Staff permissions stay intact.
 
-Ownership: Sales own/staff queries and collection access, member Dashboard/basket list/detail,
-Finance pending list, cycle badges and shared navigation. Original validation/ledger commands are reused.
+First checkpoint: an own-household HTTP collection succeeds and an identical cross-household request
+fails; reload the first actor/time and unchanged ledger counts. Then check concurrent replay.
+Paths: T65 member detail/read path, T55 MarkBasketCollected, T66 effective collection/history.
+Focused checks: Sales public commands, persistence/concurrency, role HTTP and real button interaction.
+Dependency reason: T66 supplies the corrected collection model and transitively T65's authorized member access.
+
+Size/rollout: roughly 200–450 authored lines, low confidence. Deliver on independent baskets first;
+T59 applies the same operation to weekly baskets and verifies late/closed-cycle integration. No flag.
+Pending lists/dashboard/cycle badges move to T67; this task does not require supplements to exist.
+
+## T67
+
+**Keep pending collection visible across pages and cycle closure.**
+
+Staff and members continue to see outstanding collections after the planned date and weekly closure,
+including cycleless purchases and attributed supplements, without reopening or charging them again.
+
+Source: [Sales interface](../plan.md#sales), R24/R24b, S42/S54/S83.
+
+Done when:
+
+- Given late, closed-cycle, cycleless and supplementary baskets, when pending lists are read, then
+  validated effective outstanding goods remain visible, ordered by validation time/UUID. Members see
+  only their current household; Finance/Manager sees all. Draft means preparation, not pending collection.
+- Dashboard and basket list use narrow Sales summaries; cycle list/detail show persistent count/link
+  including attributed supplements. Collection removes the pending item without reopening/recharging.
+  Full content reversal and corrected collection consume T68/T66 effective state; history remains accessible.
+- Preserve unrelated dashboard cards; do not revive feature-002 dashboard scope. Verify populated,
+  empty, late/closed, long-name and role states with exact counts/status/actions before geometry.
+
+First checkpoint: one closed-cycle pending basket appears with the correct count/link, then real
+collection removes it while the cycle stays closed and ledger is unchanged. Widen the same query to
+dashboard/list and role cases; include source-scoped HTTP privacy and PostgreSQL reads.
+Paths: Sales pending queries/adapters (planned per plan), existing Dashboard, cycle list/detail and
+basket views, T60 attribution/count data and T61 collection action. Reuse layouts/navigation.
+Focused checks: pending query/HTTP and membership regressions, dashboard/cycle/basket components,
+translations, exact effective-count fixtures. Related: DRA-202/DRA-203 as context only, never blockers.
+Dependency reasons: T60 supplies weekly plus supplement attribution; T61 supplies member collection
+and transitively T66 corrected collection. T60/T59/T68 supply effective goods quantities.
+
+Size/rollout: roughly 400–800 authored lines, low confidence. One shared pending query must feed its
+consumers consistently; checkpoint it on one page before widening. Existing basic basket status remains
+visible before this task. No flag, new financial writer or broader dashboard redesign.
 
 ## T62
 
@@ -134,11 +218,21 @@ Acceptance:
 Verify S58, S43 and S59 regressions through Membership's public commands/queries and HTTP, with
 zero-balance draft-only and pending-only obligations, final correction/collection resolution and relinking.
 The data-source adapter switched in T59; this task completes lifecycle behavior and its warning/UI checks.
-It can proceed alongside T60/T61 after T59: shared pages are scheduling contention, not blockers.
+It can proceed alongside T60/T67 once its prerequisites are integrated: shared pages are scheduling contention, not blockers.
 
 Ownership: Membership warning/deactivation/to-settle commands, Sales open-obligation query, household/
 account administration and Finance resolve-existing-basket entry points. No general household rights
 are granted to Finance.
+
+
+First checkpoint: deactivate a zero-balance household with a draft-only obligation through the public
+Membership command; the warning/list retains it, staff can resolve it, and an old member URL is denied.
+Widen to pending-only, receipt/correction and reactivation cases before final verification. Use existing
+Membership household commands and administration pages; Sales obligation adapters arrive in T59.
+Dependencies: T59 supplies the current Sales obligation source, T32 the existing lifecycle UI/rules,
+T64 confirmed receipt/correction resolution and T66 corrected collection semantics are inherited through T59. Keep one task:
+warning, retained obligation and permission changes must agree. Rough size 300–650 authored lines,
+low confidence. No new general Finance household rights or flag.
 
 ## T63
 
@@ -173,8 +267,18 @@ any deliberately retained historical documentation mention. T33 then performs th
 
 Ownership: remaining retired source/adapters/persistence/routes/tests and stale current documentation
 across the affected contexts. No new UI redesign; existing visible paths must still pass their owning
-slice's checks. Depends on T54, T61 and T62 because catalogue readers, collection indicators and household
-obligation consumers must all be cut over first.
+slice's checks. Depends on T54, T67 and T62 because catalogue readers, all collection indicators and household
+obligation consumers must be cut over first; T67 includes T60/T61 and T62 includes T64. All new slices
+therefore reach T33 through this cleanup, without adding redundant closure blockers.
+
+
+First checkpoint: remove one bounded retired ownership path together with its callers/permissions,
+then prove the public route cannot invoke it and the fresh schema/shared contracts still work. Repeat
+by retired family; reconcile the complete symbol/table/route inventory before review. Do not turn
+code, schema and architecture declarations into independent incompatible deliveries.
+Rough size 800–1,600 changed lines including deletions, low confidence; this mechanical contract-stage
+exception follows real consumer migration, not an arbitrary large cleanup. No application feature or
+production database mutation. T33 retains the final semantic audit, not first-time acceptance ownership.
 
 ## T33
 
@@ -193,8 +297,8 @@ Acceptance:
   all 11 original native blockers were retained, and T02/T44/T46/T63 plus T48/T50/T51 were
   added (18 total). T47–T51 map to DRA-219–DRA-223; every canonical closure prerequisite now
   has a native blocker. No local task row or tracker publication implies Done.
-- Record focused checks, independent review, required visual reports and exact-candidate CI evidence.
-  Only then mark feature 001 Done in `specs/README.md`, with deviations reconciled in spec/plan/log.
+- Collect each delivery's assertion-level acceptance evidence and current integration identities; investigate confirmed gaps rather than rerunning every prior suite. Record focused checks, independent review, required visual reports and exact-candidate CI evidence.
+  Only then mark feature 001 Done in `specs/README.md`, with deviations reconciled in spec/plan and immutable history entries.
 
 Ownership: tests and missing assertions, traceability evidence and final feature documentation. No
 unapproved product choices, publishing or new implementation work is authorized by this document acceptance.

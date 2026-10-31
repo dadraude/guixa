@@ -16,7 +16,10 @@ means pause and request coordinator admission before writing it. Do not omit req
    follow [visual verification](../references/visual.md): inspect and map existing components before
    building screens, declare the page/role/state inventory and selected cases, run the manifest plan
    command, and share the count/rationale with the coordinator before broad implementation.
-3. Observe a failing public-interface test per requested rule/scenario, implement its passing slice,
+3. Prove the task's first vertical checkpoint and report the failing assertion, passing behavior and
+   persisted/rendered observation to the coordinator before widening the implementation. This is
+   incremental feedback within the same task, not a separate user approval or review round.
+   Observe a failing public-interface test per requested rule/scenario, implement its passing slice,
    then refactor while green. Follow the profile's focused runner and code conventions. For genuinely
    non-executable changes, state the test-first exception and perform proportionate structural checks.
 4. Run tests for affected behavior and every changed test file, including unchanged tests of changed

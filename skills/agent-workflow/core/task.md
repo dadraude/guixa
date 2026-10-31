@@ -23,6 +23,10 @@ For visual tasks, check the implementer's route/state inventory, component plan,
 and rationale against acceptance before broad UI implementation. Return missing coverage or reuse
 decisions to that implementer without consuming an independent review round.
 
+Inspect the first vertical checkpoint's behavioral and persisted/rendered evidence before broad
+implementation; class existence, test counts and a green geometry report do not establish acceptance.
+Return a missing invariant to the same owner without creating another independent review round.
+
 Accept `committed` only after comparing actual paths with admitted scope. A scope request pauses writes
 until the coordinator readmits it; a product question goes to the user. `stopped` goes to Stop.
 

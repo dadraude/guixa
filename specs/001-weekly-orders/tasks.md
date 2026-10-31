@@ -2,7 +2,12 @@
 
 Status: T01–T51 retain their historical approvals. **2026-10-28 amendment: accepted**
 (T52–T63 and updated T33). The user accepted the document structure and task breakdown. Application
-implementation and Linear publication remain separate scopes. Implementation status belongs to Linear, not this table.
+implementation and Linear publication remain separate scopes.
+
+**2026-10-31 reslicing: accepted and published to Linear.** T56–T63/T33
+are reconciled below and T64–T68 are accepted additions; existing issue identities are retained.
+T64–T68 map to DRA-224–DRA-228. The [review and publication delta](tasks/reslicing-review.md) separates the current tracker snapshot
+from the accepted graph. Product requirements and plan decisions are unchanged. Implementation status belongs to Linear, not this table.
 
 Source: [spec](spec.md) and areas · [plan](plan.md) · [coverage allocation](tasks/coverage.md).
 
@@ -12,8 +17,8 @@ Source: [spec](spec.md) and areas · [plan](plan.md) · [coverage allocation](ta
 | --- | --- |
 | `tasks.md` | Canonical Tnn registry and prerequisite graph; one row per executable task |
 | [tasks/catalog.md](tasks/catalog.md) | T52–T54: unified producer catalogue, safe history and stock visibility |
-| [tasks/sales.md](tasks/sales.md) | T55–T58: independent basket tracer, Finance, receipts, contents and corrections |
-| [tasks/weekly-and-collection.md](tasks/weekly-and-collection.md) | T59–T63: weekly cutover, supplements, collection, household lifecycle and final contract; T33 closure |
+| [tasks/sales.md](tasks/sales.md) | T55–T58 and T64–T66/T68: independent basket, Finance, returns, receipts, member reads and corrections |
+| [tasks/weekly-and-collection.md](tasks/weekly-and-collection.md) | T59–T63/T67: weekly cutover, supplements, collection, indicators, lifecycle and cleanup; T33 closure |
 | [tasks/coverage.md](tasks/coverage.md) | All 65 requirements and 90 scenarios: retained responsibility and amendment responsibility |
 | [tasks/baseline.md](tasks/baseline.md) | Historical T01–T51 scopes, approval gates and dated evidence; superseded behavior is explicitly historical |
 
@@ -38,6 +43,10 @@ The index remains at `specs/001-weekly-orders/tasks.md`, matching the workflow's
 - `After` lists technical prerequisites. Original human/visual approval gates still apply in the
   historical scopes. Dependency-ready does not mean authorized or safe to edit in parallel: catalogue,
   routes, navigation, migrations and settlement files are shared surfaces handled by scheduling.
+- Each revised slice names a first behavioral/persisted/rendered checkpoint before broad implementation.
+  The implementer reports the assertion and actual result to the coordinator; this is not a new user
+  approval or independent-review round. Extend changed shared contracts in both adapters and assert
+  exact fixture amounts/status/identity before expanding the visual matrix.
 - Done means the slice's meaningful assertions, repository/transaction/authorization checks, focused
   regressions, applicable architecture/static checks and required UI evidence pass; use candidate-bound
   CI for the full suite. Naming an R#/S# in a test alone is insufficient. Log deviations before its PR.
@@ -56,7 +65,7 @@ See [current translation contracts](plan.md#translations); the linked T36 baseli
 ## Canonical task registry
 
 For T01–T51 except T33, linked scopes are historical: keep delivered behavior that the amendment
-preserves; implement changed behavior through T52–T63. Existing issue IDs are never repurposed.
+preserves; implement changed behavior through T52–T68. Existing issue IDs keep their lineage; explicit scope narrowing below is accepted, never a silent repurposing.
 
 | ID | Task | Covers | After |
 | --- | --- | --- | --- |
@@ -115,16 +124,26 @@ preserves; implement changed behavior through T52–T63. Existing issue IDs are 
 | T53 | <a id="t53"></a>[Retained history and protected catalogue edits](tasks/catalog.md#t53) | R1, R1b, R1c, R4b, R9, R19b, R25a; S67–S70, S72, S87 (order history) | T52, T13, T17, T28 |
 | T54 | <a id="t54"></a>[Read-only stock discovery](tasks/catalog.md#t54) | R2, R25b, R25c, R28; S66 (visibility), S73, S74 | T52 |
 | T55 | <a id="t55"></a>[Independent stock purchase tracer](tasks/sales.md#t55) | R19, R19a, R19b, R20, R21, R22, R23b, R28, R30, R31; S18, S21, S22, S45, S72 (basket history), S79, S81, S87 (basket history) | T53, T25, T26 |
-| T56 | <a id="t56"></a>[Finance role and global manual receipts](tasks/sales.md#t56) | R19a, R21, R29–R32, R36a, R36c; S19 (receipt), S24, S84, S85 | T55, T07, T38 |
-| T57 | <a id="t57"></a>[Basket contents, returns and member view](tasks/sales.md#t57) | R19a, R19b, R20, R20a, R23a, R24a; S16 (stock), S17, S41, S55, S75, S76 (sale), S88 (real contents) | T56 |
-| T58 | <a id="t58"></a>[Append-only basket corrections](tasks/sales.md#t58) | R23, R23b, R24a, R27, R32; S85 (receipt correction), S86 | T57 |
-| T59 | <a id="t59"></a>[Weekly basket cutover and redistribution](tasks/weekly-and-collection.md#t59) | R4, R12a, R18, R19, R19a, R22–R24b; S9, S14–S16 (weekly), S19 (validation), S20, S27–S30, S39, S40, S42, S46, S47, S53, S54, S61, S63, S64, S78, S83 (closure), S88 (no contents), S89 | T58, T23, T30 |
+| T56 | <a id="t56"></a>[Grant Finance access to existing basket operations](tasks/sales.md#t56) | R19a, R21, R31, R36a, R36b, R36c; S78/S79 (Finance), S84 (basket access) | T55, T07, T38 |
+| T57 | <a id="t57"></a>[Validate return-only and mixed stock-return baskets](tasks/sales.md#t57) | R19b, R20a, R21, R22, R24a; S41, S53 (returns), S88 (real contents) | T56 |
+| T58 | <a id="t58"></a>[Append amount-only basket corrections](tasks/sales.md#t58) | R23, R31, R32; amount-only correction invariants; S85 regression | T64, T65 |
+| T59 | <a id="t59"></a>[Weekly basket cutover and redistribution](tasks/weekly-and-collection.md#t59) | R4, R12a, R18, R19, R19a, R22–R24b; S9, S14–S16 (weekly), S19 (validation), S20, S27–S30, S39, S40, S42, S46, S47, S53, S54, S61, S63, S64, S78, S83 (closure), S88 (no contents), S89 | T68, T66, T23, T30 |
 | T60 | <a id="t60"></a>[Late supplements and container attribution](tasks/weekly-and-collection.md#t60) | R18a, R19, R24b; S60, S80, S90 | T59, T31 |
-| T61 | <a id="t61"></a>[Self-collection and persistent pending indicators](tasks/weekly-and-collection.md#t61) | R19a, R23a, R23b, R24, R24b, R35; S26, S42, S54 (indicators), S82, S83 (indicators) | T60 |
+| T61 | <a id="t61"></a>[Collect an own-household validated basket](tasks/weekly-and-collection.md#t61) | R19a, R23a, R23b, R35; S26 (action), S82 | T66 |
 | T62 | <a id="t62"></a>[Household obligations across lifecycle changes](tasks/weekly-and-collection.md#t62) | R35, R35a, R36b; S43, S58, S59 | T59, T32 |
-| T63 | <a id="t63"></a>[Remove superseded pickup ownership and schema](tasks/weekly-and-collection.md#t63) | Plan: final context/schema/route contracts; S1–S90 regression boundary | T54, T61, T62 |
+| T63 | <a id="t63"></a>[Remove superseded pickup ownership and schema](tasks/weekly-and-collection.md#t63) | Plan: final context/schema/route contracts; S1–S90 regression boundary | T54, T67, T62 |
+| T64 | <a id="t64"></a>[Record and correct confirmed global receipts](tasks/sales.md#t64) | R21, R29–R32, R36c; S19 (receipt), S24, S84 (receipts), S85 | T56 |
+| T65 | <a id="t65"></a>[Read own-household basket contents and status](tasks/sales.md#t65) | R19a, R21, R23a, R24a, R31, R35; own-household read and privacy invariants | T55, T38 |
+| T66 | <a id="t66"></a>[Correct collection marks without financial effects](tasks/sales.md#t66) | R23b, R24a; collection correction, history and replay invariants | T56, T65 |
+| T67 | <a id="t67"></a>[Keep pending collection visible across pages and cycle closure](tasks/weekly-and-collection.md#t67) | R23a, R24, R24b, R35; S26/S42/S54/S83 (indicators) | T60, T61 |
+| T68 | <a id="t68"></a>[Correct physical goods and effective basket quantities](tasks/sales.md#t68) | R23, R24a, R27, R28, R32; S86; full-reversal and signed-quantity invariants | T58, T57 |
 
 ## Linear publication and current gates
+
+The section below is the **2026-10-28 publication snapshot**, retained for provenance. It is not
+the proposed graph above or a current status claim. See the 2026-10-31 readback and proposed exact
+relation changes in [reslicing review](tasks/reslicing-review.md). No tracker changes have been made.
+
 
 Published with the user’s explicit authorization on 2026-10-28 to workspace `draude`, team `DRA`,
 project [Coop](https://linear.app/draude/project/coop-f80f57e1496d). Connector readback verified the
