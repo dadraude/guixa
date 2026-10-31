@@ -36,8 +36,9 @@ rolling it out. Use DOM structure, computed styles, bounds and keyboard interact
 ## Fixture and assertion contract
 
 The runner needs Node 22+, installed Chrome/Chromium (`CHROME_BIN`), and a separately started task-owned
-fixture server. Serve the actual task source and committed assets, recording the command and any build
-prerequisite. The fixture must apply the requested appearance, text enlargement and motion preference.
+fixture server. Use the project profile for its exact server command and environment; record any build
+prerequisite. Serve the actual task source and committed assets. The fixture must apply the requested
+appearance, text enlargement and motion preference.
 
 - `baseUrl` plus view `path`/`query` selects the route/role. State `query` selects deterministic states.
 - `root` and `panels` must match visible content. State `ready` and `settled` select the real prepared
@@ -84,9 +85,17 @@ Commit code, fixture and manifest; keep generated evidence in an untracked task 
 Run from the task worktree:
 
 ```sh
-CHROME_BIN="/path/to/chrome" node skills/agent-workflow/scripts/visual/run.mjs run path/to/visual.json /tmp/task-evidence FIXED_BASE_SHA
-node skills/agent-workflow/scripts/visual/run.mjs verify path/to/visual.json /tmp/task-evidence FIXED_BASE_SHA
+CHROME_BIN="/path/to/chrome" node skills/agent-workflow/scripts/visual/run.mjs preflight path/to/visual.json .atl/<task>/visual FIXED_BASE_SHA
+CHROME_BIN="/path/to/chrome" node skills/agent-workflow/scripts/visual/run.mjs run path/to/visual.json .atl/<task>/visual FIXED_BASE_SHA
+node skills/agent-workflow/scripts/visual/run.mjs verify path/to/visual.json .atl/<task>/visual FIXED_BASE_SHA
 ```
+
+A preflight checks Node, the installed browser, the tracked manifest, fixed base, safe ignored output,
+and readiness of the first expanded fixture case (route, ready selector, fonts and settled elements).
+It writes no report or screenshots and does not start the server. Its result is readiness only; the
+full run still checks every case. Confirm separately that the server uses the intended task source,
+role authorization and deterministic data. Neither readiness nor visual measurement establishes
+source identity, authorization or persistence acceptance.
 
 A default run writes a version-2 `report.json` and integrity sidecar, with measurements, assertion
 observations, focus results, failures and execution identities. No PNG/gallery is created. The verifier

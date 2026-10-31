@@ -2,7 +2,15 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { createServer } from 'node:http';
 import { spawn, execFileSync } from 'node:child_process';
-import { mkdtemp, writeFile, readFile, rm, readdir } from 'node:fs/promises';
+import {
+    mkdtemp,
+    writeFile,
+    readFile,
+    rm,
+    readdir,
+    symlink,
+    mkdir,
+} from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -18,11 +26,12 @@ void test('CLI captures settled UI, verifies coverage, and rejects changed or mi
         res.end(await readFile(join(cwd, 'index.html')));
     });
     await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
-    const cli = (command, ...flags) =>
+    let base;
+    const cliArgs = (args) =>
         new Promise((resolve, reject) => {
             const process = spawn(
                 globalThis.process.execPath,
-                [runner, command, 'visual.json', 'artifacts', 'HEAD', ...flags],
+                [runner, ...args],
                 { cwd },
             );
             let output = '';
@@ -31,6 +40,8 @@ void test('CLI captures settled UI, verifies coverage, and rejects changed or mi
             process.on('error', reject);
             process.on('exit', (code) => resolve({ code, output }));
         });
+    const cli = (command, ...flags) =>
+        cliArgs([command, 'visual.json', 'artifacts', base, ...flags]);
     try {
         await writeFile(
             join(cwd, 'index.html'),
@@ -82,8 +93,13 @@ void test('CLI captures settled UI, verifies coverage, and rejects changed or mi
             ],
         };
         await writeFile(join(cwd, 'visual.json'), JSON.stringify(manifest));
+        await writeFile(join(cwd, '.gitignore'), 'artifacts/\n');
         execFileSync('git', ['init', '-q'], { cwd });
-        execFileSync('git', ['add', 'index.html', 'visual.json'], { cwd });
+        execFileSync(
+            'git',
+            ['add', '.gitignore', 'index.html', 'visual.json'],
+            { cwd },
+        );
         execFileSync(
             'git',
             [
@@ -99,6 +115,94 @@ void test('CLI captures settled UI, verifies coverage, and rejects changed or mi
             ],
             { cwd },
         );
+        base = execFileSync('git', ['rev-parse', 'HEAD'], {
+            cwd,
+            encoding: 'utf8',
+        }).trim();
+        const ready = await cli('preflight');
+        assert.equal(ready.code, 0, ready.output);
+        assert.match(ready.output, /fixture ready/i);
+        await assert.rejects(readdir(join(cwd, 'artifacts')), /ENOENT/);
+        const outside = join(tmpdir(), 'visual-runner-outside-' + process.pid);
+        const unsafe = await cliArgs([
+            'preflight',
+            'visual.json',
+            outside,
+            base,
+        ]);
+        assert.notEqual(unsafe.code, 0);
+        assert.match(unsafe.output, /inside the task repository/);
+        await assert.rejects(readdir(outside), /ENOENT/);
+        const sourceOutput = await cliArgs([
+            'run',
+            'visual.json',
+            'index.html',
+            base,
+        ]);
+        assert.notEqual(sourceOutput.code, 0);
+        assert.match(sourceOutput.output, /tracked source/);
+        await symlink(outside, join(cwd, 'linked-output'));
+        const linked = await cliArgs([
+            'preflight',
+            'visual.json',
+            'linked-output',
+            base,
+        ]);
+        assert.notEqual(linked.code, 0);
+        assert.match(linked.output, /symlink/);
+        await writeFile(join(cwd, 'untracked.json'), JSON.stringify(manifest));
+        const untracked = await cliArgs([
+            'preflight',
+            'untracked.json',
+            'artifacts',
+            base,
+        ]);
+        assert.notEqual(untracked.code, 0);
+        assert.match(untracked.output, /tracked file/);
+        const invalidBase = await cliArgs([
+            'preflight',
+            'visual.json',
+            'artifacts',
+            'HEAD',
+        ]);
+        assert.notEqual(invalidBase.code, 0);
+        assert.match(invalidBase.output, /40-character commit SHA/);
+        await writeFile(
+            join(cwd, 'visual.json'),
+            JSON.stringify({
+                ...manifest,
+                views: [{ ...manifest.views[0], root: '#unready' }],
+            }),
+        );
+        const unready = await cli('preflight');
+        assert.notEqual(unready.code, 0);
+        assert.match(unready.output, /Timed out/);
+        await writeFile(join(cwd, 'visual.json'), JSON.stringify(manifest));
+        await assert.rejects(readdir(join(cwd, 'artifacts')), /ENOENT/);
+        await mkdir(join(cwd, 'artifacts'));
+        await symlink(
+            join(cwd, 'index.html'),
+            join(cwd, 'artifacts/report.json'),
+        );
+        const fixtureBefore = await readFile(join(cwd, 'index.html'), 'utf8');
+        const linkedArtifact = await cli('run');
+        assert.notEqual(linkedArtifact.code, 0);
+        assert.match(linkedArtifact.output, /artifact must not be a symlink/);
+        assert.equal(
+            await readFile(join(cwd, 'index.html'), 'utf8'),
+            fixtureBefore,
+        );
+        await rm(join(cwd, 'artifacts'), { recursive: true });
+        const preflightBinary = process.env.CHROME_BIN;
+        process.env.CHROME_BIN = '/nonexistent/chrome';
+        try {
+            const missingBrowser = await cli('preflight');
+            assert.notEqual(missingBrowser.code, 0);
+            assert.match(missingBrowser.output, /CHROME_BIN/);
+        } finally {
+            process.env.CHROME_BIN = preflightBinary;
+        }
+        await assert.rejects(readdir(join(cwd, 'artifacts')), /ENOENT/);
         const measured = await cli('run');
         assert.equal(measured.code, 0, measured.output);
         assert.equal((await cli('verify')).code, 0);
@@ -111,6 +215,16 @@ void test('CLI captures settled UI, verifies coverage, and rejects changed or mi
         const original = await readFile(
             join(cwd, 'artifacts/report.json'),
             'utf8',
+        );
+        process.env.CHROME_BIN = '/nonexistent/chrome';
+        try {
+            assert.match((await cli('preflight')).output, /CHROME_BIN/);
+        } finally {
+            process.env.CHROME_BIN = preflightBinary;
+        }
+        assert.equal(
+            await readFile(join(cwd, 'artifacts/report.json'), 'utf8'),
+            original,
         );
         await writeFile(
             join(cwd, 'artifacts/report.json'),

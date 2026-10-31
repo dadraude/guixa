@@ -1,7 +1,24 @@
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { readFile, writeFile, mkdir, readdir, rm } from 'node:fs/promises';
-import { dirname, resolve, basename } from 'node:path';
+import {
+    readFile,
+    writeFile,
+    mkdir,
+    readdir,
+    rm,
+    lstat,
+    stat,
+    access,
+} from 'node:fs/promises';
+import { constants } from 'node:fs';
+import {
+    dirname,
+    resolve,
+    basename,
+    relative,
+    sep,
+    isAbsolute,
+} from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { expandMatrix, checkCoverage } from './coverage.mjs';
 import { openChrome, waitFor } from './chrome.mjs';
@@ -25,7 +42,34 @@ const escapeHtml = (text) =>
     );
 
 async function identity(manifestPath, raw, base) {
-    git('ls-files', '--error-unmatch', manifestPath);
+    const root = git('rev-parse', '--show-toplevel');
+    const manifestRelative = relative(root, manifestPath);
+    if (
+        !manifestRelative ||
+        manifestRelative.startsWith('..' + sep) ||
+        manifestRelative === '..' ||
+        isAbsolute(manifestRelative)
+    )
+        throw new Error(
+            'Visual manifest must be a tracked file inside the task repository',
+        );
+    try {
+        git('ls-files', '--error-unmatch', '--', manifestRelative);
+    } catch {
+        throw new Error(
+            'Visual manifest must be a tracked file inside the task repository',
+        );
+    }
+    if (!/^[a-f0-9]{40}$/.test(base))
+        throw new Error('Fixed base must be a full 40-character commit SHA');
+    let fixedBase;
+    try {
+        fixedBase = git('rev-parse', '--verify', `${base}^{commit}`);
+    } catch {
+        throw new Error(
+            'Fixed base SHA does not resolve to a commit in this repository',
+        );
+    }
     const directory = dirname(fileURLToPath(import.meta.url));
     const sources = await Promise.all(
         (await readdir(directory))
@@ -35,12 +79,79 @@ async function identity(manifestPath, raw, base) {
     );
     return {
         head: git('rev-parse', 'HEAD'),
-        base: git('rev-parse', '--verify', `${base}^{commit}`),
+        base: fixedBase,
         manifestHash: hash(raw),
         harnessHash: hash(Buffer.concat(sources)),
         dirty: !!git('status', '--porcelain', '--untracked-files=no'),
         renderInputs: renderingInputs(JSON.parse(raw).renderInputs),
     };
+}
+
+async function validateOutput(output, cases) {
+    const root = git('rev-parse', '--show-toplevel');
+    const path = relative(root, output);
+    if (
+        !path ||
+        path === '..' ||
+        path.startsWith('..' + sep) ||
+        isAbsolute(path)
+    )
+        throw new Error(
+            'Evidence output must be inside the task repository (for example .atl/<task>/visual)',
+        );
+    let current = root;
+    for (const part of path.split(sep)) {
+        current = resolve(current, part);
+        try {
+            if ((await lstat(current)).isSymbolicLink())
+                throw new Error('Evidence output must not use symlink paths');
+        } catch (error) {
+            if (error.code !== 'ENOENT') throw error;
+        }
+    }
+    if (git('ls-files', '--', path))
+        throw new Error('Evidence output must not contain tracked source');
+    try {
+        execFileSync('git', ['check-ignore', '-q', '--', path + sep], {
+            stdio: 'ignore',
+        });
+    } catch {
+        throw new Error(
+            'Evidence output must be an ignored task artifact directory (for example .atl/<task>/visual)',
+        );
+    }
+    for (const name of [
+        'report.json',
+        'report.sha256',
+        'verification.json',
+        'index.html',
+        ...cases.map((item) => item.id + '.png'),
+    ]) {
+        try {
+            if ((await lstat(resolve(output, name))).isSymbolicLink())
+                throw new Error(
+                    `Evidence artifact must not be a symlink: ${name}`,
+                );
+        } catch (error) {
+            if (error.code !== 'ENOENT') throw error;
+        }
+    }
+}
+
+async function validateBrowser() {
+    if (!process.env.CHROME_BIN)
+        throw new Error(
+            'Set CHROME_BIN to an installed Chrome/Chromium executable',
+        );
+    try {
+        await access(process.env.CHROME_BIN, constants.X_OK);
+        if (!(await stat(process.env.CHROME_BIN)).isFile())
+            throw new Error('not a file');
+    } catch {
+        throw new Error(
+            `CHROME_BIN is not an executable file: ${process.env.CHROME_BIN}`,
+        );
+    }
 }
 
 async function checkArtifacts(manifest, report, candidate, output) {
@@ -75,7 +186,7 @@ async function checkArtifacts(manifest, report, candidate, output) {
     return errors;
 }
 
-async function runCase(browser, manifest, item, output, captureIds) {
+async function prepareCase(browser, manifest, item) {
     const { view, state, width, mode, text, id } = item;
     const url = new URL(view.path, manifest.baseUrl);
     for (const [key, value] of Object.entries({
@@ -142,6 +253,13 @@ async function runCase(browser, manifest, item, output, captureIds) {
             `settled capture: ${selector}`,
         );
     }
+    return { url: url.href, fonts };
+}
+
+async function runCase(browser, manifest, item, output, captureIds) {
+    const { view, state, width, mode, text, id } = item;
+    const { url, fonts } = await prepareCase(browser, manifest, item);
+    const dark = mode.endsWith('dark');
     const observed = await browser.evaluate(`({
         text: Math.round(parseFloat(getComputedStyle(document.documentElement).fontSize) / ${manifest.rootFontPx ?? 16} * 100),
         dark: !!document.querySelector(${JSON.stringify(manifest.darkSelector ?? 'html.dark')}),
@@ -230,7 +348,7 @@ async function runCase(browser, manifest, item, output, captureIds) {
             failures.push(`Keyboard did not reach ${selector}`);
     return {
         id,
-        url: url.href,
+        url,
         status: failures.length ? 'failed' : 'passed',
         ...captureEvidence,
         assertions,
@@ -257,13 +375,15 @@ async function main() {
     )
         throw new Error('Unknown or misplaced capture option');
     if (
-        !['plan', 'run', 'verify'].includes(command) ||
+        !['plan', 'preflight', 'run', 'verify'].includes(command) ||
         !manifestName ||
         (command !== 'plan' && (!outputName || !base))
     )
         throw new Error(
-            'Usage: node run.mjs plan <manifest.json> | run|verify <manifest.json> <output-directory> <fixed-base-sha> [--capture[=<case-id>]]',
+            'Usage: node run.mjs plan <manifest.json> | preflight|run|verify <manifest.json> <output-directory> <fixed-base-sha> [--capture[=<case-id>]]',
         );
+    if (Number(process.versions.node.split('.')[0]) < 22)
+        throw new Error('Visual runner requires Node 22 or newer');
     const manifestPath = resolve(manifestName);
     const raw = await readFile(manifestPath);
     const manifest = JSON.parse(raw);
@@ -280,6 +400,23 @@ async function main() {
     }
     const output = resolve(outputName);
     const candidate = await identity(manifestPath, raw, base);
+    await validateOutput(output, cases);
+    if (command === 'preflight') {
+        await validateBrowser();
+        const browser = await openChrome();
+        try {
+            const selected = cases[0];
+            if (!selected)
+                throw new Error('Visual manifest has no fixture cases');
+            const { url } = await prepareCase(browser, manifest, selected);
+            console.log(
+                `Fixture ready: ${selected.id} at ${url}; readiness only. Full run checks all ${cases.length} cases.`,
+            );
+        } finally {
+            await browser.close();
+        }
+        return;
+    }
     if (command === 'verify') {
         const errors = await checkArtifacts(
             manifest,
@@ -322,11 +459,6 @@ async function main() {
         throw new Error('Unknown capture case');
     await mkdir(output, { recursive: true });
     // Only remove artifacts owned by the previous run, never arbitrary user images.
-    if (
-        output === git('rev-parse', '--show-toplevel') ||
-        git('ls-files', '--', output)
-    )
-        throw new Error('Evidence output must not contain tracked source');
     let previous;
     try {
         previous = JSON.parse(await readFile(resolve(output, 'report.json')));
