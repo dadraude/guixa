@@ -85,9 +85,9 @@ Commit code, fixture and manifest; keep generated evidence in an untracked task 
 Run from the task worktree:
 
 ```sh
-CHROME_BIN="/path/to/chrome" node skills/agent-workflow/scripts/visual/run.mjs preflight path/to/visual.json .atl/<task>/visual FIXED_BASE_SHA
-CHROME_BIN="/path/to/chrome" node skills/agent-workflow/scripts/visual/run.mjs run path/to/visual.json .atl/<task>/visual FIXED_BASE_SHA
-node skills/agent-workflow/scripts/visual/run.mjs verify path/to/visual.json .atl/<task>/visual FIXED_BASE_SHA
+CHROME_BIN="/path/to/chrome" node skills/agent-workflow/scripts/visual/run.mjs preflight path/to/visual.json .atl/task-name/visual FIXED_BASE_SHA
+CHROME_BIN="/path/to/chrome" node skills/agent-workflow/scripts/visual/run.mjs run path/to/visual.json .atl/task-name/visual FIXED_BASE_SHA
+node skills/agent-workflow/scripts/visual/run.mjs verify path/to/visual.json .atl/task-name/visual FIXED_BASE_SHA
 ```
 
 A preflight checks Node, the installed browser, the tracked manifest, fixed base, safe ignored output,
