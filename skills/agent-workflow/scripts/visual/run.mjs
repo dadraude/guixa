@@ -54,7 +54,12 @@ async function identity(manifestPath, raw, base) {
             'Visual manifest must be a tracked file inside the task repository',
         );
     try {
-        git('ls-files', '--error-unmatch', '--', manifestRelative);
+        git(
+            'ls-files',
+            '--error-unmatch',
+            '--',
+            `:(literal)${manifestRelative}`,
+        );
     } catch {
         throw new Error(
             'Visual manifest must be a tracked file inside the task repository',
@@ -109,7 +114,7 @@ async function validateOutput(output, cases) {
             if (error.code !== 'ENOENT') throw error;
         }
     }
-    if (git('ls-files', '--', path))
+    if (git('ls-files', '--', `:(literal)${path}`))
         throw new Error('Evidence output must not contain tracked source');
     try {
         execFileSync('git', ['check-ignore', '-q', '--', path + sep], {

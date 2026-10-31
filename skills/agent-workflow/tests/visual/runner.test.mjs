@@ -93,7 +93,7 @@ void test('CLI captures settled UI, verifies coverage, and rejects changed or mi
             ],
         };
         await writeFile(join(cwd, 'visual.json'), JSON.stringify(manifest));
-        await writeFile(join(cwd, '.gitignore'), 'artifacts/\n');
+        await writeFile(join(cwd, '.gitignore'), 'artifacts/\n.atl/\n');
         execFileSync('git', ['init', '-q'], { cwd });
         execFileSync(
             'git',
@@ -119,6 +119,41 @@ void test('CLI captures settled UI, verifies coverage, and rejects changed or mi
             cwd,
             encoding: 'utf8',
         }).trim();
+        await writeFile(join(cwd, 'visual*.json'), JSON.stringify(manifest));
+        const globManifest = await cliArgs([
+            'preflight',
+            'visual*.json',
+            'artifacts',
+            base,
+        ]);
+        assert.notEqual(globManifest.code, 0);
+        assert.match(globManifest.output, /tracked file/);
+        await mkdir(join(cwd, '.atl/[x]'), { recursive: true });
+        await writeFile(join(cwd, '.atl/[x]/report.json'), 'tracked source');
+        execFileSync('git', ['add', '-f', '.atl/[x]/report.json'], { cwd });
+        execFileSync(
+            'git',
+            [
+                '-c',
+                'user.name=Workflow Test',
+                '-c',
+                'user.email=workflow@example.invalid',
+                '-c',
+                'commit.gpgsign=false',
+                'commit',
+                '-qm',
+                'Tracked artifact path',
+            ],
+            { cwd },
+        );
+        const globOutput = await cliArgs([
+            'preflight',
+            'visual.json',
+            '.atl/[x]',
+            base,
+        ]);
+        assert.notEqual(globOutput.code, 0);
+        assert.match(globOutput.output, /tracked source/);
         const ready = await cli('preflight');
         assert.equal(ready.code, 0, ready.output);
         assert.match(ready.output, /fixture ready/i);
