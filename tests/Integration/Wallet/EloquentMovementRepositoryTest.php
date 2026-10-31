@@ -39,6 +39,18 @@ final class EloquentMovementRepositoryTest extends TestCase
         return $this->account ??= User::factory()->create()->id;
     }
 
+    protected function basket(string $household): string
+    {
+        $id = (string) Str::uuid7();
+        DB::table('baskets')->insert([
+            'id' => $id, 'household_id' => $household, 'household_name' => 'Household',
+            'kind' => 'stock', 'state' => 'draft', 'created_by' => $this->account(),
+            'created_at' => now(),
+        ]);
+
+        return $id;
+    }
+
     /** @return array<string, array{array<string, mixed>}> */
     public static function inconsistentRows(): array
     {

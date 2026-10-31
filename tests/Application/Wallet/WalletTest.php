@@ -3,12 +3,14 @@
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Error\NotAllowed;
 use Guixa\Shared\Domain\Role;
+use Guixa\Wallet\Application\ChargeForBasket;
 use Guixa\Wallet\Application\ChargeForPickup;
 use Guixa\Wallet\Application\GetBalance;
 use Guixa\Wallet\Application\GetWalletStatement;
 use Guixa\Wallet\Application\ReadHouseholdBalance;
 use Guixa\Wallet\Application\RecordCorrection;
 use Guixa\Wallet\Application\RecordTopUp;
+use Guixa\Wallet\Domain\Error\BasketAlreadyCharged;
 use Guixa\Wallet\Domain\Error\CorrectionNoteRequired;
 use Guixa\Wallet\Domain\Error\InvalidCorrectionAmount;
 use Guixa\Wallet\Domain\Error\InvalidTopUpAmount;
@@ -95,6 +97,21 @@ it('refuses a second charge or credit for the same household and cycle (R23)', f
 
     expect(fn () => ($this->charge)($this->manager, $this->household, 'cycle-1', -150))->toThrow(PickupAlreadyCharged::class);
     expect(($this->balance)($this->manager, $this->household))->toBe(-2240);
+});
+
+it('charges distinct baskets for one household while rejecting replay and preserving weekly charges (T55)', function () {
+    $basketCharge = new ChargeForBasket($this->movements, $this->clock);
+    $first = $basketCharge($this->manager, $this->household, 'basket-1', 300);
+    $second = $basketCharge($this->manager, $this->household, 'basket-2', 200);
+    ($this->charge)($this->manager, $this->household, 'cycle-1', 100);
+
+    expect($first)->not->toBeNull()
+        ->and($second)->not->toBeNull()
+        ->and(($this->balance)($this->manager, $this->household))->toBe(-600)
+        ->and(array_map(fn ($movement) => $movement->basketId, ($this->statement)($this->manager, $this->household)->movements))
+        ->toEqualCanonicalizing(['basket-1', 'basket-2', null]);
+    expect(fn () => $basketCharge($this->manager, 'other-household', 'basket-1', -50))->toThrow(BasketAlreadyCharged::class);
+    expect(($this->balance)($this->manager, $this->household))->toBe(-600);
 });
 
 it('shows a member their household movements with their cycle, and nobody else\'s (R31)', function () {

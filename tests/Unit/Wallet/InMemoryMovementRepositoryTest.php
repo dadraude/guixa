@@ -28,4 +28,9 @@ final class InMemoryMovementRepositoryTest extends TestCase
     {
         return $this->account ??= (string) Str::uuid7();
     }
+
+    protected function basket(string $household): string
+    {
+        return (string) Str::uuid7();
+    }
 }

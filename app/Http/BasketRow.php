@@ -1,0 +1,34 @@
+<?php
+
+namespace App\Http;
+
+use Guixa\Sales\Application\BasketData;
+use Spatie\TypeScriptTransformer\Attributes\TypeScript;
+
+#[TypeScript]
+final readonly class BasketRow
+{
+    /** @param list<BasketStockLineRow> $stockLines */
+    public function __construct(
+        public string $id,
+        public string $householdId,
+        public string $householdName,
+        public string $state,
+        public array $stockLines,
+        public int $totalCents,
+        public int $balanceCents,
+        public int $projectedBalanceCents,
+        public ?string $validatedAt,
+        public ?string $collectedAt,
+    ) {}
+
+    public static function from(BasketData $basket, int $balanceCents): self
+    {
+        $total = $basket->totalCents;
+
+        return new self($basket->id, $basket->householdId, $basket->householdName,
+            $basket->state, array_map(BasketStockLineRow::from(...), $basket->stockLines),
+            $total, $balanceCents, $basket->state === 'draft' ? $balanceCents - $total : $balanceCents,
+            $basket->validatedAt?->format(DATE_ATOM), $basket->collectedAt?->format(DATE_ATOM));
+    }
+}

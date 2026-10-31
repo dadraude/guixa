@@ -7,6 +7,7 @@ use Guixa\Stock\Domain\MovementType;
 use Guixa\Stock\Domain\StockMovement;
 use Guixa\Stock\Domain\StockMovementRepository;
 use Guixa\Stock\Domain\ValueObject\SignedQuantity;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 final class EloquentStockMovementRepository implements StockMovementRepository
@@ -18,7 +19,8 @@ final class EloquentStockMovementRepository implements StockMovementRepository
 
     public function add(StockMovement $movement): void
     {
-        StockMovementModel::query()->create([
+        // A savepoint keeps the caller's transaction usable after a rejected duplicate sale.
+        DB::transaction(fn () => StockMovementModel::query()->create([
             'id' => $movement->id,
             'stock_product_id' => $movement->stockProductId,
             'type' => $movement->type->value,
@@ -28,7 +30,8 @@ final class EloquentStockMovementRepository implements StockMovementRepository
             'note' => $movement->note,
             'cycle_id' => $movement->cycleId,
             'order_id' => $movement->orderId,
-        ]);
+            'basket_id' => $movement->basketId,
+        ]));
     }
 
     public function forProduct(string $stockProductId): array
@@ -86,6 +89,7 @@ final class EloquentStockMovementRepository implements StockMovementRepository
             $model->note,
             $model->cycle_id,
             $model->order_id,
+            $model->basket_id,
         );
     }
 }

@@ -163,4 +163,17 @@ describe('stock lines', () => {
     it('formats the unit price with a comma', () => {
         expect(stockLines().text()).toContain('6,00\u00a0€');
     });
+
+    it('accepts basket rows and shows the basket-specific empty state', () => {
+        expect(
+            stockLines().get('[data-test="stock-line-honey"]').text(),
+        ).toContain('12,00\u00a0€');
+        const empty = stockLines({
+            lines: [],
+            emptyMessage: 'No basket stock yet.',
+        });
+        expect(empty.get('[data-test="no-stock-lines"]').text()).toBe(
+            'No basket stock yet.',
+        );
+    });
 });

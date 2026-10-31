@@ -9,11 +9,12 @@ import { euros } from './euros';
 import { formatQuantity } from '@/lib/locale';
 
 const props = defineProps<{
-    lines: App.Http.PickupStockLineRow[];
+    lines: App.Http.PickupStockLineRow[] | App.Http.BasketStockLineRow[];
     options: App.Http.StockLevelRow[];
     editable: boolean;
     processing: boolean;
     errors?: Record<string, string>;
+    emptyMessage?: string;
 }>();
 
 const emit = defineEmits<{
@@ -50,7 +51,9 @@ const submit = () => {
             class="text-sm text-muted-foreground"
             data-test="no-stock-lines"
         >
-            {{ trans('No stock has been added to this pickup.') }}
+            {{
+                emptyMessage ?? trans('No stock has been added to this pickup.')
+            }}
         </p>
 
         <ul class="pilot-list">

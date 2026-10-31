@@ -32,6 +32,7 @@ final class GetWalletStatement
             $movement->occurredAt,
             $movement->note,
             $movement->cycleId,
+            $movement->basketId,
         );
     }
 }

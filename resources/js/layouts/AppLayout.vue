@@ -10,7 +10,11 @@ const { breadcrumbs = [] } = defineProps<{
 }>();
 const page = usePage();
 const pilotTheme = computed(() => isPilotThemePage(page.component));
-const managerTheme = computed(() => page.component.startsWith('Manage/'));
+const managerTheme = computed(
+    () =>
+        page.component.startsWith('Manage/') ||
+        page.component.startsWith('Finance/Baskets/'),
+);
 </script>
 
 <template>

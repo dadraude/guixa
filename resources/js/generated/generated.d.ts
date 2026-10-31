@@ -10,6 +10,37 @@ readonly householdName: string | null,
 readonly active: boolean,
 readonly invitationPending: boolean,
 };
+export type BasketHouseholdRow = {
+readonly id: string,
+readonly name: string,
+};
+export type BasketRow = {
+readonly id: string,
+readonly householdId: string,
+readonly householdName: string,
+readonly state: string,
+readonly stockLines: App.Http.BasketStockLineRow[],
+readonly totalCents: number,
+readonly balanceCents: number,
+readonly projectedBalanceCents: number,
+readonly validatedAt: string | null,
+readonly collectedAt: string | null,
+};
+export type BasketStockLineRow = {
+readonly stockProductId: string,
+readonly name: string,
+readonly unit: string,
+readonly quantity: string,
+readonly unitPriceCents: number,
+readonly amountCents: number,
+};
+export type BasketSummaryRow = {
+readonly id: string,
+readonly householdName: string,
+readonly state: string,
+readonly totalCents: number,
+readonly createdAt: string,
+};
 export type ContainerCountRow = {
 readonly total: number,
 readonly households: App.Http.HouseholdContainerRow[],
@@ -345,6 +376,7 @@ readonly amount: string,
 readonly occurredAt: string,
 readonly note: string | null,
 readonly cycleId: string | null,
+readonly basketId: string | null,
 };
 export type WalletStatementRow = {
 readonly balance: string,

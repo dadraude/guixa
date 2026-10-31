@@ -4,6 +4,7 @@ namespace Tests\Support\Contracts;
 
 use DateTimeImmutable;
 use Guixa\Shared\Domain\Money;
+use Guixa\Wallet\Domain\Error\BasketAlreadyCharged;
 use Guixa\Wallet\Domain\Error\PickupAlreadyCharged;
 use Guixa\Wallet\Domain\Movement;
 use Guixa\Wallet\Domain\MovementRepository;
@@ -19,6 +20,9 @@ trait MovementRepositoryContract
     abstract protected function household(): string;
 
     abstract protected function account(): string;
+
+    /** Create a basket accepted by this adapter for the given household. */
+    abstract protected function basket(string $household): string;
 
     private function at(string $time): DateTimeImmutable
     {
@@ -136,5 +140,42 @@ trait MovementRepositoryContract
         $repository->add(Movement::correction($repository->nextId(), $household, Money::ofCents(100), 'typo', $cycle, $this->at('2026-10-22 12:00:00+00'), $this->account()));
 
         $this->assertCount(3, $repository->statementOf($household));
+    }
+
+    #[Test]
+    public function it_keeps_distinct_basket_charges_and_legacy_cycle_charges_together(): void
+    {
+        $repository = $this->repository();
+        $household = $this->household();
+        $first = $this->basket($household);
+        $second = $this->basket($household);
+        $cycle = (string) Str::uuid7();
+        $repository->add(Movement::basketCharge($repository->nextId(), $household, Money::ofCents(300), $first, $this->at('2026-10-22 10:00:00+00'), $this->account()));
+        $repository->add(Movement::basketCharge($repository->nextId(), $household, Money::ofCents(200), $second, $this->at('2026-10-22 11:00:00+00'), $this->account()));
+        $repository->add(Movement::charge($repository->nextId(), $household, Money::ofCents(100), $cycle, $this->at('2026-10-22 12:00:00+00'), $this->account()));
+
+        $this->assertSame(-600, $repository->balanceOf($household)->cents);
+        $this->assertSame([$cycle, null, null], array_map(fn (Movement $movement) => $movement->cycleId, $repository->statementOf($household)));
+        $this->assertSame([null, $second, $first], array_map(fn (Movement $movement) => $movement->basketId, $repository->statementOf($household)));
+    }
+
+    #[Test]
+    public function it_rejects_a_second_basket_charge_or_credit_globally_across_households(): void
+    {
+        $repository = $this->repository();
+        $owner = $this->household();
+        $other = $this->household();
+        $basket = $this->basket($owner);
+        $repository->add(Movement::basketCharge($repository->nextId(), $owner, Money::ofCents(300), $basket, $this->at('2026-10-22 10:00:00+00'), $this->account()));
+
+        try {
+            $repository->add(Movement::basketCredit($repository->nextId(), $other, Money::ofCents(300), $basket, $this->at('2026-10-22 11:00:00+00'), $this->account()));
+            $this->fail('A second movement for the same basket was accepted.');
+        } catch (BasketAlreadyCharged) {
+            $this->addToAssertionCount(1);
+        }
+
+        $this->assertCount(1, $repository->statementOf($owner));
+        $this->assertCount(0, $repository->statementOf($other));
     }
 }

@@ -5,7 +5,7 @@ return [
     'modules' => [
         'Catalog' => [
             'owns' => 'Producers and all product identity, metadata, classification and administration.',
-            'dependencies' => ['Membership', 'Ordering', 'Shared', 'Stock'],
+            'dependencies' => ['Membership', 'Ordering', 'Sales', 'Shared', 'Stock'],
             'exports' => [
                 'Application\GetProducer' => ['Membership'],
                 'Application\ProducerData' => ['Membership'],
@@ -18,8 +18,8 @@ return [
                 'Application\OrderableProductData' => ['Ordering'],
                 'Application\GetStockProduct' => ['Stock'],
                 'Application\ListStockProducts' => ['Stock'],
-                'Application\LockStockProduct' => ['Stock'],
-                'Application\StockProductData' => ['Stock'],
+                'Application\LockStockProduct' => ['Stock', 'Sales'],
+                'Application\StockProductData' => ['Stock', 'Sales'],
                 'Application\ListStockOfferProducts' => ['Sales'],
                 'Application\StockOfferProductData' => ['Sales'],
             ],
@@ -33,6 +33,8 @@ return [
                 'Application\GetHouseholds' => ['Ordering'],
                 'Application\HouseholdData' => ['Ordering'],
                 'Application\GetProducerAccountEmail' => ['Ordering'],
+                'Application\ReadActiveHouseholds' => ['Sales'],
+                'Application\ActiveHouseholdData' => ['Sales'],
             ],
         ],
         'Ordering' => [
@@ -52,10 +54,10 @@ return [
             'exports' => [
                 'Application\Actor' => ['Catalog', 'Membership', 'Ordering', 'Sales', 'Stock', 'Wallet'],
                 'Application\ActorResolver' => ['Catalog', 'Membership', 'Ordering', 'Stock', 'Wallet'],
-                'Application\TransactionRunner' => ['Catalog', 'Membership', 'Ordering', 'Stock', 'Wallet'],
-                'Domain\Clock' => ['Catalog', 'Membership', 'Ordering', 'Stock', 'Wallet'],
-                'Domain\Money' => ['Catalog', 'Membership', 'Ordering', 'Stock', 'Wallet'],
-                'Domain\Quantity' => ['Catalog', 'Membership', 'Ordering', 'Stock', 'Wallet'],
+                'Application\TransactionRunner' => ['Catalog', 'Membership', 'Ordering', 'Sales', 'Stock', 'Wallet'],
+                'Domain\Clock' => ['Catalog', 'Membership', 'Ordering', 'Sales', 'Stock', 'Wallet'],
+                'Domain\Money' => ['Catalog', 'Membership', 'Ordering', 'Sales', 'Stock', 'Wallet'],
+                'Domain\Quantity' => ['Catalog', 'Membership', 'Ordering', 'Sales', 'Stock', 'Wallet'],
                 'Domain\LocalTime' => ['Catalog', 'Membership', 'Ordering', 'Stock', 'Wallet'],
                 'Domain\Role' => ['Catalog', 'Membership', 'Ordering', 'Sales', 'Stock', 'Wallet'],
                 'Domain\Error\InvalidLocalTime' => ['Catalog', 'Membership', 'Ordering', 'Stock', 'Wallet'],
@@ -64,9 +66,11 @@ return [
             ],
         ],
         'Sales' => [
-            'owns' => 'Read-only stock offers for member discovery and future sales.',
-            'dependencies' => ['Catalog', 'Shared', 'Stock'],
-            'exports' => [],
+            'owns' => 'Read-only stock offers and independent stock basket drafts, validation, history and collection.',
+            'dependencies' => ['Catalog', 'Membership', 'Shared', 'Stock', 'Wallet'],
+            'exports' => [
+                'Application\HasProductHistory' => ['Catalog'],
+            ],
         ],
         'Stock' => [
             'owns' => 'Return items, append-only inventory movements and available quantities.',
@@ -80,6 +84,7 @@ return [
                 'Application\LockStockOffer' => ['Ordering'],
                 'Application\StockLevelData' => ['Ordering'],
                 'Application\SellStock' => ['Ordering'],
+                'Application\SellBasketStock' => ['Sales'],
             ],
         ],
         'Wallet' => [
@@ -90,6 +95,8 @@ return [
                 'Application\ChargeForPickup' => ['Ordering'],
                 'Application\RecordCorrection' => ['Ordering'],
                 'Application\RecordTopUp' => ['Ordering'],
+                'Application\ChargeForBasket' => ['Sales'],
+                'Application\GetBalance' => ['Sales'],
             ],
         ],
     ],
@@ -110,6 +117,9 @@ return [
         'order_stock_lines' => 'Ordering',
         'order_return_lines' => 'Ordering',
         'order_pickup_adjustments' => 'Ordering',
+        'baskets' => 'Sales',
+        'basket_lines' => 'Sales',
+        'basket_collection_events' => 'Sales',
         'return_items' => 'Stock',
         'stock_movements' => 'Stock',
         'wallet_movements' => 'Wallet',

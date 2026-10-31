@@ -58,6 +58,34 @@ it('keeps Sales discovery limited to its delivered read exports', function () {
         )))->toContain('ListStockOfferProducts is not exported to Ordering');
 });
 
+it('admits only the T55 basket integration exports and rejects unrelated or future writers', function () {
+    $checker = new ModuleContract(require dirname(__DIR__, 2).'/architecture/modules.php');
+
+    foreach ([
+        ['src/Sales/Infrastructure/Catalog/Adapter.php', '\\Guixa\\Catalog\\Application\\LockStockProduct'],
+        ['src/Sales/Infrastructure/Stock/Adapter.php', '\\Guixa\\Stock\\Application\\SellBasketStock'],
+        ['src/Sales/Infrastructure/Wallet/Adapter.php', '\\Guixa\\Wallet\\Application\\ChargeForBasket'],
+        ['src/Catalog/Infrastructure/Sales/Adapter.php', '\\Guixa\\Sales\\Application\\HasProductHistory'],
+    ] as [$path, $symbol]) {
+        expect($checker->violations($path, "<?php new {$symbol};"))->toBe([]);
+    }
+
+    foreach ([
+        ['src/Sales/Infrastructure/Catalog/Adapter.php', '\\Guixa\\Catalog\\Application\\CreateStockProduct', 'CreateStockProduct is not exported to Sales'],
+        ['src/Sales/Infrastructure/Stock/Adapter.php', '\\Guixa\\Stock\\Application\\RecordStockEntry', 'RecordStockEntry is not exported to Sales'],
+        ['src/Sales/Infrastructure/Wallet/Adapter.php', '\\Guixa\\Wallet\\Application\\RecordTopUp', 'RecordTopUp is not exported to Sales'],
+        ['src/Ordering/Infrastructure/Wallet/Adapter.php', '\\Guixa\\Wallet\\Application\\ChargeForBasket', 'ChargeForBasket is not exported to Ordering'],
+        ['src/Ordering/Infrastructure/Stock/Adapter.php', '\\Guixa\\Stock\\Application\\SellBasketStock', 'SellBasketStock is not exported to Ordering'],
+        ['src/Catalog/Infrastructure/Sales/Adapter.php', '\\Guixa\\Sales\\Application\\ValidateBasket', 'ValidateBasket is not exported to Catalog'],
+    ] as [$path, $symbol, $message]) {
+        expect(implode("\n", $checker->violations($path, "<?php new {$symbol};")))->toContain($message);
+    }
+
+    $source = "<?php use Illuminate\\Support\\Facades\\DB; DB::table('baskets')->get();";
+    expect(implode("\n", $checker->violations('src/Catalog/Infrastructure/Sales/Adapter.php', $source)))
+        ->toContain('baskets belongs to Sales');
+});
+
 it('does not allow foreign exports directly in Application', function () {
     $checker = new ModuleContract(require dirname(__DIR__, 2).'/architecture/modules.php');
     expect(implode("\n", $checker->violations('src/Ordering/Application/Adapter.php', '<?php new \Guixa\Catalog\Application\GetOrderableProduct;')))
