@@ -1,6 +1,6 @@
 # Remaining Sales tasks: accepted reslicing
 
-Status: **accepted and authorized for Linear publication, 2026-10-31**. Publication readback is recorded below when complete.
+Status: **accepted and published to Linear, 2026-10-31**. See verified publication below.
 This proposal changes task boundaries and verification sequencing, not accepted product behavior.
 Canonical titles/scopes and the prerequisite graph live in [tasks.md](../tasks.md); this document
 records the decision evidence and publication delta, not a second execution registry.
@@ -83,8 +83,8 @@ where the pending dashboard scope moves. Neither becomes a blocker or revives fe
 DRA-206's completion body expands to T52–T68. T33 keeps all 18 native blockers, including T63;
 the new leaves are transitively required by T63. Do not close or otherwise change either parent/status.
 
-Current execution frontier among these remaining tasks: **none**. T55 is not integrated and this
-breakdown is unapproved. Once T55 and this document change are integrated/accepted, T56 and T65
+At the original draft read, the execution frontier was **none**: T55 was not integrated and the
+breakdown was unapproved. The publication readback below supersedes this snapshot. Once T55 and this document change are integrated/accepted, T56 and T65
 have satisfied implementation prerequisites (T07/T26/T38 are already Done); scheduling still checks
 shared routes/components. Existing numbering is identity, not a serial execution order.
 
@@ -113,3 +113,38 @@ checkpoints without adding user approval or independent-review rounds.
 After reviewing this breakdown, return to the other retrospective recommendations: routine-harness
 recovery policy, executable preflight/examples, semantic focused-check selection, authoritative owner
 state, and non-overlapping timing/communication. Those policy/helper changes are not bundled here.
+
+## Verified Linear publication — 2026-10-31
+
+The user approved the breakdown and explicitly authorized publication. Five leaves were created
+and ten existing issues updated. Readback verified titles, complete descriptions (allowing Linear
+Markdown normalization), team/project, parent, status, labels and all native prerequisite/context
+relations. Existing assignments, milestones, priorities and dates were preserved. Linear-generated
+mention relations were removed where not part of the approved graph. No duplicate tasks or cycles
+were found. All 17 T52–T68 children remain under DRA-206; T33 retains all 18 blockers and Todo.
+New leaves are Backlog, unassigned, with ready-for-agent. Nothing was marked complete by this update.
+
+| Issue | Task | Blocked by | Related context |
+| --- | --- | --- | --- |
+| DRA-211 | T56 | DRA-159, DRA-194, DRA-210 | None |
+| DRA-212 | T57 | DRA-211 | None |
+| DRA-213 | T58 | DRA-224, DRA-225 | None |
+| DRA-214 | T59 | DRA-228, DRA-226, DRA-180, DRA-176 | None |
+| DRA-215 | T60 | DRA-214, DRA-181 | None |
+| DRA-216 | T61 | DRA-226 | DRA-203, DRA-202 |
+| DRA-217 | T62 | DRA-214, DRA-182 | None |
+| DRA-218 | T63 | DRA-227, DRA-209, DRA-217 | None |
+| DRA-224 | T64 | DRA-211 | None |
+| DRA-225 | T65 | DRA-210, DRA-194 | None |
+| DRA-226 | T66 | DRA-225, DRA-211 | None |
+| DRA-227 | T67 | DRA-216, DRA-215 | DRA-202, DRA-203 |
+| DRA-228 | T68 | DRA-212, DRA-213 | None |
+
+Sources in Linear target published commit `a3462e05e555c532788d957241c8342c198b815b`.
+The documentation/workflow branch `docs/reslice-sales-tasks` is published, not merged.
+Publication readback also found T55 Done and PR #269 merged at
+`55c1842d407c636093514e561dafb4c41e51e560`; the final T55 candidate is an ancestor
+of origin/main. T56 and T65 now have satisfied technical prerequisites. Scheduling and normal
+implementation gates still apply; use the accepted documentation revision until it is integrated.
+
+The remaining audit findings are handed to a new session for prioritization, not automatic implementation.

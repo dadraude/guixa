@@ -4,9 +4,9 @@ Status: T01–T51 retain their historical approvals. **2026-10-28 amendment: acc
 (T52–T63 and updated T33). The user accepted the document structure and task breakdown. Application
 implementation and Linear publication remain separate scopes.
 
-**2026-10-31 reslicing: accepted; Linear publication authorized.** T56–T63/T33
+**2026-10-31 reslicing: accepted and published to Linear.** T56–T63/T33
 are reconciled below and T64–T68 are accepted additions; existing issue identities are retained.
-The [review and publication delta](tasks/reslicing-review.md) separates the current tracker snapshot
+T64–T68 map to DRA-224–DRA-228. The [review and publication delta](tasks/reslicing-review.md) separates the current tracker snapshot
 from the accepted graph. Product requirements and plan decisions are unchanged. Implementation status belongs to Linear, not this table.
 
 Source: [spec](spec.md) and areas · [plan](plan.md) · [coverage allocation](tasks/coverage.md).
