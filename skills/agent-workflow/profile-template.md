@@ -19,23 +19,23 @@ Ask first:
 
 ## Identities and paths
 
-| Setting                                   | Value                                                                                                                               |
-| ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| Tracker                                   | <tool; workspace, team, project>                                                                                                    |
-| Eligible statuses / dependency completion | <statuses> / <status>                                                                                                               |
-| Active / stopped status                   | <status> / <status>                                                                                                                 |
-| Issue key                                 | <e.g. `ABC-NN`>                                                                                                                     |
-| Executable task                           | <task ID pattern and where task rows live; title format>                                                                            |
-| Ready label                               | <label>, executable mapped leaves only                                                                                              |
-| Relation fields                           | <native parent, blocking and related fields>                                                                                        |
-| Codex entrypoint prefix                   | <prefix>                                                                                                                            |
-| Remote / base                             | <remote> / <branch>                                                                                                                 |
-| Task branch                               | <pattern>                                                                                                                           |
-| Worktree root                             | <path>                                                                                                                              |
-| Task worktree                             | <path>                                                                                                                              |
-| Implementation owner record               | <ignored task-local file retaining runtime/host, implementer ID and handoff until integration>                                      |
-| Test database                             | <name pattern, or none>                                                                                                             |
-| Limits                                    | <pipelines; substantive reviews; mechanical follow-up reviews; consecutive product failures per stage; recovery attempts per stage> |
+| Setting                                   | Value                                                                                                                                                                                   |
+| ----------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Tracker                                   | <tool; workspace, team, project>                                                                                                                                                        |
+| Eligible statuses / dependency completion | <statuses> / <status>                                                                                                                                                                   |
+| Active / stopped status                   | <status> / <status>                                                                                                                                                                     |
+| Issue key                                 | <e.g. `ABC-NN`>                                                                                                                                                                         |
+| Executable task                           | <task ID pattern and where task rows live; title format>                                                                                                                                |
+| Ready label                               | <label>, executable mapped leaves only                                                                                                                                                  |
+| Relation fields                           | <native parent, blocking and related fields>                                                                                                                                            |
+| Codex entrypoint prefix                   | <prefix>                                                                                                                                                                                |
+| Remote / base                             | <remote> / <branch>                                                                                                                                                                     |
+| Task branch                               | <pattern>                                                                                                                                                                               |
+| Worktree root                             | <path>                                                                                                                                                                                  |
+| Task worktree                             | <path>                                                                                                                                                                                  |
+| Implementation owner record               | <ignored task-local file retaining runtime/host, implementer ID and handoff until integration>                                                                                          |
+| Test database                             | <name pattern, or none>                                                                                                                                                                 |
+| Limits                                    | <pipelines; substantive reviews; mechanical follow-up reviews; consecutive product failures per stage; unsuccessful recoveries per stable mechanism; total recovery attempts per stage> |
 
 <How to resolve paths and the runtime environment for workers.>
 
@@ -69,8 +69,9 @@ not shell strings; establish effective isolated settings before install hooks, t
 unexplained failures or user requests. Reuse visual evidence only with reviewed, unchanged rendering
 inputs and current verification; full application CI remains candidate-bound.>
 
-<Retain separate budgets, failure mechanisms, task disposition/reservations and stage timestamps in
-the implementation-owner record; initialize the shared state helper with profile limits.>
+<Retain separate budgets, failure mechanisms, paired recovery attempts/results, task
+disposition/reservations and stage timestamps in the implementation-owner record; initialize
+the shared state helper with profile limits `recovery` and `recoveryTotal`.>
 
 <Cleanup after verified integration: worktree removal and any project cleanup script under
 `.agent-workflow/scripts/`.>
