@@ -50,12 +50,15 @@ Before slicing, apply [planning readiness](../references/planning.md#readiness-b
 Use its [task-quality criteria](../references/planning.md#task-quality-invest), batch guidance, handoff and draft checks for both source task descriptions
 and proposed issue bodies. Report missing decisions or artifacts for blocked scope instead of hiding
 them as implementation dependencies. Existing accepted tasks need a current evidence check, not an
-automatic rewrite. Drafting tickets does not authorize changes to the canonical task registry.
+automatic rewrite. When reslicing is requested, apply the planning reference's existing-work
+reconciliation and show scope/edge deltas before tracker updates. Drafting tickets alone does not
+authorize changes to the canonical task registry; honor explicit document-edit authorization.
 
 ## Execution Steps
 
 1. Inspect the current project, matching issues and relationships to avoid duplicates. Check readiness
-   and draft vertical slices from the authorized requirements, using the project's domain vocabulary,
+   and distinguish integrated behavior from pending candidates before drafting vertical slices from the
+   authorized requirements, using the project's domain vocabulary,
    with the tracer slice first.
 2. Present the short architecture overview and complete proposed titles/bodies from the planning
    handoff, with parent (or none), blockers and contextual relations with reasons. Include any proposed
