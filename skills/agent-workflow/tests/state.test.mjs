@@ -336,6 +336,43 @@ void test('authorization for another mechanism cannot clear an exhausted blocker
     assert.throws(() => applyEvent(owner, recovery('other')), /exhausted/);
 });
 
+void test('recovery authorization cannot clear a later product or review blocker', () => {
+    for (const laterBlocker of ['product', 'review']) {
+        let owner = applyEvent(initialize(), failure('harness', 'blocked'));
+        for (let i = 0; i < 2; i++) {
+            owner = applyEvent(owner, recovery('blocked'));
+            owner = applyEvent(owner, result('blocked', 'failure'));
+        }
+        if (laterBlocker === 'product') {
+            owner = applyEvent(owner, failure('product', 'assertion'));
+            owner = applyEvent(owner, failure('product', 'assertion'));
+        } else {
+            for (let i = 0; i < 3; i++) {
+                owner = applyEvent(owner, {
+                    type: 'review',
+                    classification: 'substantive',
+                    verdict: 'findings',
+                });
+            }
+        }
+        const blocker = owner.pipeline.blocker;
+        owner = applyEvent(owner, {
+            type: 'recovery-authorization',
+            stage: 'visual',
+            mechanism: 'blocked',
+            additionalAttempts: 1,
+            authorization: 'One scoped retry approved',
+            evidence: 'Recovery failures reviewed',
+        });
+        assert.equal(owner.pipeline.blocker, blocker, laterBlocker);
+        assert.throws(
+            () => applyEvent(owner, recovery('blocked')),
+            /exhausted/,
+            laterBlocker,
+        );
+    }
+});
+
 void test('scoped authorization adds bounded recovery capacity without changing review or product limits', () => {
     let owner = applyEvent(initialize(), failure('harness'));
     for (let i = 0; i < 2; i++) {

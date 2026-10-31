@@ -152,7 +152,11 @@ export function applyEvent(owner, event) {
             authorization: event.authorization,
             evidence: event.evidence,
         };
-        if (state.recoveryBlocker?.key === key) {
+        if (
+            state.recoveryBlocker?.key === key &&
+            state.blocker ===
+                `Validation budget exhausted: ${event.stage}/recovery`
+        ) {
             delete state.blocker;
             delete state.recoveryBlocker;
         }
