@@ -105,6 +105,19 @@ shared `guixa_test` are not task databases. If isolated database configuration c
 | Full validation (CI only) | `.github/workflows/tests.yml`: selected `frontend`, `backend` and `tooling` jobs plus the always-on `docs` lint/format check; `ci` aggregates their results; resolve commands from the workflow and dependency manifests |
 
 For visual tasks, use the [shared visual workflow](../skills/agent-workflow/references/visual.md).
+Start the task-owned fixture server separately in the isolated worktree after the guarded task
+environment is prepared. The installed package script is `dev: vp dev`; the installed `vp dev --help`
+supports `--host`, `--port` and `--strictPort`. Use:
+
+```sh
+PATH="$WORKTREE_ROOT/.bin:$PATH" node .agent-workflow/scripts/task-command.mjs "$NN" -- pnpm dev --host 127.0.0.1 --port "$PORT" --strictPort
+```
+
+Choose an unused task port, keep this command running, and set the tracked visual manifest's `baseUrl`
+to that address. Then run the shared visual `preflight` with explicit `CHROME_BIN`, the tracked manifest,
+an ignored `.atl/<task>/visual` output and the fixed base commit SHA. Preflight confirms browser and
+one representative fixture route are ready; it does not prove source identity, role authorization,
+persistence or acceptance. Confirm those separately before relying on a full visual run.
 The available visual dimensions are 375, 1024 and 1280 px, light/dark, and 100%/200% root text.
 Select cases by risk instead of multiplying every state by every dimension. The minimum is each
 affected page/role in its populated state at 375 and 1280 px, light and dark, 100% text. Check each
