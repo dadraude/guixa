@@ -1,6 +1,7 @@
 {
     "Baskets": "Cistelles",
     "Basket": "Cistella",
+    "Household": "Unitat de convivència",
     "Basket: :name": "Cistella: :name",
     "Create basket": "Crea una cistella",
     "Record independent stock purchases and collection.": "Registra compres d’estoc independents i la seva recollida.",

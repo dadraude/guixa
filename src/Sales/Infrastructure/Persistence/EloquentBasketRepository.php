@@ -10,6 +10,7 @@ use Guixa\Sales\Domain\Error\BasketNotEditable;
 use Guixa\Shared\Domain\Quantity;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use UnexpectedValueException;
 
 final class EloquentBasketRepository implements BasketRepository
 {
@@ -98,6 +99,7 @@ final class EloquentBasketRepository implements BasketRepository
         return $instant?->format('Y-m-d H:i:s.uP');
     }
 
+    /** @return array<string, array{string, string, string, string, int, bool, ?string, string, ?string, ?string}> */
     private function lineSnapshots(Basket $basket): array
     {
         $snapshots = [];
@@ -127,8 +129,8 @@ final class EloquentBasketRepository implements BasketRepository
 
     public function list(): array
     {
-        return BasketModel::query()->orderByDesc('created_at')->orderByDesc('id')->get()
-            ->map(fn (BasketModel $model) => $this->toDomain($model))->all();
+        return array_values(BasketModel::query()->orderByDesc('created_at')->orderByDesc('id')->get()
+            ->map(fn (BasketModel $model) => $this->toDomain($model))->all());
     }
 
     public function hasProductHistory(string $productId): bool
@@ -141,7 +143,7 @@ final class EloquentBasketRepository implements BasketRepository
         $lines = BasketLineModel::query()->where('basket_id', $model->id)->orderBy('created_at')->orderBy('id')->get()
             ->map(fn (BasketLineModel $line) => new BasketLine($line->id, $line->basket_id, $line->product_id,
                 $line->name, $line->unit, (int) $line->price_cents, (bool) $line->variable,
-                $line->containers_per_unit, Quantity::fromString((string) $line->quantity),
+                $this->containerSnapshot($line), Quantity::fromString((string) $line->quantity),
                 new DateTimeImmutable($line->created_at), $line->removed_at === null ? null : new DateTimeImmutable($line->removed_at)))
             ->all();
 
@@ -151,5 +153,15 @@ final class EloquentBasketRepository implements BasketRepository
             $model->validated_total_cents === null ? null : (int) $model->validated_total_cents,
             $model->collected_by, $model->collected_at === null ? null : new DateTimeImmutable($model->collected_at),
             $model->cancelled_by, $model->cancelled_at === null ? null : new DateTimeImmutable($model->cancelled_at));
+    }
+
+    private function containerSnapshot(BasketLineModel $line): ?string
+    {
+        $value = $line->getRawOriginal('containers_per_unit');
+        if ($value === null || is_string($value)) {
+            return $value;
+        }
+
+        throw new UnexpectedValueException('The basket container snapshot must be an exact decimal string.');
     }
 }

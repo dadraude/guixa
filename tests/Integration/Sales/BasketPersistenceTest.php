@@ -18,6 +18,7 @@ use Guixa\Sales\Domain\BasketLine;
 use Guixa\Sales\Domain\Error\BasketAlreadyValidated;
 use Guixa\Sales\Domain\Error\BasketNotEditable;
 use Guixa\Sales\Domain\Error\StockProductUnavailable;
+use Guixa\Sales\Infrastructure\Persistence\BasketLineModel;
 use Guixa\Sales\Infrastructure\Persistence\EloquentBasketRepository;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Money;
@@ -43,7 +44,7 @@ final class BasketPersistenceTest extends TestCase
 {
     use RefreshDatabase;
 
-    private function fixture(int $priceCents = 1200, string $quantity = '5'): array
+    private function fixture(int $priceCents = 1200, string $quantity = '5', bool $variable = false, ?string $containersPerUnit = null): array
     {
         $user = User::factory()->create();
         $actor = Actor::manager($user->id);
@@ -53,7 +54,7 @@ final class BasketPersistenceTest extends TestCase
         $productId = (string) Str::uuid7();
         DB::table('products')->insert(['id' => $productId, 'producer_id' => $producer->id,
             'stock' => true, 'name' => 'Oil', 'unit' => 'bottle', 'price_cents' => $priceCents,
-            'variable' => false, 'active' => true]);
+            'variable' => $variable, 'containers_per_unit' => $containersPerUnit, 'active' => true]);
         app(RecordStockEntry::class)($actor, $productId, $quantity, null);
 
         return [$actor, $householdId, $productId];
@@ -98,6 +99,23 @@ final class BasketPersistenceTest extends TestCase
         $this->assertSame($first, DB::table('baskets')->where('id', $id)->value('collected_at'));
         $this->assertSame(1, DB::table('basket_collection_events')->where('basket_id', $id)->count());
         $this->assertSame(1, DB::table('wallet_movements')->where('basket_id', $id)->count());
+    }
+
+    #[Test]
+    public function a_variable_stock_line_reloads_its_exact_non_null_container_snapshot(): void
+    {
+        [$actor, $householdId, $productId] = $this->fixture(650, '5', true, '2.125');
+        $id = app(CreateStockBasket::class)($actor, $householdId);
+        app(AddStockToBasket::class)($actor, $id, $productId, '1.500');
+
+        $line = app(EloquentBasketRepository::class)->get($id)->activeLines()[0];
+        $this->assertTrue($line->variable);
+        $this->assertSame('2.125', $line->containersPerUnit);
+        $this->assertSame('1.500', $line->quantity->toString());
+        $this->assertSame(975, $line->amountCents());
+        $this->assertSame('2.125', (string) DB::table('basket_lines')->where('basket_id', $id)->value('containers_per_unit'));
+        $storedLine = BasketLineModel::query()->where('basket_id', $id)->firstOrFail();
+        $this->assertSame('2.125', $storedLine->getRawOriginal('containers_per_unit'));
     }
 
     #[Test]
