@@ -47,15 +47,15 @@ module interfaces and table ownership, and [`specs/README.md`](specs/README.md) 
 
 ## Demo data
 
-For a local demo, run migrations and the default seeder:
+To start the app with demo data, run this in `local` or `testing`:
 
 ```sh
-php artisan migrate
-php artisan db:seed
+php artisan migrate --seed
+composer dev
 ```
 
-`DatabaseSeeder` calls `DemoSeeder`, which is available only in `local` and `testing`.
-All demo accounts use the password `demo-password` and are already activated and verified.
+Open <http://localhost:8000> and sign in as `gestora@demo.guixa.test` with password `demo-password`.
+`DatabaseSeeder` calls `DemoSeeder`; its accounts are activated and verified.
 
 | Role              | Account                                                                                          |
 | ----------------- | ------------------------------------------------------------------------------------------------ |
