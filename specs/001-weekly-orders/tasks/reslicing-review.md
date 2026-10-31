@@ -1,6 +1,6 @@
-# Remaining Sales tasks: proposed reslicing
+# Remaining Sales tasks: accepted reslicing
 
-Status: **draft for review, 2026-10-31**. No Linear issue, relation, label or status has been changed.
+Status: **accepted and authorized for Linear publication, 2026-10-31**. Publication readback is recorded below when complete.
 This proposal changes task boundaries and verification sequencing, not accepted product behavior.
 Canonical titles/scopes and the prerequisite graph live in [tasks.md](../tasks.md); this document
 records the decision evidence and publication delta, not a second execution registry.
@@ -100,7 +100,7 @@ Publish only after the user reviews this concrete breakdown, as explicitly reque
 state and canonical source at that point; preserve concurrent changes and other native relations.
 Create new leaves, record returned IDs, then reconcile affected existing blockers and read back every
 changed body/relation. Source links must target the actually published documentation revision rather
-than inventing links to an unpushed branch. No tracker mutation occurs in this worktree preparation.
+than inventing links to an unpushed branch. The user approved the concrete breakdown and explicitly requested its publication to Linear.
 
 ## Workflow changes and remaining audit work
 

@@ -4,10 +4,10 @@ Status: T01–T51 retain their historical approvals. **2026-10-28 amendment: acc
 (T52–T63 and updated T33). The user accepted the document structure and task breakdown. Application
 implementation and Linear publication remain separate scopes.
 
-**2026-10-31 reslicing: proposed for review, not published or execution-ready.** T56–T63/T33
-are reconciled below and T64–T68 are proposed additions; existing issue identities are retained.
+**2026-10-31 reslicing: accepted; Linear publication authorized.** T56–T63/T33
+are reconciled below and T64–T68 are accepted additions; existing issue identities are retained.
 The [review and publication delta](tasks/reslicing-review.md) separates the current tracker snapshot
-from this proposed graph. Product requirements and plan decisions are unchanged. Implementation status belongs to Linear, not this table.
+from the accepted graph. Product requirements and plan decisions are unchanged. Implementation status belongs to Linear, not this table.
 
 Source: [spec](spec.md) and areas · [plan](plan.md) · [coverage allocation](tasks/coverage.md).
 
@@ -65,7 +65,7 @@ See [current translation contracts](plan.md#translations); the linked T36 baseli
 ## Canonical task registry
 
 For T01–T51 except T33, linked scopes are historical: keep delivered behavior that the amendment
-preserves; implement changed behavior through T52–T68. Existing issue IDs keep their lineage; explicit scope narrowing below is proposed, never a silent repurposing.
+preserves; implement changed behavior through T52–T68. Existing issue IDs keep their lineage; explicit scope narrowing below is accepted, never a silent repurposing.
 
 | ID | Task | Covers | After |
 | --- | --- | --- | --- |
