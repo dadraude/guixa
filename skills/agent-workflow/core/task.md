@@ -138,15 +138,32 @@ implementation-owner record using the [state helper](../scripts/state.mjs). Clas
   local verification, visual verification and CI. Success resets only that stage's product streak.
 - Harness/infrastructure: a diagnosed selector, readiness, probe, browser or service failure prevented
   valid evidence. Record diagnosis, fix and focused reproduction before another broad run; use the
-  stage's bounded recovery allowance. An unexplained failure cannot be assumed to be infrastructure.
+  bounded recovery allowance. Ordinary prerequisite preparation before a failed validation is a
+  `preparation` event and spends no recovery attempt. An unexplained failure cannot be assumed to be infrastructure.
 - Mechanical: formatting or test wiring preserves production behavior and existing assertions.
   Prove that classification with the diff and focused checks. Use a fresh independent focused
   follow-up review; changed behavior/assertions require substantive review.
 
-Record a `recovery` event before each diagnosed non-product correction retry, with its diagnosis and
-focused-correction `evidence`. These attempts use their own bounded stage counter, including successful
-recoveries; they do not consume product failures. An initial harness failure alone does not consume a
-recovery attempt. A failed final allowed recovery stops the task; another attempt beyond the limit is refused.
+Record a non-product `failure` first, then a `recovery` event before each correction retry with its
+stable `mechanism`, `diagnosis`, focused `reproduction` and correction `evidence`. Close that pending
+attempt with a matching `recovery-result` (`outcome: success|failure`, focused `evidence`) before any
+further validation, preparation, review or authorization event. Disposition, reservation and timing
+events can still record a pause while the attempt remains pending. A failed correction counts
+against that mechanism's unsuccessful-correction limit;
+successful corrections do not. All started corrections count toward the stage's total-attempt limit,
+including successful corrections, so changing mechanism names cannot create unlimited retries.
+Neither a non-product result nor a non-product validation success resets a product failure streak:
+only a product success at that stage does. An initial harness failure alone does not consume a
+recovery attempt. A failed final allowed correction stops the task; another attempt beyond either
+limit is refused. These are pilot defaults, not a measured speed improvement.
+
+If an explicitly authorized extra correction is needed, record `recovery-authorization` with
+`stage`, stable `mechanism`, `additionalAttempts` (one or two), `authorization` and decision `evidence`.
+It can be recorded once for a known non-product mechanism and adds at most two extra attempts per
+stage. Only the named mechanism can spend those extra stage attempts. It extends only that
+mechanism's unsuccessful limit and that stage's total limit; it never
+changes product failures, review counts, scope, permissions or the fresh independent review gate.
+Do not edit counters to grant an exception.
 Substantive and mechanical review counts remain separate. Repeated failures of the same stage and
 mechanism cannot be relabeled to reset a budget. Missing, pending or stale evidence is never success.
 Budget exhaustion stops the task with preserved evidence; restarting a session or rebasing resets none.
@@ -154,11 +171,16 @@ Budget exhaustion stops the task with preserved evidence; restarting a session o
 Use `node skills/agent-workflow/scripts/state.mjs OWNER_JSON EVENT_JSON` from the task worktree.
 The coordinator alone writes this record. First send an `initialize` event with admission/recovery
 `evidence` and explicit known `counters`: `substantive`, `mechanical`, `product` and `recovery`
-(stage-keyed objects for the latter two). New tasks explicitly start at zero; unknown legacy counters
-block recovery rather than silently resetting. Optional owner `workflowLimits` initializes profile limits;
+(stage-keyed objects for the latter two). New tasks explicitly start recovery at zero. A pipeline
+without a complete versioned recovery ledger, including one initialized with a nonzero recovery
+baseline, refuses new corrections and authorizations. Retain that owner record and reconcile its
+history with the coordinator; do not reset counters or initialize it again. Product/review events remain
+usable. Optional owner `workflowLimits` initializes profile limits (`recovery` is unsuccessful
+corrections per mechanism; `recoveryTotal` is all corrections per stage);
 existing pipeline limits/counters are retained. JSON events support `review` (classification
 `substantive|mechanical`, verdict `clean|findings`), `failure|success|recovery` (stage `local|visual|ci`,
-classification `product|harness|infrastructure|mechanical`, stable `mechanism`),
+classification `product|harness|infrastructure|mechanical`, stable `mechanism`), `preparation`,
+`recovery-result` and `recovery-authorization` as described above,
 `disposition` (value and decision `evidence`), `reservations` (paths and ownership `evidence`),
 and `start|end` (stage `implementation|verification|review|ci|decision-wait`).
 Optional `at` is an ISO timestamp; otherwise use current UTC time. A nonzero result may mean the

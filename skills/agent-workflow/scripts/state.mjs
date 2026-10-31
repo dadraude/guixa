@@ -36,6 +36,7 @@ export function applyEvent(owner, event) {
             mechanical: 2,
             product: 2,
             recovery: 2,
+            recoveryTotal: 8,
             ...owner.workflowLimits,
         };
         if (Object.values(limits).some((n) => !Number.isInteger(n) || n < 1))
@@ -46,12 +47,35 @@ export function applyEvent(owner, event) {
             events: [],
             counters: structuredClone(counters),
             mechanisms: {},
+            recoveryLedger: Object.values(counters.recovery).every(
+                (n) => n === 0,
+            )
+                ? {
+                      version: 1,
+                      failures: {},
+                      diagnosed: {},
+                      pending: null,
+                      authorizations: {},
+                      extraUsed: {},
+                  }
+                : undefined,
             periods: [],
             limits,
         };
     } else if (event.type === 'initialize')
         throw new Error('An existing pipeline cannot be initialized again');
     const state = next.pipeline;
+    if (
+        state.recoveryLedger?.pending &&
+        ![
+            'recovery-result',
+            'disposition',
+            'reservations',
+            'start',
+            'end',
+        ].includes(event.type)
+    )
+        throw new Error('Resolve pending recovery result before another event');
     const at = event.at ?? new Date().toISOString();
     if (!Number.isFinite(Date.parse(at)))
         throw new Error('Event timestamp must be an ISO date');
@@ -62,6 +86,14 @@ export function applyEvent(owner, event) {
         throw new Error('Events must be chronological');
     if (event.type === 'initialize') {
         // The explicit baseline is persisted with its evidence below.
+    } else if (event.type === 'preparation') {
+        if (
+            !['local', 'visual', 'ci'].includes(event.stage) ||
+            !event.evidence?.trim()
+        )
+            throw new Error(
+                'Prerequisite preparation requires stage and evidence',
+            );
     } else if (event.type === 'review') {
         if (
             !['substantive', 'mechanical'].includes(event.classification) ||
@@ -75,6 +107,98 @@ export function applyEvent(owner, event) {
         state.counters[key]++;
         if (state.counters[key] === limit && event.verdict === 'findings')
             state.blocker = 'Review budget exhausted';
+    } else if (event.type === 'recovery-authorization') {
+        const ledger = state.recoveryLedger;
+        if (
+            !ledger ||
+            ledger.version !== 1 ||
+            !Number.isInteger(state.limits.recoveryTotal)
+        )
+            throw new Error(
+                'Unknown legacy recovery history cannot be extended',
+            );
+        if (ledger.pending)
+            throw new Error('Resolve pending recovery before authorization');
+        if (
+            !['local', 'visual', 'ci'].includes(event.stage) ||
+            !event.mechanism?.trim() ||
+            !Number.isInteger(event.additionalAttempts) ||
+            event.additionalAttempts < 1 ||
+            event.additionalAttempts > 2 ||
+            !event.authorization?.trim() ||
+            !event.evidence?.trim()
+        )
+            throw new Error(
+                'Scoped recovery authorization requires stage, mechanism, one or two attempts, authorization and evidence',
+            );
+        const key = event.stage + ':' + event.mechanism;
+        if (ledger.authorizations[key])
+            throw new Error('Recovery already authorized for this mechanism');
+        if (!state.mechanisms[key] || state.mechanisms[key] === 'product')
+            throw new Error(
+                'Authorization requires a known non-product mechanism',
+            );
+        if (
+            Object.values(ledger.authorizations)
+                .filter((entry) => entry.stage === event.stage)
+                .reduce((sum, entry) => sum + entry.additionalAttempts, 0) +
+                event.additionalAttempts >
+            2
+        )
+            throw new Error('Stage recovery authorization exhausted');
+        ledger.authorizations[key] = {
+            stage: event.stage,
+            additionalAttempts: event.additionalAttempts,
+            authorization: event.authorization,
+            evidence: event.evidence,
+        };
+        if (state.recoveryBlocker?.key === key) {
+            delete state.blocker;
+            delete state.recoveryBlocker;
+        }
+    } else if (event.type === 'recovery-result') {
+        const ledger = state.recoveryLedger;
+        if (!ledger || ledger.version !== 1)
+            throw new Error('Unknown legacy recovery history');
+        const pending = ledger.pending;
+        if (
+            !pending ||
+            event.stage !== pending.stage ||
+            event.mechanism !== pending.mechanism ||
+            event.classification !== pending.classification
+        )
+            throw new Error('Result must match pending recovery');
+        if (
+            !['success', 'failure'].includes(event.outcome) ||
+            !event.evidence?.trim()
+        )
+            throw new Error(
+                'Recovery result requires outcome and focused evidence',
+            );
+        ledger.pending = null;
+        if (event.outcome === 'failure') {
+            ledger.failures[pending.key] =
+                (ledger.failures[pending.key] ?? 0) + 1;
+            const extra =
+                ledger.authorizations[pending.key]?.additionalAttempts ?? 0;
+            if (
+                ledger.failures[pending.key] >= state.limits.recovery + extra ||
+                state.counters.recovery[pending.stage] >=
+                    state.limits.recoveryTotal +
+                        Object.values(ledger.authorizations)
+                            .filter((entry) => entry.stage === pending.stage)
+                            .reduce(
+                                (sum, entry) => sum + entry.additionalAttempts,
+                                0,
+                            )
+            ) {
+                state.blocker = `Validation budget exhausted: ${pending.stage}/recovery`;
+                state.recoveryBlocker = {
+                    stage: pending.stage,
+                    key: pending.key,
+                };
+            }
+        } else ledger.diagnosed[pending.key] = false;
     } else if (['failure', 'success', 'recovery'].includes(event.type)) {
         if (
             !['local', 'visual', 'ci'].includes(event.stage) ||
@@ -87,6 +211,10 @@ export function applyEvent(owner, event) {
                 'Validation needs stage, classification and stable failure mechanism',
             );
         const key = event.stage + ':' + event.mechanism;
+        if (state.recoveryLedger?.pending)
+            throw new Error(
+                'Resolve pending recovery result before another validation event',
+            );
         if (
             state.mechanisms[key] &&
             state.mechanisms[key] !== event.classification
@@ -99,29 +227,67 @@ export function applyEvent(owner, event) {
             event.classification === 'product' ? 'product' : 'recovery';
         const current = state.counters[counter][event.stage] ?? 0;
         if (event.type === 'recovery') {
-            if (counter === 'product' || !event.evidence?.trim())
+            if (state.blocker)
+                throw new Error('Validation budget already exhausted');
+            const ledger = state.recoveryLedger;
+            if (
+                !ledger ||
+                ledger.version !== 1 ||
+                !Number.isInteger(state.limits.recoveryTotal)
+            )
                 throw new Error(
-                    'Recovery requires non-product diagnosis and focused correction evidence',
+                    'Unknown legacy recovery history cannot start a correction',
                 );
-            if (current >= state.limits.recovery)
+            if (
+                counter === 'product' ||
+                !event.evidence?.trim() ||
+                !event.diagnosis?.trim() ||
+                !event.reproduction?.trim()
+            )
+                throw new Error(
+                    'Recovery requires non-product diagnosis, focused reproduction and correction evidence',
+                );
+            if (!ledger.diagnosed[key])
+                throw new Error('Recovery requires a prior diagnosed failure');
+            const extra = ledger.authorizations[key]?.additionalAttempts ?? 0;
+            const stageExtra = Object.values(ledger.authorizations)
+                .filter((entry) => entry.stage === event.stage)
+                .reduce((sum, entry) => sum + entry.additionalAttempts, 0);
+            if (
+                (ledger.failures[key] ?? 0) >= state.limits.recovery + extra ||
+                current >= state.limits.recoveryTotal + stageExtra ||
+                (current >= state.limits.recoveryTotal &&
+                    (ledger.extraUsed[key] ?? 0) >= extra)
+            )
                 throw new Error('Validation budget already exhausted');
             state.counters.recovery[event.stage] = current + 1;
+            if (current >= state.limits.recoveryTotal)
+                ledger.extraUsed[key] = (ledger.extraUsed[key] ?? 0) + 1;
+            ledger.pending = {
+                key,
+                stage: event.stage,
+                classification: event.classification,
+                mechanism: event.mechanism,
+            };
         } else if (event.type === 'failure') {
             if (counter === 'product') {
                 if (current >= state.limits.product)
                     throw new Error('Validation budget already exhausted');
                 state.counters.product[event.stage] = current + 1;
-            }
-            if (
-                (counter === 'product' ? current + 1 : current) >=
-                state.limits[counter]
-            )
+            } else if (state.recoveryLedger)
+                state.recoveryLedger.diagnosed[key] = true;
+            if (counter === 'product' && current + 1 >= state.limits.product)
                 state.blocker =
                     'Validation budget exhausted: ' +
                     event.stage +
                     '/' +
                     counter;
-        } else state.counters.product[event.stage] = 0;
+        } else if (counter === 'product')
+            state.counters.product[event.stage] = 0;
+        else if (state.recoveryLedger?.diagnosed[key])
+            throw new Error(
+                'Non-product failure requires paired recovery result before success',
+            );
     } else if (event.type === 'disposition') {
         if (
             !['active', 'deferred', 'superseded', 'abandoned'].includes(
