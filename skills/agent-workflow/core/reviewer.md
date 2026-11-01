@@ -16,7 +16,9 @@ component plan with reuse/extension paths and reasons for new components, manife
 coverage result and compact text report, acceptance-specific checks, and prior finding/pattern
 ledger. Compare the selected cases with acceptance and the shared-pattern inventory; missing
 baseline, unique state or justified risk coverage is a blocker. Inspect DOM/measurement evidence for distinct layouts/states,
-changed patterns and failures. Routine review generates/opens no screenshots; the visual reference defines optional previews. Flag
+changed patterns and failures. Routine review generates/opens no screenshots; the visual reference defines optional previews.
+For new essential interactions, require the focused component/portal checkpoint and submitted-value
+evidence before accepting the wider matrix; closed-state geometry is insufficient. Flag
 duplicated components, page-specific reimplementations of existing patterns, or bypassed semantic
 tokens as reuse-contract findings. Return the complete finding batch and any uninspected areas; do
 not end a visual sweep after its first defect. Reuse verified unchanged evidence on follow-up rounds
