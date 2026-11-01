@@ -3,6 +3,7 @@
 namespace Guixa\Sales\Application;
 
 use Guixa\Sales\Domain\BasketLine;
+use LogicException;
 
 final readonly class BasketLineData
 {
@@ -11,7 +12,9 @@ final readonly class BasketLineData
 
     public static function from(BasketLine $line): self
     {
-        return new self($line->productId, $line->name, $line->unit, $line->quantity->toString(),
+        $productId = $line->productId ?? throw new LogicException('A stock basket line needs a product.');
+
+        return new self($productId, $line->name, $line->unit, $line->quantity->toString(),
             $line->priceCents, $line->amountCents());
     }
 }

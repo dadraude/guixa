@@ -12,6 +12,6 @@ final class InMemoryBasketRepositoryTest extends TestCase
 
     protected function basketWorld(): array
     {
-        return [new InMemoryBasketRepository, 'manager', 'household', 'product'];
+        return [new InMemoryBasketRepository, 'manager', 'household', 'product', 'return-a', 'return-b'];
     }
 }

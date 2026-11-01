@@ -30,7 +30,14 @@ final class EloquentBasketRepositoryContractTest extends TestCase
             'stock' => true, 'name' => 'Oil', 'unit' => 'bottle', 'price_cents' => 1200,
             'variable' => false, 'active' => true]);
 
-        return [new EloquentBasketRepository, $manager, $household, $product];
+        $returnA = (string) Str::uuid7();
+        $returnB = (string) Str::uuid7();
+        DB::table('return_items')->insert([
+            ['id' => $returnA, 'name' => 'Glass jar', 'amount_cents' => 50],
+            ['id' => $returnB, 'name' => 'Bottle', 'amount_cents' => 25],
+        ]);
+
+        return [new EloquentBasketRepository, $manager, $household, $product, $returnA, $returnB];
     }
 
     public function test_list_loads_all_basket_lines_in_two_queries_without_losing_snapshots(): void

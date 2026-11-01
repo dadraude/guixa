@@ -14,12 +14,20 @@ export type BasketHouseholdRow = {
 readonly id: string,
 readonly name: string,
 };
+export type BasketReturnLineRow = {
+readonly returnItemId: string,
+readonly name: string,
+readonly amountCents: number,
+readonly quantity: number,
+readonly creditCents: number,
+};
 export type BasketRow = {
 readonly id: string,
 readonly householdId: string,
 readonly householdName: string,
 readonly state: string,
 readonly stockLines: App.Http.BasketStockLineRow[],
+readonly returnLines: App.Http.BasketReturnLineRow[],
 readonly totalCents: number,
 readonly balanceCents: number,
 readonly projectedBalanceCents: number,

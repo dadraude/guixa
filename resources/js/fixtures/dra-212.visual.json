@@ -1,0 +1,527 @@
+{
+    "baseUrl": "http://127.0.0.1:5212",
+    "rootFontPx": 16,
+    "darkSelector": "html.dark",
+    "matrix": {
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark"],
+        "text": [100, 200]
+    },
+    "views": [
+        {
+            "path": "/visual-dra-212.html",
+            "root": "#main-content",
+            "panels": "#main-content section,#main-content form,#main-content .pilot-list:has(li),#main-content .pilot-layout-panel",
+            "content": "#main-content h1,#main-content h2,#main-content h3,#main-content p,#main-content label,#main-content input,#main-content a,#main-content button,#main-content li,#main-content dd",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "[data-visual-page-focus-first]",
+                "[data-test=return-item]",
+                "[data-visual-page-focus-last]"
+            ],
+            "id": "finance-basket-draft",
+            "query": {
+                "role": "finance"
+            },
+            "states": [
+                {
+                    "id": "populated",
+                    "query": {
+                        "state": "populated"
+                    },
+                    "ready": "body[data-visual-ready=\"populated\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=return-lines]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=credit]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=basket-balance]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content button:not([data-sidebar])",
+                                "minHeight": 44,
+                                "minWidth": 44
+                            },
+                            {
+                                "selector": "[data-test=validate-basket]",
+                                "attributes": {
+                                    "disabled": null
+                                }
+                            },
+                            {
+                                "selector": "[data-test=add-return-form]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"basket-balance\"] > div:nth-child(2) dd",
+                                "text": "8,00 €"
+                            },
+                            {
+                                "selector": "[data-test=\"basket-balance\"] > div:nth-child(3) dd",
+                                "text": "-8,00 €"
+                            },
+                            {
+                                "selector": "[data-test=credit]",
+                                "text": "−2,00 €"
+                            },
+                            {
+                                "selector": "[data-test=credit]",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"basket-balance\"] dd",
+                                "contrast": 4.5
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "empty",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "ready": "body[data-visual-ready=\"empty\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=no-return-lines]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=validate-basket]",
+                                "attributes": {
+                                    "disabled": ""
+                                }
+                            },
+                            {
+                                "selector": "[data-test=draft-actions]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=cancelled]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content button:not([data-sidebar])",
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"basket-balance\"] dd",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "contrast": 4.5
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "error",
+                    "query": {
+                        "state": "error"
+                    },
+                    "ready": "body[data-visual-ready=\"error\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=domain-error]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=return-lines] [data-test=quantity-error]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=credit]",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content button:not([data-sidebar])",
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"basket-balance\"] dd",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "contrast": 4.5
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "long",
+                    "query": {
+                        "state": "long"
+                    },
+                    "ready": "body[data-visual-ready=\"long\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=return-lines]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=credit]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=credit]",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content button:not([data-sidebar])",
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"basket-balance\"] dd",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "contrast": 4.5
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "disabled",
+                    "query": {
+                        "state": "disabled"
+                    },
+                    "ready": "body[data-visual-ready=\"disabled\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=validate-basket]",
+                                "attributes": {
+                                    "disabled": ""
+                                }
+                            },
+                            {
+                                "selector": "[data-test=return-item]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=cancelled]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content button:not([data-sidebar])",
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"basket-balance\"] dd",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "contrast": 4.5
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "path": "/visual-dra-212.html",
+            "root": "#main-content",
+            "panels": "#main-content section,#main-content form,#main-content .pilot-list:has(li),#main-content .pilot-layout-panel",
+            "content": "#main-content h1,#main-content h2,#main-content h3,#main-content p,#main-content label,#main-content input,#main-content a,#main-content button,#main-content li,#main-content dd",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "id": "finance-basket-validated",
+            "query": {
+                "role": "finance"
+            },
+            "states": [
+                {
+                    "id": "credit",
+                    "query": {
+                        "state": "credit"
+                    },
+                    "ready": "body[data-visual-ready=\"credit\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=credit]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=basket-balance]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=collect-basket]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=credit]",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"basket-balance\"] > div:nth-child(2) dd",
+                                "text": "-0,50 €"
+                            },
+                            {
+                                "selector": "[data-test=\"basket-balance\"] > div:first-child dd",
+                                "text": "0,50 €"
+                            },
+                            {
+                                "selector": "[data-test=credit]",
+                                "text": "−0,50 €"
+                            },
+                            {
+                                "selector": "#main-content button:not([data-sidebar])",
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"basket-balance\"] dd",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "contrast": 4.5
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "netzero",
+                    "query": {
+                        "state": "netzero"
+                    },
+                    "ready": "body[data-visual-ready=\"netzero\"]",
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=return-lines]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=stock-lines]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=collect-basket]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=credit]",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"basket-balance\"] > div:nth-child(2) dd",
+                                "text": "0,00 €"
+                            },
+                            {
+                                "selector": "[data-test=credit]",
+                                "text": "−0,50 €"
+                            },
+                            {
+                                "selector": "#main-content button:not([data-sidebar])",
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"basket-balance\"] dd",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "contrast": 4.5
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "path": "/visual-dra-212.html",
+            "root": "#main-content",
+            "panels": "#main-content section,#main-content form,#main-content .pilot-list:has(li),#main-content .pilot-layout-panel",
+            "content": "#main-content h1,#main-content h2,#main-content h3,#main-content p,#main-content label,#main-content input,#main-content a,#main-content button,#main-content li,#main-content dd",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "[data-visual-page-focus-first]",
+                "[data-test=return-item]",
+                "[data-visual-page-focus-last]"
+            ],
+            "id": "manager-basket-draft",
+            "query": {
+                "role": "manager"
+            },
+            "states": [
+                {
+                    "id": "populated",
+                    "query": {
+                        "state": "populated"
+                    },
+                    "ready": "body[data-visual-ready=\"populated\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=return-lines]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=credit]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=basket-balance]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content button:not([data-sidebar])",
+                                "minHeight": 44,
+                                "minWidth": 44
+                            },
+                            {
+                                "selector": "[data-test=\"basket-balance\"] > div:nth-child(2) dd",
+                                "text": "8,00 €"
+                            },
+                            {
+                                "selector": "[data-test=\"basket-balance\"] > div:nth-child(3) dd",
+                                "text": "-8,00 €"
+                            },
+                            {
+                                "selector": "[data-test=credit]",
+                                "text": "−2,00 €"
+                            },
+                            {
+                                "selector": "[data-test=\"basket-balance\"] dd",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=credit]",
+                                "contrast": 4.5
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    ]
+}

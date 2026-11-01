@@ -439,10 +439,11 @@ Catalog's pure internal metadata queries; quantity-only queries never call Catal
 
 | Use cases / queries | Actor and rules |
 | --- | --- |
-| `CreateReturnItem`, `UpdateReturnItem`, `DeactivateReturnItem`, `ReactivateReturnItem`, `ListReturnItems` | Existing Manager-only administration |
+| `CreateReturnItem`, `UpdateReturnItem`, `DeactivateReturnItem`, `ReactivateReturnItem` | Existing Manager-only administration |
+| `ListReturnItems` | Manager catalogue view and Finance's read-only basket return picker; no Finance editing |
 | `RecordStockEntry`, `RecordStockAdjustment` | Manager; stock mode only; positive entry / non-zero justified adjustment |
 | `ListStock`, `ListStockMovements` | Manager; metadata from Catalog, quantity/history from ledger |
-| `GetStockOffer`, `GetReturnItem` | Existing internal Ordering reads for stock/return snapshots; not the T54 discovery composition |
+| `GetStockOffer`, `GetReturnItem` | Internal Ordering reads for stock/return snapshots; Sales also reads `GetReturnItem` through its own return-items port |
 | Stock-side `ListStockOffers` | Planned later Sales basket query; not the T54 discovery composition |
 | `SellStock` | Internal Sales operation, records the already-authorized actor; locks and checks stock |
 | `CorrectBasketStock` | Internal Sales correction with source/reason; cannot make stock negative |

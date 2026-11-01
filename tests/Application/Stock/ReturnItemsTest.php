@@ -89,3 +89,14 @@ it('only lets a manager manage return items (R25, R36a)', function (Role $role) 
     expect(fn () => ($this->reactivate)($actor, $id))->toThrow(AuthorizationException::class);
     expect(fn () => ($this->list)($actor))->toThrow(AuthorizationException::class);
 })->with([Role::Member, Role::Producer]);
+
+it('lets Finance read return choices for basket sales without editing the catalogue (R20a, R25)', function () {
+    $id = ($this->create)($this->manager, 'Glass jar', 50);
+    $finance = new Actor('finance-account', [Role::Finance]);
+
+    expect(($this->list)($finance)[0]->id)->toBe($id);
+    expect(fn () => ($this->create)($finance, 'Crate', 100))->toThrow(AuthorizationException::class);
+    expect(fn () => ($this->update)($finance, $id, 'Crate', 100))->toThrow(AuthorizationException::class);
+    expect(fn () => ($this->deactivate)($finance, $id))->toThrow(AuthorizationException::class);
+    expect(fn () => ($this->reactivate)($finance, $id))->toThrow(AuthorizationException::class);
+});

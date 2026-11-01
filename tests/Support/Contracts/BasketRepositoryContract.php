@@ -13,7 +13,7 @@ use Throwable;
 
 trait BasketRepositoryContract
 {
-    /** @return array{BasketRepository,string,string,string} repository, manager, household, product */
+    /** @return array{BasketRepository,string,string,string,string,string} repository, manager, household, product, return A, return B */
     abstract protected function basketWorld(): array;
 
     private function basket(BasketRepository $repository, string $manager, string $household, array $lines): Basket
@@ -26,6 +26,24 @@ trait BasketRepositoryContract
     {
         return new BasketLine($repository->nextId(), $basketId, $product, 'Oil', 'bottle', $price,
             false, null, Quantity::fromString('1'), new DateTimeImmutable('2026-10-30T10:00:00+00:00'));
+    }
+
+    #[Test]
+    public function it_reloads_distinct_return_lines_and_retains_their_snapshots(): void
+    {
+        [$repository, $manager, $household, , $returnA, $returnB] = $this->basketWorld();
+        $basket = $this->basket($repository, $manager, $household, []);
+        $created = new DateTimeImmutable('2026-10-30T10:00:00+00:00');
+        $first = new BasketLine($repository->nextId(), $basket->id, null, 'Glass jar', 'item', 50,
+            false, null, Quantity::fromString('1'), $created, kind: 'return', returnItemId: $returnA);
+        $second = new BasketLine($repository->nextId(), $basket->id, null, 'Bottle', 'item', 25,
+            false, null, Quantity::fromString('2'), $created, kind: 'return', returnItemId: $returnB);
+
+        $repository->save($basket->withLines([$first, $second]));
+        $reloaded = $repository->get($basket->id);
+        $this->assertCount(2, $reloaded->activeLines());
+        $this->assertSame(-100, $reloaded->totalCents());
+        $this->assertSame(['Glass jar', 'Bottle'], array_map(fn (BasketLine $line) => $line->name, $reloaded->activeLines()));
     }
 
     #[Test]

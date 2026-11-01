@@ -4,6 +4,7 @@ use Guixa\Catalog\Infrastructure\Persistence\ProducerModel;
 use Guixa\Sales\Application\CreateStockBasket;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Role;
+use Guixa\Stock\Application\CreateReturnItem;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Inertia\Testing\AssertableInertia as Assert;
@@ -64,6 +65,26 @@ it('creates, adds, validates and collects through Manager routes while denying m
         ->and(DB::table('wallet_movements')->where('basket_id', $id)->count())->toBe(1);
 });
 
+it('shows and validates a return-only basket with one Wallet credit on the actual Finance detail (S88)', function () {
+    $household = basketHousehold();
+    $manager = accountWith(Role::Manager);
+    $item = app(CreateReturnItem::class)(Actor::manager($manager->id), 'Glass jar', 50);
+    $this->actingAs($manager)->post('/finance/baskets', ['household_id' => $household])->assertRedirect();
+    $id = DB::table('baskets')->value('id');
+
+    $this->post("/finance/baskets/{$id}/return-lines", ['return_item_id' => $item, 'return_quantity' => '1'])->assertRedirect();
+    $this->get("/finance/baskets/{$id}")->assertOk()->assertInertia(fn (Assert $page) => $page
+        ->component('Finance/Baskets/Show')->where('basket.returnLines.0.name', 'Glass jar')
+        ->where('basket.returnLines.0.creditCents', 50)->where('basket.totalCents', -50)
+        ->where('basket.projectedBalanceCents', 50)->where('returnItems.0.id', $item));
+    $this->post("/finance/baskets/{$id}/validation")->assertRedirect();
+    $this->get("/finance/baskets/{$id}")->assertInertia(fn (Assert $page) => $page
+        ->where('basket.state', 'validated')->where('basket.totalCents', -50)
+        ->where('basket.returnLines.0.creditCents', 50));
+    expect(DB::table('wallet_movements')->where('basket_id', $id)->count())->toBe(1)
+        ->and(DB::table('wallet_movements')->where('basket_id', $id)->value('type'))->toBe('credit');
+});
+
 it('lets a Manager remove stock and cancel a draft through HTTP while retaining its reference (R19b, S87)', function () {
     $household = basketHousehold();
     $manager = accountWith(Role::Manager);
@@ -110,6 +131,8 @@ it('denies every basket read and mutation route to non-managers at T55 (R19a)', 
     ['get', '/finance/baskets/{basket}'],
     ['post', '/finance/baskets/{basket}/stock-lines'],
     ['delete', '/finance/baskets/{basket}/stock-lines/{product}'],
+    ['post', '/finance/baskets/{basket}/return-lines'],
+    ['delete', '/finance/baskets/{basket}/return-lines/{product}'],
     ['post', '/finance/baskets/{basket}/validation'],
     ['put', '/finance/baskets/{basket}/collection'],
     ['post', '/finance/baskets/{basket}/cancellation'],

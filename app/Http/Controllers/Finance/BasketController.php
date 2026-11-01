@@ -7,6 +7,7 @@ use App\Http\BasketRow;
 use App\Http\BasketSummaryRow;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Finance\CreateBasketRequest;
+use App\Http\ReturnItemRow;
 use App\Http\StockLevelRow;
 use Guixa\Sales\Application\CancelDraftBasket;
 use Guixa\Sales\Application\CreateStockBasket;
@@ -16,6 +17,7 @@ use Guixa\Sales\Application\ListActiveHouseholds;
 use Guixa\Sales\Application\ListBaskets;
 use Guixa\Sales\Domain\Error\BasketNotFound;
 use Guixa\Shared\Application\Actor;
+use Guixa\Stock\Application\ListReturnItems;
 use Guixa\Stock\Application\ListStock;
 use Guixa\Stock\Application\StockLevelData;
 use Illuminate\Http\RedirectResponse;
@@ -41,7 +43,8 @@ final class BasketController extends Controller
         return to_route('finance.baskets.show', ['basket' => $id]);
     }
 
-    public function show(string $basket, Actor $actor, GetBasket $get, GetBasketBalance $balance, ListStock $stock): Response
+    public function show(string $basket, Actor $actor, GetBasket $get, GetBasketBalance $balance, ListStock $stock,
+        ListReturnItems $returns): Response
     {
         try {
             $record = $get($actor, $basket);
@@ -53,6 +56,9 @@ final class BasketController extends Controller
             'basket' => BasketRow::from($record, $balance($actor, $record->householdId)),
             'stockProducts' => $record->state === 'draft'
                 ? array_map(StockLevelRow::from(...), array_values(array_filter($stock($actor), fn (StockLevelData $level) => $level->active)))
+                : [],
+            'returnItems' => $record->state === 'draft'
+                ? array_map(ReturnItemRow::from(...), $returns($actor))
                 : [],
         ]);
     }

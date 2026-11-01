@@ -14,6 +14,7 @@ const props = defineProps<{
     editable: boolean;
     processing: boolean;
     errors?: Record<string, string>;
+    emptyMessage?: string;
 }>();
 
 const emit = defineEmits<{
@@ -50,7 +51,10 @@ const submit = () => {
             class="text-sm text-muted-foreground"
             data-test="no-return-lines"
         >
-            {{ trans('No returns have been added to this pickup.') }}
+            {{
+                emptyMessage ??
+                trans('No returns have been added to this pickup.')
+            }}
         </p>
 
         <ul class="pilot-list">

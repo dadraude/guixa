@@ -32,10 +32,11 @@ final class InMemoryBasketRepository implements BasketRepository
         }
         $active = [];
         foreach ($basket->activeLines() as $line) {
-            if (isset($active[$line->productId])) {
-                throw new DomainException('Duplicate active product line.');
+            $key = $line->kind.':'.($line->kind === 'return' ? $line->returnItemId : $line->productId);
+            if (isset($active[$key])) {
+                throw new DomainException('Duplicate active basket line.');
             }
-            $active[$line->productId] = true;
+            $active[$key] = true;
         }
         $this->baskets[$basket->id] = $basket;
     }
