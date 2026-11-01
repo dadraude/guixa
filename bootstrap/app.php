@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\DomainErrorResponse;
+use App\Http\DomainErrorMapper;
 use App\Http\Middleware\EnsureRole;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
@@ -46,7 +46,7 @@ return Application::configure(basePath: dirname(__DIR__))
         );
 
         $exceptions->map(AuthorizationException::class, fn (AuthorizationException $e) => new AccessDeniedHttpException(__('errors.NotAllowed'), $e));
-        $exceptions->render(fn (Throwable $e, Request $request) => DomainErrorResponse::for($e, $request));
+        $exceptions->map(Throwable::class, DomainErrorMapper::map(...));
         $exceptions->render(function (AuthenticationException $e, Request $request) {
             return ($request->expectsJson() || $request->is('api/*')) && $e->getMessage() === 'Unauthenticated.'
                 ? response()->json(['message' => __('Unauthenticated.')], 401)
@@ -71,12 +71,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(function (Throwable $e, Request $request) {
             if (config('app.debug') || (! $request->expectsJson() && ! $request->is('api/*')) ||
                 $e instanceof HttpExceptionInterface || $e instanceof AuthenticationException ||
-                $e instanceof ValidationException || $e instanceof HttpResponseException ||
-                DomainErrorResponse::matches($e)) {
+                $e instanceof ValidationException || $e instanceof HttpResponseException) {
                 return null;
             }
 
             return response()->json(['message' => __('Server Error')], 500);
         });
-        $exceptions->dontReportWhen(fn (Throwable $e) => DomainErrorResponse::matches($e));
     })->create();

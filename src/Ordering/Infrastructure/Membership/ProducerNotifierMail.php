@@ -23,12 +23,19 @@ final class ProducerNotifierMail extends Mailable
 
     public function content(): Content
     {
-        $lines = array_map(
-            fn (array $total) => '- '.e($total['name']).': '.e(self::formatQuantity($total['quantity'])).' '.e($total['unit']),
+        $formattedTotals = array_map(
+            fn (array $total) => [
+                'name' => $total['name'],
+                'quantity' => self::formatQuantity($total['quantity']),
+                'unit' => $total['unit'],
+            ],
             $this->totals,
         );
 
-        return new Content(htmlString: '<p>'.e(__('Order for the pickup on :date:', ['date' => $this->pickupDate->format('d/m/Y')])).'</p><p>'.implode('<br>', $lines).'</p>');
+        return new Content(view: 'mail.producer-order', with: [
+            'heading' => __('Order for the pickup on :date:', ['date' => $this->pickupDate->format('d/m/Y')]),
+            'formattedTotals' => $formattedTotals,
+        ]);
     }
 
     private static function formatQuantity(string $quantity): string

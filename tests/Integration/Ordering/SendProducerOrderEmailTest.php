@@ -38,7 +38,7 @@ final class SendProducerOrderEmailTest extends TestCase
         parent::setUp();
 
         $this->household = (string) Str::uuid7();
-        DB::table('households')->insert(['id' => $this->household, 'name' => 'H', 'created_at' => now(), 'updated_at' => now()]);
+        DB::table('households')->insert(['id' => $this->household, 'name' => 'Private Household', 'created_at' => now(), 'updated_at' => now()]);
         $this->anna = User::factory()->create()->id;
         $this->producer = (string) Str::uuid7();
         DB::table('producers')->insert(['id' => $this->producer, 'name' => 'Baker', 'active' => true, 'cutoff_days_before' => 3, 'cutoff_time' => '20:00']);
@@ -82,7 +82,10 @@ final class SendProducerOrderEmailTest extends TestCase
         app(SendProducerOrder::class)($this->manager(), $this->cycle, $this->producer);
 
         Mail::assertSent(ProducerNotifierMail::class, fn (ProducerNotifierMail $mail) => $mail->hasTo('baker@example.test')
-            && $mail->totals === [['name' => 'Loaf', 'unit' => 'unit', 'quantity' => '2.000']]);
+            && $mail->totals === [['name' => 'Loaf', 'unit' => 'unit', 'quantity' => '2.000']]
+            && str_contains($mail->render(), 'Loaf: 2,000 unit')
+            && ! str_contains($mail->render(), 'Private Household')
+            && ! str_contains($mail->render(), $this->household));
         $this->assertNotNull($this->sentAt());
         $this->assertSame([$this->products[1]], DB::table('order_lines')->where('not_delivered', true)->pluck('product_id')->all());
     }

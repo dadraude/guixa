@@ -129,7 +129,7 @@ final class EloquentBasketRepository implements BasketRepository
 
     public function list(): array
     {
-        return array_values(BasketModel::query()->orderByDesc('created_at')->orderByDesc('id')->get()
+        return array_values(BasketModel::query()->with('lines')->orderByDesc('created_at')->orderByDesc('id')->get()
             ->map(fn (BasketModel $model) => $this->toDomain($model))->all());
     }
 
@@ -140,7 +140,7 @@ final class EloquentBasketRepository implements BasketRepository
 
     private function toDomain(BasketModel $model): Basket
     {
-        $lines = BasketLineModel::query()->where('basket_id', $model->id)->orderBy('created_at')->orderBy('id')->get()
+        $lines = $model->lines
             ->map(fn (BasketLineModel $line) => new BasketLine($line->id, $line->basket_id, $line->product_id,
                 $line->name, $line->unit, (int) $line->price_cents, (bool) $line->variable,
                 $this->containerSnapshot($line), Quantity::fromString((string) $line->quantity),

@@ -65,6 +65,7 @@ final class EloquentCycleRepository implements CycleRepository
     public function list(): array
     {
         $cycles = CycleModel::query()
+            ->with('producers')
             ->orderBy('pickup_date')
             ->orderBy('id')
             ->get()
@@ -84,10 +85,7 @@ final class EloquentCycleRepository implements CycleRepository
 
     private function toDomain(CycleModel $model): Cycle
     {
-        $orders = DB::table('cycle_producers')
-            ->where('cycle_id', $model->id)
-            ->orderBy('producer_id')
-            ->get()
+        $orders = $model->producers
             ->map(fn (object $row) => ProducerOrder::restore(
                 $row->producer_id,
                 (bool) $row->participating,

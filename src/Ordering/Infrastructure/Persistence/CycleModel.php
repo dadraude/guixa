@@ -4,6 +4,7 @@ namespace Guixa\Ordering\Infrastructure\Persistence;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @property string $id
@@ -25,5 +26,11 @@ final class CycleModel extends Model
     protected function casts(): array
     {
         return ['pickup_date' => 'string'];
+    }
+
+    /** @return HasMany<CycleProducerModel, $this> */
+    public function producers(): HasMany
+    {
+        return $this->hasMany(CycleProducerModel::class, 'cycle_id')->orderBy('producer_id');
     }
 }

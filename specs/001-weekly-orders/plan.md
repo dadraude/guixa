@@ -171,6 +171,9 @@ Households live in `households`; invitations in `invitations` (one row per accou
 `users` gains `activated_at` and `deactivated_at`, and `users.household_id` references `households`.
 `InvitationSender` emails the link `/invitations/{token}` (D15). Login (Fortify `authenticateUsing`) needs the right
 password, `activated_at` set and `deactivated_at` empty; accepting an invitation also marks the email verified.
+The login adapter keeps case-insensitive account lookup, then uses Fortify's configured guard provider to validate
+the password and, only for an eligible account, rehash it when `hashing.rehash_on_login` allows. Fortify retains
+session login and the two-factor challenge pipeline.
 An account created by an invitation holds a random password nobody knows until the invitee sets theirs.
 Passkey login does not go through `authenticateUsing`, so `Passkeys::authorizeLoginUsing` asks `CanLogIn` too, and the
 `LogOutDeactivatedAccount` web middleware ends the session an account already had when it is deactivated (R36b).
@@ -504,6 +507,12 @@ away used product references. Cancel/archive operations retain their rows; curre
 filter removed/cancelled contents, while explicit history methods do not. Re-adding an archived line
 creates a new row/time so proportional tie-breaking stays correct.
 
+Current Basket and Cycle repository list reads load their children through ordered Eloquent
+relationships in one child query per list. Basket lines include removed history and retain their
+stored decimal snapshots; cycle producers retain participation and timestamp state. Single-record
+reads and locks still load children after selecting or locking the parent, and protected basket
+snapshot comparisons continue to use the stored lines.
+
 Concurrency and atomicity:
 - Weekly mutations lock their stable-key source cycle with `FOR NO KEY UPDATE` before affected
   orders/baskets; acquire multiple ids in stable order. Existing weekly line-edit guards use a
@@ -579,9 +588,12 @@ Concrete reuse inspected before planning:
   independent baskets or staff validation followed by member self-collection. Reuse shared layouts,
   tokens and `components/ui/`; do not introduce another component library or redesign unrelated pages.
 
-Keep `<Noun>Row` DTOs in App/Http and generate TypeScript types. Domain errors map to translated
-422 form errors and Laravel authorization denials to 403. Catalan copy/ca-ES presentation,
-44 px targets, phone-first reflow and the shared visual manifest/report workflow remain mandatory.
+Keep `<Noun>Row` DTOs in App/Http and generate TypeScript types. Domain errors map to
+Laravel `ValidationException` at the HTTP boundary, with translated messages under `errors.domain`
+and the existing fallback to the exception message. Laravel handles JSON 422 responses through the central JSON-negotiation
+rule and redirects form requests back with errors and safe old input; password fields must never be
+flashed to the session. Domain exception classes remain framework-free. Authorization denials map to
+403. Catalan copy/ca-ES presentation, 44 px targets, phone-first reflow and the shared visual manifest/report workflow remain mandatory.
 Test totals and enabled actions as display-only logic; authorization and money/stock rules stay server-side.
 
 The following accepted presentation sections retain their historical pilot inventories. The Sales
@@ -1019,7 +1031,9 @@ for CI's full validation.
   (`lang/en/errors.php` moves there).
 - Laravel's own messages (validation, auth, passwords, pagination) come from the `laravel-lang` Catalan files in
   `lang/ca/*.php`.
-- Emails (invitations, sent producer orders): subject and body through `__()`.
+- Emails (invitations, sent producer orders): subject and body through `__()`. The sent producer
+  order body uses a Laravel Blade view with escaped heading, product names and units; its mailable
+  formats quantity strings for display while retaining the original totals for delivery assertions.
 - Dates, numbers and money: Vue formats with `Intl` and `ca-ES`; PHP uses the same locale where it formats (emails).
 - Starter-kit and shadcn-vue components' own texts (e.g. screen-reader labels) go through `trans()` too.
 - Every key used in PHP and Vue has a `ca` translation; a test fails otherwise (Testing).
