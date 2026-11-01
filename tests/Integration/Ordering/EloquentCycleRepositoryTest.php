@@ -3,6 +3,7 @@
 namespace Tests\Integration\Ordering;
 
 use Guixa\Catalog\Infrastructure\Persistence\ProducerModel;
+use Guixa\Ordering\Domain\Cycle;
 use Guixa\Ordering\Domain\CycleRepository;
 use Guixa\Ordering\Infrastructure\Persistence\EloquentCycleRepository;
 use Illuminate\Database\QueryException;
@@ -69,5 +70,52 @@ final class EloquentCycleRepositoryTest extends TestCase
         $this->assertThrows(fn () => DB::table('cycle_producers')->insert([
             'cycle_id' => (string) Str::uuid7(), 'producer_id' => (string) Str::uuid7(), 'participating' => true,
         ]), QueryException::class);
+    }
+
+    #[Test]
+    public function list_loads_all_producers_in_two_queries_with_their_saved_state(): void
+    {
+        $producerA = (string) Str::uuid7();
+        $producerB = (string) Str::uuid7();
+        [$producerA, $producerB] = collect([$producerA, $producerB])->sort()->values()->all();
+        $this->producersExist($producerA, $producerB);
+        $cycleIds = [];
+
+        foreach (['2026-11-07', '2026-11-14', '2026-11-21'] as $date) {
+            $id = (string) Str::uuid7();
+            $cycleIds[] = $id;
+            DB::table('cycles')->insert(['id' => $id, 'pickup_date' => $date]);
+        }
+
+        DB::table('cycle_producers')->insert([
+            ['cycle_id' => $cycleIds[0], 'producer_id' => $producerB, 'participating' => false,
+                'closes_at' => '2026-11-04 20:00:00+00', 'sent_at' => '2026-11-05 09:00:00+00',
+                'validated_at' => '2026-11-06 10:00:00+00', 'distributed_at' => '2026-11-07 11:00:00+00'],
+            ['cycle_id' => $cycleIds[0], 'producer_id' => $producerA, 'participating' => true,
+                'closes_at' => null, 'sent_at' => null, 'validated_at' => null, 'distributed_at' => null],
+            ['cycle_id' => $cycleIds[1], 'producer_id' => $producerA, 'participating' => true,
+                'closes_at' => null, 'sent_at' => null, 'validated_at' => null, 'distributed_at' => null],
+        ]);
+
+        DB::enableQueryLog();
+        DB::flushQueryLog();
+        try {
+            $cycles = $this->repository()->list();
+            $queryCount = count(DB::getQueryLog());
+        } finally {
+            DB::disableQueryLog();
+            DB::flushQueryLog();
+        }
+
+        $this->assertSame(2, $queryCount);
+        $this->assertSame($cycleIds, array_map(fn (Cycle $cycle) => $cycle->id, $cycles));
+        $this->assertSame([$producerA, $producerB], array_map(fn ($order) => $order->producerId, $cycles[0]->producerOrders()));
+        $this->assertTrue($cycles[0]->isParticipating($producerA));
+        $this->assertFalse($cycles[0]->isParticipating($producerB));
+        $this->assertSame('2026-11-04 20:00:00', $cycles[0]->producerOrders()[1]->cutoff()?->format('Y-m-d H:i:s'));
+        $this->assertSame('2026-11-05 09:00:00', $cycles[0]->producerOrders()[1]->sentAt()?->format('Y-m-d H:i:s'));
+        $this->assertSame('2026-11-06 10:00:00', $cycles[0]->producerOrders()[1]->validatedAt()?->format('Y-m-d H:i:s'));
+        $this->assertSame('2026-11-07 11:00:00', $cycles[0]->producerOrders()[1]->distributedAt()?->format('Y-m-d H:i:s'));
+        $this->assertSame([], $cycles[2]->producerOrders());
     }
 }

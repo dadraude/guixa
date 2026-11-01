@@ -507,6 +507,12 @@ away used product references. Cancel/archive operations retain their rows; curre
 filter removed/cancelled contents, while explicit history methods do not. Re-adding an archived line
 creates a new row/time so proportional tie-breaking stays correct.
 
+Current Basket and Cycle repository list reads load their children through ordered Eloquent
+relationships in one child query per list. Basket lines include removed history and retain their
+stored decimal snapshots; cycle producers retain participation and timestamp state. Single-record
+reads and locks still load children after selecting or locking the parent, and protected basket
+snapshot comparisons continue to use the stored lines.
+
 Concurrency and atomicity:
 - Weekly mutations lock their stable-key source cycle with `FOR NO KEY UPDATE` before affected
   orders/baskets; acquire multiple ids in stable order. Existing weekly line-edit guards use a
