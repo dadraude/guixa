@@ -7,6 +7,7 @@ use Guixa\Membership\Domain\Error\AccountNotFound;
 use Guixa\Membership\Domain\HouseholdRepository;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Application\TransactionRunner;
+use Illuminate\Support\Facades\Gate;
 
 final class GrantFinanceRole
 {
@@ -18,7 +19,7 @@ final class GrantFinanceRole
 
     public function __invoke(Actor $actor, string $accountId): void
     {
-        $actor->assertManager();
+        Gate::forUser($actor)->authorize('manage');
 
         $this->transactions->run(function () use ($accountId): void {
             $this->households->lockMembershipChanges();

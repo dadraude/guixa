@@ -7,6 +7,7 @@ use Guixa\Ordering\Domain\StockLine;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Application\TransactionRunner;
 use Guixa\Shared\Domain\Clock;
+use Illuminate\Support\Facades\Gate;
 
 /** Freezes a pending pickup, sells its stock and charges or credits the household, all or nothing (R21, R22, R23). */
 final class CompletePickup
@@ -23,7 +24,7 @@ final class CompletePickup
     /** @param  ?int  $topUpCents  a cash top-up recorded at the same time, above zero (R21, R29) */
     public function __invoke(Actor $actor, string $cycleId, string $householdId, ?int $topUpCents = null): void
     {
-        $actor->assertManager();
+        Gate::forUser($actor)->authorize('manage');
 
         $this->transactions->run(function () use ($actor, $cycleId, $householdId, $topUpCents) {
             $order = $this->pickups->lock($cycleId, $householdId, completing: true);

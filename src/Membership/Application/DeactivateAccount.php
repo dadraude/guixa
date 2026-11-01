@@ -9,6 +9,7 @@ use Guixa\Membership\Domain\HouseholdRepository;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Application\TransactionRunner;
 use Guixa\Shared\Domain\Clock;
+use Illuminate\Support\Facades\Gate;
 
 final class DeactivateAccount
 {
@@ -22,7 +23,7 @@ final class DeactivateAccount
 
     public function __invoke(Actor $actor, string $accountId): void
     {
-        $actor->assertManager();
+        Gate::forUser($actor)->authorize('manage');
 
         $this->transactions->run(function () use ($accountId): void {
             // The membership lock comes before manager rows; deactivation and moves may save a manager account.

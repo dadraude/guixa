@@ -8,6 +8,7 @@ use Guixa\Membership\Domain\Error\HouseholdNotFound;
 use Guixa\Membership\Domain\HouseholdRepository;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Application\TransactionRunner;
+use Illuminate\Support\Facades\Gate;
 
 /** Links the same account to another household; it also links an unlinked account (R35). */
 final class MoveMember
@@ -21,7 +22,7 @@ final class MoveMember
 
     public function __invoke(Actor $actor, string $accountId, string $householdId): void
     {
-        $actor->assertManager();
+        Gate::forUser($actor)->authorize('manage');
 
         $this->transactions->run(function () use ($accountId, $householdId): void {
             $this->households->lockMembershipChanges();

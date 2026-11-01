@@ -7,6 +7,7 @@ use Guixa\Ordering\Domain\OrderRepository;
 use Guixa\Ordering\Domain\ReturnItemCatalog;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Application\TransactionRunner;
+use Illuminate\Support\Facades\Gate;
 
 /** Adds returned items to a pending pickup, each crediting its amount (R20a). */
 final class AddReturnToPickup
@@ -21,7 +22,7 @@ final class AddReturnToPickup
     /** @param  int  $quantity  whole units, more than zero */
     public function __invoke(Actor $actor, string $cycleId, string $householdId, string $returnItemId, int $quantity): void
     {
-        $actor->assertManager();
+        Gate::forUser($actor)->authorize('manage');
 
         $this->transactions->run(function () use ($cycleId, $householdId, $returnItemId, $quantity) {
             $order = $this->pickups->lock($cycleId, $householdId);

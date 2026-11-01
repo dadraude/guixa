@@ -8,6 +8,7 @@ use Guixa\Ordering\Domain\Error\ProducerNotActive;
 use Guixa\Ordering\Domain\ProducerCutoffRules;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Application\TransactionRunner;
+use Illuminate\Support\Facades\Gate;
 
 final class ParticipateAgain
 {
@@ -20,7 +21,7 @@ final class ParticipateAgain
     /** A deactivated producer cannot be made to participate (R3a); the cutoff it had stays (R6c). */
     public function __invoke(Actor $actor, string $cycleId, string $producerId): void
     {
-        $actor->assertManager();
+        Gate::forUser($actor)->authorize('manage');
 
         $this->transactions->run(function () use ($cycleId, $producerId) {
             $cycle = $this->cycles->getForUpdate($cycleId) ?? throw CycleNotFound::withId($cycleId);

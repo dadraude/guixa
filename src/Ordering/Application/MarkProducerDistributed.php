@@ -8,6 +8,7 @@ use Guixa\Ordering\Domain\ReceptionLoader;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Application\TransactionRunner;
 use Guixa\Shared\Domain\Clock;
+use Illuminate\Support\Facades\Gate;
 
 /** Distributes a validated, balanced reception, which makes it read-only; the last producer settles the cycle (R18, R24, S13, S27, S47). */
 final class MarkProducerDistributed
@@ -22,7 +23,7 @@ final class MarkProducerDistributed
 
     public function __invoke(Actor $actor, string $cycleId, string $producerId): void
     {
-        $actor->assertManager();
+        Gate::forUser($actor)->authorize('manage');
 
         $now = $this->clock->now()->setTimezone($this->clock->timezone());
 

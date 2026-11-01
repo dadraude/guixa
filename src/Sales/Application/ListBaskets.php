@@ -4,6 +4,7 @@ namespace Guixa\Sales\Application;
 
 use Guixa\Sales\Domain\BasketRepository;
 use Guixa\Shared\Application\Actor;
+use Illuminate\Support\Facades\Gate;
 
 final class ListBaskets
 {
@@ -12,7 +13,7 @@ final class ListBaskets
     /** @return list<BasketData> */
     public function __invoke(Actor $actor): array
     {
-        $actor->assertCanManageSales();
+        Gate::forUser($actor)->authorize('manage-sales');
 
         return array_map(BasketData::from(...), $this->baskets->list());
     }

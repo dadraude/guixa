@@ -6,7 +6,7 @@ use Guixa\Ordering\Domain\Cycle;
 use Guixa\Ordering\Domain\Order;
 use Guixa\Ordering\Domain\PickupStatus;
 use Guixa\Shared\Application\Actor;
-use Guixa\Shared\Domain\Error\NotAllowed;
+use Illuminate\Auth\Access\AuthorizationException;
 use Tests\Support\InMemory\InMemoryCycleRepository;
 use Tests\Support\InMemory\InMemoryOrderRepository;
 use Tests\Support\Ordering\OrderingWorld;
@@ -30,7 +30,7 @@ it('lists only pending pickups of the requested household across cycles (R35a, S
     expect($pending)->toHaveCount(1)
         ->and($pending[0]->cycleId)->toBe('cycle-1')
         ->and($pending[0]->pickupDate)->toBe('2026-10-28')
-        ->and(fn () => $list(Actor::memberOf('member', $household), $household))->toThrow(NotAllowed::class);
+        ->and(fn () => $list(Actor::memberOf('member', $household), $household))->toThrow(AuthorizationException::class);
 });
 
 it('reads pending pickups for another context without an actor, ordered by pickup date (R35a)', function () {

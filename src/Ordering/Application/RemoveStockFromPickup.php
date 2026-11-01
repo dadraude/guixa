@@ -5,6 +5,7 @@ namespace Guixa\Ordering\Application;
 use Guixa\Ordering\Domain\OrderRepository;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Application\TransactionRunner;
+use Illuminate\Support\Facades\Gate;
 
 /** Removes a whole stock line from a pending pickup, whether or not its product was deactivated since (R20, S55). */
 final class RemoveStockFromPickup
@@ -17,7 +18,7 @@ final class RemoveStockFromPickup
 
     public function __invoke(Actor $actor, string $cycleId, string $householdId, string $stockProductId): void
     {
-        $actor->assertManager();
+        Gate::forUser($actor)->authorize('manage');
 
         $this->transactions->run(function () use ($cycleId, $householdId, $stockProductId) {
             $order = $this->pickups->lock($cycleId, $householdId);

@@ -16,6 +16,7 @@ use Guixa\Ordering\Domain\ValueObject\PickupWeekday;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Application\TransactionRunner;
 use Guixa\Shared\Domain\Clock;
+use Illuminate\Support\Facades\Gate;
 
 final class OpenCycle
 {
@@ -36,7 +37,7 @@ final class OpenCycle
      */
     public function __invoke(Actor $actor, string $pickupDate, array $producerIds, ?int $weekday = null, bool $permanent = false): string
     {
-        $actor->assertManager();
+        Gate::forUser($actor)->authorize('manage');
 
         $given = $weekday === null ? null : PickupWeekday::of($weekday);
         $effective = $this->effectiveWeekday($given);

@@ -19,8 +19,8 @@ use Guixa\Ordering\Domain\PickupStatus;
 use Guixa\Ordering\Domain\ReceptionLoader;
 use Guixa\Ordering\Domain\StockLine;
 use Guixa\Shared\Application\Actor;
-use Guixa\Shared\Domain\Error\NotAllowed;
 use Guixa\Wallet\Domain\Error\InvalidTopUpAmount;
+use Illuminate\Auth\Access\AuthorizationException;
 use Tests\Support\InMemory\ImmediateTransactionRunner;
 use Tests\Support\Ordering\OrderingWorld;
 
@@ -280,7 +280,7 @@ it('can be done by a manager only, and only for a settled cycle and an existing 
 
     ($this->settle)();
 
-    expect(fn () => $complete($member, $this->cycleId, COMPLETE_A))->toThrow(NotAllowed::class)
+    expect(fn () => $complete($member, $this->cycleId, COMPLETE_A))->toThrow(AuthorizationException::class)
         ->and(fn () => $complete($this->world->manager, $this->cycleId, COMPLETE_K))->toThrow(PickupNotFound::class)
         ->and(($this->movementsOf)())->toBe([]);
 })->group('R22');

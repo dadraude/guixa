@@ -1,7 +1,6 @@
 <?php
 
 use Guixa\Shared\Application\Actor;
-use Guixa\Shared\Domain\Error\NotAllowed;
 use Guixa\Shared\Domain\Role;
 use Guixa\Wallet\Application\ChargeForBasket;
 use Guixa\Wallet\Application\ChargeForPickup;
@@ -15,6 +14,7 @@ use Guixa\Wallet\Domain\Error\CorrectionNoteRequired;
 use Guixa\Wallet\Domain\Error\InvalidCorrectionAmount;
 use Guixa\Wallet\Domain\Error\InvalidTopUpAmount;
 use Guixa\Wallet\Domain\Error\PickupAlreadyCharged;
+use Illuminate\Auth\Access\AuthorizationException;
 use Tests\Support\FrozenClock;
 use Tests\Support\InMemory\InMemoryMovementRepository;
 
@@ -123,21 +123,21 @@ it('shows a member their household movements with their cycle, and nobody else\'
     expect($statement->balanceCents)->toBe(-700)
         ->and($statement->movements)->toHaveCount(1)
         ->and($statement->movements[0]->cycleId)->toBe('cycle-1');
-    expect(fn () => ($this->statement)($this->member, 'household-j'))->toThrow(NotAllowed::class);
+    expect(fn () => ($this->statement)($this->member, 'household-j'))->toThrow(AuthorizationException::class);
 });
 
 it('keeps recording to managers and the balance query to managers (R29, R32)', function (Role $role) {
     $actor = new Actor('other-account', [$role], 'household-h');
 
-    expect(fn () => ($this->topUp)($actor, $this->household, 100))->toThrow(NotAllowed::class);
-    expect(fn () => ($this->correct)($actor, $this->household, 100, 'x'))->toThrow(NotAllowed::class);
-    expect(fn () => ($this->charge)($actor, $this->household, 'cycle-1', 100))->toThrow(NotAllowed::class);
-    expect(fn () => ($this->balance)($actor, $this->household))->toThrow(NotAllowed::class);
+    expect(fn () => ($this->topUp)($actor, $this->household, 100))->toThrow(AuthorizationException::class);
+    expect(fn () => ($this->correct)($actor, $this->household, 100, 'x'))->toThrow(AuthorizationException::class);
+    expect(fn () => ($this->charge)($actor, $this->household, 'cycle-1', 100))->toThrow(AuthorizationException::class);
+    expect(fn () => ($this->balance)($actor, $this->household))->toThrow(AuthorizationException::class);
 })->with([Role::Member, Role::Producer]);
 
 it('refuses the statement to a producer and to a member of no household', function () {
-    expect(fn () => ($this->statement)(Actor::producer('p', 'producer-1'), $this->household))->toThrow(NotAllowed::class);
-    expect(fn () => ($this->statement)(new Actor('a', [Role::Member]), $this->household))->toThrow(NotAllowed::class);
+    expect(fn () => ($this->statement)(Actor::producer('p', 'producer-1'), $this->household))->toThrow(AuthorizationException::class);
+    expect(fn () => ($this->statement)(new Actor('a', [Role::Member]), $this->household))->toThrow(AuthorizationException::class);
 });
 
 it('lets a manager still top up a household without members (R35a)', function () {
@@ -162,6 +162,6 @@ it('lets Finance read every household statement and record only an existing bask
     expect(($this->statement)($finance, $this->household)->balanceCents)->toBe(-1200)
         ->and(($this->balance)($finance, $this->household))->toBe(-1200)
         ->and(($this->statement)($finance, 'household-j')->balanceCents)->toBe(0);
-    expect(fn () => ($this->topUp)($finance, $this->household, 100))->toThrow(NotAllowed::class)
-        ->and(fn () => ($this->correct)($finance, $this->household, 100, 'x'))->toThrow(NotAllowed::class);
+    expect(fn () => ($this->topUp)($finance, $this->household, 100))->toThrow(AuthorizationException::class)
+        ->and(fn () => ($this->correct)($finance, $this->household, 100, 'x'))->toThrow(AuthorizationException::class);
 });

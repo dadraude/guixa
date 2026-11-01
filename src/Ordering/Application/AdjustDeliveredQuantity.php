@@ -10,6 +10,7 @@ use Guixa\Ordering\Domain\OrderRepository;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Application\TransactionRunner;
 use Guixa\Shared\Domain\Quantity;
+use Illuminate\Support\Facades\Gate;
 
 /** Records what a household really takes home of a product, e.g. the weight of a package; the allocation is kept (R19, S14). */
 final class AdjustDeliveredQuantity
@@ -23,7 +24,7 @@ final class AdjustDeliveredQuantity
     /** @param  string  $quantity  at most 3 decimals, zero or more; whole units for a non-variable product */
     public function __invoke(Actor $actor, string $cycleId, string $householdId, string $productId, string $quantity): void
     {
-        $actor->assertManager();
+        Gate::forUser($actor)->authorize('manage');
 
         $delivered = Quantity::fromString($quantity);
 

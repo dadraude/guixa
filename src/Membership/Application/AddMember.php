@@ -11,6 +11,7 @@ use Guixa\Membership\Domain\HouseholdRepository;
 use Guixa\Membership\Domain\ValueObject\Email;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Application\TransactionRunner;
+use Illuminate\Support\Facades\Gate;
 
 final class AddMember
 {
@@ -24,7 +25,7 @@ final class AddMember
     /** @return string the new account's id */
     public function __invoke(Actor $actor, string $householdId, string $name, string $email): string
     {
-        $actor->assertManager();
+        Gate::forUser($actor)->authorize('manage');
 
         return $this->transactions->run(function () use ($householdId, $name, $email): string {
             $this->households->lockMembershipChanges();

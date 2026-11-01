@@ -6,6 +6,7 @@ use Guixa\Ordering\Domain\OrderRepository;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Application\TransactionRunner;
 use Guixa\Shared\Domain\Clock;
+use Illuminate\Support\Facades\Gate;
 
 /** Charges an absent household's order lines and freezes its pickup, without selling stock (R24a). */
 final class MarkPickupNotCollected
@@ -20,7 +21,7 @@ final class MarkPickupNotCollected
 
     public function __invoke(Actor $actor, string $cycleId, string $householdId): void
     {
-        $actor->assertManager();
+        Gate::forUser($actor)->authorize('manage');
 
         $this->transactions->run(function () use ($actor, $cycleId, $householdId) {
             $order = $this->pickups->lock($cycleId, $householdId, completing: true);

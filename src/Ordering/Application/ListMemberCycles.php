@@ -8,6 +8,7 @@ use Guixa\Ordering\Domain\Error\NoHousehold;
 use Guixa\Ordering\Domain\OrderRepository;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Clock;
+use Illuminate\Support\Facades\Gate;
 
 final class ListMemberCycles
 {
@@ -21,7 +22,7 @@ final class ListMemberCycles
     public function __invoke(Actor $actor): array
     {
         $householdId = $actor->householdId ?? throw NoHousehold::create();
-        $actor->assertMemberOf($householdId);
+        Gate::forUser($actor)->authorize('memberOf', ['household', $householdId]);
 
         $now = $this->clock->now()->setTimezone($this->clock->timezone());
 

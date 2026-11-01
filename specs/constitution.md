@@ -53,8 +53,11 @@ iterating over every context. A rule change edits this list first.
 
 - **A1 — Pure domain.** `Guixa\<Context>\Domain` uses only its own Domain, `Guixa\Shared\Domain`
   and the PHP standard library. No `Illuminate`, no Carbon, no other context.
-- **A2 — Application depends on Domain only.** `Guixa\<Context>\Application` uses its own Domain,
-  its own Application and `Guixa\Shared`. Never `Illuminate` nor any Infrastructure.
+- **A2 — Application depends on Domain, with Laravel authorization.** `Guixa\<Context>\Application` uses its own Domain,
+  its own Application and `Guixa\Shared`. The sole framework exception is
+  `Illuminate\Support\Facades\Gate` for authorization against the explicit entry-point actor.
+  No other `Illuminate` dependency or Infrastructure is allowed. Gates and policies are registered
+  outside Application; domain business invariants remain plain PHP under A1.
 - **A3 — Dependencies point inwards.** Nothing in Domain or Application uses Infrastructure.
 - **A4 — Context isolation.** A context never touches another context's Domain or Infrastructure.
   When it needs data from another context, its Domain declares a port and its Infrastructure

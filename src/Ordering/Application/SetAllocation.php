@@ -16,6 +16,7 @@ use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Application\TransactionRunner;
 use Guixa\Shared\Domain\Clock;
 use Guixa\Shared\Domain\Quantity;
+use Illuminate\Support\Facades\Gate;
 
 /** Way B: sets one active household's allocation of a product by hand, without changing the received total (R16, S13, S39, S40). */
 final class SetAllocation
@@ -32,7 +33,7 @@ final class SetAllocation
     /** @param  string  $quantity  at most 3 decimals, zero or more; whole units for a non-variable product */
     public function __invoke(Actor $actor, string $cycleId, string $producerId, string $productId, string $householdId, string $quantity): void
     {
-        $actor->assertManager();
+        Gate::forUser($actor)->authorize('manage');
 
         $allocated = Quantity::fromString($quantity);
         $now = $this->clock->now()->setTimezone($this->clock->timezone());

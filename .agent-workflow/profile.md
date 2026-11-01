@@ -182,6 +182,11 @@ reported, not retried destructively.
   original Request or a behavior change needs the user's decision, not an invented requirement/log.
 - Use one failing Application test per rule/scenario through the public use case, then implement the
   passing slice. Follow repository TDD instructions when available; do not require a global skill install.
+- Laravel first: prefer the installed framework's built-in facilities over new custom equivalents
+  when they meet the requirement. Check the existing integration and official documentation before
+  adding an abstraction; explain any concrete gap that requires custom code. Use gates and policies
+  for authorization, while keeping business invariants in framework-free domain objects and respecting
+  the constitution's dependency boundaries.
 - Keep early returns, explicit names, short functions and comments for the why. Verify architecture,
   types and format with the configured checks rather than inventing additional conventions.
 - UI reuse: compose pages from `resources/js/components/`, the existing shadcn-vue primitives in

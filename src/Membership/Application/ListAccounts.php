@@ -7,6 +7,7 @@ use Guixa\Membership\Domain\AccountRepository;
 use Guixa\Membership\Domain\HouseholdRepository;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Role;
+use Illuminate\Support\Facades\Gate;
 
 final class ListAccounts
 {
@@ -18,7 +19,7 @@ final class ListAccounts
     /** @return list<AccountSummary> */
     public function __invoke(Actor $actor): array
     {
-        $actor->assertManager();
+        Gate::forUser($actor)->authorize('manage');
 
         $householdNames = [];
         foreach ($this->households->list() as $household) {

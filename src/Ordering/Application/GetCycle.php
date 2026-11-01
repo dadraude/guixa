@@ -6,6 +6,7 @@ use Guixa\Ordering\Domain\CycleRepository;
 use Guixa\Ordering\Domain\Error\CycleNotFound;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Clock;
+use Illuminate\Support\Facades\Gate;
 
 final class GetCycle
 {
@@ -13,7 +14,7 @@ final class GetCycle
 
     public function __invoke(Actor $actor, string $cycleId): CycleData
     {
-        $actor->assertManager();
+        Gate::forUser($actor)->authorize('manage');
         $cycle = $this->cycles->get($cycleId) ?? throw CycleNotFound::withId($cycleId);
 
         return CycleData::of($cycle, $this->clock->now(), $this->clock->timezone());

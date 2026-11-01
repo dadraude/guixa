@@ -8,6 +8,7 @@ use Guixa\Ordering\Domain\OrderRepository;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Application\TransactionRunner;
 use Guixa\Shared\Domain\Clock;
+use Illuminate\Support\Facades\Gate;
 
 final class CancelCycle
 {
@@ -21,7 +22,7 @@ final class CancelCycle
     /** The cycle shows as cancelled and its orders are discarded, since nothing was charged (R4b, S37). */
     public function __invoke(Actor $actor, string $cycleId): void
     {
-        $actor->assertManager();
+        Gate::forUser($actor)->authorize('manage');
 
         $now = $this->clock->now()->setTimezone($this->clock->timezone());
 

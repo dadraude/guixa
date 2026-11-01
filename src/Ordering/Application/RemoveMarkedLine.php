@@ -11,6 +11,7 @@ use Guixa\Ordering\Domain\ProductAvailabilityRepository;
 use Guixa\Ordering\Domain\ProductCatalog;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Application\TransactionRunner;
+use Illuminate\Support\Facades\Gate;
 
 final class RemoveMarkedLine
 {
@@ -30,7 +31,7 @@ final class RemoveMarkedLine
     public function __invoke(Actor $actor, string $cycleId, string $productId): void
     {
         $householdId = $actor->householdId ?? throw NoHousehold::create();
-        $actor->assertMemberOf($householdId);
+        Gate::forUser($actor)->authorize('memberOf', ['household', $householdId]);
 
         $this->transactions->run(function () use ($householdId, $cycleId, $productId) {
             $cycle = $this->cycles->getForShare($cycleId) ?? throw CycleNotFound::withId($cycleId);

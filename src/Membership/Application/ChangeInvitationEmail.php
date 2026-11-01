@@ -9,6 +9,7 @@ use Guixa\Membership\Domain\HouseholdRepository;
 use Guixa\Membership\Domain\ValueObject\Email;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Application\TransactionRunner;
+use Illuminate\Support\Facades\Gate;
 
 final class ChangeInvitationEmail
 {
@@ -21,7 +22,7 @@ final class ChangeInvitationEmail
 
     public function __invoke(Actor $actor, string $accountId, string $email): void
     {
-        $actor->assertManager();
+        Gate::forUser($actor)->authorize('manage');
         $email = Email::from($email);
 
         $this->transactions->run(function () use ($accountId, $email): void {

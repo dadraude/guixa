@@ -2,7 +2,7 @@
 
 use Guixa\Ordering\Domain\Error\CycleNotFound;
 use Guixa\Shared\Application\Actor;
-use Guixa\Shared\Domain\Error\NotAllowed;
+use Illuminate\Auth\Access\AuthorizationException;
 use Tests\Support\Ordering\OrderingWorld;
 
 const SUMMARY_HOUSEHOLD_A = '00000000-0000-7000-8000-0000000000e1';
@@ -85,7 +85,7 @@ it('names a household Membership no longer knows by its id (R13)', function () {
 });
 
 it('is for managers and an existing cycle (R13)', function () {
-    expect(fn () => ($this->world->getCycleSummary)($this->a, $this->cycleId))->toThrow(NotAllowed::class)
+    expect(fn () => ($this->world->getCycleSummary)($this->a, $this->cycleId))->toThrow(AuthorizationException::class)
         ->and(fn () => ($this->world->getCycleSummary)($this->world->manager, '00000000-0000-7000-8000-0000000000ff'))
         ->toThrow(CycleNotFound::class);
 });

@@ -8,6 +8,7 @@ use Guixa\Membership\Domain\Error\LastManager;
 use Guixa\Membership\Domain\HouseholdRepository;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Application\TransactionRunner;
+use Illuminate\Support\Facades\Gate;
 
 final class RemoveManagerRole
 {
@@ -19,7 +20,7 @@ final class RemoveManagerRole
 
     public function __invoke(Actor $actor, string $accountId): void
     {
-        $actor->assertManager();
+        Gate::forUser($actor)->authorize('manage');
 
         $this->transactions->run(function () use ($accountId): void {
             // Take membership first; deactivation can save a manager account while holding it.

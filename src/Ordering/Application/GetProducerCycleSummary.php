@@ -11,8 +11,7 @@ use Guixa\Ordering\Domain\OrderRepository;
 use Guixa\Ordering\Domain\ProductAvailabilityRepository;
 use Guixa\Ordering\Domain\ProductCatalog;
 use Guixa\Shared\Application\Actor;
-use Guixa\Shared\Domain\Error\NotAllowed;
-use Guixa\Shared\Domain\Role;
+use Illuminate\Support\Facades\Gate;
 
 /**
  * What a producer sees of a cycle: its own products with their availability, and the total quantity per product only
@@ -33,8 +32,9 @@ final class GetProducerCycleSummary
 
     public function __invoke(Actor $actor, string $cycleId): ProducerCycleSummaryData
     {
-        $producerId = $actor->producerId ?? throw NotAllowed::forRole(Role::Producer->value);
-        $actor->assertProducerOf($producerId);
+        Gate::forUser($actor)->authorize('producer');
+        $producerId = $actor->producerId ?? '';
+        Gate::forUser($actor)->authorize('owns', ['producer', $producerId]);
 
         $cycle = $this->cycles->get($cycleId) ?? throw CycleNotFound::withId($cycleId);
 

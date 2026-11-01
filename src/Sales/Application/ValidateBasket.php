@@ -12,6 +12,7 @@ use Guixa\Sales\Domain\StockProducts;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Application\TransactionRunner;
 use Guixa\Shared\Domain\Clock;
+use Illuminate\Support\Facades\Gate;
 
 final class ValidateBasket
 {
@@ -21,7 +22,7 @@ final class ValidateBasket
 
     public function __invoke(Actor $actor, string $basketId): void
     {
-        $actor->assertCanManageSales();
+        Gate::forUser($actor)->authorize('manage-sales');
         $this->transactions->run(function () use ($actor, $basketId): void {
             $basket = $this->baskets->lock($basketId) ?? throw BasketNotFound::withId($basketId);
             if ($basket->state === 'validated' || $basket->state === 'collected') {

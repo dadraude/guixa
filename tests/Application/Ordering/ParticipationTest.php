@@ -6,7 +6,7 @@ use Guixa\Ordering\Domain\Error\ProducerNotActive;
 use Guixa\Ordering\Domain\Error\ProducerNotInCycle;
 use Guixa\Ordering\Domain\Error\ProducerNotParticipating;
 use Guixa\Shared\Application\Actor;
-use Guixa\Shared\Domain\Error\NotAllowed;
+use Illuminate\Auth\Access\AuthorizationException;
 use Tests\Support\Ordering\OrderingWorld;
 
 beforeEach(function () {
@@ -100,8 +100,8 @@ it('does not let a deactivated producer participate again (R3a, R6c)', function 
 it('keeps stopping and participating again to managers (R6c)', function () {
     $producer = Actor::producer('00000000-0000-7000-8000-0000000000aa', OrderingWorld::BAKER);
 
-    expect(fn () => ($this->world->stopParticipating)($this->world->member(), $this->cycleA, OrderingWorld::BAKER))->toThrow(NotAllowed::class)
-        ->and(fn () => ($this->world->participateAgain)($producer, $this->cycleA, OrderingWorld::BAKER))->toThrow(NotAllowed::class)
+    expect(fn () => ($this->world->stopParticipating)($this->world->member(), $this->cycleA, OrderingWorld::BAKER))->toThrow(AuthorizationException::class)
+        ->and(fn () => ($this->world->participateAgain)($producer, $this->cycleA, OrderingWorld::BAKER))->toThrow(AuthorizationException::class)
         ->and(($this->participating)($this->cycleA))->toBeTrue();
 });
 

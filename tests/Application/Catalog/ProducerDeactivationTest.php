@@ -2,7 +2,7 @@
 
 use Guixa\Catalog\Domain\Error\ProducerNotFound;
 use Guixa\Shared\Application\Actor;
-use Guixa\Shared\Domain\Error\NotAllowed;
+use Illuminate\Auth\Access\AuthorizationException;
 use Tests\Support\Catalog\CatalogWorld;
 
 beforeEach(function () {
@@ -59,8 +59,8 @@ it('rejects an unknown producer and changes nothing (R3a)', function () {
 });
 
 it('keeps deactivating and reactivating to managers (R3a)', function (Actor $actor) {
-    expect(fn () => ($this->world->deactivateProducer)($actor, $this->baker))->toThrow(NotAllowed::class)
-        ->and(fn () => ($this->world->reactivateProducer)($actor, $this->baker))->toThrow(NotAllowed::class)
+    expect(fn () => ($this->world->deactivateProducer)($actor, $this->baker))->toThrow(AuthorizationException::class)
+        ->and(fn () => ($this->world->reactivateProducer)($actor, $this->baker))->toThrow(AuthorizationException::class)
         ->and(($this->isActive)())->toBeTrue()
         ->and($this->world->cycles->stopped)->toBe([]);
 })->with([

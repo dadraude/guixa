@@ -10,6 +10,7 @@ use Guixa\Ordering\Domain\OrderLine;
 use Guixa\Ordering\Domain\OrderRepository;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Quantity;
+use Illuminate\Support\Facades\Gate;
 
 /** What the manager sees of a cycle: totals per producer and product, and the breakdown per household; a cancelled cycle has none (R13, S62). */
 final class GetCycleSummary
@@ -22,7 +23,7 @@ final class GetCycleSummary
 
     public function __invoke(Actor $actor, string $cycleId): CycleSummaryData
     {
-        $actor->assertManager();
+        Gate::forUser($actor)->authorize('manage');
 
         $cycle = $this->cycles->get($cycleId) ?? throw CycleNotFound::withId($cycleId);
 

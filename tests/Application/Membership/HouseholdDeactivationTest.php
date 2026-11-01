@@ -12,11 +12,11 @@ use Guixa\Ordering\Domain\Order;
 use Guixa\Ordering\Domain\OrderLine;
 use Guixa\Ordering\Domain\PickupStatus;
 use Guixa\Shared\Application\Actor;
-use Guixa\Shared\Domain\Error\NotAllowed;
 use Guixa\Shared\Domain\Money;
 use Guixa\Shared\Domain\Quantity;
 use Guixa\Wallet\Application\ReadHouseholdBalance;
 use Guixa\Wallet\Application\RecordCorrection;
+use Illuminate\Auth\Access\AuthorizationException;
 use Tests\Support\Membership\MembershipWorld;
 use Tests\Support\Ordering\OrderingWorld;
 
@@ -68,9 +68,9 @@ it('lists inactive households until both their balance and pickups are settled (
 
 it('reactivates manually and restricts household state changes to managers (R35a)', function () {
     $household = ($this->world->createHousehold)($this->world->manager, 'H');
-    expect(fn () => ($this->world->deactivateHousehold)($this->world->member, $household))->toThrow(NotAllowed::class);
+    expect(fn () => ($this->world->deactivateHousehold)($this->world->member, $household))->toThrow(AuthorizationException::class);
     ($this->world->deactivateHousehold)($this->world->manager, $household);
-    expect(fn () => ($this->world->reactivateHousehold)($this->world->member, $household))->toThrow(NotAllowed::class);
+    expect(fn () => ($this->world->reactivateHousehold)($this->world->member, $household))->toThrow(AuthorizationException::class);
     ($this->world->reactivateHousehold)($this->world->manager, $household);
     expect($this->world->households->get($household)->isActive())->toBeTrue();
 });

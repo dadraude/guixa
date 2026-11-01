@@ -10,8 +10,8 @@ use Guixa\Membership\Domain\Error\AccountNotFound;
 use Guixa\Membership\Domain\Household;
 use Guixa\Membership\Domain\ValueObject\Email;
 use Guixa\Shared\Application\Actor;
-use Guixa\Shared\Domain\Error\NotAllowed;
 use Guixa\Shared\Domain\Role;
+use Illuminate\Auth\Access\AuthorizationException;
 use Tests\Support\InMemory\ImmediateTransactionRunner;
 use Tests\Support\InMemory\InMemoryAccountRepository;
 use Tests\Support\InMemory\InMemoryHouseholdRepository;
@@ -30,7 +30,7 @@ it('grants and removes independent Finance access on an existing account while p
     expect($accounts->get('finance')->roles)->toEqual([Role::Producer, Role::Finance]);
     $remove($manager, 'finance');
     expect($accounts->get('finance')->roles)->toEqual([Role::Producer]);
-    expect(fn () => $grant(Actor::memberOf('member', 'H'), 'finance'))->toThrow(NotAllowed::class);
+    expect(fn () => $grant(Actor::memberOf('member', 'H'), 'finance'))->toThrow(AuthorizationException::class);
     expect(fn () => $grant($manager, 'missing'))->toThrow(AccountNotFound::class);
 });
 
@@ -41,7 +41,7 @@ it('lets Finance read only the household identity needed for wallet statements (
     $finance = new Actor('finance', [Role::Finance]);
 
     expect($query($finance, 'H')->name)->toBe('Home H');
-    expect(fn () => $query(Actor::memberOf('member', 'H'), 'H'))->toThrow(NotAllowed::class);
+    expect(fn () => $query(Actor::memberOf('member', 'H'), 'H'))->toThrow(AuthorizationException::class);
 });
 
 it('makes an activated unlinked account eligible to log in only while Finance remains granted (R36c, S84)', function () {

@@ -8,9 +8,9 @@ use Guixa\Ordering\Domain\NotDeliveredMarks;
 use Guixa\Ordering\Domain\ReceptionLoader;
 use Guixa\Ordering\Domain\ValueObject\StockOffer;
 use Guixa\Shared\Application\Actor;
-use Guixa\Shared\Domain\Error\NotAllowed;
 use Guixa\Shared\Domain\Money;
 use Guixa\Shared\Domain\Quantity;
+use Illuminate\Auth\Access\AuthorizationException;
 use Tests\Support\InMemory\ImmediateTransactionRunner;
 use Tests\Support\Ordering\OrderingWorld;
 
@@ -71,7 +71,7 @@ it('uses effective delivered quantities and excludes marked, dropped and contain
 });
 
 it('is manager-only, rejects unknown cycles and has no cancelled totals (R18a)', function () {
-    expect(fn () => ($this->world->getContainerCount)($this->h, $this->cycleId))->toThrow(NotAllowed::class)
+    expect(fn () => ($this->world->getContainerCount)($this->h, $this->cycleId))->toThrow(AuthorizationException::class)
         ->and(fn () => ($this->world->getContainerCount)($this->world->manager, 'missing'))->toThrow(CycleNotFound::class);
     ($this->world->cancelCycle)($this->world->manager, $this->cycleId);
     expect(($this->world->getContainerCount)($this->world->manager, $this->cycleId)->total)->toBe(0);

@@ -11,6 +11,7 @@ use Guixa\Ordering\Domain\Households;
 use Guixa\Ordering\Domain\OrderRepository;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Application\TransactionRunner;
+use Illuminate\Support\Facades\Gate;
 
 /** Opens the pickup of an active household that has none in a settled cycle, e.g. to sell it stock (R19, S18). */
 final class OpenPickup
@@ -24,7 +25,7 @@ final class OpenPickup
 
     public function __invoke(Actor $actor, string $cycleId, string $householdId): void
     {
-        $actor->assertManager();
+        Gate::forUser($actor)->authorize('manage');
 
         $this->transactions->run(function () use ($cycleId, $householdId) {
             $cycle = $this->cycles->getForShare($cycleId) ?? throw CycleNotFound::withId($cycleId);

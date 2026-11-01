@@ -1,7 +1,6 @@
 <?php
 
 use Guixa\Shared\Application\Actor;
-use Guixa\Shared\Domain\Error\NotAllowed;
 use Guixa\Shared\Domain\Role;
 use Guixa\Stock\Application\CreateReturnItem;
 use Guixa\Stock\Application\DeactivateReturnItem;
@@ -11,6 +10,7 @@ use Guixa\Stock\Application\UpdateReturnItem;
 use Guixa\Stock\Domain\Error\InvalidReturnAmount;
 use Guixa\Stock\Domain\Error\NameRequired;
 use Guixa\Stock\Domain\Error\ReturnItemNotFound;
+use Illuminate\Auth\Access\AuthorizationException;
 use Tests\Support\InMemory\InMemoryReturnItemRepository;
 
 beforeEach(function () {
@@ -83,9 +83,9 @@ it('only lets a manager manage return items (R25, R36a)', function (Role $role) 
     $actor = new Actor('other-account', [$role], $role === Role::Member ? 'h1' : null);
     $id = ($this->create)($this->manager, 'Glass jar', 50);
 
-    expect(fn () => ($this->create)($actor, 'Crate', 100))->toThrow(NotAllowed::class);
-    expect(fn () => ($this->update)($actor, $id, 'Crate', 100))->toThrow(NotAllowed::class);
-    expect(fn () => ($this->deactivate)($actor, $id))->toThrow(NotAllowed::class);
-    expect(fn () => ($this->reactivate)($actor, $id))->toThrow(NotAllowed::class);
-    expect(fn () => ($this->list)($actor))->toThrow(NotAllowed::class);
+    expect(fn () => ($this->create)($actor, 'Crate', 100))->toThrow(AuthorizationException::class);
+    expect(fn () => ($this->update)($actor, $id, 'Crate', 100))->toThrow(AuthorizationException::class);
+    expect(fn () => ($this->deactivate)($actor, $id))->toThrow(AuthorizationException::class);
+    expect(fn () => ($this->reactivate)($actor, $id))->toThrow(AuthorizationException::class);
+    expect(fn () => ($this->list)($actor))->toThrow(AuthorizationException::class);
 })->with([Role::Member, Role::Producer]);

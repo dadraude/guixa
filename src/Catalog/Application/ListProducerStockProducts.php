@@ -6,6 +6,7 @@ use Guixa\Catalog\Domain\Product;
 use Guixa\Catalog\Domain\ProductRepository;
 use Guixa\Catalog\Domain\StockAvailability;
 use Guixa\Shared\Application\Actor;
+use Illuminate\Support\Facades\Gate;
 
 final class ListProducerStockProducts
 {
@@ -17,7 +18,7 @@ final class ListProducerStockProducts
     /** @return list<ProducerStockData> */
     public function __invoke(Actor $actor, string $producerId): array
     {
-        $actor->assertProducerOf($producerId);
+        Gate::forUser($actor)->authorize('owns', ['producer', $producerId]);
         $products = array_values(array_filter(
             $this->products->listByProducer($producerId),
             fn (Product $product) => $product->isStock(),

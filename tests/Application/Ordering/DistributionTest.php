@@ -21,7 +21,7 @@ use Guixa\Ordering\Domain\NotDeliveredMarks;
 use Guixa\Ordering\Domain\PickupStatus;
 use Guixa\Ordering\Domain\ReceptionLoader;
 use Guixa\Shared\Application\Actor;
-use Guixa\Shared\Domain\Error\NotAllowed;
+use Illuminate\Auth\Access\AuthorizationException;
 use Tests\Support\InMemory\ImmediateTransactionRunner;
 use Tests\Support\Ordering\OrderingWorld;
 
@@ -136,7 +136,7 @@ it('validates only a sent producer order, and only for a manager (R14, R17a)', f
 
     ($this->send)();
 
-    expect(fn () => ($this->validate)(OrderingWorld::BAKER, $this->households['A']))->toThrow(NotAllowed::class)
+    expect(fn () => ($this->validate)(OrderingWorld::BAKER, $this->households['A']))->toThrow(AuthorizationException::class)
         ->and(fn () => ($this->validateReception)($this->world->manager, '00000000-0000-7000-8000-0000000000ff', OrderingWorld::BAKER))->toThrow(CycleNotFound::class)
         ->and(fn () => ($this->validate)('00000000-0000-7000-8000-0000000000b9'))->toThrow(ProducerNotInCycle::class);
 })->group('R17a');
@@ -208,11 +208,11 @@ it('lets only a manager distribute or reopen (R18)', function () {
     ($this->bakerSent)();
     ($this->validate)();
 
-    expect(fn () => ($this->distribute)(OrderingWorld::BAKER, $this->households['A']))->toThrow(NotAllowed::class);
+    expect(fn () => ($this->distribute)(OrderingWorld::BAKER, $this->households['A']))->toThrow(AuthorizationException::class);
 
     ($this->distribute)();
 
-    expect(fn () => ($this->reopen)(OrderingWorld::BAKER, $this->households['A']))->toThrow(NotAllowed::class);
+    expect(fn () => ($this->reopen)(OrderingWorld::BAKER, $this->households['A']))->toThrow(AuthorizationException::class);
 })->group('R18');
 
 it('distributes only a sent producer order of the cycle (R14, R18)', function () {
@@ -549,7 +549,7 @@ it('appends successive signed pickup adjustments and wallet corrections without 
     }
     ($this->reopen)();
 
-    expect(fn () => ($this->world->setReceivedTotal)($this->households['A'], $this->cycleId, OrderingWorld::BAKER, $beef, '2', includeCompleted: true))->toThrow(NotAllowed::class);
+    expect(fn () => ($this->world->setReceivedTotal)($this->households['A'], $this->cycleId, OrderingWorld::BAKER, $beef, '2', includeCompleted: true))->toThrow(AuthorizationException::class);
     ($this->setReceived)($beef, '2', OrderingWorld::BAKER, true);
     ($this->setReceived)($beef, '2', OrderingWorld::BAKER, true);
     ($this->setReceived)($beef, '3', OrderingWorld::BAKER, true);

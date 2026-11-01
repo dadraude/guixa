@@ -4,6 +4,7 @@ namespace Guixa\Sales\Application;
 
 use Guixa\Sales\Domain\HouseholdDirectory;
 use Guixa\Shared\Application\Actor;
+use Illuminate\Support\Facades\Gate;
 
 final class ListActiveHouseholds
 {
@@ -12,7 +13,7 @@ final class ListActiveHouseholds
     /** @return list<ActiveHouseholdData> */
     public function __invoke(Actor $actor): array
     {
-        $actor->assertCanManageSales();
+        Gate::forUser($actor)->authorize('manage-sales');
 
         return array_map(
             fn ($household) => new ActiveHouseholdData($household->id, $household->name),

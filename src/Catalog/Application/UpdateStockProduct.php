@@ -9,6 +9,7 @@ use Guixa\Catalog\Domain\ProductUsage;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Application\TransactionRunner;
 use Guixa\Shared\Domain\Money;
+use Illuminate\Support\Facades\Gate;
 
 final class UpdateStockProduct
 {
@@ -20,7 +21,7 @@ final class UpdateStockProduct
 
     public function __invoke(Actor $actor, string $producerId, string $id, string $name, string $unit, int $priceCents, bool $variable, ?string $containersPerUnit): void
     {
-        $actor->assertManager();
+        Gate::forUser($actor)->authorize('manage');
 
         $this->transactions->run(function () use ($producerId, $id, $name, $unit, $priceCents, $variable, $containersPerUnit): void {
             $product = $this->products->getForUpdate($id);

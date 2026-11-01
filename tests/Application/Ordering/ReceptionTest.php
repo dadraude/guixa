@@ -14,7 +14,7 @@ use Guixa\Ordering\Domain\Error\ProductNotInReception;
 use Guixa\Ordering\Domain\Error\ProductNotOrderable;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Error\InvalidQuantity;
-use Guixa\Shared\Domain\Error\NotAllowed;
+use Illuminate\Auth\Access\AuthorizationException;
 use Tests\Support\Ordering\OrderingWorld;
 
 const RECEPTION_A = '00000000-0000-7000-8000-0000000000e1';
@@ -156,10 +156,10 @@ it('is a manager tool for every reception use case (R14)', function () {
     $member = $this->households['A'];
     $producer = OrderingWorld::BAKER;
 
-    expect(fn () => ($this->reception)($member))->toThrow(NotAllowed::class)
-        ->and(fn () => ($this->world->addUnorderedProduct)($member, $this->cycleId, $producer, $this->rye, '3'))->toThrow(NotAllowed::class)
-        ->and(fn () => ($this->world->setReceivedTotal)($member, $this->cycleId, $producer, $this->bread, '3'))->toThrow(NotAllowed::class)
-        ->and(fn () => ($this->world->setAllocation)($member, $this->cycleId, $producer, $this->bread, RECEPTION_A, '3'))->toThrow(NotAllowed::class);
+    expect(fn () => ($this->reception)($member))->toThrow(AuthorizationException::class)
+        ->and(fn () => ($this->world->addUnorderedProduct)($member, $this->cycleId, $producer, $this->rye, '3'))->toThrow(AuthorizationException::class)
+        ->and(fn () => ($this->world->setReceivedTotal)($member, $this->cycleId, $producer, $this->bread, '3'))->toThrow(AuthorizationException::class)
+        ->and(fn () => ($this->world->setAllocation)($member, $this->cycleId, $producer, $this->bread, RECEPTION_A, '3'))->toThrow(AuthorizationException::class);
 });
 
 it('answers not found for an unknown cycle or a producer that is not in it (R14)', function () {

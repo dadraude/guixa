@@ -10,6 +10,7 @@ use Guixa\Ordering\Domain\Order;
 use Guixa\Ordering\Domain\OrderRepository;
 use Guixa\Ordering\Domain\PickupStatus;
 use Guixa\Shared\Application\Actor;
+use Illuminate\Support\Facades\Gate;
 
 /** The pickups of a settled cycle, so the manager can open each one (R19). */
 final class ListPickups
@@ -23,7 +24,7 @@ final class ListPickups
     /** @return list<PickupSummaryData> by household name */
     public function __invoke(Actor $actor, string $cycleId): array
     {
-        $actor->assertManager();
+        Gate::forUser($actor)->authorize('manage');
 
         $cycle = $this->cycles->get($cycleId) ?? throw CycleNotFound::withId($cycleId);
 

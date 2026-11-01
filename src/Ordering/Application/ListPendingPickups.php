@@ -3,6 +3,7 @@
 namespace Guixa\Ordering\Application;
 
 use Guixa\Shared\Application\Actor;
+use Illuminate\Support\Facades\Gate;
 
 final class ListPendingPickups
 {
@@ -11,7 +12,7 @@ final class ListPendingPickups
     /** @return list<PendingPickupData> ordered by pickup date */
     public function __invoke(Actor $actor, string $householdId): array
     {
-        $actor->assertManager();
+        Gate::forUser($actor)->authorize('manage');
 
         return ($this->readPendingPickups)($householdId);
     }

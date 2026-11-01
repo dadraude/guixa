@@ -13,6 +13,7 @@ use Guixa\Ordering\Domain\ReceptionLoader;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Application\TransactionRunner;
 use Guixa\Shared\Domain\Quantity;
+use Illuminate\Support\Facades\Gate;
 
 /**
  * Adds a product of the producer that nobody ordered, active or not (the goods have arrived) to its reception, with what was received of it (R14, S40).
@@ -30,7 +31,7 @@ final class AddUnorderedProduct
     /** @param  string  $received  at most 3 decimals; whole units for a non-variable product */
     public function __invoke(Actor $actor, string $cycleId, string $producerId, string $productId, string $received = '0'): void
     {
-        $actor->assertManager();
+        Gate::forUser($actor)->authorize('manage');
 
         $total = Quantity::fromString($received);
 

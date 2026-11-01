@@ -4,8 +4,8 @@ use Guixa\Membership\Domain\Error\EmailAlreadyInUse;
 use Guixa\Membership\Domain\Error\ProducerAlreadyHasAccount;
 use Guixa\Membership\Domain\Error\UnknownProducer;
 use Guixa\Shared\Application\Actor;
-use Guixa\Shared\Domain\Error\NotAllowed;
 use Guixa\Shared\Domain\Role;
+use Illuminate\Auth\Access\AuthorizationException;
 use Tests\Support\Membership\MembershipWorld;
 
 const BAKER = '00000000-0000-7000-8000-0000000000b1';
@@ -69,7 +69,7 @@ it('rejects a producer that does not exist', function () {
 
 it('keeps producer accounts to managers (R36)', function (Role $role) {
     expect(fn () => ($this->world->inviteProducerAccount)(new Actor('a', [$role]), BAKER, 'Baker', 'baker@example.org'))
-        ->toThrow(NotAllowed::class)
+        ->toThrow(AuthorizationException::class)
         ->and($this->world->sender->sent)->toBe([]);
 })->with([Role::Member, Role::Producer]);
 
@@ -93,7 +93,7 @@ it('ignores member accounts and keeps the list to managers', function () {
     ($this->world->addMember)($this->world->manager, ($this->world->createHousehold)($this->world->manager, 'H'), 'Anna', 'anna@example.org');
 
     expect(($this->world->listProducerAccounts)($this->world->manager))->toBe([])
-        ->and(fn () => ($this->world->listProducerAccounts)(new Actor('a', [Role::Producer])))->toThrow(NotAllowed::class);
+        ->and(fn () => ($this->world->listProducerAccounts)(new Actor('a', [Role::Producer])))->toThrow(AuthorizationException::class);
 });
 
 // R3a, S50 — suspending and restoring the producer role

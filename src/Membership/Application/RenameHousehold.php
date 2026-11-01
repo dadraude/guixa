@@ -6,6 +6,7 @@ use Guixa\Membership\Domain\Error\HouseholdNotFound;
 use Guixa\Membership\Domain\HouseholdRepository;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Application\TransactionRunner;
+use Illuminate\Support\Facades\Gate;
 
 final class RenameHousehold
 {
@@ -16,7 +17,7 @@ final class RenameHousehold
 
     public function __invoke(Actor $actor, string $householdId, string $name): void
     {
-        $actor->assertManager();
+        Gate::forUser($actor)->authorize('manage');
 
         $this->transactions->run(function () use ($householdId, $name): void {
             $this->households->lockMembershipChanges();

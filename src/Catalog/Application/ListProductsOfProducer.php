@@ -5,6 +5,7 @@ namespace Guixa\Catalog\Application;
 use Guixa\Catalog\Domain\ProductRepository;
 use Guixa\Catalog\Domain\ProductUsage;
 use Guixa\Shared\Application\Actor;
+use Illuminate\Support\Facades\Gate;
 
 final class ListProductsOfProducer
 {
@@ -16,7 +17,7 @@ final class ListProductsOfProducer
     /** @return list<ProductAdministrationData> */
     public function __invoke(Actor $actor, string $producerId): array
     {
-        $actor->assertManager();
+        Gate::forUser($actor)->authorize('manage');
 
         return array_map(
             fn ($product) => ProductAdministrationData::of($product, $this->usage->hasAny($product->id)),

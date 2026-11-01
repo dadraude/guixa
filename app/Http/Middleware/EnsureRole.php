@@ -4,8 +4,8 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Guixa\Shared\Application\Actor;
-use Guixa\Shared\Domain\Error\NotAllowed;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Symfony\Component\HttpFoundation\Response;
 
 class EnsureRole
@@ -15,9 +15,7 @@ class EnsureRole
     {
         $actor = app()->bound(Actor::class) ? app(Actor::class) : null;
 
-        if ($actor === null || ! $actor->hasAnyRole(...$roles)) {
-            throw NotAllowed::forRole(implode(' or ', $roles));
-        }
+        Gate::forUser($actor)->authorize('role', [$roles]);
 
         return $next($request);
     }

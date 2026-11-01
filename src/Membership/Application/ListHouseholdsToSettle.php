@@ -6,6 +6,7 @@ use Guixa\Membership\Domain\HouseholdBalances;
 use Guixa\Membership\Domain\HouseholdPickups;
 use Guixa\Membership\Domain\HouseholdRepository;
 use Guixa\Shared\Application\Actor;
+use Illuminate\Support\Facades\Gate;
 
 final class ListHouseholdsToSettle
 {
@@ -18,7 +19,7 @@ final class ListHouseholdsToSettle
     /** @return list<HouseholdSettlement> */
     public function __invoke(Actor $actor): array
     {
-        $actor->assertManager();
+        Gate::forUser($actor)->authorize('manage');
         $rows = [];
 
         foreach ($this->households->list() as $household) {

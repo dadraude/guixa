@@ -8,8 +8,8 @@ use Guixa\Ordering\Domain\Error\ProducerClosed;
 use Guixa\Ordering\Domain\Error\ProductNotOrderable;
 use Guixa\Ordering\Domain\ProducerOrder;
 use Guixa\Shared\Application\Actor;
-use Guixa\Shared\Domain\Error\NotAllowed;
 use Guixa\Shared\Domain\Role;
+use Illuminate\Auth\Access\AuthorizationException;
 use Tests\Support\Ordering\OrderingWorld;
 
 const AVAILABILITY_MEMBER_ANNA = '00000000-0000-7000-8000-0000000000a1';
@@ -103,8 +103,8 @@ it('ignores marking a product unavailable or available twice (R3c)', function ()
 it('lets only the producer of the product mark it (R3c, R2)', function () {
     $other = producerActor(OrderingWorld::GROWER);
 
-    expect(fn () => ($this->world->setProductAvailability)($other, $this->cycleA, $this->jam, false))->toThrow(NotAllowed::class);
-    expect(fn () => ($this->world->setProductAvailability)($this->anna, $this->cycleA, $this->jam, false))->toThrow(NotAllowed::class);
+    expect(fn () => ($this->world->setProductAvailability)($other, $this->cycleA, $this->jam, false))->toThrow(AuthorizationException::class);
+    expect(fn () => ($this->world->setProductAvailability)($this->anna, $this->cycleA, $this->jam, false))->toThrow(AuthorizationException::class);
     expect(($this->world->getHouseholdOrder)($this->anna, $this->cycleA)->producers[0]->products)->toHaveCount(1);
 });
 

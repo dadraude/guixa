@@ -5,7 +5,7 @@ use Guixa\Sales\Domain\StockOfferCatalog;
 use Guixa\Sales\Domain\StockOfferProduct;
 use Guixa\Sales\Domain\StockQuantities;
 use Guixa\Shared\Application\Actor;
-use Guixa\Shared\Domain\Error\NotAllowed;
+use Illuminate\Auth\Access\AuthorizationException;
 
 it('lists active stock including zero and inactive producers without changing stock', function () {
     $catalog = new class implements StockOfferCatalog
@@ -43,4 +43,4 @@ it('rejects a producer-only account from the member stock catalogue', function (
     $catalog->shouldNotReceive('active');
 
     (new ListStockOffers($catalog, $quantities))(Actor::producer('producer', 'beekeeper'));
-})->throws(NotAllowed::class);
+})->throws(AuthorizationException::class);
