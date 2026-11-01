@@ -112,4 +112,18 @@ trait BasketRepositoryContract
         $this->assertSame('collected', $repository->get($basket->id)->state);
         $this->assertSame($manager, $repository->get($basket->id)->collectedBy);
     }
+
+    #[Test]
+    public function it_scopes_household_reads_without_exposing_other_household_ids(): void
+    {
+        [$repository, $manager, $household, $product] = $this->basketWorld();
+        $basket = $this->basket($repository, $manager, $household, []);
+        $repository->save($basket->withLines([$this->line($repository, $basket->id, $product)]));
+
+        $this->assertSame($basket->id, $repository->getForHousehold($basket->id, $household)?->id);
+        $this->assertNull($repository->getForHousehold($basket->id, '00000000-0000-7000-8000-000000000099'));
+        $this->assertSame([$basket->id], array_map(fn (Basket $row) => $row->id, $repository->listForHousehold($household)));
+        $this->assertSame([], $repository->listForHousehold('00000000-0000-7000-8000-000000000099'));
+        $this->assertSame('Oil', $repository->getForHousehold($basket->id, $household)?->activeLines()[0]->name);
+    }
 }

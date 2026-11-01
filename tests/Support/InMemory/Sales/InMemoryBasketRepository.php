@@ -56,6 +56,19 @@ final class InMemoryBasketRepository implements BasketRepository
         return array_values($this->baskets);
     }
 
+    public function getForHousehold(string $id, string $householdId): ?Basket
+    {
+        $basket = $this->get($id);
+
+        return $basket?->householdId === $householdId ? $basket : null;
+    }
+
+    public function listForHousehold(string $householdId): array
+    {
+        return array_values(array_filter($this->baskets,
+            fn (Basket $basket) => $basket->householdId === $householdId));
+    }
+
     public function hasProductHistory(string $productId): bool
     {
         foreach ($this->baskets as $basket) {

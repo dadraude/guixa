@@ -72,6 +72,19 @@ beforeEach(function () {
             return array_values($this->rows);
         }
 
+        public function getForHousehold(string $id, string $householdId): ?Basket
+        {
+            $basket = $this->get($id);
+
+            return $basket?->householdId === $householdId ? $basket : null;
+        }
+
+        public function listForHousehold(string $householdId): array
+        {
+            return array_values(array_filter($this->list(),
+                fn (Basket $basket) => $basket->householdId === $householdId));
+        }
+
         public function hasProductHistory(string $productId): bool
         {
             foreach ($this->rows as $basket) {

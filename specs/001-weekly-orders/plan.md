@@ -404,7 +404,8 @@ without financial changes. A full contents reversal leaves no effective goods pe
 | `ValidateBasket` | Finance/Manager; single charge/stock transaction |
 | `MarkBasketCollected` | Finance/Manager or own household member; validated only, no financial effect |
 | `CorrectBasket`, `CorrectBasketCollection` | Finance/Manager; mandatory reason, append-only history |
-| `ListBaskets`, `GetBasket` | Own household member / Finance / Manager, with restricted actions |
+| `ListBaskets`, `GetBasket` | Finance / Manager; existing operational reads remain staff-only |
+| `ListMemberBaskets`, `GetMemberBasket` | Current own-household member; repository filters by household for list and identifier reads |
 | `ListPendingCollections`, `ReadPendingCollections` | All for Finance/Manager; own household for members; include closed-cycle and cycleless baskets |
 | `ListStockOffers` | T54 Member or Manager; active stock including zero, inactive producer allowed; no reservation/edit capability. Finance sales-staff access belongs to a later slice. |
 | `HasProductHistory`, `ReadOpenHouseholdBaskets`, `ReadWeeklyBasketStates`, `ReadEffectiveWeeklyQuantities`, `ReadContainerCounts` | Internal Catalog/Ordering/Membership queries; include history only where requested |

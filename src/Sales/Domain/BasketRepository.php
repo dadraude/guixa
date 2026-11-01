@@ -15,5 +15,10 @@ interface BasketRepository
     /** @return list<Basket> */
     public function list(): array;
 
+    public function getForHousehold(string $id, string $householdId): ?Basket;
+
+    /** @return list<Basket> */
+    public function listForHousehold(string $householdId): array;
+
     public function hasProductHistory(string $productId): bool;
 }

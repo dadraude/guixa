@@ -134,6 +134,20 @@ final class EloquentBasketRepository implements BasketRepository
             ->map(fn (BasketModel $model) => $this->toDomain($model))->all());
     }
 
+    public function getForHousehold(string $id, string $householdId): ?Basket
+    {
+        $model = BasketModel::query()->whereKey($id)->where('household_id', $householdId)->first();
+
+        return $model === null ? null : $this->toDomain($model);
+    }
+
+    public function listForHousehold(string $householdId): array
+    {
+        return array_values(BasketModel::query()->where('household_id', $householdId)->with('lines')
+            ->orderByDesc('created_at')->orderByDesc('id')->get()
+            ->map(fn (BasketModel $model) => $this->toDomain($model))->all());
+    }
+
     public function hasProductHistory(string $productId): bool
     {
         return BasketLineModel::query()->where('product_id', $productId)->exists();

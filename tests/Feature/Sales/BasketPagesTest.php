@@ -138,7 +138,7 @@ it('denies every basket read and mutation route to non-managers at T55 (R19a)', 
     ['post', '/finance/baskets/{basket}/cancellation'],
 ]);
 
-it('shows a basket-sourced charge on Manager and member Wallet statements without member basket access (R31)', function () {
+it('shows a basket-sourced charge on Manager and member Wallet statements while Finance basket routes stay denied to members (R31)', function () {
     $household = basketHousehold();
     $manager = accountWith(Role::Manager);
     $basket = app(CreateStockBasket::class)(Actor::manager($manager->id), $household);
@@ -151,4 +151,5 @@ it('shows a basket-sourced charge on Manager and member Wallet statements withou
     $this->actingAs(memberOf($household))->get('/wallet')
         ->assertInertia(fn (Assert $page) => $page->where('wallet.movements.0.basketId', $basket));
     $this->get("/finance/baskets/{$basket}")->assertForbidden();
+    $this->get("/baskets/{$basket}")->assertOk();
 });

@@ -1,5 +1,9 @@
 {
     "Baskets": "Cistelles",
+    "My baskets": "Les meves cistelles",
+    "Your household baskets": "Les cistelles de la teva llar",
+    "In preparation": "En preparació",
+    "Draft basket in preparation.": "Aquesta cistella encara s’està preparant.",
     "Basket": "Cistella",
     "Household": "Unitat de convivència",
     "Basket: :name": "Cistella: :name",
@@ -50,6 +54,7 @@
     "Open for orders": "Comandes obertes",
     "Closed to orders": "Comandes tancades",
     "Cancelled": "Cancel·lades",
+    "Cancelled basket": "Cistella cancel·lada",
     "Cycle cancelled": "Cicle cancel·lat",
     "There are no cycles yet.": "Encara no hi ha cap cicle de comanda.",
     "No products yet": "Encara no hi ha productes",
