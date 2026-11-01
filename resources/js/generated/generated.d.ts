@@ -392,7 +392,7 @@ export type PickupStatus = 'none' | 'pending' | 'nothing_to_collect' | 'complete
 }
 namespace Shared {
 namespace Domain {
-export type Role = 'manager' | 'member' | 'producer';
+export type Role = 'manager' | 'finance' | 'member' | 'producer';
 }
 }
 namespace Stock {

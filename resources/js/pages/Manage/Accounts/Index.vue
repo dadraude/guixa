@@ -6,6 +6,7 @@ import AccountDeactivationController from '@/actions/App/Http/Controllers/Manage
 import AccountController from '@/actions/App/Http/Controllers/Manage/AccountController';
 import AccountHouseholdController from '@/actions/App/Http/Controllers/Manage/AccountHouseholdController';
 import ManagerRoleController from '@/actions/App/Http/Controllers/Manage/ManagerRoleController';
+import FinanceRoleController from '@/actions/App/Http/Controllers/Manage/FinanceRoleController';
 import ActiveSwitch from '@/components/ActiveSwitch.vue';
 import FormSelect from '@/components/FormSelect.vue';
 import Heading from '@/components/Heading.vue';
@@ -32,11 +33,14 @@ const householdOptions = computed(() =>
     })),
 );
 
+const isFinance = (account: App.Http.AccountRow) =>
+    account.roles.includes('finance');
 const isManager = (account: App.Http.AccountRow) =>
     account.roles.includes('manager');
 const roleLabels: Record<string, string> = {
     member: 'Member',
     manager: 'Manager',
+    finance: 'Finance',
     producer: 'Producer',
 };
 const displayRole = (role: string) =>
@@ -189,6 +193,43 @@ const displayRole = (role: string) =>
                             :disabled="processing"
                         >
                             {{ trans('Unlink') }}
+                        </Button>
+                    </Form>
+
+                    <Form
+                        v-if="isFinance(account)"
+                        v-bind="
+                            FinanceRoleController.destroy.form(
+                                account.accountId,
+                            )
+                        "
+                        v-slot="{ processing }"
+                    >
+                        <Button
+                            type="submit"
+                            variant="outline"
+                            size="sm"
+                            class="min-h-11"
+                            :disabled="processing"
+                        >
+                            {{ trans('Remove Finance role') }}
+                        </Button>
+                    </Form>
+                    <Form
+                        v-else-if="account.active"
+                        v-bind="
+                            FinanceRoleController.update.form(account.accountId)
+                        "
+                        v-slot="{ processing }"
+                    >
+                        <Button
+                            type="submit"
+                            variant="outline"
+                            size="sm"
+                            class="min-h-11"
+                            :disabled="processing"
+                        >
+                            {{ trans('Grant Finance role') }}
                         </Button>
                     </Form>
 

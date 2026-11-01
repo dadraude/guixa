@@ -12,7 +12,7 @@ final class GetBasket
 
     public function __invoke(Actor $actor, string $basketId): BasketData
     {
-        $actor->assertManager();
+        $actor->assertCanManageSales();
 
         return BasketData::from($this->baskets->get($basketId) ?? throw BasketNotFound::withId($basketId));
     }

@@ -3,6 +3,7 @@
 namespace Guixa\Stock\Application;
 
 use Guixa\Shared\Application\Actor;
+use Guixa\Shared\Domain\Role;
 use Guixa\Stock\Domain\StockMovementRepository;
 use Guixa\Stock\Domain\StockProductRepository;
 use Guixa\Stock\Domain\ValueObject\SignedQuantity;
@@ -17,7 +18,7 @@ final class ListStock
     /** @return list<StockLevelData> */
     public function __invoke(Actor $actor): array
     {
-        $actor->assertManager();
+        $actor->assertCanManageSales();
 
         $available = $this->movements->availableByProduct();
 
@@ -33,7 +34,10 @@ final class ListStock
                 ($available[$product->id] ?? SignedQuantity::ofThousandths(0))->toString(),
                 $product->producerId,
             ),
-            $this->products->list(),
+            array_values(array_filter(
+                $this->products->list(),
+                fn ($product) => $actor->hasRole(Role::Manager) || $product->isActive(),
+            )),
         );
     }
 }

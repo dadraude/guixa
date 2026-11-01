@@ -1,0 +1,751 @@
+{
+    "baseUrl": "http://127.0.0.1:5211",
+    "rootFontPx": 16,
+    "darkSelector": "html.dark",
+    "matrix": {
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark"],
+        "text": [100, 200]
+    },
+    "views": [
+        {
+            "id": "manager-account-finance-role",
+            "path": "/visual-dra-211.html",
+            "root": "#main-content",
+            "panels": "#main-content section,#main-content form,#main-content .pilot-list,#main-content .pilot-layout-panel,#main-content .pilot-layout-notice,#main-content table",
+            "content": "#main-content h1,#main-content h2,#main-content h3,#main-content p,#main-content label,#main-content input,#main-content a,#main-content button,#main-content th,#main-content td,#main-content li",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "query": {
+                "page": "Manage/Accounts/Index"
+            },
+            "states": [
+                {
+                    "id": "populated",
+                    "query": {
+                        "state": "populated"
+                    },
+                    "ready": "body[data-visual-ready=\"populated\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-visual-page-focus-first]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-visual-page-focus-last]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content form[action*=\"finance-role\"] button",
+                                "minHeight": 44
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "granted",
+                    "query": {
+                        "state": "granted"
+                    },
+                    "ready": "body[data-visual-ready=\"granted\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "#main-content form[action*=\"finance-role\"] button",
+                                "minHeight": 44
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "inactive",
+                    "query": {
+                        "state": "inactive"
+                    },
+                    "ready": "body[data-visual-ready=\"inactive\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "finance-baskets-index",
+            "path": "/visual-dra-211.html",
+            "root": "#main-content",
+            "panels": "#main-content section,#main-content form,#main-content .pilot-list,#main-content .pilot-layout-panel,#main-content .pilot-layout-notice,#main-content table",
+            "content": "#main-content h1,#main-content h2,#main-content h3,#main-content p,#main-content label,#main-content input,#main-content a,#main-content button,#main-content th,#main-content td,#main-content li",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "query": {
+                "page": "Finance/Baskets/Index"
+            },
+            "states": [
+                {
+                    "id": "populated",
+                    "query": {
+                        "state": "populated"
+                    },
+                    "ready": "body[data-visual-ready=\"populated\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-visual-page-focus-first]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-visual-page-focus-last]",
+                                "count": 1
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "empty",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "ready": "body[data-visual-ready=\"empty\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "finance-baskets-create",
+            "path": "/visual-dra-211.html",
+            "root": "#main-content",
+            "panels": "#main-content section,#main-content form,#main-content .pilot-list,#main-content .pilot-layout-panel,#main-content .pilot-layout-notice,#main-content table",
+            "content": "#main-content h1,#main-content h2,#main-content h3,#main-content p,#main-content label,#main-content input,#main-content a,#main-content button,#main-content th,#main-content td,#main-content li",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "query": {
+                "page": "Finance/Baskets/Create"
+            },
+            "states": [
+                {
+                    "id": "populated",
+                    "query": {
+                        "state": "populated"
+                    },
+                    "ready": "body[data-visual-ready=\"populated\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-visual-page-focus-first]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-visual-page-focus-last]",
+                                "count": 1
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "empty",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "ready": "body[data-visual-ready=\"empty\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "finance-basket-detail",
+            "path": "/visual-dra-211.html",
+            "root": "#main-content",
+            "panels": "#main-content section,#main-content form,#main-content .pilot-list,#main-content .pilot-layout-panel,#main-content .pilot-layout-notice,#main-content table",
+            "content": "#main-content h1,#main-content h2,#main-content h3,#main-content p,#main-content label,#main-content input,#main-content a,#main-content button,#main-content th,#main-content td,#main-content li",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "query": {
+                "page": "Finance/Baskets/Show"
+            },
+            "states": [
+                {
+                    "id": "populated",
+                    "query": {
+                        "state": "populated"
+                    },
+                    "ready": "body[data-visual-ready=\"populated\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-visual-page-focus-first]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-visual-page-focus-last]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"wallet-link\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"validate-basket\"]",
+                                "count": 1,
+                                "minHeight": 44
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "validated",
+                    "query": {
+                        "state": "validated"
+                    },
+                    "ready": "body[data-visual-ready=\"validated\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"collect-basket\"]",
+                                "count": 1,
+                                "minHeight": 44
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "collected",
+                    "query": {
+                        "state": "collected"
+                    },
+                    "ready": "body[data-visual-ready=\"collected\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "empty",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "ready": "body[data-visual-ready=\"empty\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "panels": "#main-content section,#main-content form,#main-content .pilot-layout-panel,#main-content .pilot-layout-notice,#main-content table"
+                    }
+                },
+                {
+                    "id": "error",
+                    "query": {
+                        "state": "error"
+                    },
+                    "ready": "body[data-visual-ready=\"error\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "long",
+                    "query": {
+                        "state": "long"
+                    },
+                    "ready": "body[data-visual-ready=\"long\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "finance-wallet-statement",
+            "path": "/visual-dra-211.html",
+            "root": "#main-content",
+            "panels": "#main-content .pilot-layout-panel:not(:has(.pilot-wallet-movements)),#main-content .pilot-wallet-table tbody tr,#main-content .pilot-layout-notice",
+            "content": "#main-content h1,#main-content h2,#main-content h3,#main-content p,#main-content label,#main-content input,#main-content a,#main-content button,#main-content td,#main-content .pilot-cell-label",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "query": {
+                "page": "Wallet/Statement"
+            },
+            "states": [
+                {
+                    "id": "populated",
+                    "query": {
+                        "state": "populated"
+                    },
+                    "ready": "body[data-visual-ready=\"populated\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-visual-page-focus-first]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-visual-page-focus-last]",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-wallet-forms",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"basket-source-link\"]",
+                                "count": 1
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "empty",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "ready": "body[data-visual-ready=\"empty\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".pilot-wallet-forms",
+                                "count": 0
+                            }
+                        ],
+                        "focus": [],
+                        "noFocusReason": "A Finance statement with no movements has no receipt forms or back-to-admin link."
+                    }
+                },
+                {
+                    "id": "long",
+                    "query": {
+                        "state": "long"
+                    },
+                    "ready": "body[data-visual-ready=\"long\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "manager-wallet-statement",
+            "path": "/visual-dra-211.html",
+            "root": "#main-content",
+            "panels": "#main-content .pilot-layout-panel:not(:has(.pilot-wallet-movements)),#main-content .pilot-wallet-table tbody tr,#main-content .pilot-layout-notice",
+            "content": "#main-content h1,#main-content h2,#main-content h3,#main-content p,#main-content label,#main-content input,#main-content a,#main-content button,#main-content td,#main-content .pilot-cell-label",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "query": {
+                "page": "Wallet/Statement",
+                "role": "manager"
+            },
+            "states": [
+                {
+                    "id": "populated",
+                    "query": {
+                        "state": "populated"
+                    },
+                    "ready": "body[data-visual-ready=\"populated\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".pilot-wallet-forms",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"record-top-up\"]",
+                                "count": 1,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"record-correction\"]",
+                                "count": 1,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "#main-content a[href^=\"/manage/households/\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"basket-source-link\"]",
+                                "count": 1
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "long",
+                    "query": {
+                        "state": "long"
+                    },
+                    "ready": "body[data-visual-ready=\"long\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "member-wallet-statement",
+            "path": "/visual-dra-211.html",
+            "root": "#main-content",
+            "panels": "#main-content .pilot-layout-panel:not(:has(.pilot-wallet-movements)),#main-content .pilot-wallet-table tbody tr,#main-content .pilot-layout-notice",
+            "content": "#main-content h1,#main-content h2,#main-content h3,#main-content p,#main-content label,#main-content input,#main-content a,#main-content button,#main-content td,#main-content .pilot-cell-label",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "query": {
+                "page": "Wallet/Statement",
+                "role": "member"
+            },
+            "states": [
+                {
+                    "id": "populated",
+                    "query": {
+                        "state": "populated"
+                    },
+                    "ready": "body[data-visual-ready=\"populated\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".pilot-wallet-forms",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"basket-source-link\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"basket-source-text\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content a[href^=\"/manage/households/\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content a[href^=\"/finance/baskets/\"]",
+                                "count": 0
+                            }
+                        ],
+                        "focus": [],
+                        "noFocusReason": "A member statement has no source basket link, receipt form or administration link in T56."
+                    }
+                },
+                {
+                    "id": "empty",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "ready": "body[data-visual-ready=\"empty\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "focus": [],
+                        "noFocusReason": "An empty own-household statement has no write controls or source links.",
+                        "assertions": [
+                            {
+                                "selector": ".pilot-wallet-forms",
+                                "count": 0
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    ]
+}

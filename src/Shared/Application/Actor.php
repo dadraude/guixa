@@ -74,6 +74,29 @@ final readonly class Actor
         }
     }
 
+    public function assertCanManageSales(): void
+    {
+        if (! $this->hasAnyRole(Role::Manager->value, Role::Finance->value)) {
+            throw NotAllowed::forRole('manager or finance');
+        }
+    }
+
+    public function assertCanManageWallet(): void
+    {
+        if (! $this->hasAnyRole(Role::Manager->value, Role::Finance->value)) {
+            throw NotAllowed::forRole('manager or finance');
+        }
+    }
+
+    public function assertCanCollectFor(string $householdId): void
+    {
+        if ($this->hasAnyRole(Role::Manager->value, Role::Finance->value)) {
+            return;
+        }
+
+        $this->assertMemberOf($householdId);
+    }
+
     public function assertMemberOf(string $householdId): void
     {
         if (! $this->hasRole(Role::Member)) {

@@ -6,6 +6,7 @@ use App\Http\Controllers\Finance\BasketCollectionController;
 use App\Http\Controllers\Finance\BasketController;
 use App\Http\Controllers\Finance\BasketStockController;
 use App\Http\Controllers\Finance\BasketValidationController;
+use App\Http\Controllers\Finance\HouseholdWalletController as FinanceHouseholdWalletController;
 use App\Http\Controllers\Manage\AccountController;
 use App\Http\Controllers\Manage\AccountDeactivationController;
 use App\Http\Controllers\Manage\AccountHouseholdController;
@@ -13,6 +14,7 @@ use App\Http\Controllers\Manage\CycleCancellationController;
 use App\Http\Controllers\Manage\CycleController;
 use App\Http\Controllers\Manage\CycleCutoffController;
 use App\Http\Controllers\Manage\CycleParticipantController;
+use App\Http\Controllers\Manage\FinanceRoleController;
 use App\Http\Controllers\Manage\HouseholdController;
 use App\Http\Controllers\Manage\HouseholdMemberController;
 use App\Http\Controllers\Manage\HouseholdWalletController;
@@ -55,7 +57,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 Route::middleware(['auth', 'verified', 'role:member'])->get('wallet', [WalletController::class, 'show'])->name('wallet.show');
 Route::middleware(['auth', 'verified', 'role:member'])->get('stock', [StockController::class, 'index'])->name('stock.index');
 
-Route::middleware(['auth', 'verified', 'role:manager'])->prefix('finance/baskets')->name('finance.baskets.')->whereUuid(['basket', 'stockProduct'])->group(function () {
+Route::middleware(['auth', 'verified', 'role:manager,finance'])->prefix('finance/baskets')->name('finance.baskets.')->whereUuid(['basket', 'stockProduct'])->group(function () {
     Route::get('/', [BasketController::class, 'index'])->name('index');
     Route::get('create', [BasketController::class, 'create'])->name('create');
     Route::post('/', [BasketController::class, 'store'])->name('store');
@@ -66,6 +68,9 @@ Route::middleware(['auth', 'verified', 'role:manager'])->prefix('finance/baskets
     Route::put('{basket}/collection', [BasketCollectionController::class, 'update'])->name('collect');
     Route::post('{basket}/cancellation', [BasketController::class, 'cancel'])->name('cancel');
 });
+
+Route::middleware(['auth', 'verified', 'role:manager,finance'])->get('finance/households/{household}/wallet', [FinanceHouseholdWalletController::class, 'show'])
+    ->whereUuid('household')->name('finance.households.wallet.show');
 
 Route::middleware(['auth', 'verified', 'role:member'])->prefix('cycles/{cycle}/order')->whereUuid(['cycle', 'product'])->name('orders.')->group(function () {
     Route::get('/', [OrderController::class, 'edit'])->name('edit');
@@ -210,6 +215,10 @@ Route::middleware(['auth', 'verified', 'role:manager'])->prefix('manage')->name(
     Route::delete('accounts/{account}/manager-role', [ManagerRoleController::class, 'destroy'])
         ->whereUuid('account')
         ->name('accounts.manager-role.destroy');
+    Route::put('accounts/{account}/finance-role', [FinanceRoleController::class, 'update'])
+        ->whereUuid('account')->name('accounts.finance-role.update');
+    Route::delete('accounts/{account}/finance-role', [FinanceRoleController::class, 'destroy'])
+        ->whereUuid('account')->name('accounts.finance-role.destroy');
     Route::post('accounts/{account}/deactivation', [AccountDeactivationController::class, 'store'])
         ->whereUuid('account')
         ->name('accounts.deactivation.store');

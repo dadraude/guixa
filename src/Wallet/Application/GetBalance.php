@@ -12,7 +12,7 @@ final class GetBalance
     /** @return int the household's balance in cents; it may be negative (R30) */
     public function __invoke(Actor $actor, string $householdId): int
     {
-        $actor->assertManager();
+        $actor->assertCanManageWallet();
 
         return $this->movements->balanceOf($householdId)->cents;
     }

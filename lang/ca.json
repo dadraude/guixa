@@ -628,5 +628,8 @@
     "Weekly products": "Productes setmanals",
     "Stock products": "Productes d’estoc",
     "Your stock products are read-only.": "Pots consultar els teus productes d’estoc, però no modificar-los.",
-    "No stock products yet.": "Encara no hi ha productes d’estoc."
+    "No stock products yet.": "Encara no hi ha productes d’estoc.",
+    "Finance": "Economia",
+    "Grant Finance role": "Concedeix el rol d’economia",
+    "Remove Finance role": "Retira el rol d’economia"
 }

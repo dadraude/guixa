@@ -14,6 +14,7 @@ import { trans } from 'laravel-vue-i18n';
 defineProps<{
     wallet: App.Http.WalletStatementRow;
     household: App.Http.WalletHouseholdRow | null;
+    canManageReceipts?: boolean;
 }>();
 
 const typeLabels: Record<string, string> = {
@@ -41,7 +42,7 @@ const typeLabels: Record<string, string> = {
             "
         />
 
-        <div v-if="household" class="pilot-wallet-forms">
+        <div v-if="household && canManageReceipts" class="pilot-wallet-forms">
             <div
                 class="pilot-wallet-form-grid grid min-w-0 grid-cols-[minmax(0,1fr)] gap-4"
             >
@@ -251,7 +252,7 @@ const typeLabels: Record<string, string> = {
         </section>
 
         <Link
-            v-if="household"
+            v-if="household && canManageReceipts"
             :href="HouseholdController.show(household.id)"
             class="pilot-back-link text-sm underline-offset-4 hover:underline"
         >
@@ -259,3 +260,9 @@ const typeLabels: Record<string, string> = {
         </Link>
     </div>
 </template>
+
+<style scoped>
+.pilot-t44-page :deep(.pilot-heading) {
+    overflow-wrap: anywhere;
+}
+</style>

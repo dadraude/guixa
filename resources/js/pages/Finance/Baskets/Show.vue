@@ -6,7 +6,7 @@ import BasketCollectionController from '@/actions/App/Http/Controllers/Finance/B
 import BasketController from '@/actions/App/Http/Controllers/Finance/BasketController';
 import BasketStockController from '@/actions/App/Http/Controllers/Finance/BasketStockController';
 import BasketValidationController from '@/actions/App/Http/Controllers/Finance/BasketValidationController';
-import HouseholdWalletController from '@/actions/App/Http/Controllers/Manage/HouseholdWalletController';
+import HouseholdWalletController from '@/actions/App/Http/Controllers/Finance/HouseholdWalletController';
 import Heading from '@/components/Heading.vue';
 import InputError from '@/components/InputError.vue';
 import StockLines from '@/components/pickup/StockLines.vue';

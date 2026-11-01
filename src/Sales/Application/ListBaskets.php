@@ -12,7 +12,7 @@ final class ListBaskets
     /** @return list<BasketData> */
     public function __invoke(Actor $actor): array
     {
-        $actor->assertManager();
+        $actor->assertCanManageSales();
 
         return array_map(BasketData::from(...), $this->baskets->list());
     }

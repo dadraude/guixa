@@ -120,6 +120,24 @@ final class Account
         $this->roles = array_values(array_filter($this->roles, fn (Role $role) => $role !== Role::Manager));
     }
 
+    public function grantFinance(): void
+    {
+        if (! $this->isActive()) {
+            throw AccountDeactivated::for($this->id);
+        }
+
+        if (in_array(Role::Finance, $this->roles, true)) {
+            return;
+        }
+
+        $this->roles = [...$this->roles, Role::Finance];
+    }
+
+    public function removeFinance(): void
+    {
+        $this->roles = array_values(array_filter($this->roles, fn (Role $role) => $role !== Role::Finance));
+    }
+
     /** The producer is deactivated: the account keeps its other roles (R3a). */
     public function suspendProducerRole(): void
     {

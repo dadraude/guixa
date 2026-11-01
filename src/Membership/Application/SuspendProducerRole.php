@@ -3,22 +3,29 @@
 namespace Guixa\Membership\Application;
 
 use Guixa\Membership\Domain\AccountRepository;
+use Guixa\Membership\Domain\HouseholdRepository;
+use Guixa\Shared\Application\TransactionRunner;
 
-/** Internal command for Catalog, which takes no actor. Takes the producer role away while its producer is deactivated; the account keeps its other roles (R3a). */
+/** Internal Catalog command; producer deactivation must preserve current account roles (R3a). */
 final class SuspendProducerRole
 {
-    public function __construct(private readonly AccountRepository $accounts) {}
+    public function __construct(
+        private readonly AccountRepository $accounts,
+        private readonly HouseholdRepository $households,
+        private readonly TransactionRunner $transactions,
+    ) {}
 
-    /** A producer with no account yet is left alone. */
     public function __invoke(string $producerId): void
     {
-        $account = $this->accounts->ofProducer($producerId);
+        $this->transactions->run(function () use ($producerId): void {
+            $this->households->lockMembershipChanges();
+            $account = $this->accounts->ofProducer($producerId);
+            if ($account === null) {
+                return;
+            }
 
-        if ($account === null) {
-            return;
-        }
-
-        $account->suspendProducerRole();
-        $this->accounts->save($account);
+            $account->suspendProducerRole();
+            $this->accounts->save($account);
+        });
     }
 }

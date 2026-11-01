@@ -12,7 +12,7 @@ final class ListActiveHouseholds
     /** @return list<ActiveHouseholdData> */
     public function __invoke(Actor $actor): array
     {
-        $actor->assertManager();
+        $actor->assertCanManageSales();
 
         return array_map(
             fn ($household) => new ActiveHouseholdData($household->id, $household->name),

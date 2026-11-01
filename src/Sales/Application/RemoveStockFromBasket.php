@@ -15,7 +15,7 @@ final class RemoveStockFromBasket
 
     public function __invoke(Actor $actor, string $basketId, string $productId): void
     {
-        $actor->assertManager();
+        $actor->assertCanManageSales();
         $this->transactions->run(function () use ($basketId, $productId): void {
             $basket = $this->baskets->lock($basketId) ?? throw BasketNotFound::withId($basketId);
             if ($basket->state !== 'draft') {
