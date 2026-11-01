@@ -31,6 +31,7 @@ import CutoffController from '@/actions/App/Http/Controllers/Producer/CutoffCont
 import ProductController from '@/actions/App/Http/Controllers/Producer/ProductController';
 import WalletController from '@/actions/App/Http/Controllers/WalletController';
 import BasketController from '@/actions/App/Http/Controllers/Finance/BasketController';
+import MemberBasketController from '@/actions/App/Http/Controllers/Member/BasketController';
 import { toUrl } from '@/lib/utils';
 import { dashboard } from '@/routes';
 import type { NavItem } from '@/types';
@@ -48,6 +49,11 @@ const producerItems: NavItem[] = [
 
 const memberItems: NavItem[] = [
     { title: 'Orders', href: OrderController.index(), icon: CalendarDays },
+    {
+        title: 'My baskets',
+        href: MemberBasketController.index(),
+        icon: ShoppingBasket,
+    },
     { title: 'Stock catalogue', href: StockController.index(), icon: Package },
     { title: 'Wallet', href: WalletController.show(), icon: Wallet },
 ];

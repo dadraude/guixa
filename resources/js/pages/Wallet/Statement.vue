@@ -2,6 +2,7 @@
 import { formatEventDateTime, formatMoney } from '@/lib/locale';
 import { Form, Head, Link } from '@inertiajs/vue3';
 import BasketController from '@/actions/App/Http/Controllers/Finance/BasketController';
+import MemberBasketController from '@/actions/App/Http/Controllers/Member/BasketController';
 import Heading from '@/components/Heading.vue';
 import FormSelect from '@/components/FormSelect.vue';
 import InputError from '@/components/InputError.vue';
@@ -265,11 +266,15 @@ const typeLabels: Record<string, string> = {
                                     >{{ trans('Source') }}</span
                                 >
                                 <Link
-                                    v-if="household && movement.basketId"
+                                    v-if="movement.basketId"
                                     :href="
-                                        BasketController.show.url({
-                                            basket: movement.basketId,
-                                        })
+                                        household
+                                            ? BasketController.show.url({
+                                                  basket: movement.basketId,
+                                              })
+                                            : MemberBasketController.show.url({
+                                                  basket: movement.basketId,
+                                              })
                                     "
                                     class="inline-flex min-h-11 max-w-full items-center break-all underline"
                                     data-test="basket-source-link"
@@ -280,16 +285,6 @@ const typeLabels: Record<string, string> = {
                                         })
                                     }}
                                 </Link>
-                                <span
-                                    v-else-if="movement.basketId"
-                                    data-test="basket-source-text"
-                                    class="break-all"
-                                    >{{
-                                        trans('Basket: :name', {
-                                            name: movement.basketId,
-                                        })
-                                    }}</span
-                                >
                                 <span
                                     v-else-if="movement.sourceMovementId"
                                     data-test="receipt-correction-source"

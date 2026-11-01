@@ -52,7 +52,8 @@ describe('member cycle list presentation', () => {
 
         expect(html).toContain('Comandes obertes');
         expect(html).toContain('Comandes tancades');
-        expect(html).toContain('Cancel·lades');
+        expect(html).toMatch(/<h2[^>]*>Cancel·lades<\/h2>/);
+        expect(html).not.toMatch(/<h2[^>]*>Cancel·lada<\/h2>/);
         expect(html).toContain('30/10/2026');
         expect(html).toContain('/cycles/open/order');
         expect(html).toContain('2 productes');

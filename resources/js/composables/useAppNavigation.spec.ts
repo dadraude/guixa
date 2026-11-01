@@ -16,7 +16,7 @@ describe('shared app navigation', () => {
         expect(member.map((item) => item.title)).toContain('Wallet');
         expect(member.map((item) => item.title)).toContain('Stock catalogue');
         expect(member.map((item) => item.title)).not.toContain('Stock');
-        expect(member.map((item) => item.title)).not.toContain('Baskets');
+        expect(member.map((item) => item.title)).toContain('My baskets');
         expect(
             navigationItemsFor([{ role: 'producer' }]).map(
                 (item) => item.title,
@@ -48,7 +48,7 @@ describe('shared app navigation', () => {
             sections.map((section) => section.items.map((item) => item.title)),
         ).toEqual([
             ['Dashboard'],
-            ['Orders', 'Stock catalogue', 'Wallet'],
+            ['Orders', 'My baskets', 'Stock catalogue', 'Wallet'],
             ['Cycles', 'Households', 'Baskets'],
             ['Producers', 'Stock', 'Return items'],
             ['Accounts', 'Settings'],
@@ -59,12 +59,13 @@ describe('shared app navigation', () => {
             { role: 'manager' },
             { role: 'producer' },
         ]).map((item) => item.title);
-        expect(titles).toHaveLength(14);
+        expect(titles).toHaveLength(15);
         expect(new Set(titles).size).toBe(titles.length);
     });
 
     it('keeps the parent destination selected on detail pages', () => {
         const items = navigationItemsFor([{ role: 'manager' }]);
+        const memberItems = navigationItemsFor([{ role: 'member' }]);
 
         expect(
             currentNavigationItem(
@@ -78,5 +79,8 @@ describe('shared app navigation', () => {
         expect(
             currentNavigationItem(items, '/finance/baskets/example')?.title,
         ).toBe('Baskets');
+        expect(
+            currentNavigationItem(memberItems, '/baskets/example')?.title,
+        ).toBe('My baskets');
     });
 });

@@ -1,0 +1,61 @@
+<script setup lang="ts">
+import { Head, Link } from '@inertiajs/vue3';
+import { trans } from 'laravel-vue-i18n';
+import BasketController from '@/actions/App/Http/Controllers/Member/BasketController';
+import Heading from '@/components/Heading.vue';
+import { Badge } from '@/components/ui/badge';
+import { euros } from '@/components/pickup/euros';
+import { formatEventDateTime } from '@/lib/locale';
+
+defineProps<{ baskets: App.Http.BasketSummaryRow[] }>();
+const statusLabels: Record<string, string> = {
+    draft: trans('In preparation'),
+    validated: trans('Pending collection'),
+    collected: trans('Collected'),
+    cancelled: trans('Cancelled basket'),
+};
+</script>
+
+<template>
+    <Head :title="trans('Baskets')" />
+    <div class="pilot-page pilot-layout-page">
+        <Heading
+            :title="trans('Baskets')"
+            :description="trans('Your household baskets')"
+        />
+        <p
+            v-if="baskets.length === 0"
+            class="pilot-layout-notice text-sm text-muted-foreground"
+            data-test="empty-baskets"
+        >
+            {{ trans('No baskets yet.') }}
+        </p>
+        <ul v-else class="pilot-list" data-test="basket-list">
+            <li
+                v-for="basket in baskets"
+                :key="basket.id"
+                class="pilot-list-row flex-wrap gap-2"
+            >
+                <div class="pilot-list-row-body min-w-0">
+                    <Link
+                        :href="BasketController.show.url({ basket: basket.id })"
+                        class="inline-flex min-h-11 items-center break-all underline"
+                        data-visual-page-focus-first
+                        data-visual-page-focus-last
+                    >
+                        {{ basket.householdName }}
+                    </Link>
+                    <span class="text-xs text-muted-foreground">{{
+                        formatEventDateTime(basket.createdAt)
+                    }}</span>
+                </div>
+                <Badge
+                    variant="secondary"
+                    :data-test="`status-${basket.state}`"
+                    >{{ statusLabels[basket.state] ?? basket.state }}</Badge
+                >
+                <span class="pilot-amount">{{ euros(basket.totalCents) }}</span>
+            </li>
+        </ul>
+    </div>
+</template>

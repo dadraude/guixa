@@ -40,6 +40,19 @@ it('derives stock use from movements without relying on quantity on hand (R1b, R
             return [];
         }
 
+        public function getForHousehold(string $id, string $householdId): ?Basket
+        {
+            $basket = $this->get($id);
+
+            return $basket?->householdId === $householdId ? $basket : null;
+        }
+
+        public function listForHousehold(string $householdId): array
+        {
+            return array_values(array_filter($this->list(),
+                fn (Basket $basket) => $basket->householdId === $householdId));
+        }
+
         public function hasProductHistory(string $productId): bool
         {
             return isset($this->used[$productId]);

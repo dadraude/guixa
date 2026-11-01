@@ -52,7 +52,7 @@ describe('wallet statement mobile row labels', () => {
         expect(html).not.toContain('2026-10-24 12:00');
     });
 
-    it('links a basket source for a manager but leaves member source as text', async () => {
+    it('links each basket source to the permitted staff or own-household detail', async () => {
         const wallet = {
             balance: '-12.50',
             movements: [
@@ -91,10 +91,12 @@ describe('wallet statement mobile row labels', () => {
         const member = createSSRApp(Statement, { household: null, wallet });
         installTranslations(member);
         const memberHtml = await renderToString(member);
-        expect(memberHtml).toContain('data-test="basket-source-text"');
+        expect(memberHtml).not.toContain('data-test="basket-source-text"');
         expect(memberHtml).toContain('Cistella: basket-one');
         expect(memberHtml).toContain('Cistella: basket-two');
-        expect(memberHtml).not.toContain('data-test="basket-source-link"');
+        expect(memberHtml).toContain('data-test="basket-source-link"');
+        expect(memberHtml).toContain('/baskets/basket-one');
+        expect(memberHtml).toContain('/baskets/basket-two');
         expect(memberHtml).not.toContain('/finance/baskets/basket-one');
     });
 });
