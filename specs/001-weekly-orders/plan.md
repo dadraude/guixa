@@ -171,6 +171,9 @@ Households live in `households`; invitations in `invitations` (one row per accou
 `users` gains `activated_at` and `deactivated_at`, and `users.household_id` references `households`.
 `InvitationSender` emails the link `/invitations/{token}` (D15). Login (Fortify `authenticateUsing`) needs the right
 password, `activated_at` set and `deactivated_at` empty; accepting an invitation also marks the email verified.
+The login adapter keeps case-insensitive account lookup, then uses Fortify's configured guard provider to validate
+the password and, only for an eligible account, rehash it when `hashing.rehash_on_login` allows. Fortify retains
+session login and the two-factor challenge pipeline.
 An account created by an invitation holds a random password nobody knows until the invitee sets theirs.
 Passkey login does not go through `authenticateUsing`, so `Passkeys::authorizeLoginUsing` asks `CanLogIn` too, and the
 `LogOutDeactivatedAccount` web middleware ends the session an account already had when it is deactivated (R36b).
