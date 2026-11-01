@@ -1,11 +1,17 @@
 <?php
 
+use Guixa\Catalog\Application\LockWeeklyProduct;
 use Guixa\Ordering\Infrastructure\Catalog\CatalogProductCatalog;
 use Tests\Support\Catalog\CatalogWorld;
 
 beforeEach(function () {
     $this->world = new CatalogWorld;
-    $this->catalog = new CatalogProductCatalog($this->world->getOrderableProduct, $this->world->listOrderableProducts);
+    $this->catalog = new CatalogProductCatalog(
+        $this->world->getOrderableProduct,
+        $this->world->listOrderableProducts,
+        $this->world->listProducerProductsForReception,
+        new LockWeeklyProduct($this->world->products),
+    );
     $this->producerId = ($this->world->createProducer)($this->world->manager, 'Baker', 3, '20:00');
     $this->producer = $this->world->producerActor($this->producerId);
     $this->add = fn (string $name, int $cents = 350, bool $variable = false, ?string $containers = null) => ($this->world->createProduct)(
@@ -46,4 +52,13 @@ it('lists a producer\'s orderable products by name and nothing for an unknown pr
 
     expect(array_map(fn ($product) => $product->name, $this->catalog->orderableOf($this->producerId)))->toBe(['Loaf', 'Roll'])
         ->and($this->catalog->orderableOf($this->world->products->nextId()))->toBe([]);
+});
+
+it('lists every product of a producer for the reception, deactivated ones included (R14, R16)', function () {
+    $loaf = ($this->add)('Loaf', 350, true, '2');
+    ($this->add)('Roll');
+    ($this->world->deactivateProduct)($this->producer, $loaf);
+
+    expect(array_map(fn ($product) => $product->name, $this->catalog->allOf($this->producerId)))->toBe(['Loaf', 'Roll'])
+        ->and($this->catalog->allOf($this->world->products->nextId()))->toBe([]);
 });

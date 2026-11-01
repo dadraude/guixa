@@ -1,8 +1,12 @@
 <script setup lang="ts">
 import { Form, Head, Link } from '@inertiajs/vue3';
+import { Pencil, Plus } from '@lucide/vue';
 import ReturnItemController from '@/actions/App/Http/Controllers/Manage/ReturnItemController';
 import Heading from '@/components/Heading.vue';
+import ActiveSwitch from '@/components/ActiveSwitch.vue';
 import { Button } from '@/components/ui/button';
+import { trans } from 'laravel-vue-i18n';
+import { formatMoney } from '@/lib/locale';
 
 defineOptions({
     layout: {
@@ -18,68 +22,113 @@ defineProps<{
 </script>
 
 <template>
-    <Head title="Return items" />
+    <Head :title="trans('Return items')" />
 
-    <div class="flex flex-col gap-6 p-4">
-        <div class="flex items-center justify-between">
+    <div class="pilot-page pilot-layout-page pilot-manager-page">
+        <div class="flex flex-wrap items-start justify-between gap-4">
             <Heading
-                title="Return items"
-                description="Containers households bring back and get credited for"
+                :title="trans('Return items')"
+                :description="
+                    trans(
+                        'Containers households bring back and get credited for',
+                    )
+                "
             />
             <Button as-child>
-                <Link :href="ReturnItemController.create()"
-                    >New return item</Link
-                >
+                <Link :href="ReturnItemController.create()">
+                    <Plus aria-hidden="true" />
+                    {{ trans('New return item') }}
+                </Link>
             </Button>
         </div>
 
-        <p v-if="items.length === 0" class="text-sm text-muted-foreground">
-            No return items yet.
+        <p
+            v-if="items.length === 0"
+            class="pilot-layout-notice text-sm text-muted-foreground"
+        >
+            {{ trans('No return items yet.') }}
         </p>
 
-        <table v-else class="w-full text-sm">
-            <thead>
-                <tr class="border-b text-left">
-                    <th class="py-2">Name</th>
-                    <th class="py-2">Amount</th>
-                    <th class="py-2">Status</th>
-                    <th class="py-2" />
-                </tr>
-            </thead>
-            <tbody>
-                <tr
-                    v-for="item in items"
-                    :key="item.id"
-                    class="border-b"
-                    :class="{ 'text-muted-foreground': !item.active }"
-                >
-                    <td class="py-2">{{ item.name }}</td>
-                    <td class="py-2">{{ item.amount }} EUR</td>
-                    <td class="py-2">
-                        {{ item.active ? 'Active' : 'Deactivated' }}
-                    </td>
-                    <td class="flex justify-end gap-2 py-2">
-                        <Button variant="outline" size="sm" as-child>
-                            <Link :href="ReturnItemController.edit(item.id)"
-                                >Edit</Link
+        <div v-else class="pilot-manager-list">
+            <table class="pilot-data-table pilot-manager-table w-full text-sm">
+                <thead>
+                    <tr class="border-b text-left">
+                        <th scope="col" class="py-2">{{ trans('Active') }}</th>
+                        <th scope="col" class="py-2">{{ trans('Name') }}</th>
+                        <th scope="col" class="py-2">{{ trans('Amount') }}</th>
+                        <th scope="col" class="py-2">{{ trans('Actions') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr
+                        v-for="item in items"
+                        :key="item.id"
+                        class="border-b"
+                        :class="{ 'text-muted-foreground': !item.active }"
+                    >
+                        <td class="py-2">
+                            <span class="pilot-cell-label" aria-hidden="true">{{
+                                trans('Active')
+                            }}</span>
+                            <Form
+                                v-bind="
+                                    item.active
+                                        ? ReturnItemController.destroy.form(
+                                              item.id,
+                                          )
+                                        : ReturnItemController.reactivate.form(
+                                              item.id,
+                                          )
+                                "
+                                v-slot="{ processing }"
+                                class="pilot-status-switch-form"
                             >
-                        </Button>
-                        <Form
-                            v-if="item.active"
-                            v-bind="ReturnItemController.destroy.form(item.id)"
-                        >
-                            <Button
-                                type="submit"
-                                variant="outline"
-                                size="sm"
-                                :data-test="`deactivate-${item.id}`"
-                            >
-                                Deactivate
-                            </Button>
-                        </Form>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+                                <ActiveSwitch
+                                    :id="item.id"
+                                    :active="item.active"
+                                    :name="item.name"
+                                    :processing="processing"
+                                />
+                            </Form>
+                        </td>
+                        <td class="py-2 font-medium">
+                            <span class="pilot-cell-label" aria-hidden="true">{{
+                                trans('Name')
+                            }}</span
+                            >{{ item.name }}
+                        </td>
+                        <td class="py-2 tabular-nums">
+                            <span class="pilot-cell-label" aria-hidden="true">{{
+                                trans('Amount')
+                            }}</span
+                            >{{ formatMoney(item.amount) }}
+                        </td>
+                        <td class="py-2">
+                            <span class="pilot-cell-label" aria-hidden="true">{{
+                                trans('Actions')
+                            }}</span>
+                            <div class="pilot-table-actions">
+                                <Button
+                                    variant="outline"
+                                    size="icon"
+                                    class="size-11"
+                                    as-child
+                                >
+                                    <Link
+                                        :href="
+                                            ReturnItemController.edit(item.id)
+                                        "
+                                        :aria-label="`${trans('Edit')}: ${item.name}`"
+                                        :title="trans('Edit')"
+                                    >
+                                        <Pencil aria-hidden="true" />
+                                    </Link>
+                                </Button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </template>

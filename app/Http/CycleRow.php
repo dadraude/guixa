@@ -16,6 +16,7 @@ final readonly class CycleRow
         public string $pickupDate,
         public bool $cancelled,
         public array $participants,
+        public bool $closed = false,
     ) {}
 
     /** @param  array<string, string>  $producerNames  by producer id */
@@ -27,6 +28,6 @@ final readonly class CycleRow
         );
         usort($participants, fn (CycleParticipantRow $a, CycleParticipantRow $b) => mb_strtolower($a->producerName) <=> mb_strtolower($b->producerName));
 
-        return new self($cycle->id, $cycle->pickupDate, $cycle->cancelled, $participants);
+        return new self($cycle->id, $cycle->pickupDate, $cycle->cancelled, $participants, $cycle->closed);
     }
 }

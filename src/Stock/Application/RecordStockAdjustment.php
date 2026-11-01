@@ -11,6 +11,7 @@ use Guixa\Stock\Domain\StockMovement;
 use Guixa\Stock\Domain\StockMovementRepository;
 use Guixa\Stock\Domain\StockProductRepository;
 use Guixa\Stock\Domain\ValueObject\SignedQuantity;
+use Illuminate\Support\Facades\Gate;
 
 final class RecordStockAdjustment
 {
@@ -25,11 +26,7 @@ final class RecordStockAdjustment
     /** @param  string  $quantity  Positive or negative, not zero, with at most 3 decimals. */
     public function __invoke(Actor $actor, string $stockProductId, string $quantity, string $note, ?string $cycleId): void
     {
-        $actor->assertManager();
-
-        if ($this->products->get($stockProductId) === null) {
-            throw StockProductNotFound::withId($stockProductId);
-        }
+        Gate::forUser($actor)->authorize('manage');
 
         $movement = StockMovement::adjustment(
             $this->movements->nextId(),
@@ -41,6 +38,12 @@ final class RecordStockAdjustment
             $cycleId,
         );
 
-        $this->transactions->run(fn () => $this->ledger->record($movement));
+        $this->transactions->run(function () use ($stockProductId, $movement): void {
+            if ($this->products->lock($stockProductId) === null) {
+                throw StockProductNotFound::withId($stockProductId);
+            }
+
+            $this->ledger->record($movement);
+        });
     }
 }

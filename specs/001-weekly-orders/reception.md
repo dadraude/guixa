@@ -11,8 +11,11 @@ Checking each producer's delivery against the orders, allocating it to household
 - **R14** Once a producer order is sent, a manager opens that producer's reception for the cycle. For each
   product sent it shows the ordered total, the received total (initially equal to the ordered total) and
   the allocation of every household that ordered it (initially equal to its ordered quantity).
-  A manager can also add any active product of that producer that nobody ordered, with its received total
-  (initially 0) and no allocations.
+  A manager can also add any weekly product of that producer that nobody ordered, active or not, with
+  its received total (initially 0) and no allocations. Stock products cannot be added to reception
+  or allocated through it: they enter stock through R26 and are added to baskets through R20.
+  A weekly product only has to be active, and so does its producer, when a household orders it:
+  once the goods have arrived their active state no longer matters here.
 - **R15** **Way A — change the received total.** Setting a product's received total re-allocates it among
   all the households that ordered it, proportionally to their ordered quantity.
   The allocations always add up exactly to the received total: nothing is left over and nothing is invented.
@@ -27,28 +30,37 @@ Checking each producer's delivery against the orders, allocating it to household
     allocations will be lost, and either confirms (everything is re-allocated from the ordered quantities)
     or cancels (nothing changes, not even the received total).
   - A product nobody ordered cannot use way A.
-- **R16** **Way B — edit allocations.** A manager sets any active household's allocation directly
-  (≥ 0, in the product's step: whole units, or multiples of 0.001 for variable products), including a
+- **R16** **Way B — edit allocations.** For a weekly product in the reception (R14), a manager sets
+  any active household's allocation directly (≥ 0, in the product's step: whole units, or multiples of
+  0.001 for variable products), including a
   household that did not order the product. This does not change the received total.
   An allocation to a household without a line for that product takes a snapshot of the product (R10)
-  when it is set.
+  when it is set, even if the product has been deactivated since.
 - **R17** For each product, the reception shows the difference between the received total and the sum of
   allocations. A product is *balanced* when the difference is 0. Unbalanced products are flagged.
 - **R17a** **Validating.** After checking what arrived, a manager marks a producer's reception as
   *validated*. Changing a received total afterwards clears the validation.
-- **R18** **Distributing.** A manager marks a producer order as *distributed* only when its reception is
-  validated and every product of it is balanced, not counting adjustments made at pickup (R19). Its
-  reception is then read-only. A manager can reopen a distributed producer
-  order until the cycle is closed (R24b), e.g. when goods arrive late after being received as 0.
-  The cycle becomes *settled* the first time every participating producer is distributed; at that moment
-  lines of producers that do not participate, and lines marked *will not be delivered*, are dropped: never
-  received and never charged. Reopening a producer afterwards does not stop pickups. Its new
-  allocations apply to pending pickups; completed and not collected pickups keep theirs (R23), and any
-  difference is fixed with a wallet correction and a stock adjustment.
-- **R18a** **Containers distributed.** A manager sees, per cycle, how many containers each household takes
-  and the cycle total. Each allocation (R10) and each stock line of the household's pickup (R20) counts its
-  quantity × the containers per unit of its snapshot, rounded up to a whole number; a product without
-  containers counts 0. The cycle total is the sum over households.
+- **R18** **Distributing.** A manager marks a producer order distributed only when its reception is
+  validated and all allocations are balanced, not counting actual-quantity adjustments in baskets
+  (R19a). The reception becomes read-only; it may reopen until weekly cycle closure (R24b).
+  The cycle first settles when every participating producer is distributed. Marked and nonparticipating
+  lines leave active fulfilment, retaining history; they are never received or charged. Settlement
+  creates one base basket draft per household order (R19), without a charge.
+  After a permitted reopen, new allocations synchronize unvalidated base drafts, replacing actual
+  overrides on affected weekly lines while preserving stock/return contents. A validated basket is
+  financially frozen even if physically pending collection. When proportional redistribution affects
+  it, the manager explicitly chooses unvalidated baskets only or all baskets. The former keeps
+  validated effective quantities; a received total below them or with no eligible recipient is rejected,
+  offering all or cancel. All appends signed quantity/amount adjustments and matching Wallet corrections
+  for validated baskets, preserving originals, validation time and stock/return lines. No stock is sold
+  again. An unchanged target adds nothing; later changes use the latest effective quantities/amounts.
+  Direct editing of validated original contents remains forbidden (R23).
+- **R18a** **Containers distributed.** Show container counts per household/basket and per cycle. Count
+  each effective weekly/stock line's quantity × snapshotted containers per unit, rounded up per line;
+  a product without containers counts 0. Sum the households' attributed baskets for the cycle total,
+  including later stock supplements referring to a closed cycle. An independent basket with no cycle
+  has its own count and is not attributed to a weekly cycle. Before a base draft exists, use allocations
+  and their product snapshots. Returns do not count as outgoing containers.
 
 ## Acceptance scenarios
 
@@ -87,17 +99,18 @@ Given D did not order bread and bread costs €3.00
 When the manager gives D an allocation of 1 loaf
 Then D has 1 loaf at €3.00, even if the price changes afterwards.
 
-**S40 — Product nobody ordered** (R14, R16, R18)
+**S40 — Product nobody ordered** (R14, R16, R18, R22)
 Given the baker delivered 3 rye loaves that nobody ordered
-When the manager adds rye bread to the reception with received total 3 and allocates 2 to A and 1 to B
-Then the product is balanced and A and B are charged for it at pickup.
+When the manager adds rye to reception with received 3 and allocates 2 to A and 1 to B
+Then the product is balanced, settlement creates their base drafts, and validation charges those quantities.
 
 ### Distribution
 
-**S27 — No pickup before settlement** (R18, R19)
+**S27 — No weekly base before settlement** (R18, R19)
 Given the baker is distributed but the vegetable grower is not
-When the manager tries to open H's pickup
-Then it is rejected; once the vegetable grower is distributed, the cycle is settled and H's pickup is pending.
+When the weekly basket source is requested for H
+Then it is not ready; once the grower is distributed, the cycle settles and H's base draft is created
+And a separate stock-only basket does not require this cycle to settle.
 
 **S28 — Settlement ignores non-participating producers** (R6c, R18)
 Given H has 2 jars of honey from a producer who stopped participating, and every other producer is distributed
@@ -109,12 +122,12 @@ Given the baker is distributed and the cycle is not settled
 When the manager reopens the baker and changes the bread's received total
 Then the allocations are recalculated; once distributed again, the cycle can settle.
 
-**S30 — Late delivery after settlement** (R18, R19, R24, R24b)
-Given the cherries were received as 0, so K's pickup was closed as nothing to collect, and H has already
-completed its pickup
-When the cherries arrive and the manager reopens that producer, allocates 1 kg to K and distributes again
-Then K's pickup becomes pending and can be completed with the cherries
-And H's completed pickup keeps its allocations; any difference is a wallet correction.
+**S30 — Late delivery after settlement** (R18, R19, R24a, R24b)
+Given K's cherries were received as 0 and its base has nothing to collect, H has a validated basket,
+and another household still has a draft so the cycle remains open
+When cherries arrive, the manager reopens the producer, allocates 1 kg to K and distributes again
+Then K's base returns to draft and can be validated with the cherries
+And H's validated original remains unchanged; any allowed redistribution uses explicit adjustments.
 
 **S46 — No reopening once closed** (R18, R24b)
 Given cycle A is closed
@@ -130,8 +143,29 @@ if they confirm, the allocations become A 3, B 4, C 7 (2.8 + 4.2 + 7 → 2 + 4 +
 goes to A, largest remainder 0.8).
 
 **S60 — Counting containers** (R1, R10, R18a, R20, R25)
-Given yoghurt is variable, comes with 2 containers per kg, and honey comes with 1 container per unit
-And H is allocated 1.300 kg of yoghurt and 3 jars of honey, and K 0.500 kg of yoghurt
-And K's pickup has a stock line of 2 jars of stock honey, with 1 container per unit
-When the producer changes yoghurt to 4 containers per kg and the manager opens the cycle
-Then they see H 6 containers (1.300 × 2 = 2.6 → 3, plus 3), K 3 (1 + 2), and 9 for the cycle.
+Given yoghurt is variable with 2 containers/kg, weekly honey has 1 container/unit,
+H's base has 1.300 kg yoghurt and 3 jars honey, K's base has 0.500 kg yoghurt,
+and K has an attributed stock line of 2 jars honey with 1 container/unit
+When the producer changes yoghurt to 4 containers/kg and the manager reads the cycle summary
+Then snapshots give H 6 containers (ceil(1.300 × 2) + 3), K 3 (1 + 2), and 9 for the cycle.
+
+**S63 — Explicit redistribution across validated baskets** (R18, R23)
+Given A's basket is validated at 1 kg and €20/kg, B's is draft at 1 kg and the cycle remains open
+When the manager reopens the producer and changes received to 3 kg
+Then they must choose unvalidated baskets only or all baskets before anything changes
+And unvalidated-only keeps A at 1 kg and updates B to 2 kg
+And all gives both an effective 1.5 kg: B's draft changes, while A retains its original 1 kg/€20
+and gains a +0.5 kg/+€10 adjustment and a new €10 Wallet correction, regardless of collection state.
+
+**S64 — Successive basket adjustments retain history** (R18, R23)
+Given A's validated original is 1.120 kg at €20/kg and the weekly cycle remains open
+When an explicit all-baskets redistribution sets A to 1 kg
+Then its original line and €22.40 charge remain, with a −0.120 kg/−€2.40 adjustment and Wallet credit
+And repeating that target adds nothing; a later 1.5 kg target appends +0.500 kg/+€10
+And redistribution adjustments are atomic, Manager-controlled and unavailable after weekly closure.
+
+**S77 — Stock cannot enter through reception** (R1a, R14, R16, R20, R26)
+Given the beekeeper's weekly order has been sent and that producer also has a stock honey product
+When the manager tries to add the stock honey to the reception or allocate it to a household through reception
+Then both are rejected, even though it belongs to the same producer
+And stock honey must instead be recorded as stock and added manually to a basket.

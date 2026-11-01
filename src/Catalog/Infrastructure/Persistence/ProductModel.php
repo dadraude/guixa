@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property bool $variable
  * @property ?string $containers_per_unit
  * @property bool $active
+ * @property bool $stock
  */
 final class ProductModel extends Model
 {
@@ -27,6 +28,6 @@ final class ProductModel extends Model
 
     protected function casts(): array
     {
-        return ['price_cents' => 'integer', 'variable' => 'boolean', 'active' => 'boolean'];
+        return ['price_cents' => 'integer', 'variable' => 'boolean', 'active' => 'boolean', 'stock' => 'boolean'];
     }
 }

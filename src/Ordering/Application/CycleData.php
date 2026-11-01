@@ -15,6 +15,7 @@ final readonly class CycleData
         public string $pickupDate,
         public bool $cancelled,
         public array $participants,
+        public bool $closed = false,
     ) {}
 
     public static function of(Cycle $cycle, DateTimeImmutable $now, DateTimeZone $timezone): self
@@ -32,6 +33,7 @@ final readonly class CycleData
                 ),
                 $cycle->producerOrders(),
             ),
+            $cycle->isClosed(),
         );
     }
 }

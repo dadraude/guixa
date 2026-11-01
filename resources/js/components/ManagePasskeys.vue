@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { trans } from 'laravel-vue-i18n';
 import { router } from '@inertiajs/vue3';
 import { KeyRound } from '@lucide/vue';
 import type { Passkey } from '@/types/auth';
@@ -30,11 +31,13 @@ const handleRegisterSuccess = () => {
 </script>
 
 <template>
-    <div v-if="canManagePasskeys" class="space-y-6">
+    <div v-if="canManagePasskeys" class="pilot-panel space-y-6 p-4 sm:p-6">
         <Heading
             variant="small"
-            title="Passkeys"
-            description="Manage your passkeys for passwordless sign-in"
+            :title="trans('Passkeys')"
+            :description="
+                trans('Manage your passkeys for passwordless sign-in')
+            "
         />
 
         <div class="overflow-hidden rounded-lg border border-border">
@@ -53,9 +56,9 @@ const handleRegisterSuccess = () => {
                 >
                     <KeyRound class="h-7 w-7 text-muted-foreground" />
                 </div>
-                <p class="font-medium">No passkeys yet</p>
+                <p class="font-medium">{{ trans('No passkeys yet') }}</p>
                 <p class="mt-1 text-sm text-muted-foreground">
-                    Add a passkey to sign in without a password
+                    {{ trans('Add a passkey to sign in without a password') }}
                 </p>
             </div>
         </div>

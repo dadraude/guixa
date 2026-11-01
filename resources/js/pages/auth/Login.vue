@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { trans } from 'laravel-vue-i18n';
 import { Form, Head } from '@inertiajs/vue3';
 import InputError from '@/components/InputError.vue';
 import PasswordInput from '@/components/PasswordInput.vue';
@@ -26,11 +27,11 @@ defineProps<{
 </script>
 
 <template>
-    <Head title="Log in" />
+    <Head :title="trans('Log in')" />
 
     <div
         v-if="status"
-        class="mb-4 text-center text-sm font-medium text-green-600"
+        class="pilot-status mb-4 text-center text-sm font-medium"
     >
         {{ status }}
     </div>
@@ -45,7 +46,7 @@ defineProps<{
     >
         <div class="grid gap-6">
             <div class="grid gap-2">
-                <Label for="email">Email address</Label>
+                <Label for="email">{{ trans('Email address') }}</Label>
                 <Input
                     id="email"
                     type="email"
@@ -60,15 +61,17 @@ defineProps<{
             </div>
 
             <div class="grid gap-2">
-                <div class="flex items-center justify-between">
-                    <Label for="password">Password</Label>
+                <div
+                    class="flex flex-wrap items-center justify-between gap-x-2"
+                >
+                    <Label for="password">{{ trans('Password') }}</Label>
                     <TextLink
                         v-if="canResetPassword"
                         :href="request()"
                         class="text-sm"
                         :tabindex="5"
                     >
-                        Forgot your password?
+                        {{ trans('Forgot your password?') }}
                     </TextLink>
                 </div>
                 <PasswordInput
@@ -77,15 +80,18 @@ defineProps<{
                     required
                     :tabindex="2"
                     autocomplete="current-password"
-                    placeholder="Password"
+                    :placeholder="trans('Password')"
                 />
                 <InputError :message="errors.password" />
             </div>
 
             <div class="flex items-center justify-between">
-                <Label for="remember" class="flex items-center space-x-3">
+                <Label
+                    for="remember"
+                    class="flex min-h-11 items-center space-x-3"
+                >
                     <Checkbox id="remember" name="remember" :tabindex="3" />
-                    <span>Remember me</span>
+                    <span>{{ trans('Remember me') }}</span>
                 </Label>
             </div>
 
@@ -97,7 +103,7 @@ defineProps<{
                 data-test="login-button"
             >
                 <Spinner v-if="processing" />
-                Log in
+                {{ trans('Log in') }}
             </Button>
         </div>
     </Form>

@@ -1,0 +1,851 @@
+{
+    "baseUrl": "http://127.0.0.1:5186",
+    "rootFontPx": 16,
+    "darkSelector": "html.dark",
+    "matrix": {
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark"],
+        "text": [100, 200]
+    },
+    "views": [
+        {
+            "id": "dashboard-member",
+            "path": "/visual-dra-198.html",
+            "query": {
+                "page": "Dashboard",
+                "role": "member"
+            },
+            "root": "#main-content .pilot-layout-page",
+            "panels": "#main-content .pilot-layout-panel:not(:has(table)), #main-content .pilot-layout-notice, #main-content .pilot-list-row, #main-content .pilot-data-table tbody tr",
+            "content": "#main-content h1,#main-content h2,#main-content label,#main-content input,#main-content button,#main-content a,#main-content td,#main-content [data-visual-text]",
+            "fonts": ["16px \"Nunito Variable\""],
+            "focus": [
+                "button[data-sidebar=\"trigger\"]",
+                "section[aria-label=\"member actions\"] .pilot-action-row a:first-of-type",
+                "section[aria-label=\"member actions\"] .pilot-action-row a:last-of-type"
+            ],
+            "states": [
+                {
+                    "id": "populated",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "ready": "#main-content .pilot-t44-page[data-visual-role-valid=\"true\"]"
+                },
+                {
+                    "id": "empty",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "query": {
+                        "state": "empty"
+                    },
+                    "ready": "#main-content .pilot-t44-page[data-visual-role-valid=\"true\"]"
+                }
+            ]
+        },
+        {
+            "id": "dashboard-producer",
+            "path": "/visual-dra-198.html",
+            "query": {
+                "page": "Dashboard",
+                "role": "producer"
+            },
+            "root": "#main-content .pilot-layout-page",
+            "panels": "#main-content .pilot-layout-panel:not(:has(table)), #main-content .pilot-layout-notice, #main-content .pilot-list-row, #main-content .pilot-data-table tbody tr",
+            "content": "#main-content h1,#main-content h2,#main-content label,#main-content input,#main-content button,#main-content a,#main-content td,#main-content [data-visual-text]",
+            "fonts": ["16px \"Nunito Variable\""],
+            "focus": [
+                "button[data-sidebar=\"trigger\"]",
+                "section[aria-label=\"producer actions\"] .pilot-action-row a:first-of-type",
+                "section[aria-label=\"producer actions\"] .pilot-action-row a:last-of-type"
+            ],
+            "states": [
+                {
+                    "id": "populated",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "ready": "#main-content .pilot-t44-page[data-visual-role-valid=\"true\"]"
+                },
+                {
+                    "id": "no-data",
+                    "query": {
+                        "state": "no-data"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "ready": "#main-content .pilot-t44-page[data-visual-role-valid=\"true\"]"
+                }
+            ]
+        },
+        {
+            "id": "dashboard-manager",
+            "path": "/visual-dra-198.html",
+            "query": {
+                "page": "Dashboard",
+                "role": "manager"
+            },
+            "root": "#main-content .pilot-layout-page",
+            "panels": "#main-content .pilot-layout-panel:not(:has(table)), #main-content .pilot-layout-notice, #main-content .pilot-list-row, #main-content .pilot-data-table tbody tr",
+            "content": "#main-content h1,#main-content h2,#main-content label,#main-content input,#main-content button,#main-content a,#main-content td,#main-content [data-visual-text]",
+            "fonts": ["16px \"Nunito Variable\""],
+            "focus": [
+                "button[data-sidebar=\"trigger\"]",
+                "section[aria-label=\"manager actions\"] .pilot-action-row a:first-of-type",
+                "section[aria-label=\"manager actions\"] .pilot-action-row a:last-of-type"
+            ],
+            "states": [
+                {
+                    "id": "populated",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "ready": "#main-content .pilot-t44-page[data-visual-role-valid=\"true\"]"
+                },
+                {
+                    "id": "no-cycle",
+                    "query": {
+                        "state": "no-cycle"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "ready": "#main-content .pilot-t44-page[data-visual-role-valid=\"true\"]"
+                }
+            ]
+        },
+        {
+            "id": "wallet-member",
+            "path": "/visual-dra-198.html",
+            "query": {
+                "page": "Wallet/Statement",
+                "role": "member"
+            },
+            "root": "#main-content .pilot-layout-page",
+            "panels": "#main-content .pilot-layout-panel:not(:has(table)), #main-content .pilot-layout-notice, #main-content .pilot-list-row, #main-content .pilot-data-table tbody tr",
+            "content": "#main-content h1,#main-content h2,#main-content label,#main-content input,#main-content button,#main-content a,#main-content td,#main-content [data-visual-text]",
+            "fonts": ["16px \"Nunito Variable\""],
+            "focus": ["button[data-sidebar=\"trigger\"]"],
+            "states": [
+                {
+                    "id": "populated",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "empty",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "query": {
+                        "state": "empty"
+                    }
+                },
+                {
+                    "id": "multi",
+                    "query": {
+                        "state": "multi"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "wallet-manager",
+            "path": "/visual-dra-198.html",
+            "query": {
+                "page": "Wallet/Statement",
+                "role": "manager"
+            },
+            "root": "#main-content .pilot-layout-page",
+            "panels": "#main-content .pilot-layout-panel:not(:has(table)), #main-content .pilot-layout-notice, #main-content .pilot-list-row, #main-content .pilot-data-table tbody tr",
+            "content": "#main-content h1,#main-content h2,#main-content label,#main-content input,#main-content button,#main-content a,#main-content td,#main-content [data-visual-text]",
+            "fonts": ["16px \"Nunito Variable\""],
+            "focus": [
+                "#top-up-amount",
+                "#correction-note",
+                "a.pilot-back-link"
+            ],
+            "states": [
+                {
+                    "id": "populated",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "empty",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "query": {
+                        "state": "empty"
+                    }
+                },
+                {
+                    "id": "errors",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "query": {
+                        "state": "errors"
+                    }
+                },
+                {
+                    "id": "processing",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "query": {
+                        "state": "processing"
+                    },
+                    "checks": {
+                        "focus": ["button[data-sidebar=\"trigger\"]"]
+                    }
+                },
+                {
+                    "id": "multi",
+                    "query": {
+                        "state": "multi"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "producer-cutoff",
+            "path": "/visual-dra-198.html",
+            "query": {
+                "page": "Producer/Cutoff",
+                "role": "producer"
+            },
+            "root": "#main-content .pilot-layout-page",
+            "panels": "#main-content .pilot-layout-panel:not(:has(table)), #main-content .pilot-layout-notice, #main-content .pilot-list-row, #main-content .pilot-data-table tbody tr",
+            "content": "#main-content h1,#main-content h2,#main-content label,#main-content input,#main-content button,#main-content a,#main-content td,#main-content [data-visual-text]",
+            "fonts": ["16px \"Nunito Variable\""],
+            "focus": ["#days_before", "button[data-test=\"save-cutoff\"]"],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "errors",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "query": {
+                        "state": "errors"
+                    }
+                },
+                {
+                    "id": "processing",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "query": {
+                        "state": "processing"
+                    },
+                    "checks": {
+                        "focus": ["button[data-sidebar=\"trigger\"]"]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "producer-cycle-summary",
+            "path": "/visual-dra-198.html",
+            "query": {
+                "page": "Producer/CycleSummary",
+                "role": "producer"
+            },
+            "root": "#main-content .pilot-layout-page",
+            "panels": "#main-content .pilot-layout-panel:not(:has(table)), #main-content .pilot-layout-notice, #main-content .pilot-list-row, #main-content .pilot-data-table tbody tr",
+            "content": "#main-content h1,#main-content h2,#main-content label,#main-content input,#main-content button,#main-content a,#main-content td,#main-content [data-visual-text]",
+            "fonts": ["16px \"Nunito Variable\""],
+            "focus": ["button[data-sidebar=\"trigger\"]"],
+            "states": [
+                {
+                    "id": "sent",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "unsent",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "query": {
+                        "state": "unsent"
+                    },
+                    "checks": {
+                        "focus": ["button[data-test^=\"toggle-\"]"]
+                    }
+                },
+                {
+                    "id": "empty",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "query": {
+                        "state": "empty"
+                    }
+                },
+                {
+                    "id": "long-name",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "query": {
+                        "state": "long"
+                    }
+                }
+            ]
+        },
+        {
+            "id": "producer-products-index",
+            "path": "/visual-dra-198.html",
+            "query": {
+                "page": "Producer/Products/Index",
+                "role": "producer"
+            },
+            "root": "#main-content .pilot-layout-page",
+            "panels": "#main-content .pilot-layout-panel:not(:has(table)), #main-content .pilot-layout-notice, #main-content .pilot-list-row, #main-content .pilot-data-table tbody tr",
+            "content": "#main-content h1,#main-content h2,#main-content label,#main-content input,#main-content button,#main-content a,#main-content td,#main-content [data-visual-text]",
+            "fonts": ["16px \"Nunito Variable\""],
+            "focus": ["a[href*=\"create\"]", "a[aria-label^=\"Edit\"]"],
+            "states": [
+                {
+                    "id": "populated",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "empty",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "query": {
+                        "state": "empty"
+                    },
+                    "checks": {
+                        "focus": ["a[href*=\"create\"]"]
+                    }
+                },
+                {
+                    "id": "inactive",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "query": {
+                        "state": "inactive"
+                    }
+                },
+                {
+                    "id": "multi",
+                    "query": {
+                        "state": "multi"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "focus": [
+                            "a[href*=\"create\"]",
+                            "tbody tr:last-child a[aria-label^=\"Edit\"]"
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "producer-products-create",
+            "path": "/visual-dra-198.html",
+            "query": {
+                "page": "Producer/Products/Create",
+                "role": "producer"
+            },
+            "root": "#main-content .pilot-layout-page",
+            "panels": "#main-content .pilot-layout-panel:not(:has(table)), #main-content .pilot-layout-notice, #main-content .pilot-list-row, #main-content .pilot-data-table tbody tr",
+            "content": "#main-content h1,#main-content h2,#main-content label,#main-content input,#main-content button,#main-content a,#main-content td,#main-content [data-visual-text]",
+            "fonts": ["16px \"Nunito Variable\""],
+            "focus": ["#name", "button[data-test=\"save-product\"]"],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "errors",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "query": {
+                        "state": "errors"
+                    }
+                },
+                {
+                    "id": "processing",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "query": {
+                        "state": "processing"
+                    },
+                    "checks": {
+                        "focus": ["button[data-sidebar=\"trigger\"]"]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "producer-products-edit",
+            "path": "/visual-dra-198.html",
+            "query": {
+                "page": "Producer/Products/Edit",
+                "role": "producer"
+            },
+            "root": "#main-content .pilot-layout-page",
+            "panels": "#main-content .pilot-layout-panel:not(:has(table)), #main-content .pilot-layout-notice, #main-content .pilot-list-row, #main-content .pilot-data-table tbody tr",
+            "content": "#main-content h1,#main-content h2,#main-content label,#main-content input,#main-content button,#main-content a,#main-content td,#main-content [data-visual-text]",
+            "fonts": ["16px \"Nunito Variable\""],
+            "focus": ["#name", "button[data-test=\"save-product\"]"],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "errors",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "query": {
+                        "state": "errors"
+                    }
+                },
+                {
+                    "id": "processing",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "query": {
+                        "state": "processing"
+                    },
+                    "checks": {
+                        "focus": ["button[data-sidebar=\"trigger\"]"]
+                    }
+                }
+            ]
+        }
+    ]
+}

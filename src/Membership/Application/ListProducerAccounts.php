@@ -4,6 +4,7 @@ namespace Guixa\Membership\Application;
 
 use Guixa\Membership\Domain\AccountRepository;
 use Guixa\Shared\Application\Actor;
+use Illuminate\Support\Facades\Gate;
 
 /** For the producers admin page: which producers already have their account. */
 final class ListProducerAccounts
@@ -13,7 +14,7 @@ final class ListProducerAccounts
     /** @return array<string, ProducerAccountView> keyed by producer id */
     public function __invoke(Actor $actor): array
     {
-        $actor->assertManager();
+        Gate::forUser($actor)->authorize('manage');
 
         $views = [];
 

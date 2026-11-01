@@ -18,7 +18,7 @@ const HOUSEHOLD_J = '00000000-0000-7000-8000-0000000000e2';
 
 function memberActor(string $accountId, string $householdId = HOUSEHOLD_H): Actor
 {
-    return new Actor($accountId, [Role::Member], $householdId);
+    return Actor::memberOf($accountId, $householdId);
 }
 
 beforeEach(function () {
@@ -42,6 +42,20 @@ it('adds a line while the producer is open (R7, R8, S1)', function () {
     expect($lines)->toHaveCount(1)
         ->and($lines[0]->productId)->toBe($this->bread)
         ->and($lines[0]->quantity)->toBe('2.000');
+});
+
+it('locks the Catalog product before making its first order-line reference (R1b, S66)', function () {
+    ($this->set)($this->anna, $this->bread, '1');
+
+    expect($this->world->catalog->locked)->toContain($this->bread);
+});
+
+it('rejects a stock ID of the participating producer without creating an order line (R3, S66)', function () {
+    $stockId = $this->world->catalog->offerStock(OrderingWorld::BAKER, 'Stock loaf', 'loaf', 350);
+
+    expect(fn () => ($this->set)($this->anna, $stockId, '1'))->toThrow(ProductNotOrderable::class)
+        ->and(($this->order)()->lines)->toBe([])
+        ->and(collect(($this->order)()->producers[0]->products)->pluck('id')->all())->not->toContain($stockId);
 });
 
 it('rejects a line once the producer is closed and adds nothing (R8, S2)', function () {

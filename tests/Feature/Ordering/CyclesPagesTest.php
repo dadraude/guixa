@@ -2,14 +2,18 @@
 
 use Carbon\CarbonImmutable;
 use Guixa\Catalog\Infrastructure\Persistence\ProducerModel;
+use Guixa\Shared\Domain\Clock;
 use Guixa\Shared\Domain\Role;
 use Illuminate\Support\Facades\DB;
 use Inertia\Testing\AssertableInertia as Assert;
+use Tests\Support\FrozenClock;
 
-/** The first date at least a few days ahead that falls on the given ISO weekday, in the cooperative's timezone. */
+afterEach(fn () => CarbonImmutable::setTestNow());
+
+/** The first date at least a week ahead that falls on the given ISO weekday, in the cooperative's timezone. */
 function upcoming(int $isoWeekday = 6): CarbonImmutable
 {
-    $date = CarbonImmutable::now(config('guixa.timezone'))->startOfDay()->addDays(3);
+    $date = CarbonImmutable::now(config('guixa.timezone'))->startOfDay()->addDays(7);
 
     while ($date->dayOfWeekIso !== $isoWeekday) {
         $date = $date->addDay();
@@ -69,6 +73,8 @@ it('rejects a pickup weekday outside Monday to Sunday (R4c)', function (mixed $w
 })->with([0, 8, 'saturday', null]);
 
 it('opens a cycle with its participants and shows its cutoffs (R4, R4a, R5, S6)', function () {
+    CarbonImmutable::setTestNow('2026-10-28T22:38:00+00:00');
+    $this->app->instance(Clock::class, new FrozenClock('2026-10-28T22:38:00+00:00', config('guixa.timezone')));
     pickupOnSaturdays();
     $baker = cyclesBaker();
     $date = upcoming();

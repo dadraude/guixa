@@ -12,6 +12,17 @@ interface OrderRepository
     /** Discards every order of a cycle, lines included (R4b, D14). */
     public function deleteOfCycle(string $cycleId): void;
 
+    /**
+     * Stores the *will not be delivered* mark on these lines of the order, so later catalog changes do not affect
+     * them (D9). Products without a line are ignored.
+     *
+     * @param  list<string>  $productIds
+     */
+    public function markNotDelivered(string $orderId, array $productIds): void;
+
+    /** @return list<string> product ids of the order's lines stored as not delivered, sorted */
+    public function notDeliveredProductIds(string $orderId): array;
+
     public function ofHousehold(string $cycleId, string $householdId): ?Order;
 
     /** @return list<Order> every household's order in the cycle, in no particular order */
@@ -24,11 +35,20 @@ interface OrderRepository
      */
     public function lineCountsOfHousehold(string $householdId): array;
 
+    /** @return list<string> cycle ids with a pending pickup for this household */
+    public function pendingPickupCycleIdsOfHousehold(string $householdId): array;
+
     /**
      * The household's order in the cycle, created empty if it has none, and locked until the surrounding
      * transaction ends, so two members adding the first lines at once share one order.
      */
     public function lockFor(string $cycleId, string $householdId): Order;
+
+    /** Whether retained or current weekly lines reference the product. */
+    public function hasWeeklyReference(string $productId): bool;
+
+    /** Whether retained or current temporary pickup stock lines reference the product. */
+    public function hasStockReference(string $productId): bool;
 
     /** Whether any order has a line of this product in a cycle that is not settled (R1). */
     public function hasUnsettledLinesOf(string $productId): bool;

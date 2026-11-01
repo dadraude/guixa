@@ -19,7 +19,8 @@ final class EloquentStockMovementRepository implements StockMovementRepository
 
     public function add(StockMovement $movement): void
     {
-        StockMovementModel::query()->create([
+        // A savepoint keeps the caller's transaction usable after a rejected duplicate sale.
+        DB::transaction(fn () => StockMovementModel::query()->create([
             'id' => $movement->id,
             'stock_product_id' => $movement->stockProductId,
             'type' => $movement->type->value,
@@ -29,7 +30,8 @@ final class EloquentStockMovementRepository implements StockMovementRepository
             'note' => $movement->note,
             'cycle_id' => $movement->cycleId,
             'order_id' => $movement->orderId,
-        ]);
+            'basket_id' => $movement->basketId,
+        ]));
     }
 
     public function forProduct(string $stockProductId): array
@@ -45,6 +47,11 @@ final class EloquentStockMovementRepository implements StockMovementRepository
         return array_values($movements);
     }
 
+    public function hasProductReference(string $stockProductId): bool
+    {
+        return StockMovementModel::query()->where('stock_product_id', $stockProductId)->exists();
+    }
+
     public function available(string $stockProductId): SignedQuantity
     {
         $total = StockMovementModel::query()
@@ -53,13 +60,6 @@ final class EloquentStockMovementRepository implements StockMovementRepository
             ->value('total');
 
         return $this->sum($total);
-    }
-
-    public function availableForUpdate(string $stockProductId): SignedQuantity
-    {
-        DB::table('stock_products')->where('id', $stockProductId)->lockForUpdate()->first();
-
-        return $this->available($stockProductId);
     }
 
     public function availableByProduct(): array
@@ -89,6 +89,7 @@ final class EloquentStockMovementRepository implements StockMovementRepository
             $model->note,
             $model->cycle_id,
             $model->order_id,
+            $model->basket_id,
         );
     }
 }

@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $recorded_by
  * @property string|null $note
  * @property string|null $cycle_id
+ * @property string|null $basket_id
  */
 final class MovementModel extends Model
 {

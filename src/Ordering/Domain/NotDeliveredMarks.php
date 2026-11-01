@@ -3,19 +3,47 @@
 namespace Guixa\Ordering\Domain;
 
 /**
- * Which lines of an order carry the *will not be delivered* mark (R3b, R6c). Until a producer order is sent
- * the mark is derived on every read: the product is deactivated, unavailable in the cycle, or its producer
- * does not take part in the cycle.
+ * Which lines of an order carry the *will not be delivered* mark (R3b, R6c). While a producer order is not sent the
+ * mark is derived on every read: the product is deactivated, unavailable in the cycle, or its producer does not take
+ * part in the cycle. `send` stores it (D9), and from then on the stored mark is what counts.
  */
 final class NotDeliveredMarks
 {
     public function __construct(
         private readonly ProductCatalog $catalog,
         private readonly ProductAvailabilityRepository $availability,
+        private readonly OrderRepository $orders,
     ) {}
 
-    /** @return array<string, true> product ids of the marked lines */
+    /**
+     * The marks to show: stored for the lines of a sent producer order, derived for the others.
+     *
+     * @return array<string, true> product ids of the marked lines
+     */
     public function of(Cycle $cycle, Order $order): array
+    {
+        $stored = array_flip($this->orders->notDeliveredProductIds($order->id));
+        $derived = $this->derivedOf($cycle, $order);
+        $marked = [];
+
+        foreach ($order->lines() as $line) {
+            $isMarked = $cycle->isSent($line->producerId) ? isset($stored[$line->productId]) : isset($derived[$line->productId]);
+
+            if ($isMarked) {
+                $marked[$line->productId] = true;
+            }
+        }
+
+        return $marked;
+    }
+
+    /**
+     * The marks as the catalog, availability and participation say now, whatever is stored. `send` uses it to decide
+     * what to store.
+     *
+     * @return array<string, true> product ids of the marked lines
+     */
+    public function derivedOf(Cycle $cycle, Order $order): array
     {
         $unavailable = array_flip($this->availability->unavailableIn($cycle->id));
         $marked = [];

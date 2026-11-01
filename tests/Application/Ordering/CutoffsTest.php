@@ -5,7 +5,7 @@ use Guixa\Ordering\Domain\Error\CutoffOutsideWindow;
 use Guixa\Ordering\Domain\Error\CycleNotFound;
 use Guixa\Ordering\Domain\Error\InvalidCutoff;
 use Guixa\Ordering\Domain\Error\ProducerNotInCycle;
-use Guixa\Shared\Domain\Error\NotAllowed;
+use Illuminate\Auth\Access\AuthorizationException;
 use Tests\Support\Ordering\OrderingWorld;
 
 const OTHER_PRODUCER = '00000000-0000-7000-8000-0000000000b3';
@@ -162,9 +162,9 @@ it('rejects a producer that is not in the cycle or an unknown cycle (R6)', funct
 it('keeps the cutoff changes to managers (R6)', function () {
     $member = $this->world->member();
 
-    expect(fn () => ($this->world->setCutoff)($member, $this->cycleId, OrderingWorld::BAKER, '2026-11-05T12:00'))->toThrow(NotAllowed::class)
-        ->and(fn () => ($this->world->closeProducerNow)($member, $this->cycleId, OrderingWorld::BAKER))->toThrow(NotAllowed::class)
-        ->and(fn () => ($this->world->clearCutoff)($member, $this->cycleId, OrderingWorld::BAKER))->toThrow(NotAllowed::class);
+    expect(fn () => ($this->world->setCutoff)($member, $this->cycleId, OrderingWorld::BAKER, '2026-11-05T12:00'))->toThrow(AuthorizationException::class)
+        ->and(fn () => ($this->world->closeProducerNow)($member, $this->cycleId, OrderingWorld::BAKER))->toThrow(AuthorizationException::class)
+        ->and(fn () => ($this->world->clearCutoff)($member, $this->cycleId, OrderingWorld::BAKER))->toThrow(AuthorizationException::class);
 });
 
 it('reads a local time repeated by the clocks going back as its first occurrence (R6, S38)', function () {

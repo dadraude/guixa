@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers\Manage;
 
+use App\Http\ContainerCountRow;
 use App\Http\Controllers\Controller;
 use App\Http\CycleRow;
 use App\Http\CycleSummaryRow;
 use App\Http\ProducerOptionRow;
 use Guixa\Catalog\Application\ListProducers;
 use Guixa\Catalog\Application\ProducerData;
+use Guixa\Ordering\Application\GetContainerCount;
 use Guixa\Ordering\Application\GetCycleSummary;
 use Guixa\Ordering\Application\GetPickupWeekday;
 use Guixa\Ordering\Application\ListCycles;
@@ -34,10 +36,11 @@ class CycleController extends Controller
         ]);
     }
 
-    public function show(string $cycle, Actor $actor, GetCycleSummary $getCycleSummary, ListProducers $listProducers): Response
+    public function show(string $cycle, Actor $actor, GetCycleSummary $getCycleSummary, GetContainerCount $getContainerCount, ListProducers $listProducers): Response
     {
         try {
             $summary = $getCycleSummary($actor, $cycle);
+            $containers = $getContainerCount($actor, $cycle);
         } catch (CycleNotFound) {
             abort(404);
         }
@@ -46,6 +49,7 @@ class CycleController extends Controller
 
         return Inertia::render('Manage/Cycles/Show', [
             'summary' => CycleSummaryRow::from($summary, $names),
+            'containers' => ContainerCountRow::from($containers),
         ]);
     }
 

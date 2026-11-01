@@ -1,23 +1,25 @@
 <?php
 
 use Guixa\Shared\Application\Actor;
-use Guixa\Shared\Domain\Error\NotAllowed;
 use Guixa\Shared\Domain\Role;
 use Guixa\Stock\Application\CreateReturnItem;
 use Guixa\Stock\Application\DeactivateReturnItem;
 use Guixa\Stock\Application\ListReturnItems;
+use Guixa\Stock\Application\ReactivateReturnItem;
 use Guixa\Stock\Application\UpdateReturnItem;
 use Guixa\Stock\Domain\Error\InvalidReturnAmount;
 use Guixa\Stock\Domain\Error\NameRequired;
 use Guixa\Stock\Domain\Error\ReturnItemNotFound;
+use Illuminate\Auth\Access\AuthorizationException;
 use Tests\Support\InMemory\InMemoryReturnItemRepository;
 
 beforeEach(function () {
     $this->items = new InMemoryReturnItemRepository;
-    $this->manager = new Actor('manager-account', [Role::Manager]);
+    $this->manager = Actor::manager('manager-account');
     $this->create = new CreateReturnItem($this->items);
     $this->update = new UpdateReturnItem($this->items);
     $this->deactivate = new DeactivateReturnItem($this->items);
+    $this->reactivate = new ReactivateReturnItem($this->items);
     $this->list = new ListReturnItems($this->items);
 });
 
@@ -61,17 +63,40 @@ it('deactivates a return item and keeps it listed as inactive (R25)', function (
     expect(($this->list)($this->manager)[0]->active)->toBeFalse();
 });
 
+it('reactivates a return item without changing its amount (R25)', function () {
+    $id = ($this->create)($this->manager, 'Glass jar', 50);
+    ($this->deactivate)($this->manager, $id);
+
+    ($this->reactivate)($this->manager, $id);
+
+    expect(($this->list)($this->manager)[0]->active)->toBeTrue();
+    expect(($this->list)($this->manager)[0]->amountCents)->toBe(50);
+});
+
 it('fails on an unknown return item', function () {
     expect(fn () => ($this->update)($this->manager, 'missing', 'Jar', 50))->toThrow(ReturnItemNotFound::class);
     expect(fn () => ($this->deactivate)($this->manager, 'missing'))->toThrow(ReturnItemNotFound::class);
+    expect(fn () => ($this->reactivate)($this->manager, 'missing'))->toThrow(ReturnItemNotFound::class);
 });
 
 it('only lets a manager manage return items (R25, R36a)', function (Role $role) {
     $actor = new Actor('other-account', [$role], $role === Role::Member ? 'h1' : null);
     $id = ($this->create)($this->manager, 'Glass jar', 50);
 
-    expect(fn () => ($this->create)($actor, 'Crate', 100))->toThrow(NotAllowed::class);
-    expect(fn () => ($this->update)($actor, $id, 'Crate', 100))->toThrow(NotAllowed::class);
-    expect(fn () => ($this->deactivate)($actor, $id))->toThrow(NotAllowed::class);
-    expect(fn () => ($this->list)($actor))->toThrow(NotAllowed::class);
+    expect(fn () => ($this->create)($actor, 'Crate', 100))->toThrow(AuthorizationException::class);
+    expect(fn () => ($this->update)($actor, $id, 'Crate', 100))->toThrow(AuthorizationException::class);
+    expect(fn () => ($this->deactivate)($actor, $id))->toThrow(AuthorizationException::class);
+    expect(fn () => ($this->reactivate)($actor, $id))->toThrow(AuthorizationException::class);
+    expect(fn () => ($this->list)($actor))->toThrow(AuthorizationException::class);
 })->with([Role::Member, Role::Producer]);
+
+it('lets Finance read return choices for basket sales without editing the catalogue (R20a, R25)', function () {
+    $id = ($this->create)($this->manager, 'Glass jar', 50);
+    $finance = new Actor('finance-account', [Role::Finance]);
+
+    expect(($this->list)($finance)[0]->id)->toBe($id);
+    expect(fn () => ($this->create)($finance, 'Crate', 100))->toThrow(AuthorizationException::class);
+    expect(fn () => ($this->update)($finance, $id, 'Crate', 100))->toThrow(AuthorizationException::class);
+    expect(fn () => ($this->deactivate)($finance, $id))->toThrow(AuthorizationException::class);
+    expect(fn () => ($this->reactivate)($finance, $id))->toThrow(AuthorizationException::class);
+});

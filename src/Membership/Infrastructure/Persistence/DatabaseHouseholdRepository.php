@@ -12,6 +12,12 @@ use stdClass;
 
 final class DatabaseHouseholdRepository implements HouseholdRepository
 {
+    public function lockMembershipChanges(): void
+    {
+        // One transaction lock makes membership and household-state reads current before any write.
+        DB::select('select pg_advisory_xact_lock(191983, 1)');
+    }
+
     public function nextId(): string
     {
         return (string) Str::uuid7();

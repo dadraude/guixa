@@ -1,8 +1,11 @@
 <?php
 
+use Guixa\Catalog\Application\CreateStockProduct;
+use Guixa\Catalog\Application\GetStockProduct;
+use Guixa\Catalog\Application\ListStockProducts;
+use Guixa\Catalog\Application\LockStockProduct;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Error\InvalidQuantity;
-use Guixa\Shared\Domain\Error\NotAllowed;
 use Guixa\Shared\Domain\Money;
 use Guixa\Shared\Domain\Role;
 use Guixa\Stock\Application\GetReturnItem;
@@ -19,7 +22,9 @@ use Guixa\Stock\Domain\Error\StockProductNotFound;
 use Guixa\Stock\Domain\MovementType;
 use Guixa\Stock\Domain\ReturnItem;
 use Guixa\Stock\Domain\StockLedger;
-use Guixa\Stock\Domain\StockProduct;
+use Guixa\Stock\Infrastructure\Catalog\CatalogStockProductRepository;
+use Illuminate\Auth\Access\AuthorizationException;
+use Tests\Support\Catalog\CatalogWorld;
 use Tests\Support\FrozenClock;
 use Tests\Support\InMemory\ImmediateTransactionRunner;
 use Tests\Support\InMemory\InMemoryReturnItemRepository;
@@ -33,7 +38,7 @@ beforeEach(function () {
     $this->clock = new FrozenClock('2026-10-22 10:00:00');
     $ledger = new StockLedger($this->movements);
     $transactions = new ImmediateTransactionRunner;
-    $this->manager = new Actor('manager-account', [Role::Manager]);
+    $this->manager = Actor::manager('manager-account');
 
     $this->entry = new RecordStockEntry($this->products, $this->movements, $ledger, $transactions, $this->clock);
     $this->adjust = new RecordStockAdjustment($this->products, $this->movements, $ledger, $transactions, $this->clock);
@@ -42,7 +47,7 @@ beforeEach(function () {
     $this->offer = new GetStockOffer($this->products, $this->movements);
     $this->returnItem = new GetReturnItem($this->returnItems);
 
-    $honey = StockProduct::create($this->products->nextId(), 'Honey', 'jar', Money::ofCents(650), false, '2.000');
+    $honey = $this->products->create('Honey', 'jar', Money::ofCents(650), false, '2.000');
     $this->products->add($honey);
     $this->honeyId = $honey->id;
 
@@ -66,6 +71,30 @@ it('accepts an entry without a note (R26)', function () {
 
     expect(($this->available)())->toBe('1.500')
         ->and($this->movements->forProduct($this->honeyId)[0]->note)->toBeNull();
+});
+
+it('rejects weekly Catalog IDs for inventory entry and adjustment while accepting stock of the same producer (R25, R26, S76)', function () {
+    $catalog = new CatalogWorld;
+    $producerId = ($catalog->createProducer)($catalog->manager, 'Beekeeper', 3, '20:00');
+    $weeklyId = ($catalog->createProduct)($catalog->producerActor($producerId), $producerId, 'Honey', 'jar', 500, false, null);
+    $stockId = (new CreateStockProduct($catalog->products, $catalog->producers))($catalog->manager, $producerId, 'Honey', 'jar', 650, false, null);
+    $port = new CatalogStockProductRepository(
+        new GetStockProduct($catalog->products),
+        new ListStockProducts($catalog->products),
+        new LockStockProduct($catalog->products),
+    );
+    $movements = new InMemoryStockMovementRepository;
+    $ledger = new StockLedger($movements);
+    $transactions = new ImmediateTransactionRunner;
+    $entry = new RecordStockEntry($port, $movements, $ledger, $transactions, $this->clock);
+    $adjust = new RecordStockAdjustment($port, $movements, $ledger, $transactions, $this->clock);
+
+    expect(fn () => $entry($catalog->manager, $weeklyId, '1', null))->toThrow(StockProductNotFound::class)
+        ->and(fn () => $adjust($catalog->manager, $weeklyId, '1', 'count', null))->toThrow(StockProductNotFound::class)
+        ->and($movements->forProduct($weeklyId))->toBe([]);
+
+    $entry($catalog->manager, $stockId, '1', null);
+    expect($movements->forProduct($stockId))->toHaveCount(1);
 });
 
 it('rejects an entry that is zero or negative (R26)', function (string $quantity, string $error) {
@@ -143,7 +172,7 @@ it('refuses a second sale once the first took the last of the stock (S45)', func
 });
 
 it('lists every stock product with its available quantity, zero when it has no movements (R28)', function () {
-    $oil = StockProduct::create($this->products->nextId(), 'Oil', 'bottle', Money::ofCents(900), true, null);
+    $oil = $this->products->create('Oil', 'bottle', Money::ofCents(900), true, null);
     $this->products->add($oil);
     ($this->entry)($this->manager, $this->honeyId, '10', null);
     ($this->sell)($this->manager, $this->honeyId, '4', 'order-1');
@@ -172,8 +201,7 @@ it('offers a stock product with its current price, containers and available quan
 
 it('still offers a deactivated stock product, flagged inactive (S55)', function () {
     $honey = $this->products->get($this->honeyId);
-    $honey->deactivate();
-    $this->products->add($honey);
+    $this->products->deactivate($this->honeyId);
 
     expect(($this->offer)($this->honeyId)->active)->toBeFalse();
 });
@@ -198,9 +226,9 @@ it('fails on an unknown stock product or return item', function () {
 it('only lets a manager record entries and adjustments and list the stock (R26, R27, R36a)', function (Role $role) {
     $actor = new Actor('other-account', [$role]);
 
-    expect(fn () => ($this->entry)($actor, $this->honeyId, '1', null))->toThrow(NotAllowed::class);
-    expect(fn () => ($this->adjust)($actor, $this->honeyId, '1', 'why', null))->toThrow(NotAllowed::class);
-    expect(fn () => ($this->listStock)($actor))->toThrow(NotAllowed::class);
+    expect(fn () => ($this->entry)($actor, $this->honeyId, '1', null))->toThrow(AuthorizationException::class);
+    expect(fn () => ($this->adjust)($actor, $this->honeyId, '1', 'why', null))->toThrow(AuthorizationException::class);
+    expect(fn () => ($this->listStock)($actor))->toThrow(AuthorizationException::class);
     expect($this->movements->forProduct($this->honeyId))->toBe([]);
 })->with([Role::Member, Role::Producer]);
 
@@ -209,4 +237,14 @@ it('still lists a product whose stock exceeds seven integer digits (R28)', funct
     ($this->entry)($this->manager, $this->honeyId, '9999999', null);
 
     expect(($this->available)())->toBe('19999998.000');
+});
+
+it('shows Finance only active stock for basket selection while retaining Manager inventory visibility (R19a, R36c)', function () {
+    $finance = new Actor('finance', [Role::Finance]);
+    $this->products->deactivate($this->honeyId);
+
+    expect(($this->listStock)($finance))->toBe([])
+        ->and(($this->listStock)($this->manager))->toHaveCount(1);
+    expect(fn () => ($this->entry)($finance, $this->honeyId, '1', null))->toThrow(AuthorizationException::class)
+        ->and(fn () => ($this->adjust)($finance, $this->honeyId, '1', 'note', null))->toThrow(AuthorizationException::class);
 });

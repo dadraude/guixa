@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { trans } from 'laravel-vue-i18n';
 import { Form } from '@inertiajs/vue3';
 import { useClipboard } from '@vueuse/core';
 import { Check, Copy, ScanLine } from '@lucide/vue';
@@ -39,6 +40,11 @@ const { qrCodeSvg, manualSetupKey, clearSetupData, fetchSetupData, errors } =
     useTwoFactorAuth();
 
 const showVerificationStep = ref(false);
+
+// Radix focuses the first control without scrolling, so keep it visible in a tall dialog.
+const scrollFocusIntoView = (event: FocusEvent): void =>
+    (event.target as HTMLElement).scrollIntoView({ block: 'nearest' });
+
 const code = ref<string>('');
 
 const pinInputContainerRef = useTemplateRef('pinInputContainerRef');
@@ -46,26 +52,30 @@ const pinInputContainerRef = useTemplateRef('pinInputContainerRef');
 const modalConfig = computed<TwoFactorConfigContent>(() => {
     if (props.twoFactorEnabled) {
         return {
-            title: 'Two-factor authentication enabled',
-            description:
+            title: trans('Two-factor authentication enabled'),
+            description: trans(
                 'Two-factor authentication is now enabled. Scan the QR code or enter the setup key in your authenticator app.',
-            buttonText: 'Close',
+            ),
+            buttonText: trans('Close'),
         };
     }
 
     if (showVerificationStep.value) {
         return {
-            title: 'Verify authentication code',
-            description: 'Enter the 6-digit code from your authenticator app',
-            buttonText: 'Continue',
+            title: trans('Verify authentication code'),
+            description: trans(
+                'Enter the 6-digit code from your authenticator app',
+            ),
+            buttonText: trans('Continue'),
         };
     }
 
     return {
-        title: 'Enable two-factor authentication',
-        description:
+        title: trans('Enable two-factor authentication'),
+        description: trans(
             'To finish enabling two-factor authentication, scan the QR code or enter the setup key in your authenticator app',
-        buttonText: 'Continue',
+        ),
+        buttonText: trans('Continue'),
     };
 });
 
@@ -111,7 +121,10 @@ watch(
 
 <template>
     <Dialog :open="isOpen" @update:open="isOpen = $event">
-        <DialogContent class="sm:max-w-md">
+        <DialogContent
+            class="pilot-touch-dialog sm:max-w-md"
+            @focusin="scrollFocusIntoView"
+        >
             <DialogHeader class="flex items-center justify-center">
                 <div
                     class="mb-3 w-auto rounded-full border border-border bg-card p-0.5 shadow-sm"
@@ -155,10 +168,10 @@ watch(
                     <AlertError v-if="errors?.length" :errors="errors" />
                     <template v-else>
                         <div
-                            class="relative mx-auto flex max-w-md items-center overflow-hidden"
+                            class="relative mx-auto flex w-full max-w-md items-center overflow-hidden"
                         >
                             <div
-                                class="relative mx-auto aspect-square w-64 overflow-hidden rounded-lg border border-border"
+                                class="relative mx-auto aspect-square w-64 max-w-full overflow-hidden rounded-lg border border-border"
                             >
                                 <div
                                     v-if="!qrCodeSvg"
@@ -168,11 +181,11 @@ watch(
                                 </div>
                                 <div
                                     v-else
-                                    class="relative z-10 overflow-hidden border p-5"
+                                    class="relative z-10 size-full overflow-hidden border p-3"
                                 >
                                     <div
                                         v-html="qrCodeSvg"
-                                        class="flex aspect-square size-full items-center justify-center"
+                                        class="flex aspect-square size-full items-center justify-center [&_svg]:size-full"
                                         :style="{
                                             filter:
                                                 resolvedAppearance === 'dark'
@@ -196,8 +209,11 @@ watch(
                             <div
                                 class="absolute inset-0 top-1/2 h-px w-full bg-border"
                             />
-                            <span class="relative bg-card px-2 py-1"
-                                >or, enter the code manually</span
+                            <span
+                                class="pilot-separator-label relative px-2 py-1"
+                                >{{
+                                    trans('or, enter the code manually')
+                                }}</span
                             >
                         </div>
 
@@ -226,7 +242,7 @@ watch(
                                     >
                                         <Check
                                             v-if="copied"
-                                            class="w-4 text-green-500"
+                                            class="w-4 text-primary"
                                         />
                                         <Copy v-else class="w-4" />
                                     </button>
@@ -271,22 +287,24 @@ watch(
                                 <InputError :message="errors?.code" />
                             </div>
 
-                            <div class="flex w-full items-center space-x-5">
+                            <div
+                                class="flex w-full flex-wrap items-center gap-3"
+                            >
                                 <Button
                                     type="button"
                                     variant="outline"
-                                    class="w-auto flex-1"
+                                    class="w-auto flex-auto"
                                     @click="showVerificationStep = false"
                                     :disabled="processing"
                                 >
-                                    Back
+                                    {{ trans('Back') }}
                                 </Button>
                                 <Button
                                     type="submit"
-                                    class="w-auto flex-1"
+                                    class="w-auto flex-auto"
                                     :disabled="processing || code.length < 6"
                                 >
-                                    Confirm
+                                    {{ trans('Confirm') }}
                                 </Button>
                             </div>
                         </div>

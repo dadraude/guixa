@@ -2,8 +2,7 @@
 
 use Guixa\Catalog\Domain\Error\ProducerNotFound;
 use Guixa\Shared\Application\Actor;
-use Guixa\Shared\Domain\Error\NotAllowed;
-use Guixa\Shared\Domain\Role;
+use Illuminate\Auth\Access\AuthorizationException;
 use Tests\Support\Catalog\CatalogWorld;
 
 beforeEach(function () {
@@ -60,11 +59,11 @@ it('rejects an unknown producer and changes nothing (R3a)', function () {
 });
 
 it('keeps deactivating and reactivating to managers (R3a)', function (Actor $actor) {
-    expect(fn () => ($this->world->deactivateProducer)($actor, $this->baker))->toThrow(NotAllowed::class)
-        ->and(fn () => ($this->world->reactivateProducer)($actor, $this->baker))->toThrow(NotAllowed::class)
+    expect(fn () => ($this->world->deactivateProducer)($actor, $this->baker))->toThrow(AuthorizationException::class)
+        ->and(fn () => ($this->world->reactivateProducer)($actor, $this->baker))->toThrow(AuthorizationException::class)
         ->and(($this->isActive)())->toBeTrue()
         ->and($this->world->cycles->stopped)->toBe([]);
 })->with([
-    'the producer itself' => fn () => new Actor('a', [Role::Producer], null, '00000000-0000-7000-8000-0000000000b1'),
-    'a member' => fn () => new Actor('a', [Role::Member], '00000000-0000-7000-8000-0000000000dd'),
+    'the producer itself' => fn () => Actor::producer('a', '00000000-0000-7000-8000-0000000000b1'),
+    'a member' => fn () => Actor::memberOf('a', '00000000-0000-7000-8000-0000000000dd'),
 ]);

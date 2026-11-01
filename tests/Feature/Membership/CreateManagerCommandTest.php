@@ -5,11 +5,13 @@ use Illuminate\Support\Facades\Mail;
 
 // R36a, D17 — guixa:create-manager
 
+beforeEach(fn () => app()->setLocale('ca'));
+
 it('creates the first manager and emails the invitation', function () {
     Mail::fake();
 
     $this->artisan('guixa:create-manager', ['name' => 'Marta', 'email' => 'marta@example.org'])
-        ->expectsOutput('Invitation sent to marta@example.org.')
+        ->expectsOutput('Invitació enviada a marta@example.org.')
         ->assertSuccessful();
 
     $id = DB::table('users')->where('email', 'marta@example.org')->value('id');
@@ -22,7 +24,7 @@ it('fails once any manager exists', function () {
     $this->artisan('guixa:create-manager', ['name' => 'Marta', 'email' => 'marta@example.org'])->assertSuccessful();
 
     $this->artisan('guixa:create-manager', ['name' => 'Biel', 'email' => 'biel@example.org'])
-        ->expectsOutput('A manager already exists; the first manager can only be created once.')
+        ->expectsOutput('Ja hi ha un gestor.')
         ->assertFailed();
 
     expect(DB::table('users')->where('email', 'biel@example.org')->exists())->toBeFalse();

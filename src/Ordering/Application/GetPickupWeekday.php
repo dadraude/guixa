@@ -4,6 +4,7 @@ namespace Guixa\Ordering\Application;
 
 use Guixa\Ordering\Domain\CooperativeSettings;
 use Guixa\Shared\Application\Actor;
+use Illuminate\Support\Facades\Gate;
 
 final class GetPickupWeekday
 {
@@ -12,7 +13,7 @@ final class GetPickupWeekday
     /** @return ?int 1 Monday to 7 Sunday, null until one is set (R4c) */
     public function __invoke(Actor $actor): ?int
     {
-        $actor->assertManager();
+        Gate::forUser($actor)->authorize('manage');
 
         return $this->settings->pickupWeekday()?->isoDay;
     }

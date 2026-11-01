@@ -1,0 +1,122 @@
+/*
+ * Paleta compartida: superfícies neutres, contrast nítid i un sol color de marca.
+ * Editeu els valors d'aquest bloc i recarregueu la pàgina.
+ */
+:root {
+    --palette-canvas: #f8f7f4;
+    --palette-surface: #ffffff;
+    --palette-ink: #202b26;
+    --palette-brand: #246b57;
+    --palette-soft: #e8efeb;
+    --palette-soft-ink: #305747;
+    --palette-hover: #eceae5;
+    --palette-hover-ink: #36463e;
+    --palette-muted: #f2f4f1;
+    --palette-muted-ink: #58665e;
+    --palette-border: #d6ded8;
+    --palette-field-border: #788a7d;
+    --palette-danger: #a94440;
+    --palette-sidebar: #f1f3f0;
+
+    --palette-dark-canvas: #1b1e1c;
+    --palette-dark-surface: #252a27;
+    --palette-dark-ink: #ecf2ed;
+    --palette-dark-brand: #a7d7c1;
+    --palette-dark-soft: #343a36;
+    --palette-dark-hover: #373a37;
+    --palette-dark-muted: #2f3430;
+    --palette-dark-muted-ink: #bcc9bf;
+    --palette-dark-border: #6b786f;
+    --palette-dark-field-border: #95a99b;
+    --palette-dark-danger: #e3918c;
+    --palette-dark-sidebar: #202521;
+    --palette-dark-sidebar-accent: #343d36;
+}
+
+/* Una acció principal de marca, accions secundàries neutres i perill reservat al vermell. */
+:root {
+    --background: var(--palette-canvas);
+    --foreground: var(--palette-ink);
+    --card: var(--palette-surface);
+    --card-foreground: var(--palette-ink);
+    --popover: var(--palette-surface);
+    --popover-foreground: var(--palette-ink);
+    --primary: var(--palette-brand);
+    --primary-foreground: var(--palette-surface);
+    --secondary: var(--palette-soft);
+    --secondary-foreground: var(--palette-soft-ink);
+    --muted: var(--palette-muted);
+    --muted-foreground: var(--palette-muted-ink);
+    --accent: var(--palette-hover);
+    --accent-foreground: var(--palette-hover-ink);
+    --destructive: var(--palette-danger);
+    --destructive-foreground: #ffffff;
+    --border: var(--palette-border);
+    --input: var(--palette-field-border);
+    --ring: var(--palette-brand);
+    --chart-1: #246b57;
+    --chart-2: #64a38c;
+    --chart-3: #668b9c;
+    --chart-4: #b19673;
+    --chart-5: #7d8ea4;
+    --sidebar: var(--palette-sidebar);
+    --sidebar-background: var(--palette-sidebar);
+    --sidebar-foreground: var(--palette-ink);
+    --sidebar-primary: var(--palette-brand);
+    --sidebar-primary-foreground: var(--palette-surface);
+    --sidebar-accent: var(--palette-soft);
+    --sidebar-accent-foreground: var(--palette-soft-ink);
+    --sidebar-border: var(--palette-border);
+    --sidebar-ring: var(--palette-brand);
+}
+
+.dark {
+    --background: var(--palette-dark-canvas);
+    --foreground: var(--palette-dark-ink);
+    --card: var(--palette-dark-surface);
+    --card-foreground: var(--palette-dark-ink);
+    --popover: var(--palette-dark-surface);
+    --popover-foreground: var(--palette-dark-ink);
+    --primary: var(--palette-dark-brand);
+    --primary-foreground: #1b3026;
+    --secondary: var(--palette-dark-soft);
+    --secondary-foreground: #ecf2ed;
+    --muted: var(--palette-dark-muted);
+    --muted-foreground: var(--palette-dark-muted-ink);
+    --accent: var(--palette-dark-hover);
+    --accent-foreground: #ecf2ed;
+    --destructive: var(--palette-dark-danger);
+    --destructive-foreground: #2b1f1e;
+    --border: var(--palette-dark-border);
+    --input: var(--palette-dark-field-border);
+    --ring: var(--palette-dark-brand);
+    --chart-1: #a7d7c1;
+    --chart-2: #83b8a0;
+    --chart-3: #8fb0bb;
+    --chart-4: #c6b59b;
+    --chart-5: #aab7d0;
+    --sidebar: var(--palette-dark-sidebar);
+    --sidebar-background: var(--palette-dark-sidebar);
+    --sidebar-foreground: var(--palette-dark-ink);
+    --sidebar-primary: var(--palette-dark-brand);
+    --sidebar-primary-foreground: #1b3026;
+    --sidebar-accent: var(--palette-dark-sidebar-accent);
+    --sidebar-accent-foreground: var(--palette-dark-ink);
+    --sidebar-border: var(--palette-dark-border);
+    --sidebar-ring: var(--palette-dark-brand);
+}
+
+.pilot-theme {
+    --pilot-success: #276b4e;
+    --pilot-success-foreground: #ffffff;
+    --pilot-warning: #8f5d2e;
+    --pilot-warning-foreground: #ffffff;
+}
+
+.dark .pilot-theme {
+    --pilot-success: #a9dcc1;
+    --pilot-success-foreground: #1b3026;
+    --pilot-warning: #efc693;
+    --pilot-warning-foreground: #302417;
+    --pilot-input-fill: var(--palette-dark-soft);
+}

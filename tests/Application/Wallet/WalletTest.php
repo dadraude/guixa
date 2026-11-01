@@ -1,26 +1,29 @@
 <?php
 
 use Guixa\Shared\Application\Actor;
-use Guixa\Shared\Domain\Error\NotAllowed;
 use Guixa\Shared\Domain\Role;
+use Guixa\Wallet\Application\ChargeForBasket;
 use Guixa\Wallet\Application\ChargeForPickup;
 use Guixa\Wallet\Application\GetBalance;
 use Guixa\Wallet\Application\GetWalletStatement;
+use Guixa\Wallet\Application\ReadHouseholdBalance;
 use Guixa\Wallet\Application\RecordCorrection;
 use Guixa\Wallet\Application\RecordTopUp;
+use Guixa\Wallet\Domain\Error\BasketAlreadyCharged;
 use Guixa\Wallet\Domain\Error\CorrectionNoteRequired;
 use Guixa\Wallet\Domain\Error\InvalidCorrectionAmount;
 use Guixa\Wallet\Domain\Error\InvalidTopUpAmount;
 use Guixa\Wallet\Domain\Error\PickupAlreadyCharged;
+use Illuminate\Auth\Access\AuthorizationException;
 use Tests\Support\FrozenClock;
 use Tests\Support\InMemory\InMemoryMovementRepository;
 
 beforeEach(function () {
     $this->movements = new InMemoryMovementRepository;
     $this->clock = new FrozenClock('2026-10-22 10:00:00');
-    $this->manager = new Actor('manager-account', [Role::Manager]);
+    $this->manager = Actor::manager('manager-account');
     $this->household = 'household-h';
-    $this->member = new Actor('anna-account', [Role::Member], 'household-h');
+    $this->member = Actor::memberOf('anna-account', 'household-h');
     $this->topUp = new RecordTopUp($this->movements, $this->clock);
     $this->correct = new RecordCorrection($this->movements, $this->clock);
     $this->charge = new ChargeForPickup($this->movements, $this->clock);
@@ -96,6 +99,21 @@ it('refuses a second charge or credit for the same household and cycle (R23)', f
     expect(($this->balance)($this->manager, $this->household))->toBe(-2240);
 });
 
+it('charges distinct baskets for one household while rejecting replay and preserving weekly charges (T55)', function () {
+    $basketCharge = new ChargeForBasket($this->movements, $this->clock);
+    $first = $basketCharge($this->manager, $this->household, 'basket-1', 300);
+    $second = $basketCharge($this->manager, $this->household, 'basket-2', 200);
+    ($this->charge)($this->manager, $this->household, 'cycle-1', 100);
+
+    expect($first)->not->toBeNull()
+        ->and($second)->not->toBeNull()
+        ->and(($this->balance)($this->manager, $this->household))->toBe(-600)
+        ->and(array_map(fn ($movement) => $movement->basketId, ($this->statement)($this->manager, $this->household)->movements))
+        ->toEqualCanonicalizing(['basket-1', 'basket-2', null]);
+    expect(fn () => $basketCharge($this->manager, 'other-household', 'basket-1', -50))->toThrow(BasketAlreadyCharged::class);
+    expect(($this->balance)($this->manager, $this->household))->toBe(-600);
+});
+
 it('shows a member their household movements with their cycle, and nobody else\'s (R31)', function () {
     ($this->charge)($this->manager, $this->household, 'cycle-1', 700);
     ($this->topUp)($this->manager, 'household-j', 900);
@@ -105,25 +123,45 @@ it('shows a member their household movements with their cycle, and nobody else\'
     expect($statement->balanceCents)->toBe(-700)
         ->and($statement->movements)->toHaveCount(1)
         ->and($statement->movements[0]->cycleId)->toBe('cycle-1');
-    expect(fn () => ($this->statement)($this->member, 'household-j'))->toThrow(NotAllowed::class);
+    expect(fn () => ($this->statement)($this->member, 'household-j'))->toThrow(AuthorizationException::class);
 });
 
 it('keeps recording to managers and the balance query to managers (R29, R32)', function (Role $role) {
     $actor = new Actor('other-account', [$role], 'household-h');
 
-    expect(fn () => ($this->topUp)($actor, $this->household, 100))->toThrow(NotAllowed::class);
-    expect(fn () => ($this->correct)($actor, $this->household, 100, 'x'))->toThrow(NotAllowed::class);
-    expect(fn () => ($this->charge)($actor, $this->household, 'cycle-1', 100))->toThrow(NotAllowed::class);
-    expect(fn () => ($this->balance)($actor, $this->household))->toThrow(NotAllowed::class);
+    expect(fn () => ($this->topUp)($actor, $this->household, 100))->toThrow(AuthorizationException::class);
+    expect(fn () => ($this->correct)($actor, $this->household, 100, 'x'))->toThrow(AuthorizationException::class);
+    expect(fn () => ($this->charge)($actor, $this->household, 'cycle-1', 100))->toThrow(AuthorizationException::class);
+    expect(fn () => ($this->balance)($actor, $this->household))->toThrow(AuthorizationException::class);
 })->with([Role::Member, Role::Producer]);
 
 it('refuses the statement to a producer and to a member of no household', function () {
-    expect(fn () => ($this->statement)(new Actor('p', [Role::Producer], null, 'producer-1'), $this->household))->toThrow(NotAllowed::class);
-    expect(fn () => ($this->statement)(new Actor('a', [Role::Member]), $this->household))->toThrow(NotAllowed::class);
+    expect(fn () => ($this->statement)(Actor::producer('p', 'producer-1'), $this->household))->toThrow(AuthorizationException::class);
+    expect(fn () => ($this->statement)(new Actor('a', [Role::Member]), $this->household))->toThrow(AuthorizationException::class);
 });
 
 it('lets a manager still top up a household without members (R35a)', function () {
     ($this->topUp)($this->manager, 'deactivated-household', 800, 'cash');
 
     expect(($this->balance)($this->manager, 'deactivated-household'))->toBe(800);
+});
+
+it('reads a household balance for another context without an actor (R30, R35a)', function () {
+    ($this->topUp)($this->manager, $this->household, 500, 'cash');
+    ($this->charge)($this->manager, $this->household, 'cycle-1', 1200);
+
+    expect((new ReadHouseholdBalance($this->movements))($this->household))->toBe(-700)
+        ->and((new ReadHouseholdBalance($this->movements))('household-j'))->toBe(0);
+});
+
+it('lets Finance read every household statement and record only an existing basket charge (R31, R36c, S84)', function () {
+    $finance = new Actor('finance', [Role::Finance]);
+    $basketCharge = new ChargeForBasket($this->movements, $this->clock);
+    $basketCharge($finance, $this->household, 'basket-1', 1200);
+
+    expect(($this->statement)($finance, $this->household)->balanceCents)->toBe(-1200)
+        ->and(($this->balance)($finance, $this->household))->toBe(-1200)
+        ->and(($this->statement)($finance, 'household-j')->balanceCents)->toBe(0);
+    expect(fn () => ($this->topUp)($finance, $this->household, 100))->toThrow(AuthorizationException::class)
+        ->and(fn () => ($this->correct)($finance, $this->household, 100, 'x'))->toThrow(AuthorizationException::class);
 });

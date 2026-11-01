@@ -6,8 +6,9 @@ use Guixa\Membership\Domain\Error\HouseholdNotFound;
 use Guixa\Membership\Domain\Error\LastActiveManager;
 use Guixa\Membership\Domain\Error\LastManager;
 use Guixa\Shared\Application\Actor;
-use Guixa\Shared\Domain\Error\NotAllowed;
 use Guixa\Shared\Domain\Role;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Support\Facades\Gate;
 use Tests\Support\Membership\MembershipWorld;
 
 beforeEach(function () {
@@ -102,8 +103,8 @@ it('rejects moving to an unknown household or moving an unknown or deactivated a
 it('lets only a manager move or unlink members (R33)', function () {
     [$hId, $annaId] = householdWithAnnaAndBiel($this->world);
 
-    expect(fn () => ($this->world->moveMember)($this->world->member, $annaId, $hId))->toThrow(NotAllowed::class)
-        ->and(fn () => ($this->world->unlinkMember)($this->world->member, $annaId))->toThrow(NotAllowed::class);
+    expect(fn () => ($this->world->moveMember)($this->world->member, $annaId, $hId))->toThrow(AuthorizationException::class)
+        ->and(fn () => ($this->world->unlinkMember)($this->world->member, $annaId))->toThrow(AuthorizationException::class);
 });
 
 // S44 — Several roles (R36a)
@@ -167,8 +168,8 @@ it('lets the manager role be removed from a deactivated manager', function () {
 it('lets only a manager grant or remove the manager role (R36a)', function () {
     [, $annaId] = householdWithAnnaAndBiel($this->world);
 
-    expect(fn () => ($this->world->grantManagerRole)($this->world->member, $annaId))->toThrow(NotAllowed::class)
-        ->and(fn () => ($this->world->removeManagerRole)($this->world->member, $annaId))->toThrow(NotAllowed::class)
+    expect(fn () => ($this->world->grantManagerRole)($this->world->member, $annaId))->toThrow(AuthorizationException::class)
+        ->and(fn () => ($this->world->removeManagerRole)($this->world->member, $annaId))->toThrow(AuthorizationException::class)
         ->and(fn () => ($this->world->grantManagerRole)($this->world->manager, $this->world->accounts->nextId()))->toThrow(AccountNotFound::class);
 });
 
@@ -255,7 +256,7 @@ it('lets a manager-only account linked to a household order for it', function ()
 
     $carla = $this->world->accounts->get($carlaId);
     $actor = new Actor($carla->id, $carla->roles, $carla->householdId);
-    $actor->assertMemberOf($hId);
+    Gate::forUser($actor)->authorize('memberOf', ['household', $hId]);
     expect($carla->roles)->toBe([Role::Manager])
         ->and($actor->hasRole(Role::Member))->toBeTrue();
 });
@@ -269,7 +270,7 @@ it('stops a manager-only account from being a member of the household it was unl
 
     $carla = $this->world->accounts->get($carlaId);
     $actor = new Actor($carla->id, $carla->roles, $carla->householdId);
-    expect(fn () => $actor->assertMemberOf($hId))->toThrow(NotAllowed::class)
+    expect(fn () => Gate::forUser($actor)->authorize('memberOf', ['household', $hId]))->toThrow(AuthorizationException::class)
         ->and(($this->world->canLogIn)($carlaId))->toBeTrue(); // still a manager
 });
 
@@ -297,8 +298,8 @@ it('lets only a manager deactivate or reactivate accounts, and rejects unknown o
     [, $annaId] = householdWithAnnaAndBiel($this->world);
     $unknown = $this->world->accounts->nextId();
 
-    expect(fn () => ($this->world->deactivateAccount)($this->world->member, $annaId))->toThrow(NotAllowed::class)
-        ->and(fn () => ($this->world->reactivateAccount)($this->world->member, $annaId))->toThrow(NotAllowed::class)
+    expect(fn () => ($this->world->deactivateAccount)($this->world->member, $annaId))->toThrow(AuthorizationException::class)
+        ->and(fn () => ($this->world->reactivateAccount)($this->world->member, $annaId))->toThrow(AuthorizationException::class)
         ->and(fn () => ($this->world->deactivateAccount)($this->world->manager, $unknown))->toThrow(AccountNotFound::class)
         ->and(fn () => ($this->world->reactivateAccount)($this->world->manager, $unknown))->toThrow(AccountNotFound::class);
 });
@@ -318,5 +319,5 @@ it('lists every account with its roles, household and state', function () {
         ->and($accounts[$carlaId]->roles)->toBe(['manager'])
         ->and($accounts[$carlaId]->active)->toBeTrue()
         ->and(collect($accounts)->firstWhere('name', 'Biel')->householdName)->toBe('Household H');
-    expect(fn () => ($this->world->listAccounts)($this->world->member))->toThrow(NotAllowed::class);
+    expect(fn () => ($this->world->listAccounts)($this->world->member))->toThrow(AuthorizationException::class);
 });

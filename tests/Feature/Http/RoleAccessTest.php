@@ -3,8 +3,8 @@
 use App\Models\User;
 use Guixa\Probe\Domain\Error\ProbeFailed;
 use Guixa\Shared\Application\ActorResolver;
-use Guixa\Shared\Domain\Error\NotAllowed;
 use Guixa\Shared\Domain\Role;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
@@ -34,8 +34,9 @@ beforeEach(function () {
     Route::middleware(['web', 'auth', 'role:producer'])->get('/probe/producer', fn () => 'producer area');
     Route::middleware(['web', 'auth', 'role:member'])->get('/probe/member', fn () => 'member area');
     Route::middleware(['web', 'auth', 'role:manager,producer'])->get('/probe/either', fn () => 'either area');
-    Route::middleware(['web'])->get('/probe/not-allowed', fn () => throw new NotAllowed('Nope.'));
+    Route::middleware(['web'])->get('/probe/not-allowed', fn () => throw new AuthorizationException('Nope.'));
     Route::middleware(['web'])->post('/probe/domain-error', fn () => throw new ProbeFailed('raw message'));
+    Route::middleware(['web'])->post('/api/probe/domain-error', fn () => throw new ProbeFailed('raw message'));
 });
 
 it('sends guests to the login page', function () {
@@ -73,17 +74,19 @@ it('answers 403, not 500, for an unknown role name in the middleware', function 
     $this->actingAs(userWithRoles(Role::Manager))->get('/probe/typo')->assertForbidden();
 });
 
-it('maps NotAllowed to 403', function () {
+it('maps authorization denial to 403', function () {
     $this->get('/probe/not-allowed')->assertForbidden();
 });
 
-it('maps a domain error to a 422 with its translated message', function () {
-    app('translator')->addLines(['errors.ProbeFailed' => 'The probe failed.'], 'en');
+it('maps a domain error to a 422 with its translated message', function (string $locale) {
+    app()->setLocale($locale);
+    app('translator')->addLines(['errors.ProbeFailed' => 'The probe failed.'], $locale);
 
     $this->postJson('/probe/domain-error')
         ->assertUnprocessable()
+        ->assertJsonPath('message', 'The probe failed.')
         ->assertJsonPath('errors.domain.0', 'The probe failed.');
-});
+})->with(['ca', 'en']);
 
 it('falls back to the error message when there is no translation', function () {
     $this->postJson('/probe/domain-error')
@@ -96,6 +99,28 @@ it('shows a domain error as a form error on an Inertia request', function () {
         ->post('/probe/domain-error', [], ['X-Inertia' => 'true'])
         ->assertRedirect('/somewhere')
         ->assertSessionHasErrors(['domain' => 'raw message']);
+});
+
+it('keeps harmless form input but never flashes passwords on a domain error', function () {
+    $this->from('/somewhere')
+        ->post('/probe/domain-error', [
+            'name' => 'Anna',
+            'password' => 'secret',
+            'password_confirmation' => 'secret',
+            'current_password' => 'old-secret',
+        ])
+        ->assertRedirect('/somewhere')
+        ->assertSessionHasErrors('domain')
+        ->assertSessionHasInput('name', 'Anna')
+        ->assertSessionMissingInput('password')
+        ->assertSessionMissingInput('password_confirmation')
+        ->assertSessionMissingInput('current_password');
+});
+
+it('returns a JSON validation error for an API path without an Accept header', function () {
+    $this->post('/api/probe/domain-error')
+        ->assertUnprocessable()
+        ->assertJsonPath('errors.domain.0', 'raw message');
 });
 
 it('shares the account roles and role areas with every page', function () {

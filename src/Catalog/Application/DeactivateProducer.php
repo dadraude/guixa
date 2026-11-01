@@ -8,6 +8,7 @@ use Guixa\Catalog\Domain\ProducerCycles;
 use Guixa\Catalog\Domain\ProducerRepository;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Application\TransactionRunner;
+use Illuminate\Support\Facades\Gate;
 
 final class DeactivateProducer
 {
@@ -21,7 +22,7 @@ final class DeactivateProducer
     /** The producer loses its role and stops participating in every cycle where its order is not sent (R3a, R6c, D13). */
     public function __invoke(Actor $actor, string $producerId): void
     {
-        $actor->assertManager();
+        Gate::forUser($actor)->authorize('manage');
 
         $producer = $this->producers->get($producerId) ?? throw ProducerNotFound::withId($producerId);
 

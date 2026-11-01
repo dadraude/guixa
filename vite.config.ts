@@ -4,6 +4,7 @@ import tailwindcss from '@tailwindcss/vite';
 import vue from '@vitejs/plugin-vue';
 import laravel from 'laravel-vite-plugin';
 import { bunny } from 'laravel-vite-plugin/fonts';
+import i18n from 'laravel-vue-i18n/vite';
 import { defineConfig, lazyPlugins } from 'vite-plus';
 
 // Vitest boots a Vite dev server, which laravel-vite-plugin refuses to start when CI is set.
@@ -23,6 +24,7 @@ export default defineConfig({
             ],
         }),
         inertia(),
+        i18n(),
         tailwindcss(),
         vue({
             template: {

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { trans } from "laravel-vue-i18n"
 import type { DialogContentEmits, DialogContentProps } from "reka-ui"
 import type { HTMLAttributes } from "vue"
 import { X } from "@lucide/vue"
@@ -11,6 +12,7 @@ import {
 } from "reka-ui"
 import { cn } from "@/lib/utils"
 import SheetOverlay from "./SheetOverlay.vue"
+import { usePilotTheme } from "@/composables/usePilotTheme"
 
 interface SheetContentProps extends DialogContentProps {
   class?: HTMLAttributes["class"]
@@ -29,6 +31,7 @@ const emits = defineEmits<DialogContentEmits>()
 const delegatedProps = reactiveOmit(props, "class", "side")
 
 const forwarded = useForwardPropsEmits(delegatedProps, emits)
+const pilotTheme = usePilotTheme()
 </script>
 
 <template>
@@ -46,16 +49,17 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits)
           && 'data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top inset-x-0 top-0 h-auto border-b',
         side === 'bottom'
           && 'data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom inset-x-0 bottom-0 h-auto border-t',
-        props.class)"
+        props.class, pilotTheme && 'pilot-theme')"
       v-bind="{ ...$attrs, ...forwarded }"
     >
       <slot />
 
       <DialogClose
         class="ring-offset-background focus:ring-ring data-[state=open]:bg-secondary absolute top-4 right-4 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none"
+        :class="pilotTheme && 'flex min-h-11 min-w-11 items-center justify-center opacity-100'"
       >
         <X class="size-4" />
-        <span class="sr-only">Close</span>
+        <span class="sr-only">{{ trans('Close') }}</span>
       </DialogClose>
     </DialogContent>
   </DialogPortal>

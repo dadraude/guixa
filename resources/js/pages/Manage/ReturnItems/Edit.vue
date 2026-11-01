@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { trans } from 'laravel-vue-i18n';
 import { Form, Head } from '@inertiajs/vue3';
 import ReturnItemController from '@/actions/App/Http/Controllers/Manage/ReturnItemController';
 import Heading from '@/components/Heading.vue';
@@ -20,10 +21,10 @@ defineProps<{
 </script>
 
 <template>
-    <Head title="Edit return item" />
+    <Head :title="trans('Edit return item')" />
 
-    <div class="max-w-xl p-4">
-        <Heading :title="`Edit ${item.name}`" />
+    <div class="pilot-page pilot-layout-page pilot-manager-page max-w-xl">
+        <Heading :title="trans('Edit :name', { name: item.name })" />
 
         <Form
             v-bind="ReturnItemController.update.form(item.id)"
@@ -37,7 +38,7 @@ defineProps<{
                 :disabled="processing"
                 data-test="save-return-item"
             >
-                Save
+                {{ trans('Save') }}
             </Button>
         </Form>
     </div>

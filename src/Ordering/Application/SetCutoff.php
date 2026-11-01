@@ -12,6 +12,7 @@ use Guixa\Shared\Application\TransactionRunner;
 use Guixa\Shared\Domain\Clock;
 use Guixa\Shared\Domain\Error\InvalidLocalTime;
 use Guixa\Shared\Domain\LocalTime;
+use Illuminate\Support\Facades\Gate;
 
 final class SetCutoff
 {
@@ -24,7 +25,7 @@ final class SetCutoff
     /** @param  string  $at  ISO 8601; without an offset it is read in the cooperative's timezone */
     public function __invoke(Actor $actor, string $cycleId, string $producerId, string $at): void
     {
-        $actor->assertManager();
+        Gate::forUser($actor)->authorize('manage');
 
         $now = $this->clock->now()->setTimezone($this->clock->timezone());
         $moment = $this->parse($at);

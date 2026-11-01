@@ -10,6 +10,49 @@ readonly householdName: string | null,
 readonly active: boolean,
 readonly invitationPending: boolean,
 };
+export type BasketHouseholdRow = {
+readonly id: string,
+readonly name: string,
+};
+export type BasketReturnLineRow = {
+readonly returnItemId: string,
+readonly name: string,
+readonly amountCents: number,
+readonly quantity: number,
+readonly creditCents: number,
+};
+export type BasketRow = {
+readonly id: string,
+readonly householdId: string,
+readonly householdName: string,
+readonly state: string,
+readonly stockLines: App.Http.BasketStockLineRow[],
+readonly returnLines: App.Http.BasketReturnLineRow[],
+readonly totalCents: number,
+readonly balanceCents: number,
+readonly projectedBalanceCents: number,
+readonly validatedAt: string | null,
+readonly collectedAt: string | null,
+};
+export type BasketStockLineRow = {
+readonly stockProductId: string,
+readonly name: string,
+readonly unit: string,
+readonly quantity: string,
+readonly unitPriceCents: number,
+readonly amountCents: number,
+};
+export type BasketSummaryRow = {
+readonly id: string,
+readonly householdName: string,
+readonly state: string,
+readonly totalCents: number,
+readonly createdAt: string,
+};
+export type ContainerCountRow = {
+readonly total: number,
+readonly households: App.Http.HouseholdContainerRow[],
+};
 export type CutoffRuleRow = {
 readonly daysBefore: number,
 readonly time: string,
@@ -30,12 +73,22 @@ readonly id: string,
 readonly pickupDate: string,
 readonly cancelled: boolean,
 readonly participants: App.Http.CycleParticipantRow[],
+readonly closed: boolean,
 };
 export type CycleSummaryRow = {
 readonly cycleId: string,
 readonly pickupDate: string,
 readonly cancelled: boolean,
 readonly producers: App.Http.ProducerTotalsRow[],
+};
+export type HouseholdContainerRow = {
+readonly householdId: string,
+readonly householdName: string,
+readonly count: number,
+};
+export type HouseholdOptionRow = {
+readonly id: string,
+readonly name: string,
 };
 export type HouseholdQuantityRow = {
 readonly householdId: string,
@@ -47,6 +100,12 @@ readonly id: string,
 readonly name: string,
 readonly active: boolean,
 readonly members: App.Http.MemberRow[],
+};
+export type HouseholdSettlementRow = {
+readonly householdId: string,
+readonly householdName: string,
+readonly balanceCents: number,
+readonly pendingPickups: App.Http.PendingPickupRow[],
 };
 export type HouseholdSummaryRow = {
 readonly id: string,
@@ -99,10 +158,98 @@ readonly pickupDate: string,
 readonly cancelled: boolean,
 readonly producers: App.Http.OrderProducerRow[],
 readonly lines: App.Http.OrderLineRow[],
+readonly pickup: App.Http.PickupRow | null,
+};
+export type PendingPickupRow = {
+readonly cycleId: string,
+readonly pickupDate: string,
+};
+export type PickupAdjustmentRow = {
+readonly id: string,
+readonly productId: string,
+readonly name: string,
+readonly unit: string,
+readonly quantityDelta: string,
+readonly amountCents: number,
+readonly recordedAt: string,
+};
+export type PickupLineRow = {
+readonly productId: string,
+readonly name: string,
+readonly unit: string,
+readonly variable: boolean,
+readonly unitPriceCents: number,
+readonly ordered: string,
+readonly allocated: string,
+readonly delivered: string,
+readonly adjusted: boolean,
+readonly amountCents: number,
+};
+export type PickupReturnLineRow = {
+readonly returnItemId: string,
+readonly name: string,
+readonly amountCents: number,
+readonly quantity: number,
+readonly creditCents: number,
+};
+export type PickupRow = {
+readonly cycleId: string,
+readonly pickupDate: string,
+readonly householdId: string,
+readonly householdName: string,
+readonly status: string,
+readonly lines: App.Http.PickupLineRow[],
+readonly totalCents: number,
+readonly balanceCents: number | null,
+readonly resultingBalanceCents: number | null,
+readonly stockLines: App.Http.PickupStockLineRow[],
+readonly returnLines: App.Http.PickupReturnLineRow[],
+readonly adjustments: App.Http.PickupAdjustmentRow[],
+readonly originalChargeCents: number | null,
+};
+export type PickupStockLineRow = {
+readonly stockProductId: string,
+readonly name: string,
+readonly unit: string,
+readonly variable: boolean,
+readonly unitPriceCents: number,
+readonly quantity: string,
+readonly amountCents: number,
+};
+export type PickupSummaryRow = {
+readonly householdId: string,
+readonly householdName: string,
+readonly status: string,
+readonly totalCents: number,
+};
+export type ProducerCycleSummaryRow = {
+readonly cycleId: string,
+readonly pickupDate: string,
+readonly sent: boolean,
+readonly products: App.Http.ProducerProductTotalRow[],
 };
 export type ProducerOptionRow = {
 readonly id: string,
 readonly name: string,
+};
+export type ProducerProductRow = {
+readonly id: string,
+readonly producerId: string,
+readonly name: string,
+readonly unit: string,
+readonly price: string,
+readonly variable: boolean,
+readonly containersPerUnit: string | null,
+readonly active: boolean,
+readonly stock: boolean,
+readonly used: boolean,
+};
+export type ProducerProductTotalRow = {
+readonly productId: string,
+readonly name: string,
+readonly unit: string,
+readonly available: boolean,
+readonly quantity: string | null,
 };
 export type ProducerRow = {
 readonly id: string,
@@ -112,6 +259,14 @@ readonly cutoffDaysBefore: number,
 readonly cutoffTime: string,
 readonly accountEmail: string | null,
 readonly accountInvitationPending: boolean,
+};
+export type ProducerStockRow = {
+readonly id: string,
+readonly name: string,
+readonly unit: string,
+readonly price: string,
+readonly active: boolean,
+readonly available: string,
 };
 export type ProducerTotalsRow = {
 readonly producerId: string,
@@ -134,11 +289,53 @@ readonly unit: string,
 readonly quantity: string,
 readonly households: App.Http.HouseholdQuantityRow[],
 };
+export type ReceptionAllocationRow = {
+readonly householdId: string,
+readonly householdName: string,
+readonly ordered: string,
+readonly allocated: string,
+readonly byHand: boolean,
+readonly delivered: string,
+readonly adjusted: boolean,
+};
+export type ReceptionOptionRow = {
+readonly productId: string,
+readonly name: string,
+readonly unit: string,
+readonly variable: boolean,
+};
+export type ReceptionProductRow = {
+readonly productId: string,
+readonly name: string,
+readonly unit: string,
+readonly variable: boolean,
+readonly nobodyOrdered: boolean,
+readonly ordered: string,
+readonly received: string,
+readonly allocated: string,
+readonly delivered: string,
+readonly difference: string,
+readonly balanced: boolean,
+readonly balancedForDistribution: boolean,
+readonly hasManualAllocations: boolean,
+readonly hasAdjustments: boolean,
+readonly allocations: App.Http.ReceptionAllocationRow[],
+readonly hasDonePickups: boolean,
+};
+export type ReceptionRow = {
+readonly cycleId: string,
+readonly producerId: string,
+readonly producerName: string,
+readonly pickupDate: string,
+readonly products: App.Http.ReceptionProductRow[],
+readonly unorderedOptions: App.Http.ReceptionOptionRow[],
+};
 export type ReturnItemRow = {
 readonly id: string,
 readonly name: string,
 readonly amount: string,
 readonly active: boolean,
+readonly amountCents: number,
 };
 export type RoleArea = {
 readonly role: Guixa.Shared.Domain.Role,
@@ -147,6 +344,7 @@ readonly href: string,
 };
 export type StockLevelRow = {
 readonly id: string,
+readonly producerId: string,
 readonly name: string,
 readonly unit: string,
 readonly price: string,
@@ -155,8 +353,19 @@ readonly containersPerUnit: string | null,
 readonly active: boolean,
 readonly available: string,
 };
+export type StockOfferRow = {
+readonly id: string,
+readonly producerId: string,
+readonly producerName: string,
+readonly name: string,
+readonly unit: string,
+readonly price: string,
+readonly available: string,
+readonly soldOut: boolean,
+};
 export type StockProductRow = {
 readonly id: string,
+readonly producerId: string,
 readonly name: string,
 readonly unit: string,
 readonly price: string,
@@ -175,6 +384,7 @@ readonly amount: string,
 readonly occurredAt: string,
 readonly note: string | null,
 readonly cycleId: string | null,
+readonly basketId: string | null,
 };
 export type WalletStatementRow = {
 readonly balance: string,
@@ -183,9 +393,14 @@ readonly movements: App.Http.WalletMovementRow[],
 }
 }
 declare namespace Guixa {
+namespace Ordering {
+namespace Domain {
+export type PickupStatus = 'none' | 'pending' | 'nothing_to_collect' | 'completed' | 'not_collected';
+}
+}
 namespace Shared {
 namespace Domain {
-export type Role = 'manager' | 'member' | 'producer';
+export type Role = 'manager' | 'finance' | 'member' | 'producer';
 }
 }
 namespace Stock {

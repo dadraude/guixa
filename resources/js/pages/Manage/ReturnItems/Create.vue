@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { trans } from 'laravel-vue-i18n';
 import { Form, Head } from '@inertiajs/vue3';
 import ReturnItemController from '@/actions/App/Http/Controllers/Manage/ReturnItemController';
 import Heading from '@/components/Heading.vue';
@@ -16,10 +17,10 @@ defineOptions({
 </script>
 
 <template>
-    <Head title="New return item" />
+    <Head :title="trans('New return item')" />
 
-    <div class="max-w-xl p-4">
-        <Heading title="New return item" />
+    <div class="pilot-page pilot-layout-page pilot-manager-page max-w-xl">
+        <Heading :title="trans('New return item')" />
 
         <Form
             v-bind="ReturnItemController.store.form()"
@@ -33,7 +34,7 @@ defineOptions({
                 :disabled="processing"
                 data-test="save-return-item"
             >
-                Create
+                {{ trans('Create') }}
             </Button>
         </Form>
     </div>

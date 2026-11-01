@@ -4,6 +4,7 @@ namespace Guixa\Stock\Application;
 
 use Guixa\Shared\Application\Actor;
 use Guixa\Stock\Domain\ReturnItemRepository;
+use Illuminate\Support\Facades\Gate;
 
 final class ListReturnItems
 {
@@ -12,7 +13,7 @@ final class ListReturnItems
     /** @return list<ReturnItemData> */
     public function __invoke(Actor $actor): array
     {
-        $actor->assertManager();
+        Gate::forUser($actor)->authorize('manage-sales');
 
         return array_map(
             fn ($item) => new ReturnItemData($item->id, $item->name(), $item->amount()->cents, $item->isActive()),

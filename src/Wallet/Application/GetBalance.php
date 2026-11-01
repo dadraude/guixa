@@ -4,6 +4,7 @@ namespace Guixa\Wallet\Application;
 
 use Guixa\Shared\Application\Actor;
 use Guixa\Wallet\Domain\MovementRepository;
+use Illuminate\Support\Facades\Gate;
 
 final class GetBalance
 {
@@ -12,7 +13,7 @@ final class GetBalance
     /** @return int the household's balance in cents; it may be negative (R30) */
     public function __invoke(Actor $actor, string $householdId): int
     {
-        $actor->assertManager();
+        Gate::forUser($actor)->authorize('manage-wallet');
 
         return $this->movements->balanceOf($householdId)->cents;
     }

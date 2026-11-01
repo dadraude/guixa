@@ -13,6 +13,7 @@ use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Application\TransactionRunner;
 use Guixa\Shared\Domain\Clock;
 use Guixa\Shared\Domain\Quantity;
+use Illuminate\Support\Facades\Gate;
 
 final class SetOrderLine
 {
@@ -29,7 +30,7 @@ final class SetOrderLine
     public function __invoke(Actor $actor, string $cycleId, string $productId, string $quantity): void
     {
         $householdId = $actor->householdId ?? throw NoHousehold::create();
-        $actor->assertMemberOf($householdId);
+        Gate::forUser($actor)->authorize('memberOf', ['household', $householdId]);
 
         $ordered = Quantity::fromString($quantity);
         $now = $this->clock->now()->setTimezone($this->clock->timezone());
@@ -42,6 +43,7 @@ final class SetOrderLine
             if ($ordered->isZero()) {
                 $order->removeLine($productId, $cycle, $now);
             } else {
+                $this->catalog->lockWeekly($productId) ?? throw ProductNotOrderable::withId($productId);
                 $product = $this->catalog->orderable($productId) ?? throw ProductNotOrderable::withId($productId);
 
                 if (in_array($productId, $this->availability->unavailableIn($cycleId), true)) {

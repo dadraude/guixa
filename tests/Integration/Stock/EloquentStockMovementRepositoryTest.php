@@ -2,9 +2,13 @@
 
 namespace Tests\Integration\Stock;
 
+use App\Models\User;
+use Guixa\Catalog\Infrastructure\Persistence\ProducerModel;
+use Guixa\Catalog\Infrastructure\Persistence\ProductModel;
+use Guixa\Shared\Application\Actor;
+use Guixa\Stock\Application\RecordStockEntry;
 use Guixa\Stock\Domain\StockMovementRepository;
 use Guixa\Stock\Infrastructure\Persistence\EloquentStockMovementRepository;
-use Guixa\Stock\Infrastructure\Persistence\StockProductModel;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -25,9 +29,26 @@ final class EloquentStockMovementRepositoryTest extends TestCase
 
     protected function stockProductId(): string
     {
-        return StockProductModel::query()->create([
+        $producer = ProducerModel::query()->create(['name' => 'Beekeeper', 'active' => true, 'cutoff_days_before' => 3, 'cutoff_time' => '20:00']);
+
+        return ProductModel::query()->create([
+            'producer_id' => $producer->id, 'stock' => true,
             'name' => 'Honey', 'unit' => 'jar', 'price_cents' => 650, 'variable' => false, 'active' => true,
         ])->id;
+    }
+
+    protected function basket(): string
+    {
+        $household = (string) Str::uuid7();
+        $id = (string) Str::uuid7();
+        DB::table('households')->insert(['id' => $household, 'name' => 'Household', 'created_at' => now(), 'updated_at' => now()]);
+        DB::table('baskets')->insert([
+            'id' => $id, 'household_id' => $household, 'household_name' => 'Household',
+            'kind' => 'stock', 'state' => 'draft', 'created_by' => User::factory()->create()->id,
+            'created_at' => now(),
+        ]);
+
+        return $id;
     }
 
     protected function cycleExists(string $cycleId): void
@@ -94,23 +115,29 @@ final class EloquentStockMovementRepositoryTest extends TestCase
     }
 
     #[Test]
-    public function available_for_update_locks_the_stock_product_row_before_summing(): void
+    public function a_stock_entry_locks_the_catalog_product_before_summing_and_inserting_a_movement(): void
     {
         $repository = $this->repository();
         $productId = $this->stockProductId();
+        DB::flushQueryLog();
         DB::enableQueryLog();
 
-        DB::transaction(fn () => $repository->availableForUpdate($productId));
+        app(RecordStockEntry::class)(Actor::manager((string) Str::uuid7()), $productId, '1', null);
 
-        $queries = array_column(DB::getQueryLog(), 'query');
+        $log = DB::getQueryLog();
+        $queries = array_column($log, 'query');
         DB::disableQueryLog();
 
-        $lock = array_find_key($queries, fn (string $sql) => str_contains($sql, 'from "stock_products"') && str_ends_with(trim($sql), 'for update'));
+        $lock = array_find_key($queries, fn (string $sql) => str_contains($sql, 'from "products"') && str_ends_with(trim($sql), 'for update'));
         $sum = array_find_key($queries, fn (string $sql) => str_contains($sql, 'sum(quantity * 1000)'));
+        $insert = array_find_key($queries, fn (string $sql) => str_contains($sql, 'insert into "stock_movements"'));
 
-        $this->assertNotNull($lock, 'No "select … from stock_products … for update" was issued.');
+        $this->assertNotNull($lock, 'No Catalog product row lock was issued.');
         $this->assertNotNull($sum);
+        $this->assertNotNull($insert);
         $this->assertLessThan($sum, $lock);
-        $this->assertStringContainsString('"id" = ?', $queries[$lock]);
+        $this->assertLessThan($insert, $sum);
+        $this->assertContains($productId, $log[$lock]['bindings']);
+        $this->assertSame('1.000', $repository->available($productId)->toString());
     }
 }

@@ -13,5 +13,6 @@ final readonly class MovementData
         public DateTimeImmutable $occurredAt,
         public ?string $note,
         public ?string $cycleId,
+        public ?string $basketId = null,
     ) {}
 }

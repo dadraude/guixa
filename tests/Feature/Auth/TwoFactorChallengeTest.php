@@ -26,6 +26,25 @@ class TwoFactorChallengeTest extends TestCase
         $response->assertRedirect(route('login'));
     }
 
+    public function test_successful_two_factor_login_goes_directly_to_dashboard(): void
+    {
+        $user = User::factory()->manager()->withTwoFactor()->create();
+
+        $this->withSession(['url.intended' => route('manage.cycles.index')])
+            ->post(route('login.store'), [
+                'email' => $user->email,
+                'password' => 'password',
+            ])->assertRedirect(route('two-factor.login'));
+
+        $response = $this->post(route('two-factor.login.store'), [
+            'recovery_code' => 'recovery-code-1',
+        ]);
+
+        $this->assertAuthenticatedAs($user);
+        $response->assertRedirect(route('dashboard', absolute: false));
+        $response->assertSessionMissing('url.intended');
+    }
+
     public function test_two_factor_challenge_can_be_rendered(): void
     {
         Features::twoFactorAuthentication([

@@ -1,27 +1,38 @@
 <script setup lang="ts">
+import AppLogoIcon from '@/components/AppLogoIcon.vue';
+import AppearanceMenu from '@/components/AppearanceMenu.vue';
 import Breadcrumbs from '@/components/Breadcrumbs.vue';
+import NavUser from '@/components/NavUser.vue';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import type { BreadcrumbItem } from '@/types';
 
-withDefaults(
-    defineProps<{
-        breadcrumbs?: BreadcrumbItem[];
-    }>(),
-    {
-        breadcrumbs: () => [],
-    },
-);
+defineProps<{
+    breadcrumbs: BreadcrumbItem[];
+}>();
 </script>
 
 <template>
     <header
-        class="flex h-16 shrink-0 items-center gap-2 border-b border-sidebar-border/70 px-6 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 md:px-4"
+        class="material-app-bar flex items-center justify-between"
+        data-test="material-app-bar"
     >
-        <div class="flex items-center gap-2">
-            <SidebarTrigger class="-ml-1" />
-            <template v-if="breadcrumbs && breadcrumbs.length > 0">
+        <div class="flex min-w-0 items-center gap-2">
+            <SidebarTrigger class="min-h-11 min-w-11" />
+            <div class="material-app-brand">
+                <span class="material-app-brand-icon" aria-hidden="true">
+                    <AppLogoIcon class="size-5" />
+                </span>
+                <span>Guixa</span>
+            </div>
+            <div class="reference-app-bar-trail">
                 <Breadcrumbs :breadcrumbs="breadcrumbs" />
-            </template>
+            </div>
+        </div>
+        <div class="flex min-w-0 items-center justify-end gap-2">
+            <AppearanceMenu />
+            <div class="material-app-bar-user">
+                <NavUser />
+            </div>
         </div>
     </header>
 </template>

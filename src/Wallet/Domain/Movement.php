@@ -25,6 +25,7 @@ final readonly class Movement
         public string $recordedBy,
         public ?string $note,
         public ?string $cycleId,
+        public ?string $basketId = null,
     ) {}
 
     public static function topUp(string $id, string $householdId, Money $amount, DateTimeImmutable $occurredAt, string $recordedBy, ?string $note): self
@@ -56,6 +57,24 @@ final readonly class Movement
         return new self($id, $householdId, MovementType::Credit, $total, $occurredAt, $recordedBy, null, $cycleId);
     }
 
+    public static function basketCharge(string $id, string $householdId, Money $total, string $basketId, DateTimeImmutable $occurredAt, string $recordedBy): self
+    {
+        if ($total->cents <= 0) {
+            throw InvalidChargeAmount::create();
+        }
+
+        return new self($id, $householdId, MovementType::Charge, $total->negate(), $occurredAt, $recordedBy, null, null, $basketId);
+    }
+
+    public static function basketCredit(string $id, string $householdId, Money $total, string $basketId, DateTimeImmutable $occurredAt, string $recordedBy): self
+    {
+        if ($total->cents <= 0) {
+            throw InvalidChargeAmount::create();
+        }
+
+        return new self($id, $householdId, MovementType::Credit, $total, $occurredAt, $recordedBy, null, null, $basketId);
+    }
+
     public static function correction(string $id, string $householdId, Money $amount, string $note, ?string $cycleId, DateTimeImmutable $occurredAt, string $recordedBy): self
     {
         if ($amount->cents === 0) {
@@ -71,9 +90,9 @@ final readonly class Movement
         return new self($id, $householdId, MovementType::Correction, $amount, $occurredAt, $recordedBy, $note, $cycleId);
     }
 
-    public static function restore(string $id, string $householdId, MovementType $type, Money $amount, DateTimeImmutable $occurredAt, string $recordedBy, ?string $note, ?string $cycleId): self
+    public static function restore(string $id, string $householdId, MovementType $type, Money $amount, DateTimeImmutable $occurredAt, string $recordedBy, ?string $note, ?string $cycleId, ?string $basketId = null): self
     {
-        return new self($id, $householdId, $type, $amount, $occurredAt, $recordedBy, $note, $cycleId);
+        return new self($id, $householdId, $type, $amount, $occurredAt, $recordedBy, $note, $cycleId, $basketId);
     }
 
     public function isChargeOrCredit(): bool

@@ -22,6 +22,7 @@ it('keeps the return item pages to managers', function (string $method, string $
     ['get', '/manage/return-items/{id}/edit'],
     ['put', '/manage/return-items/{id}'],
     ['delete', '/manage/return-items/{id}'],
+    ['put', '/manage/return-items/{id}/reactivation'],
 ]);
 
 it('lists the return items with their amount as a decimal string (R25)', function () {
@@ -75,10 +76,21 @@ it('updates and deactivates a return item (R25)', function () {
     expect($item->refresh()->active)->toBeFalse();
 });
 
+it('reactivates a return item (R25)', function () {
+    $item = glassJar(['active' => false]);
+
+    $this->actingAs(accountWith(Role::Manager))
+        ->put("/manage/return-items/{$item->id}/reactivation")
+        ->assertRedirect('/manage/return-items');
+
+    expect($item->refresh()->active)->toBeTrue();
+});
+
 it('answers 404 to a return item id that is not a UUID', function (string $method, string $uri) {
     $this->actingAs(accountWith(Role::Manager))->{$method}($uri, ['name' => 'Jar', 'amount' => '1'])->assertNotFound();
 })->with([
     ['get', '/manage/return-items/not-a-uuid/edit'],
     ['put', '/manage/return-items/not-a-uuid'],
     ['delete', '/manage/return-items/not-a-uuid'],
+    ['put', '/manage/return-items/not-a-uuid/reactivation'],
 ]);

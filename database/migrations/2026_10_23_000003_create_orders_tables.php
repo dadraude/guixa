@@ -13,6 +13,7 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->foreignUuid('cycle_id')->constrained('cycles');
             $table->foreignUuid('household_id')->constrained('households');
+            $table->timestampTz('cancelled_at', 6)->nullable();
             $table->string('pickup_status')->default('none');
             $table->timestampTz('pickup_done_at')->nullable();
             $table->integer('charged_cents')->nullable();
@@ -22,7 +23,7 @@ return new class extends Migration
         // The pickup columns wait for the tasks that use them (R19 onwards); the ordering part needs the rest.
         Schema::create('order_lines', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignUuid('order_id')->constrained('orders')->cascadeOnDelete();
+            $table->foreignUuid('order_id')->constrained('orders')->restrictOnDelete();
             $table->foreignUuid('product_id')->constrained('products');
             $table->foreignUuid('producer_id')->constrained('producers');
             $table->string('product_name');
@@ -35,12 +36,13 @@ return new class extends Migration
             $table->boolean('allocated_by_hand')->default(false);
             $table->decimal('delivered_quantity', 10, 3)->nullable();
             $table->timestampTz('created_at', 6);
+            $table->timestampTz('removed_at', 6)->nullable();
             $table->foreignUuid('added_by')->constrained('users');
             $table->boolean('not_delivered')->default(false);
             $table->boolean('dropped')->default(false);
-            $table->unique(['order_id', 'product_id']);
         });
 
+        DB::statement('CREATE UNIQUE INDEX order_lines_one_active_product ON order_lines (order_id, product_id) WHERE removed_at IS NULL');
         DB::statement('ALTER TABLE order_lines ADD CONSTRAINT order_lines_ordered_not_negative CHECK (ordered_quantity >= 0)');
         DB::statement('ALTER TABLE order_lines ADD CONSTRAINT order_lines_allocated_not_negative CHECK (allocated_quantity >= 0)');
         DB::statement('ALTER TABLE order_lines ADD CONSTRAINT order_lines_delivered_not_negative CHECK (delivered_quantity >= 0)');

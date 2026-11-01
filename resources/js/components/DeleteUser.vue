@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { trans } from 'laravel-vue-i18n';
 import { Form } from '@inertiajs/vue3';
 import { useTemplateRef } from 'vue';
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
@@ -19,31 +20,44 @@ import {
 import { Label } from '@/components/ui/label';
 
 const passwordInput = useTemplateRef('passwordInput');
+
+// Radix focuses the first control without scrolling, so keep it visible in a tall dialog.
+const scrollFocusIntoView = (event: FocusEvent): void =>
+    (event.target as HTMLElement).scrollIntoView({ block: 'nearest' });
 </script>
 
 <template>
-    <div class="space-y-6">
+    <div class="pilot-panel space-y-6 p-4 sm:p-6">
         <Heading
             variant="small"
-            title="Delete account"
-            description="Delete your account and all of its resources"
+            :title="trans('Delete account')"
+            :description="trans('Delete your account and all of its resources')"
         />
         <div
-            class="space-y-4 rounded-lg border border-red-100 bg-red-50 p-4 dark:border-red-200/10 dark:bg-red-700/10"
+            class="space-y-4 rounded-lg border border-destructive bg-destructive/10 p-4"
         >
-            <div class="relative space-y-0.5 text-red-600 dark:text-red-100">
-                <p class="font-medium">Warning</p>
+            <div class="relative space-y-0.5 text-destructive">
+                <p class="font-medium">{{ trans('Warning') }}</p>
                 <p class="text-sm">
-                    Please proceed with caution, this cannot be undone.
+                    {{
+                        trans(
+                            'Please proceed with caution, this cannot be undone.',
+                        )
+                    }}
                 </p>
             </div>
             <Dialog>
                 <DialogTrigger as-child>
-                    <Button variant="destructive" data-test="delete-user-button"
-                        >Delete account</Button
+                    <Button
+                        variant="destructive"
+                        data-test="delete-user-button"
+                        >{{ trans('Delete account') }}</Button
                     >
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent
+                    class="pilot-touch-dialog"
+                    @focusin="scrollFocusIntoView"
+                >
                     <Form
                         v-bind="ProfileController.destroy.form()"
                         reset-on-success
@@ -55,28 +69,29 @@ const passwordInput = useTemplateRef('passwordInput');
                         v-slot="{ errors, processing, reset, clearErrors }"
                     >
                         <DialogHeader class="space-y-3">
-                            <DialogTitle
-                                >Are you sure you want to delete your
-                                account?</DialogTitle
-                            >
+                            <DialogTitle>{{
+                                trans(
+                                    'Are you sure you want to delete your account?',
+                                )
+                            }}</DialogTitle>
                             <DialogDescription>
-                                Once your account is deleted, all of its
-                                resources and data will also be permanently
-                                deleted. Please enter your password to confirm
-                                you would like to permanently delete your
-                                account.
+                                {{
+                                    trans(
+                                        'Once your account is deleted, all of its resources and data will also be permanently deleted. Please enter your password to confirm you would like to permanently delete your account.',
+                                    )
+                                }}
                             </DialogDescription>
                         </DialogHeader>
 
-                        <div class="grid gap-2">
-                            <Label for="password" class="sr-only"
-                                >Password</Label
-                            >
+                        <div class="pilot-error grid gap-2">
+                            <Label for="password" class="sr-only">{{
+                                trans('Password')
+                            }}</Label>
                             <PasswordInput
                                 id="password"
                                 name="password"
                                 ref="passwordInput"
-                                placeholder="Password"
+                                :placeholder="trans('Password')"
                             />
                             <InputError :message="errors.password" />
                         </div>
@@ -92,7 +107,7 @@ const passwordInput = useTemplateRef('passwordInput');
                                         }
                                     "
                                 >
-                                    Cancel
+                                    {{ trans('Cancel') }}
                                 </Button>
                             </DialogClose>
 
@@ -102,7 +117,7 @@ const passwordInput = useTemplateRef('passwordInput');
                                 :disabled="processing"
                                 data-test="confirm-delete-user-button"
                             >
-                                Delete account
+                                {{ trans('Delete account') }}
                             </Button>
                         </DialogFooter>
                     </Form>

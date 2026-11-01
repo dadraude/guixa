@@ -11,6 +11,7 @@ use Guixa\Stock\Domain\StockLedger;
 use Guixa\Stock\Domain\StockMovement;
 use Guixa\Stock\Domain\StockMovementRepository;
 use Guixa\Stock\Domain\StockProductRepository;
+use Illuminate\Support\Facades\Gate;
 
 final class RecordStockEntry
 {
@@ -25,11 +26,7 @@ final class RecordStockEntry
     /** @param  string  $quantity  A quantity greater than zero, with at most 3 decimals. */
     public function __invoke(Actor $actor, string $stockProductId, string $quantity, ?string $note): void
     {
-        $actor->assertManager();
-
-        if ($this->products->get($stockProductId) === null) {
-            throw StockProductNotFound::withId($stockProductId);
-        }
+        Gate::forUser($actor)->authorize('manage');
 
         $movement = StockMovement::entry(
             $this->movements->nextId(),
@@ -40,6 +37,12 @@ final class RecordStockEntry
             $note,
         );
 
-        $this->transactions->run(fn () => $this->ledger->record($movement));
+        $this->transactions->run(function () use ($stockProductId, $movement): void {
+            if ($this->products->lock($stockProductId) === null) {
+                throw StockProductNotFound::withId($stockProductId);
+            }
+
+            $this->ledger->record($movement);
+        });
     }
 }

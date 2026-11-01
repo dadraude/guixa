@@ -5,7 +5,7 @@ namespace App\Actions\Fortify;
 use App\Models\User;
 use Guixa\Membership\Application\CanLogIn;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Laravel\Fortify\Fortify;
 
@@ -18,10 +18,21 @@ final class AuthenticateAccount
     {
         $user = User::query()->whereRaw('lower(email) = ?', [Str::lower((string) $request->input(Fortify::username()))])->first();
 
-        if ($user === null || ! Hash::check((string) $request->input('password'), $user->password)) {
+        $provider = Auth::guard(config('fortify.guard'))->getProvider();
+        $credentials = ['password' => (string) $request->input('password')];
+
+        if ($user === null || ! $provider->validateCredentials($user, $credentials)) {
             return null;
         }
 
-        return ($this->canLogIn)($user->id) ? $user : null;
+        if (! ($this->canLogIn)($user->id)) {
+            return null;
+        }
+
+        if (config('hashing.rehash_on_login', true)) {
+            $provider->rehashPasswordIfRequired($user, $credentials);
+        }
+
+        return $user;
     }
 }

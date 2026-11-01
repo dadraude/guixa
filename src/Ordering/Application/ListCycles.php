@@ -6,6 +6,7 @@ use Guixa\Ordering\Domain\Cycle;
 use Guixa\Ordering\Domain\CycleRepository;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Clock;
+use Illuminate\Support\Facades\Gate;
 
 final class ListCycles
 {
@@ -17,7 +18,7 @@ final class ListCycles
     /** @return list<CycleData> by pickup date, earliest first */
     public function __invoke(Actor $actor): array
     {
-        $actor->assertManager();
+        Gate::forUser($actor)->authorize('manage');
 
         $timezone = $this->clock->timezone();
         $now = $this->clock->now()->setTimezone($timezone);

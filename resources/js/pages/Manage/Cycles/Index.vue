@@ -1,377 +1,284 @@
 <script setup lang="ts">
 import { Form, Head, Link } from '@inertiajs/vue3';
-import CycleCancellationController from '@/actions/App/Http/Controllers/Manage/CycleCancellationController';
+import { Settings } from '@lucide/vue';
+import { trans } from 'laravel-vue-i18n';
+import { computed, shallowRef } from 'vue';
 import CycleController from '@/actions/App/Http/Controllers/Manage/CycleController';
-import CycleCutoffController from '@/actions/App/Http/Controllers/Manage/CycleCutoffController';
 import CycleParticipantController from '@/actions/App/Http/Controllers/Manage/CycleParticipantController';
-import Heading from '@/components/Heading.vue';
-import InputError from '@/components/InputError.vue';
+import CycleCreateDialog from './CycleCreateDialog.vue';
+import CycleManageDialog from './CycleManageDialog.vue';
 import { Button } from '@/components/ui/button';
-import {
-    Dialog,
-    DialogClose,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import Heading from '@/components/Heading.vue';
+import StatusIndicator from '@/components/StatusIndicator.vue';
 
 defineOptions({
     layout: {
         breadcrumbs: [{ title: 'Cycles', href: CycleController.index() }],
     },
 });
-
 const props = defineProps<{
     cycles: App.Http.CycleRow[];
     producers: App.Http.ProducerOptionRow[];
     pickupWeekday: number | null;
 }>();
-
 const weekdays = [
-    'Monday',
-    'Tuesday',
-    'Wednesday',
-    'Thursday',
-    'Friday',
-    'Saturday',
-    'Sunday',
+    trans('Monday'),
+    trans('Tuesday'),
+    trans('Wednesday'),
+    trans('Thursday'),
+    trans('Friday'),
+    trans('Saturday'),
+    trans('Sunday'),
 ];
+const createOpen = shallowRef(false);
+const manageOpen = shallowRef(false);
+const selectedCycle = shallowRef<App.Http.CycleRow | null>(null);
+const selectedParticipant = shallowRef<
+    App.Http.CycleRow['participants'][number] | null
+>(null);
+const dialogTrigger = shallowRef<HTMLElement | null>(null);
+const pageDescription = computed(() =>
+    props.pickupWeekday === null
+        ? trans("Let's organize the next pickup.")
+        : trans('The usual pickup is on :weekday.', {
+              weekday:
+                  weekdays[props.pickupWeekday - 1].toLocaleLowerCase('ca-ES'),
+          }),
+);
 
-const cutoffLabel = (cutoff: string | null) =>
-    cutoff === null ? 'no cutoff' : new Date(cutoff).toLocaleString();
-
-const missingProducers = (cycle: App.Http.CycleRow) =>
-    props.producers.filter(
+function openCreate(event: MouseEvent) {
+    dialogTrigger.value = event.currentTarget as HTMLElement;
+    createOpen.value = true;
+}
+function openManage(
+    cycle: App.Http.CycleRow,
+    participant: App.Http.CycleRow['participants'][number] | null,
+    event: MouseEvent,
+) {
+    dialogTrigger.value = event.currentTarget as HTMLElement;
+    selectedCycle.value = cycle;
+    selectedParticipant.value = participant;
+    manageOpen.value = true;
+}
+function missingProducers(cycle: App.Http.CycleRow) {
+    return props.producers.filter(
         (producer) =>
             !cycle.participants.some(
                 (participant) => participant.producerId === producer.id,
             ),
     );
+}
+function dateLabel(value: string) {
+    const [year, month, day] = value.slice(0, 10).split('-');
+    return `${day}/${month}/${year}`;
+}
+function cutoffLabel(value: string | null) {
+    return value
+        ? trans(':date at :time', {
+              date: dateLabel(value),
+              time: value.slice(11, 16),
+          })
+        : trans('without a scheduled cutoff');
+}
 </script>
 
 <template>
-    <Head title="Cycles" />
-
-    <div class="flex flex-col gap-8 p-4">
-        <Heading
-            title="Cycles"
-            :description="
-                pickupWeekday === null
-                    ? 'No pickup weekday is set yet'
-                    : `Pickup is on ${weekdays[pickupWeekday - 1]}`
-            "
-        />
-
-        <section class="flex flex-col gap-3">
-            <h2 class="text-lg font-medium">Open a cycle</h2>
-
-            <Form
-                v-bind="CycleController.store.form()"
-                class="flex flex-col gap-3"
-                v-slot="{ errors, processing }"
+    <Head :title="trans('Cycles')" />
+    <div class="pilot-page pilot-layout-page pilot-manager-page">
+        <div class="flex flex-wrap items-end justify-between gap-4">
+            <Heading :title="trans('Cycles')" :description="pageDescription" />
+            <Button
+                class="min-h-11"
+                data-test="open-create-cycle"
+                @click="openCreate"
+                >{{ trans('Open a cycle') }}</Button
             >
-                <div class="grid gap-2">
-                    <Label for="pickup-date">Pickup date</Label>
-                    <Input
-                        id="pickup-date"
-                        name="pickup_date"
-                        type="date"
-                        required
-                        class="w-fit"
-                    />
-                    <InputError :message="errors.pickup_date" />
-                </div>
-
-                <template v-if="pickupWeekday === null">
-                    <div class="grid gap-2">
-                        <Label for="cycle-weekday">Pickup weekday</Label>
-                        <select
-                            id="cycle-weekday"
-                            name="pickup_weekday"
-                            required
-                            class="h-9 w-fit rounded-md border bg-background px-2 text-sm"
-                        >
-                            <option
-                                v-for="(name, index) in weekdays"
-                                :key="name"
-                                :value="index + 1"
-                            >
-                                {{ name }}
-                            </option>
-                        </select>
-                        <InputError :message="errors.pickup_weekday" />
-                    </div>
-
-                    <fieldset class="grid gap-2">
-                        <legend class="text-sm font-medium">
-                            Is this weekday permanent?
-                        </legend>
-                        <label class="flex items-center gap-2 text-sm">
-                            <input
-                                type="radio"
-                                name="permanent"
-                                value="1"
-                                required
-                            />
-                            Permanent: it becomes the cooperative's pickup
-                            weekday
-                        </label>
-                        <label class="flex items-center gap-2 text-sm">
-                            <input type="radio" name="permanent" value="0" />
-                            Provisional: only for this cycle
-                        </label>
-                        <InputError :message="errors.permanent" />
-                    </fieldset>
-                </template>
-
-                <fieldset class="grid gap-2">
-                    <legend class="text-sm font-medium">
-                        Participating producers
-                    </legend>
-                    <p
-                        v-if="producers.length === 0"
-                        class="text-sm text-muted-foreground"
-                    >
-                        There are no active producers.
-                    </p>
-                    <label
-                        v-for="producer in producers"
-                        :key="producer.id"
-                        class="flex items-center gap-2 text-sm"
-                    >
-                        <input
-                            type="checkbox"
-                            name="producer_ids[]"
-                            :value="producer.id"
-                        />
-                        {{ producer.name }}
-                    </label>
-                    <InputError :message="errors.producer_ids" />
-                </fieldset>
-
-                <InputError :message="errors.domain" />
-                <Button
-                    type="submit"
-                    class="w-fit"
-                    :disabled="processing"
-                    data-test="open-cycle"
-                >
-                    Open cycle
-                </Button>
-            </Form>
-        </section>
-
-        <p v-if="cycles.length === 0" class="text-sm text-muted-foreground">
-            No cycles yet.
+        </div>
+        <p
+            v-if="cycles.length === 0"
+            class="pilot-layout-notice text-sm text-muted-foreground"
+        >
+            {{ trans('No cycles yet.') }}
         </p>
-
-        <ul v-else class="divide-y rounded-lg border">
+        <ul v-else class="pilot-list space-y-0">
             <li
                 v-for="cycle in cycles"
                 :key="cycle.id"
-                class="flex flex-col gap-3 p-3"
+                class="grid gap-4"
                 :data-test="`cycle-${cycle.id}`"
             >
-                <div class="flex items-center justify-between gap-2">
-                    <span class="font-medium">
-                        Pickup {{ cycle.pickupDate }}
-                    </span>
-                    <Link
-                        :href="CycleController.show(cycle.id)"
-                        class="text-sm underline"
-                        :data-test="`summary-${cycle.id}`"
-                    >
-                        Orders
-                    </Link>
-                    <span
-                        v-if="cycle.cancelled"
-                        class="text-sm text-muted-foreground"
-                        :data-test="`cancelled-${cycle.id}`"
-                    >
-                        Cancelled
-                    </span>
-                    <Dialog v-else>
-                        <DialogTrigger as-child>
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                :data-test="`cancel-${cycle.id}`"
-                            >
-                                Cancel cycle
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                            <Form
-                                v-bind="
-                                    CycleCancellationController.store.form({
-                                        cycle: cycle.id,
-                                    })
-                                "
-                                class="space-y-6"
-                                v-slot="{ errors, processing }"
-                            >
-                                <DialogHeader class="space-y-3">
-                                    <DialogTitle>
-                                        Cancel the cycle with pickup
-                                        {{ cycle.pickupDate }}?
-                                    </DialogTitle>
-                                    <DialogDescription>
-                                        This discards the orders of every
-                                        household in this cycle and cannot be
-                                        undone. Members will see the cycle as
-                                        cancelled.
-                                    </DialogDescription>
-                                </DialogHeader>
-                                <InputError :message="errors.domain" />
-                                <DialogFooter class="gap-2">
-                                    <DialogClose as-child>
-                                        <Button variant="secondary">
-                                            Keep cycle
-                                        </Button>
-                                    </DialogClose>
-                                    <Button
-                                        type="submit"
-                                        variant="destructive"
-                                        :disabled="processing"
-                                        :data-test="`confirm-cancel-${cycle.id}`"
-                                    >
-                                        Cancel cycle
-                                    </Button>
-                                </DialogFooter>
-                            </Form>
-                        </DialogContent>
-                    </Dialog>
+                <div
+                    class="flex flex-wrap items-center justify-between gap-4 border-b pb-4"
+                >
+                    <div class="flex flex-wrap items-center gap-4">
+                        <h2 class="text-lg font-semibold">
+                            {{
+                                trans('Pickup :date', {
+                                    date: dateLabel(cycle.pickupDate),
+                                })
+                            }}
+                        </h2>
+                        <StatusIndicator
+                            :label="
+                                cycle.cancelled
+                                    ? trans('Cancelled')
+                                    : cycle.closed
+                                      ? trans('Closed')
+                                      : trans('Open')
+                            "
+                            :tone="
+                                cycle.cancelled
+                                    ? 'danger'
+                                    : cycle.closed
+                                      ? 'neutral'
+                                      : 'success'
+                            "
+                            :data-test="
+                                cycle.cancelled
+                                    ? `cancelled-${cycle.id}`
+                                    : undefined
+                            "
+                        />
+                    </div>
+                    <div class="pilot-action-row">
+                        <Button as-child variant="outline" class="min-h-11"
+                            ><Link
+                                :href="CycleController.show(cycle.id)"
+                                :data-test="`summary-${cycle.id}`"
+                                >{{ trans('Orders') }}</Link
+                            ></Button
+                        >
+                        <Button
+                            v-if="!cycle.cancelled && !cycle.closed"
+                            variant="outline"
+                            size="icon"
+                            class="size-11"
+                            :aria-label="
+                                trans('Manage cycle for :date', {
+                                    date: dateLabel(cycle.pickupDate),
+                                })
+                            "
+                            :title="
+                                trans('Manage cycle for :date', {
+                                    date: dateLabel(cycle.pickupDate),
+                                })
+                            "
+                            :data-test="`manage-${cycle.id}`"
+                            @click="openManage(cycle, null, $event)"
+                        >
+                            <Settings aria-hidden="true" />
+                        </Button>
+                    </div>
                 </div>
-
                 <p
                     v-if="cycle.participants.length === 0"
                     class="text-sm text-muted-foreground"
                 >
-                    No producer participates yet.
+                    {{ trans('No producer takes part in this cycle yet.') }}
                 </p>
-                <ul v-else class="divide-y text-sm">
+                <ul v-else class="divide-y">
                     <li
                         v-for="participant in cycle.participants"
                         :key="participant.producerId"
-                        class="flex flex-col gap-2 py-2"
+                        class="flex flex-wrap items-center justify-between gap-2 py-2"
                         :data-test="`participant-${cycle.id}-${participant.producerId}`"
                     >
-                        <div class="flex justify-between gap-2">
-                            <span>{{ participant.producerName }}</span>
-                            <span class="text-muted-foreground">
-                                {{ participant.open ? 'Open' : 'Closed' }},
-                                {{ cutoffLabel(participant.cutoff) }}
-                            </span>
-                        </div>
-
-                        <div
-                            v-if="participant.participating && !cycle.cancelled"
-                            class="flex flex-wrap items-center gap-2"
+                        <span class="font-medium">{{
+                            participant.producerName
+                        }}</span>
+                        <span
+                            class="flex flex-wrap items-center gap-2 text-sm text-muted-foreground"
                         >
-                            <Form
-                                v-bind="
-                                    CycleCutoffController.update.form({
-                                        cycle: cycle.id,
-                                        producer: participant.producerId,
-                                    })
+                            <StatusIndicator
+                                :label="
+                                    participant.open
+                                        ? trans('Open')
+                                        : trans('Closed')
                                 "
-                                class="flex items-center gap-2"
-                                v-slot="{ errors, processing }"
-                            >
-                                <Input
-                                    name="cutoff"
-                                    type="datetime-local"
-                                    required
-                                    class="w-fit"
-                                    :aria-label="`New cutoff for ${participant.producerName}`"
-                                />
-                                <Button
-                                    type="submit"
-                                    variant="outline"
-                                    size="sm"
-                                    :disabled="processing"
-                                    :data-test="`set-cutoff-${cycle.id}-${participant.producerId}`"
-                                >
-                                    Set cutoff
-                                </Button>
-                                <InputError
-                                    :message="errors.cutoff ?? errors.domain"
-                                />
-                            </Form>
-                            <Form
-                                v-bind="
-                                    CycleCutoffController.close.form({
-                                        cycle: cycle.id,
-                                        producer: participant.producerId,
-                                    })
-                                "
-                                v-slot="{ processing }"
-                            >
-                                <Button
-                                    type="submit"
-                                    variant="outline"
-                                    size="sm"
-                                    :disabled="processing"
-                                    :data-test="`close-now-${cycle.id}-${participant.producerId}`"
-                                >
-                                    Close now
-                                </Button>
-                            </Form>
-                            <Form
-                                v-if="participant.cutoff !== null"
-                                v-bind="
-                                    CycleCutoffController.destroy.form({
-                                        cycle: cycle.id,
-                                        producer: participant.producerId,
-                                    })
-                                "
-                                v-slot="{ processing }"
-                            >
-                                <Button
-                                    type="submit"
-                                    variant="outline"
-                                    size="sm"
-                                    :disabled="processing"
-                                    :data-test="`clear-cutoff-${cycle.id}-${participant.producerId}`"
-                                >
-                                    Clear cutoff
-                                </Button>
-                            </Form>
-                        </div>
+                                :tone="participant.open ? 'success' : 'neutral'"
+                            />
+                            {{ cutoffLabel(participant.cutoff) }}
+                        </span>
+                        <Button
+                            v-if="
+                                participant.participating &&
+                                !cycle.cancelled &&
+                                !cycle.closed
+                            "
+                            variant="outline"
+                            size="icon"
+                            class="size-11"
+                            :aria-label="
+                                trans('Manage :producer · :date', {
+                                    producer: participant.producerName,
+                                    date: dateLabel(cycle.pickupDate),
+                                })
+                            "
+                            :title="
+                                trans('Manage :producer · :date', {
+                                    producer: participant.producerName,
+                                    date: dateLabel(cycle.pickupDate),
+                                })
+                            "
+                            :data-test="`manage-${cycle.id}-${participant.producerId}`"
+                            @click="openManage(cycle, participant, $event)"
+                        >
+                            <Settings aria-hidden="true" />
+                        </Button>
                     </li>
                 </ul>
-
-                <Form
-                    v-for="producer in cycle.cancelled
-                        ? []
-                        : missingProducers(cycle)"
-                    :key="producer.id"
-                    v-bind="
-                        CycleParticipantController.store.form({
-                            cycle: cycle.id,
-                            producer: producer.id,
-                        })
+                <details
+                    v-if="
+                        !cycle.cancelled &&
+                        !cycle.closed &&
+                        missingProducers(cycle).length
                     "
-                    class="flex items-center gap-2"
-                    v-slot="{ errors, processing }"
+                    class="border-t pt-2"
                 >
-                    <Button
-                        type="submit"
-                        variant="outline"
-                        size="sm"
-                        :disabled="processing"
-                        :data-test="`add-${cycle.id}-${producer.id}`"
+                    <summary
+                        class="flex min-h-11 cursor-pointer items-center text-sm font-medium"
                     >
-                        Add {{ producer.name }}
-                    </Button>
-                    <InputError :message="errors.domain" />
-                </Form>
+                        {{ trans('Add a producer') }}
+                    </summary>
+                    <div class="pilot-action-row mt-2">
+                        <Form
+                            v-for="producer in missingProducers(cycle)"
+                            :key="producer.id"
+                            v-bind="
+                                CycleParticipantController.store.form({
+                                    cycle: cycle.id,
+                                    producer: producer.id,
+                                })
+                            "
+                            v-slot="{ processing }"
+                        >
+                            <Button
+                                type="submit"
+                                variant="outline"
+                                size="sm"
+                                class="min-h-11"
+                                :disabled="processing"
+                                :data-test="`add-${cycle.id}-${producer.id}`"
+                                >{{ producer.name }}</Button
+                            >
+                        </Form>
+                    </div>
+                </details>
             </li>
         </ul>
+        <CycleCreateDialog
+            :open="createOpen"
+            :return-focus-to="dialogTrigger"
+            :producers="producers"
+            :pickup-weekday="pickupWeekday"
+            @close="createOpen = false"
+        />
+        <CycleManageDialog
+            :open="manageOpen"
+            :cycle="selectedCycle"
+            :participant="selectedParticipant"
+            :return-focus-to="dialogTrigger"
+            @close="manageOpen = false"
+        />
     </div>
 </template>

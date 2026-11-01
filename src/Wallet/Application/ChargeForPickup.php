@@ -7,6 +7,7 @@ use Guixa\Shared\Domain\Clock;
 use Guixa\Shared\Domain\Money;
 use Guixa\Wallet\Domain\Movement;
 use Guixa\Wallet\Domain\MovementRepository;
+use Illuminate\Support\Facades\Gate;
 
 final class ChargeForPickup
 {
@@ -21,7 +22,7 @@ final class ChargeForPickup
      */
     public function __invoke(Actor $actor, string $householdId, string $cycleId, int $totalCents): ?string
     {
-        $actor->assertManager();
+        Gate::forUser($actor)->authorize('manage');
 
         if ($totalCents === 0) {
             return null;

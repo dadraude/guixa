@@ -4,6 +4,7 @@
 /public/build
 /public/fonts-manifest.dev.json
 /public/hot
+/lang/php_*.json
 /public/storage
 /storage/*.key
 /storage/pail
@@ -30,16 +31,18 @@ yarn-error.log
 /.agents/*
 !/.agents/skills/
 /.agents/skills/*
-!/.agents/skills/guixa-implement-session/
-!/.agents/skills/guixa-implement-task/
-!/.agents/skills/guixa-to-tickets/
-/.agents/skills/guixa-*/*
-!/.agents/skills/guixa-*/SKILL.md
-!/.agents/skills/guixa-*/agents/
-/.agents/skills/guixa-*/agents/*
-!/.agents/skills/guixa-*/agents/openai.yaml
+!/.agents/skills/agent-workflow-implement-session/
+!/.agents/skills/agent-workflow-implement-task/
+!/.agents/skills/agent-workflow-to-tickets/
+/.agents/skills/agent-workflow-*/*
+!/.agents/skills/agent-workflow-*/SKILL.md
+!/.agents/skills/agent-workflow-*/agents/
+/.agents/skills/agent-workflow-*/agents/*
+!/.agents/skills/agent-workflow-*/agents/openai.yaml
 /.amp
 /.claude/*
+!/.claude/settings.json
+!/.claude/hooks/
 !/.claude/skills/
 /.claude/skills/*
 !/.claude/skills/implement-session/
@@ -56,11 +59,15 @@ yarn-error.log
 /.kiro
 /.pi
 /.mcp.json
-/AGENTS.md
-/CLAUDE.md
 /boost.json
 /opencode.json
 /opencode.jsonc
 .vitest/
 # Local AI runtime state
 .atl/
+
+# Retained implementation identity; local to each task worktree.
+/.agent-workflow/implementation-owner.json
+/.agent-workflow/implementation-owner.json.tmp
+/skills/agent-workflow/tests/__pycache__/
+/.agent-workflow/tests/__pycache__/

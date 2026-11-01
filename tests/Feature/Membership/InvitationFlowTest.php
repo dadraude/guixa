@@ -35,13 +35,15 @@ beforeEach(function () {
 // S25 — Member invitation (R33, R34)
 
 it('refuses login until the invitation is accepted, then lets Anna in with the password she chose (S25)', function () {
+    app()->setLocale('ca');
     [$householdId, $url] = inviteAnna($this->manager);
 
     $this->post(route('login.store'), ['email' => 'anna@example.org', 'password' => 'password'])->assertSessionHasErrors();
     $this->assertGuest();
 
     $this->post($url, ['password' => 'a-new-password', 'password_confirmation' => 'a-new-password'])
-        ->assertRedirect(route('login'));
+        ->assertRedirect(route('login'))
+        ->assertSessionHas('status', 'La contrasenya ja està establerta. Ara pots iniciar sessió.');
 
     $this->post(route('login.store'), ['email' => 'anna@example.org', 'password' => 'a-new-password']);
     $this->assertAuthenticated();
@@ -69,7 +71,9 @@ it('rejects a link older than 7 days with a form error (S25)', function () {
     $this->app->instance(Clock::class, new FrozenClock(now()->addDays(7)->addMinute()->toIso8601String()));
 
     $this->from($url)->post($url, ['password' => 'a-new-password', 'password_confirmation' => 'a-new-password'])
-        ->assertSessionHasErrors('domain');
+        ->assertSessionHasErrors('domain')
+        ->assertSessionMissingInput('password')
+        ->assertSessionMissingInput('password_confirmation');
     $this->assertGuest();
 });
 
@@ -81,7 +85,9 @@ it('rejects a link replaced by a resent one (S25)', function () {
     auth()->logout();
 
     $this->from($oldUrl)->post($oldUrl, ['password' => 'a-new-password', 'password_confirmation' => 'a-new-password'])
-        ->assertSessionHasErrors('domain');
+        ->assertSessionHasErrors('domain')
+        ->assertSessionMissingInput('password')
+        ->assertSessionMissingInput('password_confirmation');
 
     $newUrl = null;
     Mail::assertSent(InvitationMail::class, 2);

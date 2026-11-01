@@ -136,7 +136,7 @@ it('rolls the whole deactivation back when a step fails (R3a, D13)', function ()
     $account = deactivationAccountOf($jordi);
 
     expect(fn () => app(DeactivateProducer::class)(
-        new Actor('m', [Role::Manager]),
+        Actor::manager('m'),
         $jordi->id,
     ))->toThrow(RuntimeException::class);
 

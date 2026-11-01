@@ -5,14 +5,17 @@ namespace Guixa\Membership\Application;
 use Guixa\Membership\Domain\AccountRepository;
 use Guixa\Membership\Domain\Error\AccountNotFound;
 use Guixa\Membership\Domain\Error\LastActiveManager;
+use Guixa\Membership\Domain\HouseholdRepository;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Application\TransactionRunner;
 use Guixa\Shared\Domain\Clock;
+use Illuminate\Support\Facades\Gate;
 
 final class DeactivateAccount
 {
     public function __construct(
         private readonly AccountRepository $accounts,
+        private readonly HouseholdRepository $households,
         private readonly DeactivateEmptyHousehold $deactivateEmptyHousehold,
         private readonly TransactionRunner $transactions,
         private readonly Clock $clock,
@@ -20,10 +23,11 @@ final class DeactivateAccount
 
     public function __invoke(Actor $actor, string $accountId): void
     {
-        $actor->assertManager();
+        Gate::forUser($actor)->authorize('manage');
 
         $this->transactions->run(function () use ($accountId): void {
-            // Locked first, so two deactivations cannot each see the other manager still active (R36b).
+            // The membership lock comes before manager rows; deactivation and moves may save a manager account.
+            $this->households->lockMembershipChanges();
             $this->accounts->lockManagers();
 
             $account = $this->accounts->get($accountId) ?? throw AccountNotFound::withId($accountId);
@@ -36,6 +40,7 @@ final class DeactivateAccount
 
             $account->deactivate($this->clock->now());
             $this->accounts->save($account);
+            $this->accounts->saveHouseholdLink($account);
 
             ($this->deactivateEmptyHousehold)($previousHouseholdId);
         });

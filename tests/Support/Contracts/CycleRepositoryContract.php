@@ -78,6 +78,60 @@ trait CycleRepositoryContract
     }
 
     #[Test]
+    public function it_keeps_the_validation_and_the_distribution_of_a_producer_and_the_settlement_of_the_cycle(): void
+    {
+        $repository = $this->repository();
+        $cycle = $this->cycle($repository);
+        $now = $this->madrid('2026-10-22 10:00');
+        $cycle->addParticipant(self::BAKER, CutoffRule::of(3, '20:00'), $now);
+        $cycle->addParticipant(self::GROWER, CutoffRule::of(2, '12:00'), $now);
+        foreach ([self::BAKER, self::GROWER] as $producerId) {
+            $cycle->closeNow($producerId, $now);
+            $cycle->send($producerId, $now);
+            $cycle->validate($producerId, $now);
+        }
+        $cycle->markDistributed(self::BAKER, true, $now);
+        $repository->add($cycle);
+
+        $found = $repository->get($cycle->id);
+
+        $this->assertNotNull($found);
+        $this->assertSame([true, true, false], [$found->isValidated(self::BAKER), $found->isDistributed(self::BAKER), $found->isSettled()]);
+        $this->assertSame([true, false], [$found->isValidated(self::GROWER), $found->isDistributed(self::GROWER)]);
+
+        $found->markDistributed(self::GROWER, true, $this->madrid('2026-10-22 11:00'));
+        $repository->add($found);
+
+        $settled = $repository->getForUpdate($cycle->id);
+        $this->assertTrue($settled?->isSettled());
+        $this->assertSame($this->madrid('2026-10-22 11:00')->getTimestamp(), $settled?->settledAt()?->getTimestamp());
+    }
+
+    #[Test]
+    public function it_stores_a_reopened_producer_as_not_distributed_and_a_cleared_validation(): void
+    {
+        $repository = $this->repository();
+        $cycle = $this->cycle($repository);
+        $now = $this->madrid('2026-10-22 10:00');
+        $cycle->addParticipant(self::BAKER, CutoffRule::of(3, '20:00'), $now);
+        $cycle->addParticipant(self::GROWER, CutoffRule::of(2, '12:00'), $now);
+        $cycle->closeNow(self::BAKER, $now);
+        $cycle->send(self::BAKER, $now);
+        $cycle->validate(self::BAKER, $now);
+        $cycle->markDistributed(self::BAKER, true, $now);
+        $repository->add($cycle);
+
+        $found = $repository->get($cycle->id);
+        $found?->reopen(self::BAKER);
+        $repository->add($found);
+        $this->assertSame([true, false], [$repository->get($cycle->id)?->isValidated(self::BAKER), $repository->get($cycle->id)?->isDistributed(self::BAKER)]);
+
+        $found->clearValidation(self::BAKER);
+        $repository->add($found);
+        $this->assertFalse($repository->get($cycle->id)?->isValidated(self::BAKER));
+    }
+
+    #[Test]
     public function it_returns_null_for_an_unknown_id(): void
     {
         $repository = $this->repository();
@@ -177,6 +231,28 @@ trait CycleRepositoryContract
         }
         $this->assertSame($this->madrid('2026-11-05 12:00')->getTimestamp(), $orders[self::BAKER]);
         $this->assertNull($orders[self::GROWER]);
+    }
+
+    #[Test]
+    public function it_stores_when_a_producer_order_was_sent(): void
+    {
+        $repository = $this->repository();
+        $now = $this->madrid('2026-10-22 10:00');
+        $cycle = $this->cycle($repository);
+        $cycle->addParticipant(self::BAKER, CutoffRule::of(3, '20:00'), $now);
+        $cycle->addParticipant(self::GROWER, CutoffRule::of(2, '12:00'), $now);
+        $repository->add($cycle);
+
+        $stored = $repository->getForUpdate($cycle->id);
+        $stored->closeNow(self::BAKER, $this->madrid('2026-11-04 21:00'));
+        $stored->send(self::BAKER, $this->madrid('2026-11-04 21:00'));
+        $repository->add($stored);
+
+        $found = $repository->get($cycle->id);
+        $this->assertTrue($found->isSent(self::BAKER));
+        $this->assertFalse($found->isSent(self::GROWER));
+        $sentAt = collect($found->producerOrders())->firstWhere('producerId', self::BAKER)->sentAt();
+        $this->assertSame($this->madrid('2026-11-04 21:00')->getTimestamp(), $sentAt->getTimestamp());
     }
 
     #[Test]

@@ -5,27 +5,127 @@ on:
     branches:
       - main
   pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
-  ci:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      frontend: ${{ steps.filter.outputs.frontend }}
+      backend: ${{ steps.filter.outputs.backend }}
+      tooling: ${{ steps.filter.outputs.tooling }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Select checks
+        id: filter
+        env:
+          EVENT: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: python3 .github/scripts/checks.py changes
+
+  # Keep the existing docs check on every PR, including mixed code/docs changes.
+  docs:
+    runs-on: [self-hosted, Windows]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+
+      - name: Setup Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '22'
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check formatting and lint
+        run: pnpm run check
+
+  frontend:
+    needs: changes
+    if: needs.changes.outputs.frontend == 'true'
+    runs-on: [self-hosted, Windows]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # v2
+        with:
+          php-version: '8.5'
+          extensions: pdo_pgsql, redis
+          tools: composer:v2
+          coverage: none
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+
+      - name: Setup Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '22'
+          cache: pnpm
+
+      # Wayfinder generates routes while building; PHP is needed, services are not.
+      # One command per step: PowerShell only fails a step on its last exit code.
+      - name: Install PHP dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Prepare environment
+        run: |
+          Copy-Item .env.example .env
+          php artisan key:generate
+
+      - name: Install frontend dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build frontend and generate routes
+        run: pnpm run build
+
+      - name: Check frontend types
+        run: pnpm run types:check
+
+      - name: Run frontend tests
+        run: pnpm run test
+
+  backend:
+    needs: changes
+    if: needs.changes.outputs.backend == 'true'
     runs-on: [self-hosted, Windows]
 
-    # Job services need a Linux runner, so Postgres runs through `docker run`
-    # on a non-default port to stay clear of any local Postgres.
+    # Job services need a Linux runner, so Postgres and Redis run through
+    # `docker run` on non-default ports to stay clear of local instances.
     env:
       PG_CONTAINER: guixa-ci-pg-${{ github.run_id }}-${{ github.run_attempt }}
+      REDIS_CONTAINER: guixa-ci-redis-${{ github.run_id }}-${{ github.run_attempt }}
       DB_CONNECTION: pgsql
       DB_HOST: 127.0.0.1
       DB_PORT: 55432
       DB_DATABASE: guixa_test
       DB_USERNAME: postgres
       DB_PASSWORD: postgres
+      REDIS_HOST: 127.0.0.1
+      REDIS_PORT: 56379
 
     steps:
-      - name: Start Postgres
+      - name: Start Postgres and Redis
         run: |
           docker run -d --name $env:PG_CONTAINER `
             -e POSTGRES_USER=postgres `
@@ -34,9 +134,15 @@ jobs:
             -p "${env:DB_PORT}:5432" `
             postgres:17
           if ($LASTEXITCODE -ne 0) { exit 1 }
+          docker run -d --name $env:REDIS_CONTAINER `
+            -p "${env:REDIS_PORT}:6379" `
+            redis:7
+          if ($LASTEXITCODE -ne 0) { exit 1 }
           for ($i = 0; $i -lt 30; $i++) {
             docker exec $env:PG_CONTAINER pg_isready -h 127.0.0.1 -U postgres
-            if ($LASTEXITCODE -eq 0) { exit 0 }
+            $pg = $LASTEXITCODE
+            docker exec $env:REDIS_CONTAINER redis-cli ping
+            if ($pg -eq 0 -and $LASTEXITCODE -eq 0) { exit 0 }
             Start-Sleep -Seconds 2
           }
           exit 1
@@ -50,7 +156,7 @@ jobs:
         uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # v2
         with:
           php-version: '8.5'
-          extensions: pdo_pgsql
+          extensions: pdo_pgsql, redis
           tools: composer:v2
           coverage: none
 
@@ -66,9 +172,59 @@ jobs:
       - name: Setup Application
         run: composer setup
 
-      - name: Run CI Checks
-        run: composer ci:check
+      - name: Run PHP checks and tests
+        run: composer test
 
-      - name: Stop Postgres
+      - name: Stop Postgres and Redis
         if: always()
-        run: docker rm -f $env:PG_CONTAINER
+        run: docker rm -f $env:PG_CONTAINER $env:REDIS_CONTAINER
+
+  # Stays on Linux: it needs python3 and Chrome at /usr/bin.
+  tooling:
+    needs: changes
+    if: needs.changes.outputs.tooling == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # v2
+        with:
+          php-version: '8.5'
+          extensions: pdo_pgsql, redis
+          tools: composer:v2
+          coverage: none
+
+      - name: Setup Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '22'
+
+      - name: Check CI selection and gate
+        run: python3 .github/scripts/test_commands.py selection
+
+      - name: Check workflow contracts
+        run: python3 .github/scripts/test_commands.py contracts
+
+      - name: Check workflow helpers and visual harness
+        env:
+          CHROME_BIN: /usr/bin/google-chrome
+        run: python3 .github/scripts/test_commands.py helpers
+
+  ci:
+    if: always()
+    needs: [changes, docs, frontend, backend, tooling]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Require all selected checks to pass
+        env:
+          NEEDS: ${{ toJSON(needs) }}
+        run: python3 .github/scripts/checks.py gate

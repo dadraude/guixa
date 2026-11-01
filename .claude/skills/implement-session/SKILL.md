@@ -1,14 +1,9 @@
 ---
 name: implement-session
-description: 'Coordinate compatible Guixa implementation tasks.'
+description: Coordinate every compatible Coop task of the project in parallel, each to its own PR.
 disable-model-invocation: true
 ---
 
-# Guixa implement-session
-
-Explicit invocation only. Load the [Claude Code adapter](../../../skills/guixa-workflow/adapters/claude-code.md),
-[project profile](../../../skills/guixa-workflow/project.md), then the
-[shared process](../../../skills/guixa-workflow/core/session.md), in that order.
-Follow the shared process; this entrypoint adds no publication, ticket-migration or permission authority.
-The coordinator loads these sources once; dispatch workers with the shared process's role-scoped
-handoff, not this full loading chain. Missing capabilities stop the relevant action; keep review independent.
+Follow the [session process](../../../skills/agent-workflow/core/session.md) with the
+[Claude Code adapter](../../../skills/agent-workflow/adapters/claude-code.md) and the
+[project profile](../../../.agent-workflow/profile.md).

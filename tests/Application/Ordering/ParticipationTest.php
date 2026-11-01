@@ -6,8 +6,7 @@ use Guixa\Ordering\Domain\Error\ProducerNotActive;
 use Guixa\Ordering\Domain\Error\ProducerNotInCycle;
 use Guixa\Ordering\Domain\Error\ProducerNotParticipating;
 use Guixa\Shared\Application\Actor;
-use Guixa\Shared\Domain\Error\NotAllowed;
-use Guixa\Shared\Domain\Role;
+use Illuminate\Auth\Access\AuthorizationException;
 use Tests\Support\Ordering\OrderingWorld;
 
 beforeEach(function () {
@@ -16,7 +15,7 @@ beforeEach(function () {
     $this->bread = $this->world->catalog->offer(OrderingWorld::BAKER, 'Loaf', 'loaf', 350, variable: false);
     $this->cycleA = ($this->world->openCycle)($this->world->manager, '2026-11-07', [OrderingWorld::BAKER]);
     $this->cycleB = ($this->world->openCycle)($this->world->manager, '2026-11-14', [OrderingWorld::BAKER]);
-    $this->anna = new Actor('00000000-0000-7000-8000-0000000000a1', [Role::Member], '00000000-0000-7000-8000-0000000000e1');
+    $this->anna = Actor::memberOf('00000000-0000-7000-8000-0000000000a1', '00000000-0000-7000-8000-0000000000e1');
     $this->stop = fn (string $cycleId) => ($this->world->stopParticipating)($this->world->manager, $cycleId, OrderingWorld::BAKER);
     $this->again = fn (string $cycleId) => ($this->world->participateAgain)($this->world->manager, $cycleId, OrderingWorld::BAKER);
     $this->marked = fn (string $cycleId) => collect(($this->world->getHouseholdOrder)($this->anna, $cycleId)->lines)
@@ -99,10 +98,10 @@ it('does not let a deactivated producer participate again (R3a, R6c)', function 
 });
 
 it('keeps stopping and participating again to managers (R6c)', function () {
-    $producer = new Actor('00000000-0000-7000-8000-0000000000aa', [Role::Producer], null, OrderingWorld::BAKER);
+    $producer = Actor::producer('00000000-0000-7000-8000-0000000000aa', OrderingWorld::BAKER);
 
-    expect(fn () => ($this->world->stopParticipating)($this->world->member(), $this->cycleA, OrderingWorld::BAKER))->toThrow(NotAllowed::class)
-        ->and(fn () => ($this->world->participateAgain)($producer, $this->cycleA, OrderingWorld::BAKER))->toThrow(NotAllowed::class)
+    expect(fn () => ($this->world->stopParticipating)($this->world->member(), $this->cycleA, OrderingWorld::BAKER))->toThrow(AuthorizationException::class)
+        ->and(fn () => ($this->world->participateAgain)($producer, $this->cycleA, OrderingWorld::BAKER))->toThrow(AuthorizationException::class)
         ->and(($this->participating)($this->cycleA))->toBeTrue();
 });
 

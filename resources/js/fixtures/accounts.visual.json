@@ -1,0 +1,63 @@
+{
+    "baseUrl": "http://127.0.0.1:5184",
+    "rootFontPx": 16,
+    "darkSelector": "html.dark",
+    "matrix": {
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark"],
+        "text": [100, 200]
+    },
+    "views": [
+        {
+            "id": "manager-accounts",
+            "path": "/visual-accounts.html",
+            "root": ".pilot-manager-page",
+            "panels": ".pilot-list",
+            "content": "h1,h2,p,[data-slot=select-trigger],button,label",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "[data-test=deactivate-admin]",
+                "[aria-label='Household for Admin']",
+                "[data-test=reactivate-producer]"
+            ],
+            "states": [
+                {
+                    "id": "populated",
+                    "cases": [
+                        { "width": 375, "mode": "light", "text": 100 },
+                        { "width": 375, "mode": "dark", "text": 100 },
+                        { "width": 375, "mode": "light", "text": 200 },
+                        { "width": 1280, "mode": "light", "text": 100 },
+                        { "width": 1280, "mode": "dark", "text": 100 },
+                        { "width": 1024, "mode": "light", "text": 200 },
+                        { "width": 1024, "mode": "dark", "text": 200 }
+                    ]
+                },
+                {
+                    "id": "empty",
+                    "query": { "empty": 1 },
+                    "checks": {
+                        "panels": ".pilot-layout-notice",
+                        "focus": [],
+                        "noFocusReason": "An empty account list has no account controls."
+                    },
+                    "cases": [{ "width": 375, "mode": "light", "text": 100 }]
+                },
+                {
+                    "id": "long-content",
+                    "query": { "long": 1 },
+                    "checks": {
+                        "focus": [
+                            "[data-test=deactivate-admin]",
+                            "[aria-label^='Household for Administrador']"
+                        ]
+                    },
+                    "cases": [
+                        { "width": 375, "mode": "light", "text": 200 },
+                        { "width": 1024, "mode": "dark", "text": 200 }
+                    ]
+                }
+            ]
+        }
+    ]
+}

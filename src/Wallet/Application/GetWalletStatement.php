@@ -3,9 +3,9 @@
 namespace Guixa\Wallet\Application;
 
 use Guixa\Shared\Application\Actor;
-use Guixa\Shared\Domain\Role;
 use Guixa\Wallet\Domain\Movement;
 use Guixa\Wallet\Domain\MovementRepository;
+use Illuminate\Support\Facades\Gate;
 
 final class GetWalletStatement
 {
@@ -13,9 +13,7 @@ final class GetWalletStatement
 
     public function __invoke(Actor $actor, string $householdId): WalletStatement
     {
-        if (! $actor->hasRole(Role::Manager)) {
-            $actor->assertMemberOf($householdId);
-        }
+        Gate::forUser($actor)->authorize('collectFor', ['household', $householdId]);
 
         return new WalletStatement(
             $this->movements->balanceOf($householdId)->cents,
@@ -32,6 +30,7 @@ final class GetWalletStatement
             $movement->occurredAt,
             $movement->note,
             $movement->cycleId,
+            $movement->basketId,
         );
     }
 }

@@ -21,7 +21,7 @@ final class ListOrderableProducts
             return [];
         }
 
-        $active = array_filter($this->products->listByProducer($producerId), fn (Product $product) => $product->isActive());
+        $active = array_filter($this->products->listByProducer($producerId), fn (Product $product) => ! $product->isStock() && $product->isActive());
 
         return array_values(array_map(OrderableProductData::of(...), $active));
     }

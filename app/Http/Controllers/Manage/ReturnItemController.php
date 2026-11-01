@@ -9,6 +9,7 @@ use Guixa\Shared\Application\Actor;
 use Guixa\Stock\Application\CreateReturnItem;
 use Guixa\Stock\Application\DeactivateReturnItem;
 use Guixa\Stock\Application\ListReturnItems;
+use Guixa\Stock\Application\ReactivateReturnItem;
 use Guixa\Stock\Application\UpdateReturnItem;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
@@ -53,6 +54,13 @@ class ReturnItemController extends Controller
     public function destroy(string $returnItem, Actor $actor, DeactivateReturnItem $deactivate): RedirectResponse
     {
         $deactivate($actor, $returnItem);
+
+        return to_route('manage.return-items.index');
+    }
+
+    public function reactivate(string $returnItem, Actor $actor, ReactivateReturnItem $reactivate): RedirectResponse
+    {
+        $reactivate($actor, $returnItem);
 
         return to_route('manage.return-items.index');
     }

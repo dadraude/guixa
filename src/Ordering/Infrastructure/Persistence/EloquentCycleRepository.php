@@ -22,6 +22,8 @@ final class EloquentCycleRepository implements CycleRepository
         CycleModel::query()->updateOrCreate(['id' => $cycle->id], [
             'pickup_date' => $cycle->pickupDate()->format('Y-m-d'),
             'cancelled_at' => $cycle->cancelledAt()?->format(DATE_ATOM),
+            'settled_at' => $cycle->settledAt()?->format(DATE_ATOM),
+            'closed_at' => $cycle->closedAt()?->format(DATE_ATOM),
         ]);
 
         $rows = array_map(fn (ProducerOrder $order) => [
@@ -29,10 +31,13 @@ final class EloquentCycleRepository implements CycleRepository
             'producer_id' => $order->producerId,
             'participating' => $order->isParticipating(),
             'closes_at' => $order->cutoff()?->format(DATE_ATOM),
+            'sent_at' => $order->sentAt()?->format(DATE_ATOM),
+            'validated_at' => $order->validatedAt()?->format(DATE_ATOM),
+            'distributed_at' => $order->distributedAt()?->format(DATE_ATOM),
         ], $cycle->producerOrders());
 
         if ($rows !== []) {
-            DB::table('cycle_producers')->upsert($rows, ['cycle_id', 'producer_id'], ['participating', 'closes_at']);
+            DB::table('cycle_producers')->upsert($rows, ['cycle_id', 'producer_id'], ['participating', 'closes_at', 'sent_at', 'validated_at', 'distributed_at']);
         }
     }
 
@@ -60,6 +65,7 @@ final class EloquentCycleRepository implements CycleRepository
     public function list(): array
     {
         $cycles = CycleModel::query()
+            ->with('producers')
             ->orderBy('pickup_date')
             ->orderBy('id')
             ->get()
@@ -79,14 +85,14 @@ final class EloquentCycleRepository implements CycleRepository
 
     private function toDomain(CycleModel $model): Cycle
     {
-        $orders = DB::table('cycle_producers')
-            ->where('cycle_id', $model->id)
-            ->orderBy('producer_id')
-            ->get()
+        $orders = $model->producers
             ->map(fn (object $row) => ProducerOrder::restore(
                 $row->producer_id,
                 (bool) $row->participating,
                 $row->closes_at === null ? null : new DateTimeImmutable($row->closes_at),
+                $row->sent_at === null ? null : new DateTimeImmutable($row->sent_at),
+                $row->validated_at === null ? null : new DateTimeImmutable($row->validated_at),
+                $row->distributed_at === null ? null : new DateTimeImmutable($row->distributed_at),
             ))
             ->all();
 
@@ -95,6 +101,8 @@ final class EloquentCycleRepository implements CycleRepository
             new DateTimeImmutable($model->pickup_date),
             array_values($orders),
             $model->cancelled_at === null ? null : new DateTimeImmutable($model->cancelled_at),
+            $model->settled_at === null ? null : new DateTimeImmutable($model->settled_at),
+            $model->closed_at === null ? null : new DateTimeImmutable($model->closed_at),
         );
     }
 }

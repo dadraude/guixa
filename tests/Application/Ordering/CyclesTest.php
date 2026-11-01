@@ -9,7 +9,7 @@ use Guixa\Ordering\Domain\Error\PickupDateNotInFuture;
 use Guixa\Ordering\Domain\Error\PickupWeekdayAlreadySet;
 use Guixa\Ordering\Domain\Error\PickupWeekdayNotSet;
 use Guixa\Ordering\Domain\Error\ProducerNotActive;
-use Guixa\Shared\Domain\Error\NotAllowed;
+use Illuminate\Auth\Access\AuthorizationException;
 use Tests\Support\Ordering\OrderingWorld;
 
 beforeEach(function () {
@@ -42,11 +42,11 @@ it('rejects a pickup weekday that is not a day of the week (R4c)', function (int
 it('keeps the pickup weekday and the cycles to managers (R4c)', function () {
     $member = $this->world->member();
 
-    expect(fn () => ($this->world->setPickupWeekday)($member, 5))->toThrow(NotAllowed::class)
-        ->and(fn () => ($this->world->getPickupWeekday)($member))->toThrow(NotAllowed::class)
-        ->and(fn () => ($this->world->openCycle)($member, '2026-11-07', []))->toThrow(NotAllowed::class)
-        ->and(fn () => ($this->world->addParticipant)($member, 'any', OrderingWorld::BAKER))->toThrow(NotAllowed::class)
-        ->and(fn () => ($this->world->listCycles)($member))->toThrow(NotAllowed::class);
+    expect(fn () => ($this->world->setPickupWeekday)($member, 5))->toThrow(AuthorizationException::class)
+        ->and(fn () => ($this->world->getPickupWeekday)($member))->toThrow(AuthorizationException::class)
+        ->and(fn () => ($this->world->openCycle)($member, '2026-11-07', []))->toThrow(AuthorizationException::class)
+        ->and(fn () => ($this->world->addParticipant)($member, 'any', OrderingWorld::BAKER))->toThrow(AuthorizationException::class)
+        ->and(fn () => ($this->world->listCycles)($member))->toThrow(AuthorizationException::class);
 });
 
 it('opens a cycle on the pickup weekday with the baker participating and computes its cutoff (R4, R4a, R5, S6)', function () {

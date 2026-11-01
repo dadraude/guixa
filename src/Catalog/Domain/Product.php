@@ -23,6 +23,7 @@ final class Product
         private bool $variable,
         private ?Quantity $containersPerUnit,
         private bool $active,
+        public readonly bool $stock,
     ) {}
 
     /** @param  ?string  $containersPerUnit  A quantity with at most 3 decimals, greater than zero. */
@@ -34,8 +35,9 @@ final class Product
         Money $price,
         bool $variable,
         ?string $containersPerUnit,
+        bool $stock = false,
     ): self {
-        $product = new self($id, $producerId, '', '', $price, $variable, null, true);
+        $product = new self($id, $producerId, '', '', $price, $variable, null, true, $stock);
         $product->change($name, $unit, $price, $variable, $containersPerUnit);
 
         return $product;
@@ -50,8 +52,9 @@ final class Product
         bool $variable,
         ?Quantity $containersPerUnit,
         bool $active,
+        bool $stock = false,
     ): self {
-        return new self($id, $producerId, $name, $unit, $price, $variable, $containersPerUnit, $active);
+        return new self($id, $producerId, $name, $unit, $price, $variable, $containersPerUnit, $active, $stock);
     }
 
     /** @param  bool  $hasUnsettledLines  the product is on lines of a cycle that is not settled, which freezes its unit and variable flag (R1) */
@@ -123,6 +126,11 @@ final class Product
     public function isActive(): bool
     {
         return $this->active;
+    }
+
+    public function isStock(): bool
+    {
+        return $this->stock;
     }
 
     private function parseContainers(?string $containersPerUnit): ?Quantity

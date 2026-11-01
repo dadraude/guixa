@@ -8,17 +8,17 @@ use Guixa\Ordering\Domain\Error\ProducerClosed;
 use Guixa\Ordering\Domain\Error\ProductNotOrderable;
 use Guixa\Ordering\Domain\ProducerOrder;
 use Guixa\Shared\Application\Actor;
-use Guixa\Shared\Domain\Error\NotAllowed;
 use Guixa\Shared\Domain\Role;
+use Illuminate\Auth\Access\AuthorizationException;
 use Tests\Support\Ordering\OrderingWorld;
 
-const MEMBER_ANNA = '00000000-0000-7000-8000-0000000000a1';
+const AVAILABILITY_MEMBER_ANNA = '00000000-0000-7000-8000-0000000000a1';
 const MEMBER_BIEL = '00000000-0000-7000-8000-0000000000a2';
 const HOUSEHOLD_ONE = '00000000-0000-7000-8000-0000000000e1';
 
 function producerActor(string $producerId): Actor
 {
-    return new Actor('00000000-0000-7000-8000-0000000000aa', [Role::Producer], null, $producerId);
+    return Actor::producer('00000000-0000-7000-8000-0000000000aa', $producerId);
 }
 
 beforeEach(function () {
@@ -27,7 +27,7 @@ beforeEach(function () {
     $this->jam = $this->world->catalog->offer(OrderingWorld::BAKER, 'Jam', 'jar', 450, variable: false);
     $this->cycleA = ($this->world->openCycle)($this->world->manager, '2026-11-07', [OrderingWorld::BAKER]);
     $this->cycleB = ($this->world->openCycle)($this->world->manager, '2026-11-14', [OrderingWorld::BAKER]);
-    $this->anna = new Actor(MEMBER_ANNA, [Role::Member], HOUSEHOLD_ONE);
+    $this->anna = Actor::memberOf(AVAILABILITY_MEMBER_ANNA, HOUSEHOLD_ONE);
     $this->baker = producerActor(OrderingWorld::BAKER);
     $this->order = fn (string $cycleId) => ($this->world->getHouseholdOrder)($this->anna, $cycleId);
     $this->marked = fn (string $cycleId) => collect(($this->order)($cycleId)->lines)->pluck('notDelivered', 'productId')->all();
@@ -47,6 +47,21 @@ it('marks the line in the cycle where the product is unavailable and leaves the 
 
     expect(($this->marked)($this->cycleA))->toBe([$this->jam => true])
         ->and(($this->marked)($this->cycleB))->toBe([$this->jam => false]);
+});
+
+it('locks the weekly Catalog product before marking cycle availability (R1b, R3c)', function () {
+    ($this->available)($this->cycleA, false);
+
+    expect($this->world->catalog->locked)->toContain($this->jam);
+});
+
+it('rejects cycle availability for a stock ID of the same producer without saving a mark (R3c, S66)', function () {
+    $stockId = $this->world->catalog->offerStock(OrderingWorld::BAKER, 'Stock jam', 'jar', 450);
+
+    expect(fn () => ($this->world->setProductAvailability)($this->baker, $this->cycleA, $stockId, false))
+        ->toThrow(ProductNotOrderable::class)
+        ->and($this->world->availability->unavailableIn($this->cycleA))->toBe([])
+        ->and(($this->order)($this->cycleA)->producers[0]->products)->toHaveCount(1);
 });
 
 it('lifts the mark when the product becomes available again before the order is sent (R3b, S48)', function () {
@@ -88,8 +103,8 @@ it('ignores marking a product unavailable or available twice (R3c)', function ()
 it('lets only the producer of the product mark it (R3c, R2)', function () {
     $other = producerActor(OrderingWorld::GROWER);
 
-    expect(fn () => ($this->world->setProductAvailability)($other, $this->cycleA, $this->jam, false))->toThrow(NotAllowed::class);
-    expect(fn () => ($this->world->setProductAvailability)($this->anna, $this->cycleA, $this->jam, false))->toThrow(NotAllowed::class);
+    expect(fn () => ($this->world->setProductAvailability)($other, $this->cycleA, $this->jam, false))->toThrow(AuthorizationException::class);
+    expect(fn () => ($this->world->setProductAvailability)($this->anna, $this->cycleA, $this->jam, false))->toThrow(AuthorizationException::class);
     expect(($this->world->getHouseholdOrder)($this->anna, $this->cycleA)->producers[0]->products)->toHaveCount(1);
 });
 
@@ -166,7 +181,7 @@ it('lets any member of the household remove a marked line and refuses an account
 
     expect(fn () => ($this->world->removeMarkedLine)(new Actor(MEMBER_BIEL, [Role::Member]), $this->cycleA, $this->jam))->toThrow(NoHousehold::class);
 
-    ($this->world->removeMarkedLine)(new Actor(MEMBER_BIEL, [Role::Member], HOUSEHOLD_ONE), $this->cycleA, $this->jam);
+    ($this->world->removeMarkedLine)(Actor::memberOf(MEMBER_BIEL, HOUSEHOLD_ONE), $this->cycleA, $this->jam);
 
     expect(($this->order)($this->cycleA)->lines)->toBe([]);
 });

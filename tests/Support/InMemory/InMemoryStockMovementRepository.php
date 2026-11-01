@@ -2,6 +2,7 @@
 
 namespace Tests\Support\InMemory;
 
+use DomainException;
 use Guixa\Stock\Domain\StockMovement;
 use Guixa\Stock\Domain\StockMovementRepository;
 use Guixa\Stock\Domain\ValueObject\SignedQuantity;
@@ -11,6 +12,14 @@ final class InMemoryStockMovementRepository extends InMemoryRepository implement
 {
     public function add(StockMovement $movement): void
     {
+        if ($movement->basketId !== null) {
+            foreach ($this->all() as $existing) {
+                if ($existing->basketId === $movement->basketId && $existing->stockProductId === $movement->stockProductId) {
+                    throw new DomainException('This basket sale was already recorded for the product.');
+                }
+            }
+        }
+
         $this->save($movement);
     }
 
@@ -22,14 +31,14 @@ final class InMemoryStockMovementRepository extends InMemoryRepository implement
         return $movements;
     }
 
+    public function hasProductReference(string $stockProductId): bool
+    {
+        return $this->forProduct($stockProductId) !== [];
+    }
+
     public function available(string $stockProductId): SignedQuantity
     {
         return $this->availableByProduct()[$stockProductId] ?? SignedQuantity::ofThousandths(0);
-    }
-
-    public function availableForUpdate(string $stockProductId): SignedQuantity
-    {
-        return $this->available($stockProductId);
     }
 
     public function availableByProduct(): array

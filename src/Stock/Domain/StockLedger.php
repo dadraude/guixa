@@ -4,14 +4,14 @@ namespace Guixa\Stock\Domain;
 
 use Guixa\Stock\Domain\Error\NotEnoughStock;
 
-/** Records movements while keeping every stock product's available stock at 0 or more (R27). Call it inside a transaction. */
+/** Records movements while keeping available stock nonnegative (R27). The caller must hold the Catalog product row lock in a transaction. */
 final class StockLedger
 {
     public function __construct(private readonly StockMovementRepository $movements) {}
 
     public function record(StockMovement $movement): void
     {
-        $available = $this->movements->availableForUpdate($movement->stockProductId);
+        $available = $this->movements->available($movement->stockProductId);
 
         if ($available->plus($movement->quantity)->isNegative()) {
             throw NotEnoughStock::for($movement->stockProductId, $available->toString(), $movement->quantity->toString());

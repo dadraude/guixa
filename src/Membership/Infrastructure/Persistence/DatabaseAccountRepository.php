@@ -35,6 +35,14 @@ final class DatabaseAccountRepository implements AccountRepository
         ));
     }
 
+    public function saveHouseholdLink(Account $account): void
+    {
+        DB::table('users')->where('id', $account->id)->update([
+            'household_id' => $account->householdId,
+            'updated_at' => Carbon::now(),
+        ]);
+    }
+
     public function get(string $id): ?Account
     {
         $row = DB::table('users')->where('id', $id)->first();
@@ -128,6 +136,9 @@ final class DatabaseAccountRepository implements AccountRepository
                 // A plain `timestamp` column drops the offset, so write the UTC wall-clock time.
                 $columns['email_verified_at'] = $account->activatedAt->setTimezone(new DateTimeZone('UTC'))->format('Y-m-d H:i:s');
             }
+
+            // A stale account-detail save must not undo a separately serialized membership change.
+            unset($columns['household_id']);
 
             return $columns;
         }

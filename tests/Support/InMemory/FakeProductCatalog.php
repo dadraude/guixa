@@ -10,11 +10,24 @@ use Illuminate\Support\Str;
 
 final class FakeProductCatalog implements ProductCatalog
 {
+    /** @var list<string> */
+    public array $locked = [];
+
+    public function lockWeekly(string $productId): ?OrderableProduct
+    {
+        $this->locked[] = $productId;
+
+        return $this->orderable[$productId] ?? $this->deactivated[$productId] ?? null;
+    }
+
     /** @var array<string, OrderableProduct> */
     private array $orderable = [];
 
     /** @var array<string, OrderableProduct> */
     private array $deactivated = [];
+
+    /** @var array<string, OrderableProduct> Catalog stock records, excluded from weekly operations. */
+    private array $stock = [];
 
     /** @return string the new product's id */
     public function offer(string $producerId, string $name, string $unit, int $priceCents, bool $variable, ?string $containersPerUnit = null): string
@@ -28,12 +41,30 @@ final class FakeProductCatalog implements ProductCatalog
         return $id;
     }
 
+    public function offerStock(string $producerId, string $name, string $unit, int $priceCents): string
+    {
+        $id = (string) Str::uuid7();
+        $this->stock[$id] = new OrderableProduct($id, $producerId, $name, $unit, Money::ofCents($priceCents), false, null);
+
+        return $id;
+    }
+
     public function change(string $productId, ?string $name = null, ?int $priceCents = null): void
     {
         $product = $this->orderable[$productId];
         $this->orderable[$productId] = new OrderableProduct(
             $product->id, $product->producerId, $name ?? $product->name, $product->unit,
             $priceCents === null ? $product->price : Money::ofCents($priceCents), $product->variable, $product->containersPerUnit,
+        );
+    }
+
+    public function changeContainersPerUnit(string $productId, ?string $containersPerUnit): void
+    {
+        $product = $this->orderable[$productId];
+        $this->orderable[$productId] = new OrderableProduct(
+            $product->id, $product->producerId, $product->name, $product->unit,
+            $product->price, $product->variable,
+            $containersPerUnit === null ? null : Quantity::fromString($containersPerUnit),
         );
     }
 
@@ -57,6 +88,17 @@ final class FakeProductCatalog implements ProductCatalog
     public function orderableOf(string $producerId): array
     {
         $products = array_filter($this->orderable, fn (OrderableProduct $product) => $product->producerId === $producerId);
+        usort($products, fn (OrderableProduct $a, OrderableProduct $b) => $a->name <=> $b->name);
+
+        return $products;
+    }
+
+    public function allOf(string $producerId): array
+    {
+        $products = array_filter(
+            [...$this->orderable, ...$this->deactivated],
+            fn (OrderableProduct $product) => $product->producerId === $producerId,
+        );
         usort($products, fn (OrderableProduct $a, OrderableProduct $b) => $a->name <=> $b->name);
 
         return $products;

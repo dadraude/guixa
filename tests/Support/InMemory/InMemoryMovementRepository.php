@@ -3,6 +3,7 @@
 namespace Tests\Support\InMemory;
 
 use Guixa\Shared\Domain\Money;
+use Guixa\Wallet\Domain\Error\BasketAlreadyCharged;
 use Guixa\Wallet\Domain\Error\PickupAlreadyCharged;
 use Guixa\Wallet\Domain\Movement;
 use Guixa\Wallet\Domain\MovementRepository;
@@ -12,8 +13,13 @@ final class InMemoryMovementRepository extends InMemoryRepository implements Mov
 {
     public function add(Movement $movement): void
     {
-        if ($movement->isChargeOrCredit() && $this->hasChargeOrCredit($movement->householdId, $movement->cycleId)) {
-            throw PickupAlreadyCharged::create();
+        if ($movement->isChargeOrCredit()) {
+            if ($movement->basketId !== null && $this->hasBasketChargeOrCredit($movement->basketId)) {
+                throw BasketAlreadyCharged::create();
+            }
+            if ($movement->cycleId !== null && $this->hasChargeOrCredit($movement->householdId, $movement->cycleId)) {
+                throw PickupAlreadyCharged::create();
+            }
         }
 
         $this->save($movement);
@@ -52,6 +58,17 @@ final class InMemoryMovementRepository extends InMemoryRepository implements Mov
     {
         foreach ($this->ofHousehold($householdId) as $existing) {
             if ($existing->isChargeOrCredit() && $existing->cycleId === $cycleId) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function hasBasketChargeOrCredit(string $basketId): bool
+    {
+        foreach ($this->all() as $existing) {
+            if ($existing->isChargeOrCredit() && $existing->basketId === $basketId) {
                 return true;
             }
         }

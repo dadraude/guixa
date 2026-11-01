@@ -27,6 +27,7 @@ final class GetStockOffer
             $product->containersPerUnit()?->toString(),
             $product->isActive(),
             $this->movements->available($product->id)->toString(),
+            $product->producerId,
         );
     }
 }

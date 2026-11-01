@@ -7,6 +7,7 @@ use Guixa\Ordering\Domain\Error\CycleNotFound;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Application\TransactionRunner;
 use Guixa\Shared\Domain\Clock;
+use Illuminate\Support\Facades\Gate;
 
 final class CloseProducerNow
 {
@@ -19,7 +20,7 @@ final class CloseProducerNow
     /** The producer's cutoff becomes the current moment (R6). */
     public function __invoke(Actor $actor, string $cycleId, string $producerId): void
     {
-        $actor->assertManager();
+        Gate::forUser($actor)->authorize('manage');
 
         $now = $this->clock->now()->setTimezone($this->clock->timezone());
 

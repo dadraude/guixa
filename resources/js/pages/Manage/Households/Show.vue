@@ -1,13 +1,17 @@
 <script setup lang="ts">
 import { Form, Head, Link } from '@inertiajs/vue3';
+import { computed } from 'vue';
+import { trans } from 'laravel-vue-i18n';
+import SettlementDetails from './SettlementDetails.vue';
 import AccountHouseholdController from '@/actions/App/Http/Controllers/Manage/AccountHouseholdController';
 import HouseholdController from '@/actions/App/Http/Controllers/Manage/HouseholdController';
 import HouseholdMemberController from '@/actions/App/Http/Controllers/Manage/HouseholdMemberController';
 import HouseholdWalletController from '@/actions/App/Http/Controllers/Manage/HouseholdWalletController';
 import InvitationController from '@/actions/App/Http/Controllers/Manage/InvitationController';
+import FormSelect from '@/components/FormSelect.vue';
 import Heading from '@/components/Heading.vue';
 import InputError from '@/components/InputError.vue';
-import { Badge } from '@/components/ui/badge';
+import StatusIndicator from '@/components/StatusIndicator.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -15,6 +19,7 @@ import { Label } from '@/components/ui/label';
 const props = defineProps<{
     household: App.Http.HouseholdRow;
     otherHouseholds: App.Http.HouseholdSummaryRow[];
+    deactivationWarning: App.Http.HouseholdSettlementRow;
 }>();
 
 defineOptions({
@@ -25,20 +30,29 @@ defineOptions({
     },
 });
 
+const otherHouseholdOptions = computed(() =>
+    props.otherHouseholds.map((household) => ({
+        value: household.id,
+        label: household.name,
+    })),
+);
+
 const expiry = (iso: string | null) =>
-    iso ? new Date(iso).toLocaleString() : '';
+    iso ? new Date(iso).toLocaleString('ca-ES') : '';
 </script>
 
 <template>
     <Head :title="household.name" />
 
-    <div class="flex flex-col gap-8 p-4">
+    <div class="pilot-page pilot-layout-page pilot-manager-page">
         <Heading
             :title="household.name"
             :description="
                 household.active
-                    ? 'Active household'
-                    : 'Inactive household: adding a member reactivates it'
+                    ? trans('Active household')
+                    : trans(
+                          'Inactive household: adding a member reactivates it',
+                      )
             "
         />
 
@@ -48,7 +62,7 @@ const expiry = (iso: string | null) =>
             v-slot="{ errors, processing }"
         >
             <div class="grid gap-2">
-                <Label for="rename">Name</Label>
+                <Label for="rename">{{ trans('Name') }}</Label>
                 <Input
                     id="rename"
                     name="name"
@@ -58,25 +72,25 @@ const expiry = (iso: string | null) =>
                 <InputError :message="errors.name || errors.domain" />
             </div>
             <Button type="submit" variant="secondary" :disabled="processing">
-                Rename
+                {{ trans('Rename') }}
             </Button>
         </Form>
 
-        <section class="flex flex-col gap-3">
-            <h2 class="text-lg font-medium">Members</h2>
+        <section class="flex flex-col gap-4">
+            <h2 class="text-lg font-medium">{{ trans('Members') }}</h2>
 
             <p
                 v-if="household.members.length === 0"
                 class="text-sm text-muted-foreground"
             >
-                This household has no members.
+                {{ trans('This household has no members.') }}
             </p>
 
-            <ul v-else class="divide-y rounded-lg border">
+            <ul v-else class="pilot-list">
                 <li
                     v-for="member in props.household.members"
                     :key="member.accountId"
-                    class="flex flex-col gap-3 p-3"
+                    class="flex flex-col gap-4"
                 >
                     <div class="flex items-center justify-between gap-2">
                         <span>
@@ -85,22 +99,19 @@ const expiry = (iso: string | null) =>
                                 {{ member.email }}
                             </span>
                         </span>
-                        <Badge
-                            :variant="
+                        <StatusIndicator
+                            :label="
                                 member.invitationPending
-                                    ? 'secondary'
-                                    : 'default'
+                                    ? trans('Invitation pending')
+                                    : trans('Active')
                             "
-                        >
-                            {{
-                                member.invitationPending
-                                    ? 'Invitation pending'
-                                    : 'Active'
-                            }}
-                        </Badge>
+                            :tone="
+                                member.invitationPending ? 'warning' : 'success'
+                            "
+                        />
                     </div>
 
-                    <div class="flex flex-wrap items-start gap-3">
+                    <div class="pilot-action-row">
                         <Form
                             v-if="otherHouseholds.length > 0"
                             v-bind="
@@ -111,27 +122,25 @@ const expiry = (iso: string | null) =>
                             class="flex items-center gap-2"
                             v-slot="{ errors, processing }"
                         >
-                            <select
+                            <FormSelect
                                 name="household_id"
                                 required
-                                class="h-8 rounded-md border bg-background px-2 text-sm"
-                                :aria-label="`Move ${member.name} to`"
-                            >
-                                <option
-                                    v-for="other in otherHouseholds"
-                                    :key="other.id"
-                                    :value="other.id"
-                                >
-                                    {{ other.name }}
-                                </option>
-                            </select>
+                                :options="otherHouseholdOptions"
+                                :default-value="otherHouseholdOptions[0]?.value"
+                                class="w-full min-w-0 sm:w-fit sm:min-w-44"
+                                :aria-label="
+                                    trans('Move :name to', {
+                                        name: member.name,
+                                    })
+                                "
+                            />
                             <Button
                                 type="submit"
                                 variant="outline"
                                 size="sm"
                                 :disabled="processing"
                             >
-                                Move
+                                {{ trans('Move') }}
                             </Button>
                             <InputError :message="errors.domain" />
                         </Form>
@@ -150,24 +159,33 @@ const expiry = (iso: string | null) =>
                                 size="sm"
                                 :disabled="processing"
                             >
-                                Unlink
+                                {{ trans('Unlink') }}
                             </Button>
                         </Form>
                     </div>
 
                     <div
                         v-if="member.invitationPending"
-                        class="flex flex-wrap items-end gap-3"
+                        class="pilot-action-row"
                     >
                         <p class="text-sm text-muted-foreground">
                             <template v-if="member.invitationExpired">
-                                Link expired on
-                                {{ expiry(member.invitationExpiresAt) }}; resend
-                                it
+                                {{
+                                    trans('Link expired on :date; resend it', {
+                                        date: expiry(
+                                            member.invitationExpiresAt,
+                                        ),
+                                    })
+                                }}
                             </template>
                             <template v-else>
-                                Link valid until
-                                {{ expiry(member.invitationExpiresAt) }}
+                                {{
+                                    trans('Link valid until :date', {
+                                        date: expiry(
+                                            member.invitationExpiresAt,
+                                        ),
+                                    })
+                                }}
                             </template>
                         </p>
 
@@ -185,7 +203,7 @@ const expiry = (iso: string | null) =>
                                 size="sm"
                                 :disabled="processing"
                             >
-                                Resend invitation
+                                {{ trans('Resend invitation') }}
                             </Button>
                             <InputError :message="errors.domain" />
                         </Form>
@@ -204,7 +222,7 @@ const expiry = (iso: string | null) =>
                                     name="email"
                                     type="email"
                                     required
-                                    placeholder="New email"
+                                    :placeholder="trans('New email')"
                                     class="h-8"
                                 />
                                 <InputError
@@ -217,7 +235,7 @@ const expiry = (iso: string | null) =>
                                 size="sm"
                                 :disabled="processing"
                             >
-                                Change email
+                                {{ trans('Change email') }}
                             </Button>
                         </Form>
                     </div>
@@ -225,22 +243,22 @@ const expiry = (iso: string | null) =>
             </ul>
         </section>
 
-        <section class="flex flex-col gap-3">
-            <h2 class="text-lg font-medium">Add a member</h2>
+        <section class="flex flex-col gap-4">
+            <h2 class="text-lg font-medium">{{ trans('Add a member') }}</h2>
 
             <Form
                 v-bind="HouseholdMemberController.store.form(household.id)"
                 :reset-on-success="['name', 'email']"
-                class="flex flex-wrap items-end gap-2"
+                class="flex flex-wrap items-end gap-6"
                 v-slot="{ errors, processing }"
             >
                 <div class="grid gap-2">
-                    <Label for="member-name">Name</Label>
+                    <Label for="member-name">{{ trans('Name') }}</Label>
                     <Input id="member-name" name="name" required />
                     <InputError :message="errors.name" />
                 </div>
                 <div class="grid gap-2">
-                    <Label for="member-email">Email</Label>
+                    <Label for="member-email">{{ trans('Email') }}</Label>
                     <Input
                         id="member-email"
                         name="email"
@@ -250,7 +268,62 @@ const expiry = (iso: string | null) =>
                     <InputError :message="errors.email || errors.domain" />
                 </div>
                 <Button type="submit" :disabled="processing">
-                    Send invitation
+                    {{ trans('Send invitation') }}
+                </Button>
+            </Form>
+        </section>
+
+        <section
+            v-if="household.active"
+            class="grid gap-4"
+            aria-labelledby="deactivation-heading"
+        >
+            <h2 id="deactivation-heading" class="text-lg font-medium">
+                {{ trans('Deactivate household') }}
+            </h2>
+            <p class="text-sm">
+                {{
+                    trans(
+                        'Deactivating unlinks every member. Orders, pickups and balance stay available to settle.',
+                    )
+                }}
+            </p>
+            <SettlementDetails :settlement="deactivationWarning" />
+            <Form
+                v-bind="HouseholdController.deactivate.form(household.id)"
+                v-slot="{ processing }"
+            >
+                <Button
+                    type="submit"
+                    variant="destructive"
+                    class="min-h-11"
+                    :disabled="processing"
+                >
+                    {{ trans('Deactivate household') }}
+                </Button>
+            </Form>
+        </section>
+        <section
+            v-else
+            class="grid gap-4"
+            aria-labelledby="reactivation-heading"
+        >
+            <h2 id="reactivation-heading" class="text-lg font-medium">
+                {{ trans('Reactivate household') }}
+            </h2>
+            <p class="text-sm">
+                {{
+                    trans(
+                        'Members can be linked to this household again after reactivation.',
+                    )
+                }}
+            </p>
+            <Form
+                v-bind="HouseholdController.reactivate.form(household.id)"
+                v-slot="{ processing }"
+            >
+                <Button type="submit" class="min-h-11" :disabled="processing">
+                    {{ trans('Reactivate household') }}
                 </Button>
             </Form>
         </section>
@@ -259,14 +332,14 @@ const expiry = (iso: string | null) =>
             :href="HouseholdWalletController.show(household.id)"
             class="text-sm font-medium underline-offset-4 hover:underline"
         >
-            Wallet: balance, top-ups and corrections
+            {{ trans('Wallet: balance, top-ups and corrections') }}
         </Link>
 
         <Link
             :href="HouseholdController.index()"
             class="text-sm text-muted-foreground underline-offset-4 hover:underline"
         >
-            Back to households
+            {{ trans('Back to households') }}
         </Link>
     </div>
 </template>

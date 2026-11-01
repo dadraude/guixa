@@ -5,6 +5,7 @@ namespace Guixa\Catalog\Application;
 use Guixa\Catalog\Domain\Product;
 use Guixa\Catalog\Domain\ProductRepository;
 use Guixa\Shared\Application\Actor;
+use Illuminate\Support\Facades\Gate;
 
 final class ListProducerProducts
 {
@@ -13,9 +14,9 @@ final class ListProducerProducts
     /** @return list<ProductData> the producer's own products, inactive ones included */
     public function __invoke(Actor $actor, string $producerId): array
     {
-        $actor->assertProducerOf($producerId);
+        Gate::forUser($actor)->authorize('owns', ['producer', $producerId]);
 
-        return array_map(
+        return array_values(array_map(
             fn (Product $product) => new ProductData(
                 $product->id,
                 $product->name(),
@@ -25,7 +26,7 @@ final class ListProducerProducts
                 $product->containersPerUnit()?->toString(),
                 $product->isActive(),
             ),
-            $this->products->listByProducer($producerId),
-        );
+            array_filter($this->products->listByProducer($producerId), fn (Product $product) => ! $product->isStock()),
+        ));
     }
 }

@@ -2,30 +2,54 @@
 
 Part of [001 — Weekly orders](spec.md): glossary, time and roles are defined there.
 
-Stock products and movements, household wallets, households, members and invitations.
+Stock movements and return items, global household wallets and receipts, households, members and account roles.
 
 ## Requirements
 
 ### Stock
 
-- **R25** A manager creates, edits and deactivates stock products: name, unit, price (≥ 0), variable flag,
-  and containers per unit as for products (R1).
-  A manager creates, edits and deactivates return items: name and amount (> 0).
-- **R26** A manager records stock entries (quantity > 0, optional note, e.g. "bought from X").
+- **R25** A manager creates stock products from the supplying producer's record (R1a), and edits,
+  deactivates and reactivates them: name, unit, price (≥ 0), variable flag, and containers per unit
+  with the same bounds as weekly products (R1). The producer does not administer these records.
+  Unused stock products may be deleted under R1c.
+  A manager creates, edits, deactivates and reactivates return items: name and amount (> 0).
+- **R25a** Once a stock product has a stock movement or has appeared in a basket line, its unit and
+  variable flag can never change, even if available stock later returns to zero or the line is removed.
+  A different unit or variable flag requires a new product record. Name, price and containers per unit
+  remain editable; existing basket stock lines retain the snapshots required by R20.
+- **R25b** A producer can consult their own stock product records, current prices and available
+  quantities, but cannot create, edit, delete, deactivate or reactivate them, change their stock flag
+  or record stock movements while acting as a producer. An account also acting as a manager has the
+  manager permissions (R36a).
+- **R25c** Members can consult an informational catalogue of the cooperative's active stock products,
+  including those of deactivated producers. Each shows its producer, name, unit, current unit price
+  and current available quantity (R28). Products with zero available quantity remain visible as
+  *sold out*; deactivated products are hidden. The catalogue does not depend on an open cycle or on
+  producer participation. It offers no reservation or way to add stock to the weekly order. Viewing
+  it does not reserve or change stock: availability is the quantity on hand when consulted, and the
+  basket addition/validation checks in R20 and R22 still apply.
+- **R26** A manager records entries for stock products only (quantity > 0, optional note,
+  e.g. "bought from X"). A weekly product cannot receive stock entries or adjustments (R27).
 - **R27** A manager records stock adjustments (positive or negative, mandatory note, e.g. "broken jar",
   "inventory count", optional cycle). Available stock can never go below 0.
-- **R28** Available stock = Σ entries + Σ adjustments − Σ quantities sold at completed pickups.
-  Stock movements are never edited or deleted.
+- **R28** Available stock = Σ entries + Σ adjustments − Σ quantities sold at validated baskets,
+  including signed corrective movements. Validation records the sale once (R22); physical collection
+  records no stock movement. Stock movements are never edited or deleted.
 
 ### Wallet
 
-- **R29** A manager records top-ups, at a pickup (R21) or on their own: positive amount, optional note
-  (e.g. "transfer of the 3rd", "cash"). A top-up is dated when recorded and is not linked to a cycle.
+- **R29** Finance or a manager records a confirmed receipt/top-up after checking money received
+  (e.g. cash or bank transfer): positive amount and optional note. Date it when recorded. It credits
+  the global household Wallet independently of basket validation and is not allocated to a basket
+  or cycle. A receipt may cover several charges or leave credit; no payment gateway is included.
 - **R30** Balance = Σ top-ups + Σ credits − Σ charges ± corrections. It may be negative, with no limit.
-- **R31** Members see their household balance and every movement: top-ups, charges and credits with their
-  cycle, corrections with their cycle if any.
-- **R32** Movements are never edited or deleted. Mistakes are fixed with a correcting movement
-  recorded by a manager: a non-zero amount, a mandatory note and an optional cycle.
+- **R31** Members see their household balance and every movement. Charges/credits show their basket
+  and optional cycle; corrections preserve the original source and optional cycle. Finance and Manager
+  can read household statements for the operations they perform. Baskets have no paid/part-paid status.
+- **R32** Movements are never edited or deleted. Finance or a manager fixes mistakes with a new
+  correcting movement: non-zero amount, mandatory reason, original source and optional basket/cycle
+  reference. A correction does not rewrite the receipt, validated basket or original charge. Linked
+  stock corrections follow R23/R27 and preserve non-negative stock.
 
 ### Households and accounts
 
@@ -38,19 +62,20 @@ Stock products and movements, household wallets, households, members and invitat
   member of it: it can order for it and see its wallet, whatever other roles it holds. An account with no
   household and no other role cannot log in until a manager links it.
   - Moving a member links the same account to the new household. The old household keeps its orders,
-    pickups, balance and history; nothing moves with the person.
+    baskets, balance and history; nothing moves with the person.
   - Unlinking a member keeps the account active, without a household; it can be linked again to any
     household, the same one included.
   - Records of what a person did (e.g. who added a line) keep naming them after a move.
-- **R35a** A manager can deactivate a household at any time, even with a balance or pending pickups,
-  after a warning listing what is left to settle. A household is deactivated automatically when its last
-  member is unlinked or moved. On deactivation: its members are unlinked and nobody can order for it; its
-  existing lines and pending pickups are kept, and a manager resolves them by hand (complete, or mark not
-  collected). A deactivated household with a balance other than 0, or with pending pickups, stays in a
-  *to settle* list for managers until both are resolved.
-  A manager can reactivate a household at any time and link members to it (R35 allows linking to any
-  household, an inactive one included, which reactivates it). While a household is deactivated its wallet
-  still accepts top-ups and corrections. A household created without members is active.
+- **R35a** A manager can deactivate a household at any time, even with a balance or unresolved
+  baskets, after a warning listing what remains. It is deactivated automatically when its last member
+  is unlinked/moved. Members are unlinked and nobody can order for it; retain existing order lines,
+  basket drafts, validated pending collections and all financial/history records. Finance or Manager
+  can resolve existing basket/receipt obligations, including validating existing drafts, correcting
+  mistakes and recording collection; new stock baskets require an active household (R19).
+  An inactive household stays in the Manager's *to settle* list until its balance is zero and it has
+  no unresolved draft or collection obligation. A manager can reactivate it, and linking a member to
+  it also reactivates it. An inactive Wallet still accepts receipts and corrections. Reactivation
+  does not move history or restore old member links; a household created without members is active.
 - **R36** A manager creates producer accounts, with the same invitation flow. Each producer has exactly
   one account.
 - **R36a** One account can hold several roles (e.g. linked to household H, so a member of it, and manager). A manager grants or removes the
@@ -59,6 +84,11 @@ Stock products and movements, household wallets, households, members and invitat
 - **R36b** A manager can deactivate and reactivate any account. A deactivated account cannot log in and is
   unlinked from its household (R35); its history is kept. The last active manager's account cannot be
   deactivated.
+- **R36c** Only a manager grants or revokes the explicit Finance role on accounts. Manager retains
+  every Finance power. Finance is an effective login role independently of household membership;
+  Member remains derived from the current household link. Basket/Wallet capabilities are those in
+  R19a/R22/R23/R29/R32; the role grants no product/cycle/reception/account or unrelated inventory
+  administration. Configurable commissions are not part of this amendment.
 
 ## Acceptance scenarios
 
@@ -69,12 +99,43 @@ Given honey has 0 jars
 When the manager records an entry of 10 and an adjustment of −1 noted "broken jar"
 Then 9 jars are available; an adjustment of −10 is rejected.
 
+**S71 — The manager administers stock products** (R1a, R25, R25b)
+Given a beekeeper with a weekly honey product
+When the manager creates stock honey from that producer's record and sets its name, unit, price,
+variable flag and containers per unit
+Then it belongs to the beekeeper and is administered by the manager
+And acting only as a producer, the beekeeper cannot create, edit, delete, deactivate or reactivate it,
+change its stock flag or record its stock movements.
+
+**S72 — Stock units and variable flag are fixed after use** (R25, R25a)
+Given stock honey has an entry of 10 jars and stock oil once had a basket line that was removed
+When the manager tries to change either product's unit or variable flag
+Then it is rejected, even after the honey's stock returns to zero
+And the manager can still edit their name, price and containers per unit under R20
+And a stock product with no movement or basket line can still have its unit and variable flag corrected.
+
+**S73 — Members consult stock without reserving it** (R3, R25c, R28)
+Given active stock honey has 5 jars, active stock oil has zero bottles, a stock jam is deactivated,
+and the baker has a weekly bread product
+When a member opens the stock catalogue with no open ordering cycle
+Then it shows the honey and oil with their producers, units, current prices and available quantities,
+marks the oil as sold out, and shows neither the deactivated jam nor the weekly bread
+And there is no reservation or way to add these products to the weekly order; stock is unchanged.
+
+**S74 — A producer consults only their own stock** (R2, R25b, R25c, R36a)
+Given the beekeeper and oil producer both supply stock products
+When the beekeeper, acting only as a producer, consults the catalogue
+Then they can see their own stock product records, current prices and quantities without modifying them,
+but cannot see the oil producer's products
+And if that account is also a household member, it can consult both producers' active stock products
+through the informational member catalogue, without acquiring stock administration permissions.
+
 ### Wallet and accounts
 
-**S24 — Top-up and correction** (R29, R32)
-Given H's balance is €0.00
-When the manager records a €50.00 top-up and then a −€50.00 correction noted "duplicated"
-Then H's balance is €0.00 and both movements are visible to H.
+**S24 — Receipt and correction** (R29, R32)
+Given H's balance is €0
+When Finance records a confirmed €50 receipt and a −€50 correction with reason duplicated
+Then H's balance is €0 and both movements remain visible and immutable.
 
 **S25 — Member invitation** (R33, R34)
 Given the manager creates household H and adds anna@example.org as a member
@@ -105,13 +166,12 @@ When the baker opens the invitation and sets a password
 Then they can log in and see only their own products
 And creating a second account for the same producer is rejected.
 
-**S58 — Deactivating a household** (R35a)
-Given household H has a balance of −€5.00, a pending pickup and members Anna and Biel
-When the manager deactivates H after the warning that lists the balance and the pending pickup
-Then Anna and Biel are unlinked and nobody can order for H
-And H's lines and pending pickup are kept and H is listed as to settle
-And once the manager completes the pickup and records a top-up that brings the balance to €0.00, H leaves
-the list.
+**S58 — Deactivated household retains basket obligations** (R35a)
+Given H has balance −€5, an existing basket draft, a validated pending collection and linked members
+When the manager deactivates H after its obligations warning
+Then members are unlinked, new orders/stock baskets are refused, and existing drafts/collections remain
+And H stays to settle until Finance/Manager resolves those baskets and the resulting Wallet balance
+And recording physical collection never charges the already validated basket again.
 
 **S59 — Deactivating an account** (R36b)
 Given Anna is a member of H and Carla is the only manager

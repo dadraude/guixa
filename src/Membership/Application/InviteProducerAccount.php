@@ -11,6 +11,7 @@ use Guixa\Membership\Domain\ProducerDirectory;
 use Guixa\Membership\Domain\ValueObject\Email;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Application\TransactionRunner;
+use Illuminate\Support\Facades\Gate;
 
 final class InviteProducerAccount
 {
@@ -24,7 +25,7 @@ final class InviteProducerAccount
     /** @return string the new account's id */
     public function __invoke(Actor $actor, string $producerId, string $name, string $email): string
     {
-        $actor->assertManager();
+        Gate::forUser($actor)->authorize('manage');
 
         if (! $this->producers->exists($producerId)) {
             throw UnknownProducer::withId($producerId);

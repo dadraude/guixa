@@ -1,6 +1,13 @@
 <?php
 
 use App\Http\Controllers\AcceptInvitationController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Finance\BasketCollectionController;
+use App\Http\Controllers\Finance\BasketController;
+use App\Http\Controllers\Finance\BasketReturnController;
+use App\Http\Controllers\Finance\BasketStockController;
+use App\Http\Controllers\Finance\BasketValidationController;
+use App\Http\Controllers\Finance\HouseholdWalletController as FinanceHouseholdWalletController;
 use App\Http\Controllers\Manage\AccountController;
 use App\Http\Controllers\Manage\AccountDeactivationController;
 use App\Http\Controllers\Manage\AccountHouseholdController;
@@ -8,31 +15,65 @@ use App\Http\Controllers\Manage\CycleCancellationController;
 use App\Http\Controllers\Manage\CycleController;
 use App\Http\Controllers\Manage\CycleCutoffController;
 use App\Http\Controllers\Manage\CycleParticipantController;
+use App\Http\Controllers\Manage\FinanceRoleController;
 use App\Http\Controllers\Manage\HouseholdController;
 use App\Http\Controllers\Manage\HouseholdMemberController;
 use App\Http\Controllers\Manage\HouseholdWalletController;
 use App\Http\Controllers\Manage\InvitationController;
 use App\Http\Controllers\Manage\ManagerRoleController;
+use App\Http\Controllers\Manage\PickupCompleteController;
+use App\Http\Controllers\Manage\PickupController;
+use App\Http\Controllers\Manage\PickupLineController;
+use App\Http\Controllers\Manage\PickupReturnController;
+use App\Http\Controllers\Manage\PickupStockController;
 use App\Http\Controllers\Manage\ProducerAccountController;
 use App\Http\Controllers\Manage\ProducerController;
+use App\Http\Controllers\Manage\ProducerProductController;
+use App\Http\Controllers\Manage\ProductClassificationController;
+use App\Http\Controllers\Manage\ReceptionAllocationController;
+use App\Http\Controllers\Manage\ReceptionController;
+use App\Http\Controllers\Manage\ReceptionDistributionController;
+use App\Http\Controllers\Manage\ReceptionProductController;
+use App\Http\Controllers\Manage\ReceptionReceivedController;
+use App\Http\Controllers\Manage\ReceptionValidationController;
 use App\Http\Controllers\Manage\ReturnItemController;
 use App\Http\Controllers\Manage\SettingsController;
 use App\Http\Controllers\Manage\StockMovementController;
 use App\Http\Controllers\Manage\StockProductController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\Producer\CutoffController;
+use App\Http\Controllers\Producer\CycleController as ProducerCycleController;
 use App\Http\Controllers\Producer\ProductAvailabilityController;
 use App\Http\Controllers\Producer\ProductController;
+use App\Http\Controllers\StockController;
 use App\Http\Controllers\WalletController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [OrderController::class, 'index'])->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::inertia('dashboard', 'Dashboard')->name('dashboard');
+    Route::get('dashboard', [DashboardController::class, 'show'])->name('dashboard');
 });
 
 Route::middleware(['auth', 'verified', 'role:member'])->get('wallet', [WalletController::class, 'show'])->name('wallet.show');
+Route::middleware(['auth', 'verified', 'role:member'])->get('stock', [StockController::class, 'index'])->name('stock.index');
+
+Route::middleware(['auth', 'verified', 'role:manager,finance'])->prefix('finance/baskets')->name('finance.baskets.')->whereUuid(['basket', 'stockProduct'])->group(function () {
+    Route::get('/', [BasketController::class, 'index'])->name('index');
+    Route::get('create', [BasketController::class, 'create'])->name('create');
+    Route::post('/', [BasketController::class, 'store'])->name('store');
+    Route::get('{basket}', [BasketController::class, 'show'])->name('show');
+    Route::post('{basket}/stock-lines', [BasketStockController::class, 'store'])->name('stock-lines.store');
+    Route::post('{basket}/return-lines', [BasketReturnController::class, 'store'])->name('return-lines.store');
+    Route::delete('{basket}/return-lines/{returnItem}', [BasketReturnController::class, 'destroy'])->name('return-lines.destroy');
+    Route::delete('{basket}/stock-lines/{stockProduct}', [BasketStockController::class, 'destroy'])->name('stock-lines.destroy');
+    Route::post('{basket}/validation', [BasketValidationController::class, 'store'])->name('validate');
+    Route::put('{basket}/collection', [BasketCollectionController::class, 'update'])->name('collect');
+    Route::post('{basket}/cancellation', [BasketController::class, 'cancel'])->name('cancel');
+});
+
+Route::middleware(['auth', 'verified', 'role:manager,finance'])->get('finance/households/{household}/wallet', [FinanceHouseholdWalletController::class, 'show'])
+    ->whereUuid('household')->name('finance.households.wallet.show');
 
 Route::middleware(['auth', 'verified', 'role:member'])->prefix('cycles/{cycle}/order')->whereUuid(['cycle', 'product'])->name('orders.')->group(function () {
     Route::get('/', [OrderController::class, 'edit'])->name('edit');
@@ -48,11 +89,25 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware(['auth', 'verified', 'role:manager'])->prefix('manage')->name('manage.')->group(function () {
-    Route::resource('stock', StockProductController::class)
-        ->parameters(['stock' => 'stockProduct'])
-        ->except(['show'])
-        ->whereUuid('stockProduct')
-        ->names('stock');
+    Route::get('producers/{producer}/products', [ProducerProductController::class, 'index'])
+        ->whereUuid('producer')->name('producer-products.index');
+    Route::put('products/{product}/classification', [ProductClassificationController::class, 'update'])
+        ->whereUuid('product')->name('products.classification.update');
+    Route::get('producers/{producer}/products/create', [StockProductController::class, 'create'])
+        ->whereUuid('producer')->name('stock.create');
+    Route::post('producers/{producer}/products', [StockProductController::class, 'store'])
+        ->whereUuid('producer')->name('stock.store');
+    Route::get('stock', [StockProductController::class, 'index'])->name('stock.index');
+    Route::get('producers/{producer}/products/{stockProduct}/edit', [StockProductController::class, 'edit'])
+        ->whereUuid(['producer', 'stockProduct'])->name('stock.edit');
+    Route::put('producers/{producer}/products/{stockProduct}', [StockProductController::class, 'update'])
+        ->whereUuid(['producer', 'stockProduct'])->name('stock.update');
+    Route::delete('producers/{producer}/products/{stockProduct}', [StockProductController::class, 'destroy'])
+        ->whereUuid(['producer', 'stockProduct'])->name('stock.destroy');
+    Route::delete('producers/{producer}/products/{stockProduct}/unused', [StockProductController::class, 'deleteUnused'])
+        ->whereUuid(['producer', 'stockProduct'])->name('stock.unused.destroy');
+    Route::put('producers/{producer}/products/{stockProduct}/reactivation', [StockProductController::class, 'reactivate'])
+        ->whereUuid(['producer', 'stockProduct'])->name('stock.reactivate');
     Route::get('stock/{stockProduct}/movements', [StockMovementController::class, 'show'])
         ->whereUuid('stockProduct')
         ->name('stock.movements.show');
@@ -62,11 +117,17 @@ Route::middleware(['auth', 'verified', 'role:manager'])->prefix('manage')->name(
     Route::post('stock/{stockProduct}/adjustments', [StockMovementController::class, 'storeAdjustment'])
         ->whereUuid('stockProduct')
         ->name('stock.adjustments.store');
+    Route::put('stock/{stockProduct}/available', [StockMovementController::class, 'setAvailable'])
+        ->whereUuid('stockProduct')
+        ->name('stock.available.update');
     Route::resource('return-items', ReturnItemController::class)
         ->parameters(['return-items' => 'returnItem'])
         ->except(['show'])
         ->whereUuid('returnItem')
         ->names('return-items');
+    Route::put('return-items/{returnItem}/reactivation', [ReturnItemController::class, 'reactivate'])
+        ->whereUuid('returnItem')
+        ->name('return-items.reactivate');
 
     Route::get('cycles', [CycleController::class, 'index'])->name('cycles.index');
     Route::post('cycles', [CycleController::class, 'store'])->name('cycles.store');
@@ -87,6 +148,29 @@ Route::middleware(['auth', 'verified', 'role:manager'])->prefix('manage')->name(
         Route::delete('/', [CycleCutoffController::class, 'destroy'])->name('cycles.producers.cutoff.destroy');
     });
 
+    Route::prefix('cycles/{cycle}/receptions/{producer}')->whereUuid(['cycle', 'producer', 'product', 'household'])->group(function () {
+        Route::get('/', [ReceptionController::class, 'show'])->name('cycles.receptions.show');
+        Route::post('products', [ReceptionProductController::class, 'store'])->name('cycles.receptions.products.store');
+        Route::put('products/{product}/received', [ReceptionReceivedController::class, 'update'])->name('cycles.receptions.received.update');
+        Route::put('products/{product}/allocations/{household}', [ReceptionAllocationController::class, 'update'])->name('cycles.receptions.allocations.update');
+        Route::post('validate', [ReceptionValidationController::class, 'store'])->name('cycles.receptions.validate');
+        Route::post('distribution', [ReceptionDistributionController::class, 'store'])->name('cycles.receptions.distribution.store');
+        Route::delete('distribution', [ReceptionDistributionController::class, 'destroy'])->name('cycles.receptions.distribution.destroy');
+    });
+
+    Route::prefix('cycles/{cycle}/pickups')->whereUuid(['cycle', 'household', 'product', 'stockProduct', 'returnItem'])->group(function () {
+        Route::get('/', [PickupController::class, 'index'])->name('cycles.pickups.index');
+        Route::get('{household}', [PickupController::class, 'show'])->name('cycles.pickups.show');
+        Route::post('{household}', [PickupController::class, 'store'])->name('cycles.pickups.store');
+        Route::put('{household}/lines/{product}', [PickupLineController::class, 'update'])->name('cycles.pickups.lines.update');
+        Route::post('{household}/stock-lines', [PickupStockController::class, 'store'])->name('cycles.pickups.stock-lines.store');
+        Route::delete('{household}/stock-lines/{stockProduct}', [PickupStockController::class, 'destroy'])->name('cycles.pickups.stock-lines.destroy');
+        Route::post('{household}/return-lines', [PickupReturnController::class, 'store'])->name('cycles.pickups.return-lines.store');
+        Route::delete('{household}/return-lines/{returnItem}', [PickupReturnController::class, 'destroy'])->name('cycles.pickups.return-lines.destroy');
+        Route::post('{household}/not-collected', [PickupCompleteController::class, 'notCollected'])->name('cycles.pickups.not-collected');
+        Route::post('{household}/complete', [PickupCompleteController::class, 'store'])->name('cycles.pickups.complete');
+    });
+
     Route::get('settings', [SettingsController::class, 'show'])->name('settings.show');
     Route::put('settings/pickup-weekday', [SettingsController::class, 'updatePickupWeekday'])->name('settings.pickup-weekday.update');
 
@@ -94,6 +178,8 @@ Route::middleware(['auth', 'verified', 'role:manager'])->prefix('manage')->name(
     Route::post('households', [HouseholdController::class, 'store'])->name('households.store');
     Route::get('households/{household}', [HouseholdController::class, 'show'])->whereUuid('household')->name('households.show');
     Route::put('households/{household}', [HouseholdController::class, 'update'])->whereUuid('household')->name('households.update');
+    Route::post('households/{household}/deactivate', [HouseholdController::class, 'deactivate'])->whereUuid('household')->name('households.deactivate');
+    Route::post('households/{household}/reactivate', [HouseholdController::class, 'reactivate'])->whereUuid('household')->name('households.reactivate');
     Route::post('households/{household}/members', [HouseholdMemberController::class, 'store'])
         ->whereUuid('household')
         ->name('households.members.store');
@@ -132,6 +218,10 @@ Route::middleware(['auth', 'verified', 'role:manager'])->prefix('manage')->name(
     Route::delete('accounts/{account}/manager-role', [ManagerRoleController::class, 'destroy'])
         ->whereUuid('account')
         ->name('accounts.manager-role.destroy');
+    Route::put('accounts/{account}/finance-role', [FinanceRoleController::class, 'update'])
+        ->whereUuid('account')->name('accounts.finance-role.update');
+    Route::delete('accounts/{account}/finance-role', [FinanceRoleController::class, 'destroy'])
+        ->whereUuid('account')->name('accounts.finance-role.destroy');
     Route::post('accounts/{account}/deactivation', [AccountDeactivationController::class, 'store'])
         ->whereUuid('account')
         ->name('accounts.deactivation.store');
@@ -155,9 +245,14 @@ Route::middleware(['auth', 'verified', 'role:producer'])->prefix('producer')->na
         ->except(['show'])
         ->whereUuid('product')
         ->names('products');
+    Route::delete('products/{product}/unused', [ProductController::class, 'deleteUnused'])
+        ->whereUuid('product')->name('products.unused.destroy');
     Route::put('products/{product}/reactivation', [ProductController::class, 'reactivate'])
         ->whereUuid('product')
         ->name('products.reactivate');
+    Route::get('cycles/{cycle}', [ProducerCycleController::class, 'show'])
+        ->whereUuid('cycle')
+        ->name('cycles.show');
     Route::put('cycles/{cycle}/products/{product}/availability', [ProductAvailabilityController::class, 'update'])
         ->whereUuid(['cycle', 'product'])
         ->name('products.availability');

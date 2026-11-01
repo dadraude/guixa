@@ -27,6 +27,7 @@ class HouseholdWalletController extends Controller
         return Inertia::render('Wallet/Statement', [
             'wallet' => WalletStatementRow::from($getWalletStatement($actor, $household)),
             'household' => WalletHouseholdRow::from($detail),
+            'canManageReceipts' => true,
         ]);
     }
 

@@ -3,7 +3,8 @@
 Management app for a food consumer cooperative. One installation serves one cooperative.
 
 Stack: Laravel 13 (PHP 8.5), Inertia 3 + Vue 3, PostgreSQL. See [`specs/constitution.md`](specs/constitution.md)
-for principles and architecture, and [`specs/README.md`](specs/README.md) for how features are specified.
+for principles and architecture, [current module contracts](docs/architecture/modules.md) for enforced
+module interfaces and table ownership, and [`specs/README.md`](specs/README.md) for how features are specified.
 
 ## Requirements
 
@@ -44,12 +45,38 @@ for principles and architecture, and [`specs/README.md`](specs/README.md) for ho
     Open the invitation email in Mailpit (<http://localhost:8025>) and follow the link to set up the account.
     From there, the manager invites the rest of the members from the app.
 
-## Tests and checks
+## Demo data
+
+To start the app with demo data, run this in `local` or `testing`:
 
 ```sh
-php artisan test   # Pest, against the guixa_test database (see phpunit.xml)
-pnpm test          # Vitest
-pnpm check         # Oxlint + Oxfmt
-vendor/bin/pint --test
-vendor/bin/phpstan analyse
+php artisan migrate --seed
+composer dev
 ```
+
+Open <http://localhost:8000> and sign in as `gestora@demo.guixa.test` with password `demo-password`.
+`DatabaseSeeder` calls `DemoSeeder`; its accounts are activated and verified.
+
+| Role              | Account                                                                                          |
+| ----------------- | ------------------------------------------------------------------------------------------------ |
+| Manager           | `gestora@demo.guixa.test`                                                                        |
+| Household members | `anna@demo.guixa.test`, `biel@demo.guixa.test`, `carla@demo.guixa.test`, `david@demo.guixa.test` |
+| Producers         | `hort@demo.guixa.test`, `forn@demo.guixa.test`, `formatgeria@demo.guixa.test`                    |
+
+The demo creates four households, three producers, six weekly products, two stock products,
+opening wallet balances and stock entries. Each household has an order in three upcoming cycles:
+
+- The earliest cycle is ready for pickup, with one completed pickup and three pending.
+- The next cycle has sent producer orders and a partially prepared reception.
+- The last cycle is open for members to edit their orders.
+
+Dates follow the cooperative's timezone and configured pickup weekday (Thursday when none is set),
+skipping dates already occupied by live cycles. Demo setup sends no invitation or order emails.
+Creation is transactional, and rerunning the seeder leaves the existing demo and any manual edits
+intact. Existing application data is preserved. To start the demo over, use a separate empty database.
+
+## Tests and checks
+
+Use the [testing and CI reproduction guide](docs/testing.md) for isolated task setup, focused
+selectors, and the current CI checks. Application tests require PostgreSQL and Redis; run them
+through the guarded task environment described there rather than using the shared local database.

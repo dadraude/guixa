@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property ?string $note
  * @property ?string $cycle_id
  * @property ?string $order_id
+ * @property ?string $basket_id
  */
 final class StockMovementModel extends Model
 {
