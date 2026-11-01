@@ -10,6 +10,13 @@ readonly householdName: string | null,
 readonly active: boolean,
 readonly invitationPending: boolean,
 };
+export type BasketAdjustmentRow = {
+readonly id: string,
+readonly amountCents: number,
+readonly reason: string,
+readonly recordedBy: string,
+readonly occurredAt: string,
+};
 export type BasketHouseholdRow = {
 readonly id: string,
 readonly name: string,
@@ -33,6 +40,8 @@ readonly balanceCents: number,
 readonly projectedBalanceCents: number,
 readonly validatedAt: string | null,
 readonly collectedAt: string | null,
+readonly effectiveTotalCents: number,
+readonly adjustments: App.Http.BasketAdjustmentRow[],
 };
 export type BasketStockLineRow = {
 readonly stockProductId: string,

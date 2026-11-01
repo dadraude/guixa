@@ -151,6 +151,8 @@ beforeEach(function () {
         {
             return 500;
         }
+
+        public function correct(Actor $actor, string $householdId, string $basketId, int $amountCents, string $reason, string $correctionId): void {}
     };
     $this->returnItems = new class implements ReturnItems
     {

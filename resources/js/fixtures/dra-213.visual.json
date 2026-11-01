@@ -1,0 +1,290 @@
+{
+    "baseUrl": "http://127.0.0.1:5213",
+    "rootFontPx": 16,
+    "darkSelector": "html.dark",
+    "matrix": {
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark"],
+        "text": [100, 200]
+    },
+    "views": [
+        {
+            "id": "finance-basket-correction",
+            "path": "/visual-dra-213.html",
+            "query": { "role": "finance" },
+            "root": "#main-content",
+            "panels": "#main-content .pilot-layout-panel,#main-content .pilot-list-row",
+            "content": "#main-content h1,#main-content h2,#main-content p,#main-content label,#main-content input,#main-content textarea,#main-content button,#main-content a,#main-content dt,#main-content dd,#main-content li",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "#main-content a[data-visual-page-focus-first]",
+                "#main-content a[data-test=\"wallet-link\"]",
+                "#correction-amount",
+                "#correction-reason"
+            ],
+            "states": [
+                {
+                    "id": "corrected",
+                    "query": { "state": "corrected" },
+                    "ready": "body[data-visual-ready=\"corrected\"]",
+                    "cases": [
+                        { "width": 375, "mode": "light", "text": 100 },
+                        { "width": 375, "mode": "dark", "text": 100 },
+                        { "width": 1280, "mode": "light", "text": 100 },
+                        { "width": 1280, "mode": "dark", "text": 100 },
+                        { "width": 1024, "mode": "dark", "text": 200 },
+                        { "width": 1024, "mode": "light", "text": 200 }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"original-basket-total\"]",
+                                "text": "12,00 €"
+                            },
+                            {
+                                "selector": "[data-test=\"effective-basket-total\"]",
+                                "text": "10,00 €"
+                            },
+                            {
+                                "selector": "[data-test=\"basket-correction-history\"] li",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"basket-correction-form\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"basket-correction-form\"] button",
+                                "attributes": { "disabled": "" }
+                            },
+                            {
+                                "selector": "#correction-amount,#correction-reason,[data-test=\"basket-correction-form\"] button",
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"basket-correction-form\"] label",
+                                "contrast": 4.5
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "empty",
+                    "query": { "state": "empty" },
+                    "ready": "body[data-visual-ready=\"empty\"]",
+                    "cases": [{ "width": 375, "mode": "light", "text": 100 }],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"basket-correction-history\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"basket-correction-form\"]",
+                                "count": 1
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "draft",
+                    "query": { "state": "draft" },
+                    "ready": "body[data-visual-ready=\"draft\"]",
+                    "cases": [{ "width": 375, "mode": "dark", "text": 200 }],
+                    "checks": {
+                        "focus": [
+                            "#main-content a[data-visual-page-focus-first]",
+                            "#main-content a[data-test=\"wallet-link\"]",
+                            "#main-content [data-test=\"validate-basket\"]",
+                            "#main-content [data-test=\"draft-actions\"] button:last-child"
+                        ],
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"basket-adjustments\"]",
+                                "count": 0
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "error",
+                    "query": { "state": "error" },
+                    "ready": "body[data-visual-ready=\"error\"]",
+                    "cases": [{ "width": 375, "mode": "dark", "text": 200 }],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"domain-error\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"basket-correction-form\"]",
+                                "count": 1
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "ready",
+                    "query": { "state": "ready" },
+                    "ready": "body[data-visual-ready=\"ready\"]",
+                    "cases": [{ "width": 375, "mode": "light", "text": 200 }],
+                    "checks": {
+                        "focus": [
+                            "#main-content a[data-visual-page-focus-first]",
+                            "#main-content a[data-test=\"wallet-link\"]",
+                            "#correction-amount",
+                            "#correction-reason",
+                            "#main-content [data-test=\"basket-correction-form\"] button"
+                        ],
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"basket-correction-form\"] button",
+                                "attributes": { "disabled": null },
+                                "minHeight": 44
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "long",
+                    "query": { "state": "long" },
+                    "ready": "body[data-visual-ready=\"long\"]",
+                    "cases": [{ "width": 375, "mode": "dark", "text": 200 }],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"basket-correction-history\"] li",
+                                "count": 1
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "collected",
+                    "query": { "state": "collected" },
+                    "ready": "body[data-visual-ready=\"collected\"]",
+                    "cases": [{ "width": 375, "mode": "light", "text": 100 }],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"basket-status-collected\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"basket-correction-history\"] li",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"basket-correction-form\"]",
+                                "count": 1
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "member-basket-correction",
+            "path": "/visual-dra-213.html",
+            "query": { "role": "member" },
+            "root": "#main-content",
+            "panels": "#main-content .pilot-layout-panel,#main-content .pilot-list-row",
+            "content": "#main-content h1,#main-content h2,#main-content p,#main-content a,#main-content dt,#main-content dd,#main-content li",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "#main-content a[data-visual-page-focus-first]",
+                "#main-content a[data-test=\"wallet-link\"]"
+            ],
+            "states": [
+                {
+                    "id": "corrected",
+                    "query": { "state": "corrected" },
+                    "ready": "body[data-visual-ready=\"corrected\"]",
+                    "cases": [
+                        { "width": 375, "mode": "light", "text": 100 },
+                        { "width": 375, "mode": "dark", "text": 100 },
+                        { "width": 1280, "mode": "light", "text": 100 },
+                        { "width": 1280, "mode": "dark", "text": 100 },
+                        { "width": 1024, "mode": "dark", "text": 200 },
+                        { "width": 1024, "mode": "light", "text": 200 }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"original-basket-total\"]",
+                                "text": "12,00 €"
+                            },
+                            {
+                                "selector": "[data-test=\"effective-basket-total\"]",
+                                "text": "10,00 €"
+                            },
+                            {
+                                "selector": "[data-test=\"basket-correction-history\"] li",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content form,#main-content button,#main-content a[href^=\"/finance/\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content a[data-test=\"wallet-link\"]",
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "empty",
+                    "query": { "state": "empty" },
+                    "ready": "body[data-visual-ready=\"empty\"]",
+                    "cases": [{ "width": 375, "mode": "light", "text": 100 }],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"basket-correction-history\"]",
+                                "count": 0
+                            },
+                            { "selector": "#main-content form", "count": 0 }
+                        ]
+                    }
+                },
+                {
+                    "id": "long",
+                    "query": { "state": "long" },
+                    "ready": "body[data-visual-ready=\"long\"]",
+                    "cases": [{ "width": 375, "mode": "dark", "text": 200 }],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"basket-correction-history\"] li",
+                                "count": 1
+                            },
+                            { "selector": "#main-content form", "count": 0 }
+                        ]
+                    }
+                },
+                {
+                    "id": "collected",
+                    "query": { "state": "collected" },
+                    "ready": "body[data-visual-ready=\"collected\"]",
+                    "cases": [{ "width": 375, "mode": "light", "text": 100 }],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"basket-status-collected\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"basket-correction-history\"] li",
+                                "count": 1
+                            },
+                            { "selector": "#main-content form", "count": 0 }
+                        ]
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -92,7 +92,7 @@ return [
             'exports' => [
                 'Application\ReadHouseholdBalance' => ['Membership'],
                 'Application\ChargeForPickup' => ['Ordering'],
-                'Application\RecordCorrection' => ['Ordering'],
+                'Application\RecordCorrection' => ['Ordering', 'Sales'],
                 'Application\RecordTopUp' => ['Ordering'],
                 'Application\ChargeForBasket' => ['Sales'],
                 'Application\GetBalance' => ['Sales'],
@@ -118,6 +118,7 @@ return [
         'order_pickup_adjustments' => 'Ordering',
         'baskets' => 'Sales',
         'basket_lines' => 'Sales',
+        'basket_adjustments' => 'Sales',
         'basket_collection_events' => 'Sales',
         'return_items' => 'Stock',
         'stock_movements' => 'Stock',

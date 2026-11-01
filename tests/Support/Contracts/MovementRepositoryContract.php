@@ -15,6 +15,32 @@ use PHPUnit\Framework\Attributes\Test;
 /** Behaviour every MovementRepository promises; see ProbeNoteRepositoryContract for how it is shared. */
 trait MovementRepositoryContract
 {
+    #[Test]
+    public function it_round_trips_a_basket_sourced_correction_without_a_base_charge(): void
+    {
+        $repository = $this->repository();
+        $household = $this->household();
+        $basket = $this->basket($household);
+        $id = $repository->nextId();
+        $movement = Movement::correction($id, $household, Money::ofCents(25), 'Corrected amount', null,
+            $this->at('2026-10-22 10:00:00+00'), $this->account(), basketId: $basket);
+        $repository->add($movement);
+        $repository->add($movement);
+
+        $found = $repository->findById($id);
+        $this->assertSame($basket, $found->basketId);
+        $this->assertNull($found->sourceMovementId);
+        $this->assertSame(25, $repository->balanceOf($household)->cents);
+        $this->assertCount(1, $repository->statementOf($household));
+        try {
+            $repository->add(Movement::correction($id, $household, Money::ofCents(25), 'Changed', null,
+                $this->at('2026-10-22 11:00:00+00'), $this->account(), basketId: $basket));
+            $this->fail('A basket correction identity cannot change its reason.');
+        } catch (CorrectionIdentityConflict) {
+            $this->addToAssertionCount(1);
+        }
+    }
+
     abstract protected function repository(): MovementRepository;
 
     /** The household and cycle must exist where the repository needs them to (a foreign key). */

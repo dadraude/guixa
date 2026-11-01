@@ -4,6 +4,7 @@ namespace Guixa\Sales\Infrastructure\Persistence;
 
 use DateTimeImmutable;
 use Guixa\Sales\Domain\Basket;
+use Guixa\Sales\Domain\BasketAdjustment;
 use Guixa\Sales\Domain\BasketLine;
 use Guixa\Sales\Domain\BasketRepository;
 use Guixa\Sales\Domain\Error\BasketNotEditable;
@@ -64,6 +65,16 @@ final class EloquentBasketRepository implements BasketRepository
             ]);
         }
 
+        foreach ($basket->adjustments as $adjustment) {
+            BasketAdjustmentModel::query()->firstOrCreate(['id' => $adjustment->id], [
+                'basket_id' => $basket->id,
+                'amount_cents' => $adjustment->amountCents,
+                'reason' => $adjustment->reason,
+                'recorded_by' => $adjustment->recordedBy,
+                'occurred_at' => $adjustment->occurredAt->format(DATE_ATOM),
+            ]);
+        }
+
         if ($basket->collectedAt !== null && ! BasketCollectionEventModel::query()->where('basket_id', $basket->id)->exists()) {
             BasketCollectionEventModel::query()->create([
                 'id' => $this->nextId(), 'basket_id' => $basket->id, 'type' => 'collected',
@@ -81,6 +92,7 @@ final class EloquentBasketRepository implements BasketRepository
             && $this->instant($stored->collectedAt) === $this->instant($incoming->collectedAt);
 
         if ((! $sameState && ! $collectionTransition) || ($sameState && ! $sameCollection)
+            || ! $this->retainsAdjustments($stored, $incoming)
             || $stored->householdId !== $incoming->householdId
             || $stored->householdName !== $incoming->householdName
             || $stored->createdBy !== $incoming->createdBy
@@ -93,6 +105,22 @@ final class EloquentBasketRepository implements BasketRepository
             || $this->lineSnapshots($stored) !== $this->lineSnapshots($incoming)) {
             throw BasketNotEditable::create();
         }
+    }
+
+    private function retainsAdjustments(Basket $stored, Basket $incoming): bool
+    {
+        if (count($incoming->adjustments) < count($stored->adjustments)) {
+            return false;
+        }
+        foreach ($stored->adjustments as $index => $adjustment) {
+            $candidate = $incoming->adjustments[$index];
+            if (! $adjustment->matches($candidate)
+                || $this->instant($adjustment->occurredAt) !== $this->instant($candidate->occurredAt)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private function instant(?DateTimeImmutable $instant): ?string
@@ -130,7 +158,7 @@ final class EloquentBasketRepository implements BasketRepository
 
     public function list(): array
     {
-        return array_values(BasketModel::query()->with('lines')->orderByDesc('created_at')->orderByDesc('id')->get()
+        return array_values(BasketModel::query()->with(['lines', 'adjustments'])->orderByDesc('created_at')->orderByDesc('id')->get()
             ->map(fn (BasketModel $model) => $this->toDomain($model))->all());
     }
 
@@ -143,7 +171,7 @@ final class EloquentBasketRepository implements BasketRepository
 
     public function listForHousehold(string $householdId): array
     {
-        return array_values(BasketModel::query()->where('household_id', $householdId)->with('lines')
+        return array_values(BasketModel::query()->where('household_id', $householdId)->with(['lines', 'adjustments'])
             ->orderByDesc('created_at')->orderByDesc('id')->get()
             ->map(fn (BasketModel $model) => $this->toDomain($model))->all());
     }
@@ -168,7 +196,10 @@ final class EloquentBasketRepository implements BasketRepository
             $model->validated_by, $model->validated_at === null ? null : new DateTimeImmutable($model->validated_at),
             $model->validated_total_cents === null ? null : (int) $model->validated_total_cents,
             $model->collected_by, $model->collected_at === null ? null : new DateTimeImmutable($model->collected_at),
-            $model->cancelled_by, $model->cancelled_at === null ? null : new DateTimeImmutable($model->cancelled_at));
+            $model->cancelled_by, $model->cancelled_at === null ? null : new DateTimeImmutable($model->cancelled_at),
+            $model->adjustments->map(fn (BasketAdjustmentModel $adjustment) => new BasketAdjustment(
+                $adjustment->id, $adjustment->basket_id, (int) $adjustment->amount_cents,
+                $adjustment->reason, $adjustment->recorded_by, new DateTimeImmutable($adjustment->occurred_at)))->all());
     }
 
     private function containerSnapshot(BasketLineModel $line): ?string

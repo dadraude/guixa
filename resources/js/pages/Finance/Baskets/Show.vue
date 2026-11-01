@@ -9,12 +9,14 @@ import BasketReturnController from '@/actions/App/Http/Controllers/Finance/Baske
 import BasketValidationController from '@/actions/App/Http/Controllers/Finance/BasketValidationController';
 import HouseholdWalletController from '@/actions/App/Http/Controllers/Finance/HouseholdWalletController';
 import Heading from '@/components/Heading.vue';
+import AmountAdjustments from '@/components/baskets/AmountAdjustments.vue';
 import InputError from '@/components/InputError.vue';
 import StockLines from '@/components/pickup/StockLines.vue';
 import ReturnLines from '@/components/pickup/ReturnLines.vue';
 import { euros } from '@/components/pickup/euros';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { useTemplateRef } from 'vue';
 
 const props = defineProps<{
     basket: App.Http.BasketRow;
@@ -24,6 +26,7 @@ const props = defineProps<{
 const page = usePage();
 const errors = computed(() => page.props.errors as Record<string, string>);
 const processing = ref(false);
+const adjustmentPanel = useTemplateRef('adjustmentPanel');
 const options = {
     preserveScroll: true,
     onStart: () => (processing.value = true),
@@ -74,6 +77,12 @@ const cancel = () =>
         BasketController.cancel.url({ basket: props.basket.id }),
         {},
         options,
+    );
+const correct = (amountCents: number, reason: string, correctionId: string) =>
+    router.post(
+        `/finance/baskets/${props.basket.id}/corrections`,
+        { amount_cents: amountCents, reason, correction_id: correctionId },
+        { ...options, onSuccess: () => adjustmentPanel.value?.reset() },
     );
 const statusLabels: Record<string, string> = {
     draft: trans('Draft'),
@@ -128,7 +137,7 @@ const statusLabels: Record<string, string> = {
 
         <section class="pilot-layout-panel">
             <dl
-                class="grid grid-cols-2 gap-4 text-sm sm:grid-cols-3"
+                class="grid grid-cols-1 gap-4 text-sm sm:grid-cols-3"
                 data-test="basket-balance"
             >
                 <div>
@@ -162,6 +171,18 @@ const statusLabels: Record<string, string> = {
                 {{ trans('View household Wallet statement') }}
             </Link>
         </section>
+
+        <AmountAdjustments
+            v-if="basket.state === 'validated' || basket.state === 'collected'"
+            ref="adjustmentPanel"
+            :original-cents="basket.totalCents"
+            :effective-cents="basket.effectiveTotalCents"
+            :adjustments="basket.adjustments"
+            :editable="true"
+            :processing="processing"
+            :errors="errors"
+            @submit="correct"
+        />
 
         <div
             v-if="basket.state === 'draft'"

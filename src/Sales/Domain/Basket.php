@@ -23,6 +23,8 @@ final readonly class Basket
         public ?DateTimeImmutable $collectedAt = null,
         public ?string $cancelledBy = null,
         public ?DateTimeImmutable $cancelledAt = null,
+        /** @var list<BasketAdjustment> */
+        public array $adjustments = [],
     ) {}
 
     /** @return list<BasketLine> */
@@ -69,6 +71,24 @@ final readonly class Basket
         return array_sum(array_map(fn (BasketLine $line) => $line->amountCents(), $this->activeLines()));
     }
 
+    public function effectiveTotalCents(): int
+    {
+        return ($this->validatedTotalCents ?? $this->totalCents())
+            - array_sum(array_map(fn (BasketAdjustment $adjustment) => $adjustment->amountCents, $this->adjustments));
+    }
+
+    public function withAdjustment(BasketAdjustment $adjustment): self
+    {
+        if (! in_array($this->state, ['validated', 'collected'], true) || $adjustment->basketId !== $this->id) {
+            throw new DomainException('Only a validated basket can be corrected.');
+        }
+
+        return new self($this->id, $this->householdId, $this->householdName, $this->state,
+            $this->createdBy, $this->createdAt, $this->lines, $this->validatedBy, $this->validatedAt,
+            $this->validatedTotalCents, $this->collectedBy, $this->collectedAt, $this->cancelledBy,
+            $this->cancelledAt, [...$this->adjustments, $adjustment]);
+    }
+
     public function validated(string $actorId, DateTimeImmutable $when): self
     {
         $this->draft();
@@ -91,7 +111,7 @@ final readonly class Basket
 
         return new self($this->id, $this->householdId, $this->householdName, 'collected',
             $this->createdBy, $this->createdAt, $this->lines, $this->validatedBy, $this->validatedAt,
-            $this->validatedTotalCents, $actorId, $when);
+            $this->validatedTotalCents, $actorId, $when, adjustments: $this->adjustments);
     }
 
     public function cancelled(string $actorId, DateTimeImmutable $when): self

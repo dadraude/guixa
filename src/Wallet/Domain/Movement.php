@@ -76,7 +76,7 @@ final readonly class Movement
         return new self($id, $householdId, MovementType::Credit, $total, $occurredAt, $recordedBy, null, null, $basketId);
     }
 
-    public static function correction(string $id, string $householdId, Money $amount, string $note, ?string $cycleId, DateTimeImmutable $occurredAt, string $recordedBy, ?string $sourceMovementId = null): self
+    public static function correction(string $id, string $householdId, Money $amount, string $note, ?string $cycleId, DateTimeImmutable $occurredAt, string $recordedBy, ?string $sourceMovementId = null, ?string $basketId = null): self
     {
         if ($amount->cents === 0) {
             throw InvalidCorrectionAmount::create();
@@ -88,7 +88,7 @@ final readonly class Movement
             throw CorrectionNoteRequired::create();
         }
 
-        return new self($id, $householdId, MovementType::Correction, $amount, $occurredAt, $recordedBy, $note, $cycleId, null, $sourceMovementId);
+        return new self($id, $householdId, MovementType::Correction, $amount, $occurredAt, $recordedBy, $note, $cycleId, $basketId, $sourceMovementId);
     }
 
     public static function restore(string $id, string $householdId, MovementType $type, Money $amount, DateTimeImmutable $occurredAt, string $recordedBy, ?string $note, ?string $cycleId, ?string $basketId = null, ?string $sourceMovementId = null): self
@@ -106,6 +106,7 @@ final readonly class Movement
             && $this->note === $other->note
             && $this->cycleId === $other->cycleId
             && $this->sourceMovementId === $other->sourceMovementId
+            && $this->basketId === $other->basketId
             && $this->recordedBy === $other->recordedBy;
     }
 

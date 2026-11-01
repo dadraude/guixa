@@ -217,6 +217,11 @@ final class BasketPersistenceTest extends TestCase
             {
                 return $this->inner->balance($actor, $householdId);
             }
+
+            public function correct(Actor $actor, string $householdId, string $basketId, int $amountCents, string $reason, string $correctionId): void
+            {
+                $this->inner->correct($actor, $householdId, $basketId, $amountCents, $reason, $correctionId);
+            }
         });
 
         $this->assertThrows(fn () => app(ValidateBasket::class)($actor, $id), \RuntimeException::class);
@@ -363,6 +368,11 @@ final class BasketPersistenceTest extends TestCase
             public function balance(Actor $actor, string $householdId): int
             {
                 return $this->inner->balance($actor, $householdId);
+            }
+
+            public function correct(Actor $actor, string $householdId, string $basketId, int $amountCents, string $reason, string $correctionId): void
+            {
+                $this->inner->correct($actor, $householdId, $basketId, $amountCents, $reason, $correctionId);
             }
         });
 
