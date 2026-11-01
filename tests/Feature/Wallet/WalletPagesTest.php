@@ -34,7 +34,12 @@ it('records a top-up and a correction and shows both to the member (S24, R31)', 
     $manager = accountWith(Role::Manager);
 
     $this->actingAs($manager)->post("/manage/households/{$household}/wallet/top-ups", ['amount' => '50,00', 'note' => 'cash'])->assertRedirect();
-    $this->actingAs($manager)->post("/manage/households/{$household}/wallet/corrections", ['amount' => '-50', 'note' => 'duplicated'])->assertRedirect();
+    $receiptId = DB::table('wallet_movements')->where('household_id', $household)->where('type', 'top_up')->value('id');
+    $correctionId = (string) Str::uuid7();
+    $this->actingAs($manager)->post("/manage/households/{$household}/wallet/corrections", [
+        'amount' => '-50', 'note' => 'duplicated', 'source_movement_id' => $receiptId, 'correction_id' => $correctionId,
+    ])->assertRedirect();
+    expect(DB::table('wallet_movements')->where('id', $correctionId)->value('source_movement_id'))->toBe($receiptId);
 
     $this->actingAs(memberOf($household))->get('/wallet')
         ->assertInertia(fn (Assert $page) => $page
@@ -43,6 +48,8 @@ it('records a top-up and a correction and shows both to the member (S24, R31)', 
             ->has('wallet.movements', 2)
             ->where('wallet.movements.0.type', 'correction')
             ->where('wallet.movements.0.amount', '-50.00')
+            ->where('wallet.movements.0.sourceMovementId', $receiptId)
+            ->where('wallet.movements.0.recordedBy', $manager->id)
             ->where('wallet.movements.1.type', 'top_up')
             ->where('wallet.movements.1.note', 'cash')
             ->where('household', null));
@@ -55,6 +62,7 @@ it('shows a manager the household wallet with its name', function () {
         ->assertInertia(fn (Assert $page) => $page
             ->component('Wallet/Statement')
             ->where('household.name', 'Household H')
+            ->where('householdReturnHref', route('manage.households.show', ['household' => $household]))
             ->where('wallet.balance', '0.00')
             ->has('wallet.movements', 0));
 });
@@ -76,16 +84,21 @@ it('shows the domain error for a top-up of zero and a correction without a note'
     $this->from("/manage/households/{$household}/wallet")
         ->post("/manage/households/{$household}/wallet/top-ups", ['amount' => '0'])
         ->assertSessionHasErrors('domain');
-    $this->post("/manage/households/{$household}/wallet/corrections", ['amount' => '5', 'note' => ''])
+    $receipt = DB::table('wallet_movements')->where('household_id', $household)->where('type', 'top_up')->value('id');
+    if ($receipt === null) {
+        $this->post("/manage/households/{$household}/wallet/top-ups", ['amount' => '5'])->assertRedirect();
+        $receipt = DB::table('wallet_movements')->where('household_id', $household)->where('type', 'top_up')->value('id');
+    }
+    $this->post("/manage/households/{$household}/wallet/corrections", ['amount' => '5', 'note' => '', 'source_movement_id' => $receipt, 'correction_id' => (string) Str::uuid7()])
         ->assertSessionHasErrors('note');
-    $this->post("/manage/households/{$household}/wallet/corrections", ['amount' => '0', 'note' => 'typo'])
+    $this->post("/manage/households/{$household}/wallet/corrections", ['amount' => '0', 'note' => 'typo', 'source_movement_id' => $receipt, 'correction_id' => (string) Str::uuid7()])
         ->assertSessionHasErrors('domain');
 
-    expect(DB::table('wallet_movements')->count())->toBe(0);
+    expect(DB::table('wallet_movements')->where('type', 'correction')->count())->toBe(0);
 });
 
 it('answers 404 to an unknown household and to an id that is not a UUID', function (string $method, string $uri) {
-    $this->actingAs(accountWith(Role::Manager))->{$method}(str_replace('{id}', (string) Str::uuid7(), $uri), ['amount' => '5', 'note' => 'x'])->assertNotFound();
+    $this->actingAs(accountWith(Role::Manager))->{$method}(str_replace('{id}', (string) Str::uuid7(), $uri), ['amount' => '5', 'note' => 'x', 'source_movement_id' => (string) Str::uuid7(), 'correction_id' => (string) Str::uuid7()])->assertNotFound();
 })->with([
     ['get', '/manage/households/{id}/wallet'],
     ['post', '/manage/households/{id}/wallet/top-ups'],

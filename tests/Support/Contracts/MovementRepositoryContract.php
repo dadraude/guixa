@@ -5,6 +5,7 @@ namespace Tests\Support\Contracts;
 use DateTimeImmutable;
 use Guixa\Shared\Domain\Money;
 use Guixa\Wallet\Domain\Error\BasketAlreadyCharged;
+use Guixa\Wallet\Domain\Error\CorrectionIdentityConflict;
 use Guixa\Wallet\Domain\Error\PickupAlreadyCharged;
 use Guixa\Wallet\Domain\Movement;
 use Guixa\Wallet\Domain\MovementRepository;
@@ -63,6 +64,32 @@ trait MovementRepositoryContract
         $this->assertSame($this->account(), $found->recordedBy);
         $this->assertSame('duplicated', $found->note);
         $this->assertSame($correction->cycleId, $found->cycleId);
+    }
+
+    #[Test]
+    public function it_replays_one_correction_identity_once_and_rejects_changed_contents(): void
+    {
+        $repository = $this->repository();
+        $household = $this->household();
+        $receipt = $this->topUp($repository, $household, 5000);
+        $repository->add($receipt);
+        $id = $repository->nextId();
+        $correction = Movement::correction($id, $household, Money::ofCents(-5000), 'duplicate', null, $this->at('2026-10-22 11:00:00+00'), $this->account(), $receipt->id);
+        $repository->add($correction);
+        $repository->add($correction);
+
+        $this->assertCount(2, $repository->statementOf($household));
+        $recorded = $repository->findById($id);
+        $this->assertEquals($correction->occurredAt, $recorded->occurredAt);
+        $this->assertSame($correction->recordedBy, $recorded->recordedBy);
+        $this->assertSame(0, $repository->balanceOf($household)->cents);
+        try {
+            $repository->add(Movement::correction($id, $household, Money::ofCents(-3000), 'changed', null, $this->at('2026-10-22 12:00:00+00'), $this->account(), $receipt->id));
+            $this->fail('A changed correction reused an existing identity.');
+        } catch (CorrectionIdentityConflict) {
+            $this->addToAssertionCount(1);
+        }
+        $this->assertCount(2, $repository->statementOf($household));
     }
 
     #[Test]

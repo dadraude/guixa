@@ -102,8 +102,10 @@ it('keeps a real ordered line and pickup through deactivation until pickup and w
         )],
         PickupStatus::Pending,
     ));
+    $receipt = $ordering->recordTopUp;
+    $receiptId = $receipt($membership->manager, $household, 500, 'Opening receipt');
     $correction = new RecordCorrection($ordering->movements, $ordering->clock);
-    $correction($membership->manager, $household, -500, 'Opening adjustment');
+    $correction($membership->manager, $household, -1000, 'Opening adjustment', null, $receiptId, 'opening-adjustment');
     $balances = new WalletHouseholdBalances(new ReadHouseholdBalance($ordering->movements));
     $pickups = new OrderingHouseholdPickups(new ReadPendingPickups($ordering->cycles, $ordering->orders));
     $warning = new GetHouseholdDeactivationWarning($membership->households, $balances, $pickups);

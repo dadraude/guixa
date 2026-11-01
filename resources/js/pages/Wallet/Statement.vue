@@ -1,21 +1,42 @@
 <script setup lang="ts">
 import { formatEventDateTime, formatMoney } from '@/lib/locale';
 import { Form, Head, Link } from '@inertiajs/vue3';
-import HouseholdController from '@/actions/App/Http/Controllers/Manage/HouseholdController';
-import HouseholdWalletController from '@/actions/App/Http/Controllers/Manage/HouseholdWalletController';
 import BasketController from '@/actions/App/Http/Controllers/Finance/BasketController';
 import Heading from '@/components/Heading.vue';
+import FormSelect from '@/components/FormSelect.vue';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { trans } from 'laravel-vue-i18n';
+import { computed } from 'vue';
 
-defineProps<{
+const props = defineProps<{
     wallet: App.Http.WalletStatementRow;
     household: App.Http.WalletHouseholdRow | null;
     canManageReceipts?: boolean;
+    householdReturnHref?: string;
+    receiptAction?: string;
+    correctionAction?: string;
+    correctionId?: string;
+    status?: string | null;
 }>();
+
+const receipts = computed(() =>
+    props.wallet.movements.filter((movement) => movement.type === 'top_up'),
+);
+const receiptOptions = computed(() =>
+    receipts.value.map((movement) => ({
+        value: movement.id,
+        label: trans(':amount · :date · :note', {
+            amount: formatMoney(movement.amount),
+            date: formatEventDateTime(movement.occurredAt),
+            note: movement.note || trans('No note'),
+        }),
+    })),
+);
+const originalReceipt = (id: string) =>
+    receipts.value.find((movement) => movement.id === id);
 
 const typeLabels: Record<string, string> = {
     top_up: trans('Top-up'),
@@ -42,6 +63,10 @@ const typeLabels: Record<string, string> = {
             "
         />
 
+        <p v-if="status" role="status" class="pilot-layout-notice">
+            {{ status }}
+        </p>
+
         <div v-if="household && canManageReceipts" class="pilot-wallet-forms">
             <div
                 class="pilot-wallet-form-grid grid min-w-0 grid-cols-[minmax(0,1fr)] gap-4"
@@ -51,9 +76,8 @@ const typeLabels: Record<string, string> = {
                         {{ trans('Record a top-up') }}
                     </h2>
                     <Form
-                        v-bind="
-                            HouseholdWalletController.topUp.form(household.id)
-                        "
+                        :action="receiptAction"
+                        method="post"
                         :reset-on-success="['amount', 'note']"
                         class="pilot-layout-form flex flex-col"
                         v-slot="{ errors, processing }"
@@ -94,13 +118,36 @@ const typeLabels: Record<string, string> = {
                         {{ trans('Record a correction') }}
                     </h2>
                     <Form
-                        v-bind="
-                            HouseholdWalletController.correct.form(household.id)
-                        "
-                        :reset-on-success="['amount', 'note']"
+                        :action="correctionAction"
+                        method="post"
+                        :reset-on-success="[
+                            'amount',
+                            'note',
+                            'source_movement_id',
+                        ]"
                         class="pilot-layout-form flex flex-col"
                         v-slot="{ errors, processing }"
                     >
+                        <input
+                            type="hidden"
+                            name="correction_id"
+                            :value="correctionId"
+                        />
+                        <div class="grid gap-2">
+                            <Label for="correction-source">{{
+                                trans('Original receipt')
+                            }}</Label>
+                            <FormSelect
+                                id="correction-source"
+                                name="source_movement_id"
+                                :options="receiptOptions"
+                                content-class="wallet-receipt-menu"
+                                :placeholder="trans('Choose a receipt')"
+                                :disabled="receipts.length === 0"
+                                required
+                            />
+                            <InputError :message="errors.source_movement_id" />
+                        </div>
                         <div class="grid gap-2">
                             <Label for="correction-amount">
                                 {{
@@ -127,7 +174,7 @@ const typeLabels: Record<string, string> = {
                         <Button
                             type="submit"
                             variant="secondary"
-                            :disabled="processing"
+                            :disabled="processing || receipts.length === 0"
                             data-test="record-correction"
                         >
                             {{ trans('Record correction') }}
@@ -185,6 +232,16 @@ const typeLabels: Record<string, string> = {
                                     >{{ trans('Date') }}</span
                                 >
                                 {{ formatEventDateTime(movement.occurredAt) }}
+                                <small
+                                    v-if="movement.recordedBy"
+                                    class="block break-all text-muted-foreground"
+                                >
+                                    {{
+                                        trans('Recorded by :id', {
+                                            id: movement.recordedBy,
+                                        })
+                                    }}
+                                </small>
                             </td>
                             <td class="py-2">
                                 <span
@@ -233,6 +290,33 @@ const typeLabels: Record<string, string> = {
                                         })
                                     }}</span
                                 >
+                                <span
+                                    v-else-if="movement.sourceMovementId"
+                                    data-test="receipt-correction-source"
+                                    class="break-words"
+                                >
+                                    {{
+                                        originalReceipt(
+                                            movement.sourceMovementId,
+                                        )
+                                            ? trans(
+                                                  'Correction of receipt :amount',
+                                                  {
+                                                      amount: formatMoney(
+                                                          originalReceipt(
+                                                              movement.sourceMovementId,
+                                                          )!.amount,
+                                                      ),
+                                                  },
+                                              )
+                                            : trans(
+                                                  'Correction of receipt :id',
+                                                  {
+                                                      id: movement.sourceMovementId,
+                                                  },
+                                              )
+                                    }}
+                                </span>
                                 <span v-else-if="movement.cycleId">{{
                                     trans('Cycle')
                                 }}</span>
@@ -252,8 +336,8 @@ const typeLabels: Record<string, string> = {
         </section>
 
         <Link
-            v-if="household && canManageReceipts"
-            :href="HouseholdController.show(household.id)"
+            v-if="household && householdReturnHref"
+            :href="householdReturnHref"
             class="pilot-back-link text-sm underline-offset-4 hover:underline"
         >
             {{ trans('Back to :household', { household: household.name }) }}
@@ -263,6 +347,16 @@ const typeLabels: Record<string, string> = {
 
 <style scoped>
 .pilot-t44-page :deep(.pilot-heading) {
+    overflow-wrap: anywhere;
+}
+
+:global(.wallet-receipt-menu) {
+    max-width: calc(100vw - 1.25rem);
+}
+
+:global(.wallet-receipt-menu [data-slot='select-item']),
+:global(.wallet-receipt-menu [data-slot='select-item'] > span:last-child) {
+    min-width: 0;
     overflow-wrap: anywhere;
 }
 </style>

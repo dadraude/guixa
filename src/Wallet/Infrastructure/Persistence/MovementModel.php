@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string|null $note
  * @property string|null $cycle_id
  * @property string|null $basket_id
+ * @property string|null $source_movement_id
  */
 final class MovementModel extends Model
 {

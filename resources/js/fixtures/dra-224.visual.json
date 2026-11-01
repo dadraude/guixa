@@ -1,0 +1,466 @@
+{
+    "baseUrl": "http://127.0.0.1:5224",
+    "rootFontPx": 16,
+    "darkSelector": "html.dark",
+    "matrix": {
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark"],
+        "text": [100, 200]
+    },
+    "views": [
+        {
+            "id": "manager-wallet-statement",
+            "path": "/visual-dra-224.html",
+            "query": {
+                "role": "manager"
+            },
+            "root": "#main-content",
+            "panels": "#main-content form,#main-content .pilot-layout-panel:not(:has(table)),#main-content .pilot-layout-notice",
+            "content": "#main-content h1,#main-content h2,#main-content p,#main-content label,#main-content input,#main-content button,#main-content a,#main-content td",
+            "fonts": ["16px Nunito Variable"],
+            "states": [
+                {
+                    "id": "populated",
+                    "query": {
+                        "state": "populated"
+                    },
+                    "ready": "body[data-visual-ready=\"populated\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"record-top-up\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"record-correction\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"receipt-correction-source\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content button",
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": ".pilot-wallet-table thead",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content a[href^=\"/manage/households/\"]",
+                                "count": 1
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "empty",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "ready": "body[data-visual-ready=\"empty\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"record-correction\"]",
+                                "attributes": {
+                                    "disabled": ""
+                                }
+                            }
+                        ],
+                        "focus": [
+                            "#top-up-amount",
+                            "#top-up-note",
+                            "[data-test=\"record-top-up\"]",
+                            "#correction-amount",
+                            "#correction-note"
+                        ]
+                    }
+                },
+                {
+                    "id": "long",
+                    "query": {
+                        "state": "long"
+                    },
+                    "ready": "body[data-visual-ready=\"long\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "selector-selected",
+                    "query": {
+                        "state": "selector-selected"
+                    },
+                    "ready": "body[data-visual-ready=\"selector-selected\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "#correction-source",
+                                "text": "50,00 € · 30 d’oct. 2026, 10:00 · La Figuera de la Vall de les terres altes amb un nom extraordinàriament llarg",
+                                "attributes": {
+                                    "aria-expanded": "false"
+                                }
+                            },
+                            {
+                                "selector": ".wallet-receipt-menu[data-state=\"open\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content a[href^=\"/manage/households/\"]",
+                                "count": 1
+                            }
+                        ]
+                    }
+                }
+            ],
+            "focus": [
+                "#top-up-amount",
+                "#top-up-note",
+                "[data-test=\"record-top-up\"]",
+                "#correction-source",
+                "#correction-amount",
+                "#correction-note",
+                "[data-test=\"record-correction\"]"
+            ]
+        },
+        {
+            "id": "finance-wallet-statement",
+            "path": "/visual-dra-224.html",
+            "query": {
+                "role": "finance"
+            },
+            "root": "#main-content",
+            "panels": "#main-content form,#main-content .pilot-layout-panel:not(:has(table)),#main-content .pilot-layout-notice",
+            "content": "#main-content h1,#main-content h2,#main-content p,#main-content label,#main-content input,#main-content button,#main-content a,#main-content td",
+            "fonts": ["16px Nunito Variable"],
+            "states": [
+                {
+                    "id": "populated",
+                    "query": {
+                        "state": "populated"
+                    },
+                    "ready": "body[data-visual-ready=\"populated\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"record-top-up\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"record-correction\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"receipt-correction-source\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content button",
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": ".pilot-wallet-table thead",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content a[href^=\"/manage/households/\"]",
+                                "count": 0
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "error",
+                    "query": {
+                        "state": "error"
+                    },
+                    "ready": "body[data-visual-ready=\"error\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "disabled",
+                    "query": {
+                        "state": "disabled"
+                    },
+                    "ready": "body[data-visual-ready=\"disabled\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"record-correction\"]",
+                                "attributes": {
+                                    "disabled": ""
+                                }
+                            }
+                        ],
+                        "focus": [
+                            "#top-up-amount",
+                            "#top-up-note",
+                            "[data-test=\"record-top-up\"]",
+                            "#correction-amount",
+                            "#correction-note"
+                        ]
+                    }
+                },
+                {
+                    "id": "selector-open",
+                    "query": {
+                        "state": "selector-open"
+                    },
+                    "ready": "body[data-visual-ready=\"selector-open\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "root": "body",
+                        "panels": "#main-content form,#main-content .pilot-layout-panel:not(:has(table)),.wallet-receipt-menu",
+                        "content": "#main-content h1,#main-content h2,#main-content p,#main-content label,#main-content input,#main-content button,#main-content a,#main-content td,.wallet-receipt-menu [data-slot=\"select-item\"]",
+                        "focus": [],
+                        "noFocusReason": "Opened listbox uses ArrowDown/Enter; its interaction and selection are verified in a focused Chrome probe.",
+                        "assertions": [
+                            {
+                                "selector": "#correction-source",
+                                "attributes": {
+                                    "aria-expanded": "true"
+                                }
+                            },
+                            {
+                                "selector": ".wallet-receipt-menu[data-state=\"open\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".wallet-receipt-menu [data-slot=\"select-item\"]",
+                                "count": 1,
+                                "text": "50,00 € · 30 d’oct. 2026, 10:00 · La Figuera de la Vall de les terres altes amb un nom extraordinàriament llarg"
+                            },
+                            {
+                                "selector": "#main-content a[href^=\"/manage/households/\"]",
+                                "count": 0
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "selector-selected",
+                    "query": {
+                        "state": "selector-selected"
+                    },
+                    "ready": "body[data-visual-ready=\"selector-selected\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "#correction-source",
+                                "text": "50,00 € · 30 d’oct. 2026, 10:00 · La Figuera de la Vall de les terres altes amb un nom extraordinàriament llarg",
+                                "attributes": {
+                                    "aria-expanded": "false"
+                                }
+                            },
+                            {
+                                "selector": ".wallet-receipt-menu[data-state=\"open\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content a[href^=\"/manage/households/\"]",
+                                "count": 0
+                            }
+                        ]
+                    }
+                }
+            ],
+            "focus": [
+                "#top-up-amount",
+                "#top-up-note",
+                "[data-test=\"record-top-up\"]",
+                "#correction-source",
+                "#correction-amount",
+                "#correction-note",
+                "[data-test=\"record-correction\"]"
+            ]
+        },
+        {
+            "id": "member-wallet-statement",
+            "path": "/visual-dra-224.html",
+            "query": {
+                "role": "member"
+            },
+            "root": "#main-content",
+            "panels": "#main-content form,#main-content .pilot-layout-panel:not(:has(table)),#main-content .pilot-layout-notice",
+            "content": "#main-content h1,#main-content h2,#main-content p,#main-content label,#main-content input,#main-content button,#main-content a,#main-content td",
+            "fonts": ["16px Nunito Variable"],
+            "states": [
+                {
+                    "id": "populated",
+                    "query": {
+                        "state": "populated"
+                    },
+                    "ready": "body[data-visual-ready=\"populated\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"record-top-up\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"receipt-correction-source\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-wallet-table thead",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content a[href^=\"/manage/households/\"]",
+                                "count": 0
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "empty",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "ready": "body[data-visual-ready=\"empty\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                }
+            ],
+            "focus": [],
+            "noFocusReason": "Member statement has no action in its main content."
+        }
+    ]
+}

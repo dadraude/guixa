@@ -385,6 +385,8 @@ readonly occurredAt: string,
 readonly note: string | null,
 readonly cycleId: string | null,
 readonly basketId: string | null,
+readonly sourceMovementId: string | null,
+readonly recordedBy: string | null,
 };
 export type WalletStatementRow = {
 readonly balance: string,

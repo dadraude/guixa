@@ -56,7 +56,7 @@ it('lets Finance-only create, add, validate and collect an independent basket wi
     $this->put("/finance/baskets/{$basket}/collection")->assertRedirect();
     $this->get("/finance/baskets/{$basket}")->assertInertia(fn (Assert $page) => $page->where('basket.state', 'collected'));
     $this->get("/finance/households/{$household}/wallet")->assertInertia(fn (Assert $page) => $page
-        ->component('Wallet/Statement')->where('canManageReceipts', false)->where('wallet.movements.0.basketId', $basket));
+        ->component('Wallet/Statement')->where('canManageReceipts', true)->missing('householdReturnHref')->where('wallet.movements.0.basketId', $basket));
     expect(DB::table('stock_movements')->where('basket_id', $basket)->value('recorded_by'))->toBe($finance->id)
         ->and(DB::table('wallet_movements')->where('basket_id', $basket)->value('recorded_by'))->toBe($finance->id);
 });

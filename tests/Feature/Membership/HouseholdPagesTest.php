@@ -119,7 +119,13 @@ it('keeps pending pickups and wallet adjustments available after deactivation (R
     $this->actingAs($manager)->post(route('manage.households.deactivate', $householdId))->assertRedirect();
     expect(DB::table('orders')->where('id', $orderId)->value('pickup_status'))->toBe('pending');
     $this->actingAs($manager)->post(route('manage.households.wallet.top-ups.store', $householdId), ['amount' => '5.00'])->assertRedirect();
-    $this->actingAs($manager)->post(route('manage.households.wallet.corrections.store', $householdId), ['amount' => '-5.00', 'note' => 'settled'])->assertRedirect();
+    $receiptId = DB::table('wallet_movements')->where('household_id', $householdId)->where('type', 'top_up')->value('id');
+    $this->actingAs($manager)->post(route('manage.households.wallet.corrections.store', $householdId), [
+        'amount' => '-5.00',
+        'note' => 'settled',
+        'source_movement_id' => $receiptId,
+        'correction_id' => (string) Str::uuid7(),
+    ])->assertRedirect()->assertSessionHasNoErrors();
 
     $this->actingAs($manager)->get(route('manage.households.index'))
         ->assertInertia(fn (Assert $page) => $page

@@ -21,6 +21,8 @@ final readonly class WalletMovementRow
         public ?string $note,
         public ?string $cycleId,
         public ?string $basketId,
+        public ?string $sourceMovementId,
+        public ?string $recordedBy,
     ) {}
 
     public static function from(MovementData $movement): self
@@ -33,6 +35,8 @@ final readonly class WalletMovementRow
             $movement->note,
             $movement->cycleId,
             $movement->basketId,
+            $movement->sourceMovementId,
+            $movement->recordedBy,
         );
     }
 }
