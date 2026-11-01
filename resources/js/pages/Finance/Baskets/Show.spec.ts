@@ -49,7 +49,7 @@ const basket = {
 
 describe('Finance basket detail', () => {
     it('submits a signed amount, trimmed reason and stable identity from the real correction form, then resets only on success (R23, R32)', async () => {
-        const post = vi.mocked(router.post);
+        const post = vi.spyOn(router, 'post');
         post.mockClear();
         const wrapper = mount(Show, {
             props: {
@@ -131,6 +131,7 @@ describe('Finance basket detail', () => {
         } finally {
             wrapper.unmount();
             reset();
+            post.mockRestore();
         }
     });
 

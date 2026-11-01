@@ -3,6 +3,7 @@ import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import { trans } from 'laravel-vue-i18n';
 import { computed, ref } from 'vue';
 import BasketCollectionController from '@/actions/App/Http/Controllers/Finance/BasketCollectionController';
+import BasketCorrectionController from '@/actions/App/Http/Controllers/Finance/BasketCorrectionController';
 import BasketController from '@/actions/App/Http/Controllers/Finance/BasketController';
 import BasketStockController from '@/actions/App/Http/Controllers/Finance/BasketStockController';
 import BasketReturnController from '@/actions/App/Http/Controllers/Finance/BasketReturnController';
@@ -80,7 +81,7 @@ const cancel = () =>
     );
 const correct = (amountCents: number, reason: string, correctionId: string) =>
     router.post(
-        `/finance/baskets/${props.basket.id}/corrections`,
+        BasketCorrectionController.store.url({ basket: props.basket.id }),
         { amount_cents: amountCents, reason, correction_id: correctionId },
         { ...options, onSuccess: () => adjustmentPanel.value?.reset() },
     );

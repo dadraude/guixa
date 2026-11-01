@@ -197,9 +197,9 @@ final class EloquentBasketRepository implements BasketRepository
             $model->validated_total_cents === null ? null : (int) $model->validated_total_cents,
             $model->collected_by, $model->collected_at === null ? null : new DateTimeImmutable($model->collected_at),
             $model->cancelled_by, $model->cancelled_at === null ? null : new DateTimeImmutable($model->cancelled_at),
-            $model->adjustments->map(fn (BasketAdjustmentModel $adjustment) => new BasketAdjustment(
+            array_values($model->adjustments->map(fn (BasketAdjustmentModel $adjustment) => new BasketAdjustment(
                 $adjustment->id, $adjustment->basket_id, (int) $adjustment->amount_cents,
-                $adjustment->reason, $adjustment->recorded_by, new DateTimeImmutable($adjustment->occurred_at)))->all());
+                $adjustment->reason, $adjustment->recorded_by, new DateTimeImmutable($adjustment->occurred_at)))->all()));
     }
 
     private function containerSnapshot(BasketLineModel $line): ?string
