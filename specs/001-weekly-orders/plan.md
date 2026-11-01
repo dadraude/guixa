@@ -1031,7 +1031,9 @@ for CI's full validation.
   (`lang/en/errors.php` moves there).
 - Laravel's own messages (validation, auth, passwords, pagination) come from the `laravel-lang` Catalan files in
   `lang/ca/*.php`.
-- Emails (invitations, sent producer orders): subject and body through `__()`.
+- Emails (invitations, sent producer orders): subject and body through `__()`. The sent producer
+  order body uses a Laravel Blade view with escaped heading, product names and units; its mailable
+  formats quantity strings for display while retaining the original totals for delivery assertions.
 - Dates, numbers and money: Vue formats with `Intl` and `ca-ES`; PHP uses the same locale where it formats (emails).
 - Starter-kit and shadcn-vue components' own texts (e.g. screen-reader labels) go through `trans()` too.
 - Every key used in PHP and Vue has a `ca` translation; a test fails otherwise (Testing).
