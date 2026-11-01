@@ -11,32 +11,36 @@ permissions:
 
 jobs:
   ci:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Windows]
 
-    services:
-      postgres:
-        image: postgres:17
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: guixa_test
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
+    # Job services need a Linux runner, so Postgres runs through `docker run`
+    # on a non-default port to stay clear of any local Postgres.
     env:
+      PG_CONTAINER: guixa-ci-pg-${{ github.run_id }}-${{ github.run_attempt }}
       DB_CONNECTION: pgsql
       DB_HOST: 127.0.0.1
-      DB_PORT: 5432
+      DB_PORT: 55432
       DB_DATABASE: guixa_test
       DB_USERNAME: postgres
       DB_PASSWORD: postgres
 
     steps:
+      - name: Start Postgres
+        run: |
+          docker run -d --name $env:PG_CONTAINER `
+            -e POSTGRES_USER=postgres `
+            -e POSTGRES_PASSWORD=postgres `
+            -e POSTGRES_DB=guixa_test `
+            -p "${env:DB_PORT}:5432" `
+            postgres:17
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          for ($i = 0; $i -lt 30; $i++) {
+            docker exec $env:PG_CONTAINER pg_isready -h 127.0.0.1 -U postgres
+            if ($LASTEXITCODE -eq 0) { exit 0 }
+            Start-Sleep -Seconds 2
+          }
+          exit 1
+
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -64,3 +68,7 @@ jobs:
 
       - name: Run CI Checks
         run: composer ci:check
+
+      - name: Stop Postgres
+        if: always()
+        run: docker rm -f $env:PG_CONTAINER
