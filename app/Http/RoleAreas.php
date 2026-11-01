@@ -10,6 +10,7 @@ final class RoleAreas
     private const AREAS = [
         'member' => ['label' => 'Orders', 'href' => '/'],
         'producer' => ['label' => 'Producer', 'href' => '/producer/products'],
+        'finance' => ['label' => 'Finance', 'href' => '/finance/baskets'],
         'manager' => ['label' => 'Management', 'href' => '/manage/cycles'],
     ];
 

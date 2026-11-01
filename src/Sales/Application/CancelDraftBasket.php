@@ -15,7 +15,7 @@ final class CancelDraftBasket
 
     public function __invoke(Actor $actor, string $basketId): void
     {
-        $actor->assertManager();
+        $actor->assertCanManageSales();
         $this->transactions->run(function () use ($basketId, $actor): void {
             $basket = $this->baskets->lock($basketId) ?? throw BasketNotFound::withId($basketId);
             if ($basket->state !== 'draft') {

@@ -15,7 +15,7 @@ final class CreateStockBasket
 
     public function __invoke(Actor $actor, string $householdId): string
     {
-        $actor->assertManager();
+        $actor->assertCanManageSales();
         foreach ($this->households->all() as $household) {
             if ($household->id === $householdId && $household->active) {
                 $id = $this->baskets->nextId();

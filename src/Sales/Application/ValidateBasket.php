@@ -21,7 +21,7 @@ final class ValidateBasket
 
     public function __invoke(Actor $actor, string $basketId): void
     {
-        $actor->assertManager();
+        $actor->assertCanManageSales();
         $this->transactions->run(function () use ($actor, $basketId): void {
             $basket = $this->baskets->lock($basketId) ?? throw BasketNotFound::withId($basketId);
             if ($basket->state === 'validated' || $basket->state === 'collected') {

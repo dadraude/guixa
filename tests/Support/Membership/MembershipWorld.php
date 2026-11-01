@@ -150,10 +150,11 @@ final class MembershipWorld
             $this->transactions,
         );
         $this->resendInvitation = new ResendInvitation($this->accounts, $sendInvitation, $this->transactions);
-        $this->changeInvitationEmail = new ChangeInvitationEmail($this->accounts, $sendInvitation, $this->transactions);
+        $this->changeInvitationEmail = new ChangeInvitationEmail($this->accounts, $this->households, $sendInvitation, $this->transactions);
         $this->acceptInvitation = new AcceptInvitation(
             $this->invitations,
             $this->accounts,
+            $this->households,
             $this->passwords,
             $this->transactions,
             $this->clock,
@@ -177,8 +178,8 @@ final class MembershipWorld
         $this->deactivateAccount = new DeactivateAccount($this->accounts, $this->households, $deactivateEmptyHousehold, $this->transactions, $this->clock);
         $this->reactivateAccount = new ReactivateAccount($this->accounts, $this->households, $this->transactions);
         $this->listAccounts = new ListAccounts($this->accounts, $this->households);
-        $this->suspendProducerRole = new SuspendProducerRole($this->accounts);
-        $this->restoreProducerRole = new RestoreProducerRole($this->accounts);
+        $this->suspendProducerRole = new SuspendProducerRole($this->accounts, $this->households, $this->transactions);
+        $this->restoreProducerRole = new RestoreProducerRole($this->accounts, $this->households, $this->transactions);
 
         $this->manager = Actor::manager('00000000-0000-7000-8000-00000000000a');
         $this->member = Actor::memberOf('00000000-0000-7000-8000-00000000000b', '00000000-0000-7000-8000-00000000000c');

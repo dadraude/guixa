@@ -238,3 +238,13 @@ it('still lists a product whose stock exceeds seven integer digits (R28)', funct
 
     expect(($this->available)())->toBe('19999998.000');
 });
+
+it('shows Finance only active stock for basket selection while retaining Manager inventory visibility (R19a, R36c)', function () {
+    $finance = new Actor('finance', [Role::Finance]);
+    $this->products->deactivate($this->honeyId);
+
+    expect(($this->listStock)($finance))->toBe([])
+        ->and(($this->listStock)($this->manager))->toHaveCount(1);
+    expect(fn () => ($this->entry)($finance, $this->honeyId, '1', null))->toThrow(NotAllowed::class)
+        ->and(fn () => ($this->adjust)($finance, $this->honeyId, '1', 'note', null))->toThrow(NotAllowed::class);
+});

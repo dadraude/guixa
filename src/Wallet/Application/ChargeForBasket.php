@@ -14,7 +14,7 @@ final class ChargeForBasket
 
     public function __invoke(Actor $actor, string $householdId, string $basketId, int $totalCents): ?string
     {
-        $actor->assertManager();
+        $actor->assertCanManageWallet();
         if ($totalCents === 0) {
             return null;
         }

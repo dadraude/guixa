@@ -13,7 +13,7 @@ final class GetWalletStatement
 
     public function __invoke(Actor $actor, string $householdId): WalletStatement
     {
-        if (! $actor->hasRole(Role::Manager)) {
+        if (! $actor->hasAnyRole(Role::Manager->value, Role::Finance->value)) {
             $actor->assertMemberOf($householdId);
         }
 

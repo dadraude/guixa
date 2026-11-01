@@ -26,6 +26,7 @@ use Guixa\Sales\Domain\ValueObject\HouseholdSnapshot;
 use Guixa\Sales\Domain\ValueObject\StockProductSnapshot;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Error\NotAllowed;
+use Guixa\Shared\Domain\Role;
 use Tests\Support\FrozenClock;
 use Tests\Support\InMemory\ImmediateTransactionRunner;
 
@@ -260,4 +261,16 @@ it('rejects replay and edits after validation without extra ledger writes (S22)'
 
 it('reads the global household balance through the Sales Application port (R21)', function () {
     expect((new GetBasketBalance($this->wallet))($this->actor, 'household'))->toBe(500);
+});
+
+it('accepts the same Finance Actor through every public independent-basket use case (R19a, S79, S84)', function () {
+    $finance = new Actor('finance', [Role::Finance]);
+    $id = ($this->create)($finance, 'household');
+    ($this->add)($finance, $id, 'oil', '1');
+    ($this->validate)($finance, $id);
+    ($this->collect)($finance, $id);
+
+    expect($this->baskets->get($id)->state)->toBe('collected')
+        ->and($this->stock->sales[0][0])->toBe('finance')
+        ->and($this->wallet->charges[0][0])->toBe('finance');
 });

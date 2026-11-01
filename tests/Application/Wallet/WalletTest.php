@@ -153,3 +153,15 @@ it('reads a household balance for another context without an actor (R30, R35a)',
     expect((new ReadHouseholdBalance($this->movements))($this->household))->toBe(-700)
         ->and((new ReadHouseholdBalance($this->movements))('household-j'))->toBe(0);
 });
+
+it('lets Finance read every household statement and record only an existing basket charge (R31, R36c, S84)', function () {
+    $finance = new Actor('finance', [Role::Finance]);
+    $basketCharge = new ChargeForBasket($this->movements, $this->clock);
+    $basketCharge($finance, $this->household, 'basket-1', 1200);
+
+    expect(($this->statement)($finance, $this->household)->balanceCents)->toBe(-1200)
+        ->and(($this->balance)($finance, $this->household))->toBe(-1200)
+        ->and(($this->statement)($finance, 'household-j')->balanceCents)->toBe(0);
+    expect(fn () => ($this->topUp)($finance, $this->household, 100))->toThrow(NotAllowed::class)
+        ->and(fn () => ($this->correct)($finance, $this->household, 100, 'x'))->toThrow(NotAllowed::class);
+});

@@ -74,6 +74,21 @@ export function navigationSectionsFor(
                   },
               ]
             : []),
+        ...(roles.has('finance') && !roles.has('manager')
+            ? [
+                  {
+                      title: 'Finance',
+                      icon: Wallet,
+                      items: [
+                          {
+                              title: 'Baskets',
+                              href: BasketController.index(),
+                              icon: ShoppingBasket,
+                          },
+                      ],
+                  },
+              ]
+            : []),
         ...(roles.has('manager')
             ? [
                   {

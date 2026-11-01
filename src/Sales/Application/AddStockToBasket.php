@@ -23,7 +23,7 @@ final class AddStockToBasket
 
     public function __invoke(Actor $actor, string $basketId, string $productId, string $quantity): void
     {
-        $actor->assertManager();
+        $actor->assertCanManageSales();
         $addition = Quantity::fromString($quantity);
         if ($addition->isZero()) {
             throw InvalidBasketQuantity::create();

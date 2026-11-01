@@ -10,7 +10,7 @@ final class GetBasketBalance
 
     public function __invoke(Actor $actor, string $householdId): int
     {
-        $actor->assertManager();
+        $actor->assertCanManageSales();
 
         return $this->wallet->balance($actor, $householdId);
     }
