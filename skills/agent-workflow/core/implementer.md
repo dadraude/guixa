@@ -18,6 +18,10 @@ means pause and request coordinator admission before writing it. Do not omit req
    follow [visual verification](../references/visual.md): inspect and map existing components before
    building screens, declare the page/role/state inventory and selected cases, run the manifest plan
    command, and share the count/rationale with the coordinator before broad implementation.
+   Before changing a contract, combine graph callers with exact literals, fixtures and dynamic HTTP
+   consumers; keep evidence and intentional exclusions in the check plan. A changed route may reach
+   `HouseholdPagesTest`, `errors.ClassName` may select translation keys, and `canManageReceipts` may
+   gate forbidden Manager navigation.
 3. Prove the task's first vertical checkpoint and report the failing assertion, passing behavior and
    persisted/rendered observation to the coordinator before widening the implementation. This is
    incremental feedback within the same task, not a separate user approval or review round.

@@ -26,6 +26,8 @@ decisions to that implementer without consuming an independent review round.
 Inspect the first vertical checkpoint's behavioral and persisted/rendered evidence before broad
 implementation; class existence, test counts and a green geometry report do not establish acceptance.
 Return a missing invariant to the same owner without creating another independent review round.
+For changed contracts, check the consumer inventory before implementation widens: graph callers,
+exact literals, fixtures and dynamic HTTP paths, with exclusions explained in the check plan.
 
 Accept `committed` only after comparing actual paths with admitted scope. A scope request pauses writes
 until the coordinator readmits it; a product question goes to the user. `stopped` goes to Stop.
@@ -166,6 +168,10 @@ changes product failures, review counts, scope, permissions or the fresh indepen
 Do not edit counters to grant an exception.
 Substantive and mechanical review counts remain separate. Repeated failures of the same stage and
 mechanism cannot be relabeled to reset a budget. Missing, pending or stale evidence is never success.
+Before declaring recovery exhausted or requesting an exception, query
+`node skills/agent-workflow/scripts/state.mjs status OWNER_JSON STAGE MECHANISM` and retain its
+read-only admission result. A successful focused `recovery-result` closes that attempt; a later
+full-validation failure is a new failure event, not a retroactive change to the result.
 Budget exhaustion stops the task with preserved evidence; restarting a session or rebasing resets none.
 
 Use `node skills/agent-workflow/scripts/state.mjs OWNER_JSON EVENT_JSON` from the task worktree.

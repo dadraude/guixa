@@ -139,7 +139,10 @@ the diff-derived check selection; omit `--plan` to execute it in the guarded env
 task-local check plan has `tests` (exact executable test paths), `changedContracts` (each with
 `name`, changed `path`, source/discovery `evidence` and existing `consumers` test paths), or an empty
 contract list plus `noContractChangesReason`. The coordinator checks discovery completeness; the
-helper cannot infer every dynamic consumer. Missing consumer mappings block readiness. Changed
+helper cannot infer every dynamic consumer. Missing consumer mappings block readiness. Discover changed
+contracts through graph callers plus exact literal routes, props, error-class/translation keys,
+fixtures and dynamic HTTP consumers; record evidence and intentional exclusions in `changedContracts`.
+Graph callers alone cannot find string or runtime consumers. Changed
 executable tests are always included. Formatter exclusions from the checked-in Vite format config
 are reported, preserving append-only specs and generated files; unsupported types need their own
 structural check. Retain the helper's JSON selection/results bound to HEAD/base in task artifacts.
