@@ -579,9 +579,12 @@ Concrete reuse inspected before planning:
   independent baskets or staff validation followed by member self-collection. Reuse shared layouts,
   tokens and `components/ui/`; do not introduce another component library or redesign unrelated pages.
 
-Keep `<Noun>Row` DTOs in App/Http and generate TypeScript types. Domain errors map to translated
-422 form errors and Laravel authorization denials to 403. Catalan copy/ca-ES presentation,
-44 px targets, phone-first reflow and the shared visual manifest/report workflow remain mandatory.
+Keep `<Noun>Row` DTOs in App/Http and generate TypeScript types. Domain errors map to
+Laravel `ValidationException` at the HTTP boundary, with translated messages under `errors.domain`
+and the existing fallback to the exception message. Laravel handles JSON 422 responses through the central JSON-negotiation
+rule and redirects form requests back with errors and safe old input; password fields must never be
+flashed to the session. Domain exception classes remain framework-free. Authorization denials map to
+403. Catalan copy/ca-ES presentation, 44 px targets, phone-first reflow and the shared visual manifest/report workflow remain mandatory.
 Test totals and enabled actions as display-only logic; authorization and money/stock rules stay server-side.
 
 The following accepted presentation sections retain their historical pilot inventories. The Sales

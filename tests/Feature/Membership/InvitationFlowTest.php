@@ -71,7 +71,9 @@ it('rejects a link older than 7 days with a form error (S25)', function () {
     $this->app->instance(Clock::class, new FrozenClock(now()->addDays(7)->addMinute()->toIso8601String()));
 
     $this->from($url)->post($url, ['password' => 'a-new-password', 'password_confirmation' => 'a-new-password'])
-        ->assertSessionHasErrors('domain');
+        ->assertSessionHasErrors('domain')
+        ->assertSessionMissingInput('password')
+        ->assertSessionMissingInput('password_confirmation');
     $this->assertGuest();
 });
 
@@ -83,7 +85,9 @@ it('rejects a link replaced by a resent one (S25)', function () {
     auth()->logout();
 
     $this->from($oldUrl)->post($oldUrl, ['password' => 'a-new-password', 'password_confirmation' => 'a-new-password'])
-        ->assertSessionHasErrors('domain');
+        ->assertSessionHasErrors('domain')
+        ->assertSessionMissingInput('password')
+        ->assertSessionMissingInput('password_confirmation');
 
     $newUrl = null;
     Mail::assertSent(InvitationMail::class, 2);
