@@ -74,6 +74,10 @@ Route::middleware(['auth', 'verified', 'role:manager,finance'])->prefix('finance
 
 Route::middleware(['auth', 'verified', 'role:manager,finance'])->get('finance/households/{household}/wallet', [FinanceHouseholdWalletController::class, 'show'])
     ->whereUuid('household')->name('finance.households.wallet.show');
+Route::middleware(['auth', 'verified', 'role:manager,finance'])->prefix('finance/households/{household}/wallet')->whereUuid('household')->name('finance.households.wallet.')->group(function () {
+    Route::post('top-ups', [FinanceHouseholdWalletController::class, 'topUp'])->name('top-ups.store');
+    Route::post('corrections', [FinanceHouseholdWalletController::class, 'correct'])->name('corrections.store');
+});
 
 Route::middleware(['auth', 'verified', 'role:member'])->prefix('cycles/{cycle}/order')->whereUuid(['cycle', 'product'])->name('orders.')->group(function () {
     Route::get('/', [OrderController::class, 'edit'])->name('edit');

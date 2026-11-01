@@ -12,6 +12,8 @@ interface MovementRepository
     /** @throws Error\PickupAlreadyCharged when the household already has a charge or credit for that cycle */
     public function add(Movement $movement): void;
 
+    public function findById(string $movementId): ?Movement;
+
     public function balanceOf(string $householdId): Money;
 
     /** @return list<Movement> newest first: by `occurredAt`, then id, both descending */

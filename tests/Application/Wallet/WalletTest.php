@@ -10,8 +10,11 @@ use Guixa\Wallet\Application\ReadHouseholdBalance;
 use Guixa\Wallet\Application\RecordCorrection;
 use Guixa\Wallet\Application\RecordTopUp;
 use Guixa\Wallet\Domain\Error\BasketAlreadyCharged;
+use Guixa\Wallet\Domain\Error\CorrectionIdentityConflict;
+use Guixa\Wallet\Domain\Error\CorrectionIdentityRequired;
 use Guixa\Wallet\Domain\Error\CorrectionNoteRequired;
 use Guixa\Wallet\Domain\Error\InvalidCorrectionAmount;
+use Guixa\Wallet\Domain\Error\InvalidCorrectionSource;
 use Guixa\Wallet\Domain\Error\InvalidTopUpAmount;
 use Guixa\Wallet\Domain\Error\PickupAlreadyCharged;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -32,15 +35,17 @@ beforeEach(function () {
 });
 
 it('records a top-up and a correcting movement that bring the balance back to zero (S24, R29, R32)', function () {
-    ($this->topUp)($this->manager, $this->household, 5000, 'transfer of the 3rd');
+    $receiptId = ($this->topUp)($this->manager, $this->household, 5000, 'transfer of the 3rd');
     $this->clock->travelTo('2026-10-22 11:00:00');
-    ($this->correct)($this->manager, $this->household, -5000, 'duplicated');
+    ($this->correct)($this->manager, $this->household, -5000, 'duplicated', null, $receiptId, 'correction-1');
 
     $statement = ($this->statement)($this->member, $this->household);
 
     expect($statement->balanceCents)->toBe(0)
         ->and(array_map(fn ($m) => [$m->type, $m->amountCents, $m->note], $statement->movements))
-        ->toBe([['correction', -5000, 'duplicated'], ['top_up', 5000, 'transfer of the 3rd']]);
+        ->toBe([['correction', -5000, 'duplicated'], ['top_up', 5000, 'transfer of the 3rd']])
+        ->and($statement->movements[0]->sourceMovementId)->toBe($receiptId)
+        ->and($statement->movements[1]->sourceMovementId)->toBeNull();
 });
 
 it('dates a movement when it is recorded and keeps top-ups out of any cycle (R29)', function () {
@@ -159,9 +164,35 @@ it('lets Finance read every household statement and record only an existing bask
     $basketCharge = new ChargeForBasket($this->movements, $this->clock);
     $basketCharge($finance, $this->household, 'basket-1', 1200);
 
+    $receipt = ($this->topUp)($finance, $this->household, 100);
+    ($this->correct)($finance, $this->household, -100, 'duplicate', null, $receipt, 'finance-correction');
+
     expect(($this->statement)($finance, $this->household)->balanceCents)->toBe(-1200)
         ->and(($this->balance)($finance, $this->household))->toBe(-1200)
-        ->and(($this->statement)($finance, 'household-j')->balanceCents)->toBe(0);
-    expect(fn () => ($this->topUp)($finance, $this->household, 100))->toThrow(AuthorizationException::class)
-        ->and(fn () => ($this->correct)($finance, $this->household, 100, 'x'))->toThrow(AuthorizationException::class);
+        ->and(($this->statement)($finance, 'household-j')->balanceCents)->toBe(0)
+        ->and(($this->statement)($finance, $this->household)->movements)->toHaveCount(3);
+});
+
+it('requires a same-household receipt source and a correction identity for standalone receipt repair (R32)', function () {
+    $finance = new Actor('finance', [Role::Finance]);
+    $receipt = ($this->topUp)($finance, $this->household, 5000);
+    $foreign = ($this->topUp)($finance, 'other-household', 5000);
+
+    expect(fn () => ($this->correct)($finance, $this->household, -5000, 'duplicate', null, null, 'correction-1'))->toThrow(InvalidCorrectionSource::class)
+        ->and(fn () => ($this->correct)($finance, $this->household, -5000, 'duplicate', 'cycle-1', null, 'correction-2'))->toThrow(AuthorizationException::class)
+        ->and(fn () => ($this->correct)($finance, $this->household, -5000, 'duplicate', null, 'missing', 'correction-3'))->toThrow(InvalidCorrectionSource::class)
+        ->and(fn () => ($this->correct)($finance, $this->household, -5000, 'duplicate', null, $foreign, 'correction-4'))->toThrow(InvalidCorrectionSource::class)
+        ->and(fn () => ($this->correct)($finance, $this->household, -5000, 'duplicate', null, $receipt))->toThrow(CorrectionIdentityRequired::class);
+    expect(($this->statement)($finance, $this->household)->movements)->toHaveCount(1);
+});
+
+it('replays the same correction identity once and rejects a changed payload (R32)', function () {
+    $finance = new Actor('finance', [Role::Finance]);
+    $receipt = ($this->topUp)($finance, $this->household, 5000);
+    $first = ($this->correct)($finance, $this->household, -5000, 'duplicate', null, $receipt, 'correction-1');
+    $replay = ($this->correct)($finance, $this->household, -5000, 'duplicate', null, $receipt, 'correction-1');
+
+    expect($first)->toBe('correction-1')->and($replay)->toBe($first)
+        ->and(($this->statement)($finance, $this->household)->movements)->toHaveCount(2);
+    expect(fn () => ($this->correct)($finance, $this->household, -3000, 'changed', null, $receipt, 'correction-1'))->toThrow(CorrectionIdentityConflict::class);
 });

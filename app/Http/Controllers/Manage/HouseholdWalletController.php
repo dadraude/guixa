@@ -15,6 +15,7 @@ use Guixa\Wallet\Application\GetWalletStatement;
 use Guixa\Wallet\Application\RecordCorrection;
 use Guixa\Wallet\Application\RecordTopUp;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -28,6 +29,11 @@ class HouseholdWalletController extends Controller
             'wallet' => WalletStatementRow::from($getWalletStatement($actor, $household)),
             'household' => WalletHouseholdRow::from($detail),
             'canManageReceipts' => true,
+            'householdReturnHref' => route('manage.households.show', ['household' => $household]),
+            'receiptAction' => route('manage.households.wallet.top-ups.store', ['household' => $household]),
+            'correctionAction' => route('manage.households.wallet.corrections.store', ['household' => $household]),
+            'correctionId' => (string) Str::uuid7(),
+            'status' => session('status'),
         ]);
     }
 
@@ -37,16 +43,16 @@ class HouseholdWalletController extends Controller
 
         $recordTopUp($actor, $household, $request->amountCents(), $request->input('note'));
 
-        return back();
+        return back()->with('status', __('Receipt recorded.'));
     }
 
     public function correct(string $household, CorrectionRequest $request, Actor $actor, GetHousehold $getHousehold, RecordCorrection $recordCorrection): RedirectResponse
     {
         $this->existing($household, $actor, $getHousehold);
 
-        $recordCorrection($actor, $household, $request->amountCents(), $request->string('note')->toString(), $request->input('cycle_id'));
+        $recordCorrection($actor, $household, $request->amountCents(), $request->string('note')->toString(), null, $request->string('source_movement_id')->toString(), $request->string('correction_id')->toString());
 
-        return back();
+        return back()->with('status', __('Correction recorded.'));
     }
 
     /** The wallet table has a foreign key to the household; answer 404 instead of letting it fail. */

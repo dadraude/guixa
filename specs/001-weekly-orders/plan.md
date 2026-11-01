@@ -466,6 +466,12 @@ no required basket allocation; corrections are non-zero and require a reason.
 Enforce one base charge/credit per basket; independent baskets of the same household/cycle can each
 charge once. Amount zero records no movement. Existing negative-balance policy remains. Original
 movements cannot be edited or deleted; corrections preserve their references and reason.
+For confirmed receipt corrections, the statement form supplies the original receipt movement id and a
+client-generated correction id. The Wallet command verifies that the original is a top-up of the same
+household and treats a retry with the same id and contents as one movement; changed contents under an
+existing id are rejected. The database keeps the corrected-movement id nullable only for retained
+cycle-scoped Ordering redistribution corrections until their separate cutover. Receipt HTTP requests
+cannot supply a cycle id or use that legacy path.
 
 | Use cases / queries | Actor and rules |
 | --- | --- |

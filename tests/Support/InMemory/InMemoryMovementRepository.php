@@ -4,15 +4,26 @@ namespace Tests\Support\InMemory;
 
 use Guixa\Shared\Domain\Money;
 use Guixa\Wallet\Domain\Error\BasketAlreadyCharged;
+use Guixa\Wallet\Domain\Error\CorrectionIdentityConflict;
 use Guixa\Wallet\Domain\Error\PickupAlreadyCharged;
 use Guixa\Wallet\Domain\Movement;
 use Guixa\Wallet\Domain\MovementRepository;
+use Guixa\Wallet\Domain\MovementType;
 
 /** @extends InMemoryRepository<Movement> */
 final class InMemoryMovementRepository extends InMemoryRepository implements MovementRepository
 {
     public function add(Movement $movement): void
     {
+        $existing = $this->findById($movement->id);
+        if ($existing !== null && $movement->type === MovementType::Correction) {
+            if ($existing->matchesCorrectionReplay($movement)) {
+                return;
+            }
+
+            throw CorrectionIdentityConflict::create();
+        }
+
         if ($movement->isChargeOrCredit()) {
             if ($movement->basketId !== null && $this->hasBasketChargeOrCredit($movement->basketId)) {
                 throw BasketAlreadyCharged::create();
@@ -23,6 +34,17 @@ final class InMemoryMovementRepository extends InMemoryRepository implements Mov
         }
 
         $this->save($movement);
+    }
+
+    public function findById(string $movementId): ?Movement
+    {
+        foreach ($this->all() as $movement) {
+            if ($movement->id === $movementId) {
+                return $movement;
+            }
+        }
+
+        return null;
     }
 
     public function balanceOf(string $householdId): Money
