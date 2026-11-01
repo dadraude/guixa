@@ -11,6 +11,7 @@ use Guixa\Ordering\Domain\ProductAvailabilityRepository;
 use Guixa\Ordering\Domain\ProductCatalog;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Quantity;
+use Illuminate\Support\Facades\Gate;
 
 /** Containers each household takes from its effective allocation and pickup stock snapshots (R18a). */
 final class GetContainerCount
@@ -29,7 +30,7 @@ final class GetContainerCount
 
     public function __invoke(Actor $actor, string $cycleId): ContainerCountData
     {
-        $actor->assertManager();
+        Gate::forUser($actor)->authorize('manage');
         $cycle = $this->cycles->get($cycleId) ?? throw CycleNotFound::withId($cycleId);
 
         if ($cycle->isCancelled()) {

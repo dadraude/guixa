@@ -3,7 +3,7 @@
 use App\Models\User;
 use Guixa\Membership\Infrastructure\Mail\InvitationMail;
 use Guixa\Ordering\Infrastructure\Membership\ProducerNotifierMail;
-use Guixa\Shared\Domain\Error\NotAllowed;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Notifications\VerifyEmail;
@@ -82,7 +82,7 @@ it('translates each passkey validation error emitted by the installed package', 
 ]);
 
 it('returns a translated domain denial with the existing HTTP 403 contract', function () {
-    Route::middleware('web')->get('/probe/translated-denial', fn () => throw new NotAllowed('Internal role detail'));
+    Route::middleware('web')->get('/probe/translated-denial', fn () => throw new AuthorizationException('Internal role detail'));
 
     $this->getJson('/probe/translated-denial')
         ->assertForbidden()

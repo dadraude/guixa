@@ -15,7 +15,7 @@ use Guixa\Catalog\Domain\Error\ProducerNotFound;
 use Guixa\Catalog\Domain\Error\ProductHasStockUse;
 use Guixa\Catalog\Domain\Error\ProductNotFound;
 use Guixa\Catalog\Domain\Error\ProductUsed;
-use Guixa\Shared\Domain\Error\NotAllowed;
+use Illuminate\Auth\Access\AuthorizationException;
 use Tests\Support\Catalog\CatalogWorld;
 
 it('creates a distinct stock record from a supplying producer (R1a, S65, S66, S71)', function () {
@@ -49,7 +49,7 @@ it('lets a manager administer only stock records while keeping producer identity
         ->and($listed[0]->variable)->toBeTrue()
         ->and($listed[0]->containersPerUnit)->toBe('2.000')
         ->and(fn () => $update($world->manager, $producerId, $weeklyId, 'Wrong', 'jar', 500, false, null))->toThrow(ProductNotFound::class)
-        ->and(fn () => $update($world->producerActor($producerId), $producerId, $stockId, 'Wrong', 'jar', 500, false, null))->toThrow(NotAllowed::class);
+        ->and(fn () => $update($world->producerActor($producerId), $producerId, $stockId, 'Wrong', 'jar', 500, false, null))->toThrow(AuthorizationException::class);
 });
 
 it('rejects stock creation without a supplying producer or manager (R1a, S65, S71)', function () {
@@ -58,7 +58,7 @@ it('rejects stock creation without a supplying producer or manager (R1a, S65, S7
     $create = new CreateStockProduct($world->products, $world->producers);
 
     expect(fn () => $create($world->manager, 'missing', 'Honey', 'jar', 650, false, null))->toThrow(ProducerNotFound::class)
-        ->and(fn () => $create($world->producerActor($producerId), $producerId, 'Honey', 'jar', 650, false, null))->toThrow(NotAllowed::class)
+        ->and(fn () => $create($world->producerActor($producerId), $producerId, 'Honey', 'jar', 650, false, null))->toThrow(AuthorizationException::class)
         ->and($world->products->listByProducer($producerId))->toBe([]);
 });
 
@@ -80,9 +80,9 @@ it('keeps stock hidden from producer administration and rejects forged edits (R2
     $stockId = (new CreateStockProduct($world->products, $world->producers))($world->manager, $producerId, 'Honey', 'jar', 650, false, null);
 
     expect(($world->listProducerProducts)($actor, $producerId))->toBe([])
-        ->and(fn () => ($world->updateProduct)($actor, $stockId, 'Changed', 'jar', 650, false, null))->toThrow(NotAllowed::class)
-        ->and(fn () => ($world->deactivateProduct)($actor, $stockId))->toThrow(NotAllowed::class)
-        ->and(fn () => ($world->reactivateProduct)($actor, $stockId))->toThrow(NotAllowed::class)
+        ->and(fn () => ($world->updateProduct)($actor, $stockId, 'Changed', 'jar', 650, false, null))->toThrow(AuthorizationException::class)
+        ->and(fn () => ($world->deactivateProduct)($actor, $stockId))->toThrow(AuthorizationException::class)
+        ->and(fn () => ($world->reactivateProduct)($actor, $stockId))->toThrow(AuthorizationException::class)
         ->and($world->products->get($stockId)->name())->toBe('Honey');
 });
 
@@ -113,7 +113,7 @@ it('lets only a manager deactivate and reactivate stock, including an inactive p
 
     $deactivate($world->manager, $producerId, $stockId);
     expect($world->products->get($stockId)->isActive())->toBeFalse()
-        ->and(fn () => $reactivate($world->producerActor($producerId), $producerId, $stockId))->toThrow(NotAllowed::class);
+        ->and(fn () => $reactivate($world->producerActor($producerId), $producerId, $stockId))->toThrow(AuthorizationException::class);
 
     $reactivate($world->manager, $producerId, $stockId);
     expect($world->products->get($stockId)->isActive())->toBeTrue();
@@ -135,10 +135,10 @@ it('lets only a manager reclassify an unused product and transfers administratio
     $weeklyId = ($world->createProduct)($world->producerActor($producerId), $producerId, 'Honey', 'jar', 500, false, null);
     $change = new ChangeProductClassification($world->products, $world->usage, $world->transactions);
 
-    expect(fn () => $change($world->producerActor($producerId), $weeklyId, true))->toThrow(NotAllowed::class);
+    expect(fn () => $change($world->producerActor($producerId), $weeklyId, true))->toThrow(AuthorizationException::class);
     $change($world->manager, $weeklyId, true);
     expect($world->products->get($weeklyId)->isStock())->toBeTrue()
-        ->and(fn () => ($world->updateProduct)($world->producerActor($producerId), $weeklyId, 'Changed', 'jar', 500, false, null))->toThrow(NotAllowed::class);
+        ->and(fn () => ($world->updateProduct)($world->producerActor($producerId), $weeklyId, 'Changed', 'jar', 500, false, null))->toThrow(AuthorizationException::class);
     $change($world->manager, $weeklyId, false);
     expect($world->products->get($weeklyId)->isStock())->toBeFalse();
 });
@@ -151,8 +151,8 @@ it('deletes only unused products through their current administrator (R1c, S70)'
     $stockId = (new CreateStockProduct($world->products, $world->producers))($world->manager, $producerId, 'Honey', 'jar', 650, false, null);
     $delete = new DeleteUnusedProduct($world->products, $world->usage, $world->transactions);
 
-    expect(fn () => $delete($world->manager, $weeklyId))->toThrow(NotAllowed::class)
-        ->and(fn () => $delete($producer, $stockId))->toThrow(NotAllowed::class);
+    expect(fn () => $delete($world->manager, $weeklyId))->toThrow(AuthorizationException::class)
+        ->and(fn () => $delete($producer, $stockId))->toThrow(AuthorizationException::class);
     $delete($producer, $weeklyId);
     $delete($world->manager, $stockId);
     expect($world->products->get($weeklyId))->toBeNull()
@@ -201,7 +201,7 @@ it('shows a manager both modes and whether each product has any retained use (R1
         ->and(collect($rows)->firstWhere('id', $weeklyId)->used)->toBeTrue()
         ->and(collect($rows)->firstWhere('id', $stockId)->stock)->toBeTrue()
         ->and(collect($rows)->firstWhere('id', $stockId)->used)->toBeFalse()
-        ->and(fn () => $list($world->producerActor($producerId), $producerId))->toThrow(NotAllowed::class);
+        ->and(fn () => $list($world->producerActor($producerId), $producerId))->toThrow(AuthorizationException::class);
 });
 
 it('answers whether a product has any retained use for administration controls (R1b)', function () {

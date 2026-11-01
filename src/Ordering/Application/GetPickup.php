@@ -10,6 +10,7 @@ use Guixa\Ordering\Domain\Households;
 use Guixa\Ordering\Domain\OrderRepository;
 use Guixa\Ordering\Domain\PickupStatus;
 use Guixa\Shared\Application\Actor;
+use Illuminate\Support\Facades\Gate;
 
 /** What the manager sees of one household's pickup: lines, delivered quantities and the total (R19, R21). */
 final class GetPickup
@@ -22,7 +23,7 @@ final class GetPickup
 
     public function __invoke(Actor $actor, string $cycleId, string $householdId): PickupData
     {
-        $actor->assertManager();
+        Gate::forUser($actor)->authorize('manage');
 
         $cycle = $this->cycles->get($cycleId) ?? throw CycleNotFound::withId($cycleId);
 

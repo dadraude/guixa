@@ -6,6 +6,7 @@ use Guixa\Ordering\Domain\CycleRepository;
 use Guixa\Ordering\Domain\Error\CycleNotFound;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Application\TransactionRunner;
+use Illuminate\Support\Facades\Gate;
 
 /** Takes a distributed producer back to its reception, e.g. when goods arrive late; before settlement only for now (R18, S29). */
 final class ReopenProducerOrder
@@ -17,7 +18,7 @@ final class ReopenProducerOrder
 
     public function __invoke(Actor $actor, string $cycleId, string $producerId): void
     {
-        $actor->assertManager();
+        Gate::forUser($actor)->authorize('manage');
 
         $this->transactions->run(function () use ($cycleId, $producerId) {
             $cycle = $this->cycles->getForUpdate($cycleId) ?? throw CycleNotFound::withId($cycleId);

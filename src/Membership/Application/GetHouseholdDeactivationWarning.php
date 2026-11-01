@@ -7,6 +7,7 @@ use Guixa\Membership\Domain\HouseholdBalances;
 use Guixa\Membership\Domain\HouseholdPickups;
 use Guixa\Membership\Domain\HouseholdRepository;
 use Guixa\Shared\Application\Actor;
+use Illuminate\Support\Facades\Gate;
 
 final class GetHouseholdDeactivationWarning
 {
@@ -18,7 +19,7 @@ final class GetHouseholdDeactivationWarning
 
     public function __invoke(Actor $actor, string $householdId): HouseholdSettlement
     {
-        $actor->assertManager();
+        Gate::forUser($actor)->authorize('manage');
         $household = $this->households->get($householdId) ?? throw HouseholdNotFound::withId($householdId);
 
         return new HouseholdSettlement(

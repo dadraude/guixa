@@ -17,6 +17,7 @@ use Guixa\Ordering\Domain\ProductCatalog;
 use Guixa\Ordering\Domain\ValueObject\OrderableProduct;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Clock;
+use Illuminate\Support\Facades\Gate;
 
 final class GetHouseholdOrder
 {
@@ -31,7 +32,7 @@ final class GetHouseholdOrder
     public function __invoke(Actor $actor, string $cycleId): HouseholdOrderData
     {
         $householdId = $actor->householdId ?? throw NoHousehold::create();
-        $actor->assertMemberOf($householdId);
+        Gate::forUser($actor)->authorize('memberOf', ['household', $householdId]);
 
         $cycle = $this->cycles->get($cycleId) ?? throw CycleNotFound::withId($cycleId);
         $now = $this->clock->now()->setTimezone($this->clock->timezone());

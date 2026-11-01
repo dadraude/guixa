@@ -2,8 +2,8 @@
 
 use Guixa\Ordering\Domain\Error\CycleNotFound;
 use Guixa\Shared\Application\Actor;
-use Guixa\Shared\Domain\Error\NotAllowed;
 use Guixa\Shared\Domain\Role;
+use Illuminate\Auth\Access\AuthorizationException;
 use Tests\Support\Ordering\OrderingWorld;
 
 const PRODUCER_SUMMARY_ANNA = '00000000-0000-7000-8000-0000000000a1';
@@ -70,9 +70,9 @@ it('keeps a sent order unchanged when a product is deactivated afterwards (R3a, 
 it('is for the producer of the cycle only, not for another producer, a manager or a member (R2, S7)', function () {
     $other = Actor::producer('00000000-0000-7000-8000-0000000000ac', '00000000-0000-7000-8000-0000000000b9');
 
-    expect(fn () => ($this->summary)($this->world->manager))->toThrow(NotAllowed::class)
-        ->and(fn () => ($this->summary)($this->anna))->toThrow(NotAllowed::class)
-        ->and(fn () => ($this->summary)(new Actor('00000000-0000-7000-8000-0000000000ad', [Role::Producer])))->toThrow(NotAllowed::class)
+    expect(fn () => ($this->summary)($this->world->manager))->toThrow(AuthorizationException::class)
+        ->and(fn () => ($this->summary)($this->anna))->toThrow(AuthorizationException::class)
+        ->and(fn () => ($this->summary)(new Actor('00000000-0000-7000-8000-0000000000ad', [Role::Producer])))->toThrow(AuthorizationException::class)
         ->and(fn () => ($this->summary)($other))->toThrow(CycleNotFound::class);
 });
 

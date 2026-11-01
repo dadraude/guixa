@@ -6,7 +6,7 @@ use Guixa\Catalog\Domain\Error\ProductNotFound;
 use Guixa\Catalog\Domain\ProductRepository;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Application\TransactionRunner;
-use Guixa\Shared\Domain\Error\NotAllowed;
+use Illuminate\Support\Facades\Gate;
 
 final class DeactivateProduct
 {
@@ -19,10 +19,7 @@ final class DeactivateProduct
     {
         $this->transactions->run(function () use ($actor, $id): void {
             $product = $this->products->getForUpdate($id) ?? throw ProductNotFound::withId($id);
-            $actor->assertProducerOf($product->producerId);
-            if ($product->isStock()) {
-                throw NotAllowed::notYours('stock product');
-            }
+            Gate::forUser($actor)->authorize('update', $product);
             $product->deactivate();
             $this->products->add($product);
         });

@@ -18,6 +18,7 @@ use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Application\TransactionRunner;
 use Guixa\Shared\Domain\Clock;
 use Guixa\Shared\Domain\Quantity;
+use Illuminate\Support\Facades\Gate;
 
 /** Way A: sets what was received of a product and shares it among the households that ordered it (R15, S10-S12, S31). */
 final class SetReceivedTotal
@@ -42,7 +43,7 @@ final class SetReceivedTotal
      */
     public function __invoke(Actor $actor, string $cycleId, string $producerId, string $productId, string $received, bool $overwriteManual = false, ?bool $includeCompleted = null): void
     {
-        $actor->assertManager();
+        Gate::forUser($actor)->authorize('manage');
 
         $total = Quantity::fromString($received);
 

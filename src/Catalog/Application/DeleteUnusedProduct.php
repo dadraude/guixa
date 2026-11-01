@@ -8,6 +8,7 @@ use Guixa\Catalog\Domain\ProductRepository;
 use Guixa\Catalog\Domain\ProductUsage;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Application\TransactionRunner;
+use Illuminate\Support\Facades\Gate;
 
 final class DeleteUnusedProduct
 {
@@ -21,11 +22,7 @@ final class DeleteUnusedProduct
     {
         $this->transactions->run(function () use ($actor, $id): void {
             $product = $this->products->getForUpdate($id) ?? throw ProductNotFound::withId($id);
-            if ($product->isStock()) {
-                $actor->assertManager();
-            } else {
-                $actor->assertProducerOf($product->producerId);
-            }
+            Gate::forUser($actor)->authorize('delete', $product);
             if ($this->usage->hasAny($id)) {
                 throw ProductUsed::create();
             }

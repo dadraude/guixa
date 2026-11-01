@@ -2,7 +2,6 @@
 
 namespace Guixa\Shared\Application;
 
-use Guixa\Shared\Domain\Error\NotAllowed;
 use Guixa\Shared\Domain\Role;
 
 final readonly class Actor
@@ -65,57 +64,5 @@ final readonly class Actor
     public function roleNames(): array
     {
         return array_map(fn (Role $role) => $role->value, $this->roles);
-    }
-
-    public function assertManager(): void
-    {
-        if (! $this->hasRole(Role::Manager)) {
-            throw NotAllowed::forRole(Role::Manager->value);
-        }
-    }
-
-    public function assertCanManageSales(): void
-    {
-        if (! $this->hasAnyRole(Role::Manager->value, Role::Finance->value)) {
-            throw NotAllowed::forRole('manager or finance');
-        }
-    }
-
-    public function assertCanManageWallet(): void
-    {
-        if (! $this->hasAnyRole(Role::Manager->value, Role::Finance->value)) {
-            throw NotAllowed::forRole('manager or finance');
-        }
-    }
-
-    public function assertCanCollectFor(string $householdId): void
-    {
-        if ($this->hasAnyRole(Role::Manager->value, Role::Finance->value)) {
-            return;
-        }
-
-        $this->assertMemberOf($householdId);
-    }
-
-    public function assertMemberOf(string $householdId): void
-    {
-        if (! $this->hasRole(Role::Member)) {
-            throw NotAllowed::forRole(Role::Member->value);
-        }
-
-        if ($this->householdId !== $householdId) {
-            throw NotAllowed::notYours('household');
-        }
-    }
-
-    public function assertProducerOf(string $producerId): void
-    {
-        if (! $this->hasRole(Role::Producer)) {
-            throw NotAllowed::forRole(Role::Producer->value);
-        }
-
-        if ($this->producerId !== $producerId) {
-            throw NotAllowed::notYours('producer');
-        }
     }
 }

@@ -25,8 +25,8 @@ use Guixa\Sales\Domain\StockQuantities;
 use Guixa\Sales\Domain\ValueObject\HouseholdSnapshot;
 use Guixa\Sales\Domain\ValueObject\StockProductSnapshot;
 use Guixa\Shared\Application\Actor;
-use Guixa\Shared\Domain\Error\NotAllowed;
 use Guixa\Shared\Domain\Role;
+use Illuminate\Auth\Access\AuthorizationException;
 use Tests\Support\FrozenClock;
 use Tests\Support\InMemory\ImmediateTransactionRunner;
 
@@ -176,7 +176,7 @@ it('validates real zero-price goods without asking Wallet to create a movement (
 });
 
 it('requires a Manager and an active household for a new independent draft (R19, R19a)', function () {
-    expect(fn () => ($this->create)(Actor::memberOf('member', 'household'), 'household'))->toThrow(NotAllowed::class);
+    expect(fn () => ($this->create)(Actor::memberOf('member', 'household'), 'household'))->toThrow(AuthorizationException::class);
     $this->households->active = false;
     expect(fn () => ($this->create)($this->actor, 'household'))->toThrow(HouseholdUnavailable::class);
     expect($this->baskets->list())->toBe([]);

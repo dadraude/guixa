@@ -3,8 +3,8 @@
 use App\Models\User;
 use Guixa\Probe\Domain\Error\ProbeFailed;
 use Guixa\Shared\Application\ActorResolver;
-use Guixa\Shared\Domain\Error\NotAllowed;
 use Guixa\Shared\Domain\Role;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
@@ -34,7 +34,7 @@ beforeEach(function () {
     Route::middleware(['web', 'auth', 'role:producer'])->get('/probe/producer', fn () => 'producer area');
     Route::middleware(['web', 'auth', 'role:member'])->get('/probe/member', fn () => 'member area');
     Route::middleware(['web', 'auth', 'role:manager,producer'])->get('/probe/either', fn () => 'either area');
-    Route::middleware(['web'])->get('/probe/not-allowed', fn () => throw new NotAllowed('Nope.'));
+    Route::middleware(['web'])->get('/probe/not-allowed', fn () => throw new AuthorizationException('Nope.'));
     Route::middleware(['web'])->post('/probe/domain-error', fn () => throw new ProbeFailed('raw message'));
 });
 
@@ -73,7 +73,7 @@ it('answers 403, not 500, for an unknown role name in the middleware', function 
     $this->actingAs(userWithRoles(Role::Manager))->get('/probe/typo')->assertForbidden();
 });
 
-it('maps NotAllowed to 403', function () {
+it('maps authorization denial to 403', function () {
     $this->get('/probe/not-allowed')->assertForbidden();
 });
 

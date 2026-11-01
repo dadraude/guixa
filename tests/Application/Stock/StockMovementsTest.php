@@ -6,7 +6,6 @@ use Guixa\Catalog\Application\ListStockProducts;
 use Guixa\Catalog\Application\LockStockProduct;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Error\InvalidQuantity;
-use Guixa\Shared\Domain\Error\NotAllowed;
 use Guixa\Shared\Domain\Money;
 use Guixa\Shared\Domain\Role;
 use Guixa\Stock\Application\GetReturnItem;
@@ -24,6 +23,7 @@ use Guixa\Stock\Domain\MovementType;
 use Guixa\Stock\Domain\ReturnItem;
 use Guixa\Stock\Domain\StockLedger;
 use Guixa\Stock\Infrastructure\Catalog\CatalogStockProductRepository;
+use Illuminate\Auth\Access\AuthorizationException;
 use Tests\Support\Catalog\CatalogWorld;
 use Tests\Support\FrozenClock;
 use Tests\Support\InMemory\ImmediateTransactionRunner;
@@ -226,9 +226,9 @@ it('fails on an unknown stock product or return item', function () {
 it('only lets a manager record entries and adjustments and list the stock (R26, R27, R36a)', function (Role $role) {
     $actor = new Actor('other-account', [$role]);
 
-    expect(fn () => ($this->entry)($actor, $this->honeyId, '1', null))->toThrow(NotAllowed::class);
-    expect(fn () => ($this->adjust)($actor, $this->honeyId, '1', 'why', null))->toThrow(NotAllowed::class);
-    expect(fn () => ($this->listStock)($actor))->toThrow(NotAllowed::class);
+    expect(fn () => ($this->entry)($actor, $this->honeyId, '1', null))->toThrow(AuthorizationException::class);
+    expect(fn () => ($this->adjust)($actor, $this->honeyId, '1', 'why', null))->toThrow(AuthorizationException::class);
+    expect(fn () => ($this->listStock)($actor))->toThrow(AuthorizationException::class);
     expect($this->movements->forProduct($this->honeyId))->toBe([]);
 })->with([Role::Member, Role::Producer]);
 
@@ -245,6 +245,6 @@ it('shows Finance only active stock for basket selection while retaining Manager
 
     expect(($this->listStock)($finance))->toBe([])
         ->and(($this->listStock)($this->manager))->toHaveCount(1);
-    expect(fn () => ($this->entry)($finance, $this->honeyId, '1', null))->toThrow(NotAllowed::class)
-        ->and(fn () => ($this->adjust)($finance, $this->honeyId, '1', 'note', null))->toThrow(NotAllowed::class);
+    expect(fn () => ($this->entry)($finance, $this->honeyId, '1', null))->toThrow(AuthorizationException::class)
+        ->and(fn () => ($this->adjust)($finance, $this->honeyId, '1', 'note', null))->toThrow(AuthorizationException::class);
 });

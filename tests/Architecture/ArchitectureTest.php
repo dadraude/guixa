@@ -16,13 +16,14 @@ arch('A1 domain is pure: only its own Domain, Shared\Domain and PHP itself', fun
     }
 });
 
-arch('A2 application depends on Domain only', function () {
+arch('A2 application uses Domain and the Gate facade', function () {
     foreach (architectureContexts(includeShared: true) as $context) {
         expect("Guixa\\{$context}\\Application")->toOnlyUse([
             "Guixa\\{$context}\\Domain",
             "Guixa\\{$context}\\Application",
             'Guixa\Shared\Domain',
             'Guixa\Shared\Application',
+            'Illuminate\Support\Facades\Gate',
         ]);
     }
 });

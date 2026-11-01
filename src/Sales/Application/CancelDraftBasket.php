@@ -8,6 +8,7 @@ use Guixa\Sales\Domain\Error\BasketNotFound;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Application\TransactionRunner;
 use Guixa\Shared\Domain\Clock;
+use Illuminate\Support\Facades\Gate;
 
 final class CancelDraftBasket
 {
@@ -15,7 +16,7 @@ final class CancelDraftBasket
 
     public function __invoke(Actor $actor, string $basketId): void
     {
-        $actor->assertCanManageSales();
+        Gate::forUser($actor)->authorize('manage-sales');
         $this->transactions->run(function () use ($basketId, $actor): void {
             $basket = $this->baskets->lock($basketId) ?? throw BasketNotFound::withId($basketId);
             if ($basket->state !== 'draft') {

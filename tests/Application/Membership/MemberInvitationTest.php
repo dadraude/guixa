@@ -8,7 +8,7 @@ use Guixa\Membership\Domain\Error\InvitationAlreadyAccepted;
 use Guixa\Membership\Domain\Error\InvitationExpired;
 use Guixa\Membership\Domain\Error\InvitationNotValid;
 use Guixa\Membership\Domain\Household;
-use Guixa\Shared\Domain\Error\NotAllowed;
+use Illuminate\Auth\Access\AuthorizationException;
 use Tests\Support\Membership\MembershipWorld;
 
 beforeEach(function () {
@@ -188,17 +188,17 @@ it('rejects a member who tries to create a household or add a member (S56)', fun
     [$householdId, $accountId] = householdWithAnna($this->world);
     ($this->world->acceptInvitation)($this->world->sender->lastToken(), 'a-new-password');
 
-    expect(fn () => ($this->world->createHousehold)($this->world->member, 'Sneaky'))->toThrow(NotAllowed::class)
+    expect(fn () => ($this->world->createHousehold)($this->world->member, 'Sneaky'))->toThrow(AuthorizationException::class)
         ->and(fn () => ($this->world->addMember)($this->world->member, $householdId, 'Biel', 'biel@example.org'))
-        ->toThrow(NotAllowed::class)
+        ->toThrow(AuthorizationException::class)
         ->and(fn () => ($this->world->renameHousehold)($this->world->member, $householdId, 'Mine'))
-        ->toThrow(NotAllowed::class)
+        ->toThrow(AuthorizationException::class)
         ->and(fn () => ($this->world->resendInvitation)($this->world->member, $accountId))
-        ->toThrow(NotAllowed::class)
+        ->toThrow(AuthorizationException::class)
         ->and(fn () => ($this->world->changeInvitationEmail)($this->world->member, $accountId, 'x@example.org'))
-        ->toThrow(NotAllowed::class)
-        ->and(fn () => ($this->world->listHouseholds)($this->world->member))->toThrow(NotAllowed::class)
-        ->and(fn () => ($this->world->getHousehold)($this->world->member, $householdId))->toThrow(NotAllowed::class);
+        ->toThrow(AuthorizationException::class)
+        ->and(fn () => ($this->world->listHouseholds)($this->world->member))->toThrow(AuthorizationException::class)
+        ->and(fn () => ($this->world->getHousehold)($this->world->member, $householdId))->toThrow(AuthorizationException::class);
 });
 
 // S25 — before accepting, login is rejected

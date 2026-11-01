@@ -7,6 +7,7 @@ use Guixa\Shared\Domain\Role;
 use Guixa\Stock\Domain\StockMovementRepository;
 use Guixa\Stock\Domain\StockProductRepository;
 use Guixa\Stock\Domain\ValueObject\SignedQuantity;
+use Illuminate\Support\Facades\Gate;
 
 final class ListStock
 {
@@ -18,7 +19,7 @@ final class ListStock
     /** @return list<StockLevelData> */
     public function __invoke(Actor $actor): array
     {
-        $actor->assertCanManageSales();
+        Gate::forUser($actor)->authorize('manage-sales');
 
         $available = $this->movements->availableByProduct();
 

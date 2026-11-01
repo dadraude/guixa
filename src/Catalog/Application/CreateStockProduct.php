@@ -8,6 +8,7 @@ use Guixa\Catalog\Domain\Product;
 use Guixa\Catalog\Domain\ProductRepository;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Money;
+use Illuminate\Support\Facades\Gate;
 
 final class CreateStockProduct
 {
@@ -25,7 +26,7 @@ final class CreateStockProduct
         bool $variable,
         ?string $containersPerUnit,
     ): string {
-        $actor->assertManager();
+        Gate::forUser($actor)->authorize('manage');
 
         if ($this->producers->get($producerId) === null) {
             throw ProducerNotFound::withId($producerId);

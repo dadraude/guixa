@@ -8,6 +8,7 @@ use Guixa\Catalog\Domain\ProductRepository;
 use Guixa\Catalog\Domain\ProductUsage;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Application\TransactionRunner;
+use Illuminate\Support\Facades\Gate;
 
 final class ChangeProductClassification
 {
@@ -19,7 +20,7 @@ final class ChangeProductClassification
 
     public function __invoke(Actor $actor, string $id, bool $stock): void
     {
-        $actor->assertManager();
+        Gate::forUser($actor)->authorize('manage');
 
         $this->transactions->run(function () use ($id, $stock): void {
             $product = $this->products->getForUpdate($id) ?? throw ProductNotFound::withId($id);

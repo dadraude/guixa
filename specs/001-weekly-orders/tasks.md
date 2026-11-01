@@ -28,6 +28,10 @@ The index remains at `specs/001-weekly-orders/tasks.md`, matching the workflow's
 
 ## Execution contract
 
+- Authorization refactor (2026-11-01, direct user request, no new task ID): existing and future slices
+  use the plan's Laravel gates and policies inside use cases. Preserve each operation's role/ownership
+  permissions and HTTP 403 behavior; domain invariants remain in Domain. This supersedes the historical
+  T04 implementation detail about Actor assertions and `NotAllowed`, without changing its requirements.
 - Each new task owns its domain/application/adapters/persistence/HTTP/UI changes, tests and affected
   documentation together. Start with failing public Application tests; use shared repository contracts
   and focused HTTP/role tests. T63 is a justified contract-stage refactor, not a schema-only feature.

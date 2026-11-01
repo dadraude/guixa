@@ -2,10 +2,14 @@
 
 namespace App\Providers;
 
+use App\Policies\HouseholdPolicy;
+use App\Policies\ProducerPolicy;
+use App\Policies\ProductPolicy;
 use Carbon\CarbonImmutable;
 use Guixa\Catalog\Domain\ProducerAccess;
 use Guixa\Catalog\Domain\ProducerCycles;
 use Guixa\Catalog\Domain\ProducerRepository;
+use Guixa\Catalog\Domain\Product;
 use Guixa\Catalog\Domain\ProductRepository;
 use Guixa\Catalog\Domain\ProductUsage;
 use Guixa\Catalog\Domain\StockAvailability;
@@ -71,9 +75,11 @@ use Guixa\Sales\Infrastructure\Persistence\EloquentBasketRepository;
 use Guixa\Sales\Infrastructure\Stock\StockBasketSeller;
 use Guixa\Sales\Infrastructure\Stock\StockQuantitiesAdapter;
 use Guixa\Sales\Infrastructure\Wallet\WalletBasketLedger;
+use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Application\ActorResolver;
 use Guixa\Shared\Application\TransactionRunner;
 use Guixa\Shared\Domain\Clock;
+use Guixa\Shared\Domain\Role;
 use Guixa\Shared\Infrastructure\DatabaseActorResolver;
 use Guixa\Shared\Infrastructure\DatabaseTransactionRunner;
 use Guixa\Shared\Infrastructure\SystemClock;
@@ -88,6 +94,7 @@ use Guixa\Wallet\Infrastructure\Persistence\EloquentMovementRepository;
 use Illuminate\Foundation\DevCommands;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 
@@ -149,6 +156,16 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Gate::define('manage', fn (Actor $actor): bool => $actor->hasRole(Role::Manager));
+        Gate::define('manage-sales', fn (Actor $actor): bool => $actor->hasAnyRole(Role::Manager->value, Role::Finance->value));
+        Gate::define('manage-wallet', fn (Actor $actor): bool => $actor->hasAnyRole(Role::Manager->value, Role::Finance->value));
+        Gate::define('view-stock-offers', fn (Actor $actor): bool => $actor->hasAnyRole(Role::Member->value, Role::Manager->value));
+        Gate::define('producer', fn (Actor $actor): bool => $actor->hasRole(Role::Producer) && $actor->producerId !== null);
+        Gate::define('role', fn (Actor $actor, array $roles): bool => $actor->hasAnyRole(...$roles));
+        Gate::policy('household', HouseholdPolicy::class);
+        Gate::policy('producer', ProducerPolicy::class);
+        Gate::policy(Product::class, ProductPolicy::class);
+
         $this->configureDefaults();
         $this->configureDevCommands();
     }

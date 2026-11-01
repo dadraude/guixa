@@ -12,6 +12,8 @@ means pause and request coordinator admission before writing it. Do not omit req
    task database isolation before any install hook, test or application command. Read/Edit paths
    resolve under the supplied worktree. Never print credentials or copy them into a report/commit.
 2. Read the task row, phase acceptance, linked requirements/scenarios, design and project standards.
+   Apply the profile's framework-reuse preference before introducing custom infrastructure or wrappers;
+   for Guixa this means Laravel built-ins first, within the constitution's domain boundaries.
    Name the test for every linked requirement/scenario before implementation. For rendered UI changes,
    follow [visual verification](../references/visual.md): inspect and map existing components before
    building screens, declare the page/role/state inventory and selected cases, run the manifest plan

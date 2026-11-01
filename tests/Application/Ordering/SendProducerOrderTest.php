@@ -9,7 +9,7 @@ use Guixa\Ordering\Domain\Error\ProducerNotParticipating;
 use Guixa\Ordering\Domain\Error\ProducerOrderSent;
 use Guixa\Ordering\Domain\Error\ProducerStillOpen;
 use Guixa\Shared\Application\Actor;
-use Guixa\Shared\Domain\Error\NotAllowed;
+use Illuminate\Auth\Access\AuthorizationException;
 use Tests\Support\Ordering\OrderingWorld;
 
 const SEND_ANNA = '00000000-0000-7000-8000-0000000000a1';
@@ -138,7 +138,7 @@ it('refuses to send when the producer has no account and sends once it has one (
 it('lets only a manager send a producer order (R12a)', function () {
     ($this->closeBaker)();
 
-    expect(fn () => ($this->world->sendProducerOrder)($this->anna, $this->cycleId, OrderingWorld::BAKER))->toThrow(NotAllowed::class)
+    expect(fn () => ($this->world->sendProducerOrder)($this->anna, $this->cycleId, OrderingWorld::BAKER))->toThrow(AuthorizationException::class)
         ->and($this->world->notifier->notified)->toBe([]);
 });
 

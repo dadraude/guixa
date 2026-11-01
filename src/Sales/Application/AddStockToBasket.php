@@ -15,6 +15,7 @@ use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Application\TransactionRunner;
 use Guixa\Shared\Domain\Clock;
 use Guixa\Shared\Domain\Quantity;
+use Illuminate\Support\Facades\Gate;
 
 final class AddStockToBasket
 {
@@ -23,7 +24,7 @@ final class AddStockToBasket
 
     public function __invoke(Actor $actor, string $basketId, string $productId, string $quantity): void
     {
-        $actor->assertCanManageSales();
+        Gate::forUser($actor)->authorize('manage-sales');
         $addition = Quantity::fromString($quantity);
         if ($addition->isZero()) {
             throw InvalidBasketQuantity::create();

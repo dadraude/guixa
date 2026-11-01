@@ -8,6 +8,7 @@ use Guixa\Sales\Domain\Error\BasketNotFound;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Application\TransactionRunner;
 use Guixa\Shared\Domain\Clock;
+use Illuminate\Support\Facades\Gate;
 
 final class RemoveStockFromBasket
 {
@@ -15,7 +16,7 @@ final class RemoveStockFromBasket
 
     public function __invoke(Actor $actor, string $basketId, string $productId): void
     {
-        $actor->assertCanManageSales();
+        Gate::forUser($actor)->authorize('manage-sales');
         $this->transactions->run(function () use ($basketId, $productId): void {
             $basket = $this->baskets->lock($basketId) ?? throw BasketNotFound::withId($basketId);
             if ($basket->state !== 'draft') {

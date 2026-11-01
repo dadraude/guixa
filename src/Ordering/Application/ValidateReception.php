@@ -7,6 +7,7 @@ use Guixa\Ordering\Domain\Error\CycleNotFound;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Application\TransactionRunner;
 use Guixa\Shared\Domain\Clock;
+use Illuminate\Support\Facades\Gate;
 
 /** Marks a producer's reception as checked; changing a received total clears it again (R17a, S47). */
 final class ValidateReception
@@ -19,7 +20,7 @@ final class ValidateReception
 
     public function __invoke(Actor $actor, string $cycleId, string $producerId): void
     {
-        $actor->assertManager();
+        Gate::forUser($actor)->authorize('manage');
 
         $now = $this->clock->now()->setTimezone($this->clock->timezone());
 

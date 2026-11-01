@@ -6,6 +6,7 @@ use Guixa\Catalog\Domain\Error\ProducerNotFound;
 use Guixa\Catalog\Domain\ProducerRepository;
 use Guixa\Catalog\Domain\ValueObject\CutoffRule;
 use Guixa\Shared\Application\Actor;
+use Illuminate\Support\Facades\Gate;
 
 final class SetDefaultCutoff
 {
@@ -13,7 +14,7 @@ final class SetDefaultCutoff
 
     public function __invoke(Actor $actor, string $producerId, int $daysBefore, string $time): void
     {
-        $actor->assertProducerOf($producerId);
+        Gate::forUser($actor)->authorize('owns', ['producer', $producerId]);
 
         $producer = $this->producers->get($producerId) ?? throw ProducerNotFound::withId($producerId);
         $producer->changeCutoffRule(CutoffRule::of($daysBefore, $time));

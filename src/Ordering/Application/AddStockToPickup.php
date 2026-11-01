@@ -8,6 +8,7 @@ use Guixa\Ordering\Domain\StockCatalog;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Application\TransactionRunner;
 use Guixa\Shared\Domain\Quantity;
+use Illuminate\Support\Facades\Gate;
 
 /** Adds a stock product to a pending pickup, checking the available stock (R20, S17). */
 final class AddStockToPickup
@@ -22,7 +23,7 @@ final class AddStockToPickup
     /** @param  string  $quantity  more than zero, at most 3 decimals; whole units for a non-variable product */
     public function __invoke(Actor $actor, string $cycleId, string $householdId, string $stockProductId, string $quantity): void
     {
-        $actor->assertManager();
+        Gate::forUser($actor)->authorize('manage');
 
         $quantity = Quantity::fromString($quantity);
 

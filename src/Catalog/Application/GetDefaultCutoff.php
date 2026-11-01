@@ -5,6 +5,7 @@ namespace Guixa\Catalog\Application;
 use Guixa\Catalog\Domain\Error\ProducerNotFound;
 use Guixa\Catalog\Domain\ProducerRepository;
 use Guixa\Shared\Application\Actor;
+use Illuminate\Support\Facades\Gate;
 
 /** A producer's own default cutoff, for its cutoff page. */
 final class GetDefaultCutoff
@@ -13,7 +14,7 @@ final class GetDefaultCutoff
 
     public function __invoke(Actor $actor, string $producerId): CutoffRuleData
     {
-        $actor->assertProducerOf($producerId);
+        Gate::forUser($actor)->authorize('owns', ['producer', $producerId]);
 
         $rule = ($this->producers->get($producerId) ?? throw ProducerNotFound::withId($producerId))->cutoffRule();
 

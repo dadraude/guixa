@@ -4,6 +4,7 @@ namespace Guixa\Catalog\Application;
 
 use Guixa\Catalog\Domain\ProducerRepository;
 use Guixa\Shared\Application\Actor;
+use Illuminate\Support\Facades\Gate;
 
 final class ListProducers
 {
@@ -12,7 +13,7 @@ final class ListProducers
     /** @return list<ProducerData> */
     public function __invoke(Actor $actor): array
     {
-        $actor->assertManager();
+        Gate::forUser($actor)->authorize('manage');
 
         return array_map(ProducerData::of(...), $this->producers->list());
     }

@@ -7,7 +7,7 @@ use Guixa\Catalog\Domain\Error\ProductHasUnsettledLines;
 use Guixa\Catalog\Domain\Error\ProductNotFound;
 use Guixa\Catalog\Domain\Error\UnitRequired;
 use Guixa\Shared\Application\Actor;
-use Guixa\Shared\Domain\Error\NotAllowed;
+use Illuminate\Auth\Access\AuthorizationException;
 use Tests\Support\Catalog\CatalogWorld;
 
 beforeEach(function () {
@@ -159,11 +159,11 @@ it('changes the unit and the variable flag once the product has no unsettled lin
 it('keeps another producer from seeing or editing the products (R2, S57)', function () {
     $id = bread($this);
 
-    expect(fn () => ($this->world->listProducerProducts)($this->cheesemakerActor, $this->baker))->toThrow(NotAllowed::class)
-        ->and(fn () => ($this->world->createProduct)($this->cheesemakerActor, $this->baker, 'Fake', 'loaf', 100, false, null))->toThrow(NotAllowed::class)
-        ->and(fn () => ($this->world->updateProduct)($this->cheesemakerActor, $id, 'Stolen', 'loaf', 100, false, null))->toThrow(NotAllowed::class)
-        ->and(fn () => ($this->world->deactivateProduct)($this->cheesemakerActor, $id))->toThrow(NotAllowed::class)
-        ->and(fn () => ($this->world->reactivateProduct)($this->cheesemakerActor, $id))->toThrow(NotAllowed::class);
+    expect(fn () => ($this->world->listProducerProducts)($this->cheesemakerActor, $this->baker))->toThrow(AuthorizationException::class)
+        ->and(fn () => ($this->world->createProduct)($this->cheesemakerActor, $this->baker, 'Fake', 'loaf', 100, false, null))->toThrow(AuthorizationException::class)
+        ->and(fn () => ($this->world->updateProduct)($this->cheesemakerActor, $id, 'Stolen', 'loaf', 100, false, null))->toThrow(AuthorizationException::class)
+        ->and(fn () => ($this->world->deactivateProduct)($this->cheesemakerActor, $id))->toThrow(AuthorizationException::class)
+        ->and(fn () => ($this->world->reactivateProduct)($this->cheesemakerActor, $id))->toThrow(AuthorizationException::class);
 
     $product = bakerProducts($this)[0];
     expect($product->name)->toBe('Bread')->and($product->active)->toBeTrue();
@@ -172,10 +172,10 @@ it('keeps another producer from seeing or editing the products (R2, S57)', funct
 it('keeps product management to producers, not managers or members (R1, R2)', function (Actor $actor) {
     $id = bread($this);
 
-    expect(fn () => ($this->world->listProducerProducts)($actor, $this->baker))->toThrow(NotAllowed::class)
-        ->and(fn () => ($this->world->createProduct)($actor, $this->baker, 'Fake', 'loaf', 100, false, null))->toThrow(NotAllowed::class)
-        ->and(fn () => ($this->world->updateProduct)($actor, $id, 'Stolen', 'loaf', 100, false, null))->toThrow(NotAllowed::class)
-        ->and(fn () => ($this->world->deactivateProduct)($actor, $id))->toThrow(NotAllowed::class);
+    expect(fn () => ($this->world->listProducerProducts)($actor, $this->baker))->toThrow(AuthorizationException::class)
+        ->and(fn () => ($this->world->createProduct)($actor, $this->baker, 'Fake', 'loaf', 100, false, null))->toThrow(AuthorizationException::class)
+        ->and(fn () => ($this->world->updateProduct)($actor, $id, 'Stolen', 'loaf', 100, false, null))->toThrow(AuthorizationException::class)
+        ->and(fn () => ($this->world->deactivateProduct)($actor, $id))->toThrow(AuthorizationException::class);
 })->with([
     'manager' => fn () => Actor::manager('00000000-0000-7000-8000-00000000000a'),
     'member' => fn () => Actor::memberOf('00000000-0000-7000-8000-00000000000b', 'h1'),

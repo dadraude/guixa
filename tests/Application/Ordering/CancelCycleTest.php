@@ -3,7 +3,7 @@
 use Guixa\Ordering\Domain\Error\CycleCancelled;
 use Guixa\Ordering\Domain\Error\CycleNotFound;
 use Guixa\Shared\Application\Actor;
-use Guixa\Shared\Domain\Error\NotAllowed;
+use Illuminate\Auth\Access\AuthorizationException;
 use Tests\Support\Ordering\OrderingWorld;
 
 const CANCEL_ANNA = '00000000-0000-7000-8000-0000000000a1';
@@ -71,7 +71,7 @@ it('refuses to cancel an unknown cycle (R4b)', function () {
 });
 
 it('lets only a manager cancel a cycle and keeps the orders otherwise (R4b)', function () {
-    expect(fn () => ($this->world->cancelCycle)($this->anna, $this->cycleId))->toThrow(NotAllowed::class)
+    expect(fn () => ($this->world->cancelCycle)($this->anna, $this->cycleId))->toThrow(AuthorizationException::class)
         ->and(($this->cycle)()->cancelled)->toBeFalse()
         ->and($this->world->orders->ofHousehold($this->cycleId, CANCEL_HOUSEHOLD_H))->not->toBeNull();
 });

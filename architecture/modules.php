@@ -62,7 +62,6 @@ return [
                 'Domain\Role' => ['Catalog', 'Membership', 'Ordering', 'Sales', 'Stock', 'Wallet'],
                 'Domain\Error\InvalidLocalTime' => ['Catalog', 'Membership', 'Ordering', 'Stock', 'Wallet'],
                 'Domain\Error\InvalidQuantity' => ['Catalog', 'Membership', 'Ordering', 'Stock', 'Wallet'],
-                'Domain\Error\NotAllowed' => ['Catalog', 'Membership', 'Ordering', 'Sales', 'Stock', 'Wallet'],
             ],
         ],
         'Sales' => [

@@ -92,14 +92,19 @@ All cross-context writes in validation, redistribution or correction use the sam
   `SystemClock` (Infrastructure, reads `config('guixa.timezone')` ← `COOP_TIMEZONE`) and `FrozenClock` (`tests/Support`,
   any timezone). `LocalTime::at(date, HH:MM, timezone)` resolves a local time to one instant: a time that does
   not exist moves forward by the gap, a repeated one takes its first occurrence (Time, S38).
-- **`Actor`** (`Shared\Application`; `Role` and `NotAllowed` live in `Shared\Domain`) `final readonly`: `accountId` (UUID v7 string), `roles` (set of `Manager|Finance|Member|Producer`; `Member` is derived: present exactly when `householdId` is set, never stored), `?householdId`,
+- **`Actor`** (`Shared\\Application`; `Role` lives in `Shared\\Domain`) `final readonly`: `accountId` (UUID v7 string), `roles` (set of `Manager|Finance|Member|Producer`; `Member` is derived: present exactly when `householdId` is set, never stored), `?householdId`,
   `?producerId`. Built by an HTTP middleware from the authenticated account and passed to every use case.
-  Authorization is checked inside use cases (`assertManager()`, `assertMemberOf($householdId)`…),
-  so scenarios test it without HTTP (R36a, R36c). `assertMemberOf($householdId)` checks that the account is linked to that household (R35). A failed check throws `Shared\Domain\Error\NotAllowed`.
-- Finance permissions are centralized in semantic checks such as `assertCanManageSales()` and
-  `assertCanManageWallet()` (Manager or Finance), and `assertCanCollectFor(householdId)` (Manager,
-  Finance, or a member of that household). Basket state and quantity rules stay in Sales Domain.
-  Keep existing manager/producer/member checks for unrelated operations. A future Commissions
+  It carries identity and role facts; it does not throw permission exceptions.
+- Authorization stays inside use cases through Laravel `Gate::forUser($actor)->authorize(...)`, so
+  direct calls and scenarios without HTTP enforce the same permissions (R36a, R36c). Broad abilities
+  use gates; resource ownership and product access use policy methods registered in the service
+  provider. Policies receive the explicit actor and resource IDs or facts, without loading Eloquent
+  models into Application. A failed check throws Laravel's `AuthorizationException`, rendered as 403.
+- Finance permissions use semantic abilities for managing sales and wallets (Manager or Finance),
+  and a household collection policy (Manager, Finance, or a member of that household). Membership
+  requires the account's household link (R35). Preserve the separate manager/producer/member
+  permissions for unrelated operations; there is no global Manager bypass. Basket state, quantities,
+  cutoffs and other business invariants remain in framework-free domain objects. A future Commissions
   implementation can resolve the same capabilities without changing every use case.
 - **`TransactionRunner`** port (`Shared\Application`): `run(callable)` and `afterCommit(callable)`. DB adapter
   wraps `DB::transaction` and `DB::afterCommit`. Emails (sent orders, invitations) go out after commit, so a
@@ -527,7 +532,7 @@ Retain existing member ordering, producer catalogue/cutoff, Manager cycle/recept
 return-item and inventory administration routes with their narrowed product-mode rules. Existing
 manager-cycle pickup pages are replaced by Sales basket routes; do not retain a second completion
 endpoint that still charges/sells on physical collection. There is no production compatibility surface.
-All route middleware is backed by Application Actor checks; member-owned ids are verified server-side.
+All route middleware is backed by Application gate/policy checks against the explicit actor; member-owned ids are verified server-side.
 
 | Route / area | Page/action and use cases |
 | --- | --- |
@@ -575,7 +580,7 @@ Concrete reuse inspected before planning:
   tokens and `components/ui/`; do not introduce another component library or redesign unrelated pages.
 
 Keep `<Noun>Row` DTOs in App/Http and generate TypeScript types. Domain errors map to translated
-422 form errors and NotAllowed to 403 through the existing handler. Catalan copy/ca-ES presentation,
+422 form errors and Laravel authorization denials to 403. Catalan copy/ca-ES presentation,
 44 px targets, phone-first reflow and the shared visual manifest/report workflow remain mandatory.
 Test totals and enabled actions as display-only logic; authorization and money/stock rules stay server-side.
 
@@ -1032,7 +1037,7 @@ for CI's full validation.
 | Domain | Value objects, `LocalTime`, `CutoffRule`, `ProportionalAllocator` (property: Σ result == target), `Cycle`, `Order`, `Product`, `Basket` | `tests/Unit/<Context>` |
 | Application | **Every scenario S1–S90**, with in-memory repositories and `FrozenClock` | `tests/Application/<Context>` |
 | Infrastructure | Each Eloquent repository against `guixa_test` (constraints, locks, numeric mapping) | `tests/Integration` |
-| HTTP | Role gates, wiring, `assertInertia` props, error → 422 and `NotAllowed` → 403 mapping | `tests/Feature` |
+| HTTP | Role gates, wiring, `assertInertia` props, error → 422 and `AuthorizationException` → 403 mapping | `tests/Feature` |
 | Architecture | A1–A12 (A9 through Oxlint); explicitly register Sales contracts as its slices land | `tests/Architecture` |
 | Translations | Every key used in PHP (`__()`, `trans()`) and Vue (`trans()`, `$t`), and every domain error class, has a `ca` translation | `tests/Architecture` |
 | Frontend | Display totals, A9 via Oxlint | `resources/js/**/*.spec.ts` |

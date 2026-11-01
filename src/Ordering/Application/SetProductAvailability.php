@@ -10,6 +10,7 @@ use Guixa\Ordering\Domain\ProductAvailabilityRepository;
 use Guixa\Ordering\Domain\ProductCatalog;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Application\TransactionRunner;
+use Illuminate\Support\Facades\Gate;
 
 final class SetProductAvailability
 {
@@ -24,7 +25,7 @@ final class SetProductAvailability
     public function __invoke(Actor $actor, string $cycleId, string $productId, bool $available): void
     {
         $product = $this->catalog->orderable($productId) ?? throw ProductNotOrderable::withId($productId);
-        $actor->assertProducerOf($product->producerId);
+        Gate::forUser($actor)->authorize('owns', ['producer', $product->producerId]);
 
         $this->transactions->run(function () use ($cycleId, $productId, $available, $product) {
             // Shared lock on the cycle: a send cannot slip in while the mark changes (R3c).

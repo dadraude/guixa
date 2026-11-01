@@ -7,6 +7,7 @@ use Guixa\Shared\Domain\Clock;
 use Guixa\Shared\Domain\Money;
 use Guixa\Wallet\Domain\Movement;
 use Guixa\Wallet\Domain\MovementRepository;
+use Illuminate\Support\Facades\Gate;
 
 final class ChargeForBasket
 {
@@ -14,7 +15,7 @@ final class ChargeForBasket
 
     public function __invoke(Actor $actor, string $householdId, string $basketId, int $totalCents): ?string
     {
-        $actor->assertCanManageWallet();
+        Gate::forUser($actor)->authorize('manage-wallet');
         if ($totalCents === 0) {
             return null;
         }

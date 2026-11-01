@@ -61,8 +61,10 @@ else in a module is private to that module for integration purposes, even when P
 | Wallet → Sales           | ChargeForBasket, GetBalance                                                                                            | —                                            |
 
 Shared explicitly exports `Application\Actor`, `ActorResolver`, `TransactionRunner`, and
-`Domain\Money`, `Quantity`, `Clock`, `LocalTime`, `Role`, plus `InvalidLocalTime`, `InvalidQuantity`
-and `NotAllowed` in `Domain\Error`. Business modules may use these according to A1/A2. Shared's
+`Domain\Money`, `Quantity`, `Clock`, `LocalTime`, `Role`, plus `InvalidLocalTime` and `InvalidQuantity`
+in `Domain\Error`. Business modules may use these according to A1/A2. Application authorization uses Laravel gates
+and policies against the explicit `Actor`; denials throw Laravel's `AuthorizationException`.
+The A2 exception permits the Gate facade only; domain business rules remain framework-free. Shared's
 Infrastructure is private and is bound at application bootstrap.
 
 A caller declares its required port in its own Domain, or Application when it needs Actor. Its

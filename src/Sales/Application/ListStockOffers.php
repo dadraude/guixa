@@ -5,7 +5,7 @@ namespace Guixa\Sales\Application;
 use Guixa\Sales\Domain\StockOfferCatalog;
 use Guixa\Sales\Domain\StockQuantities;
 use Guixa\Shared\Application\Actor;
-use Guixa\Shared\Domain\Role;
+use Illuminate\Support\Facades\Gate;
 
 final class ListStockOffers
 {
@@ -17,9 +17,7 @@ final class ListStockOffers
     /** @return list<StockOfferData> */
     public function __invoke(Actor $actor): array
     {
-        if (! $actor->hasRole(Role::Member) && ! $actor->hasRole(Role::Manager)) {
-            $actor->assertMemberOf($actor->householdId ?? '');
-        }
+        Gate::forUser($actor)->authorize('view-stock-offers');
 
         $products = $this->catalog->active();
         if ($products === []) {

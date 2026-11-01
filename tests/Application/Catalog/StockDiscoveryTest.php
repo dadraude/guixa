@@ -6,7 +6,7 @@ use Guixa\Catalog\Application\ListProducerStockProducts;
 use Guixa\Catalog\Application\ListStockOfferProducts;
 use Guixa\Catalog\Domain\StockAvailability;
 use Guixa\Shared\Application\Actor;
-use Guixa\Shared\Domain\Error\NotAllowed;
+use Illuminate\Auth\Access\AuthorizationException;
 use Tests\Support\Catalog\CatalogWorld;
 
 it('shows only active stock to members, with inactive producers and separate weekly identity (S66 S73)', function () {
@@ -56,6 +56,6 @@ it('shows own active and inactive stock in one quantity batch and rejects anothe
         ->and(array_column($listed, 'available'))->toBe(['5.000', '0.000'])
         ->and(array_column($listed, 'active'))->toBe([true, false])
         ->and($availability->calls)->toBe([[$honey, $jam]])
-        ->and(fn () => $list($world->producerActor($beekeeper), $oilProducer))->toThrow(NotAllowed::class)
-        ->and(fn () => $list(Actor::memberOf('member', 'household'), $beekeeper))->toThrow(NotAllowed::class);
+        ->and(fn () => $list($world->producerActor($beekeeper), $oilProducer))->toThrow(AuthorizationException::class)
+        ->and(fn () => $list(Actor::memberOf('member', 'household'), $beekeeper))->toThrow(AuthorizationException::class);
 });

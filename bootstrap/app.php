@@ -6,7 +6,7 @@ use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\LogOutDeactivatedAccount;
 use App\Http\Middleware\ResolveActor;
-use Guixa\Shared\Domain\Error\NotAllowed;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Application;
@@ -45,7 +45,7 @@ return Application::configure(basePath: dirname(__DIR__))
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );
 
-        $exceptions->map(NotAllowed::class, fn (NotAllowed $e) => new AccessDeniedHttpException(__('errors.NotAllowed'), $e));
+        $exceptions->map(AuthorizationException::class, fn (AuthorizationException $e) => new AccessDeniedHttpException(__('errors.NotAllowed'), $e));
         $exceptions->render(fn (Throwable $e, Request $request) => DomainErrorResponse::for($e, $request));
         $exceptions->render(function (AuthenticationException $e, Request $request) {
             return ($request->expectsJson() || $request->is('api/*')) && $e->getMessage() === 'Unauthenticated.'

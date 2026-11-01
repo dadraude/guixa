@@ -6,6 +6,7 @@ use Guixa\Catalog\Domain\Error\ProductNotFound;
 use Guixa\Catalog\Domain\ProductRepository;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Application\TransactionRunner;
+use Illuminate\Support\Facades\Gate;
 
 final class ReactivateStockProduct
 {
@@ -16,7 +17,7 @@ final class ReactivateStockProduct
 
     public function __invoke(Actor $actor, string $producerId, string $id): void
     {
-        $actor->assertManager();
+        Gate::forUser($actor)->authorize('manage');
         $this->transactions->run(function () use ($producerId, $id): void {
             $product = $this->products->getForUpdate($id);
             if ($product === null || ! $product->isStock() || $product->producerId !== $producerId) {

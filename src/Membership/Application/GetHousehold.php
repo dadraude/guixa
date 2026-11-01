@@ -9,6 +9,7 @@ use Guixa\Membership\Domain\HouseholdRepository;
 use Guixa\Membership\Domain\InvitationRepository;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Clock;
+use Illuminate\Support\Facades\Gate;
 
 final class GetHousehold
 {
@@ -21,7 +22,7 @@ final class GetHousehold
 
     public function __invoke(Actor $actor, string $householdId): HouseholdDetail
     {
-        $actor->assertManager();
+        Gate::forUser($actor)->authorize('manage');
 
         $household = $this->households->get($householdId) ?? throw HouseholdNotFound::withId($householdId);
 

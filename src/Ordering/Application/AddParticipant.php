@@ -9,6 +9,7 @@ use Guixa\Ordering\Domain\ProducerCutoffRules;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Application\TransactionRunner;
 use Guixa\Shared\Domain\Clock;
+use Illuminate\Support\Facades\Gate;
 
 final class AddParticipant
 {
@@ -22,7 +23,7 @@ final class AddParticipant
     /** Makes a producer participate in the cycle; its cutoff comes from its default as it is now (R4a, R5). */
     public function __invoke(Actor $actor, string $cycleId, string $producerId): void
     {
-        $actor->assertManager();
+        Gate::forUser($actor)->authorize('manage');
 
         $rule = $this->rules->activeRuleOf($producerId) ?? throw ProducerNotActive::withId($producerId);
         $now = $this->clock->now()->setTimezone($this->clock->timezone());

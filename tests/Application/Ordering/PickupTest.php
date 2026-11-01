@@ -24,8 +24,8 @@ use Guixa\Ordering\Domain\PickupStatus;
 use Guixa\Ordering\Domain\ReceptionLoader;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Error\InvalidQuantity;
-use Guixa\Shared\Domain\Error\NotAllowed;
 use Guixa\Shared\Domain\Money;
+use Illuminate\Auth\Access\AuthorizationException;
 use Tests\Support\InMemory\ImmediateTransactionRunner;
 use Tests\Support\Ordering\OrderingWorld;
 
@@ -156,9 +156,9 @@ it('rejects an adjustment unless the pickup is pending (R19, R23, R24)', functio
 it('lets only a manager adjust, open or read a pickup (R19)', function () {
     ($this->settle)();
 
-    expect(fn () => ($this->world->getPickup)($this->memberA, $this->cycleId, PICKUP_A))->toThrow(NotAllowed::class)
-        ->and(fn () => ($this->world->openPickup)($this->memberA, $this->cycleId, PICKUP_K))->toThrow(NotAllowed::class)
-        ->and(fn () => ($this->world->adjustDeliveredQuantity)($this->memberA, $this->cycleId, PICKUP_A, $this->beef, '1'))->toThrow(NotAllowed::class)
+    expect(fn () => ($this->world->getPickup)($this->memberA, $this->cycleId, PICKUP_A))->toThrow(AuthorizationException::class)
+        ->and(fn () => ($this->world->openPickup)($this->memberA, $this->cycleId, PICKUP_K))->toThrow(AuthorizationException::class)
+        ->and(fn () => ($this->world->adjustDeliveredQuantity)($this->memberA, $this->cycleId, PICKUP_A, $this->beef, '1'))->toThrow(AuthorizationException::class)
         ->and(fn () => ($this->world->getPickup)($this->world->manager, '00000000-0000-7000-8000-0000000000ff', PICKUP_A))->toThrow(CycleNotFound::class);
 })->group('R19');
 
@@ -241,7 +241,7 @@ it('lists the pickups of a settled cycle by household name with their status and
 
     expect(array_map(fn ($pickup) => [$pickup->householdName, $pickup->status, $pickup->totalCents], $pickups))
         ->toBe([['Household A', 'pending', 3200], ['Household K', 'pending', 0]])
-        ->and(fn () => ($this->world->listPickups)($this->memberA, $this->cycleId))->toThrow(NotAllowed::class)
+        ->and(fn () => ($this->world->listPickups)($this->memberA, $this->cycleId))->toThrow(AuthorizationException::class)
         ->and(fn () => ($this->world->listPickups)($this->world->manager, '00000000-0000-7000-8000-0000000000ff'))->toThrow(CycleNotFound::class);
 })->group('R19', 'S18');
 
@@ -460,10 +460,10 @@ it('lets only a manager change stock and return lines, and answers CycleNotFound
     ($this->world->addReturnToPickup)($this->world->manager, $this->cycleId, PICKUP_A, $jar, 1);
     $manager = $this->world->manager;
 
-    expect(fn () => ($this->world->addStockToPickup)($this->memberA, $this->cycleId, PICKUP_A, $honey, '1'))->toThrow(NotAllowed::class)
-        ->and(fn () => ($this->world->removeStockFromPickup)($this->memberA, $this->cycleId, PICKUP_A, $honey))->toThrow(NotAllowed::class)
-        ->and(fn () => ($this->world->addReturnToPickup)($this->memberA, $this->cycleId, PICKUP_A, $jar, 1))->toThrow(NotAllowed::class)
-        ->and(fn () => ($this->world->removeReturnFromPickup)($this->memberA, $this->cycleId, PICKUP_A, $jar))->toThrow(NotAllowed::class)
+    expect(fn () => ($this->world->addStockToPickup)($this->memberA, $this->cycleId, PICKUP_A, $honey, '1'))->toThrow(AuthorizationException::class)
+        ->and(fn () => ($this->world->removeStockFromPickup)($this->memberA, $this->cycleId, PICKUP_A, $honey))->toThrow(AuthorizationException::class)
+        ->and(fn () => ($this->world->addReturnToPickup)($this->memberA, $this->cycleId, PICKUP_A, $jar, 1))->toThrow(AuthorizationException::class)
+        ->and(fn () => ($this->world->removeReturnFromPickup)($this->memberA, $this->cycleId, PICKUP_A, $jar))->toThrow(AuthorizationException::class)
         ->and(fn () => ($this->world->addStockToPickup)($manager, '00000000-0000-7000-8000-0000000000ff', PICKUP_A, $honey, '1'))->toThrow(CycleNotFound::class)
         ->and(fn () => ($this->world->addReturnToPickup)($manager, $this->cycleId, '00000000-0000-7000-8000-0000000000ff', $jar, 1))->toThrow(PickupNotFound::class);
 })->group('R20', 'R20a');

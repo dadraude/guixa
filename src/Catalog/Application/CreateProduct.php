@@ -6,6 +6,7 @@ use Guixa\Catalog\Domain\Product;
 use Guixa\Catalog\Domain\ProductRepository;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Money;
+use Illuminate\Support\Facades\Gate;
 
 final class CreateProduct
 {
@@ -21,7 +22,7 @@ final class CreateProduct
         bool $variable,
         ?string $containersPerUnit,
     ): string {
-        $actor->assertProducerOf($producerId);
+        Gate::forUser($actor)->authorize('owns', ['producer', $producerId]);
 
         $product = Product::create(
             $this->products->nextId(),

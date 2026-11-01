@@ -11,6 +11,7 @@ use Guixa\Ordering\Domain\ReceptionProduct;
 use Guixa\Ordering\Domain\ValueObject\OrderableProduct;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Quantity;
+use Illuminate\Support\Facades\Gate;
 
 /** What a manager sees of a producer's reception: per product the totals, the difference and every household's allocation (R14, R17). */
 final class GetReception
@@ -23,7 +24,7 @@ final class GetReception
 
     public function __invoke(Actor $actor, string $cycleId, string $producerId): ReceptionData
     {
-        $actor->assertManager();
+        Gate::forUser($actor)->authorize('manage');
 
         $cycle = $this->cycles->get($cycleId) ?? throw CycleNotFound::withId($cycleId);
         $loaded = $this->loader->load($cycle, $producerId);

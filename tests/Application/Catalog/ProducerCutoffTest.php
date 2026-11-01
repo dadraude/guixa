@@ -4,8 +4,8 @@ use Guixa\Catalog\Domain\Error\InvalidCutoffRule;
 use Guixa\Catalog\Domain\Error\NameRequired;
 use Guixa\Catalog\Domain\Error\ProducerNotFound;
 use Guixa\Shared\Application\Actor;
-use Guixa\Shared\Domain\Error\NotAllowed;
 use Guixa\Shared\Domain\Role;
+use Illuminate\Auth\Access\AuthorizationException;
 use Tests\Support\Catalog\CatalogWorld;
 
 beforeEach(function () {
@@ -44,7 +44,7 @@ it('rejects an invalid cutoff when creating a producer (R5)', function () {
 
 it('keeps producer creation to managers (R36)', function (Role $role) {
     expect(fn () => ($this->world->createProducer)(new Actor('a', [$role]), 'Baker', 3, '20:00'))
-        ->toThrow(NotAllowed::class);
+        ->toThrow(AuthorizationException::class);
 })->with([Role::Member, Role::Producer]);
 
 it('lists the producers by name for a manager only (R36)', function () {
@@ -54,7 +54,7 @@ it('lists the producers by name for a manager only (R36)', function () {
     $names = array_map(fn ($producer) => $producer->name, ($this->world->listProducers)($this->world->manager));
 
     expect($names)->toBe(['Baker', 'Cheesemaker'])
-        ->and(fn () => ($this->world->listProducers)(new Actor('a', [Role::Member])))->toThrow(NotAllowed::class);
+        ->and(fn () => ($this->world->listProducers)(new Actor('a', [Role::Member])))->toThrow(AuthorizationException::class);
 });
 
 it('answers null for an unknown producer', function () {
@@ -92,11 +92,11 @@ it('only lets the producer itself change its cutoff (R5)', function () {
     $cheesemaker = ($this->world->createProducer)($this->world->manager, 'Cheesemaker', 2, '12:00');
 
     expect(fn () => ($this->world->setDefaultCutoff)($this->world->producerActor($cheesemaker), $baker, 1, '08:00'))
-        ->toThrow(NotAllowed::class)
+        ->toThrow(AuthorizationException::class)
         ->and(fn () => ($this->world->setDefaultCutoff)($this->world->manager, $baker, 1, '08:00'))
-        ->toThrow(NotAllowed::class)
+        ->toThrow(AuthorizationException::class)
         ->and(fn () => ($this->world->setDefaultCutoff)(new Actor('a', [Role::Member]), $baker, 1, '08:00'))
-        ->toThrow(NotAllowed::class);
+        ->toThrow(AuthorizationException::class);
 });
 
 it('reports an unknown producer when setting its cutoff', function () {
@@ -111,7 +111,7 @@ it('only lets the producer read its own cutoff', function () {
     $cheesemaker = ($this->world->createProducer)($this->world->manager, 'Cheesemaker', 2, '12:00');
 
     expect(fn () => ($this->world->getDefaultCutoff)($this->world->producerActor($cheesemaker), $baker))
-        ->toThrow(NotAllowed::class);
+        ->toThrow(AuthorizationException::class);
 });
 
 it('closes orders per the new default after the producer changes it (R5, S38)', function () {
