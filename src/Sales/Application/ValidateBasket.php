@@ -36,14 +36,15 @@ final class ValidateBasket
                 throw BasketHasNoContents::create();
             }
 
-            usort($lines, fn ($left, $right) => strcmp($left->productId, $right->productId));
-            foreach ($lines as $line) {
+            $stockLines = array_values(array_filter($lines, fn ($line) => $line->kind === 'stock'));
+            usort($stockLines, fn ($left, $right) => strcmp($left->productId, $right->productId));
+            foreach ($stockLines as $line) {
                 // Lock every product identity in a stable order before any sale.
                 if ($this->products->lock($line->productId) === null) {
                     throw StockProductUnavailable::create();
                 }
             }
-            foreach ($lines as $line) {
+            foreach ($stockLines as $line) {
                 $this->stock->sell($actor, $line->productId, $line->quantity->toString(), $basketId);
             }
             $validated = $basket->validated($actor->accountId, $this->clock->now());

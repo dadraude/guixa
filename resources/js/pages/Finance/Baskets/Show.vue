@@ -5,11 +5,13 @@ import { computed, ref } from 'vue';
 import BasketCollectionController from '@/actions/App/Http/Controllers/Finance/BasketCollectionController';
 import BasketController from '@/actions/App/Http/Controllers/Finance/BasketController';
 import BasketStockController from '@/actions/App/Http/Controllers/Finance/BasketStockController';
+import BasketReturnController from '@/actions/App/Http/Controllers/Finance/BasketReturnController';
 import BasketValidationController from '@/actions/App/Http/Controllers/Finance/BasketValidationController';
 import HouseholdWalletController from '@/actions/App/Http/Controllers/Finance/HouseholdWalletController';
 import Heading from '@/components/Heading.vue';
 import InputError from '@/components/InputError.vue';
 import StockLines from '@/components/pickup/StockLines.vue';
+import ReturnLines from '@/components/pickup/ReturnLines.vue';
 import { euros } from '@/components/pickup/euros';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -17,6 +19,7 @@ import { Button } from '@/components/ui/button';
 const props = defineProps<{
     basket: App.Http.BasketRow;
     stockProducts: App.Http.StockLevelRow[];
+    returnItems: App.Http.ReturnItemRow[];
 }>();
 const page = usePage();
 const errors = computed(() => page.props.errors as Record<string, string>);
@@ -37,6 +40,20 @@ const removeStock = (stockProductId: string) =>
         BasketStockController.destroy.url({
             basket: props.basket.id,
             stockProduct: stockProductId,
+        }),
+        options,
+    );
+const addReturn = (returnItemId: string, quantity: string) =>
+    router.post(
+        BasketReturnController.store.url({ basket: props.basket.id }),
+        { return_item_id: returnItemId, return_quantity: quantity },
+        options,
+    );
+const removeReturn = (returnItemId: string) =>
+    router.delete(
+        BasketReturnController.destroy.url({
+            basket: props.basket.id,
+            returnItem: returnItemId,
         }),
         options,
     );
@@ -71,7 +88,7 @@ const statusLabels: Record<string, string> = {
     <div class="pilot-page pilot-layout-page pilot-manager-page">
         <Heading
             :title="trans('Basket: :name', { name: basket.householdName })"
-            :description="trans('Independent stock purchase')"
+            :description="trans('Independent basket')"
         />
         <Link
             :href="BasketController.index.url()"
@@ -96,6 +113,17 @@ const statusLabels: Record<string, string> = {
             :empty-message="trans('No stock has been added to this basket.')"
             @add="addStock"
             @remove="removeStock"
+        />
+
+        <ReturnLines
+            :lines="basket.returnLines"
+            :options="returnItems"
+            :editable="basket.state === 'draft'"
+            :processing="processing"
+            :errors="errors"
+            :empty-message="trans('No returns have been added to this basket.')"
+            @add="addReturn"
+            @remove="removeReturn"
         />
 
         <section class="pilot-layout-panel">
@@ -143,7 +171,11 @@ const statusLabels: Record<string, string> = {
             <Button
                 type="button"
                 class="min-h-11"
-                :disabled="processing || basket.stockLines.length === 0"
+                :disabled="
+                    processing ||
+                    (basket.stockLines.length === 0 &&
+                        basket.returnLines.length === 0)
+                "
                 data-test="validate-basket"
                 @click="validate"
                 data-visual-page-focus-last

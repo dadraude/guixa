@@ -110,6 +110,17 @@ describe('return lines', () => {
         );
     });
 
+    it('uses the basket-specific empty copy when composed on a basket', () => {
+        const wrapper = returnLines({
+            lines: [],
+            emptyMessage: 'No basket returns yet.',
+        });
+
+        expect(wrapper.get('[data-test="no-return-lines"]').text()).toBe(
+            'No basket returns yet.',
+        );
+    });
+
     it('shows the validation errors next to the fields', () => {
         const wrapper = returnLines({
             errors: {

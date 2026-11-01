@@ -6,10 +6,12 @@ use App\Models\User;
 use Guixa\Catalog\Application\UpdateStockProduct;
 use Guixa\Catalog\Domain\Error\ProductHasStockUse;
 use Guixa\Catalog\Infrastructure\Persistence\ProducerModel;
+use Guixa\Sales\Application\AddReturnToBasket;
 use Guixa\Sales\Application\AddStockToBasket;
 use Guixa\Sales\Application\CancelDraftBasket;
 use Guixa\Sales\Application\CreateStockBasket;
 use Guixa\Sales\Application\MarkBasketCollected;
+use Guixa\Sales\Application\RemoveReturnFromBasket;
 use Guixa\Sales\Application\RemoveStockFromBasket;
 use Guixa\Sales\Application\ValidateBasket;
 use Guixa\Sales\Application\WalletLedger;
@@ -17,14 +19,18 @@ use Guixa\Sales\Domain\Basket;
 use Guixa\Sales\Domain\BasketLine;
 use Guixa\Sales\Domain\Error\BasketAlreadyValidated;
 use Guixa\Sales\Domain\Error\BasketNotEditable;
+use Guixa\Sales\Domain\Error\InvalidReturnQuantity;
 use Guixa\Sales\Domain\Error\StockProductUnavailable;
 use Guixa\Sales\Infrastructure\Persistence\BasketLineModel;
 use Guixa\Sales\Infrastructure\Persistence\EloquentBasketRepository;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Money;
 use Guixa\Shared\Domain\Quantity;
+use Guixa\Stock\Application\CreateReturnItem;
+use Guixa\Stock\Application\DeactivateReturnItem;
 use Guixa\Stock\Application\RecordStockAdjustment;
 use Guixa\Stock\Application\RecordStockEntry;
+use Guixa\Stock\Application\UpdateReturnItem;
 use Guixa\Stock\Domain\Error\NotEnoughStock;
 use Guixa\Stock\Domain\StockMovement;
 use Guixa\Stock\Domain\StockMovementRepository;
@@ -58,6 +64,173 @@ final class BasketPersistenceTest extends TestCase
         app(RecordStockEntry::class)($actor, $productId, $quantity, null);
 
         return [$actor, $householdId, $productId];
+    }
+
+    #[Test]
+    public function a_return_only_basket_reloads_its_snapshot_and_records_one_credit(): void
+    {
+        [$actor, $householdId] = $this->fixture();
+        $returnItemId = app(CreateReturnItem::class)($actor, 'Glass jar', 50);
+        $id = app(CreateStockBasket::class)($actor, $householdId);
+
+        app(AddReturnToBasket::class)($actor, $id, $returnItemId, '1');
+        $draft = app(EloquentBasketRepository::class)->get($id);
+        $this->assertSame('return', $draft->activeLines()[0]->kind);
+        $this->assertSame($returnItemId, $draft->activeLines()[0]->returnItemId);
+        $this->assertSame(-50, $draft->totalCents());
+
+        app(ValidateBasket::class)($actor, $id);
+        $validated = app(EloquentBasketRepository::class)->get($id);
+        $this->assertSame(-50, $validated->validatedTotalCents);
+        $this->assertSame(1, DB::table('wallet_movements')->where('basket_id', $id)->count());
+        $this->assertSame('credit', DB::table('wallet_movements')->where('basket_id', $id)->value('type'));
+        $this->assertSame(50, (int) DB::table('wallet_movements')->where('basket_id', $id)->value('amount_cents'));
+        $this->assertSame(0, DB::table('stock_movements')->where('basket_id', $id)->count());
+    }
+
+    #[Test]
+    public function mixed_goods_and_four_returns_charge_exactly_eight_euros_once(): void
+    {
+        [$actor, $householdId, $productId] = $this->fixture(priceCents: 1000);
+        $returnItemId = app(CreateReturnItem::class)($actor, 'Glass jar', 50);
+        $id = app(CreateStockBasket::class)($actor, $householdId);
+        app(AddStockToBasket::class)($actor, $id, $productId, '1');
+        app(AddReturnToBasket::class)($actor, $id, $returnItemId, '4');
+
+        app(ValidateBasket::class)($actor, $id);
+        $this->assertSame(800, app(EloquentBasketRepository::class)->get($id)->validatedTotalCents);
+        $this->assertSame(-800, (int) DB::table('wallet_movements')->where('basket_id', $id)->value('amount_cents'));
+        $this->assertSame(1, DB::table('wallet_movements')->where('basket_id', $id)->count());
+        $this->assertSame(1, DB::table('stock_movements')->where('basket_id', $id)->count());
+        $this->assertThrows(fn () => app(ValidateBasket::class)($actor, $id), BasketAlreadyValidated::class);
+        $this->assertSame(1, DB::table('wallet_movements')->where('basket_id', $id)->count());
+    }
+
+    #[Test]
+    public function mixed_real_contents_can_validate_at_zero_and_collect_without_a_wallet_movement(): void
+    {
+        [$actor, $householdId, $productId] = $this->fixture(priceCents: 50);
+        $returnItemId = app(CreateReturnItem::class)($actor, 'Glass jar', 50);
+        $id = app(CreateStockBasket::class)($actor, $householdId);
+        app(AddStockToBasket::class)($actor, $id, $productId, '1');
+        app(AddReturnToBasket::class)($actor, $id, $returnItemId, '1');
+
+        app(ValidateBasket::class)($actor, $id);
+        app(MarkBasketCollected::class)($actor, $id);
+        $this->assertSame('collected', app(EloquentBasketRepository::class)->get($id)->state);
+        $this->assertSame(0, app(EloquentBasketRepository::class)->get($id)->validatedTotalCents);
+        $this->assertSame(0, DB::table('wallet_movements')->where('basket_id', $id)->count());
+        $this->assertSame(1, DB::table('stock_movements')->where('basket_id', $id)->count());
+    }
+
+    #[Test]
+    public function a_removed_return_reloads_as_history_and_readding_takes_the_new_catalogue_snapshot(): void
+    {
+        [$actor, $householdId] = $this->fixture();
+        $returnItemId = app(CreateReturnItem::class)($actor, 'Glass jar', 50);
+        $id = app(CreateStockBasket::class)($actor, $householdId);
+        app(AddReturnToBasket::class)($actor, $id, $returnItemId, '1');
+        app(UpdateReturnItem::class)($actor, $returnItemId, 'Changed jar', 75);
+        app(RemoveReturnFromBasket::class)($actor, $id, $returnItemId);
+        app(AddReturnToBasket::class)($actor, $id, $returnItemId, '1');
+
+        $reloaded = app(EloquentBasketRepository::class)->get($id);
+        $this->assertCount(2, $reloaded->lines);
+        $this->assertSame('Glass jar', $reloaded->lines[0]->name);
+        $this->assertNotNull($reloaded->lines[0]->removedAt);
+        $this->assertSame('Changed jar', $reloaded->activeLines()[0]->name);
+        $this->assertSame(-75, $reloaded->totalCents());
+    }
+
+    #[Test]
+    public function an_inactive_return_can_be_increased_and_readded_with_the_correct_snapshots_and_credit(): void
+    {
+        [$actor, $householdId] = $this->fixture();
+        $item = app(CreateReturnItem::class)($actor, 'Glass jar', 50);
+        $id = app(CreateStockBasket::class)($actor, $householdId);
+        app(AddReturnToBasket::class)($actor, $id, $item, '1');
+        app(UpdateReturnItem::class)($actor, $item, 'Changed jar', 75);
+        app(DeactivateReturnItem::class)($actor, $item);
+        app(AddReturnToBasket::class)($actor, $id, $item, '1');
+
+        $draft = app(EloquentBasketRepository::class)->get($id);
+        $this->assertSame('Glass jar', $draft->activeLines()[0]->name);
+        $this->assertSame(50, $draft->activeLines()[0]->priceCents);
+        $this->assertSame('2.000', $draft->activeLines()[0]->quantity->toString());
+
+        app(RemoveReturnFromBasket::class)($actor, $id, $item);
+        app(AddReturnToBasket::class)($actor, $id, $item, '1');
+        $reloaded = app(EloquentBasketRepository::class)->get($id);
+        $this->assertCount(2, $reloaded->lines);
+        $this->assertNotNull($reloaded->lines[0]->removedAt);
+        $this->assertSame('Changed jar', $reloaded->activeLines()[0]->name);
+        $this->assertSame(75, $reloaded->activeLines()[0]->priceCents);
+        app(ValidateBasket::class)($actor, $id);
+        $this->assertSame(-75, app(EloquentBasketRepository::class)->get($id)->validatedTotalCents);
+        $this->assertSame(1, DB::table('wallet_movements')->where('basket_id', $id)->count());
+        $this->assertSame('credit', DB::table('wallet_movements')->where('basket_id', $id)->value('type'));
+        $this->assertSame(75, (int) DB::table('wallet_movements')->where('basket_id', $id)->value('amount_cents'));
+    }
+
+    #[Test]
+    public function an_over_limit_return_increment_preserves_the_persisted_draft_and_ledgers(): void
+    {
+        [$actor, $householdId] = $this->fixture();
+        $item = app(CreateReturnItem::class)($actor, 'Glass jar', 50);
+        $id = app(CreateStockBasket::class)($actor, $householdId);
+        $this->assertThrows(fn () => app(AddReturnToBasket::class)($actor, $id, $item, '10000000'), InvalidReturnQuantity::class);
+        $this->assertSame(0, DB::table('basket_lines')->where('basket_id', $id)->count());
+
+        app(AddReturnToBasket::class)($actor, $id, $item, '9999999');
+        $before = app(EloquentBasketRepository::class)->get($id)->activeLines()[0];
+        $this->assertThrows(fn () => app(AddReturnToBasket::class)($actor, $id, $item, '1'), InvalidReturnQuantity::class);
+        $after = app(EloquentBasketRepository::class)->get($id);
+        $this->assertSame('draft', $after->state);
+        $this->assertCount(1, $after->lines);
+        $this->assertSame($before->quantity->toString(), $after->activeLines()[0]->quantity->toString());
+        $this->assertSame($before->name, $after->activeLines()[0]->name);
+        $this->assertSame($before->priceCents, $after->activeLines()[0]->priceCents);
+        $this->assertSame(0, DB::table('wallet_movements')->where('basket_id', $id)->count());
+        $this->assertSame(0, DB::table('stock_movements')->where('basket_id', $id)->count());
+    }
+
+    #[Test]
+    public function mixed_validation_rolls_back_stock_credit_and_state_after_wallet_failure_then_retries_once(): void
+    {
+        [$actor, $householdId, $productId] = $this->fixture(priceCents: 25);
+        $returnItemId = app(CreateReturnItem::class)($actor, 'Glass jar', 50);
+        $id = app(CreateStockBasket::class)($actor, $householdId);
+        app(AddStockToBasket::class)($actor, $id, $productId, '1');
+        app(AddReturnToBasket::class)($actor, $id, $returnItemId, '1');
+        $real = app(WalletLedger::class);
+        app()->instance(WalletLedger::class, new class($real) implements WalletLedger
+        {
+            public function __construct(private readonly WalletLedger $inner) {}
+
+            public function charge(Actor $actor, string $householdId, string $basketId, int $totalCents): void
+            {
+                $this->inner->charge($actor, $householdId, $basketId, $totalCents);
+                throw new \RuntimeException('Injected wallet failure');
+            }
+
+            public function balance(Actor $actor, string $householdId): int
+            {
+                return $this->inner->balance($actor, $householdId);
+            }
+        });
+
+        $this->assertThrows(fn () => app(ValidateBasket::class)($actor, $id), \RuntimeException::class);
+        $this->assertSame('draft', DB::table('baskets')->where('id', $id)->value('state'));
+        $this->assertSame(0, DB::table('stock_movements')->where('basket_id', $id)->count());
+        $this->assertSame(0, DB::table('wallet_movements')->where('basket_id', $id)->count());
+
+        app()->instance(WalletLedger::class, $real);
+        app(ValidateBasket::class)($actor, $id);
+        $this->assertSame(-25, app(EloquentBasketRepository::class)->get($id)->validatedTotalCents);
+        $this->assertSame(1, DB::table('stock_movements')->where('basket_id', $id)->count());
+        $this->assertSame(1, DB::table('wallet_movements')->where('basket_id', $id)->count());
+        $this->assertThrows(fn () => app(ValidateBasket::class)($actor, $id), BasketAlreadyValidated::class);
+        $this->assertSame(1, DB::table('wallet_movements')->where('basket_id', $id)->count());
     }
 
     #[Test]

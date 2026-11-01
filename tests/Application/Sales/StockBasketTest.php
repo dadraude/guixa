@@ -1,5 +1,6 @@
 <?php
 
+use Guixa\Sales\Application\AddReturnToBasket;
 use Guixa\Sales\Application\AddStockToBasket;
 use Guixa\Sales\Application\BasketData;
 use Guixa\Sales\Application\CancelDraftBasket;
@@ -7,6 +8,7 @@ use Guixa\Sales\Application\CreateStockBasket;
 use Guixa\Sales\Application\GetBasketBalance;
 use Guixa\Sales\Application\HasProductHistory;
 use Guixa\Sales\Application\MarkBasketCollected;
+use Guixa\Sales\Application\RemoveReturnFromBasket;
 use Guixa\Sales\Application\RemoveStockFromBasket;
 use Guixa\Sales\Application\StockSeller;
 use Guixa\Sales\Application\ValidateBasket;
@@ -14,15 +16,20 @@ use Guixa\Sales\Application\WalletLedger;
 use Guixa\Sales\Domain\Basket;
 use Guixa\Sales\Domain\BasketRepository;
 use Guixa\Sales\Domain\Error\BasketAlreadyValidated;
+use Guixa\Sales\Domain\Error\BasketHasNoContents;
 use Guixa\Sales\Domain\Error\BasketNotEditable;
 use Guixa\Sales\Domain\Error\HouseholdUnavailable;
 use Guixa\Sales\Domain\Error\InvalidBasketQuantity;
+use Guixa\Sales\Domain\Error\InvalidReturnQuantity;
 use Guixa\Sales\Domain\Error\NotEnoughBasketStock;
+use Guixa\Sales\Domain\Error\ReturnItemUnavailable;
 use Guixa\Sales\Domain\Error\StockProductUnavailable;
 use Guixa\Sales\Domain\HouseholdDirectory;
+use Guixa\Sales\Domain\ReturnItems;
 use Guixa\Sales\Domain\StockProducts;
 use Guixa\Sales\Domain\StockQuantities;
 use Guixa\Sales\Domain\ValueObject\HouseholdSnapshot;
+use Guixa\Sales\Domain\ValueObject\ReturnItemSnapshot;
 use Guixa\Sales\Domain\ValueObject\StockProductSnapshot;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Role;
@@ -132,8 +139,22 @@ beforeEach(function () {
             return 500;
         }
     };
+    $this->returnItems = new class implements ReturnItems
+    {
+        public string $name = 'Glass jar';
+
+        public int $amountCents = 50;
+
+        public bool $active = true;
+
+        public function get(string $id): ?ReturnItemSnapshot
+        {
+            return $id === 'jar' ? new ReturnItemSnapshot('jar', $this->name, $this->amountCents, $this->active) : null;
+        }
+    };
     $this->create = new CreateStockBasket($this->baskets, $this->households, $this->clock);
     $this->add = new AddStockToBasket($this->baskets, $this->products, $this->quantities, $this->transactions, $this->clock);
+    $this->addReturn = new AddReturnToBasket($this->baskets, $this->returnItems, $this->transactions, $this->clock);
     $this->validate = new ValidateBasket($this->baskets, $this->products, $this->stock, $this->wallet, $this->transactions, $this->clock);
     $this->collect = new MarkBasketCollected($this->baskets, $this->transactions, $this->clock);
     $this->remove = new RemoveStockFromBasket($this->baskets, $this->transactions, $this->clock);
@@ -173,6 +194,97 @@ it('validates real zero-price goods without asking Wallet to create a movement (
     expect($this->baskets->get($id)->validatedTotalCents)->toBe(0)
         ->and($this->stock->sales)->toHaveCount(1)
         ->and($this->wallet->charges)->toBe([]);
+});
+
+it('credits a return-only basket through the public validator (S88, R20a, R22)', function () {
+    $id = ($this->create)($this->actor, 'household');
+    ($this->addReturn)($this->actor, $id, 'jar', '1');
+
+    ($this->validate)($this->actor, $id);
+
+    expect($this->baskets->get($id)->validatedTotalCents)->toBe(-50)
+        ->and($this->stock->sales)->toBe([])
+        ->and($this->wallet->charges)->toBe([['manager', 'household', $id, -50]]);
+});
+
+it('charges exactly eight euros for ten euros of goods and four jar returns (S41, R20a, R22)', function () {
+    $this->products->priceCents = 1000;
+    $id = ($this->create)($this->actor, 'household');
+    ($this->add)($this->actor, $id, 'oil', '1');
+    ($this->addReturn)($this->actor, $id, 'jar', '4');
+    ($this->validate)($this->actor, $id);
+
+    expect($this->baskets->get($id)->validatedTotalCents)->toBe(800)
+        ->and($this->stock->sales)->toHaveCount(1)
+        ->and($this->wallet->charges)->toBe([['manager', 'household', $id, 800]]);
+});
+
+it('validates real-content net-zero goods without a Wallet movement (S88, R22)', function () {
+    $this->products->priceCents = 50;
+    $id = ($this->create)($this->actor, 'household');
+    ($this->add)($this->actor, $id, 'oil', '1');
+    ($this->addReturn)($this->actor, $id, 'jar', '1');
+    ($this->validate)($this->actor, $id);
+    ($this->collect)($this->actor, $id);
+
+    expect($this->baskets->get($id)->state)->toBe('collected')
+        ->and($this->baskets->get($id)->validatedTotalCents)->toBe(0)
+        ->and($this->wallet->charges)->toBe([]);
+});
+
+it('rejects empty validation but cancels an empty draft without money or stock effects (S88, R24a)', function () {
+    $id = ($this->create)($this->actor, 'household');
+    expect(fn () => ($this->validate)($this->actor, $id))->toThrow(BasketHasNoContents::class);
+    ($this->cancel)($this->actor, $id);
+    expect($this->baskets->get($id)->state)->toBe('cancelled')
+        ->and($this->wallet->charges)->toBe([])
+        ->and($this->stock->sales)->toBe([]);
+});
+
+it('allows a known inactive return item but requires a positive whole quantity (R20a)', function () {
+    $id = ($this->create)($this->actor, 'household');
+    expect(fn () => ($this->addReturn)($this->actor, $id, 'jar', '0'))->toThrow(InvalidReturnQuantity::class);
+    expect(fn () => ($this->addReturn)($this->actor, $id, 'jar', '0.5'))->toThrow(InvalidReturnQuantity::class);
+    expect(fn () => ($this->addReturn)($this->actor, $id, 'jar', '-1'))->toThrow(InvalidReturnQuantity::class);
+    expect(fn () => ($this->addReturn)($this->actor, $id, 'unknown', '1'))->toThrow(ReturnItemUnavailable::class);
+    $this->returnItems->active = false;
+    ($this->addReturn)($this->actor, $id, 'jar', '1');
+    expect($this->baskets->get($id)->activeLines()[0]->quantity->toString())->toBe('1.000');
+});
+
+it('keeps a return snapshot on increase and archives it before re-add (R20a, R24a)', function () {
+    $id = ($this->create)($this->actor, 'household');
+    ($this->addReturn)($this->actor, $id, 'jar', '1');
+    $this->returnItems->name = 'Changed jar';
+    $this->returnItems->amountCents = 75;
+    $this->returnItems->active = false;
+    ($this->addReturn)($this->actor, $id, 'jar', '1');
+    expect($this->baskets->get($id)->activeLines()[0]->name)->toBe('Glass jar')
+        ->and($this->baskets->get($id)->activeLines()[0]->priceCents)->toBe(50)
+        ->and($this->baskets->get($id)->totalCents())->toBe(-100);
+
+    $remove = new RemoveReturnFromBasket($this->baskets, $this->transactions, $this->clock);
+    $remove($this->actor, $id, 'jar');
+    ($this->addReturn)($this->actor, $id, 'jar', '1');
+    $basket = $this->baskets->get($id);
+    expect($basket->lines)->toHaveCount(2)
+        ->and($basket->lines[0]->removedAt)->not->toBeNull()
+        ->and($basket->activeLines()[0]->name)->toBe('Changed jar')
+        ->and($basket->totalCents())->toBe(-75);
+});
+
+it('rejects initial and combined return quantities above the representable bound without changing the draft (R20a)', function () {
+    $id = ($this->create)($this->actor, 'household');
+    expect(fn () => ($this->addReturn)($this->actor, $id, 'jar', '10000000'))->toThrow(InvalidReturnQuantity::class);
+    expect($this->baskets->get($id)->lines)->toBe([]);
+
+    ($this->addReturn)($this->actor, $id, 'jar', '9999999');
+    $before = $this->baskets->get($id);
+    expect(fn () => ($this->addReturn)($this->actor, $id, 'jar', '1'))->toThrow(InvalidReturnQuantity::class);
+    expect($this->baskets->get($id))->toBe($before)
+        ->and($this->baskets->get($id)->activeLines()[0]->quantity->toString())->toBe('9999999.000')
+        ->and($this->wallet->charges)->toBe([])
+        ->and($this->stock->sales)->toBe([]);
 });
 
 it('requires a Manager and an active household for a new independent draft (R19, R19a)', function () {

@@ -4,6 +4,7 @@ use App\Http\Controllers\AcceptInvitationController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Finance\BasketCollectionController;
 use App\Http\Controllers\Finance\BasketController;
+use App\Http\Controllers\Finance\BasketReturnController;
 use App\Http\Controllers\Finance\BasketStockController;
 use App\Http\Controllers\Finance\BasketValidationController;
 use App\Http\Controllers\Finance\HouseholdWalletController as FinanceHouseholdWalletController;
@@ -63,6 +64,8 @@ Route::middleware(['auth', 'verified', 'role:manager,finance'])->prefix('finance
     Route::post('/', [BasketController::class, 'store'])->name('store');
     Route::get('{basket}', [BasketController::class, 'show'])->name('show');
     Route::post('{basket}/stock-lines', [BasketStockController::class, 'store'])->name('stock-lines.store');
+    Route::post('{basket}/return-lines', [BasketReturnController::class, 'store'])->name('return-lines.store');
+    Route::delete('{basket}/return-lines/{returnItem}', [BasketReturnController::class, 'destroy'])->name('return-lines.destroy');
     Route::delete('{basket}/stock-lines/{stockProduct}', [BasketStockController::class, 'destroy'])->name('stock-lines.destroy');
     Route::post('{basket}/validation', [BasketValidationController::class, 'store'])->name('validate');
     Route::put('{basket}/collection', [BasketCollectionController::class, 'update'])->name('collect');

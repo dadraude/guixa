@@ -65,7 +65,7 @@ return [
             ],
         ],
         'Sales' => [
-            'owns' => 'Read-only stock offers and independent stock basket drafts, validation, history and collection.',
+            'owns' => 'Read-only stock offers and independent stock/return basket drafts, validation, history and collection.',
             'dependencies' => ['Catalog', 'Membership', 'Shared', 'Stock', 'Wallet'],
             'exports' => [
                 'Application\HasProductHistory' => ['Catalog'],
@@ -77,8 +77,8 @@ return [
             'exports' => [
                 'Application\CheckProductUsage' => ['Catalog'],
                 'Application\GetAvailableQuantities' => ['Catalog', 'Sales'],
-                'Application\GetReturnItem' => ['Ordering'],
-                'Application\ReturnItemData' => ['Ordering'],
+                'Application\GetReturnItem' => ['Ordering', 'Sales'],
+                'Application\ReturnItemData' => ['Ordering', 'Sales'],
                 'Application\GetStockOffer' => ['Ordering'],
                 'Application\LockStockOffer' => ['Ordering'],
                 'Application\StockLevelData' => ['Ordering'],

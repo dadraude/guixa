@@ -6,6 +6,9 @@ use Guixa\Sales\Application\GetBasket;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Application\ActorResolver;
 use Guixa\Shared\Domain\Role;
+use Guixa\Stock\Application\CreateReturnItem;
+use Guixa\Stock\Application\DeactivateReturnItem;
+use Guixa\Stock\Application\UpdateReturnItem;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Inertia\Testing\AssertableInertia as Assert;
@@ -56,6 +59,66 @@ it('lets Finance-only create, add, validate and collect an independent basket wi
         ->component('Wallet/Statement')->where('canManageReceipts', false)->where('wallet.movements.0.basketId', $basket));
     expect(DB::table('stock_movements')->where('basket_id', $basket)->value('recorded_by'))->toBe($finance->id)
         ->and(DB::table('wallet_movements')->where('basket_id', $basket)->value('recorded_by'))->toBe($finance->id);
+});
+
+it('lets Finance-only add, remove and validate return contents without catalogue administration (R20a, S88)', function () {
+    $manager = accountWith(Role::Manager);
+    $finance = accountWith(Role::Finance);
+    $household = (string) Str::uuid7();
+    DB::table('households')->insert(['id' => $household, 'name' => 'Household H', 'created_at' => now(), 'updated_at' => now()]);
+    $item = app(CreateReturnItem::class)(Actor::manager($manager->id), 'Glass jar', 50);
+
+    $this->actingAs($finance)->post('/finance/baskets', ['household_id' => $household])->assertRedirect();
+    $basket = DB::table('baskets')->value('id');
+    $this->get("/finance/baskets/{$basket}")->assertInertia(fn (Assert $page) => $page->where('returnItems.0.id', $item));
+    $this->post("/finance/baskets/{$basket}/return-lines", ['return_item_id' => $item, 'return_quantity' => '1'])->assertRedirect();
+    app(UpdateReturnItem::class)(Actor::manager($manager->id), $item, 'Changed jar', 75);
+    app(DeactivateReturnItem::class)(Actor::manager($manager->id), $item);
+    $this->get("/finance/baskets/{$basket}")->assertInertia(fn (Assert $page) => $page
+        ->where('returnItems.0.id', $item)->where('returnItems.0.active', false));
+    $this->post("/finance/baskets/{$basket}/return-lines", ['return_item_id' => $item, 'return_quantity' => '1'])->assertRedirect();
+    $this->get("/finance/baskets/{$basket}")->assertInertia(fn (Assert $page) => $page
+        ->where('basket.returnLines.0.name', 'Glass jar')->where('basket.returnLines.0.amountCents', 50)
+        ->where('basket.returnLines.0.quantity', 2));
+    $this->delete("/finance/baskets/{$basket}/return-lines/{$item}")->assertRedirect();
+    $this->get("/finance/baskets/{$basket}")->assertInertia(fn (Assert $page) => $page->has('basket.returnLines', 0));
+    $this->post("/finance/baskets/{$basket}/return-lines", ['return_item_id' => $item, 'return_quantity' => '2'])->assertRedirect();
+    $this->post("/finance/baskets/{$basket}/validation")->assertRedirect();
+    $this->get("/finance/baskets/{$basket}")->assertInertia(fn (Assert $page) => $page
+        ->where('basket.totalCents', -150)->where('basket.returnLines.0.quantity', 2)
+        ->where('basket.returnLines.0.name', 'Changed jar')->where('basket.returnLines.0.amountCents', 75));
+    expect(DB::table('wallet_movements')->where('basket_id', $basket)->value('recorded_by'))->toBe($finance->id)
+        ->and(DB::table('wallet_movements')->where('basket_id', $basket)->value('type'))->toBe('credit')
+        ->and((int) DB::table('wallet_movements')->where('basket_id', $basket)->value('amount_cents'))->toBe(150)
+        ->and(DB::table('basket_lines')->where('basket_id', $basket)->count())->toBe(2);
+    $this->get('/manage/return-items')->assertForbidden();
+});
+
+it('returns a domain error for an over-limit return request without changing the Finance draft or ledgers (R20a)', function () {
+    $manager = accountWith(Role::Manager);
+    $finance = accountWith(Role::Finance);
+    $household = (string) Str::uuid7();
+    DB::table('households')->insert(['id' => $household, 'name' => 'Household H', 'created_at' => now(), 'updated_at' => now()]);
+    $item = app(CreateReturnItem::class)(Actor::manager($manager->id), 'Glass jar', 50);
+    $basket = app(CreateStockBasket::class)(Actor::manager($manager->id), $household);
+
+    $this->actingAs($finance)->post("/finance/baskets/{$basket}/return-lines", [
+        'return_item_id' => $item, 'return_quantity' => '10000000',
+    ])->assertSessionHasErrors('domain');
+    expect(DB::table('basket_lines')->where('basket_id', $basket)->count())->toBe(0);
+
+    $this->post("/finance/baskets/{$basket}/return-lines", [
+        'return_item_id' => $item, 'return_quantity' => '9999999',
+    ])->assertRedirect();
+    $this->post("/finance/baskets/{$basket}/return-lines", [
+        'return_item_id' => $item, 'return_quantity' => '1',
+    ])->assertSessionHasErrors('domain');
+    $this->get("/finance/baskets/{$basket}")->assertInertia(fn (Assert $page) => $page
+        ->where('basket.state', 'draft')->where('basket.returnLines.0.name', 'Glass jar')
+        ->where('basket.returnLines.0.amountCents', 50)->where('basket.returnLines.0.quantity', 9999999));
+    expect(DB::table('basket_lines')->where('basket_id', $basket)->count())->toBe(1)
+        ->and(DB::table('wallet_movements')->where('basket_id', $basket)->count())->toBe(0)
+        ->and(DB::table('stock_movements')->where('basket_id', $basket)->count())->toBe(0);
 });
 
 it('keeps Finance out of account, catalogue, cycle, reception, stock administration and receipt mutations (R19a, R36c, S84)', function () {

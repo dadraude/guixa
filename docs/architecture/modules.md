@@ -20,7 +20,7 @@ modules. `Platform` below names framework persistence ownership, not a `src/Plat
 | Catalog    | Producers; all product identity, metadata, classification and administration                                  | Membership, Ordering, Sales, Stock, Shared |
 | Membership | Accounts, households, roles, invitations and household lifecycle                                              | Catalog, Ordering, Wallet, Shared          |
 | Ordering   | Weekly demand, cycles, cutoffs, producer orders, reception, allocation, and the current pickup/sale lifecycle | Catalog, Membership, Stock, Wallet, Shared |
-| Sales      | Stock offers and independent basket drafts, validation, history and collection                                | Catalog, Membership, Stock, Wallet, Shared |
+| Sales      | Stock offers and independent stock/return basket drafts, validation, history and collection                   | Catalog, Membership, Stock, Wallet, Shared |
 | Stock      | Return items, append-only stock movements and availability                                                    | Catalog, Shared                            |
 | Wallet     | Append-only household money movements, balances, top-ups and corrections                                      | Shared                                     |
 | Shared     | Money, Quantity, Clock, Actor and transaction contracts                                                       | None                                       |
@@ -56,6 +56,7 @@ else in a module is private to that module for integration purposes, even when P
 | Stock → Catalog          | CheckProductUsage, GetAvailableQuantities                                                                              | —                                            |
 | Stock → Sales            | GetAvailableQuantities, SellBasketStock                                                                                | —                                            |
 | Stock → Ordering         | GetReturnItem, GetStockOffer, LockStockOffer, SellStock                                                                | ReturnItemData, StockLevelData               |
+| Stock → Sales            | GetReturnItem                                                                                                          | ReturnItemData                               |
 | Wallet → Membership      | ReadHouseholdBalance                                                                                                   | —                                            |
 | Wallet → Ordering        | ChargeForPickup, RecordCorrection, RecordTopUp                                                                         | —                                            |
 | Wallet → Sales           | ChargeForBasket, GetBalance                                                                                            | —                                            |
