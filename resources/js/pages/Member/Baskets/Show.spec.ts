@@ -2,7 +2,7 @@
 import { router } from '@inertiajs/vue3';
 import { mount } from '@vue/test-utils';
 import { describe, expect, it, vi } from 'vite-plus/test';
-import { createSSRApp, defineComponent, h, nextTick } from 'vue';
+import { createSSRApp, nextTick } from 'vue';
 import { renderToString } from 'vue/server-renderer';
 import { installTranslations } from '@/lib/i18n';
 import Show from './Show.vue';

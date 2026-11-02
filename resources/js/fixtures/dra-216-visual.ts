@@ -99,7 +99,9 @@ initialPage.textContent = JSON.stringify(page);
 document.body.append(initialPage);
 const requests: string[] = [];
 router.put = (url, _data, options) => {
-    requests.push(String(url));
+    requests.push(
+        typeof url === 'string' ? url : url instanceof URL ? url.href : url.url,
+    );
     document.body.dataset.visualRequests = requests.join(',');
     options?.onStart?.({} as never);
 };
