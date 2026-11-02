@@ -22,13 +22,23 @@ final class InMemoryBasketRepository implements BasketRepository
     public function save(Basket $basket): void
     {
         $prior = $this->baskets[$basket->id] ?? null;
-        if ($prior !== null && in_array($prior->state, ['validated', 'collected', 'cancelled'], true)
-            && $prior->state !== 'validated') {
+        if ($prior !== null && in_array($prior->state, ['collected', 'cancelled'], true)
+            && ($prior->state !== $basket->state || $prior->lines !== $basket->lines
+                || $prior->validatedTotalCents !== $basket->validatedTotalCents)) {
             throw BasketNotEditable::create();
         }
-        if ($prior?->state === 'validated' && ($basket->state !== 'collected' || $prior->lines !== $basket->lines
+        if ($prior?->state === 'validated' && (! in_array($basket->state, ['validated', 'collected'], true) || $prior->lines !== $basket->lines
             || $prior->validatedTotalCents !== $basket->validatedTotalCents)) {
             throw BasketNotEditable::create();
+        }
+        if ($prior !== null && count($basket->adjustments) < count($prior->adjustments)) {
+            throw BasketNotEditable::create();
+        }
+        foreach ($prior?->adjustments ?? [] as $index => $adjustment) {
+            $candidate = $basket->adjustments[$index];
+            if (! $adjustment->matches($candidate) || $adjustment->occurredAt != $candidate->occurredAt) {
+                throw BasketNotEditable::create();
+            }
         }
         $active = [];
         foreach ($basket->activeLines() as $line) {

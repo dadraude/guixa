@@ -40,7 +40,7 @@ final class EloquentBasketRepositoryContractTest extends TestCase
         return [new EloquentBasketRepository, $manager, $household, $product, $returnA, $returnB];
     }
 
-    public function test_list_loads_all_basket_lines_in_two_queries_without_losing_snapshots(): void
+    public function test_list_loads_all_basket_lines_and_adjustments_in_three_queries_without_losing_snapshots(): void
     {
         [$repository, $manager, $household, $product] = $this->basketWorld();
         $created = new \DateTimeImmutable('2026-10-30T10:00:00+00:00');
@@ -72,7 +72,7 @@ final class EloquentBasketRepositoryContractTest extends TestCase
             DB::flushQueryLog();
         }
 
-        $this->assertSame(2, $queryCount);
+        $this->assertSame(3, $queryCount);
         $this->assertSame(array_reverse($ids), array_map(fn (Basket $basket) => $basket->id, $listed));
         $this->assertSame([], $listed[0]->lines);
         $this->assertSame('1.125', $listed[1]->lines[0]->quantity->toString());

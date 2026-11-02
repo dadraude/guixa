@@ -2,6 +2,8 @@
 
 /** User-facing domain errors resolved by the HTTP adapter. */
 return [
+    'BasketCorrectionIdentityConflict' => 'Aquest identificador ja s’ha utilitzat per a una altra correcció de la cistella.',
+    'InvalidBasketCorrection' => 'La correcció requereix una cistella validada, un import diferent de zero, un motiu i un identificador.',
     'AccountDeactivated' => 'Aquest compte està desactivat.',
     'AccountNotFound' => 'No s’ha trobat aquest compte.',
     'AdjustmentNoteRequired' => 'Indica per què ajustes l’estoc.',

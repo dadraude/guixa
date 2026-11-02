@@ -4,6 +4,7 @@ namespace Tests\Support\Contracts;
 
 use DateTimeImmutable;
 use Guixa\Sales\Domain\Basket;
+use Guixa\Sales\Domain\BasketAdjustment;
 use Guixa\Sales\Domain\BasketLine;
 use Guixa\Sales\Domain\BasketRepository;
 use Guixa\Sales\Domain\Error\BasketNotEditable;
@@ -13,6 +14,45 @@ use Throwable;
 
 trait BasketRepositoryContract
 {
+    #[Test]
+    public function it_appends_ordered_amount_adjustments_without_rewriting_prior_history(): void
+    {
+        [$repository, $manager, $household, $product] = $this->basketWorld();
+        $basket = $this->basket($repository, $manager, $household, []);
+        $basket = $basket->withLines([$this->line($repository, $basket->id, $product)]);
+        $repository->save($basket);
+        $validated = $basket->validated($manager, new DateTimeImmutable('2026-10-30T11:00:00+00:00'));
+        $repository->save($validated);
+        $first = new BasketAdjustment($repository->nextId(), $basket->id, 200, 'Price correction', $manager,
+            new DateTimeImmutable('2026-10-30T12:00:00+00:00'));
+        $second = new BasketAdjustment($repository->nextId(), $basket->id, -50, 'Second correction', $manager,
+            new DateTimeImmutable('2026-10-30T13:00:00+00:00'));
+        $repository->save($validated->withAdjustment($first));
+        $repository->save($repository->get($basket->id)->withAdjustment($second));
+
+        $reloaded = $repository->get($basket->id);
+        $this->assertSame([$first->id, $second->id], array_map(fn (BasketAdjustment $row) => $row->id, $reloaded->adjustments));
+        $this->assertSame(1050, $reloaded->effectiveTotalCents());
+        $collectedAt = new DateTimeImmutable('2026-10-30T14:00:00+00:00');
+        $repository->save($reloaded->collected($manager, $collectedAt));
+        $collected = $repository->get($basket->id);
+        $this->assertSame('collected', $collected->state);
+        $this->assertSame($manager, $collected->collectedBy);
+        $this->assertEquals($collectedAt, $collected->collectedAt);
+        $this->assertSame(1200, $collected->validatedTotalCents);
+        $this->assertSame(1050, $collected->effectiveTotalCents());
+        $this->assertEquals([$first, $second], $collected->adjustments);
+        $repository->save($collected->collected($manager, $collectedAt));
+        $this->assertEquals([$first, $second], $repository->get($basket->id)->adjustments);
+        try {
+            $repository->save($validated);
+            $this->fail('A saved correction cannot be removed.');
+        } catch (BasketNotEditable) {
+            // Expected append-only boundary.
+        }
+        $this->assertCount(2, $repository->get($basket->id)->adjustments);
+    }
+
     /** @return array{BasketRepository,string,string,string,string,string} repository, manager, household, product, return A, return B */
     abstract protected function basketWorld(): array;
 

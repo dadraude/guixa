@@ -21,9 +21,9 @@ final class RecordCorrection
     ) {}
 
     /** @return string the new movement's id */
-    public function __invoke(Actor $actor, string $householdId, int $amountCents, string $note, ?string $cycleId = null, ?string $sourceMovementId = null, ?string $correctionId = null): string
+    public function __invoke(Actor $actor, string $householdId, int $amountCents, string $note, ?string $cycleId = null, ?string $sourceMovementId = null, ?string $correctionId = null, ?string $basketId = null): string
     {
-        Gate::forUser($actor)->authorize($sourceMovementId === null && $cycleId !== null ? 'manage' : 'manage-wallet');
+        Gate::forUser($actor)->authorize($sourceMovementId === null && $cycleId !== null && $basketId === null ? 'manage' : 'manage-wallet');
 
         $movement = Movement::correction(
             $correctionId ?? $this->movements->nextId(),
@@ -34,10 +34,16 @@ final class RecordCorrection
             $this->clock->now(),
             $actor->accountId,
             $sourceMovementId,
+            $basketId,
         );
         // Only the Manager's existing weekly redistribution path may omit a receipt source.
-        if ($sourceMovementId === null && $cycleId === null) {
+        if (($sourceMovementId === null && $cycleId === null && $basketId === null)
+            || ($basketId !== null && ($cycleId !== null || $sourceMovementId !== null))) {
             throw InvalidCorrectionSource::create();
+        }
+
+        if ($basketId !== null && $correctionId === null) {
+            throw CorrectionIdentityRequired::create();
         }
 
         if ($sourceMovementId !== null) {

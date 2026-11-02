@@ -14,7 +14,7 @@ vi.mock('@inertiajs/vue3', () => ({
     }),
 }));
 
-const basket = {
+const basket: App.Http.BasketRow = {
     id: 'basket-own',
     householdId: 'household-own',
     householdName: 'La Figuera',
@@ -39,6 +39,8 @@ const basket = {
         },
     ],
     totalCents: 2300,
+    effectiveTotalCents: 2300,
+    adjustments: [],
     balanceCents: -500,
     projectedBalanceCents: -2800,
     validatedAt: null,
@@ -52,6 +54,28 @@ async function render(record = basket) {
 }
 
 describe('member basket detail', () => {
+    it('shows corrected amounts and reason without staff controls (R23, R31)', async () => {
+        const html = await render({
+            ...basket,
+            state: 'validated',
+            totalCents: 1200,
+            effectiveTotalCents: 1000,
+            adjustments: [
+                {
+                    id: 'correction-1',
+                    amountCents: 200,
+                    reason: 'Corrected price',
+                    recordedBy: 'manager',
+                    occurredAt: '2026-10-30T11:00:00+00:00',
+                },
+            ],
+        });
+        expect(html).toContain('data-test="original-basket-total"');
+        expect(html).toContain('data-test="effective-basket-total"');
+        expect(html).toContain('Corrected price');
+        expect(html).not.toContain('data-test="basket-correction-form"');
+    });
+
     it('shows actual line snapshots, exact money and a draft preparation label without mutations (R19a, R21, R23a)', async () => {
         const html = await render();
         expect(html).toContain('Olive oil');

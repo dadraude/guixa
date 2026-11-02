@@ -1,6 +1,11 @@
+// @vitest-environment jsdom
 import { describe, expect, it, vi } from 'vite-plus/test';
-import { createSSRApp } from 'vue';
+import { createSSRApp, nextTick } from 'vue';
 import { renderToString } from 'vue/server-renderer';
+import { mount } from '@vue/test-utils';
+import { router } from '@inertiajs/vue3';
+import { installTranslations } from '@/lib/i18n';
+import { reset } from 'laravel-vue-i18n';
 import Show from './Show.vue';
 
 vi.mock('@inertiajs/vue3', async () => {
@@ -34,6 +39,8 @@ const basket = {
         },
     ],
     totalCents: -50,
+    effectiveTotalCents: -50,
+    adjustments: [],
     balanceCents: 0,
     projectedBalanceCents: 50,
     validatedAt: null,
@@ -41,6 +48,121 @@ const basket = {
 };
 
 describe('Finance basket detail', () => {
+    it('submits a signed amount, trimmed reason and stable identity from the real correction form, then resets only on success (R23, R32)', async () => {
+        const post = vi.spyOn(router, 'post');
+        post.mockClear();
+        const wrapper = mount(Show, {
+            props: {
+                basket: {
+                    ...basket,
+                    state: 'validated',
+                    adjustments: [],
+                    effectiveTotalCents: 1200,
+                },
+                stockProducts: [],
+                returnItems: [],
+            },
+            global: { plugins: [{ install: installTranslations }] },
+        });
+        try {
+            const form = wrapper.get('[data-test="basket-correction-form"]');
+            const amount = wrapper.get<HTMLInputElement>('#correction-amount');
+            const reason =
+                wrapper.get<HTMLTextAreaElement>('#correction-reason');
+            const button = form.get('button[type="submit"]');
+            expect(button.attributes('disabled')).toBeDefined();
+
+            await amount.setValue('0');
+            await reason.setValue('Valid reason');
+            await form.trigger('submit');
+            await amount.setValue('1.5');
+            await form.trigger('submit');
+            await amount.setValue('-20');
+            await reason.setValue('   ');
+            await form.trigger('submit');
+            expect(post).not.toHaveBeenCalled();
+
+            await reason.setValue('  Corrected jar credit  ');
+            await form.trigger('submit');
+            expect(post).toHaveBeenCalledTimes(1);
+            const first = post.mock.calls[0];
+            expect(first[0]).toBe('/finance/baskets/basket/corrections');
+            expect(first[1]).toMatchObject({
+                amount_cents: -20,
+                reason: 'Corrected jar credit',
+            });
+            const identity = (first[1] as { correction_id: string })
+                .correction_id;
+            expect(identity).toMatch(/^[0-9a-f-]{36}$/);
+
+            first[2]?.onStart?.({} as never);
+            await nextTick();
+            expect(button.attributes('disabled')).toBeDefined();
+            first[2]?.onFinish?.({} as never);
+            await nextTick();
+            await form.trigger('submit');
+            expect(post).toHaveBeenCalledTimes(2);
+            expect(
+                (post.mock.calls[1][1] as { correction_id: string })
+                    .correction_id,
+            ).toBe(identity);
+
+            post.mock.calls[1][2]?.onSuccess?.({} as never);
+            await nextTick();
+            expect(amount.element.value).toBe('');
+            expect(reason.element.value).toBe('');
+            expect(button.attributes('disabled')).toBeDefined();
+
+            await amount.setValue('25');
+            await reason.setValue('Second correction');
+            await form.trigger('submit');
+            expect(post).toHaveBeenCalledTimes(3);
+            expect(post.mock.calls[2][0]).toBe(
+                '/finance/baskets/basket/corrections',
+            );
+            expect(post.mock.calls[2][1]).toMatchObject({
+                amount_cents: 25,
+                reason: 'Second correction',
+            });
+            expect(
+                (post.mock.calls[2][1] as { correction_id: string })
+                    .correction_id,
+            ).not.toBe(identity);
+        } finally {
+            wrapper.unmount();
+            reset();
+            post.mockRestore();
+        }
+    });
+
+    it('renders original and effective totals, correction history and the staff form for a validated basket (R23, R32)', async () => {
+        const html = await renderToString(
+            createSSRApp(Show, {
+                basket: {
+                    ...basket,
+                    state: 'validated',
+                    totalCents: 1200,
+                    effectiveTotalCents: 1000,
+                    adjustments: [
+                        {
+                            id: 'correction-1',
+                            amountCents: 200,
+                            reason: 'Corrected price',
+                            recordedBy: 'manager',
+                            occurredAt: '2026-10-30T11:00:00+00:00',
+                        },
+                    ],
+                },
+                stockProducts: [],
+                returnItems: [],
+            }),
+        );
+        expect(html).toContain('data-test="original-basket-total"');
+        expect(html).toContain('data-test="effective-basket-total"');
+        expect(html).toContain('Corrected price');
+        expect(html).toContain('data-test="basket-correction-form"');
+    });
+
     it('renders a return-only credit and enables validation for real return contents (S88)', async () => {
         const html = await renderToString(
             createSSRApp(Show, {

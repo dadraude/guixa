@@ -4,6 +4,7 @@ use App\Http\Controllers\AcceptInvitationController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Finance\BasketCollectionController;
 use App\Http\Controllers\Finance\BasketController;
+use App\Http\Controllers\Finance\BasketCorrectionController;
 use App\Http\Controllers\Finance\BasketReturnController;
 use App\Http\Controllers\Finance\BasketStockController;
 use App\Http\Controllers\Finance\BasketValidationController;
@@ -74,6 +75,7 @@ Route::middleware(['auth', 'verified', 'role:manager,finance'])->prefix('finance
     Route::delete('{basket}/return-lines/{returnItem}', [BasketReturnController::class, 'destroy'])->name('return-lines.destroy');
     Route::delete('{basket}/stock-lines/{stockProduct}', [BasketStockController::class, 'destroy'])->name('stock-lines.destroy');
     Route::post('{basket}/validation', [BasketValidationController::class, 'store'])->name('validate');
+    Route::post('{basket}/corrections', [BasketCorrectionController::class, 'store'])->name('corrections.store');
     Route::put('{basket}/collection', [BasketCollectionController::class, 'update'])->name('collect');
     Route::post('{basket}/cancellation', [BasketController::class, 'cancel'])->name('cancel');
 });

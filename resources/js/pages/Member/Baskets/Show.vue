@@ -4,6 +4,7 @@ import { trans } from 'laravel-vue-i18n';
 import BasketController from '@/actions/App/Http/Controllers/Member/BasketController';
 import WalletController from '@/actions/App/Http/Controllers/WalletController';
 import Heading from '@/components/Heading.vue';
+import AmountAdjustments from '@/components/baskets/AmountAdjustments.vue';
 import StockLines from '@/components/pickup/StockLines.vue';
 import ReturnLines from '@/components/pickup/ReturnLines.vue';
 import { euros } from '@/components/pickup/euros';
@@ -84,6 +85,13 @@ const statusLabels: Record<string, string> = {
                 {{ trans('View household Wallet statement') }}
             </Link>
         </section>
+        <AmountAdjustments
+            v-if="basket.state === 'validated' || basket.state === 'collected'"
+            :original-cents="basket.totalCents"
+            :effective-cents="basket.effectiveTotalCents"
+            :adjustments="basket.adjustments"
+            :editable="false"
+        />
         <p v-if="basket.state === 'draft'" data-test="draft-preparation">
             {{ trans('Draft basket in preparation.') }}
         </p>

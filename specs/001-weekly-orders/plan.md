@@ -390,6 +390,12 @@ product or inventory administration. Cross-context corrective stock/money change
 stock non-negativity and are idempotent by correction id. Distinguish pure financial correction from
 physical goods actually returned. Redistribution uses the same signed adjustment mechanism, with
 Ordering's before-cycle-closure restrictions, and never resells stock/returns.
+For a validated independent basket's amount-only correction, Sales appends a `basket_adjustments`
+row and Wallet appends a correction with the same identity in one transaction. The basket id is
+the original source, including when a zero-total basket has no base charge or credit. Its effective
+total is the immutable validated total minus the sum of signed Wallet correction amounts. Replay
+with the same basket, actor, amount and trimmed reason has one effect; changed contents under the
+same identity are rejected. Amount-only corrections never change quantities or Stock movements.
 A mistaken collection mark is corrected by staff with a reason and retained collection history,
 without financial changes. A full contents reversal leaves no effective goods pending collection.
 
@@ -490,7 +496,9 @@ introduced by this amendment. Household deactivation retains balances, receipts 
 
 Design the fresh schema directly: no production data migration, legacy stock-product import, UUID
 remapping or dual-schema compatibility. Reorder creation migrations so Catalog products precede
-referencing tables and Sales baskets precede stock/wallet sale-source references. Existing unrelated
+referencing tables and Sales baskets precede stock/wallet sale-source references. The Wallet creation
+migration defines its final basket and correction references directly after baskets; no Wallet alteration
+chain or production backfill is required before launch. Existing unrelated
 settings, accounts, invitations, producers and return-item constraints remain.
 All ids are UUID v7; money is integer cents, quantities numeric(10,3), times timestamptz in UTC.
 
