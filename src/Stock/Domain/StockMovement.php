@@ -22,6 +22,7 @@ final readonly class StockMovement
         public ?string $cycleId,
         public ?string $orderId,
         public ?string $basketId = null,
+        public ?string $correctionId = null,
     ) {}
 
     public static function entry(
@@ -99,6 +100,27 @@ final readonly class StockMovement
             null, null, null, $basketId);
     }
 
+    /** A signed correction of a validated basket's goods; the correction id is its own stable source. */
+    public static function basketCorrection(
+        string $id,
+        string $stockProductId,
+        SignedQuantity $quantity,
+        DateTimeImmutable $occurredAt,
+        string $recordedBy,
+        string $reason,
+        string $basketId,
+        string $correctionId,
+    ): self {
+        if ($quantity->isZero()) {
+            throw InvalidMovementQuantity::adjustmentMustNotBeZero();
+        }
+
+        $reason = self::cleanNote($reason) ?? throw AdjustmentNoteRequired::create();
+
+        return new self($id, $stockProductId, MovementType::Adjustment, $quantity, $occurredAt, $recordedBy,
+            $reason, null, null, $basketId, $correctionId);
+    }
+
     public static function restore(
         string $id,
         string $stockProductId,
@@ -110,8 +132,9 @@ final readonly class StockMovement
         ?string $cycleId,
         ?string $orderId,
         ?string $basketId = null,
+        ?string $correctionId = null,
     ): self {
-        return new self($id, $stockProductId, $type, $quantity, $occurredAt, $recordedBy, $note, $cycleId, $orderId, $basketId);
+        return new self($id, $stockProductId, $type, $quantity, $occurredAt, $recordedBy, $note, $cycleId, $orderId, $basketId, $correctionId);
     }
 
     private static function cleanNote(?string $note): ?string

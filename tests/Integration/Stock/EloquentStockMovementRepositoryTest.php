@@ -37,6 +37,15 @@ final class EloquentStockMovementRepositoryTest extends TestCase
         ])->id;
     }
 
+    protected function correctionFor(string $basket): string
+    {
+        $id = (string) Str::uuid7();
+        DB::table('basket_adjustments')->insert(['id' => $id, 'basket_id' => $basket, 'amount_cents' => 100,
+            'reason' => 'Came back', 'recorded_by' => User::factory()->create()->id, 'occurred_at' => now()]);
+
+        return $id;
+    }
+
     protected function basket(): string
     {
         $household = (string) Str::uuid7();

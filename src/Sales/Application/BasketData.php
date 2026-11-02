@@ -16,16 +16,18 @@ final readonly class BasketData
         public string $state, public array $stockLines, public array $returnLines, public int $totalCents,
         public DateTimeImmutable $createdAt, public ?DateTimeImmutable $validatedAt,
         public ?DateTimeImmutable $collectedAt, public int $effectiveTotalCents, public array $adjustments,
-        public array $collectionEvents) {}
+        public array $collectionEvents, public bool $pendingCollection) {}
 
     public static function from(Basket $basket): self
     {
         return new self($basket->id, $basket->householdId, $basket->householdName, $basket->state,
-            array_map(BasketLineData::from(...), array_values(array_filter($basket->activeLines(), fn ($line) => $line->kind === 'stock'))),
+            array_map(fn ($line) => BasketLineData::from($line, $basket->effectiveQuantity($line->productId)),
+                array_values(array_filter($basket->activeLines(), fn ($line) => $line->kind === 'stock'))),
             array_map(BasketReturnLineData::from(...), array_values(array_filter($basket->activeLines(), fn ($line) => $line->kind === 'return'))),
             $basket->validatedTotalCents ?? $basket->totalCents(), $basket->createdAt,
             $basket->validatedAt, $basket->collectedAt, $basket->effectiveTotalCents(),
             array_map(BasketAdjustmentData::from(...), $basket->adjustments),
-            array_map(BasketCollectionEventData::from(...), $basket->collectionEvents));
+            array_map(BasketCollectionEventData::from(...), $basket->collectionEvents),
+            $basket->state === 'validated' && ! $basket->goodsFullyReversed());
     }
 }

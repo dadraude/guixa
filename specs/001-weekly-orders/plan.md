@@ -396,6 +396,17 @@ the original source, including when a zero-total basket has no base charge or cr
 total is the immutable validated total minus the sum of signed Wallet correction amounts. Replay
 with the same basket, actor, amount and trimmed reason has one effect; changed contents under the
 same identity are rejected. Amount-only corrections never change quantities or Stock movements.
+A physical goods correction uses the same `CorrectBasket` command with the returned quantity of
+each stock product. Sales appends one signed `basket_adjustment_lines` row per product (negative: goods
+left the basket) to the correction; Stock records one `adjustment` movement per line through
+`CorrectBasketStock`, linked to the basket and to the correction id and carrying the reason. Its
+product-row lock and ledger keep stock non-negative, and a movement is unique per correction and
+product. Sales, Stock and Wallet effects share one transaction, so a later failure rolls back every
+earlier write. A product's effective quantity is its immutable line quantity plus the signed
+correction lines; a return cannot exceed it. The read model exposes original and effective quantity
+and amount per line, and `pendingCollection` is false once every stock line's effective quantity is
+zero and the basket has no active return lines (returned empties still need collection), while the
+validated state and original contents remain.
 A mistaken collection mark is corrected by staff with a reason and retained collection history,
 without financial changes. A full contents reversal leaves no effective goods pending collection.
 Collection history uses a basket-local append sequence assigned while holding the basket lock.

@@ -23,6 +23,9 @@ trait StockMovementRepositoryContract
     /** Create a basket accepted by this adapter. */
     abstract protected function basket(): string;
 
+    /** Create a correction source for a basket that this adapter accepts. */
+    abstract protected function correctionFor(string $basket): string;
+
     /** Lets an adapter that enforces foreign keys create the cycle the tests refer to. */
     protected function cycleExists(string $cycleId): void {}
 
@@ -196,5 +199,35 @@ trait StockMovementRepositoryContract
         $this->assertNotNull($rejected);
         $this->assertCount(1, $repository->forProduct($firstProduct));
         $this->assertCount(1, $repository->forProduct($secondProduct));
+    }
+
+    #[Test]
+    public function it_keeps_a_basket_correction_linked_to_its_sale_and_rejects_a_duplicate_correction_per_product(): void
+    {
+        $repository = $this->repository();
+        $product = $this->stockProductId();
+        $other = $this->stockProductId();
+        $basket = $this->basket();
+        $correction = $this->correctionFor($basket);
+        $at = new DateTimeImmutable('2026-10-22T10:00:00+00:00');
+        $repository->add(StockMovement::basketSale($repository->nextId(), $product, Quantity::fromString('3'), $at, self::ACCOUNT, $basket));
+        $correct = fn (string $productId) => StockMovement::basketCorrection($repository->nextId(), $productId,
+            SignedQuantity::fromString('1'), $at->modify('+1 minute'), self::ACCOUNT, 'Came back', $basket, $correction);
+        $repository->add($correct($product));
+        $repository->add($correct($other));
+
+        $stored = $repository->forProduct($product)[1];
+        $this->assertSame(MovementType::Adjustment, $stored->type);
+        $this->assertSame([$basket, $correction, 'Came back', '1.000'], [$stored->basketId, $stored->correctionId, $stored->note, $stored->quantity->toString()]);
+        $this->assertSame('-2.000', $repository->available($product)->toString());
+
+        $rejected = null;
+        try {
+            $repository->add($correct($product));
+        } catch (DomainException|QueryException $exception) {
+            $rejected = $exception;
+        }
+        $this->assertNotNull($rejected);
+        $this->assertCount(2, $repository->forProduct($product));
     }
 }

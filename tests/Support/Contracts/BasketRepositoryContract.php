@@ -5,6 +5,7 @@ namespace Tests\Support\Contracts;
 use DateTimeImmutable;
 use Guixa\Sales\Domain\Basket;
 use Guixa\Sales\Domain\BasketAdjustment;
+use Guixa\Sales\Domain\BasketAdjustmentLine;
 use Guixa\Sales\Domain\BasketCollectionEvent;
 use Guixa\Sales\Domain\BasketLine;
 use Guixa\Sales\Domain\BasketRepository;
@@ -117,6 +118,40 @@ trait BasketRepositoryContract
             // Expected append-only boundary.
         }
         $this->assertCount(2, $repository->get($basket->id)->adjustments);
+    }
+
+    #[Test]
+    public function it_reloads_signed_quantity_lines_of_an_adjustment_and_rejects_changing_them(): void
+    {
+        [$repository, $manager, $household, $product] = $this->basketWorld();
+        $basket = $this->basket($repository, $manager, $household, []);
+        $line = new BasketLine($repository->nextId(), $basket->id, $product, 'Oil', 'bottle', 1200, false, null,
+            Quantity::fromString('3'), new DateTimeImmutable('2026-10-30T10:00:00+00:00'));
+        $repository->save($basket->withLines([$line]));
+        $validated = $repository->get($basket->id)->validated($manager, new DateTimeImmutable('2026-10-30T11:00:00+00:00'));
+        $repository->save($validated);
+        $adjustment = new BasketAdjustment($repository->nextId(), $basket->id, 1200, 'One came back', $manager,
+            new DateTimeImmutable('2026-10-30T12:00:00+00:00'), [new BasketAdjustmentLine($product, -1000)]);
+        $repository->save($validated->withAdjustment($adjustment));
+
+        $reloaded = $repository->get($basket->id);
+        $this->assertEquals([$adjustment], $reloaded->adjustments);
+        $this->assertSame(2000, $reloaded->effectiveQuantity($product));
+        $this->assertSame(2400, $reloaded->effectiveTotalCents());
+        $this->assertSame('3.000', $reloaded->lines[0]->quantity->toString());
+        $this->assertEquals([$adjustment], $repository->getForHousehold($basket->id, $household)->adjustments);
+
+        $changed = new BasketAdjustment($adjustment->id, $basket->id, 1200, 'One came back', $manager,
+            $adjustment->occurredAt, [new BasketAdjustmentLine($product, -2000)]);
+        try {
+            $repository->save(new Basket($reloaded->id, $reloaded->householdId, $reloaded->householdName, $reloaded->state,
+                $reloaded->createdBy, $reloaded->createdAt, $reloaded->lines, $reloaded->validatedBy, $reloaded->validatedAt,
+                $reloaded->validatedTotalCents, adjustments: [$changed]));
+            $this->fail('A saved adjustment cannot change its lines.');
+        } catch (BasketNotEditable) {
+            // Expected append-only boundary.
+        }
+        $this->assertSame(2000, $repository->get($basket->id)->effectiveQuantity($product));
     }
 
     /** @return array{BasketRepository,string,string,string,string,string} repository, manager, household, product, return A, return B */

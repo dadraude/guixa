@@ -10,12 +10,17 @@ readonly householdName: string | null,
 readonly active: boolean,
 readonly invitationPending: boolean,
 };
+export type BasketAdjustmentLineRow = {
+readonly stockProductId: string,
+readonly quantityDelta: string,
+};
 export type BasketAdjustmentRow = {
 readonly id: string,
 readonly amountCents: number,
 readonly reason: string,
 readonly recordedBy: string,
 readonly occurredAt: string,
+readonly lines: App.Http.BasketAdjustmentLineRow[],
 };
 export type BasketCollectionEventRow = {
 readonly id: string,
@@ -50,6 +55,7 @@ readonly collectedAt: string | null,
 readonly effectiveTotalCents: number,
 readonly adjustments: App.Http.BasketAdjustmentRow[],
 readonly collectionEvents: App.Http.BasketCollectionEventRow[],
+readonly pendingCollection: boolean,
 };
 export type BasketStockLineRow = {
 readonly stockProductId: string,
@@ -58,6 +64,8 @@ readonly unit: string,
 readonly quantity: string,
 readonly unitPriceCents: number,
 readonly amountCents: number,
+readonly effectiveQuantity: string,
+readonly effectiveAmountCents: number,
 };
 export type BasketSummaryRow = {
 readonly id: string,
@@ -65,6 +73,7 @@ readonly householdName: string,
 readonly state: string,
 readonly totalCents: number,
 readonly createdAt: string,
+readonly pendingCollection: boolean,
 };
 export type ContainerCountRow = {
 readonly total: number,

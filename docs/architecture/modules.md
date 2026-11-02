@@ -54,7 +54,7 @@ else in a module is private to that module for integration purposes, even when P
 | Ordering → Membership    | ReadPendingPickups                                                                                                     | PendingPickupData                            |
 | Sales → Catalog          | HasProductHistory                                                                                                      | —                                            |
 | Stock → Catalog          | CheckProductUsage, GetAvailableQuantities                                                                              | —                                            |
-| Stock → Sales            | GetAvailableQuantities, SellBasketStock                                                                                | —                                            |
+| Stock → Sales            | GetAvailableQuantities, SellBasketStock, CorrectBasketStock                                                            | —                                            |
 | Stock → Ordering         | GetReturnItem, GetStockOffer, LockStockOffer, SellStock                                                                | ReturnItemData, StockLevelData               |
 | Stock → Sales            | GetReturnItem                                                                                                          | ReturnItemData                               |
 | Wallet → Membership      | ReadHouseholdBalance                                                                                                   | —                                            |
@@ -90,7 +90,7 @@ owning module's Infrastructure. Cross-module access goes through the declared in
 | Catalog    | producers, products                                                                                                                                                            |
 | Membership | users, account_roles, households, invitations                                                                                                                                  |
 | Ordering   | cooperative_settings, cycles, cycle_producers, orders, order_lines, product_unavailabilities, received_totals, order_stock_lines, order_return_lines, order_pickup_adjustments |
-| Sales      | baskets, basket_lines, basket_adjustments, basket_collection_events                                                                                                            |
+| Sales      | baskets, basket_lines, basket_adjustments, basket_adjustment_lines, basket_collection_events                                                                                   |
 | Stock      | return_items, stock_movements                                                                                                                                                  |
 | Wallet     | wallet_movements                                                                                                                                                               |
 | Platform   | password_reset_tokens, sessions, cache, cache_locks, jobs, job_batches, failed_jobs, passkeys                                                                                  |

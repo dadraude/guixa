@@ -28,6 +28,7 @@ final readonly class BasketRow
         public int $effectiveTotalCents,
         public array $adjustments,
         public array $collectionEvents,
+        public bool $pendingCollection,
     ) {}
 
     public static function from(BasketData $basket, int $balanceCents): self
@@ -40,6 +41,7 @@ final readonly class BasketRow
             $total, $balanceCents, $basket->state === 'draft' ? $balanceCents - $total : $balanceCents,
             $basket->validatedAt?->format(DATE_ATOM), $basket->collectedAt?->format(DATE_ATOM),
             $basket->effectiveTotalCents, array_map(BasketAdjustmentRow::from(...), $basket->adjustments),
-            array_map(BasketCollectionEventRow::from(...), $basket->collectionEvents));
+            array_map(BasketCollectionEventRow::from(...), $basket->collectionEvents),
+            $basket->pendingCollection);
     }
 }

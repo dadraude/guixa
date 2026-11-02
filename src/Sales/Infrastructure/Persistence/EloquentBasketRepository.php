@@ -5,6 +5,7 @@ namespace Guixa\Sales\Infrastructure\Persistence;
 use DateTimeImmutable;
 use Guixa\Sales\Domain\Basket;
 use Guixa\Sales\Domain\BasketAdjustment;
+use Guixa\Sales\Domain\BasketAdjustmentLine;
 use Guixa\Sales\Domain\BasketCollectionEvent;
 use Guixa\Sales\Domain\BasketLine;
 use Guixa\Sales\Domain\BasketRepository;
@@ -67,13 +68,21 @@ final class EloquentBasketRepository implements BasketRepository
         }
 
         foreach ($basket->adjustments as $adjustment) {
-            BasketAdjustmentModel::query()->firstOrCreate(['id' => $adjustment->id], [
+            $row = BasketAdjustmentModel::query()->firstOrCreate(['id' => $adjustment->id], [
                 'basket_id' => $basket->id,
                 'amount_cents' => $adjustment->amountCents,
                 'reason' => $adjustment->reason,
                 'recorded_by' => $adjustment->recordedBy,
                 'occurred_at' => $adjustment->occurredAt->format(DATE_ATOM),
             ]);
+            if (! $row->wasRecentlyCreated) {
+                continue;
+            }
+            foreach ($adjustment->lines as $line) {
+                BasketAdjustmentLineModel::query()->create(['adjustment_id' => $adjustment->id,
+                    'product_id' => $line->productId,
+                    'quantity_delta' => $line->quantityDelta()]);
+            }
         }
 
         $nextCollectionSequence = ((int) BasketCollectionEventModel::query()->where('basket_id', $basket->id)->max('sequence')) + 1;
@@ -216,7 +225,7 @@ final class EloquentBasketRepository implements BasketRepository
 
     public function list(): array
     {
-        return array_values(BasketModel::query()->with(['lines', 'adjustments', 'collectionEvents'])->orderByDesc('created_at')->orderByDesc('id')->get()
+        return array_values(BasketModel::query()->with(['lines', 'adjustments.lines', 'collectionEvents'])->orderByDesc('created_at')->orderByDesc('id')->get()
             ->map(fn (BasketModel $model) => $this->toDomain($model))->all());
     }
 
@@ -229,7 +238,7 @@ final class EloquentBasketRepository implements BasketRepository
 
     public function listForHousehold(string $householdId): array
     {
-        return array_values(BasketModel::query()->where('household_id', $householdId)->with(['lines', 'adjustments', 'collectionEvents'])
+        return array_values(BasketModel::query()->where('household_id', $householdId)->with(['lines', 'adjustments.lines', 'collectionEvents'])
             ->orderByDesc('created_at')->orderByDesc('id')->get()
             ->map(fn (BasketModel $model) => $this->toDomain($model))->all());
     }
@@ -257,7 +266,9 @@ final class EloquentBasketRepository implements BasketRepository
             $model->cancelled_by, $model->cancelled_at === null ? null : new DateTimeImmutable($model->cancelled_at),
             array_values($model->adjustments->map(fn (BasketAdjustmentModel $adjustment) => new BasketAdjustment(
                 $adjustment->id, $adjustment->basket_id, (int) $adjustment->amount_cents,
-                $adjustment->reason, $adjustment->recorded_by, new DateTimeImmutable($adjustment->occurred_at)))->all()),
+                $adjustment->reason, $adjustment->recorded_by, new DateTimeImmutable($adjustment->occurred_at),
+                array_values($adjustment->lines->map(fn (BasketAdjustmentLineModel $line) => BasketAdjustmentLine::fromDecimal(
+                    $line->product_id, (string) $line->quantity_delta))->all())))->all()),
             array_values($model->collectionEvents->map(fn (BasketCollectionEventModel $event) => new BasketCollectionEvent(
                 $event->id, $event->basket_id, $event->type, $event->recorded_by,
                 new DateTimeImmutable($event->occurred_at), $event->reason))->all()));

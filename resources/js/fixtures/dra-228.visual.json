@@ -1,0 +1,325 @@
+{
+    "baseUrl": "http://127.0.0.1:5228",
+    "rootFontPx": 16,
+    "darkSelector": "html.dark",
+    "matrix": {
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark"],
+        "text": [100, 200]
+    },
+    "views": [
+        {
+            "id": "finance-goods",
+            "path": "/visual-dra-228.html",
+            "query": {
+                "role": "finance"
+            },
+            "root": "#main-content",
+            "panels": "#main-content .pilot-layout-panel,#main-content .pilot-list-row",
+            "content": "#main-content h1,#main-content h2,#main-content p,#main-content label,#main-content input,#main-content textarea,#main-content button,#main-content a,#main-content dt,#main-content dd,#main-content li,#main-content legend",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "#main-content a[data-visual-page-focus-first]",
+                "#main-content a[data-test=\"wallet-link\"]"
+            ],
+            "states": [
+                {
+                    "id": "form",
+                    "query": {
+                        "state": "form"
+                    },
+                    "ready": "body[data-visual-ready=\"form\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"returned-goods\"] input",
+                                "count": 2,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"effective-quantity\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"basket-status-validated\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"basket-correction-form\"] button",
+                                "minHeight": 44
+                            }
+                        ],
+                        "focus": [
+                            "#main-content a[data-visual-page-focus-first]",
+                            "#main-content a[data-test=\"wallet-link\"]",
+                            "#main-content [data-test=\"returned-0198f0a0-0000-7000-8000-000000000231\"]",
+                            "#main-content [data-test=\"returned-0198f0a0-0000-7000-8000-000000000233\"]",
+                            "#correction-amount",
+                            "#correction-reason"
+                        ]
+                    }
+                },
+                {
+                    "id": "partial",
+                    "query": {
+                        "state": "partial"
+                    },
+                    "ready": "body[data-visual-ready=\"partial\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"effective-quantity\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"effective-amount\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"basket-correction-form\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test^=\"basket-adjustment-lines-\"] li",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"collect-basket\"]",
+                                "count": 1,
+                                "minHeight": 44
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "reversed",
+                    "query": {
+                        "state": "reversed"
+                    },
+                    "ready": "body[data-visual-ready=\"reversed\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"basket-status-reversed\"]",
+                                "count": 1,
+                                "text": "Productes retornats del tot"
+                            },
+                            {
+                                "selector": "[data-test=\"goods-reversed\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"collect-basket\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"returned-goods\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"effective-quantity\"]",
+                                "count": 2
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "error",
+                    "query": {
+                        "state": "error"
+                    },
+                    "ready": "body[data-visual-ready=\"error\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"domain-error\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"returned-goods\"] input",
+                                "count": 2,
+                                "minHeight": 44
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "long",
+                    "query": {
+                        "state": "long"
+                    },
+                    "ready": "body[data-visual-ready=\"long\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"effective-quantity\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test^=\"basket-adjustment-lines-\"] li",
+                                "count": 1
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "member-goods",
+            "path": "/visual-dra-228.html",
+            "query": {
+                "role": "member"
+            },
+            "root": "#main-content",
+            "panels": "#main-content .pilot-layout-panel,#main-content .pilot-list-row",
+            "content": "#main-content h1,#main-content h2,#main-content p,#main-content a,#main-content dt,#main-content dd,#main-content li,#main-content legend",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "#main-content a[data-visual-page-focus-first]",
+                "#main-content a[data-test=\"wallet-link\"]"
+            ],
+            "states": [
+                {
+                    "id": "partial",
+                    "query": {
+                        "state": "partial"
+                    },
+                    "ready": "body[data-visual-ready=\"partial\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"effective-quantity\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"basket-correction-form\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test^=\"basket-adjustment-lines-\"] li",
+                                "count": 1
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "reversed",
+                    "query": {
+                        "state": "reversed"
+                    },
+                    "ready": "body[data-visual-ready=\"reversed\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"basket-status-reversed\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"collect-basket\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"goods-reversed\"]",
+                                "count": 1
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    ]
+}
