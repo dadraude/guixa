@@ -21,7 +21,9 @@ final class BasketCorrectionController extends Controller
     /** @return array<string, string> */
     private function returnedGoods(StoreBasketCorrectionRequest $request): array
     {
-        return collect($request->input('returned_goods', []))
-            ->mapWithKeys(fn (array $line) => [$line['stock_product_id'] => $line['quantity']])->all();
+        /** @var list<array{stock_product_id: string, quantity: string}> $lines */
+        $lines = $request->array('returned_goods');
+
+        return array_column($lines, 'quantity', 'stock_product_id');
     }
 }
