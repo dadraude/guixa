@@ -1,0 +1,439 @@
+{
+    "baseUrl": "http://127.0.0.1:5226",
+    "rootFontPx": 16,
+    "darkSelector": "html.dark",
+    "matrix": {
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark"],
+        "text": [100, 200]
+    },
+    "views": [
+        {
+            "id": "manager-collection",
+            "path": "/visual-dra-226.html",
+            "query": { "role": "manager" },
+            "root": "#main-content",
+            "panels": "#main-content .pilot-layout-panel,#main-content .pilot-list-row",
+            "content": "#main-content h1,#main-content h2,#main-content p,#main-content label,#main-content textarea,#main-content button,#main-content a,#main-content dt,#main-content dd,#main-content li",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "#main-content a[data-visual-page-focus-first]",
+                "#main-content a[data-test=\"wallet-link\"]",
+                "#main-content [data-test=\"collect-basket\"]"
+            ],
+            "states": [
+                {
+                    "id": "corrected",
+                    "query": { "state": "corrected" },
+                    "ready": "body[data-visual-ready=\"corrected\"]",
+                    "cases": [
+                        { "width": 375, "mode": "light", "text": 100 },
+                        { "width": 375, "mode": "dark", "text": 100 },
+                        { "width": 1280, "mode": "light", "text": 100 },
+                        { "width": 1280, "mode": "dark", "text": 100 },
+                        { "width": 1024, "mode": "light", "text": 200 },
+                        { "width": 1024, "mode": "dark", "text": 200 }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"basket-status-validated\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"collection-history\"] li",
+                                "count": 2
+                            },
+                            {
+                                "selector": "[data-test=\"collection-correction-form\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"effective-collection\"]",
+                                "text": "Pendent de recollida"
+                            },
+                            {
+                                "selector": "[data-test=\"collect-basket\"]",
+                                "minHeight": 44
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "never",
+                    "query": { "state": "never" },
+                    "ready": "body[data-visual-ready=\"never\"]",
+                    "cases": [
+                        { "width": 375, "mode": "light", "text": 100 },
+                        { "width": 1024, "mode": "dark", "text": 200 }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"original-collection\"]",
+                                "text": "Encara no s’ha recollit"
+                            },
+                            {
+                                "selector": "[data-test=\"effective-collection\"]",
+                                "text": "Pendent de recollida"
+                            },
+                            {
+                                "selector": "[data-test=\"collection-history\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"collection-correction-form\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"collect-basket\"]",
+                                "count": 1,
+                                "minHeight": 44
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "original",
+                    "query": { "state": "original" },
+                    "ready": "body[data-visual-ready=\"original\"]",
+                    "cases": [{ "width": 375, "mode": "light", "text": 100 }],
+                    "checks": {
+                        "focus": [
+                            "#main-content a[data-visual-page-focus-first]",
+                            "#main-content a[data-test=\"wallet-link\"]",
+                            "#collection-reason"
+                        ],
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"collection-history\"] li",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"collection-correction-form\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#collection-reason",
+                                "minHeight": 44
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "recollected",
+                    "query": { "state": "recollected" },
+                    "ready": "body[data-visual-ready=\"recollected\"]",
+                    "cases": [{ "width": 375, "mode": "dark", "text": 100 }],
+                    "checks": {
+                        "focus": [
+                            "#main-content a[data-visual-page-focus-first]",
+                            "#main-content a[data-test=\"wallet-link\"]",
+                            "#collection-reason"
+                        ],
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"collection-history\"] li",
+                                "count": 3
+                            },
+                            {
+                                "selector": "[data-test=\"effective-collection\"]",
+                                "text": "Recollida"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "long",
+                    "query": { "state": "long" },
+                    "ready": "body[data-visual-ready=\"long\"]",
+                    "cases": [{ "width": 375, "mode": "dark", "text": 200 }],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"collection-history\"] li",
+                                "count": 2
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "error",
+                    "query": { "state": "error" },
+                    "ready": "body[data-visual-ready=\"error\"]",
+                    "cases": [{ "width": 375, "mode": "light", "text": 200 }],
+                    "checks": {
+                        "focus": [
+                            "#main-content a[data-visual-page-focus-first]",
+                            "#main-content a[data-test=\"wallet-link\"]",
+                            "#collection-reason"
+                        ],
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"collection-history\"] li",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"collection-correction-form\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"collection-correction-form\"] .text-destructive",
+                                "count": 1,
+                                "text": "Cal indicar el motiu de la correcció."
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "ready",
+                    "query": { "state": "ready" },
+                    "ready": "body[data-visual-ready=\"ready\"]",
+                    "cases": [{ "width": 375, "mode": "light", "text": 200 }],
+                    "checks": {
+                        "focus": [
+                            "#main-content a[data-visual-page-focus-first]",
+                            "#main-content a[data-test=\"wallet-link\"]",
+                            "#collection-reason",
+                            "#main-content [data-test=\"collection-correction-form\"] button"
+                        ],
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"collection-history\"] li",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"collection-correction-form\"] button",
+                                "attributes": { "disabled": null },
+                                "minHeight": 44
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "processing",
+                    "query": { "state": "processing" },
+                    "ready": "body[data-visual-ready=\"processing\"]",
+                    "cases": [{ "width": 375, "mode": "dark", "text": 200 }],
+                    "checks": {
+                        "focus": [
+                            "#main-content a[data-visual-page-focus-first]",
+                            "#main-content a[data-test=\"wallet-link\"]",
+                            "#collection-reason"
+                        ],
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"collection-history\"] li",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"collection-correction-form\"] button",
+                                "attributes": { "disabled": "" }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "finance-collection",
+            "path": "/visual-dra-226.html",
+            "query": { "role": "finance" },
+            "root": "#main-content",
+            "panels": "#main-content .pilot-layout-panel,#main-content .pilot-list-row",
+            "content": "#main-content h1,#main-content h2,#main-content p,#main-content label,#main-content textarea,#main-content button,#main-content a,#main-content dt,#main-content dd,#main-content li",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "#main-content a[data-visual-page-focus-first]",
+                "#main-content a[data-test=\"wallet-link\"]",
+                "#main-content [data-test=\"collect-basket\"]"
+            ],
+            "states": [
+                {
+                    "id": "corrected",
+                    "query": { "state": "corrected" },
+                    "ready": "body[data-visual-ready=\"corrected\"]",
+                    "cases": [
+                        { "width": 375, "mode": "light", "text": 100 },
+                        { "width": 375, "mode": "dark", "text": 100 },
+                        { "width": 1280, "mode": "light", "text": 100 },
+                        { "width": 1280, "mode": "dark", "text": 100 },
+                        { "width": 1024, "mode": "light", "text": 200 },
+                        { "width": 1024, "mode": "dark", "text": 200 }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"collection-history\"] li",
+                                "count": 2
+                            },
+                            {
+                                "selector": "[data-test=\"collection-correction-form\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"effective-collection\"]",
+                                "text": "Pendent de recollida"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "never",
+                    "query": { "state": "never" },
+                    "ready": "body[data-visual-ready=\"never\"]",
+                    "cases": [{ "width": 375, "mode": "dark", "text": 100 }],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"original-collection\"]",
+                                "text": "Encara no s’ha recollit"
+                            },
+                            {
+                                "selector": "[data-test=\"effective-collection\"]",
+                                "text": "Pendent de recollida"
+                            },
+                            {
+                                "selector": "[data-test=\"collection-history\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"collection-correction-form\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"collect-basket\"]",
+                                "count": 1,
+                                "minHeight": 44
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "member-collection",
+            "path": "/visual-dra-226.html",
+            "query": { "role": "member" },
+            "root": "#main-content",
+            "panels": "#main-content .pilot-layout-panel,#main-content .pilot-list-row",
+            "content": "#main-content h1,#main-content h2,#main-content p,#main-content a,#main-content dt,#main-content dd,#main-content li",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "#main-content a[data-visual-page-focus-first]",
+                "#main-content a[data-test=\"wallet-link\"]"
+            ],
+            "states": [
+                {
+                    "id": "corrected",
+                    "query": { "state": "corrected" },
+                    "ready": "body[data-visual-ready=\"corrected\"]",
+                    "cases": [
+                        { "width": 375, "mode": "light", "text": 100 },
+                        { "width": 375, "mode": "dark", "text": 100 },
+                        { "width": 1280, "mode": "light", "text": 100 },
+                        { "width": 1280, "mode": "dark", "text": 100 },
+                        { "width": 1024, "mode": "light", "text": 200 },
+                        { "width": 1024, "mode": "dark", "text": 200 }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"collection-history\"] li",
+                                "count": 2
+                            },
+                            {
+                                "selector": "[data-test=\"collection-correction-form\"]",
+                                "count": 0
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "never",
+                    "query": { "state": "never" },
+                    "ready": "body[data-visual-ready=\"never\"]",
+                    "cases": [
+                        { "width": 375, "mode": "light", "text": 100 },
+                        { "width": 1024, "mode": "light", "text": 200 }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"original-collection\"]",
+                                "text": "Encara no s’ha recollit"
+                            },
+                            {
+                                "selector": "[data-test=\"effective-collection\"]",
+                                "text": "Pendent de recollida"
+                            },
+                            {
+                                "selector": "[data-test=\"collection-history\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"collection-correction-form\"]",
+                                "count": 0
+                            },
+                            { "selector": "#main-content button", "count": 0 }
+                        ]
+                    }
+                },
+                {
+                    "id": "original",
+                    "query": { "state": "original" },
+                    "ready": "body[data-visual-ready=\"original\"]",
+                    "cases": [{ "width": 375, "mode": "light", "text": 100 }],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"collection-history\"] li",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"effective-collection\"]",
+                                "text": "Recollida"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "recollected",
+                    "query": { "state": "recollected" },
+                    "ready": "body[data-visual-ready=\"recollected\"]",
+                    "cases": [{ "width": 375, "mode": "dark", "text": 100 }],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"collection-history\"] li",
+                                "count": 3
+                            },
+                            {
+                                "selector": "[data-test=\"collection-correction-form\"]",
+                                "count": 0
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "long",
+                    "query": { "state": "long" },
+                    "ready": "body[data-visual-ready=\"long\"]",
+                    "cases": [{ "width": 375, "mode": "dark", "text": 200 }],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"collection-history\"] li",
+                                "count": 2
+                            },
+                            {
+                                "selector": "[data-test=\"collection-correction-form\"]",
+                                "count": 0
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    ]
+}

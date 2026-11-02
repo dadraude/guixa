@@ -6,7 +6,9 @@ use App\Models\User;
 use Guixa\Catalog\Infrastructure\Persistence\ProducerModel;
 use Guixa\Sales\Application\AddStockToBasket;
 use Guixa\Sales\Application\CorrectBasket;
+use Guixa\Sales\Application\CorrectBasketCollection;
 use Guixa\Sales\Application\CreateStockBasket;
+use Guixa\Sales\Application\MarkBasketCollected;
 use Guixa\Sales\Application\ValidateBasket;
 use Guixa\Shared\Application\Actor;
 use Guixa\Stock\Application\RecordStockEntry;
@@ -96,6 +98,31 @@ final class BasketConcurrencyTest extends TestCase
     }
 
     #[Test]
+    public function concurrent_collection_correction_replay_waits_for_the_basket_lock_and_appends_once(): void
+    {
+        [$actor, $household, $products] = $this->world(['Oil' => '2']);
+        $basket = $this->draft($actor, $household, [$products['Oil'] => '1']);
+        app(ValidateBasket::class)($actor, $basket);
+        app(MarkBasketCollected::class)($actor, $basket);
+        $identity = (string) Str::uuid7();
+        $stock = DB::table('stock_movements')->where('basket_id', $basket)->get();
+        $wallet = DB::table('wallet_movements')->where('basket_id', $basket)->get();
+
+        DB::beginTransaction();
+        app(CorrectBasketCollection::class)($actor, $basket, 'Wrong mark', $identity);
+        $pipes = $this->startCollectionCorrection($actor->accountId, $basket, $identity);
+        $this->waitForLock($pipes);
+        DB::commit();
+
+        $this->assertSame('corrected', $this->finish($pipes));
+        $this->assertSame('validated', DB::table('baskets')->where('id', $basket)->value('state'));
+        $this->assertSame(2, DB::table('basket_collection_events')->where('basket_id', $basket)->count());
+        $this->assertSame([1, 2], DB::table('basket_collection_events')->where('basket_id', $basket)->orderBy('sequence')->pluck('sequence')->all());
+        $this->assertEquals($stock, DB::table('stock_movements')->where('basket_id', $basket)->get());
+        $this->assertEquals($wallet, DB::table('wallet_movements')->where('basket_id', $basket)->get());
+    }
+
+    #[Test]
     public function opposite_draft_line_order_uses_the_same_product_lock_order_and_both_complete(): void
     {
         [$actor, $household, $products] = $this->world(['Oil' => '2', 'Rice' => '2']);
@@ -167,6 +194,29 @@ final class BasketConcurrencyTest extends TestCase
         $app->make(\Illuminate\Contracts\Console\Kernel::class)->bootstrap();
         try {
             $app->make(\Guixa\Sales\Application\CorrectBasket::class)(\Guixa\Shared\Application\Actor::manager($argv[1]), $argv[2], 25, 'Price correction', $argv[3]);
+            echo 'corrected';
+        } catch (\Throwable $error) {
+            echo (new \ReflectionClass($error))->getShortName();
+        }
+        PHP;
+        $pipes = [];
+        $this->other = proc_open([PHP_BINARY, '-r', $script, '--', $accountId, $basketId, $identity],
+            [1 => ['pipe', 'w'], 2 => ['pipe', 'w']], $pipes, null,
+            [...getenv(), 'DB_DATABASE' => DB::connection()->getDatabaseName()]);
+        $this->assertIsResource($this->other);
+
+        return $pipes;
+    }
+
+    /** @return array<int,resource> */
+    private function startCollectionCorrection(string $accountId, string $basketId, string $identity): array
+    {
+        $script = <<<'PHP'
+        require getcwd().'/vendor/autoload.php';
+        $app = require getcwd().'/bootstrap/app.php';
+        $app->make(\Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+        try {
+            $app->make(\Guixa\Sales\Application\CorrectBasketCollection::class)(\Guixa\Shared\Application\Actor::manager($argv[1]), $argv[2], 'Wrong mark', $argv[3]);
             echo 'corrected';
         } catch (\Throwable $error) {
             echo (new \ReflectionClass($error))->getShortName();

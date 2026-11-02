@@ -41,6 +41,7 @@ const basket = {
     totalCents: -50,
     effectiveTotalCents: -50,
     adjustments: [],
+    collectionEvents: [],
     balanceCents: 0,
     projectedBalanceCents: 50,
     validatedAt: null,
@@ -48,6 +49,84 @@ const basket = {
 };
 
 describe('Finance basket detail', () => {
+    it('shows a never-collected validated basket as pending without history or correction form', async () => {
+        const app = createSSRApp(Show, {
+            basket: {
+                ...basket,
+                state: 'validated',
+                collectionEvents: [],
+                collectedAt: null,
+            },
+            stockProducts: [],
+            returnItems: [],
+        });
+        installTranslations(app);
+        const html = await renderToString(app);
+        expect(html).toContain('data-test="original-collection"');
+        expect(html).toContain('Encara no s’ha recollit');
+        expect(html).toContain('data-test="effective-collection"');
+        expect(html).toContain('Pendent de recollida');
+        expect(html).not.toContain('data-test="collection-history"');
+        expect(html).not.toContain('data-test="collection-correction-form"');
+        expect(html).toContain('data-test="collect-basket"');
+    });
+
+    it('posts a collection correction with a stable identity and resets on success (R23b)', async () => {
+        const post = vi.spyOn(router, 'post');
+        post.mockClear();
+        const wrapper = mount(Show, {
+            props: {
+                basket: {
+                    ...basket,
+                    state: 'collected',
+                    collectionEvents: [
+                        {
+                            id: 'event-1',
+                            type: 'collected',
+                            recordedBy: 'manager',
+                            occurredAt: '2026-10-30T10:00:00+00:00',
+                            reason: null,
+                        },
+                    ],
+                },
+                stockProducts: [],
+                returnItems: [],
+            },
+            global: { plugins: [{ install: installTranslations }] },
+        });
+        try {
+            const form = wrapper.get(
+                '[data-test="collection-correction-form"]',
+            );
+            const reason =
+                wrapper.get<HTMLTextAreaElement>('#collection-reason');
+            await reason.setValue('  Wrong mark  ');
+            await form.trigger('submit');
+            expect(post).toHaveBeenCalledTimes(1);
+            expect(post.mock.calls[0][0]).toBe(
+                '/finance/baskets/basket/collection-corrections',
+            );
+            const payload = post.mock.calls[0][1] as {
+                reason: string;
+                correction_id: string;
+            };
+            expect(payload.reason).toBe('Wrong mark');
+            expect(payload.correction_id).toMatch(/^[0-9a-f-]{36}$/);
+            await form.trigger('submit');
+            expect(
+                (post.mock.calls[1][1] as { correction_id: string })
+                    .correction_id,
+            ).toBe(payload.correction_id);
+            post.mock.calls[1][2]?.onSuccess?.({} as never);
+            await nextTick();
+            expect(reason.element.value).toBe('');
+        } finally {
+            wrapper.unmount();
+            reset();
+            post.mockRestore();
+        }
+    });
+
     it('submits a signed amount, trimmed reason and stable identity from the real correction form, then resets only on success (R23, R32)', async () => {
         const post = vi.spyOn(router, 'post');
         post.mockClear();

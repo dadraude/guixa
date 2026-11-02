@@ -5,6 +5,7 @@ namespace Guixa\Sales\Infrastructure\Persistence;
 use DateTimeImmutable;
 use Guixa\Sales\Domain\Basket;
 use Guixa\Sales\Domain\BasketAdjustment;
+use Guixa\Sales\Domain\BasketCollectionEvent;
 use Guixa\Sales\Domain\BasketLine;
 use Guixa\Sales\Domain\BasketRepository;
 use Guixa\Sales\Domain\Error\BasketNotEditable;
@@ -75,10 +76,31 @@ final class EloquentBasketRepository implements BasketRepository
             ]);
         }
 
-        if ($basket->collectedAt !== null && ! BasketCollectionEventModel::query()->where('basket_id', $basket->id)->exists()) {
+        $nextCollectionSequence = ((int) BasketCollectionEventModel::query()->where('basket_id', $basket->id)->max('sequence')) + 1;
+        if ($basket->collectedAt !== null && $nextCollectionSequence === 1
+            && $basket->collectionEvents === []) {
             BasketCollectionEventModel::query()->create([
                 'id' => $this->nextId(), 'basket_id' => $basket->id, 'type' => 'collected',
                 'recorded_by' => $basket->collectedBy, 'occurred_at' => $basket->collectedAt->format(DATE_ATOM),
+                'sequence' => $nextCollectionSequence++,
+            ]);
+        }
+        foreach ($basket->collectionEvents as $event) {
+            $existing = BasketCollectionEventModel::query()->find($event->id);
+            if ($existing !== null) {
+                if ($existing->basket_id !== $event->basketId || $existing->type !== $event->type
+                    || $existing->recorded_by !== $event->recordedBy || $existing->reason !== $event->reason
+                    || $this->instant(new DateTimeImmutable($existing->occurred_at)) !== $this->instant($event->occurredAt)) {
+                    throw BasketNotEditable::create();
+                }
+
+                continue;
+            }
+            BasketCollectionEventModel::query()->create([
+                'id' => $event->id, 'basket_id' => $basket->id, 'type' => $event->type,
+                'recorded_by' => $event->recordedBy, 'occurred_at' => $event->occurredAt->format(DATE_ATOM),
+                'reason' => $event->reason,
+                'sequence' => $nextCollectionSequence++,
             ]);
         }
     }
@@ -87,12 +109,22 @@ final class EloquentBasketRepository implements BasketRepository
     {
         $collectionTransition = $stored->state === 'validated' && $incoming->state === 'collected'
             && $incoming->collectedAt !== null && $incoming->collectedBy !== null;
+        $correctionTransition = $stored->state === 'collected' && $incoming->state === 'validated'
+            && count($incoming->collectionEvents) === count($stored->collectionEvents) + 1
+            && $this->latestCollectionEventType($incoming) === 'corrected';
         $sameState = $stored->state === $incoming->state;
+        $appendedEvents = count($incoming->collectionEvents) - count($stored->collectionEvents);
+        $validCollectionEvents = $correctionTransition || ($sameState && $appendedEvents === 0)
+            || ($collectionTransition && (($stored->collectedAt === null && $appendedEvents <= 1)
+                || ($stored->collectedAt !== null && $appendedEvents === 1))
+                && ($appendedEvents === 0 || $this->latestCollectionEventType($incoming) === 'collected'));
         $sameCollection = $stored->collectedBy === $incoming->collectedBy
             && $this->instant($stored->collectedAt) === $this->instant($incoming->collectedAt);
 
-        if ((! $sameState && ! $collectionTransition) || ($sameState && ! $sameCollection)
+        if ((! $sameState && ! $collectionTransition && ! $correctionTransition) || ! $validCollectionEvents
+            || (! $sameCollection && ! ($collectionTransition && $stored->collectedAt === null))
             || ! $this->retainsAdjustments($stored, $incoming)
+            || ! $this->retainsCollectionEvents($stored, $incoming)
             || $stored->householdId !== $incoming->householdId
             || $stored->householdName !== $incoming->householdName
             || $stored->createdBy !== $incoming->createdBy
@@ -121,6 +153,32 @@ final class EloquentBasketRepository implements BasketRepository
         }
 
         return true;
+    }
+
+    private function retainsCollectionEvents(Basket $stored, Basket $incoming): bool
+    {
+        if (count($incoming->collectionEvents) < count($stored->collectionEvents)) {
+            return false;
+        }
+        foreach ($stored->collectionEvents as $index => $event) {
+            $candidate = $incoming->collectionEvents[$index];
+            if (! $event->matches($candidate)
+                || $this->instant($event->occurredAt) !== $this->instant($candidate->occurredAt)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private function latestCollectionEventType(Basket $basket): ?string
+    {
+        $type = null;
+        foreach ($basket->collectionEvents as $event) {
+            $type = $event->type;
+        }
+
+        return $type;
     }
 
     private function instant(?DateTimeImmutable $instant): ?string
@@ -158,7 +216,7 @@ final class EloquentBasketRepository implements BasketRepository
 
     public function list(): array
     {
-        return array_values(BasketModel::query()->with(['lines', 'adjustments'])->orderByDesc('created_at')->orderByDesc('id')->get()
+        return array_values(BasketModel::query()->with(['lines', 'adjustments', 'collectionEvents'])->orderByDesc('created_at')->orderByDesc('id')->get()
             ->map(fn (BasketModel $model) => $this->toDomain($model))->all());
     }
 
@@ -171,7 +229,7 @@ final class EloquentBasketRepository implements BasketRepository
 
     public function listForHousehold(string $householdId): array
     {
-        return array_values(BasketModel::query()->where('household_id', $householdId)->with(['lines', 'adjustments'])
+        return array_values(BasketModel::query()->where('household_id', $householdId)->with(['lines', 'adjustments', 'collectionEvents'])
             ->orderByDesc('created_at')->orderByDesc('id')->get()
             ->map(fn (BasketModel $model) => $this->toDomain($model))->all());
     }
@@ -199,7 +257,10 @@ final class EloquentBasketRepository implements BasketRepository
             $model->cancelled_by, $model->cancelled_at === null ? null : new DateTimeImmutable($model->cancelled_at),
             array_values($model->adjustments->map(fn (BasketAdjustmentModel $adjustment) => new BasketAdjustment(
                 $adjustment->id, $adjustment->basket_id, (int) $adjustment->amount_cents,
-                $adjustment->reason, $adjustment->recorded_by, new DateTimeImmutable($adjustment->occurred_at)))->all()));
+                $adjustment->reason, $adjustment->recorded_by, new DateTimeImmutable($adjustment->occurred_at)))->all()),
+            array_values($model->collectionEvents->map(fn (BasketCollectionEventModel $event) => new BasketCollectionEvent(
+                $event->id, $event->basket_id, $event->type, $event->recorded_by,
+                new DateTimeImmutable($event->occurred_at), $event->reason))->all()));
     }
 
     private function containerSnapshot(BasketLineModel $line): ?string

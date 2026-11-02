@@ -25,7 +25,7 @@ final class MarkBasketCollected
             if ($basket->state !== 'validated') {
                 throw BasketNotEditable::create();
             }
-            $this->baskets->save($basket->collected($actor->accountId, $this->clock->now()));
+            $this->baskets->save($basket->collected($actor->accountId, $this->clock->now(), $this->baskets->nextId()));
         });
     }
 }

@@ -5,6 +5,7 @@ namespace Tests\Support\Contracts;
 use DateTimeImmutable;
 use Guixa\Sales\Domain\Basket;
 use Guixa\Sales\Domain\BasketAdjustment;
+use Guixa\Sales\Domain\BasketCollectionEvent;
 use Guixa\Sales\Domain\BasketLine;
 use Guixa\Sales\Domain\BasketRepository;
 use Guixa\Sales\Domain\Error\BasketNotEditable;
@@ -14,6 +15,71 @@ use Throwable;
 
 trait BasketRepositoryContract
 {
+    #[Test]
+    public function it_reloads_same_second_collection_events_in_append_order_regardless_of_identity(): void
+    {
+        [$repository, $manager, $household, $product] = $this->basketWorld();
+        $basket = $this->basket($repository, $manager, $household, []);
+        $repository->save($basket->withLines([$this->line($repository, $basket->id, $product)]));
+        $instant = new DateTimeImmutable('2026-10-30T12:00:00+00:00');
+        $repository->save($repository->get($basket->id)->validated($manager, $instant));
+        $repository->save($repository->get($basket->id)->collected($manager, $instant, $repository->nextId()));
+        $correction = new BasketCollectionEvent('ffffffff-ffff-4fff-8fff-ffffffffffff', $basket->id,
+            'corrected', $manager, $instant, 'Wrong mark');
+        $repository->save($repository->get($basket->id)->collectionCorrected($correction));
+        $repository->save($repository->get($basket->id)->collected($manager, $instant, $repository->nextId()));
+
+        $reloaded = $repository->get($basket->id);
+        $this->assertSame(['collected', 'corrected', 'collected'],
+            array_map(fn (BasketCollectionEvent $event) => $event->type, $reloaded->collectionEvents));
+        $this->assertSame('collected', $reloaded->state);
+        $this->assertEquals($instant, $reloaded->collectedAt);
+    }
+
+    #[Test]
+    public function it_retains_collection_history_and_rejects_reused_or_removed_event_identities(): void
+    {
+        [$repository, $manager, $household, $product] = $this->basketWorld();
+        $basket = $this->basket($repository, $manager, $household, []);
+        $repository->save($basket->withLines([$this->line($repository, $basket->id, $product)]));
+        $validated = $repository->get($basket->id)->validated($manager, new DateTimeImmutable('2026-10-30T11:00:00+00:00'));
+        $repository->save($validated);
+        $firstAt = new DateTimeImmutable('2026-10-30T12:00:00+00:00');
+        $repository->save($repository->get($basket->id)->collected($manager, $firstAt, $repository->nextId()));
+        $collected = $repository->get($basket->id);
+        $this->assertCount(1, $collected->collectionEvents);
+        $identity = $repository->nextId();
+        $correction = new BasketCollectionEvent($identity, $basket->id, 'corrected', $manager,
+            new DateTimeImmutable('2026-10-30T13:00:00+00:00'), 'Wrong mark');
+        $repository->save($collected->collectionCorrected($correction));
+        $pending = $repository->get($basket->id);
+        $this->assertSame('validated', $pending->state);
+        $this->assertSame($manager, $pending->collectedBy);
+        $this->assertEquals($firstAt, $pending->collectedAt);
+        $this->assertSame(['collected', 'corrected'], array_map(fn (BasketCollectionEvent $event) => $event->type, $pending->collectionEvents));
+        $this->assertSame('Wrong mark', $pending->collectionEvents[1]->reason);
+        try {
+            $repository->save($collected);
+            $this->fail('Retained correction history cannot be removed.');
+        } catch (BasketNotEditable) {
+            // Expected append-only boundary.
+        }
+        $this->assertCount(2, $repository->get($basket->id)->collectionEvents);
+
+        $other = $this->basket($repository, $manager, $household, []);
+        $repository->save($other->withLines([$this->line($repository, $other->id, $product)]));
+        $repository->save($repository->get($other->id)->validated($manager, $firstAt));
+        $repository->save($repository->get($other->id)->collected($manager, $firstAt, $repository->nextId()));
+        try {
+            $repository->save($repository->get($other->id)->collectionCorrected(new BasketCollectionEvent(
+                $identity, $other->id, 'corrected', $manager, new DateTimeImmutable('2026-10-30T14:00:00+00:00'), 'Other')));
+            $this->fail('A correction identity cannot be reused for another basket.');
+        } catch (BasketNotEditable) {
+            // Expected global event identity boundary.
+        }
+        $this->assertSame('collected', $repository->get($other->id)->state);
+    }
+
     #[Test]
     public function it_appends_ordered_amount_adjustments_without_rewriting_prior_history(): void
     {
