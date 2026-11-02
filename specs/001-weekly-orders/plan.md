@@ -398,6 +398,10 @@ with the same basket, actor, amount and trimmed reason has one effect; changed c
 same identity are rejected. Amount-only corrections never change quantities or Stock movements.
 A mistaken collection mark is corrected by staff with a reason and retained collection history,
 without financial changes. A full contents reversal leaves no effective goods pending collection.
+Collection history uses a basket-local append sequence assigned while holding the basket lock.
+Event time and correction identity remain intact but do not determine causal display order when
+collection, correction and recollection share a stored second. Replaying a correction does not append
+another event or sequence number.
 
 ### Application interface
 
@@ -524,9 +528,11 @@ filter removed/cancelled contents, while explicit history methods do not. Re-add
 creates a new row/time so proportional tie-breaking stays correct.
 
 Current Basket and Cycle repository list reads load their children through ordered Eloquent
-relationships in one child query per list. Basket lines include removed history and retain their
-stored decimal snapshots; cycle producers retain participation and timestamp state. Single-record
-reads and locks still load children after selecting or locking the parent, and protected basket
+relationships, one child query per relationship rather than one query per parent. Basket lines include
+removed history and retain their stored decimal snapshots; ordered basket adjustments and collection
+events retain correction history by basket-local append sequence. Cycle producers retain
+participation and timestamp state. Single-record reads and locks still load children after
+selecting or locking the parent, and protected basket
 snapshot comparisons continue to use the stored lines.
 
 Concurrency and atomicity:

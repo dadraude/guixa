@@ -17,6 +17,13 @@ readonly reason: string,
 readonly recordedBy: string,
 readonly occurredAt: string,
 };
+export type BasketCollectionEventRow = {
+readonly id: string,
+readonly type: string,
+readonly recordedBy: string,
+readonly occurredAt: string,
+readonly reason: string | null,
+};
 export type BasketHouseholdRow = {
 readonly id: string,
 readonly name: string,
@@ -42,6 +49,7 @@ readonly validatedAt: string | null,
 readonly collectedAt: string | null,
 readonly effectiveTotalCents: number,
 readonly adjustments: App.Http.BasketAdjustmentRow[],
+readonly collectionEvents: App.Http.BasketCollectionEventRow[],
 };
 export type BasketStockLineRow = {
 readonly stockProductId: string,

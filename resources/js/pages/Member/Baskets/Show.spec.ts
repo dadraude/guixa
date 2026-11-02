@@ -41,6 +41,7 @@ const basket: App.Http.BasketRow = {
     totalCents: 2300,
     effectiveTotalCents: 2300,
     adjustments: [],
+    collectionEvents: [],
     balanceCents: -500,
     projectedBalanceCents: -2800,
     validatedAt: null,
@@ -54,6 +55,49 @@ async function render(record = basket) {
 }
 
 describe('member basket detail', () => {
+    it('shows a never-collected validated basket as pending and read-only', async () => {
+        const html = await render({
+            ...basket,
+            state: 'validated',
+            collectionEvents: [],
+            collectedAt: null,
+        });
+        expect(html).toContain('data-test="original-collection"');
+        expect(html).toContain('Encara no s’ha recollit');
+        expect(html).toContain('data-test="effective-collection"');
+        expect(html).toContain('Pendent de recollida');
+        expect(html).not.toContain('data-test="collection-history"');
+        expect(html).not.toContain('data-test="collection-correction-form"');
+        expect(html).not.toContain('<button');
+    });
+
+    it('shows original collection and correction history without a staff form (R23b)', async () => {
+        const html = await render({
+            ...basket,
+            state: 'validated',
+            collectionEvents: [
+                {
+                    id: 'event-1',
+                    type: 'collected',
+                    recordedBy: 'manager',
+                    occurredAt: '2026-10-30T10:00:00+00:00',
+                    reason: null,
+                },
+                {
+                    id: 'event-2',
+                    type: 'corrected',
+                    recordedBy: 'finance',
+                    occurredAt: '2026-10-30T11:00:00+00:00',
+                    reason: 'Wrong mark',
+                },
+            ],
+        });
+        expect(html).toContain('data-test="original-collection"');
+        expect(html).toContain('data-test="effective-collection"');
+        expect(html).toContain('Wrong mark');
+        expect(html).not.toContain('data-test="collection-correction-form"');
+    });
+
     it('shows corrected amounts and reason without staff controls (R23, R31)', async () => {
         const html = await render({
             ...basket,

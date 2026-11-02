@@ -3,6 +3,7 @@ import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import { trans } from 'laravel-vue-i18n';
 import { computed, ref } from 'vue';
 import BasketCollectionController from '@/actions/App/Http/Controllers/Finance/BasketCollectionController';
+import BasketCollectionCorrectionController from '@/actions/App/Http/Controllers/Finance/BasketCollectionCorrectionController';
 import BasketCorrectionController from '@/actions/App/Http/Controllers/Finance/BasketCorrectionController';
 import BasketController from '@/actions/App/Http/Controllers/Finance/BasketController';
 import BasketStockController from '@/actions/App/Http/Controllers/Finance/BasketStockController';
@@ -11,6 +12,7 @@ import BasketValidationController from '@/actions/App/Http/Controllers/Finance/B
 import HouseholdWalletController from '@/actions/App/Http/Controllers/Finance/HouseholdWalletController';
 import Heading from '@/components/Heading.vue';
 import AmountAdjustments from '@/components/baskets/AmountAdjustments.vue';
+import BasketCollectionHistory from '@/components/baskets/BasketCollectionHistory.vue';
 import InputError from '@/components/InputError.vue';
 import StockLines from '@/components/pickup/StockLines.vue';
 import ReturnLines from '@/components/pickup/ReturnLines.vue';
@@ -28,6 +30,7 @@ const page = usePage();
 const errors = computed(() => page.props.errors as Record<string, string>);
 const processing = ref(false);
 const adjustmentPanel = useTemplateRef('adjustmentPanel');
+const collectionPanel = useTemplateRef('collectionPanel');
 const options = {
     preserveScroll: true,
     onStart: () => (processing.value = true),
@@ -84,6 +87,14 @@ const correct = (amountCents: number, reason: string, correctionId: string) =>
         BasketCorrectionController.store.url({ basket: props.basket.id }),
         { amount_cents: amountCents, reason, correction_id: correctionId },
         { ...options, onSuccess: () => adjustmentPanel.value?.reset() },
+    );
+const correctCollection = (reason: string, correctionId: string) =>
+    router.post(
+        BasketCollectionCorrectionController.store.url({
+            basket: props.basket.id,
+        }),
+        { reason, correction_id: correctionId },
+        { ...options, onSuccess: () => collectionPanel.value?.reset() },
     );
 const statusLabels: Record<string, string> = {
     draft: trans('Draft'),
@@ -183,6 +194,17 @@ const statusLabels: Record<string, string> = {
             :processing="processing"
             :errors="errors"
             @submit="correct"
+        />
+
+        <BasketCollectionHistory
+            v-if="basket.state === 'validated' || basket.state === 'collected'"
+            ref="collectionPanel"
+            :state="basket.state"
+            :events="basket.collectionEvents ?? []"
+            :editable="true"
+            :processing="processing"
+            :errors="errors"
+            @submit="correctCollection"
         />
 
         <div

@@ -11,6 +11,7 @@ final readonly class BasketRow
     /** @param list<BasketStockLineRow> $stockLines
      * @param  list<BasketReturnLineRow>  $returnLines
      * @param  list<BasketAdjustmentRow>  $adjustments
+     * @param  list<BasketCollectionEventRow>  $collectionEvents
      */
     public function __construct(
         public string $id,
@@ -26,6 +27,7 @@ final readonly class BasketRow
         public ?string $collectedAt,
         public int $effectiveTotalCents,
         public array $adjustments,
+        public array $collectionEvents,
     ) {}
 
     public static function from(BasketData $basket, int $balanceCents): self
@@ -37,6 +39,7 @@ final readonly class BasketRow
             array_map(BasketReturnLineRow::from(...), $basket->returnLines),
             $total, $balanceCents, $basket->state === 'draft' ? $balanceCents - $total : $balanceCents,
             $basket->validatedAt?->format(DATE_ATOM), $basket->collectedAt?->format(DATE_ATOM),
-            $basket->effectiveTotalCents, array_map(BasketAdjustmentRow::from(...), $basket->adjustments));
+            $basket->effectiveTotalCents, array_map(BasketAdjustmentRow::from(...), $basket->adjustments),
+            array_map(BasketCollectionEventRow::from(...), $basket->collectionEvents));
     }
 }

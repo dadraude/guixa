@@ -10,11 +10,13 @@ final readonly class BasketData
     /** @param list<BasketLineData> $stockLines
      * @param  list<BasketReturnLineData>  $returnLines
      * @param  list<BasketAdjustmentData>  $adjustments
+     * @param  list<BasketCollectionEventData>  $collectionEvents
      */
     public function __construct(public string $id, public string $householdId, public string $householdName,
         public string $state, public array $stockLines, public array $returnLines, public int $totalCents,
         public DateTimeImmutable $createdAt, public ?DateTimeImmutable $validatedAt,
-        public ?DateTimeImmutable $collectedAt, public int $effectiveTotalCents, public array $adjustments) {}
+        public ?DateTimeImmutable $collectedAt, public int $effectiveTotalCents, public array $adjustments,
+        public array $collectionEvents) {}
 
     public static function from(Basket $basket): self
     {
@@ -23,6 +25,7 @@ final readonly class BasketData
             array_map(BasketReturnLineData::from(...), array_values(array_filter($basket->activeLines(), fn ($line) => $line->kind === 'return'))),
             $basket->validatedTotalCents ?? $basket->totalCents(), $basket->createdAt,
             $basket->validatedAt, $basket->collectedAt, $basket->effectiveTotalCents(),
-            array_map(BasketAdjustmentData::from(...), $basket->adjustments));
+            array_map(BasketAdjustmentData::from(...), $basket->adjustments),
+            array_map(BasketCollectionEventData::from(...), $basket->collectionEvents));
     }
 }

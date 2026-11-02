@@ -5,6 +5,7 @@ import BasketController from '@/actions/App/Http/Controllers/Member/BasketContro
 import WalletController from '@/actions/App/Http/Controllers/WalletController';
 import Heading from '@/components/Heading.vue';
 import AmountAdjustments from '@/components/baskets/AmountAdjustments.vue';
+import BasketCollectionHistory from '@/components/baskets/BasketCollectionHistory.vue';
 import StockLines from '@/components/pickup/StockLines.vue';
 import ReturnLines from '@/components/pickup/ReturnLines.vue';
 import { euros } from '@/components/pickup/euros';
@@ -90,6 +91,12 @@ const statusLabels: Record<string, string> = {
             :original-cents="basket.totalCents"
             :effective-cents="basket.effectiveTotalCents"
             :adjustments="basket.adjustments"
+            :editable="false"
+        />
+        <BasketCollectionHistory
+            v-if="basket.state === 'validated' || basket.state === 'collected'"
+            :state="basket.state"
+            :events="basket.collectionEvents ?? []"
             :editable="false"
         />
         <p v-if="basket.state === 'draft'" data-test="draft-preparation">

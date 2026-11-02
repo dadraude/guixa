@@ -4,6 +4,7 @@ namespace Guixa\Sales\Domain;
 
 use DateTimeImmutable;
 use DomainException;
+use Guixa\Sales\Domain\Error\InvalidBasketCollectionCorrection;
 
 final readonly class Basket
 {
@@ -25,6 +26,8 @@ final readonly class Basket
         public ?DateTimeImmutable $cancelledAt = null,
         /** @var list<BasketAdjustment> */
         public array $adjustments = [],
+        /** @var list<BasketCollectionEvent> */
+        public array $collectionEvents = [],
     ) {}
 
     /** @return list<BasketLine> */
@@ -86,7 +89,7 @@ final readonly class Basket
         return new self($this->id, $this->householdId, $this->householdName, $this->state,
             $this->createdBy, $this->createdAt, $this->lines, $this->validatedBy, $this->validatedAt,
             $this->validatedTotalCents, $this->collectedBy, $this->collectedAt, $this->cancelledBy,
-            $this->cancelledAt, [...$this->adjustments, $adjustment]);
+            $this->cancelledAt, [...$this->adjustments, $adjustment], $this->collectionEvents);
     }
 
     public function validated(string $actorId, DateTimeImmutable $when): self
@@ -100,7 +103,7 @@ final readonly class Basket
             $this->createdBy, $this->createdAt, $this->lines, $actorId, $when, $this->totalCents());
     }
 
-    public function collected(string $actorId, DateTimeImmutable $when): self
+    public function collected(string $actorId, DateTimeImmutable $when, ?string $eventId = null): self
     {
         if ($this->state === 'collected') {
             return $this;
@@ -109,9 +112,28 @@ final readonly class Basket
             throw new DomainException('Only validated baskets can be collected.');
         }
 
+        $events = $this->collectionEvents;
+        if ($eventId !== null) {
+            $events[] = new BasketCollectionEvent($eventId, $this->id, 'collected', $actorId, $when);
+        }
+
         return new self($this->id, $this->householdId, $this->householdName, 'collected',
             $this->createdBy, $this->createdAt, $this->lines, $this->validatedBy, $this->validatedAt,
-            $this->validatedTotalCents, $actorId, $when, adjustments: $this->adjustments);
+            $this->validatedTotalCents, $this->collectedBy ?? $actorId, $this->collectedAt ?? $when,
+            adjustments: $this->adjustments, collectionEvents: $events);
+    }
+
+    public function collectionCorrected(BasketCollectionEvent $correction): self
+    {
+        if ($this->state !== 'collected' || $correction->basketId !== $this->id
+            || $correction->type !== 'corrected' || trim($correction->reason ?? '') === '') {
+            throw InvalidBasketCollectionCorrection::create();
+        }
+
+        return new self($this->id, $this->householdId, $this->householdName, 'validated',
+            $this->createdBy, $this->createdAt, $this->lines, $this->validatedBy, $this->validatedAt,
+            $this->validatedTotalCents, $this->collectedBy, $this->collectedAt, $this->cancelledBy,
+            $this->cancelledAt, $this->adjustments, [...$this->collectionEvents, $correction]);
     }
 
     public function cancelled(string $actorId, DateTimeImmutable $when): self
