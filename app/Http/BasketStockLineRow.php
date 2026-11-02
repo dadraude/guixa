@@ -15,11 +15,14 @@ final readonly class BasketStockLineRow
         public string $quantity,
         public int $unitPriceCents,
         public int $amountCents,
+        public string $effectiveQuantity,
+        public int $effectiveAmountCents,
     ) {}
 
     public static function from(BasketLineData $line): self
     {
         return new self($line->productId, $line->name, $line->unit, $line->quantity,
-            $line->priceCents, $line->amountCents);
+            $line->priceCents, $line->amountCents,
+            $line->effectiveQuantity, $line->effectiveAmountCents);
     }
 }

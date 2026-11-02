@@ -12,7 +12,13 @@ final class InMemoryStockMovementRepository extends InMemoryRepository implement
 {
     public function add(StockMovement $movement): void
     {
-        if ($movement->basketId !== null) {
+        if ($movement->correctionId !== null) {
+            foreach ($this->all() as $existing) {
+                if ($existing->correctionId === $movement->correctionId && $existing->stockProductId === $movement->stockProductId) {
+                    throw new DomainException('This basket correction was already recorded for the product.');
+                }
+            }
+        } elseif ($movement->basketId !== null) {
             foreach ($this->all() as $existing) {
                 if ($existing->basketId === $movement->basketId && $existing->stockProductId === $movement->stockProductId) {
                     throw new DomainException('This basket sale was already recorded for the product.');

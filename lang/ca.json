@@ -662,8 +662,14 @@
     "Weekly products": "Productes setmanals",
     "Stock products": "Productes d’estoc",
     "Your stock products are read-only.": "Pots consultar els teus productes d’estoc, però no modificar-los.",
-    "No stock products yet.": "Encara no hi ha productes d’estoc.",
     "Finance": "Economia",
     "Grant Finance role": "Concedeix el rol d’economia",
-    "Remove Finance role": "Retira el rol d’economia"
+    "Remove Finance role": "Retira el rol d’economia",
+    "Effective quantity: :quantity :unit": "Quantitat efectiva: :quantity :unit",
+    "Goods physically returned": "Productes retornats físicament",
+    "Leave empty for an amount-only correction. Returned goods go back to stock.": "Deixa-ho buit per a una correcció només d’import. Els productes retornats tornen a l’estoc.",
+    "Returned :name (:unit)": "Retornat: :name (:unit)",
+    "At most :quantity": "Com a màxim :quantity",
+    "Goods fully reversed": "Productes retornats del tot",
+    "All goods were returned; nothing is left to collect.": "S’han retornat tots els productes; no queda res per recollir."
 }

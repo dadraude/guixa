@@ -80,6 +80,39 @@ final readonly class Basket
             - array_sum(array_map(fn (BasketAdjustment $adjustment) => $adjustment->amountCents, $this->adjustments));
     }
 
+    /** Original active quantity plus signed corrections, in thousandths. */
+    public function effectiveQuantity(string $productId): int
+    {
+        $original = $this->activeLineFor($productId)?->quantity->thousandths ?? 0;
+        foreach ($this->adjustments as $adjustment) {
+            foreach ($adjustment->lines as $line) {
+                if ($line->productId === $productId) {
+                    $original += $line->quantityDeltaThousandths;
+                }
+            }
+        }
+
+        return $original;
+    }
+
+    /** A basket that had stock goods and has none left after corrections has nothing to collect. */
+    public function goodsFullyReversed(): bool
+    {
+        $hadGoods = false;
+        foreach ($this->activeLines() as $line) {
+            if ($line->kind !== 'stock') {
+                // Returned empties still have to be collected, so the basket is not fully reversed.
+                return false;
+            }
+            if ($this->effectiveQuantity((string) $line->productId) > 0) {
+                return false;
+            }
+            $hadGoods = true;
+        }
+
+        return $hadGoods;
+    }
+
     public function withAdjustment(BasketAdjustment $adjustment): self
     {
         if (! in_array($this->state, ['validated', 'collected'], true) || $adjustment->basketId !== $this->id) {

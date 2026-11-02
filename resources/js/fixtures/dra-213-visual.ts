@@ -53,6 +53,7 @@ const basket = {
                   reason: state === 'long' ? longText : 'Preu corregit',
                   recordedBy: 'Finances',
                   occurredAt: '2026-11-01T11:00:00+00:00',
+                  lines: [],
               },
           ]
         : [],

@@ -42,6 +42,7 @@ const basket = {
     effectiveTotalCents: -50,
     adjustments: [],
     collectionEvents: [],
+    pendingCollection: true,
     balanceCents: 0,
     projectedBalanceCents: 50,
     validatedAt: null,
@@ -229,6 +230,7 @@ describe('Finance basket detail', () => {
                             reason: 'Corrected price',
                             recordedBy: 'manager',
                             occurredAt: '2026-10-30T11:00:00+00:00',
+                            lines: [],
                         },
                     ],
                 },
@@ -289,5 +291,109 @@ describe('Finance basket detail', () => {
         )?.[0];
         expect(validateButton).toMatch(/\sdisabled(?:\s|>)/);
         expect(html).toContain('Cancel draft');
+    });
+
+    it('shows a fully reversed validated basket as nothing to collect, without a collect action (R24a)', async () => {
+        const app = createSSRApp(Show, {
+            basket: {
+                ...basket,
+                state: 'validated',
+                pendingCollection: false,
+                effectiveTotalCents: 0,
+                stockLines: [
+                    {
+                        stockProductId: 'oil',
+                        name: 'Olive oil',
+                        unit: 'bottle',
+                        quantity: '3.000',
+                        unitPriceCents: 1200,
+                        amountCents: 3600,
+                        effectiveQuantity: '0.000',
+                        effectiveAmountCents: 0,
+                    },
+                ],
+            },
+            stockProducts: [],
+            returnItems: [],
+        });
+        installTranslations(app);
+        const html = await renderToString(app);
+        expect(html).toContain('data-test="basket-status-reversed"');
+        expect(html).toContain('data-test="goods-reversed"');
+        expect(html).toContain('data-test="effective-quantity"');
+        expect(html).not.toContain('data-test="collect-basket"');
+        expect(html).not.toContain('data-test="returned-goods"');
+    });
+
+    it('posts the returned goods with the correction identity (S86)', async () => {
+        const post = vi.spyOn(router, 'post');
+        const wrapper = mount(Show, {
+            props: {
+                basket: {
+                    ...basket,
+                    state: 'validated',
+                    stockLines: [
+                        {
+                            stockProductId: 'oil',
+                            name: 'Olive oil',
+                            unit: 'bottle',
+                            quantity: '3.000',
+                            unitPriceCents: 1200,
+                            amountCents: 3600,
+                            effectiveQuantity: '3.000',
+                            effectiveAmountCents: 3600,
+                        },
+                    ],
+                },
+                stockProducts: [],
+                returnItems: [],
+            },
+            global: { plugins: [{ install: installTranslations }] },
+        });
+        await wrapper.get('#correction-amount').setValue('1200');
+        await wrapper.get('#correction-reason').setValue('Came back');
+        await wrapper.get('[data-test="returned-oil"]').setValue('1');
+        await wrapper
+            .get('[data-test="basket-correction-form"]')
+            .trigger('submit');
+
+        expect(post).toHaveBeenLastCalledWith(
+            expect.stringContaining('/corrections'),
+            expect.objectContaining({
+                amount_cents: 1200,
+                reason: 'Came back',
+                returned_goods: [{ stock_product_id: 'oil', quantity: '1' }],
+            }),
+            expect.anything(),
+        );
+    });
+
+    it('keeps a basket with returned empties pending when its stock is fully reversed (R24a, S88)', async () => {
+        const app = createSSRApp(Show, {
+            basket: {
+                ...basket,
+                state: 'validated',
+                pendingCollection: true,
+                stockLines: [
+                    {
+                        stockProductId: 'oil',
+                        name: 'Olive oil',
+                        unit: 'bottle',
+                        quantity: '1.000',
+                        unitPriceCents: 1200,
+                        amountCents: 1200,
+                        effectiveQuantity: '0.000',
+                        effectiveAmountCents: 0,
+                    },
+                ],
+            },
+            stockProducts: [],
+            returnItems: [],
+        });
+        installTranslations(app);
+        const html = await renderToString(app);
+        expect(html).toContain('data-test="basket-status-validated"');
+        expect(html).toContain('data-test="collect-basket"');
+        expect(html).not.toContain('data-test="goods-reversed"');
     });
 });

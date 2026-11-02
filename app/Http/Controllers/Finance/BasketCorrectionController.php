@@ -13,8 +13,17 @@ final class BasketCorrectionController extends Controller
     public function store(string $basket, StoreBasketCorrectionRequest $request, Actor $actor, CorrectBasket $correct): RedirectResponse
     {
         $correct($actor, $basket, $request->integer('amount_cents'), $request->string('reason')->toString(),
-            $request->string('correction_id')->toString());
+            $request->string('correction_id')->toString(), $this->returnedGoods($request));
 
         return back();
+    }
+
+    /** @return array<string, string> */
+    private function returnedGoods(StoreBasketCorrectionRequest $request): array
+    {
+        /** @var list<array{stock_product_id: string, quantity: string}> $lines */
+        $lines = $request->array('returned_goods');
+
+        return array_column($lines, 'quantity', 'stock_product_id');
     }
 }

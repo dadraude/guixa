@@ -22,6 +22,11 @@ final class InMemoryStockMovementRepositoryTest extends TestCase
         return (string) Str::uuid7();
     }
 
+    protected function correctionFor(string $basket): string
+    {
+        return (string) Str::uuid7();
+    }
+
     protected function basket(): string
     {
         return (string) Str::uuid7();

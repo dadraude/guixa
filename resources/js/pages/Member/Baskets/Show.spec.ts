@@ -37,6 +37,8 @@ const basket: App.Http.BasketRow = {
             quantity: '2.000',
             unitPriceCents: 1200,
             amountCents: 2400,
+            effectiveQuantity: '2.000',
+            effectiveAmountCents: 2400,
         },
     ],
     returnLines: [
@@ -52,6 +54,7 @@ const basket: App.Http.BasketRow = {
     effectiveTotalCents: 2300,
     adjustments: [],
     collectionEvents: [],
+    pendingCollection: true,
     balanceCents: -500,
     projectedBalanceCents: -2800,
     validatedAt: null,
@@ -122,6 +125,7 @@ describe('member basket detail', () => {
                     reason: 'Corrected price',
                     recordedBy: 'manager',
                     occurredAt: '2026-10-30T11:00:00+00:00',
+                    lines: [],
                 },
             ],
         });

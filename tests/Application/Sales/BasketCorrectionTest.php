@@ -1,6 +1,7 @@
 <?php
 
 use Guixa\Sales\Application\CorrectBasket;
+use Guixa\Sales\Application\StockCorrector;
 use Guixa\Sales\Application\WalletLedger;
 use Guixa\Sales\Domain\Basket;
 use Guixa\Sales\Domain\BasketLine;
@@ -38,7 +39,10 @@ it('records one amount correction for a validated basket when the identity is re
             $this->corrections[$correctionId] = $amountCents;
         }
     };
-    $correct = new CorrectBasket($baskets, $wallet, new ImmediateTransactionRunner, new FrozenClock('2026-10-30 11:00:00'));
+    $correct = new CorrectBasket($baskets, $wallet, new class implements StockCorrector
+    {
+        public function correct(Actor $actor, string $productId, string $quantity, string $reason, string $basketId, string $correctionId): void {}
+    }, new ImmediateTransactionRunner, new FrozenClock('2026-10-30 11:00:00'));
 
     $correct(Actor::manager('manager'), 'basket-1', 200, 'Price correction', 'correction-1');
     $correct(Actor::manager('manager'), 'basket-1', 200, 'Price correction', 'correction-1');

@@ -82,10 +82,22 @@ const cancel = () =>
         {},
         options,
     );
-const correct = (amountCents: number, reason: string, correctionId: string) =>
+const correct = (
+    amountCents: number,
+    reason: string,
+    correctionId: string,
+    returnedGoods: { stock_product_id: string; quantity: string }[],
+) =>
     router.post(
         BasketCorrectionController.store.url({ basket: props.basket.id }),
-        { amount_cents: amountCents, reason, correction_id: correctionId },
+        {
+            amount_cents: amountCents,
+            reason,
+            correction_id: correctionId,
+            ...(returnedGoods.length > 0
+                ? { returned_goods: returnedGoods }
+                : {}),
+        },
         { ...options, onSuccess: () => adjustmentPanel.value?.reset() },
     );
 const correctCollection = (reason: string, correctionId: string) =>
@@ -96,8 +108,14 @@ const correctCollection = (reason: string, correctionId: string) =>
         { reason, correction_id: correctionId },
         { ...options, onSuccess: () => collectionPanel.value?.reset() },
     );
+const status = computed(() =>
+    props.basket.state === 'validated' && !props.basket.pendingCollection
+        ? 'reversed'
+        : props.basket.state,
+);
 const statusLabels: Record<string, string> = {
     draft: trans('Draft'),
+    reversed: trans('Goods fully reversed'),
     validated: trans('Pending collection'),
     collected: trans('Collected'),
     cancelled: trans('Cancelled'),
@@ -119,11 +137,9 @@ const statusLabels: Record<string, string> = {
             {{ trans('All baskets') }}
         </Link>
         <InputError :message="errors.domain" data-test="domain-error" />
-        <Badge
-            variant="secondary"
-            :data-test="`basket-status-${basket.state}`"
-            >{{ statusLabels[basket.state] ?? basket.state }}</Badge
-        >
+        <Badge variant="secondary" :data-test="`basket-status-${status}`">{{
+            statusLabels[status] ?? status
+        }}</Badge>
 
         <StockLines
             :lines="basket.stockLines"
@@ -191,6 +207,7 @@ const statusLabels: Record<string, string> = {
             :effective-cents="basket.effectiveTotalCents"
             :adjustments="basket.adjustments"
             :editable="true"
+            :stock-lines="basket.stockLines"
             :processing="processing"
             :errors="errors"
             @submit="correct"
@@ -235,6 +252,14 @@ const statusLabels: Record<string, string> = {
                 >{{ trans('Cancel draft') }}</Button
             >
         </div>
+        <p
+            v-else-if="status === 'reversed'"
+            class="text-sm text-muted-foreground"
+            data-test="goods-reversed"
+            data-visual-page-focus-last
+        >
+            {{ trans('All goods were returned; nothing is left to collect.') }}
+        </p>
         <div
             v-else-if="basket.state === 'validated'"
             class="flex flex-col items-start gap-2"

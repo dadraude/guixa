@@ -31,8 +31,14 @@ const collect = () =>
             onFinish: () => (processing.value = false),
         },
     );
+const status = computed(() =>
+    props.basket.state === 'validated' && !props.basket.pendingCollection
+        ? 'reversed'
+        : props.basket.state,
+);
 const statusLabels: Record<string, string> = {
     draft: trans('In preparation'),
+    reversed: trans('Goods fully reversed'),
     validated: trans('Pending collection'),
     collected: trans('Collected'),
     cancelled: trans('Cancelled basket'),
@@ -53,11 +59,9 @@ const statusLabels: Record<string, string> = {
         >
             {{ trans('All baskets') }}
         </Link>
-        <Badge
-            variant="secondary"
-            :data-test="`basket-status-${basket.state}`"
-            >{{ statusLabels[basket.state] ?? basket.state }}</Badge
-        >
+        <Badge variant="secondary" :data-test="`basket-status-${status}`">{{
+            statusLabels[status] ?? status
+        }}</Badge>
         <StockLines
             :lines="basket.stockLines"
             :options="[]"
@@ -112,6 +116,7 @@ const statusLabels: Record<string, string> = {
             :original-cents="basket.totalCents"
             :effective-cents="basket.effectiveTotalCents"
             :adjustments="basket.adjustments"
+            :stock-lines="basket.stockLines"
             :editable="false"
         />
         <BasketCollectionHistory
@@ -122,6 +127,9 @@ const statusLabels: Record<string, string> = {
         />
         <p v-if="basket.state === 'draft'" data-test="draft-preparation">
             {{ trans('Draft basket in preparation.') }}
+        </p>
+        <p v-else-if="status === 'reversed'" data-test="goods-reversed">
+            {{ trans('All goods were returned; nothing is left to collect.') }}
         </p>
         <div
             v-else-if="basket.state === 'validated'"

@@ -29,6 +29,7 @@ describe('member basket list', () => {
                 state: 'draft',
                 totalCents: 2300,
                 createdAt: '2026-10-30 10:00',
+                pendingCollection: false,
             },
             {
                 id: 'basket-two',
@@ -36,6 +37,7 @@ describe('member basket list', () => {
                 state: 'validated',
                 totalCents: -100,
                 createdAt: '2026-10-31 10:00',
+                pendingCollection: true,
             },
             {
                 id: 'basket-three',
@@ -43,6 +45,7 @@ describe('member basket list', () => {
                 state: 'cancelled',
                 totalCents: 0,
                 createdAt: '2026-11-01 10:00',
+                pendingCollection: false,
             },
         ]);
         expect(html).toContain('/baskets/basket-one');

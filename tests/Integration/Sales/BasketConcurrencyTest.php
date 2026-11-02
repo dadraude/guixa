@@ -98,6 +98,27 @@ final class BasketConcurrencyTest extends TestCase
     }
 
     #[Test]
+    public function racing_goods_corrections_that_would_over_return_let_exactly_one_succeed(): void
+    {
+        [$actor, $household, $products] = $this->world(['Oil' => '5']);
+        $basket = $this->draft($actor, $household, [$products['Oil'] => '3']);
+        app(ValidateBasket::class)($actor, $basket);
+        $product = $products['Oil'];
+
+        DB::beginTransaction();
+        app(CorrectBasket::class)($actor, $basket, 200, 'Two came back', (string) Str::uuid7(), [$product => '2']);
+        $pipes = $this->startGoodsCorrection($actor->accountId, $basket, (string) Str::uuid7(), $product, '2');
+        $this->waitForLock($pipes);
+        DB::commit();
+
+        $this->assertSame('InvalidBasketCorrection', $this->finish($pipes));
+        $this->assertSame(1, DB::table('basket_adjustments')->where('basket_id', $basket)->count());
+        $this->assertSame(1, DB::table('stock_movements')->whereNotNull('correction_id')->count());
+        $this->assertSame(1, DB::table('wallet_movements')->where('basket_id', $basket)->where('type', 'correction')->count());
+        $this->assertSame(4.0, (float) DB::table('stock_movements')->where('stock_product_id', $product)->sum('quantity'));
+    }
+
+    #[Test]
     public function concurrent_collection_correction_replay_waits_for_the_basket_lock_and_appends_once(): void
     {
         [$actor, $household, $products] = $this->world(['Oil' => '2']);
@@ -225,6 +246,29 @@ final class BasketConcurrencyTest extends TestCase
         PHP;
         $pipes = [];
         $this->other = proc_open([PHP_BINARY, '-r', $script, '--', $accountId, $basketId, $identity],
+            [1 => ['pipe', 'w'], 2 => ['pipe', 'w']], $pipes, null,
+            [...getenv(), 'DB_DATABASE' => DB::connection()->getDatabaseName()]);
+        $this->assertIsResource($this->other);
+
+        return $pipes;
+    }
+
+    /** @return array<int,resource> */
+    private function startGoodsCorrection(string $accountId, string $basketId, string $identity, string $productId, string $quantity): array
+    {
+        $script = <<<'PHP'
+        require getcwd().'/vendor/autoload.php';
+        $app = require getcwd().'/bootstrap/app.php';
+        $app->make(\Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+        try {
+            $app->make(\Guixa\Sales\Application\CorrectBasket::class)(\Guixa\Shared\Application\Actor::manager($argv[1]), $argv[2], 200, 'Two came back', $argv[3], [$argv[4] => $argv[5]]);
+            echo 'corrected';
+        } catch (\Throwable $error) {
+            echo (new \ReflectionClass($error))->getShortName();
+        }
+        PHP;
+        $pipes = [];
+        $this->other = proc_open([PHP_BINARY, '-r', $script, '--', $accountId, $basketId, $identity, $productId, $quantity],
             [1 => ['pipe', 'w'], 2 => ['pipe', 'w']], $pipes, null,
             [...getenv(), 'DB_DATABASE' => DB::connection()->getDatabaseName()]);
         $this->assertIsResource($this->other);

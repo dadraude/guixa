@@ -84,6 +84,7 @@ return [
                 'Application\StockLevelData' => ['Ordering'],
                 'Application\SellStock' => ['Ordering'],
                 'Application\SellBasketStock' => ['Sales'],
+                'Application\CorrectBasketStock' => ['Sales'],
             ],
         ],
         'Wallet' => [
@@ -119,6 +120,7 @@ return [
         'baskets' => 'Sales',
         'basket_lines' => 'Sales',
         'basket_adjustments' => 'Sales',
+        'basket_adjustment_lines' => 'Sales',
         'basket_collection_events' => 'Sales',
         'return_items' => 'Stock',
         'stock_movements' => 'Stock',

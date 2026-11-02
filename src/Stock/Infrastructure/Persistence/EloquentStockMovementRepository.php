@@ -31,6 +31,7 @@ final class EloquentStockMovementRepository implements StockMovementRepository
             'cycle_id' => $movement->cycleId,
             'order_id' => $movement->orderId,
             'basket_id' => $movement->basketId,
+            'correction_id' => $movement->correctionId,
         ]));
     }
 
@@ -90,6 +91,7 @@ final class EloquentStockMovementRepository implements StockMovementRepository
             $model->cycle_id,
             $model->order_id,
             $model->basket_id,
+            $model->correction_id,
         );
     }
 }
