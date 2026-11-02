@@ -123,6 +123,30 @@ final class BasketConcurrencyTest extends TestCase
     }
 
     #[Test]
+    public function concurrent_member_collection_replay_waits_for_the_basket_lock_and_records_one_event(): void
+    {
+        [$actor, $household, $products] = $this->world(['Oil' => '2']);
+        $basket = $this->draft($actor, $household, [$products['Oil'] => '1']);
+        app(ValidateBasket::class)($actor, $basket);
+        $anna = User::factory()->create();
+        $berta = User::factory()->create();
+        $stock = DB::table('stock_movements')->where('basket_id', $basket)->get();
+        $wallet = DB::table('wallet_movements')->where('basket_id', $basket)->get();
+
+        DB::beginTransaction();
+        app(MarkBasketCollected::class)(Actor::memberOf($anna->id, $household), $basket);
+        $pipes = $this->startMemberCollection($berta->id, $household, $basket);
+        $this->waitForLock($pipes);
+        DB::commit();
+
+        $this->assertSame('collected', $this->finish($pipes));
+        $this->assertSame($anna->id, DB::table('baskets')->where('id', $basket)->value('collected_by'));
+        $this->assertSame(1, DB::table('basket_collection_events')->where('basket_id', $basket)->count());
+        $this->assertEquals($stock, DB::table('stock_movements')->where('basket_id', $basket)->get());
+        $this->assertEquals($wallet, DB::table('wallet_movements')->where('basket_id', $basket)->get());
+    }
+
+    #[Test]
     public function opposite_draft_line_order_uses_the_same_product_lock_order_and_both_complete(): void
     {
         [$actor, $household, $products] = $this->world(['Oil' => '2', 'Rice' => '2']);
@@ -224,6 +248,29 @@ final class BasketConcurrencyTest extends TestCase
         PHP;
         $pipes = [];
         $this->other = proc_open([PHP_BINARY, '-r', $script, '--', $accountId, $basketId, $identity],
+            [1 => ['pipe', 'w'], 2 => ['pipe', 'w']], $pipes, null,
+            [...getenv(), 'DB_DATABASE' => DB::connection()->getDatabaseName()]);
+        $this->assertIsResource($this->other);
+
+        return $pipes;
+    }
+
+    /** @return array<int,resource> */
+    private function startMemberCollection(string $accountId, string $householdId, string $basketId): array
+    {
+        $script = <<<'PHP'
+        require getcwd().'/vendor/autoload.php';
+        $app = require getcwd().'/bootstrap/app.php';
+        $app->make(\Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+        try {
+            $app->make(\Guixa\Sales\Application\MarkBasketCollected::class)(\Guixa\Shared\Application\Actor::memberOf($argv[1], $argv[2]), $argv[3]);
+            echo 'collected';
+        } catch (\Throwable $error) {
+            echo (new \ReflectionClass($error))->getShortName();
+        }
+        PHP;
+        $pipes = [];
+        $this->other = proc_open([PHP_BINARY, '-r', $script, '--', $accountId, $householdId, $basketId],
             [1 => ['pipe', 'w'], 2 => ['pipe', 'w']], $pipes, null,
             [...getenv(), 'DB_DATABASE' => DB::connection()->getDatabaseName()]);
         $this->assertIsResource($this->other);

@@ -16,9 +16,9 @@ final class MarkBasketCollected
 
     public function __invoke(Actor $actor, string $basketId): void
     {
-        Gate::forUser($actor)->authorize('manage-sales');
         $this->transactions->run(function () use ($actor, $basketId): void {
             $basket = $this->baskets->lock($basketId) ?? throw BasketNotFound::withId($basketId);
+            Gate::forUser($actor)->authorize('collectFor', ['household', $basket->householdId]);
             if ($basket->state === 'collected') {
                 return;
             }
