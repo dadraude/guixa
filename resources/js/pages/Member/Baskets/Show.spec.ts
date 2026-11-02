@@ -1,18 +1,28 @@
+// @vitest-environment jsdom
+import { router } from '@inertiajs/vue3';
+import { mount } from '@vue/test-utils';
 import { describe, expect, it, vi } from 'vite-plus/test';
-import { createSSRApp, defineComponent, h } from 'vue';
+import { createSSRApp, defineComponent, h, nextTick } from 'vue';
 import { renderToString } from 'vue/server-renderer';
 import { installTranslations } from '@/lib/i18n';
 import Show from './Show.vue';
 
-vi.mock('@inertiajs/vue3', () => ({
-    Head: () => null,
-    Link: defineComponent({
-        setup:
-            (_, { attrs, slots }) =>
-            () =>
-                h('a', attrs, slots.default?.()),
-    }),
-}));
+vi.mock('@inertiajs/vue3', async () => {
+    const { defineComponent, h } = await import('vue');
+    return {
+        Head: () => null,
+        Link: defineComponent({
+            setup:
+                (_, { attrs, slots }) =>
+                () =>
+                    h('a', attrs, slots.default?.()),
+        }),
+        usePage: () => ({
+            props: { errors: { domain: 'Cistella no recollible' } },
+        }),
+        router: { put: vi.fn() },
+    };
+});
 
 const basket: App.Http.BasketRow = {
     id: 'basket-own',
@@ -68,7 +78,8 @@ describe('member basket detail', () => {
         expect(html).toContain('Pendent de recollida');
         expect(html).not.toContain('data-test="collection-history"');
         expect(html).not.toContain('data-test="collection-correction-form"');
-        expect(html).not.toContain('<button');
+        expect(html).toContain('data-test="collect-basket"');
+        expect(html).not.toContain('<form');
     });
 
     it('shows original collection and correction history without a staff form (R23b)', async () => {
@@ -136,7 +147,7 @@ describe('member basket detail', () => {
         expect(html).not.toContain('/finance/');
     });
 
-    it.each(['validated', 'collected', 'cancelled'] as const)(
+    it.each(['collected', 'cancelled'] as const)(
         'renders %s as read-only retained history',
         async (state) => {
             const html = await render({ ...basket, state });
@@ -148,4 +159,46 @@ describe('member basket detail', () => {
             expect(html).not.toContain('<button');
         },
     );
+
+    it.each(['draft', 'collected', 'cancelled'] as const)(
+        'offers no collect action for %s (R23b)',
+        async (state) => {
+            const html = await render({ ...basket, state });
+            expect(html).not.toContain('data-test="collect-basket"');
+            expect(html).not.toContain('data-test="domain-error"');
+        },
+    );
+
+    it('puts the own-household collection from a real translated button and disables it while processing (R23b, S82)', async () => {
+        const put = vi.spyOn(router, 'put');
+        put.mockClear();
+        const wrapper = mount(Show, {
+            props: { basket: { ...basket, state: 'validated' } },
+            global: { plugins: [{ install: installTranslations }] },
+        });
+        try {
+            const button = wrapper.get<HTMLButtonElement>(
+                '[data-test="collect-basket"]',
+            );
+            expect(button.element.tagName).toBe('BUTTON');
+            expect(button.attributes('type')).toBe('button');
+            expect(button.text()).toBe('Marca com a recollida');
+            expect(button.classes()).toContain('min-h-11');
+            expect(wrapper.get('[data-test="domain-error"]').text()).toBe(
+                'Cistella no recollible',
+            );
+            await button.trigger('click');
+            expect(put).toHaveBeenCalledTimes(1);
+            expect(put.mock.calls[0][0]).toBe('/baskets/basket-own/collection');
+            put.mock.calls[0][2]?.onStart?.({} as never);
+            await nextTick();
+            expect(button.element.disabled).toBe(true);
+            put.mock.calls[0][2]?.onFinish?.({} as never);
+            await nextTick();
+            expect(button.element.disabled).toBe(false);
+        } finally {
+            wrapper.unmount();
+            put.mockRestore();
+        }
+    });
 });

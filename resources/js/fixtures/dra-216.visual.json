@@ -1,0 +1,213 @@
+{
+    "baseUrl": "http://127.0.0.1:5216",
+    "rootFontPx": 16,
+    "darkSelector": "html.dark",
+    "matrix": {
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark"],
+        "text": [100, 200]
+    },
+    "views": [
+        {
+            "id": "member-collection",
+            "path": "/visual-dra-216.html",
+            "query": {},
+            "root": "#main-content",
+            "panels": "#main-content .pilot-layout-panel,#main-content .pilot-list-row",
+            "content": "#main-content h1,#main-content h2,#main-content p,#main-content label,#main-content button,#main-content a,#main-content dt,#main-content dd,#main-content li",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "#main-content a[data-visual-page-focus-first]",
+                "#main-content a[data-test=\"wallet-link\"]",
+                "#main-content [data-test=\"collect-basket\"]"
+            ],
+            "states": [
+                {
+                    "id": "validated",
+                    "query": {
+                        "state": "validated"
+                    },
+                    "ready": "body[data-visual-ready=\"validated\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"collect-basket\"]",
+                                "count": 1,
+                                "minHeight": 44,
+                                "minWidth": 44
+                            },
+                            {
+                                "selector": "[data-test=\"basket-status-validated\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"domain-error\"] p",
+                                "text": ""
+                            },
+                            {
+                                "selector": "[data-test=\"collection-correction-form\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"collect-basket\"]",
+                                "attributes": {
+                                    "disabled": null
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "processing",
+                    "query": {
+                        "state": "processing"
+                    },
+                    "ready": "body[data-visual-ready=\"processing\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"collect-basket\"]",
+                                "count": 1,
+                                "minHeight": 44,
+                                "minWidth": 44
+                            },
+                            {
+                                "selector": "[data-test=\"collect-basket\"]",
+                                "attributes": {
+                                    "disabled": ""
+                                }
+                            }
+                        ],
+                        "focus": [
+                            "#main-content a[data-visual-page-focus-first]",
+                            "#main-content a[data-test=\"wallet-link\"]"
+                        ]
+                    }
+                },
+                {
+                    "id": "error",
+                    "query": {
+                        "state": "error"
+                    },
+                    "ready": "body[data-visual-ready=\"error\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"collect-basket\"]",
+                                "count": 1,
+                                "minHeight": 44,
+                                "minWidth": 44
+                            },
+                            {
+                                "selector": "[data-test=\"domain-error\"] p",
+                                "text": "Només es pot recollir una cistella validada.",
+                                "contrast": 4.5
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "corrected",
+                    "query": {
+                        "state": "corrected"
+                    },
+                    "ready": "body[data-visual-ready=\"corrected\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"collect-basket\"]",
+                                "count": 1,
+                                "minHeight": 44,
+                                "minWidth": 44
+                            },
+                            {
+                                "selector": "[data-test=\"collection-history\"] li",
+                                "count": 2
+                            },
+                            {
+                                "selector": "[data-test=\"effective-collection\"]",
+                                "text": "Pendent de recollida"
+                            },
+                            {
+                                "selector": "[data-test=\"collection-correction-form\"]",
+                                "count": 0
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "long",
+                    "query": {
+                        "state": "long"
+                    },
+                    "ready": "body[data-visual-ready=\"long\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"collect-basket\"]",
+                                "count": 1,
+                                "minHeight": 44,
+                                "minWidth": 44
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    ]
+}

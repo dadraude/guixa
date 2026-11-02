@@ -47,6 +47,7 @@
     "Source": "Origen",
     "Cycle": "Cicle",
     "errors.BasketNotFound": "No s’ha trobat la cistella.",
+    "errors.BasketNotCollectable": "Només es pot recollir una cistella validada.",
     "errors.BasketNotEditable": "Només es pot modificar una cistella en esborrany.",
     "errors.BasketAlreadyValidated": "Aquesta cistella ja s’ha validat.",
     "errors.StockProductUnavailable": "Aquest producte d’estoc no està disponible.",

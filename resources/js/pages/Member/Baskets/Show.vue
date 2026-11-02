@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import { trans } from 'laravel-vue-i18n';
+import { computed, ref } from 'vue';
+import BasketCollectionController from '@/actions/App/Http/Controllers/Member/BasketCollectionController';
 import BasketController from '@/actions/App/Http/Controllers/Member/BasketController';
 import WalletController from '@/actions/App/Http/Controllers/WalletController';
 import Heading from '@/components/Heading.vue';
@@ -9,9 +11,26 @@ import BasketCollectionHistory from '@/components/baskets/BasketCollectionHistor
 import StockLines from '@/components/pickup/StockLines.vue';
 import ReturnLines from '@/components/pickup/ReturnLines.vue';
 import { euros } from '@/components/pickup/euros';
+import InputError from '@/components/InputError.vue';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 
-defineProps<{ basket: App.Http.BasketRow }>();
+const props = defineProps<{ basket: App.Http.BasketRow }>();
+const page = usePage();
+const errors = computed(
+    () => (page.props.errors ?? {}) as Record<string, string>,
+);
+const processing = ref(false);
+const collect = () =>
+    router.put(
+        BasketCollectionController.update.url({ basket: props.basket.id }),
+        {},
+        {
+            preserveScroll: true,
+            onStart: () => (processing.value = true),
+            onFinish: () => (processing.value = false),
+        },
+    );
 const statusLabels: Record<string, string> = {
     draft: trans('In preparation'),
     validated: trans('Pending collection'),
@@ -81,7 +100,9 @@ const statusLabels: Record<string, string> = {
                 :href="WalletController.show.url()"
                 class="inline-flex min-h-11 items-center text-sm underline"
                 data-test="wallet-link"
-                data-visual-page-focus-last
+                :data-visual-page-focus-last="
+                    basket.state === 'validated' ? undefined : ''
+                "
             >
                 {{ trans('View household Wallet statement') }}
             </Link>
@@ -102,12 +123,24 @@ const statusLabels: Record<string, string> = {
         <p v-if="basket.state === 'draft'" data-test="draft-preparation">
             {{ trans('Draft basket in preparation.') }}
         </p>
-        <p
+        <div
             v-else-if="basket.state === 'validated'"
+            class="flex flex-col items-start gap-2"
             data-test="pending-collection"
         >
-            {{ trans('Validated and pending physical collection.') }}
-        </p>
+            <p>{{ trans('Validated and pending physical collection.') }}</p>
+            <Button
+                type="button"
+                class="min-h-11"
+                :disabled="processing"
+                data-test="collect-basket"
+                data-visual-page-focus-last
+                @click="collect"
+            >
+                {{ trans('Mark collected') }}
+            </Button>
+            <InputError :message="errors.domain" data-test="domain-error" />
+        </div>
         <p v-else-if="basket.state === 'collected'" data-test="collected">
             {{ trans('This basket was collected.') }}
         </p>

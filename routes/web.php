@@ -42,6 +42,7 @@ use App\Http\Controllers\Manage\ReturnItemController;
 use App\Http\Controllers\Manage\SettingsController;
 use App\Http\Controllers\Manage\StockMovementController;
 use App\Http\Controllers\Manage\StockProductController;
+use App\Http\Controllers\Member\BasketCollectionController as MemberBasketCollectionController;
 use App\Http\Controllers\Member\BasketController as MemberBasketController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\Producer\CutoffController;
@@ -61,6 +62,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 Route::middleware(['auth', 'verified', 'role:member'])->prefix('baskets')->name('baskets.')->whereUuid('basket')->group(function () {
     Route::get('/', [MemberBasketController::class, 'index'])->name('index');
     Route::get('{basket}', [MemberBasketController::class, 'show'])->name('show');
+    Route::put('{basket}/collection', [MemberBasketCollectionController::class, 'update'])->name('collect');
 });
 
 Route::middleware(['auth', 'verified', 'role:member'])->get('wallet', [WalletController::class, 'show'])->name('wallet.show');
