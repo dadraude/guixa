@@ -496,7 +496,9 @@ introduced by this amendment. Household deactivation retains balances, receipts 
 
 Design the fresh schema directly: no production data migration, legacy stock-product import, UUID
 remapping or dual-schema compatibility. Reorder creation migrations so Catalog products precede
-referencing tables and Sales baskets precede stock/wallet sale-source references. Existing unrelated
+referencing tables and Sales baskets precede stock/wallet sale-source references. The Wallet creation
+migration defines its final basket and correction references directly after baskets; no Wallet alteration
+chain or production backfill is required before launch. Existing unrelated
 settings, accounts, invitations, producers and return-item constraints remain.
 All ids are UUID v7; money is integer cents, quantities numeric(10,3), times timestamptz in UTC.
 
