@@ -159,3 +159,84 @@ function cycleWithBaker(?CarbonImmutable $cutoff = null): array
 
     return [$cycleId, $baker, $loaf];
 }
+
+/**
+ * A settled cycle where household A ordered 5 loaves (EUR 3.50) and was allocated 4, and household B ordered 2 and got 2.
+ *
+ * @return array{cycle: string, producer: string, loaf: string, households: array<string, string>, baskets: array<string, string>, manager: User}
+ */
+function twoHouseholdWeek(int $loafPriceCents = 350): array
+{
+    [$cycleId, $baker, $loaf] = cycleWithBaker();
+    DB::table('products')->where('id', $loaf)->update(['price_cents' => $loafPriceCents]);
+    $households = [];
+    foreach (['A' => '5', 'B' => '2'] as $name => $quantity) {
+        $households[$name] = (string) Str::uuid7();
+        DB::table('households')->insert(['id' => $households[$name], 'name' => "Household {$name}", 'created_at' => now(), 'updated_at' => now()]);
+        test()->actingAs(memberOf($households[$name], "Member {$name}"))->put("/cycles/{$cycleId}/order/lines/{$loaf}", ['quantity' => $quantity])->assertRedirect();
+        app('auth')->forgetGuards();
+    }
+    DB::table('cycle_producers')->where('cycle_id', $cycleId)->update(['closes_at' => now()->subHour(), 'sent_at' => now()]);
+    $manager = accountWith(Role::Manager);
+    $reception = "/manage/cycles/{$cycleId}/receptions/{$baker->id}";
+    test()->actingAs($manager)->put("{$reception}/products/{$loaf}/received", ['received' => '6'])->assertRedirect();
+    test()->post("{$reception}/validate")->assertRedirect();
+    test()->post("{$reception}/distribution")->assertRedirect();
+
+    $baskets = [];
+    foreach ($households as $name => $household) {
+        $baskets[$name] = (string) DB::table('baskets')->where('household_id', $household)->value('id');
+    }
+
+    return ['cycle' => $cycleId, 'producer' => $baker->id, 'loaf' => $loaf, 'households' => $households, 'baskets' => $baskets, 'manager' => $manager];
+}
+
+/**
+ * A settled cycle where A (loaf 2, cherries 1, eggs 1) has a validated base, B (loaf 2) has a draft and K (cherries 1)
+ * has a nothing-to-collect base, because the cherries and the eggs were received as 0. With a spare draft, C (loaf 1) also has a draft.
+ *
+ * @return array{cycle: string, reception: string, cherries: string, eggs: string, households: array<string, string>, baskets: array<string, string>, orders: array<string, string>, manager: User}
+ */
+function lateArrivalWeek(bool $withSpareDraft = false): array
+{
+    [$cycleId, $baker, $loaf] = cycleWithBaker();
+    $product = function (string $name) use ($baker) {
+        $id = (string) Str::uuid7();
+        DB::table('products')->insert(['id' => $id, 'producer_id' => $baker->id, 'name' => $name, 'unit' => 'unit', 'price_cents' => 500, 'variable' => false, 'active' => true]);
+
+        return $id;
+    };
+    $cherries = $product('Cherries');
+    $eggs = $product('Eggs');
+    $households = [];
+    $demand = ['A' => [$loaf => '2', $cherries => '1', $eggs => '1'], 'B' => [$loaf => '2'], 'K' => [$cherries => '1']];
+    // A spare draft household keeps the cycle open while A and B are both validated.
+    if ($withSpareDraft) {
+        $demand['C'] = [$loaf => '1'];
+    }
+    foreach ($demand as $name => $lines) {
+        $households[$name] = (string) Str::uuid7();
+        DB::table('households')->insert(['id' => $households[$name], 'name' => "Household {$name}", 'created_at' => now(), 'updated_at' => now()]);
+        foreach ($lines as $productId => $quantity) {
+            test()->actingAs(memberOf($households[$name], "Member {$name}"))->put("/cycles/{$cycleId}/order/lines/{$productId}", ['quantity' => $quantity])->assertRedirect();
+        }
+        app('auth')->forgetGuards();
+    }
+    DB::table('cycle_producers')->where('cycle_id', $cycleId)->update(['closes_at' => now()->subHour(), 'sent_at' => now()]);
+    $manager = accountWith(Role::Manager);
+    $reception = "/manage/cycles/{$cycleId}/receptions/{$baker->id}";
+    test()->actingAs($manager)->put("{$reception}/products/{$cherries}/received", ['received' => '0'])->assertRedirect();
+    test()->put("{$reception}/products/{$eggs}/received", ['received' => '0'])->assertRedirect();
+    test()->post("{$reception}/validate")->assertRedirect();
+    test()->post("{$reception}/distribution")->assertRedirect();
+
+    $orders = [];
+    $baskets = [];
+    foreach ($households as $name => $household) {
+        $orders[$name] = (string) DB::table('orders')->where('cycle_id', $cycleId)->where('household_id', $household)->value('id');
+        $baskets[$name] = (string) DB::table('baskets')->where('source_order_id', $orders[$name])->value('id');
+    }
+    test()->post("/finance/baskets/{$baskets['A']}/validation")->assertRedirect();
+
+    return compact('cycleId', 'reception', 'cherries', 'eggs', 'households', 'baskets', 'orders', 'manager') + ['cycle' => $cycleId];
+}

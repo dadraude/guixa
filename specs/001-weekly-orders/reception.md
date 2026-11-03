@@ -46,15 +46,18 @@ Checking each producer's delivery against the orders, allocating it to household
   The cycle first settles when every participating producer is distributed. Marked and nonparticipating
   lines leave active fulfilment, retaining history; they are never received or charged. Settlement
   creates one base basket draft per household order (R19), without a charge.
-  After a permitted reopen, new allocations synchronize unvalidated base drafts, replacing actual
+  After a permitted reopen, a product whose previous received total was 0 is a *late arrival*: it is
+  allocated as usual and each household's share is added to its open weekly draft in the cycle,
+  reviving a nothing-to-collect base (R24a); a household whose weekly baskets in the cycle are all
+  validated gets a new *late weekly basket* draft with only those lines (R19). Likewise, when no
+  validated basket contains a product, a share a manager allocates to a household whose weekly baskets
+  are all validated goes to that household's late weekly basket draft, which can then be corrected
+  like any draft. Any other change to an already received product is a *redistribution*: it synchronizes unvalidated drafts, replacing actual
   overrides on affected weekly lines while preserving stock/return contents. A validated basket is
-  financially frozen even if physically pending collection. When proportional redistribution affects
-  it, the manager explicitly chooses unvalidated baskets only or all baskets. The former keeps
-  validated effective quantities; a received total below them or with no eligible recipient is rejected,
-  offering all or cancel. All appends signed quantity/amount adjustments and matching Wallet corrections
-  for validated baskets, preserving originals, validation time and stock/return lines. No stock is sold
-  again. An unchanged target adds nothing; later changes use the latest effective quantities/amounts.
-  Direct editing of validated original contents remains forbidden (R23).
+  financially frozen even if physically pending collection, so a redistribution of a product that any
+  validated basket contains is rejected before anything changes, pointing staff to individual basket
+  corrections (R23). Reception never appends adjustments to validated baskets. Direct editing of
+  validated original contents remains forbidden (R23).
 - **R18a** **Containers distributed.** Show container counts per household/basket and per cycle. Count
   each effective weekly/stock line's quantity × snapshotted containers per unit, rounded up per line;
   a product without containers counts 0. Sum the households' attributed baskets for the cycle total,
@@ -125,9 +128,10 @@ Then the allocations are recalculated; once distributed again, the cycle can set
 **S30 — Late delivery after settlement** (R18, R19, R24a, R24b)
 Given K's cherries were received as 0 and its base has nothing to collect, H has a validated basket,
 and another household still has a draft so the cycle remains open
-When cherries arrive, the manager reopens the producer, allocates 1 kg to K and distributes again
+When 2 kg of cherries arrive, the manager reopens the producer, allocates 1 kg to K and 1 kg to H and distributes again
 Then K's base returns to draft and can be validated with the cherries
-And H's validated original remains unchanged; any allowed redistribution uses explicit adjustments.
+And H's validated basket remains unchanged, while H gets a new late weekly basket draft with only 1 kg cherries,
+validated and charged separately; the cycle cannot close until it is validated.
 
 **S46 — No reopening once closed** (R18, R24b)
 Given cycle A is closed
@@ -149,20 +153,18 @@ and K has an attributed stock line of 2 jars honey with 1 container/unit
 When the producer changes yoghurt to 4 containers/kg and the manager reads the cycle summary
 Then snapshots give H 6 containers (ceil(1.300 × 2) + 3), K 3 (1 + 2), and 9 for the cycle.
 
-**S63 — Explicit redistribution across validated baskets** (R18, R23)
-Given A's basket is validated at 1 kg and €20/kg, B's is draft at 1 kg and the cycle remains open
-When the manager reopens the producer and changes received to 3 kg
-Then they must choose unvalidated baskets only or all baskets before anything changes
-And unvalidated-only keeps A at 1 kg and updates B to 2 kg
-And all gives both an effective 1.5 kg: B's draft changes, while A retains its original 1 kg/€20
-and gains a +0.5 kg/+€10 adjustment and a new €10 Wallet correction, regardless of collection state.
+**S63 — A validated basket blocks redistribution of its product** (R18, R23)
+Given 2 kg beef was received and distributed 1 kg each, A's basket is validated at 1 kg and €20/kg,
+B's is draft at 1 kg and the cycle remains open
+When the manager reopens the producer and changes beef's received total to 3 kg
+Then it is rejected because A's validated basket contains beef, pointing to A's basket corrections
+And the received total, allocations, both baskets and the Wallet stay unchanged.
 
-**S64 — Successive basket adjustments retain history** (R18, R23)
-Given A's validated original is 1.120 kg at €20/kg and the weekly cycle remains open
-When an explicit all-baskets redistribution sets A to 1 kg
-Then its original line and €22.40 charge remain, with a −0.120 kg/−€2.40 adjustment and Wallet credit
-And repeating that target adds nothing; a later 1.5 kg target appends +0.500 kg/+€10
-And redistribution adjustments are atomic, Manager-controlled and unavailable after weekly closure.
+**S64 — Redistributing a product no validated basket contains** (R18, R19a)
+Given 5 loaves were distributed as B 2 and C 3, B's draft has actual 1, A's basket is validated without bread,
+and the weekly cycle remains open
+When the manager reopens the baker and sets the allocations to B 3 and C 2
+Then B's and C's drafts become 3 and 2, replacing B's actual override, and A's basket is unchanged.
 
 **S77 — Stock cannot enter through reception** (R1a, R14, R16, R20, R26)
 Given the beekeeper's weekly order has been sent and that producer also has a stock honey product

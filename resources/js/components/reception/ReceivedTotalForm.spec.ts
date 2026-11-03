@@ -29,7 +29,6 @@ const product = (hasManualAllocations: boolean) => ({
     balancedForDistribution: false,
     hasManualAllocations,
     hasAdjustments: false,
-    hasDonePickups: false,
     allocations: [
         allocation('a', 'Household A', false),
         allocation('c', 'Household C', hasManualAllocations),
@@ -123,34 +122,4 @@ describe('received total form', () => {
 
         expect(wrapper.emitted('save')).toEqual([['14', true]]);
     });
-});
-
-it('requires an explicit scope and composes it with manual allocation confirmation (S63)', async () => {
-    const wrapper = form(true);
-    await wrapper.setProps({
-        product: { ...product(true), hasDonePickups: true },
-    });
-    await type(wrapper, '14');
-    expect(wrapper.emitted('save')).toBeUndefined();
-    expect(dialog()?.textContent).toContain('Which pickups should change?');
-    button('All pickups').click();
-    await nextTick();
-    expect(wrapper.emitted('save')).toBeUndefined();
-    button('Replace them').click();
-    await nextTick();
-    expect(wrapper.emitted('save')).toEqual([['14', true, true]]);
-});
-
-it('cancels redistribution without changing the saved total (S63)', async () => {
-    const wrapper = form(false);
-    await wrapper.setProps({
-        product: { ...product(false), hasDonePickups: true },
-    });
-    await type(wrapper, '14');
-    button('Cancel').click();
-    await nextTick();
-    expect(wrapper.emitted('save')).toBeUndefined();
-    expect((wrapper.find('input').element as HTMLInputElement).value).toBe(
-        '15.000',
-    );
 });

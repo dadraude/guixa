@@ -32,7 +32,7 @@ export const checkedFiles = [
     'components/UserInfo.vue',
     'components/AppLogo.vue',
     'components/UserMenuContent.vue',
-    'components/pickup/Adjustments.vue',
+    'components/baskets/WeeklyLines.vue',
     'components/pickup/StockLines.vue',
     'components/pickup/ReturnLines.vue',
     'pages/Manage/Accounts/Index.vue',

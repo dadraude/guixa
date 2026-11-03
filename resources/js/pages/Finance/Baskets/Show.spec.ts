@@ -43,6 +43,10 @@ const basket = {
     adjustments: [],
     collectionEvents: [],
     pendingCollection: true,
+    weeklyLines: [],
+    kind: 'stock',
+    referenceCycleId: null,
+    late: false,
     balanceCents: 0,
     projectedBalanceCents: 50,
     validatedAt: null,
@@ -50,6 +54,23 @@ const basket = {
 };
 
 describe('Finance basket detail', () => {
+    it('titles a late weekly basket apart from the base weekly basket (R19)', async () => {
+        const html = async (late: boolean) => {
+            const app = createSSRApp(Show, {
+                basket: { ...basket, kind: 'weekly', late },
+                stockProducts: [],
+                returnItems: [],
+            });
+            installTranslations(app);
+
+            return renderToString(app);
+        };
+
+        expect(await html(false)).toContain('Cistella setmanal');
+        expect(await html(false)).not.toContain('Cistella tardana');
+        expect(await html(true)).toContain('Cistella tardana');
+    });
+
     it('shows a never-collected validated basket as pending without history or correction form', async () => {
         const app = createSSRApp(Show, {
             basket: {

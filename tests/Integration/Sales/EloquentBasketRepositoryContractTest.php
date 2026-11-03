@@ -40,6 +40,18 @@ final class EloquentBasketRepositoryContractTest extends TestCase
         return [new EloquentBasketRepository, $manager, $household, $product, $returnA, $returnB];
     }
 
+    protected function weeklySource(): array
+    {
+        $household = (string) Str::uuid7();
+        DB::table('households')->insert(['id' => $household, 'name' => 'Household W', 'created_at' => now(), 'updated_at' => now()]);
+        $cycle = (string) Str::uuid7();
+        DB::table('cycles')->insert(['id' => $cycle, 'pickup_date' => now()->addDays(30)->toDateString()]);
+        $order = (string) Str::uuid7();
+        DB::table('orders')->insert(['id' => $order, 'cycle_id' => $cycle, 'household_id' => $household]);
+
+        return [$order, $cycle];
+    }
+
     public function test_list_loads_all_basket_lines_adjustments_and_collection_events_in_four_queries_without_losing_snapshots(): void
     {
         [$repository, $manager, $household, $product] = $this->basketWorld();

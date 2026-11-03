@@ -25,8 +25,8 @@ it('seeds a usable cooperative with accounts, orders, reception and pickups', fu
     $this->assertDatabaseCount('orders', 12);
     expect(DB::table('order_lines')->count())->toBeGreaterThan(60);
     expect(DB::table('cycles')->whereNotNull('settled_at')->count())->toBe(1);
-    expect(DB::table('orders')->where('pickup_status', 'pending')->count())->toBe(3);
-    expect(DB::table('orders')->where('pickup_status', 'completed')->count())->toBe(1);
+    expect(DB::table('baskets')->where('kind', 'weekly')->where('state', 'draft')->count())->toBe(3);
+    expect(DB::table('baskets')->where('kind', 'weekly')->where('state', 'collected')->count())->toBe(1);
     expect(DB::table('received_totals')->count())->toBeGreaterThan(0);
     expect(DB::table('stock_movements')->count())->toBe(2);
     expect(DB::table('wallet_movements')->count())->toBeGreaterThanOrEqual(5);
@@ -51,10 +51,9 @@ it('lets every demo role log in and open its main screens', function (string $em
     }
     if ($email === 'gestora@demo.guixa.test') {
         $cycle = DB::table('cycles')->whereNotNull('settled_at')->value('id');
-        $household = DB::table('orders')->where('cycle_id', $cycle)->where('pickup_status', 'pending')->value('household_id');
         $producer = DB::table('producers')->value('id');
         $this->get(route('manage.cycles.receptions.show', [$cycle, $producer]))->assertOk();
-        $this->get(route('manage.cycles.pickups.show', [$cycle, $household]))->assertOk();
+        $this->get(route('manage.cycles.pickups.index', $cycle))->assertOk();
     }
 })->with([
     'manager' => ['gestora@demo.guixa.test', ['/dashboard', '/manage/households', '/manage/producers', '/manage/cycles', '/manage/stock']],

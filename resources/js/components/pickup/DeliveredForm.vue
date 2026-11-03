@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
 const props = defineProps<{
-    line: App.Http.PickupLineRow;
+    line: { productId: string; name: string; quantity: string };
     processing: boolean;
 }>();
 
@@ -13,10 +13,10 @@ const emit = defineEmits<{
     save: [productId: string, quantity: string];
 }>();
 
-const quantity = ref(props.line.delivered);
+const quantity = ref(props.line.quantity);
 
 watch(
-    () => props.line.delivered,
+    () => props.line.quantity,
     (value) => (quantity.value = value),
 );
 </script>
@@ -30,7 +30,7 @@ watch(
         <Input
             v-model="quantity"
             inputmode="decimal"
-            :aria-label="trans('Delivered :name', { name: line.name })"
+            :aria-label="trans('Actual :name', { name: line.name })"
             class="w-28"
         />
         <Button

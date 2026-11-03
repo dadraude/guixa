@@ -2,6 +2,7 @@
 
 namespace Guixa\Ordering\Application;
 
+use Guixa\Ordering\Domain\Cycle;
 use Guixa\Ordering\Domain\CycleRepository;
 use Guixa\Ordering\Domain\Error\CycleNotFound;
 use Guixa\Ordering\Domain\Error\HouseholdInactive;
@@ -10,6 +11,7 @@ use Guixa\Ordering\Domain\Error\LineMarkedNotDelivered;
 use Guixa\Ordering\Domain\Error\ProductNotInReception;
 use Guixa\Ordering\Domain\Error\ProductNotOrderable;
 use Guixa\Ordering\Domain\Households;
+use Guixa\Ordering\Domain\Order;
 use Guixa\Ordering\Domain\OrderRepository;
 use Guixa\Ordering\Domain\ReceptionLoader;
 use Guixa\Shared\Application\Actor;
@@ -28,6 +30,7 @@ final class SetAllocation
         private readonly Households $households,
         private readonly TransactionRunner $transactions,
         private readonly Clock $clock,
+        private readonly SalesBaskets $baskets,
     ) {}
 
     /** @param  string  $quantity  at most 3 decimals, zero or more; whole units for a non-variable product */
@@ -46,6 +49,7 @@ final class SetAllocation
             $product = $loaded->reception->product($productId) ?? throw ProductNotInReception::withId($productId);
             $this->loader->lockWeekly($productId) ?? throw ProductNotInReception::withId($productId);
             $product->assertInStep($allocated);
+            $loaded->assertRedistributable($cycle, $productId);
 
             $household = $this->households->find([$householdId])[$householdId] ?? throw HouseholdNotFound::withId($householdId);
 
@@ -55,11 +59,16 @@ final class SetAllocation
 
             $order = $this->orders->lockFor($cycleId, $householdId);
 
+            // No validated basket has a line of the product (checked above), so a validated household's share
+            // goes to its late weekly basket, which stays correctable like any draft (R16, R18, R19, S40).
+            $lateArrival = $cycle->isSettled() && $loaded->baskets->isValidated($householdId);
+
             if (! $order->hasLine($productId)) {
                 // A household that did not order gets a line with the product as it is now (R10, R16, S39).
                 $snapshot = $loaded->catalog[$productId] ?? throw ProductNotOrderable::withId($productId);
                 $order->allocateNew($snapshot, $allocated, $this->orders->nextId(), $actor->accountId, $now);
                 $this->orders->add($order);
+                $this->followAllocation($cycle, $order, $lateArrival ? $productId : null);
 
                 return;
             }
@@ -70,6 +79,18 @@ final class SetAllocation
 
             $order->allocate($productId, $allocated);
             $this->orders->add($order);
+            $this->followAllocation($cycle, $order, $lateArrival ? $productId : null);
         });
+    }
+
+    /** After settlement an unvalidated base follows the allocation at once, so the reception compares real actual quantities. */
+    private function followAllocation(Cycle $cycle, Order $order, ?string $lateProductId): void
+    {
+        if (! $cycle->isSettled()) {
+            return;
+        }
+
+        $source = WeeklySourceData::of($order);
+        $lateProductId === null ? $this->baskets->syncWeeklyBase($source) : $this->baskets->addLateArrival($source, [$lateProductId]);
     }
 }

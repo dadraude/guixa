@@ -12,6 +12,7 @@ final readonly class BasketRow
      * @param  list<BasketReturnLineRow>  $returnLines
      * @param  list<BasketAdjustmentRow>  $adjustments
      * @param  list<BasketCollectionEventRow>  $collectionEvents
+     * @param  list<BasketWeeklyLineRow>  $weeklyLines
      */
     public function __construct(
         public string $id,
@@ -29,6 +30,10 @@ final readonly class BasketRow
         public array $adjustments,
         public array $collectionEvents,
         public bool $pendingCollection,
+        public array $weeklyLines = [],
+        public string $kind = 'stock',
+        public ?string $referenceCycleId = null,
+        public bool $late = false,
     ) {}
 
     public static function from(BasketData $basket, int $balanceCents): self
@@ -42,6 +47,7 @@ final readonly class BasketRow
             $basket->validatedAt?->format(DATE_ATOM), $basket->collectedAt?->format(DATE_ATOM),
             $basket->effectiveTotalCents, array_map(BasketAdjustmentRow::from(...), $basket->adjustments),
             array_map(BasketCollectionEventRow::from(...), $basket->collectionEvents),
-            $basket->pendingCollection);
+            $basket->pendingCollection, array_map(BasketWeeklyLineRow::from(...), $basket->weeklyLines),
+            $basket->kind, $basket->referenceCycleId, $basket->late);
     }
 }

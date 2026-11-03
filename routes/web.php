@@ -9,6 +9,7 @@ use App\Http\Controllers\Finance\BasketCorrectionController;
 use App\Http\Controllers\Finance\BasketReturnController;
 use App\Http\Controllers\Finance\BasketStockController;
 use App\Http\Controllers\Finance\BasketValidationController;
+use App\Http\Controllers\Finance\BasketWeeklyLineController;
 use App\Http\Controllers\Finance\HouseholdWalletController as FinanceHouseholdWalletController;
 use App\Http\Controllers\Manage\AccountController;
 use App\Http\Controllers\Manage\AccountDeactivationController;
@@ -23,11 +24,7 @@ use App\Http\Controllers\Manage\HouseholdMemberController;
 use App\Http\Controllers\Manage\HouseholdWalletController;
 use App\Http\Controllers\Manage\InvitationController;
 use App\Http\Controllers\Manage\ManagerRoleController;
-use App\Http\Controllers\Manage\PickupCompleteController;
 use App\Http\Controllers\Manage\PickupController;
-use App\Http\Controllers\Manage\PickupLineController;
-use App\Http\Controllers\Manage\PickupReturnController;
-use App\Http\Controllers\Manage\PickupStockController;
 use App\Http\Controllers\Manage\ProducerAccountController;
 use App\Http\Controllers\Manage\ProducerController;
 use App\Http\Controllers\Manage\ProducerProductController;
@@ -68,12 +65,13 @@ Route::middleware(['auth', 'verified', 'role:member'])->prefix('baskets')->name(
 Route::middleware(['auth', 'verified', 'role:member'])->get('wallet', [WalletController::class, 'show'])->name('wallet.show');
 Route::middleware(['auth', 'verified', 'role:member'])->get('stock', [StockController::class, 'index'])->name('stock.index');
 
-Route::middleware(['auth', 'verified', 'role:manager,finance'])->prefix('finance/baskets')->name('finance.baskets.')->whereUuid(['basket', 'stockProduct'])->group(function () {
+Route::middleware(['auth', 'verified', 'role:manager,finance'])->prefix('finance/baskets')->name('finance.baskets.')->whereUuid(['basket', 'stockProduct', 'product'])->group(function () {
     Route::get('/', [BasketController::class, 'index'])->name('index');
     Route::get('create', [BasketController::class, 'create'])->name('create');
     Route::post('/', [BasketController::class, 'store'])->name('store');
     Route::get('{basket}', [BasketController::class, 'show'])->name('show');
     Route::post('{basket}/stock-lines', [BasketStockController::class, 'store'])->name('stock-lines.store');
+    Route::put('{basket}/weekly-lines/{product}', [BasketWeeklyLineController::class, 'update'])->name('weekly-lines.update');
     Route::post('{basket}/return-lines', [BasketReturnController::class, 'store'])->name('return-lines.store');
     Route::delete('{basket}/return-lines/{returnItem}', [BasketReturnController::class, 'destroy'])->name('return-lines.destroy');
     Route::delete('{basket}/stock-lines/{stockProduct}', [BasketStockController::class, 'destroy'])->name('stock-lines.destroy');
@@ -177,14 +175,6 @@ Route::middleware(['auth', 'verified', 'role:manager'])->prefix('manage')->name(
     Route::prefix('cycles/{cycle}/pickups')->whereUuid(['cycle', 'household', 'product', 'stockProduct', 'returnItem'])->group(function () {
         Route::get('/', [PickupController::class, 'index'])->name('cycles.pickups.index');
         Route::get('{household}', [PickupController::class, 'show'])->name('cycles.pickups.show');
-        Route::post('{household}', [PickupController::class, 'store'])->name('cycles.pickups.store');
-        Route::put('{household}/lines/{product}', [PickupLineController::class, 'update'])->name('cycles.pickups.lines.update');
-        Route::post('{household}/stock-lines', [PickupStockController::class, 'store'])->name('cycles.pickups.stock-lines.store');
-        Route::delete('{household}/stock-lines/{stockProduct}', [PickupStockController::class, 'destroy'])->name('cycles.pickups.stock-lines.destroy');
-        Route::post('{household}/return-lines', [PickupReturnController::class, 'store'])->name('cycles.pickups.return-lines.store');
-        Route::delete('{household}/return-lines/{returnItem}', [PickupReturnController::class, 'destroy'])->name('cycles.pickups.return-lines.destroy');
-        Route::post('{household}/not-collected', [PickupCompleteController::class, 'notCollected'])->name('cycles.pickups.not-collected');
-        Route::post('{household}/complete', [PickupCompleteController::class, 'store'])->name('cycles.pickups.complete');
     });
 
     Route::get('settings', [SettingsController::class, 'show'])->name('settings.show');

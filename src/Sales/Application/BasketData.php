@@ -8,6 +8,7 @@ use Guixa\Sales\Domain\Basket;
 final readonly class BasketData
 {
     /** @param list<BasketLineData> $stockLines
+     * @param  list<BasketWeeklyLineData>  $weeklyLines
      * @param  list<BasketReturnLineData>  $returnLines
      * @param  list<BasketAdjustmentData>  $adjustments
      * @param  list<BasketCollectionEventData>  $collectionEvents
@@ -16,7 +17,8 @@ final readonly class BasketData
         public string $state, public array $stockLines, public array $returnLines, public int $totalCents,
         public DateTimeImmutable $createdAt, public ?DateTimeImmutable $validatedAt,
         public ?DateTimeImmutable $collectedAt, public int $effectiveTotalCents, public array $adjustments,
-        public array $collectionEvents, public bool $pendingCollection) {}
+        public array $collectionEvents, public bool $pendingCollection,
+        public array $weeklyLines = [], public string $kind = 'stock', public ?string $referenceCycleId = null, public bool $late = false) {}
 
     public static function from(Basket $basket): self
     {
@@ -28,6 +30,9 @@ final readonly class BasketData
             $basket->validatedAt, $basket->collectedAt, $basket->effectiveTotalCents(),
             array_map(BasketAdjustmentData::from(...), $basket->adjustments),
             array_map(BasketCollectionEventData::from(...), $basket->collectionEvents),
-            $basket->state === 'validated' && ! $basket->goodsFullyReversed());
+            $basket->state === 'validated' && ! $basket->goodsFullyReversed(),
+            array_map(fn ($line) => BasketWeeklyLineData::from($line, $basket->effectiveQuantity((string) $line->productId)),
+                array_values(array_filter($basket->activeLines(), fn ($line) => $line->kind === 'weekly'))),
+            $basket->kind, $basket->referenceCycleId, $basket->late);
     }
 }

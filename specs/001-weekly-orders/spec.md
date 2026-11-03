@@ -8,7 +8,7 @@ R20, R25).
 Revised and accepted (2026-10-28): every product belongs to a producer and is either weekly or stock;
 Sales baskets separate actual purchases, validation and physical collection from weekly demand.
 Finance operates baskets and manual receipts; retained history establishes first use. Requirements
-R1–R36c and scenarios S1–S90 include this amendment. The amended plan and [task breakdown](tasks.md) are accepted (2026-10-28).
+R1–R36c and scenarios S1–S91 include this amendment. The amended plan and [task breakdown](tasks.md) are accepted (2026-10-28).
 
 Households order products from local producers every week, with a planned pickup date. After each
 producer closes, a manager sends it the order, checks the delivery and allocates goods to households.
@@ -32,14 +32,14 @@ is recorded manually as a separate credit to the household's global wallet.
 | Product | Producte | Belongs to exactly one producer for its lifetime, with a unit (kg, unit, bunch…) and a unit price (≥ 0). Either a weekly product or a stock product. |
 | Weekly product | Producte de comanda setmanal | Product offered through weekly ordering and received and allocated in a cycle. Not a stock product. |
 | Variable product | Producte de pes variable | Quantity can be fractional (weight); delivered quantity may differ from ordered. |
-| Cycle | Cicle | One week of ordering, identified by its planned pickup date. Closed once distribution is finished and all base baskets are validated or have nothing to collect (R24b). |
+| Cycle | Cicle | One week of ordering, identified by its planned pickup date. Closed once distribution is finished and all base and late weekly baskets are validated or have nothing to collect (R24b). |
 | Participating producer | Productor/a actiu al cicle | A producer a manager has made active in a cycle. Only they can be ordered from in it. |
 | Cutoff | Tancament | Moment after which a producer's products can no longer be ordered in a cycle. Optional. |
 | Producer order | Comanda al productor | Everything households ordered from one producer in one cycle. |
 | Sent | Enviada | A producer order a manager has sent to the producer. It can no longer change. |
 | Order | Comanda | A household's order in one cycle. One per household per cycle. |
 | Order line | Línia de comanda | Weekly product, ordered and allocated quantities, and its product snapshot. Removed lines remain as history. |
-| Basket | Cistella | A household's actual purchase contents, either a base from a weekly order or an additional stock purchase with an optional cycle reference. |
+| Basket | Cistella | A household's actual purchase contents, either a base or late weekly basket from a weekly order, or an additional stock purchase with an optional cycle reference. |
 | Validated basket | Cistella validada | Basket whose actual contents and total have been confirmed, with its charge and stock sale recorded. Original records remain immutable. |
 | Reception | Recepció | Check of one producer's delivery in one cycle: received vs ordered, and allocation to households. |
 | Allocation | Assignació | Quantity of a product a household will take in a cycle. Starts equal to the ordered quantity. |

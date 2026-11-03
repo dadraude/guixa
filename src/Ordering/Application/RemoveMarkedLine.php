@@ -5,10 +5,12 @@ namespace Guixa\Ordering\Application;
 use Guixa\Ordering\Domain\CycleRepository;
 use Guixa\Ordering\Domain\Error\CycleNotFound;
 use Guixa\Ordering\Domain\Error\NoHousehold;
+use Guixa\Ordering\Domain\Error\PickupNotPending;
 use Guixa\Ordering\Domain\NotDeliveredMarks;
 use Guixa\Ordering\Domain\OrderRepository;
 use Guixa\Ordering\Domain\ProductAvailabilityRepository;
 use Guixa\Ordering\Domain\ProductCatalog;
+use Guixa\Ordering\Domain\WeeklyBasketView;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Application\TransactionRunner;
 use Illuminate\Support\Facades\Gate;
@@ -23,6 +25,7 @@ final class RemoveMarkedLine
         ProductCatalog $catalog,
         ProductAvailabilityRepository $availability,
         private readonly TransactionRunner $transactions,
+        private readonly WeeklyBasketView $baskets,
     ) {
         $this->marks = new NotDeliveredMarks($catalog, $availability, $orders);
     }
@@ -37,6 +40,10 @@ final class RemoveMarkedLine
             $cycle = $this->cycles->getForShare($cycleId) ?? throw CycleNotFound::withId($cycleId);
             $cycle->assertNotClosed();
             $order = $this->orders->lockFor($cycleId, $householdId);
+
+            if ($this->baskets->snapshot($cycleId)->isValidated($householdId)) {
+                throw PickupNotPending::forOrder($order->id);
+            }
 
             $order->removeMarkedLine($productId, $this->marks->of($cycle, $order));
             $this->orders->add($order);

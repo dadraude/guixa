@@ -7,7 +7,7 @@ final readonly class HouseholdOrderData
     /**
      * @param  list<OrderProducerData>  $producers  those that participate in the cycle
      * @param  list<OrderLineData>  $lines  in the order they were added
-     * @param  ?PickupData  $pickup  once the cycle is settled and the household has one (R23a)
+     * @param  ?string  $basketId  the household's Sales base basket once the cycle is settled (R23a)
      */
     public function __construct(
         public string $cycleId,
@@ -15,6 +15,6 @@ final readonly class HouseholdOrderData
         public bool $cancelled,
         public array $producers,
         public array $lines,
-        public ?PickupData $pickup = null,
+        public ?string $basketId = null,
     ) {}
 }

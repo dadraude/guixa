@@ -7,10 +7,12 @@ import BasketCollectionCorrectionController from '@/actions/App/Http/Controllers
 import BasketCorrectionController from '@/actions/App/Http/Controllers/Finance/BasketCorrectionController';
 import BasketController from '@/actions/App/Http/Controllers/Finance/BasketController';
 import BasketStockController from '@/actions/App/Http/Controllers/Finance/BasketStockController';
+import BasketWeeklyLineController from '@/actions/App/Http/Controllers/Finance/BasketWeeklyLineController';
 import BasketReturnController from '@/actions/App/Http/Controllers/Finance/BasketReturnController';
 import BasketValidationController from '@/actions/App/Http/Controllers/Finance/BasketValidationController';
 import HouseholdWalletController from '@/actions/App/Http/Controllers/Finance/HouseholdWalletController';
 import Heading from '@/components/Heading.vue';
+import WeeklyLines from '@/components/baskets/WeeklyLines.vue';
 import AmountAdjustments from '@/components/baskets/AmountAdjustments.vue';
 import BasketCollectionHistory from '@/components/baskets/BasketCollectionHistory.vue';
 import InputError from '@/components/InputError.vue';
@@ -64,6 +66,21 @@ const removeReturn = (returnItemId: string) =>
         }),
         options,
     );
+const saveActual = (productId: string, quantity: string) =>
+    router.put(
+        BasketWeeklyLineController.update.url({
+            basket: props.basket.id,
+            product: productId,
+        }),
+        { quantity },
+        options,
+    );
+const hasContents = computed(
+    () =>
+        props.basket.weeklyLines.length > 0 ||
+        props.basket.stockLines.length > 0 ||
+        props.basket.returnLines.length > 0,
+);
 const validate = () =>
     router.post(
         BasketValidationController.store.url({ basket: props.basket.id }),
@@ -115,6 +132,7 @@ const status = computed(() =>
 );
 const statusLabels: Record<string, string> = {
     draft: trans('Draft'),
+    nothing_to_collect: trans('Nothing to collect'),
     reversed: trans('Goods fully reversed'),
     validated: trans('Pending collection'),
     collected: trans('Collected'),
@@ -127,7 +145,13 @@ const statusLabels: Record<string, string> = {
     <div class="pilot-page pilot-layout-page pilot-manager-page">
         <Heading
             :title="trans('Basket: :name', { name: basket.householdName })"
-            :description="trans('Independent basket')"
+            :description="
+                basket.kind !== 'weekly'
+                    ? trans('Independent basket')
+                    : basket.late
+                      ? trans('Late basket')
+                      : trans('Weekly basket')
+            "
         />
         <Link
             :href="BasketController.index.url()"
@@ -140,6 +164,14 @@ const statusLabels: Record<string, string> = {
         <Badge variant="secondary" :data-test="`basket-status-${status}`">{{
             statusLabels[status] ?? status
         }}</Badge>
+
+        <WeeklyLines
+            v-if="basket.kind === 'weekly'"
+            :lines="basket.weeklyLines"
+            :editable="basket.state === 'draft'"
+            :processing="processing"
+            @save="saveActual"
+        />
 
         <StockLines
             :lines="basket.stockLines"
@@ -232,11 +264,7 @@ const statusLabels: Record<string, string> = {
             <Button
                 type="button"
                 class="min-h-11"
-                :disabled="
-                    processing ||
-                    (basket.stockLines.length === 0 &&
-                        basket.returnLines.length === 0)
-                "
+                :disabled="processing || !hasContents"
                 data-test="validate-basket"
                 @click="validate"
                 data-visual-page-focus-last
@@ -244,6 +272,7 @@ const statusLabels: Record<string, string> = {
                 {{ trans('Validate basket') }}
             </Button>
             <Button
+                v-if="basket.kind !== 'weekly'"
                 type="button"
                 variant="outline"
                 class="min-h-11"
@@ -286,6 +315,14 @@ const statusLabels: Record<string, string> = {
             data-visual-page-focus-last
         >
             {{ trans('This basket was collected.') }}
+        </p>
+        <p
+            v-else-if="basket.state === 'nothing_to_collect'"
+            class="text-sm text-muted-foreground"
+            data-test="nothing-to-collect"
+            data-visual-page-focus-last
+        >
+            {{ trans('There is nothing to collect in this basket.') }}
         </p>
         <p
             v-else

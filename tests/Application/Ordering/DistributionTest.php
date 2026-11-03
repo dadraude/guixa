@@ -1,9 +1,7 @@
 <?php
 
 use Guixa\Ordering\Application\CycleSettlement;
-use Guixa\Ordering\Application\MarkPickupNotCollected;
 use Guixa\Ordering\Application\MarkProducerDistributed;
-use Guixa\Ordering\Application\PickupLocker;
 use Guixa\Ordering\Application\ReopenProducerOrder;
 use Guixa\Ordering\Application\ValidateReception;
 use Guixa\Ordering\Domain\Error\CycleClosed;
@@ -15,11 +13,10 @@ use Guixa\Ordering\Domain\Error\ProducerNotInCycle;
 use Guixa\Ordering\Domain\Error\ProducerOrderNotSent;
 use Guixa\Ordering\Domain\Error\ReceptionNotValidated;
 use Guixa\Ordering\Domain\Error\ReceptionUnbalanced;
-use Guixa\Ordering\Domain\Error\RedistributionCannotExcludeCompleted;
-use Guixa\Ordering\Domain\Error\RedistributionChoiceRequired;
+use Guixa\Ordering\Domain\Error\RedistributionBlockedByValidatedBasket;
 use Guixa\Ordering\Domain\NotDeliveredMarks;
-use Guixa\Ordering\Domain\PickupStatus;
 use Guixa\Ordering\Domain\ReceptionLoader;
+use Guixa\Ordering\Domain\WeeklyBasketStates;
 use Guixa\Shared\Application\Actor;
 use Illuminate\Auth\Access\AuthorizationException;
 use Tests\Support\InMemory\ImmediateTransactionRunner;
@@ -47,8 +44,8 @@ beforeEach(function () {
     $this->householdIds = ['A' => DIST_A, 'B' => DIST_B, 'C' => DIST_C];
 
     $transactions = new ImmediateTransactionRunner;
-    $loader = new ReceptionLoader($this->world->orders, $this->world->catalog, $this->world->availability, $this->world->receivedTotals);
-    $settlement = new CycleSettlement($this->world->orders, new NotDeliveredMarks($this->world->catalog, $this->world->availability, $this->world->orders));
+    $loader = new ReceptionLoader($this->world->orders, $this->world->catalog, $this->world->availability, $this->world->receivedTotals, $this->world->baskets);
+    $settlement = new CycleSettlement($this->world->orders, new NotDeliveredMarks($this->world->catalog, $this->world->availability, $this->world->orders), $this->world->baskets);
     $this->validateReception = new ValidateReception($this->world->cycles, $transactions, $this->world->clock);
     $this->markDistributed = new MarkProducerDistributed($this->world->cycles, $loader, $settlement, $transactions, $this->world->clock);
     $this->reopenProducerOrder = new ReopenProducerOrder($this->world->cycles, $transactions);
@@ -67,14 +64,22 @@ beforeEach(function () {
     $this->distribute = fn (string $producerId = OrderingWorld::BAKER, ?Actor $actor = null) => ($this->markDistributed)($actor ?? $this->world->manager, $this->cycleId, $producerId);
     $this->reopen = fn (string $producerId = OrderingWorld::BAKER, ?Actor $actor = null) => ($this->reopenProducerOrder)($actor ?? $this->world->manager, $this->cycleId, $producerId);
     $this->reception = fn (string $producerId = OrderingWorld::BAKER) => ($this->world->getReception)($this->world->manager, $this->cycleId, $producerId);
-    $this->setReceived = fn (string $productId, string $received, string $producerId = OrderingWorld::BAKER, ?bool $includeCompleted = null) => ($this->world->setReceivedTotal)(
-        $this->world->manager, $this->cycleId, $producerId, $productId, $received, includeCompleted: $includeCompleted,
+    $this->setReceived = fn (string $productId, string $received, string $producerId = OrderingWorld::BAKER) => ($this->world->setReceivedTotal)(
+        $this->world->manager, $this->cycleId, $producerId, $productId, $received,
     );
     $this->allocate = fn (string $productId, string $household, string $quantity) => ($this->world->setAllocation)(
         $this->world->manager, $this->cycleId, OrderingWorld::BAKER, $productId, $this->householdIds[$household], $quantity,
     );
     $this->settled = fn () => $this->world->cycles->get($this->cycleId)->isSettled();
-    $this->pickup = fn (string $household) => $this->world->orders->ofHousehold($this->cycleId, $this->householdIds[$household])->pickup();
+    // The state of the household's weekly base basket in Sales: null before settlement or without an order.
+    $this->pickup = fn (string $household) => $this->world->baskets->stateOfHousehold($this->cycleId, $this->householdIds[$household]);
+    $orderOf = fn (string $household) => $this->world->orders->ofHousehold($this->cycleId, $this->householdIds[$household]);
+    // Sales validated the household's base basket: from now on it is financially frozen.
+    $this->freeze = fn (string $household) => $this->world->baskets->validate($orderOf($household)->id);
+    $this->setActual = fn (string $household, string $productId, string $quantity) => $this->world->baskets->setActual($orderOf($household)->id, $productId, $quantity);
+    $this->lates = fn (string $household) => $this->world->baskets->latesOfHousehold($this->cycleId, $this->householdIds[$household]);
+    $this->closable = fn () => WeeklyBasketStates::areFinished($this->world->baskets->snapshot($this->cycleId)->states());
+    $this->actual = fn (string $household, string $productId) => $this->world->baskets->snapshot($this->cycleId)->effective($this->householdIds[$household], $productId);
     $this->dropped = fn (string $household) => collect($this->world->orders->ofHousehold($this->cycleId, $this->householdIds[$household])->lines())
         ->filter(fn ($line) => $line->dropped)->map(fn ($line) => $line->productId)->values()->all();
     $this->onlyBaker = fn () => ($this->world->stopParticipating)($this->world->manager, $this->cycleId, OrderingWorld::GROWER);
@@ -240,17 +245,17 @@ it('settles the cycle only when the last participating producer is distributed (
     expect(($this->settled)())->toBeTrue();
 })->group('S27');
 
-it('makes every household with an allocation have a pending pickup once settled (R19, R24, S27)', function () {
+it('makes every household with an allocation have one weekly base basket once settled (R19, R24, S27)', function () {
     ($this->onlyBaker)();
     ($this->bakerSent)();
     ($this->validate)();
 
-    expect(($this->pickup)('A'))->toBe(PickupStatus::None);
+    expect(($this->pickup)('A'))->toBeNull();
 
     ($this->distribute)();
 
     expect(($this->settled)())->toBeTrue()
-        ->and([($this->pickup)('A'), ($this->pickup)('B'), ($this->pickup)('C')])->toBe([PickupStatus::Pending, PickupStatus::Pending, PickupStatus::Pending]);
+        ->and([($this->pickup)('A'), ($this->pickup)('B'), ($this->pickup)('C')])->toBe(['draft', 'draft', 'draft']);
 })->group('S27');
 
 // S28 — non-participating producers and marked lines are dropped
@@ -266,7 +271,7 @@ it('drops the lines of a producer that stopped participating and never charges t
 
     expect(($this->settled)())->toBeTrue()
         ->and(($this->dropped)('A'))->toBe([$this->apples])
-        ->and(($this->pickup)('A'))->toBe(PickupStatus::Pending);
+        ->and(($this->pickup)('A'))->toBe('draft');
 })->group('S28');
 
 it('drops the lines stored as will not be delivered (R3b, R18, S28)', function () {
@@ -304,8 +309,8 @@ it('closes a pickup whose every allocation is 0 as nothing to collect when the c
 
     ($this->distribute)();
 
-    expect(($this->pickup)('A'))->toBe(PickupStatus::Pending)
-        ->and(($this->pickup)('B'))->toBe(PickupStatus::NothingToCollect);
+    expect(($this->pickup)('A'))->toBe('draft')
+        ->and(($this->pickup)('B'))->toBe('nothing_to_collect');
 })->group('S20', 'R24');
 
 it('closes a pickup whose only lines were dropped as nothing to collect (R18, R24, S28)', function () {
@@ -317,7 +322,7 @@ it('closes a pickup whose only lines were dropped as nothing to collect (R18, R2
 
     ($this->distribute)();
 
-    expect(($this->pickup)('B'))->toBe(PickupStatus::NothingToCollect);
+    expect(($this->pickup)('B'))->toBe('nothing_to_collect');
 })->group('S28', 'R24');
 
 // S29 — reopening before settlement
@@ -366,32 +371,89 @@ it('reopens only a distributed producer order (R18)', function () {
         ->and(fn () => ($this->reopen)('00000000-0000-7000-8000-0000000000b9'))->toThrow(ProducerNotInCycle::class);
 })->group('R18');
 
-it('reopens after settlement, keeps completed allocations and restores a nothing-to-collect pickup after late delivery (R18, R24, S30)', function () {
+it('revives a nothing-to-collect base and gives a validated household a late weekly basket when a product received as 0 arrives (R18, R19, R24a, S30)', function () {
     ($this->onlyBaker)();
     ($this->order)('A', $this->bread, '4');
+    ($this->order)('A', $this->rye, '1');
+    ($this->order)('B', $this->rye, '1');
     ($this->order)('C', $this->bread, '10');
-    ($this->order)('B', $this->rye, '2');
     ($this->send)();
     ($this->setReceived)($this->rye, '0');
     ($this->validate)();
     ($this->distribute)();
-    ($this->world->completePickup)($this->world->manager, $this->cycleId, DIST_A);
+    ($this->freeze)('A');
+    expect(($this->pickup)('B'))->toBe('nothing_to_collect');
 
     ($this->reopen)();
-    ($this->setReceived)($this->bread, '20', OrderingWorld::BAKER, false);
-    ($this->setReceived)($this->rye, '1');
+    ($this->setReceived)($this->rye, '2');
     ($this->validate)();
     ($this->distribute)();
 
-    $pickupA = ($this->world->getPickup)($this->world->manager, $this->cycleId, DIST_A);
-    $pickupB = ($this->world->getPickup)($this->world->manager, $this->cycleId, DIST_B);
-    $pickupC = ($this->world->getPickup)($this->world->manager, $this->cycleId, DIST_C);
-    expect($pickupA->status)->toBe('completed')
-        ->and($pickupA->lines[0]->allocated)->toBe('4.000')
-        ->and($pickupB->status)->toBe('pending')
-        ->and($pickupB->lines[0]->allocated)->toBe('1.000')
-        ->and($pickupC->lines[0]->allocated)->toBe('16.000');
-})->group('R18', 'R24', 'S30');
+    expect(($this->pickup)('B'))->toBe('draft')
+        ->and(($this->actual)('B', $this->rye))->toBe(1000)
+        ->and(($this->pickup)('A'))->toBe('validated')
+        ->and(($this->actual)('A', $this->bread))->toBe(4000)
+        ->and(collect(($this->lates)('A'))->map(fn (array $late) => [$late['state'], $late['effective']])->all())->toBe([['draft', [$this->rye => 1000]]])
+        ->and(($this->actual)('A', $this->rye))->toBe(1000)
+        ->and(($this->closable)())->toBeFalse();
+
+    ($this->freeze)('B');
+    ($this->freeze)('C');
+    expect(($this->closable)())->toBeFalse();
+
+    $this->world->baskets->validateLate(($this->world->orders->ofHousehold($this->cycleId, DIST_A))->id);
+    expect(($this->lates)('A')[0]['state'])->toBe('validated')
+        ->and(($this->closable)())->toBeTrue();
+})->group('R18', 'R19', 'R24', 'S30');
+
+it('keeps received and allocated balanced after a rejected correction of a late arrival, so the reception can still be distributed (R17, R18, S30, S63)', function () {
+    ($this->onlyBaker)();
+    ($this->order)('A', $this->bread, '4');
+    ($this->order)('A', $this->rye, '1');
+    ($this->order)('B', $this->rye, '1');
+    ($this->order)('C', $this->bread, '10');
+    ($this->send)();
+    ($this->setReceived)($this->rye, '0');
+    ($this->validate)();
+    ($this->distribute)();
+    ($this->freeze)('A');
+    ($this->reopen)();
+    ($this->setReceived)($this->rye, '2');
+
+    expect(fn () => ($this->setReceived)($this->rye, '3'))->toThrow(RedistributionBlockedByValidatedBasket::class);
+
+    $rye = collect(($this->reception)()->products)->firstWhere('productId', $this->rye);
+    expect($rye->received)->toBe('2.000')
+        ->and($rye->balancedForDistribution)->toBeTrue()
+        ->and(($this->lates)('A')[0]['effective'])->toBe([$this->rye => 1000]);
+
+    ($this->validate)();
+    ($this->distribute)();
+    expect(($this->reception)()->distributed)->toBeTrue();
+})->group('R17', 'R18', 'S30', 'S63');
+
+it('adds a second late arrival to the household open late draft instead of creating another basket (R18, R19, S91)', function () {
+    ($this->onlyBaker)();
+    $cake = $this->world->catalog->offer(OrderingWorld::BAKER, 'Cake', 'loaf', 500, variable: false);
+    ($this->order)('A', $this->bread, '4');
+    ($this->order)('A', $this->rye, '1');
+    ($this->order)('A', $cake, '2');
+    ($this->order)('C', $this->bread, '10');
+    ($this->send)();
+    ($this->setReceived)($this->rye, '0');
+    ($this->setReceived)($cake, '0');
+    ($this->validate)();
+    ($this->distribute)();
+    ($this->freeze)('A');
+
+    ($this->reopen)();
+    ($this->setReceived)($this->rye, '1');
+    ($this->setReceived)($cake, '2');
+
+    expect(($this->lates)('A'))->toHaveCount(1)
+        ->and(($this->lates)('A')[0]['effective'])->toBe([$this->rye => 1000, $cake => 2000])
+        ->and(($this->pickup)('A'))->toBe('validated');
+})->group('R18', 'R19', 'S91');
 
 // R12a, D10 — SendEmptyProducerOrders validates, distributes and settles
 
@@ -422,7 +484,7 @@ it('settles the cycle through the same step when the empty producer is the last 
 
     expect(($this->settled)())->toBeTrue()
         ->and(($this->dropped)('A'))->toBe([$this->apples])
-        ->and(($this->pickup)('A'))->toBe(PickupStatus::Pending);
+        ->and(($this->pickup)('A'))->toBe('draft');
 })->group('R12a', 'S28');
 
 it('does not distribute an empty producer while another order is still waiting (R12a, D10)', function () {
@@ -456,12 +518,13 @@ it('settles a cycle whose every producer is empty, once, when the last is sent (
     expect(($this->settled)())->toBeTrue();
 })->group('R12a');
 
-it('clears pending pickup adjustments when reception allocations change by either way (D16)', function (bool $byHand) {
+it('resets a staff actual quantity when reception allocations change by either way, leaving unchanged lines alone (R18, D16)', function (bool $byHand) {
     ($this->onlyBaker)();
     ($this->bakerSent)();
     ($this->validate)();
     ($this->distribute)();
-    ($this->world->adjustDeliveredQuantity)($this->world->manager, $this->cycleId, DIST_A, $this->bread, '5');
+    ($this->setActual)('A', $this->bread, '5');
+    ($this->setActual)('B', $this->bread, '4');
     ($this->reopen)();
 
     if ($byHand) {
@@ -470,22 +533,149 @@ it('clears pending pickup adjustments when reception allocations change by eithe
         ($this->setReceived)($this->bread, '15');
     }
 
-    $pickup = ($this->world->getPickup)($this->world->manager, $this->cycleId, DIST_A);
-    expect($pickup->lines[0]->delivered)->toBe('3.000')->and($pickup->lines[0]->adjusted)->toBeFalse();
+    // A's allocation changed (4 to 3): its override is gone. B (6 to 5) resets only in the proportional case.
+    expect(($this->actual)('A', $this->bread))->toBe(3000)
+        ->and(($this->actual)('B', $this->bread))->toBe($byHand ? 4000 : 5000);
 })->with([true, false])->group('R18', 'D16');
 
-it('rejects changing or adding reception allocations for a frozen pickup (R18, R23)', function () {
+it('rejects changing the allocation of a product a validated basket has a line of (R18, R23)', function () {
     ($this->onlyBaker)();
     ($this->bakerSent)();
     ($this->validate)();
     ($this->distribute)();
-    ($this->world->completePickup)($this->world->manager, $this->cycleId, DIST_A);
+    ($this->freeze)('A');
+    ($this->reopen)();
+
+    expect(fn () => ($this->allocate)($this->bread, 'A', '3'))->toThrow(RedistributionBlockedByValidatedBasket::class);
+})->group('R18', 'R23');
+
+it('lets two fully validated households split an unordered product into two late drafts and then correct each, including to zero (R14, R16, R18, R19, S40, S91)', function () {
+    ($this->onlyBaker)();
+    ($this->bakerSent)();
+    ($this->validate)();
+    ($this->distribute)();
+    ($this->freeze)('A');
+    ($this->freeze)('B');
+    ($this->reopen)();
+    ($this->world->addUnorderedProduct)($this->world->manager, $this->cycleId, OrderingWorld::BAKER, $this->rye, '2');
+
+    ($this->allocate)($this->rye, 'A', '1');
+    ($this->allocate)($this->rye, 'B', '1');
+    $drafts = fn (string $household) => collect(($this->lates)($household))->map(fn (array $late) => [$late['state'], $late['effective']])->all();
+    expect($drafts('A'))->toBe([['draft', [$this->rye => 1000]]])
+        ->and($drafts('B'))->toBe([['draft', [$this->rye => 1000]]]);
+
+    ($this->allocate)($this->rye, 'A', '2');
+    ($this->allocate)($this->rye, 'B', '0');
+
+    expect($drafts('A'))->toBe([['draft', [$this->rye => 2000]]])
+        ->and($drafts('B'))->toBe([['nothing_to_collect', [$this->rye => 0]]])
+        ->and(($this->pickup)('A'))->toBe('validated')
+        ->and(($this->pickup)('B'))->toBe('validated')
+        ->and(($this->actual)('A', $this->bread))->toBe(4000)
+        ->and(($this->actual)('B', $this->bread))->toBe(6000)
+        ->and(collect(($this->reception)()->products)->firstWhere('productId', $this->rye)->balancedForDistribution)->toBeTrue();
+
+    ($this->validate)();
+    ($this->distribute)();
+    expect(($this->reception)()->distributed)->toBeTrue();
+})->group('R14', 'R16', 'R18', 'R19', 'S40', 'S91');
+
+it('lets a replaced received total reset a hand allocation that went to a late draft, to zero (R15, R16, R18, R19)', function () {
+    ($this->onlyBaker)();
+    ($this->order)('A', $this->bread, '4');
+    ($this->order)('B', $this->rye, '2');
+    ($this->send)();
+    ($this->setReceived)($this->rye, '0');
+    ($this->validate)();
+    ($this->distribute)();
+    ($this->freeze)('A');
+    ($this->reopen)();
+    ($this->setReceived)($this->rye, '2');
+    ($this->allocate)($this->rye, 'B', '1');
+    ($this->allocate)($this->rye, 'A', '1');
+    expect(($this->lates)('A')[0]['effective'])->toBe([$this->rye => 1000]);
+
+    ($this->world->setReceivedTotal)($this->world->manager, $this->cycleId, OrderingWorld::BAKER, $this->rye, '2', overwriteManual: true);
+
+    expect(($this->lates)('A')[0]['state'])->toBe('nothing_to_collect')
+        ->and(($this->lates)('A')[0]['effective'])->toBe([$this->rye => 0])
+        ->and(($this->actual)('B', $this->rye))->toBe(2000)
+        ->and(collect(($this->reception)()->products)->firstWhere('productId', $this->rye)->balancedForDistribution)->toBeTrue();
+})->group('R15', 'R16', 'R18', 'R19');
+
+it('gives a fully validated household a late draft for a product only another household ordered, once its total arrived (R16, R18, R19, S30)', function () {
+    ($this->onlyBaker)();
+    ($this->order)('A', $this->bread, '4');
+    ($this->order)('B', $this->rye, '2');
+    ($this->send)();
+    ($this->setReceived)($this->rye, '0');
+    ($this->validate)();
+    ($this->distribute)();
+    ($this->freeze)('A');
+    expect(($this->pickup)('B'))->toBe('nothing_to_collect');
+
+    ($this->reopen)();
+    ($this->setReceived)($this->rye, '2');
+    expect(($this->pickup)('B'))->toBe('draft');
+    ($this->allocate)($this->rye, 'B', '1');
+    ($this->allocate)($this->rye, 'A', '1');
+
+    expect(($this->actual)('B', $this->rye))->toBe(1000)
+        ->and(collect(($this->lates)('A'))->map(fn (array $late) => [$late['state'], $late['effective']])->all())->toBe([['draft', [$this->rye => 1000]]])
+        ->and(($this->pickup)('A'))->toBe('validated')
+        ->and(collect(($this->reception)()->products)->firstWhere('productId', $this->rye)->balancedForDistribution)->toBeTrue();
+})->group('R16', 'R18', 'R19', 'S30');
+
+it('still rejects a hand allocation of a product a validated basket has a line of, even at zero, and changes nothing (R16, R18, R23)', function () {
+    ($this->onlyBaker)();
+    ($this->order)('A', $this->bread, '4');
+    ($this->order)('A', $this->rye, '1');
+    ($this->order)('B', $this->rye, '1');
+    ($this->send)();
+    ($this->setReceived)($this->rye, '0');
+    ($this->validate)();
+    ($this->distribute)();
+    ($this->freeze)('A');
+    ($this->reopen)();
+    ($this->setReceived)($this->rye, '2');
+    $before = [($this->lates)('A'), ($this->actual)('B', $this->rye), ($this->pickup)('A')];
+
+    expect(fn () => ($this->allocate)($this->rye, 'A', '1'))->toThrow(RedistributionBlockedByValidatedBasket::class)
+        ->and(fn () => ($this->allocate)($this->rye, 'B', '2'))->toThrow(RedistributionBlockedByValidatedBasket::class)
+        ->and([($this->lates)('A'), ($this->actual)('B', $this->rye), ($this->pickup)('A')])->toBe($before);
+})->group('R16', 'R18', 'R23');
+
+it('gives a household whose baskets are all validated a late weekly basket when a product no basket had is allocated to it by hand, and adds the next one to that draft (R14, R16, R18, R19, S40, S91)', function () {
+    ($this->onlyBaker)();
+    $cake = $this->world->catalog->offer(OrderingWorld::BAKER, 'Cake', 'loaf', 500, variable: false);
+    ($this->bakerSent)();
+    ($this->validate)();
+    ($this->distribute)();
+    ($this->freeze)('A');
+    ($this->freeze)('B');
+    ($this->freeze)('C');
     ($this->reopen)();
     ($this->world->addUnorderedProduct)($this->world->manager, $this->cycleId, OrderingWorld::BAKER, $this->rye, '1');
+    ($this->world->addUnorderedProduct)($this->world->manager, $this->cycleId, OrderingWorld::BAKER, $cake, '2');
 
-    expect(fn () => ($this->allocate)($this->bread, 'A', '3'))->toThrow(PickupNotPending::class)
-        ->and(fn () => ($this->allocate)($this->rye, 'A', '1'))->toThrow(PickupNotPending::class);
-})->group('R18', 'R23');
+    ($this->allocate)($this->rye, 'A', '1');
+    expect(($this->closable)())->toBeFalse();
+    ($this->allocate)($cake, 'A', '2');
+
+    expect(($this->pickup)('A'))->toBe('validated')
+        ->and(($this->actual)('A', $this->bread))->toBe(4000)
+        ->and(collect(($this->lates)('A'))->map(fn (array $late) => [$late['state'], $late['effective']])->all())
+        ->toBe([['draft', [$this->rye => 1000, $cake => 2000]]])
+        ->and(($this->lates)('B'))->toBe([])
+        ->and(($this->closable)())->toBeFalse();
+
+    ($this->validate)();
+    ($this->distribute)();
+    expect(($this->reception)()->distributed)->toBeTrue();
+    $this->world->baskets->validateLate($this->world->orders->ofHousehold($this->cycleId, DIST_A)->id);
+    expect(($this->closable)())->toBeTrue();
+})->group('R14', 'R16', 'R18', 'R19', 'S40', 'S91');
 
 it('closes at settlement when every pickup has nothing to collect (R24b, S20, S46)', function () {
     ($this->onlyBaker)();
@@ -498,7 +688,7 @@ it('closes at settlement when every pickup has nothing to collect (R24b, S20, S4
     expect(fn () => ($this->reopen)())->toThrow(CycleClosed::class);
 })->group('R24b', 'S20', 'S46');
 
-it('redistributes while leaving a pickup adjustment difference flagged (R18, S61)', function () {
+it('redistributes while leaving an actual-versus-allocation difference flagged (R18, S61)', function () {
     ($this->onlyBaker)();
     $beef = $this->world->catalog->offer(OrderingWorld::BAKER, 'Beef', 'kg', 2000, variable: true);
     ($this->order)('A', $beef, '1');
@@ -506,8 +696,8 @@ it('redistributes while leaving a pickup adjustment difference flagged (R18, S61
     ($this->send)();
     ($this->validate)();
     ($this->distribute)();
-    ($this->world->adjustDeliveredQuantity)($this->world->manager, $this->cycleId, DIST_A, $beef, '1.120');
-    ($this->world->completePickup)($this->world->manager, $this->cycleId, DIST_A);
+    ($this->setActual)('A', $beef, '1.120');
+    ($this->freeze)('A');
 
     ($this->reopen)();
     ($this->distribute)();
@@ -518,19 +708,7 @@ it('redistributes while leaving a pickup adjustment difference flagged (R18, S61
         ->and($product->hasAdjustments)->toBeTrue();
 })->group('R18', 'S61');
 
-it('asks which pickups to redistribute before changing a product with a done pickup (R18, S63)', function () {
-    ($this->onlyBaker)();
-    ($this->bakerSent)();
-    ($this->validate)();
-    ($this->distribute)();
-    ($this->world->completePickup)($this->world->manager, $this->cycleId, DIST_A);
-    ($this->reopen)();
-
-    expect(fn () => ($this->setReceived)($this->bread, '30'))->toThrow(RedistributionChoiceRequired::class)
-        ->and(collect(($this->reception)()->products)->firstWhere('productId', $this->bread)->received)->toBe('20.000');
-})->group('R18', 'S63');
-
-it('appends successive signed pickup adjustments and wallet corrections without rewriting original completion (R23, S64)', function (bool $notCollected) {
+it('rejects redistributing a product a validated basket contains, however it was collected, and changes nothing (R18, R23, S63, S89)', function (bool $collected) {
     ($this->onlyBaker)();
     $beef = $this->world->catalog->offer(OrderingWorld::BAKER, 'Beef', 'kg', 2000, variable: true);
     ($this->order)('A', $beef, '1');
@@ -538,69 +716,70 @@ it('appends successive signed pickup adjustments and wallet corrections without 
     ($this->send)();
     ($this->validate)();
     ($this->distribute)();
-    ($this->world->adjustDeliveredQuantity)($this->world->manager, $this->cycleId, DIST_A, $beef, '1.120');
-    if ($notCollected) {
-        (new MarkPickupNotCollected(
-            new PickupLocker($this->world->cycles, $this->world->orders),
-            $this->world->orders, $this->world->walletLedger, new ImmediateTransactionRunner, $this->world->clock,
-        ))($this->world->manager, $this->cycleId, DIST_A);
-    } else {
-        ($this->world->completePickup)($this->world->manager, $this->cycleId, DIST_A);
+    ($this->freeze)('A');
+    if ($collected) {
+        $this->world->baskets->collect(($this->world->orders->ofHousehold($this->cycleId, DIST_A))->id);
     }
     ($this->reopen)();
 
-    expect(fn () => ($this->world->setReceivedTotal)($this->households['A'], $this->cycleId, OrderingWorld::BAKER, $beef, '2', includeCompleted: true))->toThrow(AuthorizationException::class);
-    ($this->setReceived)($beef, '2', OrderingWorld::BAKER, true);
-    ($this->setReceived)($beef, '2', OrderingWorld::BAKER, true);
-    ($this->setReceived)($beef, '3', OrderingWorld::BAKER, true);
+    expect(fn () => ($this->setReceived)($beef, '3'))->toThrow(RedistributionBlockedByValidatedBasket::class);
 
-    $pickup = ($this->world->getPickup)($this->world->manager, $this->cycleId, DIST_A);
-    $pending = ($this->world->getPickup)($this->world->manager, $this->cycleId, DIST_B);
-    expect($pickup->lines[0]->delivered)->toBe('1.120')
-        ->and($pickup->originalChargeCents)->toBe(2240)
-        ->and($pickup->status)->toBe($notCollected ? 'not_collected' : 'completed')
-        ->and($pickup->totalCents)->toBe(3000)
-        ->and(array_map(fn ($line) => [$line->quantityDelta, $line->amountCents], $pickup->adjustments))->toBe([['-0.120', -240], ['0.500', 1000]])
-        ->and($pending->lines[0]->delivered)->toBe('1.500')
-        ->and($this->world->movements->balanceOf(DIST_A)->cents)->toBe(-3000)
-        ->and(count($this->world->movements->statementOf(DIST_A)))->toBe(3)
-        ->and(collect(($this->reception)()->products)->firstWhere('productId', $beef)->balancedForDistribution)->toBeTrue();
-})->with([false, true])->group('R23', 'S64');
+    $product = collect(($this->reception)()->products)->firstWhere('productId', $beef);
+    $allocations = collect($product->allocations)->keyBy('householdName');
+    expect($product->received)->toBe('2.000')
+        ->and($allocations['Household A']->allocated)->toBe('1.000')
+        ->and($allocations['Household B']->allocated)->toBe('1.000')
+        ->and(($this->actual)('B', $beef))->toBe(1000)
+        ->and(($this->pickup)('A'))->toBe($collected ? 'collected' : 'validated')
+        ->and(($this->pickup)('B'))->toBe('draft')
+        ->and(($this->lates)('A'))->toBe([]);
+})->with([false, true])->group('R18', 'R23', 'S63', 'S89');
 
-it('explains when unfinished-only cannot redistribute and leaves everything unchanged (R18, S63)', function (string $received) {
-    ($this->onlyBaker)();
-    ($this->order)('A', $this->bread, '4');
-    ($this->order)('B', $this->rye, '1');
-    ($this->send)();
-    ($this->validate)();
-    ($this->distribute)();
-    ($this->world->completePickup)($this->world->manager, $this->cycleId, DIST_A);
-    ($this->reopen)();
-
-    expect(fn () => ($this->setReceived)($this->bread, $received, OrderingWorld::BAKER, false))
-        ->toThrow(RedistributionCannotExcludeCompleted::class)
-        ->and(collect(($this->reception)()->products)->firstWhere('productId', $this->bread)->received)->toBe('4.000')
-        ->and(count($this->world->movements->statementOf(DIST_A)))->toBe(1);
-})->with(['3', '4'])->group('R18', 'S63');
-
-it('balances an all-pickups target equal to already charged weight without charging it again (S64)', function () {
+it('rejects a hand-set allocation of a product another household\'s validated basket contains, in both branches, and changes nothing (R16, R18, R23, S63, S64)', function (bool $line) {
     ($this->onlyBaker)();
     $beef = $this->world->catalog->offer(OrderingWorld::BAKER, 'Beef', 'kg', 2000, variable: true);
     ($this->order)('A', $beef, '1');
     ($this->order)('B', $beef, '1');
+    ($this->order)('C', $this->bread, '1');
     ($this->send)();
     ($this->validate)();
     ($this->distribute)();
-    ($this->world->adjustDeliveredQuantity)($this->world->manager, $this->cycleId, DIST_A, $beef, '1.120');
-    ($this->world->completePickup)($this->world->manager, $this->cycleId, DIST_A);
+    ($this->freeze)('A');
     ($this->reopen)();
-    ($this->setReceived)($beef, '2.240', OrderingWorld::BAKER, true);
+    $observed = fn () => [
+        collect(($this->reception)()->products)->map(fn ($product) => [$product->productId, $product->received, collect($product->allocations)->map(fn ($a) => [$a->householdId, $a->allocated])->all()])->all(),
+        ($this->pickup)('A'), ($this->pickup)('B'), ($this->actual)('B', $beef), ($this->lates)('A'),
+    ];
+    $before = $observed();
 
-    expect(collect(($this->reception)()->products)->firstWhere('productId', $beef)->balancedForDistribution)->toBeTrue()
-        ->and(count($this->world->movements->statementOf(DIST_A)))->toBe(1);
-})->group('S64');
+    // B has a beef line (an update); C has none (a new line).
+    expect(fn () => ($this->allocate)($beef, $line ? 'B' : 'C', '2'))->toThrow(RedistributionBlockedByValidatedBasket::class);
 
-it('opens a pickup for a newly allocated household after settlement (R18, R19)', function () {
+    expect($observed())->toBe($before);
+})->with([true, false])->group('R16', 'R18', 'R23', 'S63', 'S64');
+
+it('redistributes a product no validated basket contains into the drafts, replacing the actual override (R18, R19a, S64)', function () {
+    ($this->onlyBaker)();
+    ($this->order)('A', $this->rye, '1');
+    ($this->order)('B', $this->bread, '2');
+    ($this->order)('C', $this->bread, '3');
+    ($this->send)();
+    ($this->validate)();
+    ($this->distribute)();
+    ($this->setActual)('B', $this->bread, '1');
+    ($this->freeze)('A');
+    ($this->reopen)();
+
+    ($this->allocate)($this->bread, 'B', '3');
+    ($this->allocate)($this->bread, 'C', '2');
+
+    expect(($this->actual)('B', $this->bread))->toBe(3000)
+        ->and(($this->actual)('C', $this->bread))->toBe(2000)
+        ->and(($this->pickup)('A'))->toBe('validated')
+        ->and(($this->lates)('A'))->toBe([]);
+})->group('R18', 'S64');
+
+it('gives a newly allocated household a draft base after settlement (R18, R19)', function () {
     ($this->onlyBaker)();
     ($this->bakerSent)();
     ($this->validate)();
@@ -613,17 +792,37 @@ it('opens a pickup for a newly allocated household after settlement (R18, R19)',
     ($this->validate)();
     ($this->distribute)();
 
-    expect(($this->world->getPickup)($this->world->manager, $this->cycleId, $household)->status)->toBe('pending');
+    expect($this->world->baskets->stateOfHousehold($this->cycleId, $household))->toBe('draft');
 })->group('R18', 'R19');
 
-it('preserves even dropped original order lines after pickup completion while the cycle stays open (R23)', function () {
+it('rejects changing the received total of an unordered product a validated basket has a line of, and keeps the old total (R14, R18, R23)', function () {
+    ($this->onlyBaker)();
+    ($this->bakerSent)();
+    ($this->validate)();
+    ($this->distribute)();
+    ($this->reopen)();
+    $household = '00000000-0000-7000-8000-0000000000e4';
+    $this->world->households->know($household, 'Household D');
+    ($this->world->addUnorderedProduct)($this->world->manager, $this->cycleId, OrderingWorld::BAKER, $this->rye, '1');
+    ($this->world->setAllocation)($this->world->manager, $this->cycleId, OrderingWorld::BAKER, $this->rye, $household, '1');
+    ($this->validate)();
+    ($this->distribute)();
+    $this->world->baskets->validate($this->world->orders->ofHousehold($this->cycleId, $household)->id);
+    ($this->reopen)();
+
+    expect(fn () => ($this->world->addUnorderedProduct)($this->world->manager, $this->cycleId, OrderingWorld::BAKER, $this->rye, '2'))
+        ->toThrow(RedistributionBlockedByValidatedBasket::class)
+        ->and(collect(($this->reception)()->products)->firstWhere('productId', $this->rye)->received)->toBe('1.000');
+})->group('R14', 'R18', 'R23');
+
+it('keeps a marked line of a validated basket in the order while the cycle stays open (R23)', function () {
     ($this->onlyBaker)();
     ($this->order)('A', $this->rye, '1');
     $this->world->catalog->deactivate($this->rye);
     ($this->bakerSent)();
     ($this->validate)();
     ($this->distribute)();
-    ($this->world->completePickup)($this->world->manager, $this->cycleId, DIST_A);
+    ($this->freeze)('A');
 
     expect(fn () => ($this->world->removeMarkedLine)($this->households['A'], $this->cycleId, $this->rye))->toThrow(PickupNotPending::class);
 })->group('R23');

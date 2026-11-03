@@ -14,7 +14,6 @@ const stateNames = new Set([
     'default',
     'long-content',
     'manual-allocation',
-    'received-scope-choice',
     'received-overwrite',
     'adjusted-summary',
     'unordered-summary',

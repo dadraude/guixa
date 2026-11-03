@@ -9,7 +9,7 @@ import { euros } from './euros';
 import { formatQuantity } from '@/lib/locale';
 
 const props = defineProps<{
-    lines: App.Http.PickupStockLineRow[] | App.Http.BasketStockLineRow[];
+    lines: App.Http.BasketStockLineRow[];
     options: App.Http.StockLevelRow[];
     editable: boolean;
     processing: boolean;

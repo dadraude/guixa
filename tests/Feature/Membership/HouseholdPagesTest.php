@@ -109,7 +109,12 @@ it('keeps pending pickups and wallet adjustments available after deactivation (R
     $cycleId = (string) Str::uuid7();
     $orderId = (string) Str::uuid7();
     DB::table('cycles')->insert(['id' => $cycleId, 'pickup_date' => '2026-10-28', 'settled_at' => now()]);
-    DB::table('orders')->insert(['id' => $orderId, 'cycle_id' => $cycleId, 'household_id' => $householdId, 'pickup_status' => 'pending']);
+    DB::table('orders')->insert(['id' => $orderId, 'cycle_id' => $cycleId, 'household_id' => $householdId]);
+    $basketId = (string) Str::uuid7();
+    DB::table('baskets')->insert([
+        'id' => $basketId, 'household_id' => $householdId, 'household_name' => 'Household H', 'kind' => 'weekly', 'state' => 'draft',
+        'created_by' => null, 'created_at' => now(), 'source_order_id' => $orderId, 'reference_cycle_id' => $cycleId,
+    ]);
 
     $this->actingAs($manager)->get(route('manage.households.show', $householdId))
         ->assertInertia(fn (Assert $page) => $page
@@ -117,7 +122,7 @@ it('keeps pending pickups and wallet adjustments available after deactivation (R
             ->where('deactivationWarning.pendingPickups.0.pickupDate', '2026-10-28'));
 
     $this->actingAs($manager)->post(route('manage.households.deactivate', $householdId))->assertRedirect();
-    expect(DB::table('orders')->where('id', $orderId)->value('pickup_status'))->toBe('pending');
+    expect(DB::table('baskets')->where('id', $basketId)->value('state'))->toBe('draft');
     $this->actingAs($manager)->post(route('manage.households.wallet.top-ups.store', $householdId), ['amount' => '5.00'])->assertRedirect();
     $receiptId = DB::table('wallet_movements')->where('household_id', $householdId)->where('type', 'top_up')->value('id');
     $this->actingAs($manager)->post(route('manage.households.wallet.corrections.store', $householdId), [
@@ -132,7 +137,7 @@ it('keeps pending pickups and wallet adjustments available after deactivation (R
             ->where('toSettle.0.balanceCents', 0)
             ->where('toSettle.0.pendingPickups.0.cycleId', $cycleId));
 
-    DB::table('orders')->where('id', $orderId)->update(['pickup_status' => 'not_collected']);
+    DB::table('baskets')->where('id', $basketId)->update(['state' => 'collected']);
     $this->actingAs($manager)->get(route('manage.households.index'))
         ->assertInertia(fn (Assert $page) => $page->where('toSettle', []));
 });

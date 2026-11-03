@@ -36,6 +36,7 @@ use Guixa\Shared\Domain\Role;
 use Illuminate\Auth\Access\AuthorizationException;
 use Tests\Support\FrozenClock;
 use Tests\Support\InMemory\ImmediateTransactionRunner;
+use Tests\Support\InMemory\Sales\NoWeeklyBasketSource;
 
 beforeEach(function () {
     $this->actor = Actor::manager('manager');
@@ -60,6 +61,21 @@ beforeEach(function () {
         public function get(string $id): ?Basket
         {
             return $this->rows[$id] ?? null;
+        }
+
+        public function getBySourceOrder(string $orderId): ?Basket
+        {
+            return null;
+        }
+
+        public function getOpenLateBySourceOrder(string $orderId): ?Basket
+        {
+            return null;
+        }
+
+        public function weeklyOfCycle(string $cycleId): array
+        {
+            return [];
         }
 
         public function lock(string $id): ?Basket
@@ -170,7 +186,7 @@ beforeEach(function () {
     $this->create = new CreateStockBasket($this->baskets, $this->households, $this->clock);
     $this->add = new AddStockToBasket($this->baskets, $this->products, $this->quantities, $this->transactions, $this->clock);
     $this->addReturn = new AddReturnToBasket($this->baskets, $this->returnItems, $this->transactions, $this->clock);
-    $this->validate = new ValidateBasket($this->baskets, $this->products, $this->stock, $this->wallet, $this->transactions, $this->clock);
+    $this->validate = new ValidateBasket($this->baskets, $this->products, $this->stock, $this->wallet, new NoWeeklyBasketSource, $this->transactions, $this->clock);
     $this->collect = new MarkBasketCollected($this->baskets, $this->transactions, $this->clock);
     $this->remove = new RemoveStockFromBasket($this->baskets, $this->transactions, $this->clock);
     $this->cancel = new CancelDraftBasket($this->baskets, $this->transactions, $this->clock);

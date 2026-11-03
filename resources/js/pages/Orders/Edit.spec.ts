@@ -189,116 +189,17 @@ describe('member order editor presentation', () => {
         expect(html).toContain('0,00');
     });
 
-    it('shows the pickup once the cycle is settled, with the delivered quantities and the total', async () => {
+    it('links the settled cycle to the household basket, where ordered versus actual is shown (R23a)', async () => {
         const html = await render(Edit, {
-            order: {
-                ...order,
-                pickup: {
-                    cycleId: 'cycle',
-                    pickupDate: '2026-10-30',
-                    householdId: 'home',
-                    householdName: '',
-                    status: 'pending',
-                    totalCents: 1050,
-                    balanceCents: null,
-                    resultingBalanceCents: null,
-                    stockLines: [],
-                    returnLines: [],
-                    lines: [
-                        {
-                            productId: 'bread',
-                            name: 'Pa de pagès',
-                            unit: 'unitat',
-                            variable: false,
-                            unitPriceCents: 350,
-                            ordered: '4.000',
-                            allocated: '4.000',
-                            delivered: '3.000',
-                            adjusted: true,
-                            amountCents: 1050,
-                        },
-                    ],
-                },
-            },
+            order: { ...order, basketId: 'basket-1' },
         });
 
         expect(html).toContain('data-test="pickup"');
-        expect(html).toContain('La teva recollida');
-        expect(html).toContain('Demanat 4,000, lliurat 3,000');
-        expect(html).toContain('data-test="pickup-total"');
-        expect(html).toContain('10,50');
+        expect(html).toContain('La teva cistella');
+        expect(html).toContain('data-test="basket-link"');
     });
 
-    it('shows the stock and return lines of the pickup read-only, since the total includes them (R22, R23a)', async () => {
-        const html = await render(Edit, {
-            order: {
-                ...order,
-                pickup: {
-                    cycleId: 'cycle',
-                    pickupDate: '2026-10-30',
-                    householdId: 'home',
-                    householdName: '',
-                    status: 'pending',
-                    totalCents: 1000,
-                    balanceCents: null,
-                    resultingBalanceCents: null,
-                    lines: [],
-                    stockLines: [
-                        {
-                            stockProductId: 'honey',
-                            name: 'Mel',
-                            unit: 'pot',
-                            variable: false,
-                            unitPriceCents: 600,
-                            quantity: '2.000',
-                            amountCents: 1200,
-                        },
-                    ],
-                    returnLines: [
-                        {
-                            returnItemId: 'jar',
-                            name: 'Pot de vidre',
-                            amountCents: 50,
-                            quantity: 4,
-                            creditCents: 200,
-                        },
-                    ],
-                },
-            },
-        });
-
-        expect(html).toContain('data-test="stock-line-honey"');
-        expect(html).toContain('data-test="return-line-jar"');
-        expect(html).not.toContain('data-test="add-stock-form"');
-        expect(html).not.toContain('data-test="add-return-form"');
-        expect(html).not.toContain('data-test="remove-stock-honey"');
-    });
-
-    it('shows no stock or return section when the pickup has none', async () => {
-        const html = await render(Edit, {
-            order: {
-                ...order,
-                pickup: {
-                    cycleId: 'cycle',
-                    pickupDate: '2026-10-30',
-                    householdId: 'home',
-                    householdName: '',
-                    status: 'pending',
-                    totalCents: 0,
-                    balanceCents: null,
-                    resultingBalanceCents: null,
-                    lines: [],
-                    stockLines: [],
-                    returnLines: [],
-                },
-            },
-        });
-
-        expect(html).not.toContain('data-test="stock-lines"');
-        expect(html).not.toContain('data-test="return-lines"');
-    });
-
-    it('shows no pickup before the cycle is settled', async () => {
+    it('shows no basket link before the cycle is settled', async () => {
         const html = await render(Edit, { order });
 
         expect(html).not.toContain('data-test="pickup"');

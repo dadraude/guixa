@@ -23,11 +23,12 @@ final class SendEmptyProducerOrders
         private readonly OrderRepository $orders,
         ProductCatalog $catalog,
         ProductAvailabilityRepository $availability,
+        SalesBaskets $baskets,
         private readonly TransactionRunner $transactions,
         private readonly Clock $clock,
     ) {
         $this->marks = new NotDeliveredMarks($catalog, $availability, $orders);
-        $this->settlement = new CycleSettlement($orders, $this->marks);
+        $this->settlement = new CycleSettlement($orders, $this->marks, $baskets);
     }
 
     /**

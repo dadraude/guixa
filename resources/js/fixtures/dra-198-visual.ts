@@ -99,34 +99,6 @@ const cycle = {
         },
     ],
 };
-const pickup = {
-    cycleId,
-    pickupDate,
-    householdId,
-    householdName: household.name,
-    status: 'pending',
-    lines: [
-        {
-            productId,
-            name: product.name,
-            unit: product.unit,
-            variable: product.variable,
-            unitPriceCents: 320,
-            ordered: '2',
-            allocated: '2',
-            delivered: '2',
-            adjusted: false,
-            amountCents: 640,
-        },
-    ],
-    totalCents: 640,
-    balanceCents: 2000,
-    resultingBalanceCents: 1360,
-    stockLines: [],
-    returnLines: [],
-    adjustments: [],
-    originalChargeCents: null,
-};
 const settlement = {
     householdId,
     householdName: household.name,
@@ -155,7 +127,6 @@ const reception = {
             balancedForDistribution: true,
             hasManualAllocations: false,
             hasAdjustments: false,
-            hasDonePickups: false,
             allocations: [
                 {
                     householdId,
@@ -195,7 +166,7 @@ const order = {
             notDelivered: false,
         },
     ],
-    pickup: null,
+    basketId: null,
 };
 
 const pageProps: Record<string, Record<string, unknown>> = {
@@ -291,18 +262,13 @@ const pageProps: Record<string, Record<string, unknown>> = {
         closed: false,
         pickups: [
             {
+                basketId: 'basket',
                 householdId,
                 householdName: household.name,
-                status: 'pending',
+                status: 'draft',
                 totalCents: 640,
             },
         ],
-        households: [household],
-    },
-    'Manage/Pickups/Show': {
-        pickup,
-        stockProducts: [stockProduct],
-        returnItems: [returnItem],
     },
     'Manage/Producers/Index': { producers: [producer] },
     'Manage/Reception/Show': {

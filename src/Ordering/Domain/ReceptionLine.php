@@ -16,7 +16,6 @@ final readonly class ReceptionLine
         public Quantity $delivered,
         public bool $allocatedByHand,
         public DateTimeImmutable $createdAt,
-        public bool $done = false,
     ) {}
 
     public function isAdjusted(): bool

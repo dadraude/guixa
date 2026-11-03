@@ -195,24 +195,17 @@ final class Order
 
     /**
      * Settlement: drops the lines marked *will not be delivered*, which include those of producers that do not
-     * participate, and opens the pickup: pending when anything is allocated, nothing to collect when every allocation
-     * is 0 (R18, R24). An order without any line has no pickup.
+     * participate. Sales owns what happens next: the base basket and its collection (R18, R24).
      *
      * @param  array<string, true>  $marked  product ids of the marked lines (`NotDeliveredMarks::of`)
      */
     public function drop(array $marked): void
     {
-        if ($this->lines === []) {
-            return;
-        }
-
         foreach ($this->lines as $productId => $line) {
             if (isset($marked[$productId])) {
                 $this->lines[$productId] = $line->asDropped();
             }
         }
-
-        $this->pickup = $this->hasAllocation() ? PickupStatus::Pending : PickupStatus::NothingToCollect;
     }
 
     /** @return list<PickupAdjustment> in recording order */
@@ -472,6 +465,11 @@ final class Order
         }
 
         return $total;
+    }
+
+    public function lineOf(string $productId): OrderLine
+    {
+        return $this->lines[$productId] ?? throw new LogicException("The order has no line of product {$productId}.");
     }
 
     public function hasLine(string $productId): bool

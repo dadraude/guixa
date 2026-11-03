@@ -1,18 +1,16 @@
 <script setup lang="ts">
-import { Form, Head, Link } from '@inertiajs/vue3';
+import { Head, Link } from '@inertiajs/vue3';
 import { trans } from 'laravel-vue-i18n';
 import CycleController from '@/actions/App/Http/Controllers/Manage/CycleController';
-import PickupController from '@/actions/App/Http/Controllers/Manage/PickupController';
+import BasketController from '@/actions/App/Http/Controllers/Finance/BasketController';
 import Heading from '@/components/Heading.vue';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { formatMoney } from '@/lib/locale';
 
-const props = defineProps<{
+defineProps<{
     cycleId: string;
     closed?: boolean;
     pickups: App.Http.PickupSummaryRow[];
-    households: App.Http.HouseholdOptionRow[];
 }>();
 
 defineOptions({
@@ -22,19 +20,13 @@ defineOptions({
 });
 
 const statusLabels: Record<string, string> = {
-    pending: trans('Pending'),
-    completed: trans('Completed'),
-    not_collected: trans('Not collected'),
+    draft: trans('Draft'),
+    validated: trans('Pending collection'),
+    collected: trans('Collected'),
     nothing_to_collect: trans('Nothing to collect'),
 };
 
 const euros = (cents: number) => formatMoney((cents / 100).toFixed(2));
-
-const openForm = (householdId: string) =>
-    PickupController.store.form({
-        cycle: props.cycleId,
-        household: householdId,
-    });
 </script>
 
 <template>
@@ -44,7 +36,9 @@ const openForm = (householdId: string) =>
         <Heading
             :title="trans('Pickups')"
             :description="
-                trans('Households collect their allocation and stock products.')
+                trans(
+                    'Each household has a weekly basket, plus a late one for goods that arrive after it is validated: validate each to charge it, then mark it collected.',
+                )
             "
         />
 
@@ -53,7 +47,11 @@ const openForm = (householdId: string) =>
             class="text-sm text-muted-foreground"
             data-test="cycle-closed"
         >
-            {{ trans('This cycle is closed. Pickups cannot be changed.') }}
+            {{
+                trans(
+                    'This cycle is closed. Baskets can still be collected and corrected.',
+                )
+            }}
         </p>
 
         <p
@@ -61,61 +59,36 @@ const openForm = (householdId: string) =>
             class="text-sm text-muted-foreground"
             data-test="no-pickups"
         >
-            {{ trans('No household has a pickup in this cycle yet.') }}
+            {{ trans('No household has a weekly basket in this cycle yet.') }}
         </p>
 
         <ul class="divide-y">
             <li
                 v-for="pickup in pickups"
-                :key="pickup.householdId"
+                :key="pickup.basketId"
                 class="flex flex-wrap items-center justify-between gap-2 py-2"
-                :data-test="`pickup-${pickup.householdId}`"
+                :data-test="`pickup-${pickup.basketId}`"
             >
                 <Link
                     :href="
-                        PickupController.show.url({
-                            cycle: cycleId,
-                            household: pickup.householdId,
-                        })
+                        BasketController.show.url({ basket: pickup.basketId })
                     "
                     class="underline"
                 >
                     {{ pickup.householdName }}
                 </Link>
+                <Badge
+                    v-if="pickup.late"
+                    variant="outline"
+                    :data-test="`late-basket-${pickup.basketId}`"
+                >
+                    {{ trans('Late basket') }}
+                </Badge>
                 <Badge variant="secondary">
                     {{ statusLabels[pickup.status] ?? pickup.status }}
                 </Badge>
                 <span>{{ euros(pickup.totalCents) }}</span>
             </li>
         </ul>
-
-        <section
-            v-if="!closed && households.length > 0"
-            class="flex flex-col gap-2"
-        >
-            <h2 class="text-lg font-medium">{{ trans('Open a pickup') }}</h2>
-            <p class="text-sm text-muted-foreground">
-                {{
-                    trans(
-                        'For a household without an order, for example to sell it stock.',
-                    )
-                }}
-            </p>
-            <ul class="divide-y">
-                <li
-                    v-for="household in households"
-                    :key="household.id"
-                    class="flex items-center justify-between gap-2 py-2"
-                    :data-test="`open-${household.id}`"
-                >
-                    <span>{{ household.name }}</span>
-                    <Form v-bind="openForm(household.id)">
-                        <Button type="submit" variant="outline" size="sm">
-                            {{ trans('Open pickup') }}
-                        </Button>
-                    </Form>
-                </li>
-            </ul>
-        </section>
     </div>
 </template>
