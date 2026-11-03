@@ -24,7 +24,7 @@ final class SyncWeeklyBasket
         }
 
         $basket = $this->baskets->lock($stored->id);
-        if ($basket === null || ! in_array($basket->state, ['draft', 'nothing_to_collect'], true)) {
+        if ($basket === null || ! $basket->state->followsSource()) {
             return;
         }
 

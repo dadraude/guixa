@@ -17,6 +17,8 @@ use Guixa\Sales\Application\ValidateBasket;
 use Guixa\Sales\Application\WalletLedger;
 use Guixa\Sales\Domain\Basket;
 use Guixa\Sales\Domain\BasketLine;
+use Guixa\Sales\Domain\BasketLineKind;
+use Guixa\Sales\Domain\BasketState;
 use Guixa\Sales\Domain\Error\BasketAlreadyValidated;
 use Guixa\Sales\Domain\Error\BasketNotEditable;
 use Guixa\Sales\Domain\Error\InvalidReturnQuantity;
@@ -75,7 +77,7 @@ final class BasketPersistenceTest extends TestCase
 
         app(AddReturnToBasket::class)($actor, $id, $returnItemId, '1');
         $draft = app(EloquentBasketRepository::class)->get($id);
-        $this->assertSame('return', $draft->activeLines()[0]->kind);
+        $this->assertSame(BasketLineKind::Return, $draft->activeLines()[0]->kind);
         $this->assertSame($returnItemId, $draft->activeLines()[0]->returnItemId);
         $this->assertSame(-50, $draft->totalCents());
 
@@ -117,7 +119,7 @@ final class BasketPersistenceTest extends TestCase
 
         app(ValidateBasket::class)($actor, $id);
         app(MarkBasketCollected::class)($actor, $id);
-        $this->assertSame('collected', app(EloquentBasketRepository::class)->get($id)->state);
+        $this->assertSame(BasketState::Collected, app(EloquentBasketRepository::class)->get($id)->state);
         $this->assertSame(0, app(EloquentBasketRepository::class)->get($id)->validatedTotalCents);
         $this->assertSame(0, DB::table('wallet_movements')->where('basket_id', $id)->count());
         $this->assertSame(1, DB::table('stock_movements')->where('basket_id', $id)->count());
@@ -185,7 +187,7 @@ final class BasketPersistenceTest extends TestCase
         $before = app(EloquentBasketRepository::class)->get($id)->activeLines()[0];
         $this->assertThrows(fn () => app(AddReturnToBasket::class)($actor, $id, $item, '1'), InvalidReturnQuantity::class);
         $after = app(EloquentBasketRepository::class)->get($id);
-        $this->assertSame('draft', $after->state);
+        $this->assertSame(BasketState::Draft, $after->state);
         $this->assertCount(1, $after->lines);
         $this->assertSame($before->quantity->toString(), $after->activeLines()[0]->quantity->toString());
         $this->assertSame($before->name, $after->activeLines()[0]->name);
@@ -321,7 +323,7 @@ final class BasketPersistenceTest extends TestCase
 
         $repository = app(EloquentBasketRepository::class);
         $reloaded = $repository->get($id);
-        $this->assertSame('cancelled', $reloaded->state);
+        $this->assertSame(BasketState::Cancelled, $reloaded->state);
         $this->assertCount(1, $reloaded->lines);
         $this->assertSame([], $reloaded->activeLines());
         $this->assertSame(0, $reloaded->totalCents());

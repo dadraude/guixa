@@ -7,8 +7,11 @@ use Guixa\Sales\Domain\Basket;
 use Guixa\Sales\Domain\BasketAdjustment;
 use Guixa\Sales\Domain\BasketAdjustmentLine;
 use Guixa\Sales\Domain\BasketCollectionEvent;
+use Guixa\Sales\Domain\BasketKind;
 use Guixa\Sales\Domain\BasketLine;
+use Guixa\Sales\Domain\BasketLineKind;
 use Guixa\Sales\Domain\BasketRepository;
+use Guixa\Sales\Domain\BasketState;
 use Guixa\Sales\Domain\Error\BasketNotEditable;
 use Guixa\Shared\Domain\Quantity;
 use PHPUnit\Framework\Attributes\Test;
@@ -25,10 +28,10 @@ trait BasketRepositoryContract
         [$repository, $manager, $household] = $this->basketWorld();
         [$orderId, $cycleId] = $this->weeklySource();
         $at = new DateTimeImmutable('2026-11-07T10:00:00+00:00');
-        $weekly = fn (string $id, bool $late, string $state = 'draft') => new Basket($id, $household, 'Household K', $state, null, $at, [],
-            validatedBy: $state === 'validated' ? $manager : null, validatedAt: $state === 'validated' ? $at : null,
-            validatedTotalCents: $state === 'validated' ? 0 : null,
-            kind: 'weekly', sourceOrderId: $orderId, referenceCycleId: $cycleId, late: $late);
+        $weekly = fn (string $id, bool $late, BasketState $state = BasketState::Draft) => new Basket($id, $household, 'Household K', $state, null, $at, [],
+            validatedBy: $state === BasketState::Validated ? $manager : null, validatedAt: $state === BasketState::Validated ? $at : null,
+            validatedTotalCents: $state === BasketState::Validated ? 0 : null,
+            kind: BasketKind::Weekly, sourceOrderId: $orderId, referenceCycleId: $cycleId, late: $late);
         $base = $repository->nextId();
         $first = $repository->nextId();
         $repository->save($weekly($base, false));
@@ -40,7 +43,7 @@ trait BasketRepositoryContract
         $this->assertRejected(fn () => $repository->save($weekly($repository->nextId(), false)));
         $this->assertRejected(fn () => $repository->save($weekly($repository->nextId(), true)));
 
-        $repository->save($weekly($first, true, 'validated'));
+        $repository->save($weekly($first, true, BasketState::Validated));
         $this->assertNull($repository->getOpenLateBySourceOrder($orderId));
         $second = $repository->nextId();
         $repository->save($weekly($second, true));
@@ -84,7 +87,7 @@ trait BasketRepositoryContract
         $reloaded = $repository->get($basket->id);
         $this->assertSame(['collected', 'corrected', 'collected'],
             array_map(fn (BasketCollectionEvent $event) => $event->type, $reloaded->collectionEvents));
-        $this->assertSame('collected', $reloaded->state);
+        $this->assertSame(BasketState::Collected, $reloaded->state);
         $this->assertEquals($instant, $reloaded->collectedAt);
     }
 
@@ -105,7 +108,7 @@ trait BasketRepositoryContract
             new DateTimeImmutable('2026-10-30T13:00:00+00:00'), 'Wrong mark');
         $repository->save($collected->collectionCorrected($correction));
         $pending = $repository->get($basket->id);
-        $this->assertSame('validated', $pending->state);
+        $this->assertSame(BasketState::Validated, $pending->state);
         $this->assertSame($manager, $pending->collectedBy);
         $this->assertEquals($firstAt, $pending->collectedAt);
         $this->assertSame(['collected', 'corrected'], array_map(fn (BasketCollectionEvent $event) => $event->type, $pending->collectionEvents));
@@ -129,7 +132,7 @@ trait BasketRepositoryContract
         } catch (BasketNotEditable) {
             // Expected global event identity boundary.
         }
-        $this->assertSame('collected', $repository->get($other->id)->state);
+        $this->assertSame(BasketState::Collected, $repository->get($other->id)->state);
     }
 
     #[Test]
@@ -154,7 +157,7 @@ trait BasketRepositoryContract
         $collectedAt = new DateTimeImmutable('2026-10-30T14:00:00+00:00');
         $repository->save($reloaded->collected($manager, $collectedAt));
         $collected = $repository->get($basket->id);
-        $this->assertSame('collected', $collected->state);
+        $this->assertSame(BasketState::Collected, $collected->state);
         $this->assertSame($manager, $collected->collectedBy);
         $this->assertEquals($collectedAt, $collected->collectedAt);
         $this->assertSame(1200, $collected->validatedTotalCents);
@@ -210,7 +213,7 @@ trait BasketRepositoryContract
 
     private function basket(BasketRepository $repository, string $manager, string $household, array $lines): Basket
     {
-        return new Basket($repository->nextId(), $household, 'Household K', 'draft', $manager,
+        return new Basket($repository->nextId(), $household, 'Household K', BasketState::Draft, $manager,
             new DateTimeImmutable('2026-10-30T10:00:00+00:00'), $lines);
     }
 
@@ -227,9 +230,9 @@ trait BasketRepositoryContract
         $basket = $this->basket($repository, $manager, $household, []);
         $created = new DateTimeImmutable('2026-10-30T10:00:00+00:00');
         $first = new BasketLine($repository->nextId(), $basket->id, null, 'Glass jar', 'item', 50,
-            false, null, Quantity::fromString('1'), $created, kind: 'return', returnItemId: $returnA);
+            false, null, Quantity::fromString('1'), $created, kind: BasketLineKind::Return, returnItemId: $returnA);
         $second = new BasketLine($repository->nextId(), $basket->id, null, 'Bottle', 'item', 25,
-            false, null, Quantity::fromString('2'), $created, kind: 'return', returnItemId: $returnB);
+            false, null, Quantity::fromString('2'), $created, kind: BasketLineKind::Return, returnItemId: $returnB);
 
         $repository->save($basket->withLines([$first, $second]));
         $reloaded = $repository->get($basket->id);
@@ -288,7 +291,7 @@ trait BasketRepositoryContract
         $changed = new BasketLine($line->id, $basket->id, $product, 'Changed', 'bottle', 1200,
             false, null, Quantity::fromString('1'), $line->createdAt);
         $rewrite = new Basket($validated->id, $validated->householdId, $validated->householdName,
-            'validated', $validated->createdBy, $validated->createdAt, [$changed],
+            BasketState::Validated, $validated->createdBy, $validated->createdAt, [$changed],
             $validated->validatedBy, $validated->validatedAt, $validated->validatedTotalCents);
         $error = null;
         try {
@@ -301,7 +304,7 @@ trait BasketRepositoryContract
 
         $collected = $repository->get($basket->id)->collected($manager, new DateTimeImmutable('2026-10-30T13:00:00+00:00'));
         $repository->save($collected);
-        $this->assertSame('collected', $repository->get($basket->id)->state);
+        $this->assertSame(BasketState::Collected, $repository->get($basket->id)->state);
         $this->assertSame($manager, $repository->get($basket->id)->collectedBy);
     }
 

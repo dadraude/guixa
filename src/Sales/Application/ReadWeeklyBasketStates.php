@@ -16,7 +16,7 @@ final class ReadWeeklyBasketStates
         return array_map(function (Basket $basket) {
             $products = [];
             foreach ($basket->activeLines() as $line) {
-                if ($line->kind === 'weekly') {
+                if ($line->kind->isWeekly()) {
                     $products[(string) $line->productId] = true;
                 }
             }
@@ -26,7 +26,7 @@ final class ReadWeeklyBasketStates
                 }
             }
 
-            return new WeeklyBasketStateData($basket->householdId, $basket->state,
+            return new WeeklyBasketStateData($basket->householdId, $basket->state->value,
                 array_map(fn (string $productId) => $basket->effectiveQuantity($productId), array_combine(array_keys($products), array_keys($products))),
                 $basket->id, $basket->late);
         }, $this->baskets->weeklyOfCycle($cycleId));

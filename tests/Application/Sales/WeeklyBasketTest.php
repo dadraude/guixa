@@ -15,7 +15,9 @@ use Guixa\Sales\Application\WeeklyBaseData;
 use Guixa\Sales\Application\WeeklyBaseLineData;
 use Guixa\Sales\Application\WeeklyBasketSource;
 use Guixa\Sales\Domain\Basket;
+use Guixa\Sales\Domain\BasketKind;
 use Guixa\Sales\Domain\BasketLine;
+use Guixa\Sales\Domain\BasketState;
 use Guixa\Sales\Domain\Error\BasketAlreadyValidated;
 use Guixa\Sales\Domain\Error\BasketNotEditable;
 use Guixa\Sales\Domain\Error\InvalidBasketQuantity;
@@ -117,8 +119,8 @@ it('creates one uncharged base per source order with ordered and allocated snaps
     ($this->create)(sourceOf([sourceLine('bread', '5', '3')]));
 
     $lines = $basket->activeLines();
-    expect($basket->state)->toBe('draft')
-        ->and($basket->kind)->toBe('weekly')
+    expect($basket->state)->toBe(BasketState::Draft)
+        ->and($basket->kind)->toBe(BasketKind::Weekly)
         ->and($basket->referenceCycleId)->toBe('cycle')
         ->and($basket->validatedTotalCents)->toBeNull()
         ->and(array_map(fn ($line) => [$line->orderedQuantity->toString(), $line->allocatedQuantity->toString(), $line->quantity->toString()], $lines))
@@ -129,12 +131,12 @@ it('creates one uncharged base per source order with ordered and allocated snaps
 
 it('has nothing to collect when no allocation is positive, and Sync revives it when one becomes positive (R24, S20, S30, S88)', function () {
     $basket = ($this->made)([sourceLine('bread', '2', '0')]);
-    expect($basket->state)->toBe('nothing_to_collect');
+    expect($basket->state)->toBe(BasketState::NothingToCollect);
 
     ($this->sync)(sourceOf([sourceLine('bread', '2', '1')]));
 
     $revived = ($this->base)();
-    expect($revived->state)->toBe('draft')
+    expect($revived->state)->toBe(BasketState::Draft)
         ->and($revived->activeLines()[0]->quantity->toString())->toBe('1.000');
 });
 
@@ -179,7 +181,7 @@ it('charges the actual quantities once under the cycle lock, rounds each line ha
 
     // 3 x 3.50 = 10.50 and 1.123 kg x 20.00 = 22.46.
     expect($this->wallet->charges)->toBe([[$basket->id, 3296]])
-        ->and(($this->base)()->state)->toBe('validated')
+        ->and(($this->base)()->state)->toBe(BasketState::Validated)
         ->and(($this->base)()->validatedTotalCents)->toBe(3296)
         ->and($this->source->calls)->toBe(['lock:cycle', 'lock:cycle', 'close:cycle'])
         ->and($this->stock->sales)->toBe(0)
@@ -205,13 +207,13 @@ it('validates real contents with a zero total without any money movement and ref
     $empty = ($this->made)([sourceLine('bread', '2', '0')], 'order-2');
 
     expect($this->wallet->charges)->toBe([])
-        ->and(($this->base)()->state)->toBe('validated')
+        ->and(($this->base)()->state)->toBe(BasketState::Validated)
         ->and(($this->base)()->validatedTotalCents)->toBe(0)
         ->and(fn () => ($this->validate)($this->staff, $empty->id))->toThrow(BasketNotEditable::class);
 });
 
 it('does not lock or close any cycle for an independent stock basket (R19b)', function () {
-    $stock = new Basket('stock-1', 'household', 'Household K', 'draft', 'manager', $this->clock->now(),
+    $stock = new Basket('stock-1', 'household', 'Household K', BasketState::Draft, 'manager', $this->clock->now(),
         [new BasketLine('l1', 'stock-1', 'oil', 'Oil', 'bottle', 1200, false, null, Quantity::fromString('1'), $this->clock->now())]);
     $this->baskets->save($stock);
 
@@ -244,7 +246,7 @@ it('leaves a validated base alone on Sync (R18, R23)', function () {
     ($this->sync)(sourceOf([sourceLine('bread', '5', '1')]));
 
     expect(($this->base)()->activeLines()[0]->quantity->toString())->toBe('4.000')
-        ->and(($this->base)()->state)->toBe('validated');
+        ->and(($this->base)()->state)->toBe(BasketState::Validated);
 });
 
 it('revives an unvalidated base on a late arrival, adding the late line to the base itself (R24a, S30)', function () {
@@ -252,7 +254,7 @@ it('revives an unvalidated base on a late arrival, adding the late line to the b
 
     ($this->late)(sourceOf([sourceLine('bread', '2', '2'), sourceLine('beef', '1', '0')]), ['bread']);
 
-    expect(($this->base)()->state)->toBe('draft')
+    expect(($this->base)()->state)->toBe(BasketState::Draft)
         ->and($this->baskets->list())->toHaveCount(1)
         ->and(array_map(fn ($line) => $line->quantity->toString(), ($this->base)()->activeLines()))->toBe(['2.000', '0.000']);
 });
@@ -267,8 +269,8 @@ it('gives a validated base a late weekly basket from the same source order with 
     $late = $this->baskets->getOpenLateBySourceOrder('order-1');
     expect($this->baskets->list())->toHaveCount(2)
         ->and($late->late)->toBeTrue()
-        ->and($late->kind)->toBe('weekly')
-        ->and($late->state)->toBe('draft')
+        ->and($late->kind)->toBe(BasketKind::Weekly)
+        ->and($late->state)->toBe(BasketState::Draft)
         ->and($late->sourceOrderId)->toBe('order-1')
         ->and($late->referenceCycleId)->toBe('cycle')
         ->and(array_map(fn ($line) => [$line->productId, $line->orderedQuantity->toString(), $line->allocatedQuantity->toString(), $line->quantity->toString()], $late->activeLines()))
@@ -310,13 +312,13 @@ it('follows a correction of a late line down to zero and back, in the same late 
     ($this->late)($with('0'), ['beef']);
     $zeroed = $this->baskets->getOpenLateBySourceOrder('order-1');
     expect($zeroed->id)->toBe($late->id)
-        ->and($zeroed->state)->toBe('nothing_to_collect')
+        ->and($zeroed->state)->toBe(BasketState::NothingToCollect)
         ->and(array_map(fn ($line) => [$line->quantity->toString(), $line->allocatedQuantity->toString()], $zeroed->activeLines()))->toBe([['0.000', '0.000']]);
 
     ($this->late)($with('1.500'), ['beef']);
     $back = $this->baskets->getOpenLateBySourceOrder('order-1');
     expect($back->id)->toBe($late->id)
-        ->and($back->state)->toBe('draft')
+        ->and($back->state)->toBe(BasketState::Draft)
         ->and($back->activeLines()[0]->quantity->toString())->toBe('1.500')
         ->and($this->baskets->list())->toHaveCount(2);
 });
@@ -334,8 +336,8 @@ it('refuses a second base or a second open late draft for one source order (R19)
     $basket = ($this->made)([sourceLine('bread', '2', '2')]);
     ($this->validate)($this->staff, $basket->id);
     ($this->late)(sourceOf([sourceLine('bread', '2', '2'), sourceLine('beef', '1', '1')]), ['beef']);
-    $duplicate = fn (bool $late) => new Basket('duplicate', 'household', 'Household K', 'draft', null, $this->clock->now(), [],
-        kind: 'weekly', sourceOrderId: 'order-1', referenceCycleId: 'cycle', late: $late);
+    $duplicate = fn (bool $late) => new Basket('duplicate', 'household', 'Household K', BasketState::Draft, null, $this->clock->now(), [],
+        kind: BasketKind::Weekly, sourceOrderId: 'order-1', referenceCycleId: 'cycle', late: $late);
 
     expect(fn () => $this->baskets->save($duplicate(true)))->toThrow(DomainException::class)
         ->and(fn () => $this->baskets->save($duplicate(false)))->toThrow(DomainException::class);

@@ -26,15 +26,15 @@ final class ValidateBasket
         Gate::forUser($actor)->authorize('manage-sales');
         $this->transactions->run(function () use ($actor, $basketId): void {
             $source = $this->baskets->get($basketId) ?? throw BasketNotFound::withId($basketId);
-            if ($source->referenceCycleId !== null && $source->kind === 'weekly') {
+            if ($source->referenceCycleId !== null && $source->kind->isWeekly()) {
                 // The cycle lock comes before the basket lock, like every other weekly mutation.
                 $this->weeklySource->lockSettled($source->referenceCycleId);
             }
             $basket = $this->baskets->lock($basketId) ?? throw BasketNotFound::withId($basketId);
-            if ($basket->state === 'validated' || $basket->state === 'collected') {
+            if ($basket->state->isSettled()) {
                 throw BasketAlreadyValidated::create();
             }
-            if ($basket->state !== 'draft') {
+            if (! $basket->state->isDraft()) {
                 throw BasketNotEditable::create();
             }
             $lines = $basket->activeLines();
@@ -42,7 +42,7 @@ final class ValidateBasket
                 throw BasketHasNoContents::create();
             }
 
-            $stockLines = array_values(array_filter($lines, fn ($line) => $line->kind === 'stock'));
+            $stockLines = array_values(array_filter($lines, fn ($line) => $line->kind->isStock()));
             usort($stockLines, fn ($left, $right) => strcmp($left->productId, $right->productId));
             foreach ($stockLines as $line) {
                 // Lock every product identity in a stable order before any sale.
@@ -58,7 +58,7 @@ final class ValidateBasket
                 $this->wallet->charge($actor, $basket->householdId, $basketId, $validated->validatedTotalCents);
             }
             $this->baskets->save($validated);
-            if ($basket->kind === 'weekly' && $basket->referenceCycleId !== null) {
+            if ($basket->kind->isWeekly() && $basket->referenceCycleId !== null) {
                 $this->weeklySource->closeIfFinished($basket->referenceCycleId);
             }
         });

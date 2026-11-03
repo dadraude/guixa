@@ -15,6 +15,7 @@ use Guixa\Sales\Application\ValidateBasket;
 use Guixa\Sales\Application\WalletLedger;
 use Guixa\Sales\Domain\Basket;
 use Guixa\Sales\Domain\BasketRepository;
+use Guixa\Sales\Domain\BasketState;
 use Guixa\Sales\Domain\Error\BasketAlreadyValidated;
 use Guixa\Sales\Domain\Error\BasketHasNoContents;
 use Guixa\Sales\Domain\Error\BasketNotEditable;
@@ -196,21 +197,21 @@ it('creates, snapshots, validates and collects an independent stock basket once 
     $id = ($this->create)($this->actor, 'household');
     ($this->add)($this->actor, $id, 'oil', '1');
     $draft = $this->baskets->get($id);
-    expect($draft->state)->toBe('draft')
+    expect($draft->state)->toBe(BasketState::Draft)
         ->and($draft->lines[0]->name)->toBe('Oil')
         ->and($draft->lines[0]->priceCents)->toBe(1200)
         ->and($this->stock->sales)->toBe([])
         ->and($this->wallet->charges)->toBe([]);
 
     ($this->validate)($this->actor, $id);
-    expect($this->baskets->get($id)->state)->toBe('validated')
+    expect($this->baskets->get($id)->state)->toBe(BasketState::Validated)
         ->and($this->stock->sales)->toHaveCount(1)
         ->and($this->wallet->charges)->toBe([['manager', 'household', $id, 1200]]);
 
     ($this->collect)($this->actor, $id);
     $firstCollection = $this->baskets->get($id)->collectedAt;
     ($this->collect)($this->actor, $id);
-    expect($this->baskets->get($id)->state)->toBe('collected')
+    expect($this->baskets->get($id)->state)->toBe(BasketState::Collected)
         ->and($this->baskets->get($id)->collectedAt)->toEqual($firstCollection)
         ->and($this->stock->sales)->toHaveCount(1)
         ->and($this->wallet->charges)->toHaveCount(1);
@@ -258,7 +259,7 @@ it('validates real-content net-zero goods without a Wallet movement (S88, R22)',
     ($this->validate)($this->actor, $id);
     ($this->collect)($this->actor, $id);
 
-    expect($this->baskets->get($id)->state)->toBe('collected')
+    expect($this->baskets->get($id)->state)->toBe(BasketState::Collected)
         ->and($this->baskets->get($id)->validatedTotalCents)->toBe(0)
         ->and($this->wallet->charges)->toBe([]);
 });
@@ -267,7 +268,7 @@ it('rejects empty validation but cancels an empty draft without money or stock e
     $id = ($this->create)($this->actor, 'household');
     expect(fn () => ($this->validate)($this->actor, $id))->toThrow(BasketHasNoContents::class);
     ($this->cancel)($this->actor, $id);
-    expect($this->baskets->get($id)->state)->toBe('cancelled')
+    expect($this->baskets->get($id)->state)->toBe(BasketState::Cancelled)
         ->and($this->wallet->charges)->toBe([])
         ->and($this->stock->sales)->toBe([]);
 });
@@ -358,7 +359,7 @@ it('retains removed and cancelled draft references but excludes them from curren
     expect($this->baskets->get($id)->lines)->toHaveCount(2)
         ->and($this->baskets->get($id)->activeLineFor('oil')->priceCents)->toBe(1500);
     ($this->cancel)($this->actor, $id);
-    expect($this->baskets->get($id)->state)->toBe('cancelled')
+    expect($this->baskets->get($id)->state)->toBe(BasketState::Cancelled)
         ->and($this->baskets->get($id)->activeLines())->toBe([])
         ->and($this->baskets->get($id)->totalCents())->toBe(0)
         ->and(BasketData::from($this->baskets->get($id))->stockLines)->toBe([])
@@ -413,7 +414,7 @@ it('accepts the same Finance Actor through every public independent-basket use c
     ($this->validate)($finance, $id);
     ($this->collect)($finance, $id);
 
-    expect($this->baskets->get($id)->state)->toBe('collected')
+    expect($this->baskets->get($id)->state)->toBe(BasketState::Collected)
         ->and($this->stock->sales[0][0])->toBe('finance')
         ->and($this->wallet->charges[0][0])->toBe('finance');
 });

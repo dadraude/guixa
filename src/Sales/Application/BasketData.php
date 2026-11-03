@@ -22,17 +22,17 @@ final readonly class BasketData
 
     public static function from(Basket $basket): self
     {
-        return new self($basket->id, $basket->householdId, $basket->householdName, $basket->state,
+        return new self($basket->id, $basket->householdId, $basket->householdName, $basket->state->value,
             array_map(fn ($line) => BasketLineData::from($line, $basket->effectiveQuantity($line->productId)),
-                array_values(array_filter($basket->activeLines(), fn ($line) => $line->kind === 'stock'))),
-            array_map(BasketReturnLineData::from(...), array_values(array_filter($basket->activeLines(), fn ($line) => $line->kind === 'return'))),
+                array_values(array_filter($basket->activeLines(), fn ($line) => $line->kind->isStock()))),
+            array_map(BasketReturnLineData::from(...), array_values(array_filter($basket->activeLines(), fn ($line) => $line->kind->isReturn()))),
             $basket->validatedTotalCents ?? $basket->totalCents(), $basket->createdAt,
             $basket->validatedAt, $basket->collectedAt, $basket->effectiveTotalCents(),
             array_map(BasketAdjustmentData::from(...), $basket->adjustments),
             array_map(BasketCollectionEventData::from(...), $basket->collectionEvents),
-            $basket->state === 'validated' && ! $basket->goodsFullyReversed(),
+            $basket->state->isValidated() && ! $basket->goodsFullyReversed(),
             array_map(fn ($line) => BasketWeeklyLineData::from($line, $basket->effectiveQuantity((string) $line->productId)),
-                array_values(array_filter($basket->activeLines(), fn ($line) => $line->kind === 'weekly'))),
-            $basket->kind, $basket->referenceCycleId, $basket->late);
+                array_values(array_filter($basket->activeLines(), fn ($line) => $line->kind->isWeekly()))),
+            $basket->kind->value, $basket->referenceCycleId, $basket->late);
     }
 }

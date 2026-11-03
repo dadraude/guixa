@@ -5,7 +5,10 @@ namespace Tests\Support\InMemory\Sales;
 use DomainException;
 use Guixa\Sales\Domain\Basket;
 use Guixa\Sales\Domain\BasketCollectionEvent;
+use Guixa\Sales\Domain\BasketKind;
+use Guixa\Sales\Domain\BasketLineKind;
 use Guixa\Sales\Domain\BasketRepository;
+use Guixa\Sales\Domain\BasketState;
 use Guixa\Sales\Domain\Error\BasketNotEditable;
 
 final class InMemoryBasketRepository implements BasketRepository
@@ -23,12 +26,12 @@ final class InMemoryBasketRepository implements BasketRepository
     public function save(Basket $basket): void
     {
         $prior = $this->baskets[$basket->id] ?? null;
-        $corrected = $prior?->state === 'collected' && $basket->state === 'validated'
+        $corrected = $prior?->state === BasketState::Collected && $basket->state === BasketState::Validated
             && count($basket->collectionEvents) === count($prior->collectionEvents) + 1
             && $basket->collectionEvents[array_key_last($basket->collectionEvents)]->type === 'corrected';
         if ($prior !== null) {
             $appendedEvents = count($basket->collectionEvents) - count($prior->collectionEvents);
-            $collected = $prior->state === 'validated' && $basket->state === 'collected'
+            $collected = $prior->state === BasketState::Validated && $basket->state === BasketState::Collected
                 && (($prior->collectedAt === null && $appendedEvents <= 1)
                     || ($prior->collectedAt !== null && $appendedEvents === 1))
                 && ($appendedEvents === 0 || $basket->collectionEvents[array_key_last($basket->collectionEvents)]->type === 'collected');
@@ -36,12 +39,12 @@ final class InMemoryBasketRepository implements BasketRepository
                 throw BasketNotEditable::create();
             }
         }
-        if ($prior !== null && in_array($prior->state, ['collected', 'cancelled'], true)
+        if ($prior !== null && in_array($prior->state, [BasketState::Collected, BasketState::Cancelled], true)
             && ((! $corrected && $prior->state !== $basket->state) || $prior->lines !== $basket->lines
                 || $prior->validatedTotalCents !== $basket->validatedTotalCents)) {
             throw BasketNotEditable::create();
         }
-        if ($prior?->state === 'validated' && (! in_array($basket->state, ['validated', 'collected'], true) || $prior->lines !== $basket->lines
+        if ($prior?->state === BasketState::Validated && (! $basket->state->isSettled() || $prior->lines !== $basket->lines
             || $prior->validatedTotalCents !== $basket->validatedTotalCents)) {
             throw BasketNotEditable::create();
         }
@@ -74,7 +77,7 @@ final class InMemoryBasketRepository implements BasketRepository
         }
         $active = [];
         foreach ($basket->activeLines() as $line) {
-            $key = $line->kind.':'.($line->kind === 'return' ? $line->returnItemId : $line->productId);
+            $key = $line->kind->value.':'.($line->kind === BasketLineKind::Return ? $line->returnItemId : $line->productId);
             if (isset($active[$key])) {
                 throw new DomainException('Duplicate active basket line.');
             }
@@ -84,12 +87,12 @@ final class InMemoryBasketRepository implements BasketRepository
             $sameSource = $basket->sourceOrderId !== null && $storedBasket->id !== $basket->id
                 && $storedBasket->sourceOrderId === $basket->sourceOrderId;
             $isBase = ! $basket->late && ! $storedBasket->late;
-            $bothOpenLate = $basket->late && $storedBasket->late && in_array($basket->state, ['draft', 'nothing_to_collect'], true) && in_array($storedBasket->state, ['draft', 'nothing_to_collect'], true);
+            $bothOpenLate = $basket->late && $storedBasket->late && $basket->state->followsSource() && $storedBasket->state->followsSource();
             if ($sameSource && ($isBase || $bothOpenLate)) {
                 throw new DomainException('Duplicate weekly source basket.');
             }
         }
-        if ($basket->state === 'collected' && $basket->collectedAt !== null && $basket->collectionEvents === []) {
+        if ($basket->state === BasketState::Collected && $basket->collectedAt !== null && $basket->collectionEvents === []) {
             $basket = new Basket($basket->id, $basket->householdId, $basket->householdName, $basket->state,
                 $basket->createdBy, $basket->createdAt, $basket->lines, $basket->validatedBy, $basket->validatedAt,
                 $basket->validatedTotalCents, $basket->collectedBy, $basket->collectedAt, $basket->cancelledBy,
@@ -119,7 +122,7 @@ final class InMemoryBasketRepository implements BasketRepository
     public function getOpenLateBySourceOrder(string $orderId): ?Basket
     {
         foreach ($this->baskets as $basket) {
-            if ($basket->sourceOrderId === $orderId && $basket->late && in_array($basket->state, ['draft', 'nothing_to_collect'], true)) {
+            if ($basket->sourceOrderId === $orderId && $basket->late && $basket->state->followsSource()) {
                 return $basket;
             }
         }
@@ -129,7 +132,7 @@ final class InMemoryBasketRepository implements BasketRepository
 
     public function weeklyOfCycle(string $cycleId): array
     {
-        return array_values(array_filter($this->baskets, fn (Basket $basket) => $basket->kind === 'weekly' && $basket->referenceCycleId === $cycleId));
+        return array_values(array_filter($this->baskets, fn (Basket $basket) => $basket->kind === BasketKind::Weekly && $basket->referenceCycleId === $cycleId));
     }
 
     public function lock(string $id): ?Basket

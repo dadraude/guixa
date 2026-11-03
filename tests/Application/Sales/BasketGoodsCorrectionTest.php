@@ -7,6 +7,8 @@ use Guixa\Sales\Domain\Basket;
 use Guixa\Sales\Domain\BasketAdjustment;
 use Guixa\Sales\Domain\BasketAdjustmentLine;
 use Guixa\Sales\Domain\BasketLine;
+use Guixa\Sales\Domain\BasketLineKind;
+use Guixa\Sales\Domain\BasketState;
 use Guixa\Sales\Domain\Error\BasketCorrectionIdentityConflict;
 use Guixa\Sales\Domain\Error\InvalidBasketCorrection;
 use Guixa\Sales\Infrastructure\Stock\StockBasketCorrector;
@@ -33,7 +35,7 @@ function goodsCorrectionWorld(): object
     $movements = new InMemoryStockMovementRepository;
     $movements->add(StockMovement::entry($movements->nextId(), $oil->id, Quantity::fromString('5'), $when, 'manager', null));
     $baskets = new InMemoryBasketRepository;
-    $basket = new Basket('basket-1', 'household-1', 'Household K', 'draft', 'manager', $when, [
+    $basket = new Basket('basket-1', 'household-1', 'Household K', BasketState::Draft, 'manager', $when, [
         new BasketLine('line-1', 'basket-1', $oil->id, 'Oil', 'bottle', 1200, false, null, Quantity::fromString('3'), $when),
     ]);
     $baskets->save($basket);
@@ -216,9 +218,9 @@ it('replays a full reversal and a partial return as a no-op although the quantit
 
 it('keeps a basket with an active return line pending after every stock line is reversed (R24a, S88)', function () {
     $when = new DateTimeImmutable('2026-10-30T10:00:00+00:00');
-    $basket = new Basket('basket-2', 'household-1', 'Household K', 'draft', 'manager', $when, [
+    $basket = new Basket('basket-2', 'household-1', 'Household K', BasketState::Draft, 'manager', $when, [
         new BasketLine('line-1', 'basket-2', 'oil', 'Oil', 'bottle', 1200, false, null, Quantity::fromString('1'), $when),
-        new BasketLine('line-2', 'basket-2', null, 'Jar', 'jar', 50, false, null, Quantity::fromString('2'), $when, kind: 'return', returnItemId: 'jar'),
+        new BasketLine('line-2', 'basket-2', null, 'Jar', 'jar', 50, false, null, Quantity::fromString('2'), $when, kind: BasketLineKind::Return, returnItemId: 'jar'),
     ]);
     $validated = $basket->validated('manager', $when)->withAdjustment(new BasketAdjustment(
         'correction-1', 'basket-2', 1200, 'Came back', 'manager', $when, [new BasketAdjustmentLine('oil', -1000)]));

@@ -3,6 +3,7 @@
 use Guixa\Sales\Application\GetMemberBasket;
 use Guixa\Sales\Application\ListMemberBaskets;
 use Guixa\Sales\Domain\Basket;
+use Guixa\Sales\Domain\BasketState;
 use Guixa\Sales\Domain\Error\BasketNotFound;
 use Guixa\Shared\Application\Actor;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -11,8 +12,8 @@ use Tests\Support\InMemory\Sales\InMemoryBasketRepository;
 it('lists and reads only the actor current household from the public Sales queries (R19a, R35)', function () {
     $repository = new InMemoryBasketRepository;
     $now = new DateTimeImmutable('2026-10-30T10:00:00+00:00');
-    $own = new Basket('own', 'mine', 'Mine', 'draft', 'manager', $now);
-    $other = new Basket('other', 'theirs', 'Theirs', 'draft', 'manager', $now);
+    $own = new Basket('own', 'mine', 'Mine', BasketState::Draft, 'manager', $now);
+    $other = new Basket('other', 'theirs', 'Theirs', BasketState::Draft, 'manager', $now);
     $repository->save($own);
     $repository->save($other);
 
