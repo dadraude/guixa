@@ -91,6 +91,21 @@ iterating over every context. A rule change edits this list first.
   or through a named, scoped exception in the manifest. Literal query-builder tables, joins and model
   mappings are checked statically. Dynamic table selection and raw SQL require explicit reviewed
   declarations; exceptions must not silently authorize additional tables or writes.
+- **A13 — Vue shows allowed actions.** Pages and components never compare a `state`, `status` or
+  `kind`; they show or enable controls from the `can` flags the server sends for the current actor.
+- **A14 — No business arithmetic in the frontend.** Frontend code never computes with amounts in
+  cents; totals, balances and previews of unsaved input come from the server.
+- **A15 — DTOs carry, they do not compute.** Application DTOs do not use `Money` or `Quantity`; the
+  aggregate or a domain service computes the value and the DTO copies it.
+- **A16 — Controllers do not select data.** Controllers never filter, sort or aggregate use case
+  results; the criterion is a method of a read repository or query use case.
+- **A17 — States are enums.** Lifecycle states and kinds are backed enums in Domain that answer their
+  own questions; code in `src/` never compares a `state`, `status` or `kind` with a string literal.
+
+A13–A17 come from [ADR 0001](../docs/adr/0001-calculations-in-domain-reads-through-read-repositories.md),
+which also asks for one read method per need and sibling props per screen section. They are enforced
+by `tests/Architecture/PresentationRulesTest.php` against the adoption baseline in
+`architecture/presentation-exceptions.php`, which only shrinks: new code may not join it.
 
 The [current module contract](../docs/architecture/modules.md) explains the manifest, existing
 exceptions, check coverage and the transition to the separately planned Sales module.
