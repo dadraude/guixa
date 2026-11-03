@@ -55,6 +55,10 @@ const basket: App.Http.BasketRow = {
     adjustments: [],
     collectionEvents: [],
     pendingCollection: true,
+    weeklyLines: [],
+    kind: 'stock',
+    referenceCycleId: null,
+    late: false,
     balanceCents: -500,
     projectedBalanceCents: -2800,
     validatedAt: null,
@@ -68,6 +72,23 @@ async function render(record = basket) {
 }
 
 describe('member basket detail', () => {
+    it('titles a late weekly basket apart from the base weekly basket (R19)', async () => {
+        const base = await render({
+            ...basket,
+            kind: 'weekly',
+            late: false,
+        } as typeof basket);
+        const late = await render({
+            ...basket,
+            kind: 'weekly',
+            late: true,
+        } as typeof basket);
+
+        expect(base).toContain('Cistella setmanal');
+        expect(base).not.toContain('Cistella tardana');
+        expect(late).toContain('Cistella tardana');
+    });
+
     it('shows a never-collected validated basket as pending and read-only', async () => {
         const html = await render({
             ...basket,

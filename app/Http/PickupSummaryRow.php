@@ -2,22 +2,24 @@
 
 namespace App\Http;
 
-use Guixa\Ordering\Application\PickupSummaryData;
+use Guixa\Sales\Application\BasketData;
 use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 
-/** One row of the pickups list: a household, where its pickup stands and what it costs so far, in cents. */
+/** One row of the cycle's weekly baskets: a household, the state of its base or late weekly basket and what it costs, in cents. */
 #[TypeScript]
 final readonly class PickupSummaryRow
 {
     public function __construct(
+        public string $basketId,
         public string $householdId,
         public string $householdName,
         public string $status,
         public int $totalCents,
+        public bool $late = false,
     ) {}
 
-    public static function from(PickupSummaryData $pickup): self
+    public static function from(BasketData $basket): self
     {
-        return new self($pickup->householdId, $pickup->householdName, $pickup->status, $pickup->totalCents);
+        return new self($basket->id, $basket->householdId, $basket->householdName, $basket->state, $basket->effectiveTotalCents, $basket->late);
     }
 }

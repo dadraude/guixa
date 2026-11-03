@@ -8,6 +8,7 @@ import WalletController from '@/actions/App/Http/Controllers/WalletController';
 import Heading from '@/components/Heading.vue';
 import AmountAdjustments from '@/components/baskets/AmountAdjustments.vue';
 import BasketCollectionHistory from '@/components/baskets/BasketCollectionHistory.vue';
+import WeeklyLines from '@/components/baskets/WeeklyLines.vue';
 import StockLines from '@/components/pickup/StockLines.vue';
 import ReturnLines from '@/components/pickup/ReturnLines.vue';
 import { euros } from '@/components/pickup/euros';
@@ -38,6 +39,7 @@ const status = computed(() =>
 );
 const statusLabels: Record<string, string> = {
     draft: trans('In preparation'),
+    nothing_to_collect: trans('Nothing to collect'),
     reversed: trans('Goods fully reversed'),
     validated: trans('Pending collection'),
     collected: trans('Collected'),
@@ -50,7 +52,13 @@ const statusLabels: Record<string, string> = {
     <div class="pilot-page pilot-layout-page">
         <Heading
             :title="trans('Basket: :name', { name: basket.householdName })"
-            :description="trans('Independent basket')"
+            :description="
+                basket.kind !== 'weekly'
+                    ? trans('Independent basket')
+                    : basket.late
+                      ? trans('Late basket')
+                      : trans('Weekly basket')
+            "
         />
         <Link
             :href="BasketController.index.url()"
@@ -62,6 +70,12 @@ const statusLabels: Record<string, string> = {
         <Badge variant="secondary" :data-test="`basket-status-${status}`">{{
             statusLabels[status] ?? status
         }}</Badge>
+        <WeeklyLines
+            v-if="basket.kind === 'weekly'"
+            :lines="basket.weeklyLines"
+            :editable="false"
+            :processing="false"
+        />
         <StockLines
             :lines="basket.stockLines"
             :options="[]"
@@ -151,6 +165,12 @@ const statusLabels: Record<string, string> = {
         </div>
         <p v-else-if="basket.state === 'collected'" data-test="collected">
             {{ trans('This basket was collected.') }}
+        </p>
+        <p
+            v-else-if="basket.state === 'nothing_to_collect'"
+            data-test="nothing-to-collect"
+        >
+            {{ trans('There is nothing to collect in this basket.') }}
         </p>
         <p v-else data-test="cancelled">
             {{ trans('This draft was cancelled.') }}

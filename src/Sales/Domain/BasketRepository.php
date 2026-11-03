@@ -10,6 +10,15 @@ interface BasketRepository
 
     public function get(string $id): ?Basket;
 
+    /** The base basket of a source order, never a late one. */
+    public function getBySourceOrder(string $orderId): ?Basket;
+
+    /** The source order's late weekly basket that is not validated yet (draft, or nothing to collect after a correction to zero), if any. */
+    public function getOpenLateBySourceOrder(string $orderId): ?Basket;
+
+    /** @return list<Basket> every weekly basket attributed to the cycle, base and late, by id */
+    public function weeklyOfCycle(string $cycleId): array;
+
     public function lock(string $id): ?Basket;
 
     /** @return list<Basket> */

@@ -184,7 +184,7 @@ it('validates, distributes and settles through the routes, and shows the state (
         ->where('distribution', ['validated' => true, 'distributed' => true, 'settled' => true, 'closed' => false]));
     $this->assertDatabaseHas('cycle_producers', ['cycle_id' => $cycleId, 'producer_id' => $producerId]);
     expect(DB::table('cycles')->where('id', $cycleId)->value('settled_at'))->not->toBeNull()
-        ->and(DB::table('orders')->where('household_id', $households['A'])->value('pickup_status'))->toBe('pending');
+        ->and(DB::table('baskets')->where('household_id', $households['A'])->where('reference_cycle_id', $cycleId)->value('state'))->toBe('draft');
 });
 
 it('rejects distributing an unbalanced reception and a changed total clears the validation (R17, R17a, S13, S47)', function () {

@@ -55,6 +55,11 @@ final class AddUnorderedProduct
                 throw ProductAlreadyOrdered::withId($productId);
             }
 
+            // Replacing a received total that arrived already is a redistribution; the first total is a late arrival.
+            if ($inReception !== null && ! $inReception->received->isZero()) {
+                $loaded->assertRedistributable($cycle, $productId);
+            }
+
             $this->receivedTotals->set(new ReceivedTotal($cycleId, $producerId, $productId, $total));
             $cycle->clearValidation($producerId);
             $this->cycles->add($cycle);

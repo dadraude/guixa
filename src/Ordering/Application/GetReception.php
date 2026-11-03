@@ -96,7 +96,6 @@ final class GetReception
             $product->manuallyAllocatedHouseholds() !== [],
             $product->hasAdjustments(),
             $allocations,
-            array_filter($product->lines, fn (ReceptionLine $line) => $line->done) !== [],
         );
     }
 

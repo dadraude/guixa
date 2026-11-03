@@ -18,12 +18,18 @@ final class ValidateBasket
 {
     public function __construct(private readonly BasketRepository $baskets, private readonly StockProducts $products,
         private readonly StockSeller $stock, private readonly WalletLedger $wallet,
+        private readonly WeeklyBasketSource $weeklySource,
         private readonly TransactionRunner $transactions, private readonly Clock $clock) {}
 
     public function __invoke(Actor $actor, string $basketId): void
     {
         Gate::forUser($actor)->authorize('manage-sales');
         $this->transactions->run(function () use ($actor, $basketId): void {
+            $source = $this->baskets->get($basketId) ?? throw BasketNotFound::withId($basketId);
+            if ($source->referenceCycleId !== null && $source->kind === 'weekly') {
+                // The cycle lock comes before the basket lock, like every other weekly mutation.
+                $this->weeklySource->lockSettled($source->referenceCycleId);
+            }
             $basket = $this->baskets->lock($basketId) ?? throw BasketNotFound::withId($basketId);
             if ($basket->state === 'validated' || $basket->state === 'collected') {
                 throw BasketAlreadyValidated::create();
@@ -52,6 +58,9 @@ final class ValidateBasket
                 $this->wallet->charge($actor, $basket->householdId, $basketId, $validated->validatedTotalCents);
             }
             $this->baskets->save($validated);
+            if ($basket->kind === 'weekly' && $basket->referenceCycleId !== null) {
+                $this->weeklySource->closeIfFinished($basket->referenceCycleId);
+            }
         });
     }
 }

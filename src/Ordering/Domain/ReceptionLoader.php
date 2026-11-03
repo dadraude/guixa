@@ -12,6 +12,7 @@ final class ReceptionLoader
         private readonly ProductCatalog $catalog,
         ProductAvailabilityRepository $availability,
         private readonly ReceivedTotalRepository $receivedTotals,
+        private readonly WeeklyBasketView $baskets,
     ) {
         $this->marks = new NotDeliveredMarks($catalog, $availability, $orders);
     }
@@ -33,9 +34,10 @@ final class ReceptionLoader
             $catalog[$product->id] = $product;
         }
 
-        $reception = Reception::of($producerId, $orders, $marksByOrder, $this->receivedTotals->ofProducer($cycle->id, $producerId), $catalog);
+        $snapshot = $this->baskets->snapshot($cycle->id);
+        $reception = Reception::of($producerId, $orders, $marksByOrder, $this->receivedTotals->ofProducer($cycle->id, $producerId), $catalog, $snapshot);
 
-        return new LoadedReception($reception, $orders, $catalog, $marksByOrder);
+        return new LoadedReception($reception, $orders, $catalog, $marksByOrder, $snapshot);
     }
 
     public function lockWeekly(string $productId): ?ValueObject\OrderableProduct

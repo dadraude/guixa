@@ -1,15 +1,13 @@
 <script setup lang="ts">
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import { computed, reactive, ref } from 'vue';
+import MemberBasketController from '@/actions/App/Http/Controllers/Member/BasketController';
 import OrderController from '@/actions/App/Http/Controllers/OrderController';
 import { ArrowLeft } from '@lucide/vue';
 import { trans } from 'laravel-vue-i18n';
-import Adjustments from '@/components/pickup/Adjustments.vue';
-import ReturnLines from '@/components/pickup/ReturnLines.vue';
-import StockLines from '@/components/pickup/StockLines.vue';
 import OrderPageHeader from '@/components/orders/OrderPageHeader.vue';
 import OrderProductRow from '@/components/orders/OrderProductRow.vue';
-import { formatMoney, formatPickupDate, formatQuantity } from '@/lib/locale';
+import { formatMoney, formatPickupDate } from '@/lib/locale';
 import InputError from '@/components/InputError.vue';
 import { orderRows, type OrderRow } from '@/lib/orderRows';
 import { lineCents, orderTotal } from '@/lib/orderTotal';
@@ -24,8 +22,6 @@ const domainError = computed(
 );
 
 const groups = computed(() => orderRows(props.order));
-
-const cents = (amount: number) => formatMoney((amount / 100).toFixed(2));
 
 // What each box holds, saved or not; the total follows it.
 const drafts = reactive<Record<string, string>>({});
@@ -119,91 +115,31 @@ const lineTotal = (price: string, quantity: string) =>
             {{ trans('No producer takes part in this cycle yet.') }}
         </p>
         <section
-            v-if="order.pickup"
+            v-if="order.basketId"
             class="pilot-layout-panel"
             data-test="pickup"
         >
             <div class="pilot-layout-panel-header">
                 <h2 class="pilot-heading text-lg font-semibold">
-                    {{ trans('Your pickup') }}
+                    {{ trans('Your basket') }}
                 </h2>
             </div>
-            <p
-                v-if="order.pickup.status === 'nothing_to_collect'"
-                class="text-muted-foreground"
-                data-test="pickup-nothing"
-            >
-                {{ trans('There is nothing to collect in this pickup.') }}
+            <p class="text-muted-foreground">
+                {{
+                    trans(
+                        'This cycle is settled. See what was ordered and what you take in your basket.',
+                    )
+                }}
             </p>
-            <ul v-else class="pilot-list">
-                <li
-                    v-for="line in order.pickup.lines"
-                    :key="line.productId"
-                    class="pilot-list-row"
-                    :data-test="`pickup-line-${line.productId}`"
-                >
-                    <div class="pilot-list-row-body">
-                        <span class="font-medium wrap-anywhere">{{
-                            line.name
-                        }}</span>
-                        <span class="text-sm text-muted-foreground">
-                            {{
-                                trans(
-                                    'Ordered :ordered, delivered :delivered',
-                                    {
-                                        ordered: formatQuantity(line.ordered),
-                                        delivered: formatQuantity(
-                                            line.delivered,
-                                        ),
-                                    },
-                                )
-                            }}
-                            {{ line.unit }} ·
-                            {{ cents(line.unitPriceCents) }}
-                        </span>
-                    </div>
-                    <span class="pilot-amount" data-test="pickup-line-amount">{{
-                        cents(line.amountCents)
-                    }}</span>
-                </li>
-            </ul>
-            <div
-                v-if="order.pickup.stockLines.length > 0"
-                class="pilot-layout-panel-section"
+            <Link
+                :href="
+                    MemberBasketController.show.url({ basket: order.basketId })
+                "
+                class="inline-flex min-h-11 items-center text-sm underline"
+                data-test="basket-link"
             >
-                <StockLines
-                    :lines="order.pickup.stockLines"
-                    :options="[]"
-                    :editable="false"
-                    :processing="false"
-                />
-            </div>
-            <div
-                v-if="order.pickup.returnLines.length > 0"
-                class="pilot-layout-panel-section"
-            >
-                <ReturnLines
-                    :lines="order.pickup.returnLines"
-                    :options="[]"
-                    :editable="false"
-                    :processing="false"
-                />
-            </div>
-            <div
-                v-if="order.pickup.originalChargeCents != null"
-                class="pilot-layout-panel-section"
-            >
-                <Adjustments
-                    :lines="order.pickup.adjustments ?? []"
-                    :original-charge-cents="order.pickup.originalChargeCents"
-                />
-            </div>
-            <p class="pilot-layout-panel-section pilot-total-row font-semibold">
-                <span>{{ trans('Pickup total') }}</span>
-                <span class="pilot-amount" data-test="pickup-total">{{
-                    cents(order.pickup.totalCents)
-                }}</span>
-            </p>
+                {{ trans('Open your basket') }}
+            </Link>
         </section>
         <template v-if="!order.cancelled">
             <p

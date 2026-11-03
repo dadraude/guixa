@@ -16,6 +16,57 @@ use Throwable;
 
 trait BasketRepositoryContract
 {
+    /** @return array{string, string} a source order id and its cycle id that weekly baskets can reference */
+    abstract protected function weeklySource(): array;
+
+    #[Test]
+    public function it_keeps_one_base_and_at_most_one_open_late_draft_per_source_order(): void
+    {
+        [$repository, $manager, $household] = $this->basketWorld();
+        [$orderId, $cycleId] = $this->weeklySource();
+        $at = new DateTimeImmutable('2026-11-07T10:00:00+00:00');
+        $weekly = fn (string $id, bool $late, string $state = 'draft') => new Basket($id, $household, 'Household K', $state, null, $at, [],
+            validatedBy: $state === 'validated' ? $manager : null, validatedAt: $state === 'validated' ? $at : null,
+            validatedTotalCents: $state === 'validated' ? 0 : null,
+            kind: 'weekly', sourceOrderId: $orderId, referenceCycleId: $cycleId, late: $late);
+        $base = $repository->nextId();
+        $first = $repository->nextId();
+        $repository->save($weekly($base, false));
+        $repository->save($weekly($first, true));
+
+        $this->assertSame($base, $repository->getBySourceOrder($orderId)->id);
+        $this->assertSame($first, $repository->getOpenLateBySourceOrder($orderId)->id);
+        $this->assertTrue($repository->get($first)->late);
+        $this->assertRejected(fn () => $repository->save($weekly($repository->nextId(), false)));
+        $this->assertRejected(fn () => $repository->save($weekly($repository->nextId(), true)));
+
+        $repository->save($weekly($first, true, 'validated'));
+        $this->assertNull($repository->getOpenLateBySourceOrder($orderId));
+        $second = $repository->nextId();
+        $repository->save($weekly($second, true));
+        $this->assertSame($second, $repository->getOpenLateBySourceOrder($orderId)->id);
+        $this->assertSame($base, $repository->getBySourceOrder($orderId)->id);
+        $this->assertCount(3, $repository->weeklyOfCycle($cycleId));
+
+        // A late draft corrected to zero (nothing to collect) still holds the open slot.
+        $repository->save($weekly($second, true, 'nothing_to_collect'));
+        $this->assertSame($second, $repository->getOpenLateBySourceOrder($orderId)->id);
+        $this->assertRejected(fn () => $repository->save($weekly($repository->nextId(), true)));
+    }
+
+    private function assertRejected(callable $write): void
+    {
+        try {
+            $write();
+        } catch (Throwable) {
+            $this->addToAssertionCount(1);
+
+            return;
+        }
+
+        $this->fail('A second base or open late draft for one source order was accepted.');
+    }
+
     #[Test]
     public function it_reloads_same_second_collection_events_in_append_order_regardless_of_identity(): void
     {

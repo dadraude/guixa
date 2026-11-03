@@ -5,7 +5,7 @@ namespace App\Http;
 use Guixa\Ordering\Application\HouseholdOrderData;
 use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 
-/** A household's order in a cycle, its producers named and sorted by name; `pickup` is set once the cycle is settled (R23a). */
+/** A household's order in a cycle, its producers named and sorted by name; `basketId` links the Sales base basket once the cycle is settled (R23a). */
 #[TypeScript]
 final readonly class OrderRow
 {
@@ -19,7 +19,7 @@ final readonly class OrderRow
         public bool $cancelled,
         public array $producers,
         public array $lines,
-        public ?PickupRow $pickup = null,
+        public ?string $basketId = null,
     ) {}
 
     /** @param  array<string, string>  $producerNames  by producer id, those of the participants and of every line */
@@ -31,6 +31,6 @@ final readonly class OrderRow
         );
         usort($producers, fn (OrderProducerRow $a, OrderProducerRow $b) => mb_strtolower($a->producerName) <=> mb_strtolower($b->producerName));
 
-        return new self($order->cycleId, $order->pickupDate, $order->cancelled, $producers, array_map(fn ($line) => OrderLineRow::from($line, $producerNames[$line->producerId] ?? $line->producerId), $order->lines), $order->pickup === null ? null : PickupRow::forMember($order->pickup));
+        return new self($order->cycleId, $order->pickupDate, $order->cancelled, $producers, array_map(fn ($line) => OrderLineRow::from($line, $producerNames[$line->producerId] ?? $line->producerId), $order->lines), $order->basketId);
     }
 }

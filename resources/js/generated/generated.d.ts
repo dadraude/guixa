@@ -56,6 +56,10 @@ readonly effectiveTotalCents: number,
 readonly adjustments: App.Http.BasketAdjustmentRow[],
 readonly collectionEvents: App.Http.BasketCollectionEventRow[],
 readonly pendingCollection: boolean,
+readonly weeklyLines: App.Http.BasketWeeklyLineRow[],
+readonly kind: string,
+readonly referenceCycleId: string | null,
+readonly late: boolean,
 };
 export type BasketStockLineRow = {
 readonly stockProductId: string,
@@ -74,6 +78,19 @@ readonly state: string,
 readonly totalCents: number,
 readonly createdAt: string,
 readonly pendingCollection: boolean,
+};
+export type BasketWeeklyLineRow = {
+readonly productId: string,
+readonly name: string,
+readonly unit: string,
+readonly ordered: string,
+readonly allocated: string,
+readonly quantity: string,
+readonly unitPriceCents: number,
+readonly amountCents: number,
+readonly effectiveQuantity: string,
+readonly effectiveAmountCents: number,
+readonly differsFromAllocation: boolean,
 };
 export type ContainerCountRow = {
 readonly total: number,
@@ -184,69 +201,19 @@ readonly pickupDate: string,
 readonly cancelled: boolean,
 readonly producers: App.Http.OrderProducerRow[],
 readonly lines: App.Http.OrderLineRow[],
-readonly pickup: App.Http.PickupRow | null,
+readonly basketId: string | null,
 };
 export type PendingPickupRow = {
 readonly cycleId: string,
 readonly pickupDate: string,
 };
-export type PickupAdjustmentRow = {
-readonly id: string,
-readonly productId: string,
-readonly name: string,
-readonly unit: string,
-readonly quantityDelta: string,
-readonly amountCents: number,
-readonly recordedAt: string,
-};
-export type PickupLineRow = {
-readonly productId: string,
-readonly name: string,
-readonly unit: string,
-readonly variable: boolean,
-readonly unitPriceCents: number,
-readonly ordered: string,
-readonly allocated: string,
-readonly delivered: string,
-readonly adjusted: boolean,
-readonly amountCents: number,
-};
-export type PickupReturnLineRow = {
-readonly returnItemId: string,
-readonly name: string,
-readonly amountCents: number,
-readonly quantity: number,
-readonly creditCents: number,
-};
-export type PickupRow = {
-readonly cycleId: string,
-readonly pickupDate: string,
-readonly householdId: string,
-readonly householdName: string,
-readonly status: string,
-readonly lines: App.Http.PickupLineRow[],
-readonly totalCents: number,
-readonly balanceCents: number | null,
-readonly resultingBalanceCents: number | null,
-readonly stockLines: App.Http.PickupStockLineRow[],
-readonly returnLines: App.Http.PickupReturnLineRow[],
-readonly adjustments: App.Http.PickupAdjustmentRow[],
-readonly originalChargeCents: number | null,
-};
-export type PickupStockLineRow = {
-readonly stockProductId: string,
-readonly name: string,
-readonly unit: string,
-readonly variable: boolean,
-readonly unitPriceCents: number,
-readonly quantity: string,
-readonly amountCents: number,
-};
 export type PickupSummaryRow = {
+readonly basketId: string,
 readonly householdId: string,
 readonly householdName: string,
 readonly status: string,
 readonly totalCents: number,
+readonly late: boolean,
 };
 export type ProducerCycleSummaryRow = {
 readonly cycleId: string,
@@ -346,7 +313,6 @@ readonly balancedForDistribution: boolean,
 readonly hasManualAllocations: boolean,
 readonly hasAdjustments: boolean,
 readonly allocations: App.Http.ReceptionAllocationRow[],
-readonly hasDonePickups: boolean,
 };
 export type ReceptionRow = {
 readonly cycleId: string,

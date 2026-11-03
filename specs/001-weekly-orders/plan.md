@@ -1,6 +1,6 @@
 # 001 — Weekly orders · Plan
 
-Status: Accepted (2026-10-21) · Spec: [spec.md](spec.md) + areas (R1–R36c, S1–S90) · Rules: [constitution](../constitution.md)
+Status: Accepted (2026-10-21) · Spec: [spec.md](spec.md) + areas (R1–R36c, S1–S91) · Rules: [constitution](../constitution.md)
 
 Accepted amendment (2026-10-24): **Application visual identity** below. The user approved the plan;
 the associated tasks were separately approved. The user subsequently authorized T39 implementation
@@ -275,18 +275,30 @@ Ordering does not maintain another delivered column to synchronize back on every
 2. At first settlement, drop marked/nonparticipating lines from active fulfilment, retaining history.
    Through `SalesBaskets`, create one idempotent base draft per source order with eligible allocations
    and its full ordered product snapshots. Retrying settlement cannot create a second base basket.
-3. After a permitted reopen, synchronize changed weekly allocations into unvalidated base drafts,
-   resetting actual overrides on the affected weekly lines as the earlier plan did. Keep stock/return
-   lines intact. Reopen a zero-content base draft when allocations become positive while the cycle is open.
-4. A validated basket is financially frozen even if physically pending collection. Redistribution uses
-   the existing explicit unfinished-only/all choice, where unfinished now means unvalidated. Subtract
-   validated effective quantities when excluding them; reject a negative remainder or absent eligible claims.
-   Including them appends signed Sales basket adjustments and Wallet corrections atomically, retaining
-   original lines/charges and never selling stock/returns again. An unchanged target appends nothing.
-5. Close when settled, every participating reception is distributed and every base basket is validated
-   or has nothing to collect. Stock-only/supplementary baskets do not gate weekly closure, even when
+3. After a permitted reopen, a product whose previous received total was 0 is a late arrival: its
+   allocations are added to the household's open weekly draft (base or late), reviving a zero-content
+   base while the cycle is open. A household whose weekly baskets in the cycle are all validated gets
+   one late weekly basket draft from the same source order with only the late lines. A household has
+   at most one unvalidated weekly draft per cycle; source uniqueness is one base plus at most one open
+   late draft per source order.
+4. Any other allocation change after a reopen is a redistribution: synchronize it into unvalidated
+   weekly drafts, resetting actual overrides on the affected weekly lines as the earlier plan did and
+   keeping stock/return lines intact. A validated basket is financially frozen even if physically
+   pending collection: under the cycle lock, reject the redistribution of a product that any validated
+   weekly basket of the cycle contains, before anything changes, and point staff to that basket's
+   corrections (T58/T68). Reception never appends adjustments or Wallet corrections to validated baskets.
+5. Close when settled, every participating reception is distributed and every base and late weekly
+   basket is validated or has nothing to collect. Stock-only/supplementary baskets do not gate weekly closure, even when
    they reference the cycle. Collection remains possible after closure, with a visible pending indicator.
    Closed weekly orders/receptions cannot reopen; later sale corrections retain their original records.
+
+Delivered by T59: after settlement an unvalidated base follows reception changes at once (sync on every
+allocation write and on re-distribution), resetting the actual quantity only of lines whose allocation
+changed; a validated base is never synchronized. Weekly validation and actual-quantity edits are refused
+while a producer is reopened after settlement. A scheduler-created base has no creator (`baskets.created_by`
+is nullable). The drafts-only/all choice and reception adjustments to validated baskets are removed
+(Change 2026-11-03). Staff reach a cycle's bases from the pickups list; the old per-household pickup URL redirects
+to the basket.
 
 Ordering's `SalesBaskets` port creates/synchronizes sources and reads validation/effective-quantity
 summaries. Sales's `WeeklyBasketSource` calls narrow Ordering use cases for source readiness, its
@@ -344,7 +356,7 @@ is sales and linked corrections. Source or household ownership is always derived
 
 A draft is uncharged and stock is not reserved. Stock-only drafts can be cancelled while retaining
 history. A base with no positive quantity and no stock/return contents has nothing to collect and
-requires no charge; permitted redistribution can restore it to draft before cycle closure. Free goods
+requires no charge; a late arrival or permitted redistribution can restore it to draft before cycle closure. Free goods
 or a zero net total with real contents can still be validated. A return-only basket may yield a credit.
 
 ### ValidateBasket: the transactional seam
@@ -388,8 +400,8 @@ or original receipt. Original lines, validation amount/time and ledger movements
 Finance/Manager may correct the agreed basket/receipt operations; they do not thereby acquire unrelated
 product or inventory administration. Cross-context corrective stock/money changes are atomic, preserve
 stock non-negativity and are idempotent by correction id. Distinguish pure financial correction from
-physical goods actually returned. Redistribution uses the same signed adjustment mechanism, with
-Ordering's before-cycle-closure restrictions, and never resells stock/returns.
+physical goods actually returned. Reception redistribution never uses this mechanism: a validated
+basket blocks redistribution of its products, and staff correct it individually.
 For a validated independent basket's amount-only correction, Sales appends a `basket_adjustments`
 row and Wallet appends a correction with the same identity in one transaction. The basket id is
 the original source, including when a zero-total basket has no base charge or credit. Its effective
@@ -1082,7 +1094,7 @@ for CI's full validation.
 | Level | What | Where |
 | --- | --- | --- |
 | Domain | Value objects, `LocalTime`, `CutoffRule`, `ProportionalAllocator` (property: Σ result == target), `Cycle`, `Order`, `Product`, `Basket` | `tests/Unit/<Context>` |
-| Application | **Every scenario S1–S90**, with in-memory repositories and `FrozenClock` | `tests/Application/<Context>` |
+| Application | **Every scenario S1–S91**, with in-memory repositories and `FrozenClock` | `tests/Application/<Context>` |
 | Infrastructure | Each Eloquent repository against `guixa_test` (constraints, locks, numeric mapping) | `tests/Integration` |
 | HTTP | Role gates, wiring, `assertInertia` props, error → 422 and `AuthorizationException` → 403 mapping | `tests/Feature` |
 | Architecture | A1–A12 (A9 through Oxlint); explicitly register Sales contracts as its slices land | `tests/Architecture` |
@@ -1109,7 +1121,7 @@ history filtering, one active line, removed references, source uniqueness and sa
 Cross-context integration checks must prove rollback of a failed validation leaves basket, stock and
 wallet unchanged, simultaneous baskets cannot oversell, attributed stock sales do not invert cycle/product locks,
 and classification/deletion cannot race first use.
-Check source redistribution against validated baskets, replay, negative/zero totals, product deactivation,
+Check redistribution rejection by validated baskets, late weekly baskets, replay, negative/zero totals, product deactivation,
 late collection after cycle closure, Finance boundaries, own-household self-collection and manual receipts.
 Rendered coverage includes draft/validated/collected, zero stock, empty, insufficient stock, long names,
 closed-cycle pending indicators and narrow-role navigation at the shared workflow's required dimensions.
@@ -1131,10 +1143,11 @@ not application tests. Implementation and task creation require their own later 
 - **D11** The pickup weekday is a single-row `cooperative_settings` table, not configuration: R4c lets a
   manager change it. It is still one value per installation, as the constitution allows for settings a
   manager changes in the app. Its value is null until a manager sets it, directly or when opening a cycle as permanent (R4c).
-- **D12** Redistribution before weekly closure keeps the explicit unfinished-only/all choice, now
-  keyed to basket validation rather than physical collection. Draft sources synchronize; validated
-  originals remain immutable and receive signed Sales adjustments and matching Wallet corrections
-  in one transaction. Repeated identical targets append nothing; stock/return lines are not sold again.
+- **D12** Reception changes before weekly closure never touch validated baskets (Change 2026-11-03).
+  A late arrival (received 0 → >0) goes to the household's open weekly draft or one new late weekly
+  basket; any other redistribution synchronizes drafts and is rejected when a validated basket contains
+  the product. Validated baskets change only through individual Sales corrections (R23), which keep
+  originals immutable and pair adjustments with Wallet corrections in one transaction.
 - **D13** Producer deactivation is a Catalog use case that calls Membership (producer role) and Ordering
   (participation) through ports, in one transaction (R3a).
 - **D14** Superseded destructive cancellation: retain cancelled orders/baskets and removed lines as

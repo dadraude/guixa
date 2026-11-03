@@ -149,8 +149,8 @@ behavior and verify its regression through the new final contracts, not that the
 | [S60 — Counting containers](../reception.md) | [T31](../tasks.md#t31) | [T60](../tasks.md#t60) |
 | [S61 — Redistributing after an actual-quantity adjustment](../pickup.md) | [T30](../tasks.md#t30) | [T59](../tasks.md#t59) |
 | [S62 — Totals of a cancelled cycle](../ordering.md) | [T35](../tasks.md#t35), [T41](../tasks.md#t41) | [T53](../tasks.md#t53) (archive regression) |
-| [S63 — Explicit redistribution across validated baskets](../reception.md) | [T30](../tasks.md#t30) | [T59](../tasks.md#t59) |
-| [S64 — Successive basket adjustments retain history](../reception.md) | [T30](../tasks.md#t30) | [T59](../tasks.md#t59) |
+| [S63 — A validated basket blocks redistribution of its product](../reception.md) | [T30](../tasks.md#t30) | [T59](../tasks.md#t59) |
+| [S64 — Redistributing a product no validated basket contains](../reception.md) | [T30](../tasks.md#t30) | [T59](../tasks.md#t59) |
 | [S65 — A product stays with its producer](../ordering.md) | — | [T52](../tasks.md#t52) |
 | [S66 — Separate weekly and stock records](../ordering.md) | — | [T52](../tasks.md#t52) (separate modes), [T54](../tasks.md#t54) (visibility) |
 | [S67 — Only the manager changes an unused classification](../ordering.md) | — | [T53](../tasks.md#t53) |
@@ -175,8 +175,9 @@ behavior and verify its regression through the new final contracts, not that the
 | [S86 — Corrections retain the validated original](../pickup.md) | — | [T68](../tasks.md#t68) |
 | [S87 — Retained references establish use](../pickup.md) | — | [T53](../tasks.md#t53) (orders), [T55](../tasks.md#t55) (baskets) |
 | [S88 — Returns, zero total and no contents](../pickup.md) | — | [T57](../tasks.md#t57) (returns/real contents), [T59](../tasks.md#t59) (weekly empty) |
-| [S89 — Redistribution uses validation, not collection](../pickup.md) | — | [T59](../tasks.md#t59) |
+| [S89 — Validation, not collection, freezes a basket](../pickup.md) | — | [T59](../tasks.md#t59) |
 | [S90 — Supplementary containers retain cycle attribution](../pickup.md) | — | [T60](../tasks.md#t60) |
+| [S91 — Successive late arrivals share one open draft](../pickup.md) | — | [T59](../tasks.md#t59) |
 
 ## Required checks beyond scenario identifiers
 

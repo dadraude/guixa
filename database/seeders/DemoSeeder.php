@@ -12,7 +12,6 @@ use Guixa\Membership\Domain\Account;
 use Guixa\Membership\Domain\AccountPasswords;
 use Guixa\Membership\Domain\AccountRepository;
 use Guixa\Membership\Domain\ValueObject\Email;
-use Guixa\Ordering\Application\CompletePickup;
 use Guixa\Ordering\Application\MarkProducerDistributed;
 use Guixa\Ordering\Application\OpenCycle;
 use Guixa\Ordering\Application\SetOrderLine;
@@ -20,6 +19,10 @@ use Guixa\Ordering\Application\SetReceivedTotal;
 use Guixa\Ordering\Application\ValidateReception;
 use Guixa\Ordering\Domain\CooperativeSettings;
 use Guixa\Ordering\Domain\CycleRepository;
+use Guixa\Sales\Application\BasketData;
+use Guixa\Sales\Application\ListBaskets;
+use Guixa\Sales\Application\MarkBasketCollected;
+use Guixa\Sales\Application\ValidateBasket;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Application\ActorResolver;
 use Guixa\Shared\Domain\Clock;
@@ -110,10 +113,20 @@ final class DemoSeeder extends Seeder
             app(ValidateReception::class)($manager, $cycles[0], $producerId);
             app(MarkProducerDistributed::class)($manager, $cycles[0], $producerId);
         }
-        app(CompletePickup::class)($manager, $cycles[0], $members[0]['householdId']);
+        $this->collectFirstBasket($manager, $cycles[0], $members[0]['householdId']);
 
         $this->prepareReception($cycles[1], $catalog['producers']);
         $this->receiveProducts($manager, $cycles[1], array_slice($catalog['products'], 0, 2));
+    }
+
+    /** Settlement created one draft base basket per household; the first household's is validated and collected. */
+    private function collectFirstBasket(Actor $manager, string $cycleId, string $householdId): void
+    {
+        $basket = collect(app(ListBaskets::class)($manager))->first(
+            fn (BasketData $basket) => $basket->kind === 'weekly' && $basket->referenceCycleId === $cycleId && $basket->householdId === $householdId,
+        );
+        app(ValidateBasket::class)($manager, $basket->id);
+        app(MarkBasketCollected::class)($manager, $basket->id);
     }
 
     private function createAccount(Account $account): Actor

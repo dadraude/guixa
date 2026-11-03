@@ -53,7 +53,6 @@ const setReceived = (
     productId: string,
     received: string,
     overwriteManual: boolean,
-    includeCompleted?: boolean,
 ) =>
     send(
         ReceptionReceivedController.update.url({
@@ -64,9 +63,6 @@ const setReceived = (
         {
             received,
             overwrite_manual: overwriteManual,
-            ...(includeCompleted === undefined
-                ? {}
-                : { include_completed: includeCompleted }),
         },
     );
 
@@ -257,7 +253,11 @@ const addProduct = computed(() =>
                     class="max-w-full min-w-0 break-words whitespace-normal"
                     data-test="adjusted"
                 >
-                    {{ trans('Adjusted at pickup: this blocks nothing') }}
+                    {{
+                        trans(
+                            'Actual quantity differs from the allocation: this blocks nothing',
+                        )
+                    }}
                 </Badge>
             </div>
 
@@ -292,7 +292,7 @@ const addProduct = computed(() =>
                 </div>
                 <div v-if="product.hasAdjustments">
                     <dt class="text-muted-foreground">
-                        {{ trans('Delivered') }}
+                        {{ trans('Actual') }}
                     </dt>
                     <dd data-test="delivered">
                         {{ formatQuantity(product.delivered) }}
@@ -347,12 +347,11 @@ const addProduct = computed(() =>
                 :product="product"
                 :processing="processing"
                 @save="
-                    (received, overwriteManual, includeCompleted) =>
+                    (received, overwriteManual) =>
                         setReceived(
                             product.productId,
                             received,
                             overwriteManual,
-                            includeCompleted,
                         )
                 "
             />

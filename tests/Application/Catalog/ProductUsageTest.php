@@ -30,6 +30,21 @@ it('derives stock use from movements without relying on quantity on hand (R1b, R
             return null;
         }
 
+        public function getBySourceOrder(string $orderId): ?Basket
+        {
+            return null;
+        }
+
+        public function getOpenLateBySourceOrder(string $orderId): ?Basket
+        {
+            return null;
+        }
+
+        public function weeklyOfCycle(string $cycleId): array
+        {
+            return [];
+        }
+
         public function lock(string $id): ?Basket
         {
             return null;

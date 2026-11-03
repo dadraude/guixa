@@ -22,13 +22,14 @@ Acceptance:
   Staff changes actual weekly quantity (including zero) before validation; member sees ordered versus
   actual, reception flags differences but still balances on allocations. Only Sales owns actuals.
 - Reopen/synchronize resets affected unvalidated actual overrides, preserves stock/returns and revives
-  nothing-to-collect bases while open. Validate only a settled, current source, under the shared source
+  nothing-to-collect bases while open. A late arrival (received 0 → >0) adds to the open weekly draft
+  or creates one late weekly basket draft when all the household's weekly baskets are validated (S30/S91). Validate only a settled, current source, under the shared source
   cycle lock; stale source edits are rejected. Preserve cutoff/send and empty-order scheduler behavior.
-- Explicit unvalidated-only/all redistribution uses validation as financial freeze even if uncollected.
-  Exclusion subtracts effective validated quantities and rejects negative/no-claim remainders; inclusion
-  appends signed effective quantity/Wallet adjustments, with no stock/return resale. Unchanged targets
-  append nothing; successive changes use latest effective amounts. Never edit validated originals.
-- Close after settlement, distributed receptions and all bases validated/nothing to collect, irrespective
+- Validation is the financial freeze even if uncollected: a redistribution of a product any validated
+  basket contains is rejected before anything changes, pointing to per-basket corrections (T58/T68).
+  There is no drafts-only/all choice and reception never appends adjustments to validated baskets.
+  Products no validated basket contains synchronize into drafts (S63/S64/S89). Never edit validated originals.
+- Close after settlement, distributed receptions and all base/late weekly baskets validated/nothing to collect, irrespective
   of physical collection. Empty/no-content means no money or collection; real-content zero totals can
   validate. Closed weekly sources cannot reopen. Supplements never gate closure.
 - Switch all weekly financial writers and current source readers together, including pending/obligation
@@ -42,7 +43,7 @@ Acceptance:
   ownership and Wallet keeps ledger ownership. Retired schema cleanup remains in T63. Update the
   module-contract documentation and relevant rejection tests, then run `tests/Architecture`.
 
-Verify S78/S89 and S9/S14–S16/S19/S20/S27–S30/S39/S40/S42/S46/S47/S53/S54/S61/S63/S64 plus S88's
+Verify S78/S89 and S9/S14–S16/S19/S20/S27–S30/S39/S40/S42/S46/S47/S53/S54/S61/S63/S64/S91 plus S88's
 weekly no-contents/revival case. Preserve allocator/tie/overwrite/cutoff regressions instead of rewriting
 them. Integration proves source-sync versus validation serialization, idempotent settlement/redistribution,
 source uniqueness, weekly rollback, no reopening after closure and one charge despite old endpoint replay.
@@ -71,9 +72,10 @@ Internal checkpoints with the same owner, before broad final verification:
 1. Through public settlement and HTTP, create/reload one uncharged weekly base with original ordered
    and initial actual quantities. Assert source uniqueness and no ledger write; then validate once,
    close only when eligible, and collect without a second charge. Include an old-endpoint replay probe.
-2. Reopen/synchronize and exercise drafts-only/all redistribution with one validated pending basket
-   and one draft. Assert exact effective quantities/amounts, immutable originals, no resold stock/returns,
-   negative/no-claim remainder rejection and unchanged-target no-op. Preserve allocator regressions.
+2. Reopen/synchronize with one validated pending basket and one draft. Assert rejection of a
+   redistribution of a product the validated basket contains (nothing changes), draft sync for other
+   products, and late arrivals into the open draft or one late weekly basket with its own validation and
+   charge. Assert immutable originals and no Wallet write from reception. Preserve allocator regressions.
 3. Race source sync against validation under the cycle lock; prove rollback, empty/revived sources,
    scheduler and closed-cycle guards, Membership obligations, current readers and role boundaries.
    Reconcile the entrypoint inventory before independent review and candidate-bound CI.
@@ -289,7 +291,7 @@ its original baseline remains historical. The accepted scope was published with 
 
 Acceptance:
 
-- Audit all 65 requirements and S1–S90 against meaningful assertions through the appropriate public
+- Audit all 65 requirements and S1–S91 against meaningful assertions through the appropriate public
   seams, using [coverage allocation](coverage.md) as responsibility, not proof. Read assertions and
   failure boundaries, fill confirmed gaps without changing accepted behavior; identifier presence alone
   never establishes coverage. Include source/stock/Wallet concurrency, permissions and retained history.

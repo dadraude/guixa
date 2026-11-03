@@ -1,0 +1,715 @@
+{
+    "baseUrl": "http://127.0.0.1:5214",
+    "rootFontPx": 16,
+    "darkSelector": "html.dark",
+    "matrix": {
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark"],
+        "text": [100, 200]
+    },
+    "views": [
+        {
+            "id": "finance-weekly-manager",
+            "path": "/visual-dra-214.html",
+            "query": {
+                "screen": "finance",
+                "role": "manager"
+            },
+            "root": "#main-content",
+            "panels": "#main-content .pilot-layout-panel,#main-content .pilot-list-row,#main-content .pilot-data-table tbody tr,#main-content ul > li",
+            "content": "#main-content h1,#main-content h2,#main-content h3,#main-content p,#main-content label,#main-content input,#main-content button,#main-content a,#main-content dt,#main-content dd,#main-content li,#main-content span",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["#main-content a[data-visual-page-focus-first]"],
+            "states": [
+                {
+                    "id": "draft-equal",
+                    "query": {
+                        "state": "draft-equal"
+                    },
+                    "ready": "body[data-visual-ready=\"finance-draft-equal\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"weekly-lines\"] li",
+                                "count": 2
+                            },
+                            {
+                                "selector": "[data-test^=\"weekly-difference-\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"validate-basket\"], [data-test=\"collect-basket\"]",
+                                "minHeight": 44
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "validated-adjusted",
+                    "query": {
+                        "state": "validated-adjusted"
+                    },
+                    "ready": "body[data-visual-ready=\"finance-validated-adjusted\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"weekly-lines\"] li",
+                                "count": 2
+                            },
+                            {
+                                "selector": "[data-test=\"collect-basket\"]",
+                                "count": 1,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"validate-basket\"]",
+                                "count": 0
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "late-draft",
+                    "query": {
+                        "state": "late-draft"
+                    },
+                    "ready": "body[data-visual-ready=\"finance-late-draft\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"weekly-lines\"] li",
+                                "count": 1
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "finance-weekly-finance",
+            "path": "/visual-dra-214.html",
+            "query": {
+                "screen": "finance",
+                "role": "finance"
+            },
+            "root": "#main-content",
+            "panels": "#main-content .pilot-layout-panel,#main-content .pilot-list-row,#main-content .pilot-data-table tbody tr,#main-content ul > li",
+            "content": "#main-content h1,#main-content h2,#main-content h3,#main-content p,#main-content label,#main-content input,#main-content button,#main-content a,#main-content dt,#main-content dd,#main-content li,#main-content span",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["#main-content a[data-visual-page-focus-first]"],
+            "states": [
+                {
+                    "id": "draft-diff",
+                    "query": {
+                        "state": "draft-diff"
+                    },
+                    "ready": "body[data-visual-ready=\"finance-draft-diff\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"weekly-lines\"] li",
+                                "count": 2
+                            },
+                            {
+                                "selector": "[data-test^=\"weekly-difference-\"]",
+                                "count": 2
+                            },
+                            {
+                                "selector": "[data-test^=\"delivered-form-\"] input",
+                                "count": 2,
+                                "minHeight": 44
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "collected",
+                    "query": {
+                        "state": "collected"
+                    },
+                    "ready": "body[data-visual-ready=\"finance-collected\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"collect-basket\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"validate-basket\"]",
+                                "count": 0
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "nothing",
+                    "query": {
+                        "state": "nothing"
+                    },
+                    "ready": "body[data-visual-ready=\"finance-nothing\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"nothing-to-collect\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"validate-basket\"]",
+                                "count": 0
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "member-weekly",
+            "path": "/visual-dra-214.html",
+            "query": {
+                "screen": "member",
+                "role": "member"
+            },
+            "root": "#main-content",
+            "panels": "#main-content .pilot-layout-panel,#main-content .pilot-list-row,#main-content .pilot-data-table tbody tr,#main-content ul > li",
+            "content": "#main-content h1,#main-content h2,#main-content h3,#main-content p,#main-content label,#main-content input,#main-content button,#main-content a,#main-content dt,#main-content dd,#main-content li,#main-content span",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["#main-content a[data-visual-page-focus-first]"],
+            "states": [
+                {
+                    "id": "draft",
+                    "query": {
+                        "state": "draft-diff"
+                    },
+                    "ready": "body[data-visual-ready=\"member-draft-diff\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"weekly-lines\"] li",
+                                "count": 2
+                            },
+                            {
+                                "selector": "[data-test^=\"delivered-form-\"]",
+                                "count": 0
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "validated-adjusted",
+                    "query": {
+                        "state": "validated-adjusted"
+                    },
+                    "ready": "body[data-visual-ready=\"member-validated-adjusted\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"weekly-lines\"] li",
+                                "count": 2
+                            },
+                            {
+                                "selector": "[data-test^=\"weekly-effective-\"]",
+                                "count": 1
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "nothing",
+                    "query": {
+                        "state": "nothing"
+                    },
+                    "ready": "body[data-visual-ready=\"member-nothing\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"nothing-to-collect\"]",
+                                "count": 1
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "late-draft",
+                    "query": {
+                        "state": "late-draft"
+                    },
+                    "ready": "body[data-visual-ready=\"member-late-draft\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "reception-weekly",
+            "path": "/visual-dra-214.html",
+            "query": {
+                "screen": "reception",
+                "role": "manager"
+            },
+            "root": "#main-content",
+            "panels": "#main-content .pilot-layout-panel,#main-content .pilot-list-row,#main-content .pilot-data-table tbody tr,#main-content ul > li",
+            "content": "#main-content h1,#main-content h2,#main-content h3,#main-content p,#main-content label,#main-content input,#main-content button,#main-content a,#main-content dt,#main-content dd,#main-content li,#main-content span",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["button[data-sidebar=\"trigger\"]"],
+            "states": [
+                {
+                    "id": "diff",
+                    "query": {
+                        "state": "diff"
+                    },
+                    "ready": "body[data-visual-ready=\"reception-diff\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"weekly-lines\"]",
+                                "count": 0
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "rejected",
+                    "query": {
+                        "state": "rejected"
+                    },
+                    "ready": "body[data-visual-ready=\"reception-rejected\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"domain-error\"]",
+                                "count": 1
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "pickups-weekly",
+            "path": "/visual-dra-214.html",
+            "query": {
+                "screen": "pickups",
+                "role": "manager"
+            },
+            "root": "#main-content",
+            "panels": "#main-content .pilot-layout-panel,#main-content .pilot-list-row,#main-content .pilot-data-table tbody tr,#main-content ul > li",
+            "content": "#main-content h1,#main-content h2,#main-content h3,#main-content p,#main-content label,#main-content input,#main-content button,#main-content a,#main-content dt,#main-content dd,#main-content li,#main-content span",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["button[data-sidebar=\"trigger\"]"],
+            "states": [
+                {
+                    "id": "mixed",
+                    "query": {
+                        "state": "mixed"
+                    },
+                    "ready": "body[data-visual-ready=\"pickups-mixed\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test^=\"pickup-\"]",
+                                "count": 4
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "late-closed",
+                    "query": {
+                        "state": "late-closed"
+                    },
+                    "ready": "body[data-visual-ready=\"pickups-late-closed\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test^=\"pickup-\"]",
+                                "count": 4
+                            },
+                            {
+                                "selector": "[data-test^=\"late-basket-\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"cycle-closed\"]",
+                                "count": 1
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "orders-settled",
+            "path": "/visual-dra-214.html",
+            "query": {
+                "screen": "orders",
+                "role": "member"
+            },
+            "root": "#main-content",
+            "panels": "#main-content .pilot-layout-panel,#main-content .pilot-list-row,#main-content .pilot-data-table tbody tr,#main-content ul > li",
+            "content": "#main-content h1,#main-content h2,#main-content h3,#main-content p,#main-content label,#main-content input,#main-content button,#main-content a,#main-content dt,#main-content dd,#main-content li,#main-content span",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["button[data-sidebar=\"trigger\"]"],
+            "states": [
+                {
+                    "id": "basket-link",
+                    "query": {
+                        "state": "basket-link"
+                    },
+                    "ready": "body[data-visual-ready=\"orders-basket-link\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"basket-link\"]",
+                                "count": 1,
+                                "minHeight": 44
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    ]
+}

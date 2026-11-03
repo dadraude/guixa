@@ -5,6 +5,7 @@ namespace Guixa\Sales\Domain;
 use DateTimeImmutable;
 use DomainException;
 use Guixa\Sales\Domain\Error\InvalidBasketCollectionCorrection;
+use Guixa\Shared\Domain\Quantity;
 
 final readonly class Basket
 {
@@ -14,7 +15,7 @@ final readonly class Basket
         public string $householdId,
         public string $householdName,
         public string $state,
-        public string $createdBy,
+        public ?string $createdBy,
         public DateTimeImmutable $createdAt,
         public array $lines = [],
         public ?string $validatedBy = null,
@@ -28,6 +29,11 @@ final readonly class Basket
         public array $adjustments = [],
         /** @var list<BasketCollectionEvent> */
         public array $collectionEvents = [],
+        public string $kind = 'stock',
+        public ?string $sourceOrderId = null,
+        public ?string $referenceCycleId = null,
+        /** A weekly basket created after the base was validated, holding only the lines that arrived late (R19). */
+        public bool $late = false,
     ) {}
 
     /** @return list<BasketLine> */
@@ -66,7 +72,7 @@ final readonly class Basket
         $this->draft();
 
         return new self($this->id, $this->householdId, $this->householdName, $this->state,
-            $this->createdBy, $this->createdAt, $lines);
+            $this->createdBy, $this->createdAt, $lines, kind: $this->kind, sourceOrderId: $this->sourceOrderId, referenceCycleId: $this->referenceCycleId, late: $this->late);
     }
 
     public function totalCents(): int
@@ -122,7 +128,7 @@ final readonly class Basket
         return new self($this->id, $this->householdId, $this->householdName, $this->state,
             $this->createdBy, $this->createdAt, $this->lines, $this->validatedBy, $this->validatedAt,
             $this->validatedTotalCents, $this->collectedBy, $this->collectedAt, $this->cancelledBy,
-            $this->cancelledAt, [...$this->adjustments, $adjustment], $this->collectionEvents);
+            $this->cancelledAt, [...$this->adjustments, $adjustment], $this->collectionEvents, kind: $this->kind, sourceOrderId: $this->sourceOrderId, referenceCycleId: $this->referenceCycleId, late: $this->late);
     }
 
     public function validated(string $actorId, DateTimeImmutable $when): self
@@ -133,7 +139,7 @@ final readonly class Basket
         }
 
         return new self($this->id, $this->householdId, $this->householdName, 'validated',
-            $this->createdBy, $this->createdAt, $this->lines, $actorId, $when, $this->totalCents());
+            $this->createdBy, $this->createdAt, $this->lines, $actorId, $when, $this->totalCents(), kind: $this->kind, sourceOrderId: $this->sourceOrderId, referenceCycleId: $this->referenceCycleId, late: $this->late);
     }
 
     public function collected(string $actorId, DateTimeImmutable $when, ?string $eventId = null): self
@@ -153,7 +159,7 @@ final readonly class Basket
         return new self($this->id, $this->householdId, $this->householdName, 'collected',
             $this->createdBy, $this->createdAt, $this->lines, $this->validatedBy, $this->validatedAt,
             $this->validatedTotalCents, $this->collectedBy ?? $actorId, $this->collectedAt ?? $when,
-            adjustments: $this->adjustments, collectionEvents: $events);
+            adjustments: $this->adjustments, collectionEvents: $events, kind: $this->kind, sourceOrderId: $this->sourceOrderId, referenceCycleId: $this->referenceCycleId, late: $this->late);
     }
 
     public function collectionCorrected(BasketCollectionEvent $correction): self
@@ -166,7 +172,7 @@ final readonly class Basket
         return new self($this->id, $this->householdId, $this->householdName, 'validated',
             $this->createdBy, $this->createdAt, $this->lines, $this->validatedBy, $this->validatedAt,
             $this->validatedTotalCents, $this->collectedBy, $this->collectedAt, $this->cancelledBy,
-            $this->cancelledAt, $this->adjustments, [...$this->collectionEvents, $correction]);
+            $this->cancelledAt, $this->adjustments, [...$this->collectionEvents, $correction], kind: $this->kind, sourceOrderId: $this->sourceOrderId, referenceCycleId: $this->referenceCycleId, late: $this->late);
     }
 
     public function cancelled(string $actorId, DateTimeImmutable $when): self
@@ -174,6 +180,129 @@ final readonly class Basket
         $this->draft();
 
         return new self($this->id, $this->householdId, $this->householdName, 'cancelled',
-            $this->createdBy, $this->createdAt, $this->lines, cancelledBy: $actorId, cancelledAt: $when);
+            $this->createdBy, $this->createdAt, $this->lines, cancelledBy: $actorId, cancelledAt: $when, kind: $this->kind, sourceOrderId: $this->sourceOrderId, referenceCycleId: $this->referenceCycleId, late: $this->late);
+    }
+
+    public function isWeekly(): bool
+    {
+        return $this->kind === 'weekly';
+    }
+
+    /** Staff sets what the household really takes of a weekly product, zero included, before validation. */
+    public function withActualQuantity(string $productId, Quantity $actual): self
+    {
+        $this->draft();
+        $changed = false;
+        $lines = array_map(function (BasketLine $line) use ($productId, $actual, &$changed) {
+            if ($line->kind !== 'weekly' || $line->removedAt !== null || $line->productId !== $productId) {
+                return $line;
+            }
+            $changed = true;
+
+            return $line->withQuantity($actual);
+        }, $this->lines);
+        if (! $changed) {
+            throw new DomainException('The basket has no weekly line of that product.');
+        }
+
+        return $this->rebuilt($this->state, $lines);
+    }
+
+    /**
+     * Follows the source order while the base is not validated: changed allocations replace the snapshot and reset the actual
+     * quantity of those lines, new source lines are added, vanished ones are archived. Stock and return lines stay (R18, S29, S30).
+     *
+     * @param  list<BasketLine>  $source  weekly lines built from the current source order
+     */
+    public function synchronizedWith(array $source, DateTimeImmutable $when): self
+    {
+        if (! $this->isWeekly() || ! in_array($this->state, ['draft', 'nothing_to_collect'], true)) {
+            return $this;
+        }
+
+        $bySource = [];
+        foreach ($source as $line) {
+            $bySource[$line->sourceOrderLineId] = $line;
+        }
+        $lines = [];
+        $seen = [];
+        foreach ($this->lines as $line) {
+            if ($line->kind !== 'weekly' || $line->removedAt !== null) {
+                $lines[] = $line;
+
+                continue;
+            }
+            $current = $bySource[$line->sourceOrderLineId] ?? null;
+            $seen[$line->sourceOrderLineId] = true;
+            if ($current === null) {
+                $lines[] = $line->removedAt($when);
+            } elseif ($line->allocatedQuantity === null || ! $line->allocatedQuantity->equals($current->allocatedQuantity)) {
+                $lines[] = $line->reallocated($current->allocatedQuantity);
+            } else {
+                $lines[] = $line;
+            }
+        }
+        foreach ($source as $line) {
+            if (! isset($seen[$line->sourceOrderLineId])) {
+                $lines[] = $line;
+            }
+        }
+
+        $candidate = $this->rebuilt($this->state, $lines);
+
+        return $candidate->rebuilt($candidate->hasContent() ? 'draft' : 'nothing_to_collect', $lines);
+    }
+
+    /**
+     * Adds late-arrival lines to an unvalidated weekly basket. A product already on it takes the new allocation and resets
+     * its actual quantity; every other line stays (R18, R19, S91).
+     *
+     * @param  list<BasketLine>  $arrived  weekly lines built from the source order, for the late products only
+     */
+    public function withLateLines(array $arrived): self
+    {
+        if (! $this->isWeekly() || ! in_array($this->state, ['draft', 'nothing_to_collect'], true)) {
+            throw new DomainException('Late lines can only join an unvalidated weekly basket.');
+        }
+
+        $bySource = [];
+        foreach ($arrived as $line) {
+            $bySource[$line->sourceOrderLineId] = $line;
+        }
+        $lines = [];
+        foreach ($this->lines as $line) {
+            $current = $line->removedAt === null ? ($bySource[$line->sourceOrderLineId] ?? null) : null;
+            if ($current === null) {
+                $lines[] = $line;
+
+                continue;
+            }
+            unset($bySource[$line->sourceOrderLineId]);
+            $lines[] = $line->allocatedQuantity?->equals($current->allocatedQuantity) ? $line : $line->reallocated($current->allocatedQuantity);
+        }
+
+        $merged = [...$lines, ...array_values($bySource)];
+        $candidate = $this->rebuilt($this->state, $merged);
+
+        return $candidate->rebuilt($candidate->hasContent() ? 'draft' : 'nothing_to_collect', $merged);
+    }
+
+    /** Something to collect: a stock or return line, or a weekly product that was allocated. */
+    public function hasContent(): bool
+    {
+        foreach ($this->activeLines() as $line) {
+            if ($line->kind !== 'weekly' || ! ($line->allocatedQuantity?->isZero() ?? true)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /** @param list<BasketLine> $lines */
+    private function rebuilt(string $state, array $lines): self
+    {
+        return new self($this->id, $this->householdId, $this->householdName, $state, $this->createdBy, $this->createdAt,
+            $lines, kind: $this->kind, sourceOrderId: $this->sourceOrderId, referenceCycleId: $this->referenceCycleId, late: $this->late);
     }
 }

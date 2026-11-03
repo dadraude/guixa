@@ -102,34 +102,6 @@ const cycle = {
         },
     ],
 };
-const pickup = {
-    cycleId,
-    pickupDate,
-    householdId,
-    householdName: household.name,
-    status: 'pending',
-    lines: [
-        {
-            productId,
-            name: product.name,
-            unit: product.unit,
-            variable: product.variable,
-            unitPriceCents: 320,
-            ordered: '2',
-            allocated: '2',
-            delivered: '2',
-            adjusted: false,
-            amountCents: 640,
-        },
-    ],
-    totalCents: 640,
-    balanceCents: 2000,
-    resultingBalanceCents: 1360,
-    stockLines: [],
-    returnLines: [],
-    adjustments: [],
-    originalChargeCents: null,
-};
 const settlement = {
     householdId,
     householdName: household.name,
@@ -158,7 +130,6 @@ const reception = {
             balancedForDistribution: true,
             hasManualAllocations: false,
             hasAdjustments: false,
-            hasDonePickups: false,
             allocations: [
                 {
                     householdId,
@@ -198,7 +169,7 @@ const order = {
             notDelivered: false,
         },
     ],
-    pickup: null,
+    basketId: null,
 };
 
 const pageProps: Record<string, Record<string, unknown>> = {
@@ -294,18 +265,13 @@ const pageProps: Record<string, Record<string, unknown>> = {
         closed: false,
         pickups: [
             {
+                basketId: 'basket',
                 householdId,
                 householdName: household.name,
-                status: 'pending',
+                status: 'draft',
                 totalCents: 640,
             },
         ],
-        households: [household],
-    },
-    'Manage/Pickups/Show': {
-        pickup,
-        stockProducts: [stockProduct],
-        returnItems: [returnItem],
     },
     'Manage/Producers/Index': { producers: [producer] },
     'Manage/Reception/Show': {
@@ -567,7 +533,6 @@ if (state === 'empty') {
         }
     }
     if (pageName === 'Manage/Cycles/Show') visualProps.summary.producers = [];
-    if (pageName === 'Manage/Pickups/Show') visualProps.pickup.lines = [];
     if (pageName === 'Manage/Reception/Show')
         visualProps.reception.products = [];
     if (pageName === 'Manage/Stock/Movements') visualProps.cycles = [];
@@ -630,8 +595,6 @@ if (state === 'settlement-details' && pageName === 'Manage/Households/Index') {
     ];
     visualProps.toSettle[0].balanceCents = -1200;
 }
-if (state === 'completed' && pageName === 'Manage/Pickups/Show')
-    visualProps.pickup.status = 'completed';
 if (state === 'status') {
     visualProps.status = 'verification-link-sent';
     if (pageName === 'settings/Profile') {
@@ -639,27 +602,6 @@ if (state === 'status') {
         visualProps.auth.user.email_verified_at = null;
     }
 }
-if (state === 'stock-lines' && pageName === 'Manage/Pickups/Show')
-    visualProps.pickup.stockLines = [
-        {
-            stockProductId: stockId,
-            name: stockProduct.name,
-            unit: stockProduct.unit,
-            quantity: '1',
-            unitPriceCents: 250,
-            amountCents: 250,
-        },
-    ];
-if (state === 'return-lines' && pageName === 'Manage/Pickups/Show')
-    visualProps.pickup.returnLines = [
-        {
-            returnItemId: returnItem.id,
-            name: returnItem.name,
-            quantity: '1',
-            amountCents: 50,
-            creditCents: 50,
-        },
-    ];
 if (pageName === 'Manage/Reception/Show') {
     if (query.get('receptionBranch') === 'unordered') {
         visualProps.reception.products[0].nobodyOrdered = true;
@@ -683,10 +625,7 @@ if (state === 'manual-allocation' && pageName === 'Manage/Reception/Show') {
     visualProps.reception.products[0].hasManualAllocations = true;
     visualProps.reception.products[0].allocations[0].byHand = true;
 }
-if (
-    pageName === 'Manage/Reception/Show' &&
-    ['received-overwrite', 'received-scope-choice'].includes(state)
-) {
+if (pageName === 'Manage/Reception/Show' && state === 'received-overwrite') {
     visualProps.reception.products[0].name =
         'Arròs integral de la cooperativa de la Vall de les Hortes';
     visualProps.reception.products[0].allocations[0].householdName =
@@ -695,8 +634,6 @@ if (
         state === 'received-overwrite';
     visualProps.reception.products[0].allocations[0].byHand =
         state === 'received-overwrite';
-    visualProps.reception.products[0].hasDonePickups =
-        state === 'received-scope-choice';
 }
 if (pageName === 'Manage/Cycles/Index' && state === 'create-no-weekday')
     visualProps.pickupWeekday = null;
@@ -829,11 +766,7 @@ void createInertiaApp({
     };
     if (
         ['error', 'disabled'].includes(state) &&
-        ![
-            'Manage/Pickups/Show',
-            'Manage/Reception/Show',
-            'Orders/Edit',
-        ].includes(pageName)
+        !['Manage/Reception/Show', 'Orders/Edit'].includes(pageName)
     ) {
         const forms = [
             ...document.querySelectorAll<HTMLFormElement>(
@@ -935,7 +868,7 @@ void createInertiaApp({
     }
     if (
         pageName === 'Manage/Reception/Show' &&
-        ['received-overwrite', 'received-scope-choice'].includes(state)
+        state === 'received-overwrite'
     ) {
         const form = (await waitForElement(
             '[data-test="received-form-product-1"]',
@@ -1013,8 +946,7 @@ void createInertiaApp({
             'Manage/Cycles/Show': 'Nobody has ordered yet.',
             'Manage/Households/Index': 'There are no households yet.',
             'Manage/Pickups/Index':
-                'No household has a pickup in this cycle yet.',
-            'Manage/Pickups/Show': 'This pickup has no order lines.',
+                'No household has a weekly basket in this cycle yet.',
             'Manage/Producers/Index': 'No producers yet.',
             'Manage/Reception/Show': 'Nothing was ordered from this producer.',
             'Manage/ReturnItems/Index': 'No return items yet.',
@@ -1156,15 +1088,6 @@ void createInertiaApp({
                     document.querySelector(
                         '[role="dialog"] button[data-variant="destructive"]:not(:disabled)',
                     ) !== null
-                );
-            case 'received-scope-choice':
-                return (
-                    visible('[role="dialog"]') &&
-                    document
-                        .querySelector('[role="dialog"]')
-                        ?.textContent?.includes(
-                            trans('Which pickups should change?'),
-                        ) === true
                 );
             case 'received-overwrite':
                 return (
@@ -1397,7 +1320,6 @@ void createInertiaApp({
             'passkey-remove',
             'passkey-remove-pending',
             'passkey-remove-error',
-            'received-scope-choice',
             'received-overwrite',
         ].includes(state)
     )

@@ -19,7 +19,6 @@ const pilotPages = new Set([
     'Manage/Cycles/Index',
     'Manage/Cycles/Show',
     'Manage/Pickups/Index',
-    'Manage/Pickups/Show',
     'Manage/Reception/Show',
     'Manage/Settings',
     'Manage/Stock/Index',

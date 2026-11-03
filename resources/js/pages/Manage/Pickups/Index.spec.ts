@@ -31,53 +31,84 @@ describe('pickups index', () => {
         return renderToString(app);
     };
 
-    it('shows a closed cycle without offering another pickup', async () => {
+    it('shows a closed cycle that can still be collected', async () => {
         const html = await render({
             cycleId: 'cycle',
             closed: true,
             pickups: [
                 {
+                    basketId: 'basket-a',
                     householdId: 'a',
                     householdName: 'A',
-                    status: 'not_collected',
+                    status: 'collected',
                     totalCents: 600,
                 },
             ],
-            households: [{ id: 'k', name: 'K' }],
         });
         expect(html).toContain('data-test="cycle-closed"');
-        expect(html).not.toContain('data-test="open-k"');
-        expect(html).toContain('No recollida');
+        expect(html).toContain('Recollida');
     });
 
-    it('lists the pickups and offers to open one for a household without', async () => {
+    it('lists each weekly basket with its state and total, validated ones pending collection', async () => {
         const html = await render({
             cycleId: 'cycle',
             pickups: [
                 {
+                    basketId: 'basket-a',
                     householdId: 'a',
                     householdName: 'Household A',
-                    status: 'pending',
+                    status: 'draft',
                     totalCents: 3200,
                 },
+                {
+                    basketId: 'basket-b',
+                    householdId: 'b',
+                    householdName: 'Household B',
+                    status: 'validated',
+                    totalCents: 1000,
+                },
+                {
+                    basketId: 'basket-c',
+                    householdId: 'c',
+                    householdName: 'Household C',
+                    status: 'nothing_to_collect',
+                    totalCents: 0,
+                },
             ],
-            households: [{ id: 'k', name: 'Household K' }],
         });
 
         expect(html).toContain('Household A');
-        expect(html).toContain('Pendent');
+        expect(html).toContain('Esborrany');
+        expect(html).toContain('Pendent de recollida');
+        expect(html).toContain('Res per recollir');
         expect(html).toContain('32,00\u00a0€');
-        expect(html).toContain('data-test="open-k"');
     });
 
-    it('says when no household has a pickup', async () => {
-        const html = await render({
-            cycleId: 'cycle',
-            pickups: [],
-            households: [],
-        });
+    it('says when no household has a weekly basket', async () => {
+        const html = await render({ cycleId: 'cycle', pickups: [] });
 
         expect(html).toContain('data-test="no-pickups"');
-        expect(html).not.toContain('Obre una recollida');
+    });
+
+    it('marks a late basket as its own row keyed by basket id (R19)', async () => {
+        const row = (basketId: string, late: boolean) => ({
+            basketId,
+            householdId: 'a',
+            householdName: 'Household A',
+            status: 'draft',
+            totalCents: 500,
+            late,
+        });
+        const html = await render({
+            cycleId: 'cycle',
+            pickups: [row('basket-base', false), row('basket-late', true)],
+        });
+
+        expect(html).toContain('data-test="pickup-basket-base"');
+        expect(html).toContain('data-test="pickup-basket-late"');
+        expect(html).not.toContain('data-test="pickup-a"');
+        expect(html).toContain('data-test="late-basket-basket-late"');
+        expect(html).not.toContain('data-test="late-basket-basket-base"');
+        expect(html).toContain('Cistella tardana');
     });
 });

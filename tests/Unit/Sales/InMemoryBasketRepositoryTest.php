@@ -14,4 +14,9 @@ final class InMemoryBasketRepositoryTest extends TestCase
     {
         return [new InMemoryBasketRepository, 'manager', 'household', 'product', 'return-a', 'return-b'];
     }
+
+    protected function weeklySource(): array
+    {
+        return ['order', 'cycle'];
+    }
 }

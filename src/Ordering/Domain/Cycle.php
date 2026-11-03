@@ -242,6 +242,11 @@ final class Cycle
         $producerOrder->reopen();
     }
 
+    public function isFullyDistributed(): bool
+    {
+        return $this->everyParticipatingProducerIsDistributed();
+    }
+
     public function close(DateTimeImmutable $now, bool $everyPickupDone): void
     {
         if ($this->isClosed() || ! $this->isSettled() || ! $everyPickupDone || ! $this->everyParticipatingProducerIsDistributed()) {

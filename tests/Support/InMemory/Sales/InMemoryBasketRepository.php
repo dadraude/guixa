@@ -80,12 +80,22 @@ final class InMemoryBasketRepository implements BasketRepository
             }
             $active[$key] = true;
         }
+        foreach ($this->baskets as $storedBasket) {
+            $sameSource = $basket->sourceOrderId !== null && $storedBasket->id !== $basket->id
+                && $storedBasket->sourceOrderId === $basket->sourceOrderId;
+            $isBase = ! $basket->late && ! $storedBasket->late;
+            $bothOpenLate = $basket->late && $storedBasket->late && in_array($basket->state, ['draft', 'nothing_to_collect'], true) && in_array($storedBasket->state, ['draft', 'nothing_to_collect'], true);
+            if ($sameSource && ($isBase || $bothOpenLate)) {
+                throw new DomainException('Duplicate weekly source basket.');
+            }
+        }
         if ($basket->state === 'collected' && $basket->collectedAt !== null && $basket->collectionEvents === []) {
             $basket = new Basket($basket->id, $basket->householdId, $basket->householdName, $basket->state,
                 $basket->createdBy, $basket->createdAt, $basket->lines, $basket->validatedBy, $basket->validatedAt,
                 $basket->validatedTotalCents, $basket->collectedBy, $basket->collectedAt, $basket->cancelledBy,
                 $basket->cancelledAt, $basket->adjustments,
-                [new BasketCollectionEvent($this->nextId(), $basket->id, 'collected', $basket->collectedBy, $basket->collectedAt)]);
+                [new BasketCollectionEvent($this->nextId(), $basket->id, 'collected', $basket->collectedBy, $basket->collectedAt)],
+                $basket->kind, $basket->sourceOrderId, $basket->referenceCycleId, $basket->late);
         }
         $this->baskets[$basket->id] = $basket;
     }
@@ -93,6 +103,33 @@ final class InMemoryBasketRepository implements BasketRepository
     public function get(string $id): ?Basket
     {
         return $this->baskets[$id] ?? null;
+    }
+
+    public function getBySourceOrder(string $orderId): ?Basket
+    {
+        foreach ($this->baskets as $basket) {
+            if ($basket->sourceOrderId === $orderId && ! $basket->late) {
+                return $basket;
+            }
+        }
+
+        return null;
+    }
+
+    public function getOpenLateBySourceOrder(string $orderId): ?Basket
+    {
+        foreach ($this->baskets as $basket) {
+            if ($basket->sourceOrderId === $orderId && $basket->late && in_array($basket->state, ['draft', 'nothing_to_collect'], true)) {
+                return $basket;
+            }
+        }
+
+        return null;
+    }
+
+    public function weeklyOfCycle(string $cycleId): array
+    {
+        return array_values(array_filter($this->baskets, fn (Basket $basket) => $basket->kind === 'weekly' && $basket->referenceCycleId === $cycleId));
     }
 
     public function lock(string $id): ?Basket
