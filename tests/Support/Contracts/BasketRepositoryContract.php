@@ -52,7 +52,7 @@ trait BasketRepositoryContract
         $this->assertCount(3, $repository->weeklyOfCycle($cycleId));
 
         // A late draft corrected to zero (nothing to collect) still holds the open slot.
-        $repository->save($weekly($second, true, 'nothing_to_collect'));
+        $repository->save($weekly($second, true, BasketState::NothingToCollect));
         $this->assertSame($second, $repository->getOpenLateBySourceOrder($orderId)->id);
         $this->assertRejected(fn () => $repository->save($weekly($repository->nextId(), true)));
     }
