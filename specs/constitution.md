@@ -40,8 +40,9 @@ resources/js/
 
 - Controllers only translate HTTP ↔ use case DTOs and call `Inertia::render`. No business rules in
   controllers, models or Vue.
-- Vue may compute display-only values (e.g. a running total while editing), but the server is
-  always the source of truth: the charged amount comes from the use case, never from the client.
+- Vue only displays props and dispatches user actions; it formats for display but computes no amounts,
+  totals or rules. A total that follows unsaved input comes from a server preview through a partial
+  reload ([ADR 0001](../docs/adr/0001-calculations-in-domain-reads-through-read-repositories.md)).
 - Eloquent models live in Infrastructure and never leak into Domain or Application.
 - Time comes from a `Clock` port, so cutoffs are testable.
 
