@@ -34,6 +34,14 @@ it through a read repository, and that the frontend only displays data and trigg
 5. **Vue displays and dispatches.** Pages and components render props and submit user actions. They
    contain no business arithmetic or rules; every amount, total, balance and state flag arrives from
    the server. Formatting for display (currency, dates, pluralisation) stays in the frontend.
+6. **The server sends what the user may do.** Read DTOs carry the allowed actions (`can: { edit,
+   validate, correct, markCollected }`), decided by the domain and the Application gate for the
+   current actor. Vue shows or enables controls from `can`, never from `state === 'draft'` or similar
+   comparisons; the use case still enforces the rule on submit.
+7. **States and kinds are enums with behaviour.** A lifecycle state or kind is a backed enum in the
+   Domain (`BasketState`, `BasketKind`) that answers its own questions (`isEditable()`), instead of
+   string literals compared across the aggregate, its repository and its use cases. Generated types
+   expose it to TypeScript as a union for display only.
 
 ## Considered options
 
@@ -54,5 +62,8 @@ it through a read repository, and that the frontend only displays data and trigg
   cost is one request per pause in typing and a short delay before the figure updates.
 - Read repositories get contract tests against PostgreSQL; they need no in-memory fakes, since the
   Application tests that use them can run against the database.
+- The basket pages today decide editability in Vue (`basket.state === 'draft'` in 13 places in
+  `Finance/Baskets/Show.vue` and 12 in `Member/Baskets/Show.vue`) and Sales compares state strings
+  in `Basket`, `EloquentBasketRepository` and `ValidateBasket`; the basket pilot replaces both.
 - Adoption is incremental: a screen moves to read repositories the next time a feature touches it,
   starting with the basket pages.
