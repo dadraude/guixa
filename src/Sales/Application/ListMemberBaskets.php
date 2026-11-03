@@ -16,6 +16,6 @@ final class ListMemberBaskets
         $householdId = $actor->householdId ?? '';
         Gate::forUser($actor)->authorize('memberOf', ['household', $householdId]);
 
-        return array_map(BasketData::from(...), $this->baskets->listForHousehold($householdId));
+        return array_map(fn ($basket) => BasketData::from($basket, forStaff: false), $this->baskets->listForHousehold($householdId));
     }
 }

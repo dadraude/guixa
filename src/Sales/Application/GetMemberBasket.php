@@ -17,6 +17,6 @@ final class GetMemberBasket
         Gate::forUser($actor)->authorize('memberOf', ['household', $householdId]);
 
         return BasketData::from($this->baskets->getForHousehold($basketId, $householdId)
-            ?? throw BasketNotFound::withId($basketId));
+            ?? throw BasketNotFound::withId($basketId), forStaff: false);
     }
 }

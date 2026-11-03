@@ -183,6 +183,30 @@ final readonly class Basket
             $this->createdBy, $this->createdAt, $this->lines, cancelledBy: $actorId, cancelledAt: $when, kind: $this->kind, sourceOrderId: $this->sourceOrderId, referenceCycleId: $this->referenceCycleId, late: $this->late);
     }
 
+    /** Lines can still be added, removed or re-quantified, and the basket validated. */
+    public function isEditable(): bool
+    {
+        return $this->state->isDraft();
+    }
+
+    /** An independent draft can be cancelled; a weekly one follows its source order instead. */
+    public function canBeCancelled(): bool
+    {
+        return $this->state->isDraft() && ! $this->isWeekly();
+    }
+
+    /** Validated and still holding goods to hand over. */
+    public function isPendingCollection(): bool
+    {
+        return $this->state->isValidated() && ! $this->goodsFullyReversed();
+    }
+
+    /** Validated, but every good was returned: nothing is left to collect. */
+    public function isGoodsReversed(): bool
+    {
+        return $this->state->isValidated() && $this->goodsFullyReversed();
+    }
+
     public function isWeekly(): bool
     {
         return $this->kind->isWeekly();

@@ -7,6 +7,7 @@ import { router } from '@inertiajs/vue3';
 import { installTranslations } from '@/lib/i18n';
 import { reset } from 'laravel-vue-i18n';
 import Show from './Show.vue';
+import { withServerFlags } from '@/testing/basketFlags';
 
 vi.mock('@inertiajs/vue3', async () => {
     const { defineComponent, h } = await import('vue');
@@ -23,41 +24,47 @@ vi.mock('@inertiajs/vue3', async () => {
     };
 });
 
-const basket = {
-    id: 'basket',
-    householdId: 'household',
-    householdName: 'Household K',
-    state: 'draft',
-    stockLines: [],
-    returnLines: [
-        {
-            returnItemId: 'jar',
-            name: 'Glass jar',
-            amountCents: 50,
-            quantity: 1,
-            creditCents: 50,
-        },
-    ],
-    totalCents: -50,
-    effectiveTotalCents: -50,
-    adjustments: [],
-    collectionEvents: [],
-    pendingCollection: true,
-    weeklyLines: [],
-    kind: 'stock',
-    referenceCycleId: null,
-    late: false,
-    balanceCents: 0,
-    projectedBalanceCents: 50,
-    validatedAt: null,
-    collectedAt: null,
-};
+const basket = withServerFlags(
+    {
+        id: 'basket',
+        householdId: 'household',
+        householdName: 'Household K',
+        state: 'draft',
+        stockLines: [],
+        returnLines: [
+            {
+                returnItemId: 'jar',
+                name: 'Glass jar',
+                amountCents: 50,
+                quantity: 1,
+                creditCents: 50,
+            },
+        ],
+        totalCents: -50,
+        effectiveTotalCents: -50,
+        adjustments: [],
+        collectionEvents: [],
+        pendingCollection: true,
+        weeklyLines: [],
+        kind: 'stock',
+        referenceCycleId: null,
+        late: false,
+        balanceCents: 0,
+        projectedBalanceCents: 50,
+        validatedAt: null,
+        collectedAt: null,
+    },
+    'staff',
+);
 
 describe('Finance basket detail', () => {
     it('titles a late weekly basket apart from the base weekly basket (R19)', async () => {
         const html = async (late: boolean) => {
             const app = createSSRApp(Show, {
-                basket: { ...basket, kind: 'weekly', late },
+                basket: withServerFlags(
+                    { ...basket, kind: 'weekly', late },
+                    'staff',
+                ),
                 stockProducts: [],
                 returnItems: [],
             });
@@ -73,12 +80,15 @@ describe('Finance basket detail', () => {
 
     it('shows a never-collected validated basket as pending without history or correction form', async () => {
         const app = createSSRApp(Show, {
-            basket: {
-                ...basket,
-                state: 'validated',
-                collectionEvents: [],
-                collectedAt: null,
-            },
+            basket: withServerFlags(
+                {
+                    ...basket,
+                    state: 'validated',
+                    collectionEvents: [],
+                    collectedAt: null,
+                },
+                'staff',
+            ),
             stockProducts: [],
             returnItems: [],
         });
@@ -98,19 +108,22 @@ describe('Finance basket detail', () => {
         post.mockClear();
         const wrapper = mount(Show, {
             props: {
-                basket: {
-                    ...basket,
-                    state: 'collected',
-                    collectionEvents: [
-                        {
-                            id: 'event-1',
-                            type: 'collected',
-                            recordedBy: 'manager',
-                            occurredAt: '2026-10-30T10:00:00+00:00',
-                            reason: null,
-                        },
-                    ],
-                },
+                basket: withServerFlags(
+                    {
+                        ...basket,
+                        state: 'collected',
+                        collectionEvents: [
+                            {
+                                id: 'event-1',
+                                type: 'collected',
+                                recordedBy: 'manager',
+                                occurredAt: '2026-10-30T10:00:00+00:00',
+                                reason: null,
+                            },
+                        ],
+                    },
+                    'staff',
+                ),
                 stockProducts: [],
                 returnItems: [],
             },
@@ -154,12 +167,15 @@ describe('Finance basket detail', () => {
         post.mockClear();
         const wrapper = mount(Show, {
             props: {
-                basket: {
-                    ...basket,
-                    state: 'validated',
-                    adjustments: [],
-                    effectiveTotalCents: 1200,
-                },
+                basket: withServerFlags(
+                    {
+                        ...basket,
+                        state: 'validated',
+                        adjustments: [],
+                        effectiveTotalCents: 1200,
+                    },
+                    'staff',
+                ),
                 stockProducts: [],
                 returnItems: [],
             },
@@ -239,22 +255,25 @@ describe('Finance basket detail', () => {
     it('renders original and effective totals, correction history and the staff form for a validated basket (R23, R32)', async () => {
         const html = await renderToString(
             createSSRApp(Show, {
-                basket: {
-                    ...basket,
-                    state: 'validated',
-                    totalCents: 1200,
-                    effectiveTotalCents: 1000,
-                    adjustments: [
-                        {
-                            id: 'correction-1',
-                            amountCents: 200,
-                            reason: 'Corrected price',
-                            recordedBy: 'manager',
-                            occurredAt: '2026-10-30T11:00:00+00:00',
-                            lines: [],
-                        },
-                    ],
-                },
+                basket: withServerFlags(
+                    {
+                        ...basket,
+                        state: 'validated',
+                        totalCents: 1200,
+                        effectiveTotalCents: 1000,
+                        adjustments: [
+                            {
+                                id: 'correction-1',
+                                amountCents: 200,
+                                reason: 'Corrected price',
+                                recordedBy: 'manager',
+                                occurredAt: '2026-10-30T11:00:00+00:00',
+                                lines: [],
+                            },
+                        ],
+                    },
+                    'staff',
+                ),
                 stockProducts: [],
                 returnItems: [],
             }),
@@ -296,12 +315,15 @@ describe('Finance basket detail', () => {
     it('keeps validation disabled for an empty draft while leaving cancellation available (S88)', async () => {
         const html = await renderToString(
             createSSRApp(Show, {
-                basket: {
-                    ...basket,
-                    returnLines: [],
-                    totalCents: 0,
-                    projectedBalanceCents: 0,
-                },
+                basket: withServerFlags(
+                    {
+                        ...basket,
+                        returnLines: [],
+                        totalCents: 0,
+                        projectedBalanceCents: 0,
+                    },
+                    'staff',
+                ),
                 stockProducts: [],
                 returnItems: [],
             }),
@@ -316,24 +338,27 @@ describe('Finance basket detail', () => {
 
     it('shows a fully reversed validated basket as nothing to collect, without a collect action (R24a)', async () => {
         const app = createSSRApp(Show, {
-            basket: {
-                ...basket,
-                state: 'validated',
-                pendingCollection: false,
-                effectiveTotalCents: 0,
-                stockLines: [
-                    {
-                        stockProductId: 'oil',
-                        name: 'Olive oil',
-                        unit: 'bottle',
-                        quantity: '3.000',
-                        unitPriceCents: 1200,
-                        amountCents: 3600,
-                        effectiveQuantity: '0.000',
-                        effectiveAmountCents: 0,
-                    },
-                ],
-            },
+            basket: withServerFlags(
+                {
+                    ...basket,
+                    state: 'validated',
+                    pendingCollection: false,
+                    effectiveTotalCents: 0,
+                    stockLines: [
+                        {
+                            stockProductId: 'oil',
+                            name: 'Olive oil',
+                            unit: 'bottle',
+                            quantity: '3.000',
+                            unitPriceCents: 1200,
+                            amountCents: 3600,
+                            effectiveQuantity: '0.000',
+                            effectiveAmountCents: 0,
+                        },
+                    ],
+                },
+                'staff',
+            ),
             stockProducts: [],
             returnItems: [],
         });
@@ -350,22 +375,25 @@ describe('Finance basket detail', () => {
         const post = vi.spyOn(router, 'post');
         const wrapper = mount(Show, {
             props: {
-                basket: {
-                    ...basket,
-                    state: 'validated',
-                    stockLines: [
-                        {
-                            stockProductId: 'oil',
-                            name: 'Olive oil',
-                            unit: 'bottle',
-                            quantity: '3.000',
-                            unitPriceCents: 1200,
-                            amountCents: 3600,
-                            effectiveQuantity: '3.000',
-                            effectiveAmountCents: 3600,
-                        },
-                    ],
-                },
+                basket: withServerFlags(
+                    {
+                        ...basket,
+                        state: 'validated',
+                        stockLines: [
+                            {
+                                stockProductId: 'oil',
+                                name: 'Olive oil',
+                                unit: 'bottle',
+                                quantity: '3.000',
+                                unitPriceCents: 1200,
+                                amountCents: 3600,
+                                effectiveQuantity: '3.000',
+                                effectiveAmountCents: 3600,
+                            },
+                        ],
+                    },
+                    'staff',
+                ),
                 stockProducts: [],
                 returnItems: [],
             },
@@ -391,23 +419,26 @@ describe('Finance basket detail', () => {
 
     it('keeps a basket with returned empties pending when its stock is fully reversed (R24a, S88)', async () => {
         const app = createSSRApp(Show, {
-            basket: {
-                ...basket,
-                state: 'validated',
-                pendingCollection: true,
-                stockLines: [
-                    {
-                        stockProductId: 'oil',
-                        name: 'Olive oil',
-                        unit: 'bottle',
-                        quantity: '1.000',
-                        unitPriceCents: 1200,
-                        amountCents: 1200,
-                        effectiveQuantity: '0.000',
-                        effectiveAmountCents: 0,
-                    },
-                ],
-            },
+            basket: withServerFlags(
+                {
+                    ...basket,
+                    state: 'validated',
+                    pendingCollection: true,
+                    stockLines: [
+                        {
+                            stockProductId: 'oil',
+                            name: 'Olive oil',
+                            unit: 'bottle',
+                            quantity: '1.000',
+                            unitPriceCents: 1200,
+                            amountCents: 1200,
+                            effectiveQuantity: '0.000',
+                            effectiveAmountCents: 0,
+                        },
+                    ],
+                },
+                'staff',
+            ),
             stockProducts: [],
             returnItems: [],
         });

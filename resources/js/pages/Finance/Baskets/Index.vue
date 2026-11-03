@@ -9,10 +9,6 @@ import { euros } from '@/components/pickup/euros';
 import { formatEventDateTime } from '@/lib/locale';
 
 defineProps<{ baskets: App.Http.BasketSummaryRow[] }>();
-const statusOf = (basket: App.Http.BasketSummaryRow) =>
-    basket.state === 'validated' && !basket.pendingCollection
-        ? 'reversed'
-        : basket.state;
 const statusLabels: Record<string, string> = {
     draft: trans('Draft'),
     reversed: trans('Goods fully reversed'),
@@ -66,8 +62,8 @@ const statusLabels: Record<string, string> = {
                 </div>
                 <Badge
                     variant="secondary"
-                    :data-test="`status-${statusOf(basket)}`"
-                    >{{ statusLabels[statusOf(basket)] ?? basket.state }}</Badge
+                    :data-test="`status-${basket.status}`"
+                    >{{ statusLabels[basket.status] ?? basket.status }}</Badge
                 >
                 <span class="pilot-amount">{{ euros(basket.totalCents) }}</span>
             </li>

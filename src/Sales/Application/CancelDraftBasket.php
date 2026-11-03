@@ -19,7 +19,7 @@ final class CancelDraftBasket
         Gate::forUser($actor)->authorize('manage-sales');
         $this->transactions->run(function () use ($basketId, $actor): void {
             $basket = $this->baskets->lock($basketId) ?? throw BasketNotFound::withId($basketId);
-            if (! $basket->state->isDraft() || $basket->isWeekly()) {
+            if (! $basket->canBeCancelled()) {
                 throw BasketNotEditable::create();
             }
             $this->baskets->save($basket->cancelled($actor->accountId, $this->clock->now()));

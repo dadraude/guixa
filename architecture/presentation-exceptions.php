@@ -5,11 +5,6 @@
 // offends. Fix a file, then delete its line here.
 return [
     'A13' => [
-        'resources/js/components/baskets/BasketCollectionHistory.vue',
-        'resources/js/pages/Finance/Baskets/Index.vue',
-        'resources/js/pages/Finance/Baskets/Show.vue',
-        'resources/js/pages/Member/Baskets/Index.vue',
-        'resources/js/pages/Member/Baskets/Show.vue',
         // Starter-kit flash status, not a domain state; leaves when the page receives a flag.
         'resources/js/pages/settings/Profile.vue',
     ],

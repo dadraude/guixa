@@ -10,6 +10,14 @@ readonly householdName: string | null,
 readonly active: boolean,
 readonly invitationPending: boolean,
 };
+export type BasketActionsRow = {
+readonly edit: boolean,
+readonly validate: boolean,
+readonly cancel: boolean,
+readonly markCollected: boolean,
+readonly correct: boolean,
+readonly correctCollection: boolean,
+};
 export type BasketAdjustmentLineRow = {
 readonly stockProductId: string,
 readonly quantityDelta: string,
@@ -49,13 +57,18 @@ readonly stockLines: App.Http.BasketStockLineRow[],
 readonly returnLines: App.Http.BasketReturnLineRow[],
 readonly totalCents: number,
 readonly balanceCents: number,
-readonly projectedBalanceCents: number,
+readonly projectedBalanceCents: number | null,
 readonly validatedAt: string | null,
 readonly collectedAt: string | null,
 readonly effectiveTotalCents: number,
 readonly adjustments: App.Http.BasketAdjustmentRow[],
 readonly collectionEvents: App.Http.BasketCollectionEventRow[],
 readonly pendingCollection: boolean,
+readonly can: App.Http.BasketActionsRow,
+readonly status: string,
+readonly settled: boolean,
+readonly collected: boolean,
+readonly weekly: boolean,
 readonly weeklyLines: App.Http.BasketWeeklyLineRow[],
 readonly kind: string,
 readonly referenceCycleId: string | null,
@@ -78,6 +91,7 @@ readonly state: string,
 readonly totalCents: number,
 readonly createdAt: string,
 readonly pendingCollection: boolean,
+readonly status: string,
 };
 export type BasketWeeklyLineRow = {
 readonly productId: string,
@@ -390,6 +404,13 @@ declare namespace Guixa {
 namespace Ordering {
 namespace Domain {
 export type PickupStatus = 'none' | 'pending' | 'nothing_to_collect' | 'completed' | 'not_collected';
+}
+}
+namespace Sales {
+namespace Domain {
+export type BasketKind = 'stock' | 'weekly';
+export type BasketLineKind = 'stock' | 'return' | 'weekly';
+export type BasketState = 'draft' | 'validated' | 'collected' | 'cancelled' | 'nothing_to_collect';
 }
 }
 namespace Shared {
