@@ -14,9 +14,9 @@ Weekly base and independent stock baskets, actual contents, validation, global W
   most one unvalidated weekly draft per cycle, and later late arrivals add to it.
   Finance or Manager can create additional stock baskets for any active household, including one
   without a weekly order, at any time and without requiring an open or settled cycle.
-  A supplement originating from a collection can reference that original cycle, even if already closed;
-  independent purchases may have no cycle. The reference groups sales and container counts and does not
-  reopen the cycle, block closure, duplicate the weekly contents or backdate movements.
+  While a basket is not validated, additions go to it; once validated, anything added creates a new
+  independent basket with no cycle attribution, which does not reopen the cycle, block closure,
+  duplicate the weekly contents or backdate movements.
 - **R19a** **Draft contents and access.** Only Finance or Manager creates/edits stock basket drafts, adjusts actual weekly quantities and
   adds/removes stock and return lines. Preserve ordered quantities separately; actual quantities obey
   the source product's whole-unit/0.001 step and may be zero for weekly lines. Members can consult
@@ -76,8 +76,7 @@ Weekly base and independent stock baskets, actual contents, validation, global W
   A full justified contents reversal leaves no effective goods pending physical collection.
 - **R24b** **Weekly closure.** A cycle closes once settled, every participating reception is distributed and every base and late weekly
   basket is validated or has nothing to collect. Physical collection is independent and remains actionable after
-  closure. Supplementary/cycleless stock baskets never gate weekly closure. A reference from a later
-  stock purchase does not permit reopening or editing frozen weekly orders/receptions.
+  closure. Supplementary/cycleless stock baskets never gate weekly closure.
 
 ## Acceptance scenarios
 
@@ -196,7 +195,7 @@ Then the sale and charge belong to that basket without a cycle, and collection r
 **S80 — Late supplementary basket** (R19, R22, R23b, R24b)
 Given the weekly basket is validated and its cycle closed
 When a member collects next day, reports extra honey taken, and Finance records a separate honey basket
-with the original cycle reference, validates it and marks it collected
+with no cycle, validates it and marks it collected
 Then the original basket/charge and cycle closure are unchanged, the new basket charges/sells honey once,
 and its recording date is not the old planned pickup date.
 
@@ -259,8 +258,4 @@ Given H's base is validated and its late weekly basket draft holds 1 kg cherries
 When strawberries received as 0 arrive and the manager reopens their producer and allocates 1 kg to H
 Then they are added to that late draft; H still has two weekly baskets and one charge per validation.
 
-**S90 — Supplementary containers retain cycle attribution** (R18a, R19, R24b)
-Given a weekly basket with 2 containers and a later stock supplement with 1 container referring to its closed cycle
-When the cycle's container summary is read
-Then the household/cycle count is 3 without reopening the cycle
-And an unrelated stock basket without a cycle has its own count and is not attributed to that cycle.
+**S90 — retired (see history entry)**

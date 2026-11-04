@@ -97,43 +97,35 @@ Checkpoints bound feedback latency; source-specific scope must be reassessed bef
 
 ## T60
 
-**Late supplements and container attribution.** Staff can open another basket from an existing
-collection, including a basket collected the next day after its weekly cycle closed.
+**Household container balance.** Each household has an accumulated balance of containers it still has
+to return, across all its baskets and days. Validating a basket adds; return lines reduce. A late
+addition after validation is simply a new independent basket with no cycle.
 
-Source: [Basket sources](../plan.md#basket-aggregate-and-history),
-[collection](../plan.md#collection-and-corrections), R18a/R19/R24b.
+Source: [Basket sources](../plan.md#basket-aggregate-and-history), R18a/R19/R24b.
 
 Acceptance:
 
-- Supplement carries only newly chosen stock/return contents, not copied weekly lines. Optional
-  origin cycle is server-verified attribution, not an open/settled gate or an exclusive cycle mutation
-  lock. Multiple baskets per household/cycle are valid; cycleless purchases remain valid too. Cancelling a referenced pre-send cycle leaves an independent
-  stock basket and its posted movements intact (R4b); attribution never imports weekly cancellation.
-- For goods taken earlier and reported later, create/validate/collect with current recorded actor/time,
-  preserving origin attribution without backdating/reopening the cycle. Insufficient recorded stock
-  requires the existing justified Manager inventory process; Finance cannot bypass it.
-- Per-basket/household and cycle container counts use effective weekly/stock snapshots, ceil per line;
-  returns excluded. Before the base exists use allocations. Later attributed supplements update the
-  closed cycle's counts; cycleless baskets count only for themselves.
+- Additions go to a basket while it is not validated; once validated, anything added creates a new
+  independent basket with no cycle reference. For goods taken earlier and reported later, create,
+  validate and collect with the current recorded actor/time, without backdating or reopening a cycle.
+  Insufficient recorded stock requires the existing justified Manager inventory process; Finance
+  cannot bypass it.
+- The balance is derived: effective validated weekly/stock lines add quantity × snapshotted containers
+  per unit, ceil per line; validated return lines reduce it. No money movement is added (the container
+  price is already in the product price).
+- Open question to settle before coding: a return larger than the balance is shown to the Manager and
+  its handling is undecided.
 
-Verify S80/S90 and updated S60 with late physical pickup then stock, cycleless purchases, multiple
-supplements and corrected effective quantities. PostgreSQL interleaving must prove an attributed stock
-sale and weekly validation cannot invert cycle/product locks via foreign-key key-share locks; use the
-plan's compatible stable-key cycle lock and ordered product locks. Test origin access/identity server-side.
+Verify S60 (per household), S80 and S92 with late physical pickup then a new independent basket, multiple
+baskets and corrected effective quantities. Test household scoping server-side.
 
-Ownership: Sales create-from-collection flow, attribution and count queries/adapters, Ordering cycle
-counts and Finance basket links. Reuse staff list/detail and cycle summary components with no new weekly
-order/session requirement. This supplements the T55 purchase tracer rather than adding a second sale path.
+Ownership: Sales balance read query/adapter, Ordering's container summary consumer and Finance basket
+links. Reuse staff list/detail components. This supplements the T55 purchase tracer rather than adding
+a second sale path. Focused checks: Sales public queries, persistence, role HTTP and real button interaction.
+Dependency reason: T59 supplies validated weekly baskets; T31 supplies container snapshots.
 
-
-First checkpoint: create one supplement from a closed collection via HTTP, validate/collect it, and
-read the exact combined count (S90: 2 + 1 = 3) without reopening. Then prove attribution identity,
-cycleless exclusion, cancellation independence and the PostgreSQL lock interleaving.
-Keep attribution and count integration together: exposing supplementary goods while the established
-container summary omits them would be an incorrect intermediate result. Existing `GetContainerCount`
-and pickup forms are reuse candidates; Sales attribution/count adapters are planned per the plan.
-After T59 for weekly source/current counts and T31 for retained container rules. Rough size 400–800
-authored lines, low confidence; no flag or layer-only task. T67 owns persistent pending badges.
+Size/rollout: roughly 150-350 authored lines, low confidence. No flag. Pending lists/dashboard/cycle
+badges stay in T67.
 
 ## T61
 
@@ -169,7 +161,7 @@ Pending lists/dashboard/cycle badges move to T67; this task does not require sup
 **Keep pending collection visible across pages and cycle closure.**
 
 Staff and members continue to see outstanding collections after the planned date and weekly closure,
-including cycleless purchases and attributed supplements, without reopening or charging them again.
+including cycleless purchases, without reopening or charging them again.
 
 Source: [Sales interface](../plan.md#sales), R24/R24b, S42/S54/S83.
 
@@ -179,7 +171,7 @@ Done when:
   validated effective outstanding goods remain visible, ordered by validation time/UUID. Members see
   only their current household; Finance/Manager sees all. Draft means preparation, not pending collection.
 - Dashboard and basket list use narrow Sales summaries; cycle list/detail show persistent count/link
-  including attributed supplements. Collection removes the pending item without reopening/recharging.
+  of weekly baskets. Collection removes the pending item without reopening/recharging.
   Full content reversal and corrected collection consume T68/T66 effective state; history remains accessible.
 - Preserve unrelated dashboard cards; do not revive feature-002 dashboard scope. Verify populated,
   empty, late/closed, long-name and role states with exact counts/status/actions before geometry.
@@ -188,10 +180,10 @@ First checkpoint: one closed-cycle pending basket appears with the correct count
 collection removes it while the cycle stays closed and ledger is unchanged. Widen the same query to
 dashboard/list and role cases; include source-scoped HTTP privacy and PostgreSQL reads.
 Paths: Sales pending queries/adapters (planned per plan), existing Dashboard, cycle list/detail and
-basket views, T60 attribution/count data and T61 collection action. Reuse layouts/navigation.
+basket views, T61 collection action. Reuse layouts/navigation.
 Focused checks: pending query/HTTP and membership regressions, dashboard/cycle/basket components,
 translations, exact effective-count fixtures. Related: DRA-202/DRA-203 as context only, never blockers.
-Dependency reasons: T60 supplies weekly plus supplement attribution; T61 supplies member collection
+Dependency reasons: T60 supplies independent baskets; T61 supplies member collection
 and transitively T66 corrected collection. T60/T59/T68 supply effective goods quantities.
 
 Size/rollout: roughly 400–800 authored lines, low confidence. One shared pending query must feed its
@@ -247,6 +239,8 @@ Source: [Context map](../plan.md#bounded-contexts), [Persistence](../plan.md#per
 
 Acceptance:
 
+- Drop column `baskets.reference_cycle_id` (created by an earlier migration) in the contract stage, with
+  its foreign key and any index; baskets carry no cycle reference of their own.
 - Remove Stock's duplicate product entity/table/metadata, Ordering stock/return/actual/pickup/charge
   ownership and obsolete adapters/helpers/tests of replaced behavior. Active commands/routes cannot
   invoke `CompletePickup`, charge-on-collection or automatic not-collected charging.
@@ -291,7 +285,7 @@ its original baseline remains historical. The accepted scope was published with 
 
 Acceptance:
 
-- Audit all 65 requirements and S1–S91 against meaningful assertions through the appropriate public
+- Audit all 65 requirements and S1–S92 (S90 retired) against meaningful assertions through the appropriate public
   seams, using [coverage allocation](coverage.md) as responsibility, not proof. Read assertions and
   failure boundaries, fill confirmed gaps without changing accepted behavior; identifier presence alone
   never establishes coverage. Include source/stock/Wallet concurrency, permissions and retained history.

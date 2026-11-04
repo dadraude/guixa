@@ -105,7 +105,7 @@ preserves; implement changed behavior through T52–T68. Existing issue IDs keep
 | T30 | <a id="t30"></a>[Pickup resolution and redistribution](tasks/baseline.md#t30) | [Retained scope](tasks/baseline.md#t30) | T29 |
 | T31 | <a id="t31"></a>[Container counts](tasks/baseline.md#t31) | [Retained scope](tasks/baseline.md#t31) | T29, T20 |
 | T32 | <a id="t32"></a>[Household deactivation and to-settle list](tasks/baseline.md#t32) | [Retained scope](tasks/baseline.md#t32) | T07, T30 |
-| T33 | <a id="t33"></a>[Current traceability audit and feature closure](tasks/weekly-and-collection.md#t33) | All 65 R# and S1–S91; semantic test audit | T02, T14, T17, T19, T31, T32, T34, T35, T36, T37, T38, T42, T44, T46, T48, T50, T51, T63 |
+| T33 | <a id="t33"></a>[Current traceability audit and feature closure](tasks/weekly-and-collection.md#t33) | All 65 R# and S1–S92 (S90 retired); semantic test audit | T02, T14, T17, T19, T31, T32, T34, T35, T36, T37, T38, T42, T44, T46, T48, T50, T51, T63 |
 | T34 | <a id="t34"></a>[First manager installation command](tasks/baseline.md#t34) | [Retained scope](tasks/baseline.md#t34) | T06 |
 | T35 | <a id="t35"></a>[Cancelled cycle summary](tasks/baseline.md#t35) | [Retained scope](tasks/baseline.md#t35) | T17, T20 |
 | T36 | <a id="t36"></a>[Remaining app-wide Catalan translations](tasks/baseline.md#t36) | [Retained scope](tasks/baseline.md#t36) | T38 |
@@ -132,10 +132,10 @@ preserves; implement changed behavior through T52–T68. Existing issue IDs keep
 | T57 | <a id="t57"></a>[Validate return-only and mixed stock-return baskets](tasks/sales.md#t57) | R19b, R20a, R21, R22, R24a; S41, S53 (returns), S88 (real contents) | T56 |
 | T58 | <a id="t58"></a>[Append amount-only basket corrections](tasks/sales.md#t58) | R23, R31, R32; amount-only correction invariants; S85 regression | T64, T65 |
 | T59 | <a id="t59"></a>[Weekly basket cutover and redistribution](tasks/weekly-and-collection.md#t59) | R4, R12a, R18, R19, R19a, R22–R24b; S9, S14–S16 (weekly), S19 (validation), S20, S27–S30, S39, S40, S42, S46, S47, S53, S54, S61, S63, S64, S78, S83 (closure), S88 (no contents), S89, S91 | T68, T66, T23, T30 |
-| T60 | <a id="t60"></a>[Late supplements and container attribution](tasks/weekly-and-collection.md#t60) | R18a, R19, R24b; S60, S80, S90 | T59, T31 |
+| T60 | <a id="t60"></a>[Household container balance](tasks/weekly-and-collection.md#t60) | R18a, R19, R24b; S60, S80, S92 | T59, T31 |
 | T61 | <a id="t61"></a>[Collect an own-household validated basket](tasks/weekly-and-collection.md#t61) | R19a, R23a, R23b, R35; S26 (action), S82 | T66 |
 | T62 | <a id="t62"></a>[Household obligations across lifecycle changes](tasks/weekly-and-collection.md#t62) | R35, R35a, R36b; S43, S58, S59 | T59, T32 |
-| T63 | <a id="t63"></a>[Remove superseded pickup ownership and schema](tasks/weekly-and-collection.md#t63) | Plan: final context/schema/route contracts; S1–S91 regression boundary | T54, T67, T62 |
+| T63 | <a id="t63"></a>[Remove superseded pickup ownership and schema](tasks/weekly-and-collection.md#t63) | Plan: final context/schema/route contracts; S1–S92 regression boundary (S90 retired) | T54, T67, T62 |
 | T64 | <a id="t64"></a>[Record and correct confirmed global receipts](tasks/sales.md#t64) | R21, R29–R32, R36c; S19 (receipt), S24, S84 (receipts), S85 | T56 |
 | T65 | <a id="t65"></a>[Read own-household basket contents and status](tasks/sales.md#t65) | R19a, R21, R23a, R24a, R31, R35; own-household read and privacy invariants | T55, T38 |
 | T66 | <a id="t66"></a>[Correct collection marks without financial effects](tasks/sales.md#t66) | R23b, R24a; collection correction, history and replay invariants | T56, T65 |
@@ -180,7 +180,7 @@ links to feature-002 dashboard data tasks DRA-202/DRA-203 supply context; they a
 and this publication implements no feature-002 work.
 
 [T33 / DRA-183](https://linear.app/draude/issue/DRA-183/t33-traceability-check-and-close-feature-001) now describes the semantic audit of all 65 requirements
-and S1–S90. Its 11 existing native blockers remain: T38/DRA-194, T37/DRA-195, T36/DRA-205,
+and S1–S92 (S90 retired). Its 11 existing native blockers remain: T38/DRA-194, T37/DRA-195, T36/DRA-205,
 T42/DRA-193, T35/DRA-187, T32/DRA-182, T19/DRA-174, T31/DRA-181, T14/DRA-168,
 T17/DRA-170 and T34/DRA-158. Added blockers: T02/DRA-151, T44/DRA-198, T46/DRA-200
 and T63/DRA-218, giving 15 native blockers. Identity, title, project, Todo status, milestone,

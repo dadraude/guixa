@@ -85,7 +85,6 @@ erDiagram
     BASKET {
         uuid householdId
         uuid sourceOrderId
-        uuid referenceCycleId
         enum state "draft or validated or cancelled or nothingToCollect"
         ts validatedAt
         money validatedTotal
@@ -104,7 +103,7 @@ erDiagram
 ```
 
 A source order is required only for the automatic weekly base. A stock-only basket can have neither
-order nor cycle; a supplement can reference its origin cycle without another copy of weekly contents.
+order nor cycle.
 Member is derived from the household link, not stored in ACCOUNT_ROLE. Removed/cancelled source
 records remain for first-use evidence; no separate used-product marker is added.
 
@@ -116,7 +115,7 @@ flowchart TB
     P[Manager sends producer totals]
     R[Manager receives, allocates and distributes]
     D[Sales creates one base draft per household order]
-    S[Finance or Manager creates extra stock basket<br/>any time, with optional origin cycle]
+    S[Finance or Manager creates extra stock basket<br/>any time, no cycle]
     E[Finance or Manager checks actual quantities<br/>and adds stock or return lines]
     V[Validate basket<br/>confirm contents and check stock]
     A[One local transaction<br/>save validation, stock sale and Wallet charge or credit]

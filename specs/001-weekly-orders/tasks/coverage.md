@@ -24,7 +24,7 @@ semicolon identify retained work; the amendment owner implements the stated chan
 | [R3c](../ordering.md) | [T15](../tasks.md#t15); [T52](../tasks.md#t52) (weekly only) |
 | [R4](../ordering.md) | [T11](../tasks.md#t11); [T55](../tasks.md#t55)/[T59](../tasks.md#t59) (purchase/validation boundary) |
 | [R4a](../ordering.md) | [T11](../tasks.md#t11)/[T14](../tasks.md#t14) |
-| [R4b](../ordering.md) | [T17](../tasks.md#t17); [T53](../tasks.md#t53) (archive), [T60](../tasks.md#t60) (independent attributed baskets) |
+| [R4b](../ordering.md) | [T17](../tasks.md#t17); [T53](../tasks.md#t53) (archive), [T60](../tasks.md#t60) (independent baskets) |
 | [R4c](../ordering.md) | [T11](../tasks.md#t11) |
 | [R5](../ordering.md) | [T08](../tasks.md#t08)/[T11](../tasks.md#t11) |
 | [R6](../ordering.md) | [T12](../tasks.md#t12) |
@@ -176,8 +176,9 @@ behavior and verify its regression through the new final contracts, not that the
 | [S87 — Retained references establish use](../pickup.md) | — | [T53](../tasks.md#t53) (orders), [T55](../tasks.md#t55) (baskets) |
 | [S88 — Returns, zero total and no contents](../pickup.md) | — | [T57](../tasks.md#t57) (returns/real contents), [T59](../tasks.md#t59) (weekly empty) |
 | [S89 — Validation, not collection, freezes a basket](../pickup.md) | — | [T59](../tasks.md#t59) |
-| [S90 — Supplementary containers retain cycle attribution](../pickup.md) | — | [T60](../tasks.md#t60) |
+| S90 — retired | — | — |
 | [S91 — Successive late arrivals share one open draft](../pickup.md) | — | [T59](../tasks.md#t59) |
+| [S92 — Container balance accumulates per household](../reception.md) | — | [T60](../tasks.md#t60) |
 
 ## Required checks beyond scenario identifiers
 
@@ -190,7 +191,6 @@ behavior and verify its regression through the new final contracts, not that the
 | Amount-only corrections; physical stock/money atomicity, originals and replay | T58 / T68; T59 weekly integration |
 | Collection correction with retained history and no financial effects | T66 |
 | Settlement/source-sync/validation lock, immutable financial freeze, effective redistribution | T59 |
-| Attributed stock insert versus weekly cycle/product lock interleaving | T60 |
 | Current own-household reads, duplicate collection and late/closed indicators | T65 / T61 / T67; T62 lifecycle |
 | Fresh final schema, no duplicate metadata/financial writers or retired live routes | T63 |
 | Semantic R#/S# audit, T36 and visual integration, exact-candidate CI | T33 |

@@ -8,7 +8,7 @@ R20, R25).
 Revised and accepted (2026-10-28): every product belongs to a producer and is either weekly or stock;
 Sales baskets separate actual purchases, validation and physical collection from weekly demand.
 Finance operates baskets and manual receipts; retained history establishes first use. Requirements
-R1–R36c and scenarios S1–S91 include this amendment. The amended plan and [task breakdown](tasks.md) are accepted (2026-10-28).
+R1–R36c and scenarios S1–S92 (S90 retired) include this amendment. The amended plan and [task breakdown](tasks.md) are accepted (2026-10-28).
 
 Households order products from local producers every week, with a planned pickup date. After each
 producer closes, a manager sends it the order, checks the delivery and allocates goods to households.
