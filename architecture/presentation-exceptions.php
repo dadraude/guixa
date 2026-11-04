@@ -11,10 +11,7 @@ return [
     'A14' => [
         'resources/js/lib/orderTotal.ts',
     ],
-    'A15' => [
-        'src/Sales/Application/BasketLineData.php',
-        'src/Sales/Application/BasketWeeklyLineData.php',
-    ],
+    'A15' => [],
     'A16' => [
         'app/Http/Controllers/DashboardController.php',
         'app/Http/Controllers/Finance/BasketController.php',

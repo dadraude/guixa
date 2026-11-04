@@ -5,6 +5,7 @@ namespace Guixa\Sales\Domain;
 use DateTimeImmutable;
 use DomainException;
 use Guixa\Sales\Domain\Error\InvalidBasketCollectionCorrection;
+use Guixa\Shared\Domain\Money;
 use Guixa\Shared\Domain\Quantity;
 
 final readonly class Basket
@@ -84,6 +85,20 @@ final readonly class Basket
     {
         return ($this->validatedTotalCents ?? $this->totalCents())
             - array_sum(array_map(fn (BasketAdjustment $adjustment) => $adjustment->amountCents, $this->adjustments));
+    }
+
+    /** The effective quantity of a line as decimal text, e.g. "1.250". */
+    public function effectiveQuantityText(BasketLine $line): string
+    {
+        return Quantity::ofThousandths($this->effectiveQuantity((string) $line->productId))->toString();
+    }
+
+    /** The line's unit price times its effective quantity, in cents. */
+    public function effectiveAmountCents(BasketLine $line): int
+    {
+        $effective = Quantity::ofThousandths($this->effectiveQuantity((string) $line->productId));
+
+        return Money::ofCents($line->priceCents)->multiply($effective)->cents;
     }
 
     /** Original active quantity plus signed corrections, in thousandths. */
