@@ -41,7 +41,7 @@ records the decision evidence and publication delta, not a second execution regi
 | T57 / DRA-212 | Return-only/mixed basket validation | T65 owns member reads; stock rules already in T55 remain regressions, not duplicate work |
 | T58 / DRA-213 | Amount-only basket correction | T68 owns physical stock/effective quantity correction and S86; T66 owns collection-mark correction |
 | T59 / DRA-214 | Retain atomic weekly cutover | All source-sync, validation, redistribution, closure, readers and old-writer disabling remain together; three checkpoints bound feedback |
-| T60 / DRA-215 | Retain supplements plus container counts | S90 requires an attributed supplement to update the count; deferring counts would give a wrong intermediate summary |
+| T60 / DRA-215 | Retain the household container balance | S92 accumulates validated baskets and return lines per household; splitting them would give a wrong intermediate balance |
 | T61 / DRA-216 | Member collection action | T67 owns persistent pending query/list/dashboard/cycle indicators |
 | T62 / DRA-217 | Retain lifecycle warning plus resolution/access behavior | Separate warnings and resolution would disagree about whether obligations remain actionable |
 | T63 / DRA-218 | Retain final mechanical contract cleanup | Retired source, schema, permissions and readers are removed coherently after all consumers migrate |

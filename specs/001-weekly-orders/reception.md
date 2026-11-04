@@ -63,7 +63,7 @@ Checking each producer's delivery against the orders, allocating it to household
   adds each effective weekly/stock line's quantity × snapshotted containers per unit, rounded up per
   line; a product without containers adds 0. The container price is already in the product price, so
   the balance is a pure count and creates no money movement. A return line (R20) reduces the balance
-  by its containers. Before a base draft exists, a household's expected containers can be shown from
+  by its containers. The balance may be negative, like the Wallet; a return is never rejected for exceeding it. Before a base draft exists, a household's expected containers can be shown from
   allocations and their product snapshots, but they do not enter the balance until validation.
 
 ## Acceptance scenarios
@@ -158,6 +158,8 @@ Given H has no containers pending and no cycle is involved in the reading
 When H's basket with 3 containers is validated, then a return line of 2 containers is validated,
 and later a new independent basket with 1 container is validated
 Then H's balance is 3, then 1, then 2, and no cycle attribution is needed to read it.
+When a later basket validates a return line of 4 containers
+Then H's balance is −2 and the return is accepted.
 
 **S63 — A validated basket blocks redistribution of its product** (R18, R23)
 Given 2 kg beef was received and distributed 1 kg each, A's basket is validated at 1 kg and €20/kg,

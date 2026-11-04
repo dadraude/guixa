@@ -180,7 +180,7 @@ links to feature-002 dashboard data tasks DRA-202/DRA-203 supply context; they a
 and this publication implements no feature-002 work.
 
 [T33 / DRA-183](https://linear.app/draude/issue/DRA-183/t33-traceability-check-and-close-feature-001) now describes the semantic audit of all 65 requirements
-and S1–S90. Its 11 existing native blockers remain: T38/DRA-194, T37/DRA-195, T36/DRA-205,
+and S1–S92 (S90 retired). Its 11 existing native blockers remain: T38/DRA-194, T37/DRA-195, T36/DRA-205,
 T42/DRA-193, T35/DRA-187, T32/DRA-182, T19/DRA-174, T31/DRA-181, T14/DRA-168,
 T17/DRA-170 and T34/DRA-158. Added blockers: T02/DRA-151, T44/DRA-198, T46/DRA-200
 and T63/DRA-218, giving 15 native blockers. Identity, title, project, Todo status, milestone,
