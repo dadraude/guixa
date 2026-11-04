@@ -1,6 +1,6 @@
 # 001 — Weekly orders · Plan
 
-Status: Accepted (2026-10-21) · Spec: [spec.md](spec.md) + areas (R1–R36c, S1–S91) · Rules: [constitution](../constitution.md)
+Status: Accepted (2026-10-21) · Spec: [spec.md](spec.md) + areas (R1–R36c, S1–S92) · Rules: [constitution](../constitution.md)
 
 Accepted amendment (2026-10-24): **Application visual identity** below. The user approved the plan;
 the associated tasks were separately approved. The user subsequently authorized T39 implementation
@@ -49,9 +49,9 @@ schema directly, without a legacy import, data backfill or compatibility layer.
 
 This is a modular monolith: one application and database, with context-local domain models.
 A weekly `Order` represents household demand and allocation; a `Basket` represents the goods actually
-sold. A stock basket need not reference any weekly order or cycle. A supplementary stock basket
-created from a collection can reference its original cycle, including a closed one, for grouping
-and container counts. That reference neither authorizes the sale nor changes cycle state.
+sold. A stock basket need not reference any weekly order or cycle. A basket added after a validated one is a
+new independent basket with no cycle attribution. Containers are counted per household, not per cycle
+(see the household container balance).
 
 ```text
 Ordering -> Catalog       ProductCatalog / ProducerCutoffRules (weekly products only)
@@ -320,7 +320,7 @@ constructor cycle. Stock-only validation does not call Ordering readiness/closur
 | `GetProducerCycleSummary`, `GetCycleSummary` | Own producer / Manager, with existing privacy and cancellation rules |
 | `GetReception`, `AddUnorderedProduct`, `SetReceivedTotal`, `SetAllocation` | Manager; weekly only; existing sent/editable/quantity guards |
 | `ValidateReception`, `MarkProducerDistributed`, `ReopenProducerOrder` | Manager; existing balance guards and closed-cycle restriction |
-| `GetContainerCount` | Manager; combine Sales effective weekly/stock lines of baskets attributed to this cycle |
+| `GetContainerCount` | Manager; read each household's accumulated container balance from Sales (validated lines minus return lines), not per cycle |
 | `HasUnsettledLines`, `HasProductHistory`, `StopParticipatingWhereNotSent` | Internal queries/command for Catalog; history includes cancelled/removed records |
 | `GetWeeklyBasketSource`, `LockWeeklyBasketSource`, `CloseCycleAfterBasketValidation` | Internal Sales interface; snapshots/readiness/closure only |
 
@@ -334,12 +334,16 @@ validate/distribute through the scheduler and common settlement (D10).
 ### Basket aggregate and history
 
 `Basket` is independent of `Order`: id, householdId, optional sourceOrderId (base weekly basket),
-optional referenceCycleId, draft/validated/cancelled/nothing-to-collect state, creation/validation
+draft/validated/cancelled/nothing-to-collect state, creation/validation
 actor/time and the immutable validated total. A base basket is unique per source order; any number of
 stock-only baskets can exist for a household without a source order or cycle.
-A weekly base uses its source cycle. A stock supplement created from a collection carries that cycle
-as attribution, even after closure. A standalone purchase may carry no cycle. It never imports the
-weekly contents again and does not reopen/gate the referenced cycle.
+A weekly base uses its source cycle through its source order. Any other basket, including one added
+after a validated basket, has no cycle. It never imports the weekly contents again.
+
+The household container balance is a derived read model, not a stored duplicate: per household, the sum
+over validated basket lines of the effective quantity × snapshotted containers per unit (rounded up per
+line), minus the containers of validated return lines. It is not grouped by cycle and creates no money
+movement; the container price is already in the product price.
 
 Lines have their own stable ids and kind: weekly, stock or return. Weekly lines retain source line id,
 ordered/allocated snapshot and actual quantity; stock lines reference the single Catalog product;
@@ -364,7 +368,7 @@ or a zero net total with real contents can still be validated. A return-only bas
 `ValidateBasket` is the public Sales Application use case. Within one `TransactionRunner`:
 
 1. Authorize Finance/Manager. For a weekly source, acquire its cycle/source lock and require settlement
-   with the latest synchronized source. Stock-only baskets need no cycle, even if attribution references one.
+   with the latest synchronized source. Stock-only baskets need no cycle.
 2. Lock/reload the basket, reject cancelled/already-validated drafts, and validate its effective contents.
    Original weekly snapshots are retained; actual quantities determine the charge. Reject stale source edits
    rather than applying a view of allocation that changed concurrently.
@@ -391,7 +395,7 @@ receipts and the global Wallet remain independent. Delayed collection stays pend
 date and after cycle closure; there is no date-based abandonment or automatic stock return/refund.
 
 When goods were already taken and reported later, staff creates the stock basket, keeps the recording
-instant, validates it and records collection. The origin cycle is attribution, not backdating. If stock
+instant, validates it and records collection. The sale is never backdated to a cycle. If stock
 records do not permit the sale, reconcile the inventory discrepancy through the existing justified
 inventory process before validating; do not allow negative stock to bypass R27.
 
@@ -431,7 +435,7 @@ another event or sequence number.
 | Use cases / queries | Actor and purpose |
 | --- | --- |
 | `CreateWeeklyBasket`, `SyncWeeklyBasket` | Internal Ordering calls; idempotent source order, authoritative allocation snapshots |
-| `CreateStockBasket` | Finance/Manager; active household; optional origin-cycle attribution |
+| `CreateStockBasket` | Finance/Manager; active household; no cycle |
 | `SetBasketActualQuantity`, `AddStockToBasket`, `RemoveStockFromBasket`, `AddReturnToBasket`, `RemoveReturnFromBasket` | Finance/Manager; draft only; archive removed references |
 | `CancelDraftBasket` | Finance/Manager; stock-only draft, no money/stock effect; retain history |
 | `ValidateBasket` | Finance/Manager; single charge/stock transaction |
@@ -444,9 +448,8 @@ another event or sequence number.
 | `HasProductHistory`, `ReadOpenHouseholdBaskets`, `ReadWeeklyBasketStates`, `ReadEffectiveWeeklyQuantities`, `ReadContainerCounts` | Internal Catalog/Ordering/Membership queries; include history only where requested |
 
 Pending collection lists are ordered by validation instant, then UUID; monetary movement lists keep
-their existing recorded-time/id ordering. Grouping by an origin cycle never hides a basket because
-that cycle closed. Per-basket container totals sum rounded-up line snapshot counts; per-cycle totals
-include all attributed base/supplementary baskets, with independent baskets counted on their own.
+their existing recorded-time/id ordering. Per-basket container totals sum rounded-up line snapshot counts; the household balance sums validated
+baskets of any day and subtracts return lines.
 In T54, `ListStockOffers` composes Catalog's `ListStockOfferProducts` metadata with Stock's
 `GetAvailableQuantities` through Sales-owned read ports. One quantity batch supplies current
 availability, with zero for products without movements. This discovery query has no basket,
@@ -536,7 +539,7 @@ All ids are UUID v7; money is integer cents, quantities numeric(10,3), times tim
 | `cycles`, `cycle_producers`, `product_unavailabilities`, `received_totals` | Existing cycle/cutoff/reception model; weekly-product eligibility enforced through use cases |
 | `orders` | id, cycle_id, household_id, cancelled_at?; unique(cycle_id, household_id); no pickup/charge columns |
 | `order_lines` | Existing weekly snapshot/ordered/allocated/manual/creation fields plus removed_at?; no delivered column; one active line per order/product using a partial unique index |
-| `baskets` | id, household_id, source_order_id?, reference_cycle_id?, kind weekly/stock, state, created/validated/cancelled actor/time, validated_total_cents?; source order unique when present; source/household consistency checked at creation |
+| `baskets` | id, household_id, source_order_id?, kind weekly/stock, state, created/validated/cancelled actor/time, validated_total_cents?; source order unique when present; source/household consistency checked at creation |
 | `basket_lines` | id, basket_id, kind weekly/stock/return, product_id? or return_item_id?, source_order_line_id?, product/return snapshot, ordered/allocated snapshot?, actual quantity, removed_at?; kind-specific checks and one active source/item per basket |
 | `basket_adjustments` | id, basket_id, original line/source reference, signed quantity/amount/stock delta or target, reason, actor/time; append-only, unique correction source; validated original fields remain unchanged |
 | `basket_collection_events` | id, basket_id, collected/corrected-to-pending event, actor/time, reason on corrections; append-only; derived current collection state |
@@ -562,13 +565,7 @@ Concurrency and atomicity:
 - Weekly mutations lock their stable-key source cycle with `FOR NO KEY UPDATE` before affected
   orders/baskets; acquire multiple ids in stable order. Existing weekly line-edit guards use a
   conflicting shared/mutation lock so cutoff/send cannot race an order edit. Cycle ids never change.
-  Stock-only operations do not acquire an exclusive lock on an unrelated attribution cycle.
-  Keep cycle mutation locks compatible with the key-share locks needed by referencing inserts:
-  otherwise a stock supplement holding a product lock while inserting a cycle FK can deadlock with
-  weekly validation holding that cycle and waiting for the product. Stronger key-changing/deletion
-  operations are absent from this retained-history model. Check the attributed-sale/weekly-validation
-  interleaving explicitly against PostgreSQL's row-lock compatibility rules.
-  [PostgreSQL row locks](https://www.postgresql.org/docs/current/explicit-locking.html).
+  Stock-only operations do not acquire any cycle lock: they carry no cycle reference.
 - Source synchronization and weekly basket validation serialize on that source-cycle lock, preventing
   validation of stale allocation or closure during unfinished distribution.
 - Lock a basket before its state-changing operations. Product first-reference writes and catalogue
@@ -614,9 +611,8 @@ CRUD is delivered. Existing producer privacy and member household scoping remain
 Persistent pending-collection indication:
 - Member Dashboard and basket list show their own validated pending baskets, including closed-cycle
   and cycleless purchases. Use pending/preparation labels accurately; draft is not ready for collection.
-- Finance/Manager see all pending collections with household, validation date and optional origin cycle.
-- Cycle list/detail retain a pending-count badge/link after weekly closure, including attributed stock
-  supplements. Collection removes the corresponding pending item without reopening or recharging.
+- Finance/Manager see all pending collections with household, validation date.
+- Cycle list/detail retain a pending-count badge/link after weekly closure, counting weekly baskets only. Collection removes the corresponding pending item without reopening or recharging.
 - Adapt feature 002's dashboard data source from pending pickup cycle ids to Sales basket summaries;
   preserve unrelated dashboard cards. An overdue date alone never produces an abandoned/cancelled state.
 
@@ -1094,7 +1090,7 @@ for CI's full validation.
 | Level | What | Where |
 | --- | --- | --- |
 | Domain | Value objects, `LocalTime`, `CutoffRule`, `ProportionalAllocator` (property: Σ result == target), `Cycle`, `Order`, `Product`, `Basket` | `tests/Unit/<Context>` |
-| Application | **Every scenario S1–S91**, with in-memory repositories and `FrozenClock` | `tests/Application/<Context>` |
+| Application | **Every scenario S1–S92**, with in-memory repositories and `FrozenClock` | `tests/Application/<Context>` |
 | Infrastructure | Each Eloquent repository against `guixa_test` (constraints, locks, numeric mapping) | `tests/Integration` |
 | HTTP | Role gates, wiring, `assertInertia` props, error → 422 and `AuthorizationException` → 403 mapping | `tests/Feature` |
 | Architecture | A1–A12 (A9 through Oxlint); explicitly register Sales contracts as its slices land | `tests/Architecture` |
@@ -1114,12 +1110,12 @@ Eloquent test (`Tests\TestCase` with `RefreshDatabase`) both use it and only imp
 
 ### Amendment verification
 
-Use existing public Application seams with in-memory ports/repositories; add Sales tests for S78–S90
+Use existing public Application seams with in-memory ports/repositories; add Sales tests for S78–S92
 and update existing scenarios whose charge/collection boundary changed. Do not preserve obsolete
 CompletePickup behavior behind a compatibility path. Contract-test both in-memory and Eloquent
 history filtering, one active line, removed references, source uniqueness and sale/charge source ids.
 Cross-context integration checks must prove rollback of a failed validation leaves basket, stock and
-wallet unchanged, simultaneous baskets cannot oversell, attributed stock sales do not invert cycle/product locks,
+wallet unchanged, simultaneous baskets cannot oversell, stock sales take no cycle lock,
 and classification/deletion cannot race first use.
 Check redistribution rejection by validated baskets, late weekly baskets, replay, negative/zero totals, product deactivation,
 late collection after cycle closure, Finance boundaries, own-household self-collection and manual receipts.
@@ -1182,8 +1178,8 @@ not application tests. Implementation and task creation require their own later 
   within one local transaction, with stable lock order and unique source ids. Collection and confirmed
   receipts are independent operations; no eventual financial consistency or online payment integration.
 - **D25** Weekly closure depends on distribution and base basket validation, not collection. Late
-  collections retain pending visual indicators after closure. Supplementary baskets may reference a
-  closed origin cycle for grouping/containers; the reference never gates or reopens that cycle.
+  collections retain pending visual indicators after closure. Supplementary baskets carry no cycle and never gate or reopen it;
+  containers are a per-household balance.
 
 Dropped: D1 (pickup is a sequence of saved steps, R19–R22). D2 and D3 became spec rules (R4a, R6). D4 was
 replaced by R35 and R36b (unlinking keeps the account; deactivation is separate). D5, D6 and D8 became spec

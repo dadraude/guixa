@@ -58,12 +58,13 @@ Checking each producer's delivery against the orders, allocating it to household
   validated basket contains is rejected before anything changes, pointing staff to individual basket
   corrections (R23). Reception never appends adjustments to validated baskets. Direct editing of
   validated original contents remains forbidden (R23).
-- **R18a** **Containers distributed.** Show container counts per household/basket and per cycle. Count
-  each effective weekly/stock line's quantity × snapshotted containers per unit, rounded up per line;
-  a product without containers counts 0. Sum the households' attributed baskets for the cycle total,
-  including later stock supplements referring to a closed cycle. An independent basket with no cycle
-  has its own count and is not attributed to a weekly cycle. Before a base draft exists, use allocations
-  and their product snapshots. Returns do not count as outgoing containers.
+- **R18a** **Containers distributed.** Show each household's accumulated container balance (containers
+  it holds and still has to return), across all its baskets and days, not per cycle. Validating a basket
+  adds each effective weekly/stock line's quantity × snapshotted containers per unit, rounded up per
+  line; a product without containers adds 0. The container price is already in the product price, so
+  the balance is a pure count and creates no money movement. A return line (R20) reduces the balance
+  by its containers. Before a base draft exists, a household's expected containers can be shown from
+  allocations and their product snapshots, but they do not enter the balance until validation.
 
 ## Acceptance scenarios
 
@@ -149,9 +150,14 @@ goes to A, largest remainder 0.8).
 **S60 — Counting containers** (R1, R10, R18a, R20, R25)
 Given yoghurt is variable with 2 containers/kg, weekly honey has 1 container/unit,
 H's base has 1.300 kg yoghurt and 3 jars honey, K's base has 0.500 kg yoghurt,
-and K has an attributed stock line of 2 jars honey with 1 container/unit
-When the producer changes yoghurt to 4 containers/kg and the manager reads the cycle summary
-Then snapshots give H 6 containers (ceil(1.300 × 2) + 3), K 3 (1 + 2), and 9 for the cycle.
+When the producer changes yoghurt to 4 containers/kg and the manager reads the containers per household
+Then snapshots give H 6 containers (ceil(1.300 × 2) + 3) and K 1 (ceil(0.500 × 2)).
+
+**S92 — Container balance accumulates per household** (R18a, R19, R20)
+Given H has no containers pending and no cycle is involved in the reading
+When H's basket with 3 containers is validated, then a return line of 2 containers is validated,
+and later a new independent basket with 1 container is validated
+Then H's balance is 3, then 1, then 2, and no cycle attribution is needed to read it.
 
 **S63 — A validated basket blocks redistribution of its product** (R18, R23)
 Given 2 kg beef was received and distributed 1 kg each, A's basket is validated at 1 kg and €20/kg,
