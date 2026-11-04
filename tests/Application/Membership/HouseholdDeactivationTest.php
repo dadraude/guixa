@@ -5,16 +5,24 @@ use Guixa\Membership\Application\ListHouseholdsToSettle;
 use Guixa\Membership\Domain\ValueObject\OpenHouseholdBasket;
 use Guixa\Membership\Infrastructure\Sales\SalesHouseholdBaskets;
 use Guixa\Membership\Infrastructure\Wallet\WalletHouseholdBalances;
+use Guixa\Ordering\Application\ReadCyclePickupDates;
 use Guixa\Ordering\Domain\Cycle;
 use Guixa\Ordering\Domain\Error\NoHousehold;
 use Guixa\Ordering\Domain\Order;
 use Guixa\Ordering\Domain\OrderLine;
+use Guixa\Sales\Application\MarkBasketCollected;
 use Guixa\Sales\Application\ReadOpenHouseholdBaskets;
+use Guixa\Sales\Application\StockSeller;
+use Guixa\Sales\Application\ValidateBasket;
+use Guixa\Sales\Application\WalletLedger;
 use Guixa\Sales\Domain\Basket;
 use Guixa\Sales\Domain\BasketKind;
 use Guixa\Sales\Domain\BasketLine;
 use Guixa\Sales\Domain\BasketLineKind;
 use Guixa\Sales\Domain\BasketState;
+use Guixa\Sales\Domain\StockProducts;
+use Guixa\Sales\Domain\ValueObject\StockProductSnapshot;
+use Guixa\Sales\Infrastructure\Ordering\OrderingCyclePickupDates;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Money;
 use Guixa\Shared\Domain\Quantity;
@@ -23,8 +31,10 @@ use Guixa\Wallet\Application\ReadHouseholdBalance;
 use Guixa\Wallet\Application\RecordCorrection;
 use Guixa\Wallet\Application\RecordTopUp;
 use Illuminate\Auth\Access\AuthorizationException;
+use Tests\Support\InMemory\ImmediateTransactionRunner;
 use Tests\Support\InMemory\InMemoryMovementRepository;
 use Tests\Support\InMemory\Sales\InMemoryBasketRepository;
+use Tests\Support\InMemory\Sales\NoWeeklyBasketSource;
 use Tests\Support\Membership\MembershipWorld;
 use Tests\Support\Ordering\OrderingWorld;
 
@@ -133,12 +143,44 @@ it('keeps a real ordered line and basket through deactivation until the basket i
     $correction = new RecordCorrection($movements, $ordering->clock);
     $correction($membership->manager, $household, -1000, 'Opening adjustment', null, $receiptId, 'opening-adjustment');
     $balances = new WalletHouseholdBalances(new ReadHouseholdBalance($movements));
-    $baskets = new SalesHouseholdBaskets(new ReadOpenHouseholdBaskets($sales));
+    $baskets = new SalesHouseholdBaskets(new ReadOpenHouseholdBaskets($sales, new OrderingCyclePickupDates(new ReadCyclePickupDates($ordering->cycles))));
+    $charge = new ChargeForBasket($movements, $ordering->clock);
+    $products = new class implements StockProducts
+    {
+        public function lock(string $productId): ?StockProductSnapshot
+        {
+            return null;
+        }
+    };
+    $stockSeller = new class implements StockSeller
+    {
+        public function sell(Actor $actor, string $productId, string $quantity, string $basketId): void {}
+    };
+    $wallet = new class($charge) implements WalletLedger
+    {
+        public function __construct(private readonly ChargeForBasket $charge) {}
+
+        public function charge(Actor $actor, string $householdId, string $basketId, int $totalCents): void
+        {
+            ($this->charge)($actor, $householdId, $basketId, $totalCents);
+        }
+
+        public function balance(Actor $actor, string $householdId): int
+        {
+            return 0;
+        }
+
+        public function correct(Actor $actor, string $householdId, string $basketId, int $amountCents, string $reason, string $correctionId): void {}
+    };
+    $transactions = new ImmediateTransactionRunner;
+    $validate = new ValidateBasket($sales, $products, $stockSeller, $wallet, new NoWeeklyBasketSource, $transactions, $ordering->clock);
+    $collect = new MarkBasketCollected($sales, $transactions, $ordering->clock);
     $warning = new GetHouseholdDeactivationWarning($membership->households, $balances, $baskets);
     $toSettle = new ListHouseholdsToSettle($membership->households, $balances, $baskets);
 
     expect($warning($membership->manager, $household)->balanceCents)->toBe(-500)
-        ->and($warning($membership->manager, $household)->openBaskets[0]->basketId)->toBe($basketId);
+        ->and($warning($membership->manager, $household)->openBaskets[0]->basketId)->toBe($basketId)
+        ->and($warning($membership->manager, $household)->openBaskets[0]->date)->toBe('2026-11-07');
 
     ($membership->deactivateHousehold)($membership->manager, $household);
 
@@ -151,12 +193,11 @@ it('keeps a real ordered line and basket through deactivation until the basket i
     expect(fn () => ($ordering->setOrderLine)($unlinkedAnna, $cycleId, $productId, '1'))->toThrow(NoHousehold::class);
 
     // Sales validates the base (one Wallet charge by basket) and the household later collects it.
-    $sales->save($sales->get($basketId)->validated('manager', $when));
-    (new ChargeForBasket($movements, $ordering->clock))($ordering->manager, $household, 'basket-1', 500);
+    $validate($ordering->manager, $basketId);
     expect($balances->balanceCents($household))->toBe(-1000)
         ->and($toSettle($membership->manager))->toHaveCount(1);
 
-    $sales->save($sales->get($basketId)->collected('manager', $when));
+    $collect($ordering->manager, $basketId);
     (new RecordTopUp($movements, $ordering->clock))($ordering->manager, $household, 1000, 'Settlement');
     expect($balances->balanceCents($household))->toBe(0)
         ->and($sales->get($basketId)->state)->toBe(BasketState::Collected)

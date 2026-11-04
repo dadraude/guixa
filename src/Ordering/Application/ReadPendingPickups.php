@@ -4,7 +4,7 @@ namespace Guixa\Ordering\Application;
 
 use Guixa\Ordering\Domain\CycleRepository;
 
-/** Internal query for Membership, which settles households its own manager-only use cases already authorised (R35a); it takes no actor. */
+/** Read model for the Dashboard: the pickups where a household still has a weekly base to validate or to collect (R35a); it takes no actor, the dashboard authorises the household. */
 final class ReadPendingPickups
 {
     public function __construct(

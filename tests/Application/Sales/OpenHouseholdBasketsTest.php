@@ -1,30 +1,20 @@
 <?php
 
-use Guixa\Sales\Application\AddReturnToBasket;
-use Guixa\Sales\Application\AddStockToBasket;
-use Guixa\Sales\Application\BuildWeeklyBasketLines;
-use Guixa\Sales\Application\CorrectBasket;
-use Guixa\Sales\Application\CreateStockBasket;
-use Guixa\Sales\Application\CreateWeeklyBasket;
 use Guixa\Sales\Application\MarkBasketCollected;
+use Guixa\Sales\Application\OpenBasketData;
 use Guixa\Sales\Application\ReadOpenHouseholdBaskets;
-use Guixa\Sales\Application\SetBasketActualQuantity;
-use Guixa\Sales\Application\StockCorrector;
 use Guixa\Sales\Application\StockSeller;
 use Guixa\Sales\Application\ValidateBasket;
 use Guixa\Sales\Application\WalletLedger;
-use Guixa\Sales\Application\WeeklyBasketSource;
 use Guixa\Sales\Domain\Basket;
+use Guixa\Sales\Domain\BasketAdjustment;
+use Guixa\Sales\Domain\BasketAdjustmentLine;
 use Guixa\Sales\Domain\BasketKind;
 use Guixa\Sales\Domain\BasketLine;
 use Guixa\Sales\Domain\BasketLineKind;
 use Guixa\Sales\Domain\BasketState;
-use Guixa\Sales\Domain\HouseholdDirectory;
-use Guixa\Sales\Domain\ReturnItems;
+use Guixa\Sales\Domain\CyclePickupDates;
 use Guixa\Sales\Domain\StockProducts;
-use Guixa\Sales\Domain\StockQuantities;
-use Guixa\Sales\Domain\ValueObject\HouseholdSnapshot;
-use Guixa\Sales\Domain\ValueObject\ReturnItemSnapshot;
 use Guixa\Sales\Domain\ValueObject\StockProductSnapshot;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Quantity;
@@ -38,39 +28,17 @@ beforeEach(function () {
     $clock = new FrozenClock('2026-11-07 10:00:00');
     $transactions = new ImmediateTransactionRunner;
     $this->baskets = new InMemoryBasketRepository;
-    $households = new class implements HouseholdDirectory
-    {
-        public function all(): array
-        {
-            return [new HouseholdSnapshot('h', 'Household H', true), new HouseholdSnapshot('k', 'Household K', true)];
-        }
-    };
+    $this->when = new DateTimeImmutable('2026-11-02');
     $products = new class implements StockProducts
     {
-        public string $yoghurtContainers = '2';
-
         public function lock(string $productId): ?StockProductSnapshot
         {
-            return match ($productId) {
-                'honey' => new StockProductSnapshot('honey', 'Honey', 'jar', 700, false, '1', true),
-                'yoghurt' => new StockProductSnapshot('yoghurt', 'Yoghurt', 'kg', 400, true, $this->yoghurtContainers, true),
-                'bread' => new StockProductSnapshot('bread', 'Bread', 'loaf', 300, false, null, true),
-                default => null,
-            };
+            return $productId === 'honey' ? new StockProductSnapshot('honey', 'Honey', 'jar', 700, false, '1', true) : null;
         }
     };
-    $quantities = new class implements StockQuantities
-    {
-        public function forProducts(array $ids): array
-        {
-            return array_fill_keys($ids, '100.000');
-        }
-    };
-    $stock = new class implements StockCorrector, StockSeller
+    $stock = new class implements StockSeller
     {
         public function sell(Actor $actor, string $productId, string $quantity, string $basketId): void {}
-
-        public function correct(Actor $actor, string $productId, string $quantity, string $reason, string $basketId, string $correctionId): void {}
     };
     $wallet = new class implements WalletLedger
     {
@@ -83,95 +51,87 @@ beforeEach(function () {
 
         public function correct(Actor $actor, string $householdId, string $basketId, int $amountCents, string $reason, string $correctionId): void {}
     };
-    $returnItems = new class implements ReturnItems
+    $pickupDates = new class implements CyclePickupDates
     {
-        public function get(string $id): ?ReturnItemSnapshot
+        public function forCycles(array $cycleIds): array
         {
-            return $id === 'jar' ? new ReturnItemSnapshot('jar', 'Glass jar', 50, true) : null;
+            return array_intersect_key(['cycle-1' => '2026-11-07', 'cycle-2' => '2026-10-31'], array_flip($cycleIds));
         }
     };
-    $create = new CreateStockBasket($this->baskets, $households, $clock);
-    $add = new AddStockToBasket($this->baskets, $products, $quantities, $transactions, $clock);
-    $addReturn = new AddReturnToBasket($this->baskets, $returnItems, $transactions, $clock);
-    $this->products = $products;
-    $this->closedCycles = [];
-    $weeklySource = new class($this) implements WeeklyBasketSource
-    {
-        public function __construct(private readonly object $test) {}
-
-        public function lockSettled(string $cycleId): void {}
-
-        public function closeIfFinished(string $cycleId): void
-        {
-            $this->test->closedCycles[] = $cycleId;
-        }
-    };
-    $validate = new ValidateBasket($this->baskets, $products, $stock, $wallet, $weeklySource, $transactions, $clock);
-    $this->validate = $validate;
+    $this->validate = new ValidateBasket($this->baskets, $products, $stock, $wallet, new NoWeeklyBasketSource, $transactions, $clock);
     $this->collect = new MarkBasketCollected($this->baskets, $transactions, $clock);
-    $this->open = new ReadOpenHouseholdBaskets($this->baskets);
-    $this->correct = new CorrectBasket($this->baskets, $wallet, $stock, $transactions, $clock);
-    $this->setActual = new SetBasketActualQuantity($this->baskets, new NoWeeklyBasketSource, $transactions);
-    $this->weekly = new CreateWeeklyBasket($this->baskets, new BuildWeeklyBasketLines($this->baskets, $clock), $clock);
+    $this->open = new ReadOpenHouseholdBaskets($this->baskets, $pickupDates);
 
-    /** Creates a basket for the household, fills it with product => quantity and return jars, and returns its id. */
-    $this->draft = function (string $household, array $goods = [], int $jars = 0) use ($create, $add, $addReturn): string {
-        $id = $create($this->manager, $household);
-        foreach ($goods as $product => $quantity) {
-            $add($this->manager, $id, $product, $quantity);
-        }
-        if ($jars > 0) {
-            $addReturn($this->manager, $id, 'jar', (string) $jars);
-        }
+    /** Saves a basket of the household in the given state; weekly ones hold a weekly line, the others a returned jar. */
+    $this->basket = function (string $id, string $household, BasketState $state, bool $weekly, string $created = '2026-11-02', ?string $cycle = null): Basket {
+        $when = new DateTimeImmutable($created);
+        $line = $weekly
+            ? new BasketLine("{$id}-line", $id, 'bread', 'Bread', 'loaf', 300, false, null, Quantity::fromString('1'), $when, kind: BasketLineKind::Weekly)
+            : new BasketLine("{$id}-line", $id, null, 'Jar', 'jar', 50, false, null, Quantity::fromString('1'), $when, kind: BasketLineKind::Return, returnItemId: 'jar');
+        $draft = new Basket($id, $household, 'Household', BasketState::Draft, null, $when, [$line],
+            kind: $weekly ? BasketKind::Weekly : BasketKind::Stock, referenceCycleId: $cycle);
+        $basket = match ($state) {
+            BasketState::Draft => $draft,
+            BasketState::Validated => $draft->validated('manager', $when),
+            BasketState::Collected => $draft->validated('manager', $when)->collected('manager', $when),
+            BasketState::Cancelled => $draft->cancelled('manager', $when),
+            BasketState::NothingToCollect => new Basket($id, $household, 'Household', $state, null, $when, [$line], kind: BasketKind::Weekly, referenceCycleId: $cycle),
+        };
+        $this->baskets->save($basket);
 
-        return $id;
+        return $basket;
     };
-    $this->validated = function (string $household, array $goods = [], int $jars = 0) use ($validate): string {
-        $id = ($this->draft)($household, $goods, $jars);
-        $validate($this->manager, $id);
-
-        return $id;
-    };
+    $this->summary = fn (string $household) => array_map(fn (OpenBasketData $b) => [$b->basketId, $b->status, $b->date], ($this->open)($household));
 });
 
-it('lists a draft basket and a validated basket still to collect, never a collected one (R35a)', function () {
-    $draft = ($this->draft)('h', ['honey' => '1']);
-    $validated = ($this->validated)('h', ['bread' => '2']);
-    $collected = ($this->validated)('h', ['honey' => '1']);
-    ($this->collect)($this->manager, $collected);
-    ($this->validated)('k', ['honey' => '1']);
+it('lists only draft and pending-collection baskets, a weekly one by its pickup date and the others by creation date (R35a)', function () {
+    ($this->basket)('weekly-draft', 'h', BasketState::Draft, true, cycle: 'cycle-1');
+    ($this->basket)('weekly-validated', 'h', BasketState::Validated, true, cycle: 'cycle-2');
+    ($this->basket)('weekly-unknown-cycle', 'h', BasketState::Draft, true, '2026-11-04', 'cycle-9');
+    ($this->basket)('stock-draft', 'h', BasketState::Draft, false, '2026-11-03');
+    ($this->basket)('stock-validated', 'h', BasketState::Validated, false, '2026-11-01');
+    ($this->basket)('weekly-collected', 'h', BasketState::Collected, true, cycle: 'cycle-1');
+    ($this->basket)('weekly-nothing', 'h', BasketState::NothingToCollect, true, cycle: 'cycle-1');
+    ($this->basket)('stock-cancelled', 'h', BasketState::Cancelled, false);
+    ($this->basket)('stock-collected', 'h', BasketState::Collected, false);
+    ($this->basket)('other-household', 'k', BasketState::Draft, false);
 
-    $open = ($this->open)('h');
-
-    expect(array_map(fn ($basket) => [$basket->basketId, $basket->status], $open))
-        ->toEqualCanonicalizing([[$draft, 'draft'], [$validated, 'validated']]);
+    expect(($this->summary)('h'))->toBe([
+        ['weekly-validated', 'validated', '2026-10-31'],
+        ['stock-validated', 'validated', '2026-11-01'],
+        ['stock-draft', 'draft', '2026-11-03'],
+        ['weekly-unknown-cycle', 'draft', '2026-11-04'],
+        ['weekly-draft', 'draft', '2026-11-07'],
+    ])->and(($this->summary)('nobody'))->toBe([]);
 });
 
 it('drops a validated basket once a correction reverses all its goods (R35a)', function () {
-    $id = ($this->validated)('h', ['honey' => '2']);
-    expect(($this->open)('h'))->toHaveCount(1);
+    $when = new DateTimeImmutable('2026-11-03');
+    $draft = new Basket('stock-1', 'h', 'Household', BasketState::Draft, null, $when, [
+        new BasketLine('line-1', 'stock-1', 'honey', 'Honey', 'jar', 700, false, null, Quantity::fromString('2'), $when),
+    ]);
+    $this->baskets->save($draft->validated('manager', $when));
+    expect(($this->summary)('h'))->toBe([['stock-1', 'validated', '2026-11-03']]);
 
-    ($this->correct)($this->manager, $id, 1400, 'Returned', 'corr-1', ['honey' => '2']);
+    $this->baskets->save($this->baskets->get('stock-1')->withAdjustment(new BasketAdjustment(
+        'correction-1', 'stock-1', 1400, 'Returned', 'manager', $when, [new BasketAdjustmentLine('honey', -2000)])));
 
-    expect(($this->open)('h'))->toBe([]);
+    expect(($this->summary)('h'))->toBe([]);
 });
 
-it('keeps a weekly and a return basket of a household that left the directory open until staff validate and collect them (R35a)', function () {
-    $when = new DateTimeImmutable('2026-11-06');
-    $this->baskets->save(new Basket('weekly-1', 'gone', 'Gone', BasketState::Draft, null, $when, [
-        new BasketLine('line-1', 'weekly-1', 'bread', 'Bread', 'loaf', 300, false, null, Quantity::fromString('1'), $when, kind: BasketLineKind::Weekly),
-    ], kind: BasketKind::Weekly, referenceCycleId: 'cycle-1'));
-    $this->baskets->save(new Basket('stock-1', 'gone', 'Gone', BasketState::Draft, null, $when, [
-        new BasketLine('line-2', 'stock-1', null, 'Jar', 'jar', 50, false, null, Quantity::fromString('1'), $when, kind: BasketLineKind::Return, returnItemId: 'jar'),
-    ]));
-
-    expect(array_column(array_map(fn ($b) => (array) $b, ($this->open)('gone')), 'basketId'))->toEqualCanonicalizing(['weekly-1', 'stock-1']);
+it('keeps a household that is no longer active settling its baskets through the existing validate and collect actions (R35a)', function () {
+    ($this->basket)('weekly-1', 'gone', BasketState::Draft, true, cycle: 'cycle-1');
+    ($this->basket)('stock-1', 'gone', BasketState::Draft, false, '2026-11-03');
 
     ($this->validate)($this->manager, 'weekly-1');
     ($this->validate)($this->manager, 'stock-1');
-    expect(($this->open)('gone'))->toHaveCount(2);
+    expect(($this->summary)('gone'))->toBe([
+        ['stock-1', 'validated', '2026-11-03'],
+        ['weekly-1', 'validated', '2026-11-07'],
+    ]);
 
     ($this->collect)($this->manager, 'weekly-1');
+    expect(($this->summary)('gone'))->toBe([['stock-1', 'validated', '2026-11-03']]);
     ($this->collect)($this->manager, 'stock-1');
-    expect(($this->open)('gone'))->toBe([]);
+    expect(($this->summary)('gone'))->toBe([]);
 });
