@@ -24,6 +24,10 @@ defineOptions({
     },
 });
 
+defineProps<{
+    verificationLinkSent: boolean;
+}>();
+
 const page = usePage();
 const user = computed(() => page.props.auth.user);
 </script>
@@ -91,7 +95,7 @@ const user = computed(() => page.props.auth.user);
                 </p>
 
                 <div
-                    v-if="page.props.status === 'verification-link-sent'"
+                    v-if="verificationLinkSent"
                     class="pilot-status mt-2 text-sm font-medium"
                 >
                     {{
