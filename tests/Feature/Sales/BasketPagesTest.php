@@ -153,3 +153,36 @@ it('shows a basket-sourced charge on Manager and member Wallet statements while 
     $this->get("/finance/baskets/{$basket}")->assertForbidden();
     $this->get("/baskets/{$basket}")->assertOk();
 });
+
+it('shows the household container balance on the Finance detail across baskets, going negative (S92, R18a)', function () {
+    $household = basketHousehold();
+    $manager = accountWith(Role::Manager);
+    $producer = ProducerModel::query()->create([
+        'name' => 'Honey maker', 'active' => true, 'cutoff_days_before' => 3, 'cutoff_time' => '20:00',
+    ]);
+    $product = (string) Str::uuid7();
+    DB::table('products')->insert(['id' => $product, 'producer_id' => $producer->id, 'stock' => true,
+        'name' => 'Honey', 'unit' => 'jar', 'price_cents' => 700, 'variable' => false, 'active' => true, 'containers_per_unit' => '1']);
+    DB::table('stock_movements')->insert(['id' => (string) Str::uuid7(), 'stock_product_id' => $product,
+        'type' => 'entry', 'quantity' => '10', 'occurred_at' => now(), 'recorded_by' => $manager->id]);
+    $item = app(CreateReturnItem::class)(Actor::manager($manager->id), 'Glass jar', 50);
+    $newBasket = function () use ($household): string {
+        $this->post('/finance/baskets', ['household_id' => $household])->assertRedirect();
+
+        return (string) DB::table('baskets')->orderByDesc('id')->value('id');
+    };
+    $balance = fn (string $id) => $this->get("/finance/baskets/{$id}")->assertOk()->viewData('page')['props']['containerBalance'];
+
+    $this->actingAs($manager);
+    $first = $newBasket();
+    $this->post("/finance/baskets/{$first}/stock-lines", ['stock_product_id' => $product, 'stock_quantity' => '3'])->assertRedirect();
+    expect($balance($first))->toBe(0);
+    $this->post("/finance/baskets/{$first}/validation")->assertRedirect();
+    expect($balance($first))->toBe(3);
+
+    $second = $newBasket();
+    $this->post("/finance/baskets/{$second}/return-lines", ['return_item_id' => $item, 'return_quantity' => '5'])->assertRedirect();
+    $this->post("/finance/baskets/{$second}/validation")->assertRedirect();
+
+    expect($balance($second))->toBe(-2);
+});

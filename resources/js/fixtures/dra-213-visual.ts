@@ -4,6 +4,7 @@ import { createInertiaApp } from '@inertiajs/vue3';
 import type { DefineComponent } from 'vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { installTranslations } from '@/lib/i18n';
+import { withServerFlags } from '@/testing/basketFlags';
 
 const query = new URLSearchParams(location.search);
 const role = query.get('role') === 'member' ? 'member' : 'finance';
@@ -22,46 +23,57 @@ const correctionId = '0198f0a0-0000-7000-8000-000000000215';
 const longText =
     'Correcció de l’import per una incidència documentada a la cistella original amb un motiu molt llarg que ha de continuar sent llegible en pantalles estretes';
 const corrected = !['empty', 'draft'].includes(state);
-const basket = {
-    id: basketId,
-    householdId,
-    householdName: state === 'long' ? longText : 'La Figuera',
-    state:
-        state === 'draft'
-            ? 'draft'
-            : state === 'collected'
-              ? 'collected'
-              : 'validated',
-    stockLines: [
-        {
-            stockProductId: '0198f0a0-0000-7000-8000-000000000216',
-            name: 'Oli',
-            unit: 'ampolla',
-            quantity: '1.000',
-            unitPriceCents: 1200,
-            amountCents: 1200,
-        },
-    ],
-    returnLines: [],
-    totalCents: 1200,
-    effectiveTotalCents: corrected ? 1000 : 1200,
-    adjustments: corrected
-        ? [
-              {
-                  id: correctionId,
-                  amountCents: 200,
-                  reason: state === 'long' ? longText : 'Preu corregit',
-                  recordedBy: 'Finances',
-                  occurredAt: '2026-11-01T11:00:00+00:00',
-                  lines: [],
-              },
-          ]
-        : [],
-    balanceCents: -1000,
-    projectedBalanceCents: -1000,
-    validatedAt: state === 'draft' ? null : '2026-11-01T10:00:00+00:00',
-    collectedAt: state === 'collected' ? '2026-11-01T12:00:00+00:00' : null,
-};
+const basket = withServerFlags(
+    {
+        id: basketId,
+        householdId,
+        householdName: state === 'long' ? longText : 'La Figuera',
+        state:
+            state === 'draft'
+                ? 'draft'
+                : state === 'collected'
+                  ? 'collected'
+                  : 'validated',
+        stockLines: [
+            {
+                stockProductId: '0198f0a0-0000-7000-8000-000000000216',
+                name: 'Oli',
+                unit: 'ampolla',
+                quantity: '1.000',
+                unitPriceCents: 1200,
+                amountCents: 1200,
+                effectiveQuantity: '1.000',
+                effectiveAmountCents: 1200,
+            },
+        ],
+        returnLines: [],
+        totalCents: 1200,
+        effectiveTotalCents: corrected ? 1000 : 1200,
+        adjustments: corrected
+            ? [
+                  {
+                      id: correctionId,
+                      amountCents: 200,
+                      reason: state === 'long' ? longText : 'Preu corregit',
+                      recordedBy: 'Finances',
+                      occurredAt: '2026-11-01T11:00:00+00:00',
+                      lines: [],
+                  },
+              ]
+            : [],
+        balanceCents: -1000,
+        projectedBalanceCents: -1000,
+        validatedAt: state === 'draft' ? null : '2026-11-01T10:00:00+00:00',
+        collectedAt: state === 'collected' ? '2026-11-01T12:00:00+00:00' : null,
+        collectionEvents: [],
+        pendingCollection: state === 'validated' || state === 'corrected',
+        weeklyLines: [],
+        kind: 'stock',
+        referenceCycleId: null,
+        late: false,
+    },
+    role === 'member' ? 'member' : 'staff',
+);
 const components = import.meta.glob('../pages/**/*.vue', {
     eager: true,
 }) as Record<string, { default: DefineComponent }>;
@@ -95,6 +107,7 @@ const page = {
             },
         ],
         basket,
+        containerBalance: state === 'negative' ? -2 : 3,
         stockProducts: [],
         returnItems: [],
     },

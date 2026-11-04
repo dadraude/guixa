@@ -237,7 +237,12 @@ const pageProps: Record<string, Record<string, unknown>> = {
         containers: {
             total: 2,
             households: [
-                { householdId, householdName: household.name, count: 2 },
+                {
+                    householdId,
+                    householdName: household.name,
+                    count: 2,
+                    balance: -2,
+                },
             ],
         },
     },

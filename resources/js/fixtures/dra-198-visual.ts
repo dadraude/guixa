@@ -238,9 +238,31 @@ const pageProps: Record<string, Record<string, unknown>> = {
         },
         containers: {
             total: 2,
-            households: [
-                { householdId, householdName: household.name, count: 2 },
-            ],
+            households:
+                state === 'balances'
+                    ? [
+                          {
+                              householdId,
+                              householdName: household.name,
+                              count: 2,
+                              balance: -2,
+                          },
+                          {
+                              householdId: 'household-2',
+                              householdName:
+                                  'Cooperativa agroecològica de la Vall de Sant Joan i dels Masos de Baix',
+                              count: 1234,
+                              balance: 5678,
+                          },
+                      ]
+                    : [
+                          {
+                              householdId,
+                              householdName: household.name,
+                              count: 2,
+                              balance: 3,
+                          },
+                      ],
         },
     },
     'Manage/Households/Index': {

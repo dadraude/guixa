@@ -114,6 +114,7 @@ const page = {
             },
         ],
         basket,
+        containerBalance: 3,
         stockProducts: [],
         returnItems: [],
     },

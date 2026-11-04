@@ -29,5 +29,13 @@ interface BasketRepository
     /** @return list<Basket> */
     public function listForHousehold(string $householdId): array;
 
+    /**
+     * Whole validated and collected baskets of the households, in a fixed number of queries.
+     *
+     * @param  list<string>  $householdIds
+     * @return list<Basket>
+     */
+    public function settledForHouseholds(array $householdIds): array;
+
     public function hasProductHistory(string $productId): bool;
 }

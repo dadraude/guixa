@@ -65,6 +65,7 @@ describe('Finance basket detail', () => {
                     { ...basket, kind: 'weekly', late },
                     'staff',
                 ),
+                containerBalance: 0,
                 stockProducts: [],
                 returnItems: [],
             });
@@ -89,6 +90,7 @@ describe('Finance basket detail', () => {
                 },
                 'staff',
             ),
+            containerBalance: 0,
             stockProducts: [],
             returnItems: [],
         });
@@ -124,6 +126,7 @@ describe('Finance basket detail', () => {
                     },
                     'staff',
                 ),
+                containerBalance: 0,
                 stockProducts: [],
                 returnItems: [],
             },
@@ -176,6 +179,7 @@ describe('Finance basket detail', () => {
                     },
                     'staff',
                 ),
+                containerBalance: 0,
                 stockProducts: [],
                 returnItems: [],
             },
@@ -274,6 +278,7 @@ describe('Finance basket detail', () => {
                     },
                     'staff',
                 ),
+                containerBalance: 0,
                 stockProducts: [],
                 returnItems: [],
             }),
@@ -288,6 +293,7 @@ describe('Finance basket detail', () => {
         const html = await renderToString(
             createSSRApp(Show, {
                 basket,
+                containerBalance: 0,
                 stockProducts: [],
                 returnItems: [
                     {
@@ -324,6 +330,7 @@ describe('Finance basket detail', () => {
                     },
                     'staff',
                 ),
+                containerBalance: 0,
                 stockProducts: [],
                 returnItems: [],
             }),
@@ -359,6 +366,7 @@ describe('Finance basket detail', () => {
                 },
                 'staff',
             ),
+            containerBalance: 0,
             stockProducts: [],
             returnItems: [],
         });
@@ -394,6 +402,7 @@ describe('Finance basket detail', () => {
                     },
                     'staff',
                 ),
+                containerBalance: 0,
                 stockProducts: [],
                 returnItems: [],
             },
@@ -439,6 +448,7 @@ describe('Finance basket detail', () => {
                 },
                 'staff',
             ),
+            containerBalance: 0,
             stockProducts: [],
             returnItems: [],
         });
@@ -447,5 +457,19 @@ describe('Finance basket detail', () => {
         expect(html).toContain('data-test="basket-status-validated"');
         expect(html).toContain('data-test="collect-basket"');
         expect(html).not.toContain('data-test="goods-reversed"');
+    });
+
+    it('shows the household container balance, negative included (R18a, S92)', async () => {
+        const app = createSSRApp(Show, {
+            basket,
+            containerBalance: -2,
+            stockProducts: [],
+            returnItems: [],
+        });
+        installTranslations(app);
+        const html = await renderToString(app);
+        expect(html).toMatch(
+            /data-test="container-balance"[^>]*>.*Envasos per retornar.*−2/s,
+        );
     });
 });

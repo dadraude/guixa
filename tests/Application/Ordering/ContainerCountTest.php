@@ -122,3 +122,15 @@ it('keeps sent marks authoritative after later catalog changes (R3b, R18a, D9)',
 
     expect(($this->world->getContainerCount)($this->world->manager, $this->cycleId)->total)->toBe(2);
 });
+
+it('shows each household its accumulated container balance beside the cycle count, negative included (R18a, S92)', function () {
+    $honey = $this->world->catalog->offer(OrderingWorld::BAKER, 'Honey', 'jar', 600, false, '1');
+    ($this->world->setOrderLine)($this->h, $this->cycleId, $honey, '2');
+    ($this->world->setOrderLine)($this->k, $this->cycleId, $honey, '1');
+    $this->world->baskets->balances = [CONTAINER_H => 5, CONTAINER_K => -2];
+
+    $rows = ($this->world->getContainerCount)($this->world->manager, $this->cycleId)->households;
+
+    expect(array_map(fn ($row) => [$row->householdName, $row->count, $row->balance], $rows))
+        ->toBe([['Household H', 2, 5], ['Household K', 1, -2]]);
+});

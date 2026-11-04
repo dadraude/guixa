@@ -69,7 +69,7 @@ defineOptions({
                 <li
                     v-for="household in containers.households"
                     :key="household.householdId"
-                    class="flex items-center justify-between gap-4"
+                    class="flex flex-wrap items-center justify-between gap-x-4 gap-y-1"
                     :data-test="`container-household-${household.householdId}`"
                 >
                     <span class="min-w-0 break-words">{{
@@ -78,6 +78,17 @@ defineOptions({
                     <span class="shrink-0">{{
                         formatQuantity(String(household.count))
                     }}</span>
+                    <span
+                        class="min-w-0 break-words text-muted-foreground"
+                        :data-test="`container-balance-${household.householdId}`"
+                        >{{
+                            trans('Containers to return: :count', {
+                                count: formatQuantity(
+                                    String(household.balance),
+                                ),
+                            })
+                        }}</span
+                    >
                 </li>
             </ul>
         </section>

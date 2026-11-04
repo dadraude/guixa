@@ -102,6 +102,11 @@ beforeEach(function () {
                 fn (Basket $basket) => $basket->householdId === $householdId));
         }
 
+        public function settledForHouseholds(array $householdIds): array
+        {
+            return [];
+        }
+
         public function hasProductHistory(string $productId): bool
         {
             foreach ($this->rows as $basket) {

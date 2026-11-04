@@ -107,6 +107,14 @@ final class FakeSalesBaskets implements SalesBaskets
         return new WeeklyBasketSnapshot($entries);
     }
 
+    /** @var array<string, int> accumulated container balance by household id */
+    public array $balances = [];
+
+    public function containerBalances(array $householdIds): array
+    {
+        return array_combine($householdIds, array_map(fn (string $id) => $this->balances[$id] ?? 0, $householdIds));
+    }
+
     /** Staff records what the household really takes, like `SetBasketActualQuantity`. */
     public function setActual(string $orderId, string $productId, string $quantity): void
     {

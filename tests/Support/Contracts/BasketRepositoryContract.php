@@ -12,6 +12,7 @@ use Guixa\Sales\Domain\BasketLine;
 use Guixa\Sales\Domain\BasketLineKind;
 use Guixa\Sales\Domain\BasketRepository;
 use Guixa\Sales\Domain\BasketState;
+use Guixa\Sales\Domain\ContainerBalance;
 use Guixa\Sales\Domain\Error\BasketNotEditable;
 use Guixa\Shared\Domain\Quantity;
 use PHPUnit\Framework\Attributes\Test;
@@ -320,5 +321,73 @@ trait BasketRepositoryContract
         $this->assertSame([$basket->id], array_map(fn (Basket $row) => $row->id, $repository->listForHousehold($household)));
         $this->assertSame([], $repository->listForHousehold('00000000-0000-7000-8000-000000000099'));
         $this->assertSame('Oil', $repository->getForHousehold($basket->id, $household)?->activeLines()[0]->name);
+    }
+
+    #[Test]
+    public function it_reloads_the_baskets_a_household_container_balance_derives_from_s92(): void
+    {
+        [$repository, $manager, $household, $product, $jar] = $this->basketWorld();
+        $when = new DateTimeImmutable('2026-10-30T10:00:00+00:00');
+        $validate = function (string $kind, int $quantity) use ($repository, $manager, $household, $product, $jar, $when): void {
+            $basket = $this->basket($repository, $manager, $household, []);
+            $line = $kind === 'return'
+                ? new BasketLine($repository->nextId(), $basket->id, null, 'Glass jar', 'item', 50, false, null,
+                    Quantity::fromString((string) $quantity), $when, kind: BasketLineKind::Return, returnItemId: $jar)
+                : new BasketLine($repository->nextId(), $basket->id, $product, 'Honey', 'jar', 700, false, '1',
+                    Quantity::fromString((string) $quantity), $when);
+            $repository->save($basket->withLines([$line]));
+            $repository->save($repository->get($basket->id)->validated($manager, $when));
+        };
+
+        $this->assertSame(0, ContainerBalance::of($repository->settledForHouseholds([$household])));
+        $validate('goods', 3);
+        $this->assertSame(3, ContainerBalance::of($repository->settledForHouseholds([$household])));
+        $validate('return', 2);
+        $this->assertSame(1, ContainerBalance::of($repository->settledForHouseholds([$household])));
+        $validate('goods', 1);
+        $this->assertSame(2, ContainerBalance::of($repository->settledForHouseholds([$household])));
+        $validate('return', 4);
+        $this->assertSame(-2, ContainerBalance::of($repository->settledForHouseholds([$household])));
+    }
+
+    #[Test]
+    public function it_reads_only_settled_baskets_with_their_corrections_for_the_given_households(): void
+    {
+        [$repository, $manager, $household, $product] = $this->basketWorld();
+        $when = new DateTimeImmutable('2026-10-30T10:00:00+00:00');
+        $draft = $this->basket($repository, $manager, $household, []);
+        $repository->save($draft->withLines([$this->line($repository, $draft->id, $product)]));
+        $cancelled = $this->basket($repository, $manager, $household, []);
+        $repository->save($cancelled);
+        $repository->save($cancelled->cancelled($manager, $when));
+        $validated = $this->basket($repository, $manager, $household, []);
+        $repository->save($validated->withLines([$this->line($repository, $validated->id, $product)]));
+        $repository->save($repository->get($validated->id)->validated($manager, $when));
+        $collected = $this->basket($repository, $manager, $household, []);
+        $repository->save($collected->withLines([$this->line($repository, $collected->id, $product)]));
+        $repository->save($repository->get($collected->id)->validated($manager, $when));
+        $repository->save($repository->get($collected->id)->collected($manager, $when, $repository->nextId()));
+        $adjustment = new BasketAdjustment($repository->nextId(), $validated->id, 100, 'One came back', $manager, $when,
+            [BasketAdjustmentLine::fromDecimal($product, '-1.000')]);
+        $repository->save($repository->get($validated->id)->withAdjustment($adjustment));
+
+        $settled = $repository->settledForHouseholds([$household]);
+
+        $ids = array_map(fn (Basket $basket) => $basket->id, $settled);
+        sort($ids);
+        $expected = [$validated->id, $collected->id];
+        sort($expected);
+        $this->assertSame($expected, $ids);
+        $byId = array_column(array_map(fn (Basket $basket) => ['id' => $basket->id, 'basket' => $basket], $settled), 'basket', 'id');
+        $this->assertSame(0, $byId[$validated->id]->effectiveQuantity($product));
+        $this->assertCount(1, $byId[$collected->id]->collectionEvents);
+        $this->assertEquals($repository->get($collected->id)->collectionEvents, $byId[$collected->id]->collectionEvents);
+        // Every multi-aggregate read returns the same whole aggregate as get().
+        foreach ([$repository->listForHousehold($household), $repository->list()] as $rows) {
+            $listed = array_values(array_filter($rows, fn (Basket $basket) => $basket->id === $collected->id))[0];
+            $this->assertEquals($repository->get($collected->id)->collectionEvents, $listed->collectionEvents);
+        }
+        $this->assertSame([], $repository->settledForHouseholds([]));
+        $this->assertSame([], $repository->settledForHouseholds(['00000000-0000-7000-8000-000000000099']));
     }
 }

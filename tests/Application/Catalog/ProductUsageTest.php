@@ -68,6 +68,11 @@ it('derives stock use from movements without relying on quantity on hand (R1b, R
                 fn (Basket $basket) => $basket->householdId === $householdId));
         }
 
+        public function settledForHouseholds(array $householdIds): array
+        {
+            return [];
+        }
+
         public function hasProductHistory(string $productId): bool
         {
             return isset($this->used[$productId]);

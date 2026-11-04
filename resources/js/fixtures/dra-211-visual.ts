@@ -135,6 +135,7 @@ const propsByPage: Record<string, Record<string, unknown>> = {
     },
     'Finance/Baskets/Show': {
         basket,
+        containerBalance: 3,
         stockProducts: basketState === 'draft' ? [stock] : [],
     },
     'Wallet/Statement': {

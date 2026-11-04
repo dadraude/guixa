@@ -142,6 +142,7 @@ export type HouseholdContainerRow = {
 readonly householdId: string,
 readonly householdName: string,
 readonly count: number,
+readonly balance: number,
 };
 export type HouseholdOptionRow = {
 readonly id: string,

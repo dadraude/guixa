@@ -1,0 +1,149 @@
+{
+    "baseUrl": "http://127.0.0.1:5215",
+    "rootFontPx": 16,
+    "darkSelector": "html.dark",
+    "matrix": {
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark"],
+        "text": [100, 200]
+    },
+    "views": [
+        {
+            "id": "finance-basket-container-balance",
+            "path": "/visual-dra-213.html",
+            "query": { "role": "finance" },
+            "root": "#main-content",
+            "panels": "#main-content .pilot-layout-panel,#main-content .pilot-list-row",
+            "content": "#main-content h1,#main-content h2,#main-content p,#main-content a,#main-content dt,#main-content dd,#main-content li",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "#main-content a[data-visual-page-focus-first]",
+                "#main-content a[data-test=\"wallet-link\"]"
+            ],
+            "states": [
+                {
+                    "id": "positive",
+                    "query": { "state": "corrected" },
+                    "ready": "body[data-visual-ready=\"corrected\"]",
+                    "cases": [
+                        { "width": 375, "mode": "light", "text": 100 },
+                        { "width": 375, "mode": "dark", "text": 100 },
+                        { "width": 1280, "mode": "light", "text": 100 },
+                        { "width": 1280, "mode": "dark", "text": 100 }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"container-balance\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"container-balance\"] dd",
+                                "text": "3"
+                            },
+                            {
+                                "selector": "[data-test=\"container-balance\"] dt",
+                                "contrast": 4.5
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "negative",
+                    "query": { "state": "negative" },
+                    "ready": "body[data-visual-ready=\"negative\"]",
+                    "cases": [
+                        { "width": 375, "mode": "dark", "text": 200 },
+                        { "width": 1024, "mode": "light", "text": 200 }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"container-balance\"] dd",
+                                "text": "−2"
+                            },
+                            {
+                                "selector": "[data-test=\"container-balance\"] dt",
+                                "contrast": 4.5
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "long-household-name",
+                    "query": { "state": "long" },
+                    "ready": "body[data-visual-ready=\"long\"]",
+                    "cases": [
+                        { "width": 375, "mode": "light", "text": 200 },
+                        { "width": 1280, "mode": "dark", "text": 100 }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"container-balance\"] dd",
+                                "text": "3"
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "cycle-container-balances",
+            "path": "/visual-dra-198.html",
+            "query": { "page": "Manage/Cycles/Show", "role": "manager" },
+            "root": "#main-content [data-test=\"container-counts\"]",
+            "panels": "#main-content [data-test=\"container-counts\"] li",
+            "content": "#main-content [data-test=\"container-counts\"] h2,#main-content [data-test=\"container-counts\"] p,#main-content [data-test=\"container-counts\"] li,#main-content [data-test=\"container-counts\"] li span",
+            "fonts": ["16px \"Nunito Variable\""],
+            "focus": [],
+            "noFocusReason": "The container summary is read-only text; this change adds no control.",
+            "states": [
+                {
+                    "id": "populated",
+                    "cases": [
+                        { "width": 375, "mode": "light", "text": 100 },
+                        { "width": 375, "mode": "dark", "text": 100 },
+                        { "width": 1280, "mode": "light", "text": 100 },
+                        { "width": 1280, "mode": "dark", "text": 100 }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test^=\"container-balance-\"]",
+                                "text": "Envasos per retornar: 3"
+                            },
+                            {
+                                "selector": "[data-test^=\"container-balance-\"]",
+                                "contrast": 4.5
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "negative-and-long-name",
+                    "query": { "state": "balances" },
+                    "cases": [
+                        { "width": 375, "mode": "light", "text": 100 },
+                        { "width": 375, "mode": "dark", "text": 200 },
+                        { "width": 1024, "mode": "light", "text": 200 },
+                        { "width": 1024, "mode": "dark", "text": 100 },
+                        { "width": 1280, "mode": "light", "text": 100 }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"container-balance-household-1\"]",
+                                "text": "Envasos per retornar: −2"
+                            },
+                            {
+                                "selector": "[data-test^=\"container-balance-\"]",
+                                "contrast": 4.5
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    ]
+}
