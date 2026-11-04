@@ -244,7 +244,10 @@ const pages: Record<string, { component: string; props: object }> = {
         component: 'Manage/Pickups/Index',
         props: { cycleId: ids.cycle, closed: state === 'late-closed', pickups },
     },
-    orders: { component: 'Orders/Edit', props: { order } },
+    orders: {
+        component: 'Orders/Edit',
+        props: { order, preview: { totalCents: 0, amountCents: {} } },
+    },
 };
 const selected = pages[screen];
 const components = import.meta.glob('../pages/**/*.vue', {

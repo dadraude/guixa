@@ -8,20 +8,8 @@ return [
         // Starter-kit flash status, not a domain state; leaves when the page receives a flag.
         'resources/js/pages/settings/Profile.vue',
     ],
-    'A14' => [
-        'resources/js/lib/orderTotal.ts',
-    ],
-    'A15' => [
-        'src/Sales/Application/BasketLineData.php',
-        'src/Sales/Application/BasketWeeklyLineData.php',
-    ],
-    'A16' => [
-        'app/Http/Controllers/DashboardController.php',
-        'app/Http/Controllers/Finance/BasketController.php',
-        'app/Http/Controllers/Manage/CycleController.php',
-        'app/Http/Controllers/Manage/HouseholdController.php',
-        'app/Http/Controllers/Manage/PickupController.php',
-        'app/Http/Controllers/Manage/ReceptionController.php',
-    ],
+    'A14' => [],
+    'A15' => [],
+    'A16' => [],
     'A17' => [],
 ];

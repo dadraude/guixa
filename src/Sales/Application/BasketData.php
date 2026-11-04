@@ -24,7 +24,7 @@ final readonly class BasketData
     public static function from(Basket $basket, bool $forStaff = true): self
     {
         return new self($basket->id, $basket->householdId, $basket->householdName, $basket->state->value,
-            array_map(fn ($line) => BasketLineData::from($line, $basket->effectiveQuantity($line->productId)),
+            array_map(fn ($line) => BasketLineData::from($line, $basket->effectiveQuantityText($line), $basket->effectiveAmountCents($line)),
                 array_values(array_filter($basket->activeLines(), fn ($line) => $line->kind->isStock()))),
             array_map(BasketReturnLineData::from(...), array_values(array_filter($basket->activeLines(), fn ($line) => $line->kind->isReturn()))),
             $basket->validatedTotalCents ?? $basket->totalCents(), $basket->createdAt,
@@ -35,7 +35,7 @@ final readonly class BasketData
             $forStaff ? BasketActions::forStaff($basket) : BasketActions::forMember($basket),
             $basket->isGoodsReversed() ? 'reversed' : $basket->state->value,
             $basket->state->isSettled(), $basket->state->isCollected(), $basket->isWeekly(), $basket->state->isDraft(),
-            array_map(fn ($line) => BasketWeeklyLineData::from($line, $basket->effectiveQuantity((string) $line->productId)),
+            array_map(fn ($line) => BasketWeeklyLineData::from($line, $basket->effectiveQuantityText($line), $basket->effectiveAmountCents($line)),
                 array_values(array_filter($basket->activeLines(), fn ($line) => $line->kind->isWeekly()))),
             $basket->kind->value, $basket->referenceCycleId, $basket->late);
     }

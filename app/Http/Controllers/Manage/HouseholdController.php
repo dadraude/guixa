@@ -10,9 +10,9 @@ use Guixa\Membership\Application\CreateHousehold;
 use Guixa\Membership\Application\DeactivateHousehold;
 use Guixa\Membership\Application\GetHousehold;
 use Guixa\Membership\Application\GetHouseholdDeactivationWarning;
-use Guixa\Membership\Application\HouseholdSummary;
 use Guixa\Membership\Application\ListHouseholds;
 use Guixa\Membership\Application\ListHouseholdsToSettle;
+use Guixa\Membership\Application\ListOtherHouseholds;
 use Guixa\Membership\Application\ReactivateHousehold;
 use Guixa\Membership\Application\RenameHousehold;
 use Guixa\Membership\Domain\Error\HouseholdNotFound;
@@ -41,7 +41,7 @@ class HouseholdController extends Controller
         return to_route('manage.households.show', $id);
     }
 
-    public function show(string $household, Actor $actor, GetHousehold $getHousehold, ListHouseholds $listHouseholds, GetHouseholdDeactivationWarning $warning): Response
+    public function show(string $household, Actor $actor, GetHousehold $getHousehold, ListOtherHouseholds $listOtherHouseholds, GetHouseholdDeactivationWarning $warning): Response
     {
         try {
             $detail = $getHousehold($actor, $household);
@@ -52,10 +52,7 @@ class HouseholdController extends Controller
         return Inertia::render('Manage/Households/Show', [
             'household' => HouseholdRow::from($detail),
             'deactivationWarning' => HouseholdSettlementRow::from($warning($actor, $household)),
-            'otherHouseholds' => array_values(array_map(
-                HouseholdSummaryRow::from(...),
-                array_filter($listHouseholds($actor), fn (HouseholdSummary $other) => $other->id !== $detail->id),
-            )),
+            'otherHouseholds' => array_map(HouseholdSummaryRow::from(...), $listOtherHouseholds($actor, $detail->id)),
         ]);
     }
 

@@ -3,8 +3,6 @@
 namespace Guixa\Sales\Application;
 
 use Guixa\Sales\Domain\BasketLine;
-use Guixa\Shared\Domain\Money;
-use Guixa\Shared\Domain\Quantity;
 use LogicException;
 
 final readonly class BasketLineData
@@ -13,13 +11,11 @@ final readonly class BasketLineData
         public string $quantity, public int $priceCents, public int $amountCents,
         public string $effectiveQuantity, public int $effectiveAmountCents) {}
 
-    public static function from(BasketLine $line, int $effectiveThousandths): self
+    public static function from(BasketLine $line, string $effectiveQuantity, int $effectiveAmountCents): self
     {
         $productId = $line->productId ?? throw new LogicException('A stock basket line needs a product.');
-        $effective = Quantity::ofThousandths($effectiveThousandths);
 
         return new self($productId, $line->name, $line->unit, $line->quantity->toString(),
-            $line->priceCents, $line->amountCents(),
-            $effective->toString(), Money::ofCents($line->priceCents)->multiply($effective)->cents);
+            $line->priceCents, $line->amountCents(), $effectiveQuantity, $effectiveAmountCents);
     }
 }

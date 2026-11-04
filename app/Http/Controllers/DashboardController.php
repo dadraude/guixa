@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Guixa\Catalog\Application\ListProducers;
-use Guixa\Membership\Application\ListAccounts;
-use Guixa\Membership\Application\ListHouseholds;
-use Guixa\Ordering\Application\ListCycles;
+use Guixa\Catalog\Application\CountProducers;
+use Guixa\Membership\Application\CountAccounts;
+use Guixa\Membership\Application\CountHouseholds;
+use Guixa\Ordering\Application\CountCycles;
+use Guixa\Ordering\Application\CountOpenMemberCycles;
 use Guixa\Ordering\Application\ListMemberCycles;
 use Guixa\Ordering\Application\PendingPickupData;
 use Guixa\Ordering\Application\ReadPendingPickups;
@@ -19,10 +20,11 @@ class DashboardController extends Controller
     public function show(
         Actor $actor,
         ListMemberCycles $listMemberCycles,
-        ListCycles $listCycles,
-        ListHouseholds $listHouseholds,
-        ListAccounts $listAccounts,
-        ListProducers $listProducers,
+        CountOpenMemberCycles $countOpenMemberCycles,
+        CountCycles $countCycles,
+        CountHouseholds $countHouseholds,
+        CountAccounts $countAccounts,
+        CountProducers $countProducers,
         ReadHouseholdBalance $readHouseholdBalance,
         ReadPendingPickups $readPendingPickups,
     ): Response {
@@ -32,10 +34,6 @@ class DashboardController extends Controller
 
         $hasHousehold = $isMember && $actor->householdId !== null;
         $memberCycles = $hasHousehold ? $listMemberCycles($actor) : [];
-        $openCycles = array_filter(
-            $memberCycles,
-            fn ($c) => $c->open && ! $c->cancelled,
-        );
         $nextPickup = null;
         foreach ($memberCycles as $cycle) {
             if (! $cycle->cancelled) {
@@ -62,32 +60,20 @@ class DashboardController extends Controller
 
         $managerSummary = null;
         if ($isManager) {
-            $cycles = $listCycles($actor);
-            $households = $listHouseholds($actor);
-            $accounts = $listAccounts($actor);
-            $producers = $listProducers($actor);
+            $cycles = $countCycles($actor);
+            $households = $countHouseholds($actor);
+            $accounts = $countAccounts($actor);
+            $producers = $countProducers($actor);
 
             $managerSummary = [
-                'cycles' => count($cycles),
-                'activeCycles' => count(array_filter(
-                    $cycles,
-                    fn ($c) => ! $c->cancelled && ! $c->closed,
-                )),
-                'households' => count($households),
-                'activeHouseholds' => count(array_filter(
-                    $households,
-                    fn ($h) => $h->active,
-                )),
-                'accounts' => count($accounts),
-                'pendingInvitations' => count(array_filter(
-                    $accounts,
-                    fn ($a) => $a->invitationPending,
-                )),
-                'producers' => count($producers),
-                'activeProducers' => count(array_filter(
-                    $producers,
-                    fn ($p) => $p->active,
-                )),
+                'cycles' => $cycles->total,
+                'activeCycles' => $cycles->active,
+                'households' => $households->total,
+                'activeHouseholds' => $households->active,
+                'accounts' => $accounts->total,
+                'pendingInvitations' => $accounts->pendingInvitations,
+                'producers' => $producers->total,
+                'activeProducers' => $producers->active,
             ];
         }
 
@@ -96,7 +82,7 @@ class DashboardController extends Controller
             'isManager' => $isManager,
             'isMember' => $isMember,
             'nextPickup' => $nextPickup,
-            'openCycles' => count($openCycles),
+            'openCycles' => $hasHousehold ? $countOpenMemberCycles($actor) : 0,
             'balance' => $balance,
             'pendingPickups' => $pendingPickups,
             'managerSummary' => $managerSummary,

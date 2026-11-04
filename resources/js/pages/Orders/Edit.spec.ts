@@ -22,9 +22,10 @@ vi.mock('@inertiajs/vue3', () => ({
                 h('a', attrs, slots.default?.()),
     }),
     usePage: () => ({ props: { errors: {} } }),
-    router: { put: vi.fn(), delete: vi.fn() },
+    router: { put: vi.fn(), delete: vi.fn(), get: vi.fn() },
 }));
 
+const preview = { totalCents: 0, amountCents: {} };
 const order = {
     cycleId: 'cycle',
     pickupDate: '2026-10-30',
@@ -59,7 +60,7 @@ describe('member order editor presentation', () => {
         const put = vi.spyOn(router, 'put');
         const element = document.createElement('div');
         document.body.append(element);
-        const app = createApp(Edit, { order });
+        const app = createApp(Edit, { order, preview });
         installTranslations(app);
         app.mount(element);
 
@@ -68,9 +69,6 @@ describe('member order editor presentation', () => {
         quantity.value = '2';
         quantity.dispatchEvent(new Event('input', { bubbles: true }));
         await nextTick();
-        expect(
-            element.querySelector('[data-test="order-total"]')?.textContent,
-        ).toContain('7,00');
         quantity.dispatchEvent(
             new KeyboardEvent('keydown', { bubbles: true, key: 'Enter' }),
         );
@@ -87,8 +85,47 @@ describe('member order editor presentation', () => {
         element.remove();
     });
 
+    it('asks the server to price what is typed after a short pause, and shows its answer', async () => {
+        vi.useFakeTimers();
+        const get = vi.spyOn(router, 'get');
+        get.mockClear();
+        const element = document.createElement('div');
+        document.body.append(element);
+        const app = createApp(Edit, {
+            order,
+            preview: { totalCents: 700, amountCents: { bread: 700 } },
+        });
+        installTranslations(app);
+        app.mount(element);
+
+        const quantity =
+            element.querySelector<HTMLInputElement>('#quantity-bread')!;
+        quantity.value = '2';
+        quantity.dispatchEvent(new Event('input', { bubbles: true }));
+        await nextTick();
+        expect(get).not.toHaveBeenCalled();
+        vi.advanceTimersByTime(300);
+
+        expect(get).toHaveBeenCalledTimes(1);
+        expect(get).toHaveBeenCalledWith(
+            '/cycles/cycle/order',
+            { typed: { bread: '2' } },
+            expect.objectContaining({
+                only: ['preview'],
+                preserveState: true,
+                preserveScroll: true,
+            }),
+        );
+        expect(
+            element.querySelector('[data-test="order-total"]')?.textContent,
+        ).toContain('7,00');
+        app.unmount();
+        element.remove();
+        vi.useRealTimers();
+    });
+
     it('labels quantity inputs and keeps explicit save and the running total', async () => {
-        const html = await render(Edit, { order });
+        const html = await render(Edit, { order, preview });
 
         expect(html).toContain('La teva comanda');
         expect(html).toContain('for="quantity-bread"');
@@ -104,7 +141,7 @@ describe('member order editor presentation', () => {
         const rowMarkup = async (order: unknown) => {
             const element = document.createElement('div');
             document.body.append(element);
-            const app = createApp(Edit, { order });
+            const app = createApp(Edit, { order, preview });
             installTranslations(app);
             app.mount(element);
             await nextTick();
@@ -152,6 +189,7 @@ describe('member order editor presentation', () => {
 
     it('retains the cancelled notice without any product controls', async () => {
         const html = await render(Edit, {
+            preview,
             order: { ...order, cancelled: true },
         });
 
@@ -161,6 +199,7 @@ describe('member order editor presentation', () => {
 
     it('keeps closed rows read-only and marked lines removable with a zero amount', async () => {
         const html = await render(Edit, {
+            preview,
             order: {
                 ...order,
                 producers: [{ ...order.producers[0], open: false }],
@@ -191,6 +230,7 @@ describe('member order editor presentation', () => {
 
     it('links the settled cycle to the household basket, where ordered versus actual is shown (R23a)', async () => {
         const html = await render(Edit, {
+            preview,
             order: { ...order, basketId: 'basket-1' },
         });
 
@@ -200,7 +240,7 @@ describe('member order editor presentation', () => {
     });
 
     it('shows no basket link before the cycle is settled', async () => {
-        const html = await render(Edit, { order });
+        const html = await render(Edit, { order, preview });
 
         expect(html).not.toContain('data-test="pickup"');
     });

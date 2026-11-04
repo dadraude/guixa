@@ -295,3 +295,30 @@ it('tells the home page which listed cycles are cancelled (R23a)', function () {
     $this->actingAs($anna)->get('/')
         ->assertInertia(fn (Assert $page) => $page->where('cycles.0.cancelled', true)->where('cycles.0.open', false));
 });
+
+it('prices the saved quantities and the ones being typed on the server (R7)', function () {
+    [$cycleId, , $loaf] = cycleWithBaker();
+    $anna = accountWith(Role::Member);
+
+    $this->actingAs($anna)->get("/cycles/{$cycleId}/order")
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('preview.totalCents', 0)
+            ->where("preview.amountCents.{$loaf}", 0));
+
+    $this->actingAs($anna)->put("/cycles/{$cycleId}/order/lines/{$loaf}", ['quantity' => '2'])->assertRedirect();
+    $this->actingAs($anna)->get("/cycles/{$cycleId}/order")
+        ->assertInertia(fn (Assert $page) => $page->where('preview.totalCents', 700));
+
+    $this->actingAs($anna)->get("/cycles/{$cycleId}/order?typed[{$loaf}]=1.5")
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('preview.totalCents', 525)
+            ->where("preview.amountCents.{$loaf}", 525));
+});
+
+it('counts a typed text that is not a quantity as nothing (R9)', function (string $typed) {
+    [$cycleId, , $loaf] = cycleWithBaker();
+
+    $this->actingAs(accountWith(Role::Member))->get("/cycles/{$cycleId}/order?typed[{$loaf}]=".urlencode($typed))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page->where('preview.totalCents', 0));
+})->with(['', '-1', '1.2345', 'abc', '1,5']);
