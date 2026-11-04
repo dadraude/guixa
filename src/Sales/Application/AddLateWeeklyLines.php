@@ -3,7 +3,9 @@
 namespace Guixa\Sales\Application;
 
 use Guixa\Sales\Domain\Basket;
+use Guixa\Sales\Domain\BasketKind;
 use Guixa\Sales\Domain\BasketRepository;
+use Guixa\Sales\Domain\BasketState;
 use Guixa\Sales\Domain\Error\BasketNotFound;
 use Guixa\Shared\Domain\Clock;
 use Guixa\Shared\Domain\Quantity;
@@ -21,7 +23,7 @@ final class AddLateWeeklyLines
     public function __invoke(WeeklyBaseData $source, array $productIds): void
     {
         $base = $this->baskets->getBySourceOrder($source->sourceOrderId);
-        if ($base === null || in_array($base->state, ['draft', 'nothing_to_collect'], true)) {
+        if ($base === null || $base->state->followsSource()) {
             ($this->sync)($source);
 
             return;
@@ -45,7 +47,7 @@ final class AddLateWeeklyLines
         }
 
         $id = $this->baskets->nextId();
-        $this->baskets->save(new Basket($id, $source->householdId, $source->householdName, 'draft', null, $this->clock->now(),
-            ($this->lines)($arrived, $id), kind: 'weekly', sourceOrderId: $source->sourceOrderId, referenceCycleId: $source->cycleId, late: true));
+        $this->baskets->save(new Basket($id, $source->householdId, $source->householdName, BasketState::Draft, null, $this->clock->now(),
+            ($this->lines)($arrived, $id), kind: BasketKind::Weekly, sourceOrderId: $source->sourceOrderId, referenceCycleId: $source->cycleId, late: true));
     }
 }

@@ -3,6 +3,7 @@
 use Guixa\Sales\Application\MarkBasketCollected;
 use Guixa\Sales\Domain\Basket;
 use Guixa\Sales\Domain\BasketLine;
+use Guixa\Sales\Domain\BasketState;
 use Guixa\Sales\Domain\Error\BasketNotEditable;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Quantity;
@@ -17,7 +18,7 @@ function memberCollectionFixture(): array
     $when = new DateTimeImmutable('2026-10-30T10:00:00+00:00');
     foreach (['own' => 'mine', 'other' => 'theirs'] as $id => $household) {
         $line = new BasketLine("line-{$id}", $id, 'product', 'Oil', 'bottle', 1200, false, null, Quantity::fromString('1'), $when);
-        $baskets->save((new Basket($id, $household, $household, 'draft', 'manager', $when, [$line]))->validated('manager', $when));
+        $baskets->save((new Basket($id, $household, $household, BasketState::Draft, 'manager', $when, [$line]))->validated('manager', $when));
     }
 
     return [$baskets, fn (string $now) => new MarkBasketCollected($baskets, new ImmediateTransactionRunner, new FrozenClock($now))];
@@ -30,7 +31,7 @@ it('lets a current member collect their own household basket keeping the first a
     $collect('2026-11-05 09:00:00')(Actor::memberOf('berta', 'mine'), 'own');
 
     $basket = $baskets->get('own');
-    expect($basket->state)->toBe('collected')
+    expect($basket->state)->toBe(BasketState::Collected)
         ->and($basket->collectedBy)->toBe('anna')
         ->and($basket->collectedAt->format('Y-m-d H:i'))->toBe('2026-11-04 09:00')
         ->and($basket->collectionEvents)->toHaveCount(1);
@@ -41,7 +42,7 @@ it('rejects a member collecting another household basket and leaves it pending (
 
     expect(fn () => $collect('2026-11-04 09:00:00')(Actor::memberOf('anna', 'mine'), 'other'))
         ->toThrow(AuthorizationException::class)
-        ->and($baskets->get('other')->state)->toBe('validated');
+        ->and($baskets->get('other')->state)->toBe(BasketState::Validated);
     expect(fn () => $collect('2026-11-04 09:00:00')(Actor::producer('farm', 'farm-1'), 'own'))
         ->toThrow(AuthorizationException::class);
 });
@@ -51,7 +52,7 @@ it('keeps staff collection working and refuses a member collecting a draft (R23b
     $collect('2026-11-04 09:00:00')(Actor::manager('boss'), 'other');
     expect($baskets->get('other')->collectedBy)->toBe('boss');
 
-    $draft = new Basket('draft', 'mine', 'Mine', 'draft', 'manager', new DateTimeImmutable('2026-10-30'));
+    $draft = new Basket('draft', 'mine', 'Mine', BasketState::Draft, 'manager', new DateTimeImmutable('2026-10-30'));
     $baskets->save($draft);
     expect(fn () => $collect('2026-11-04 09:00:00')(Actor::memberOf('anna', 'mine'), 'draft'))
         ->toThrow(BasketNotEditable::class);

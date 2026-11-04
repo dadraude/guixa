@@ -21,7 +21,7 @@ final readonly class BasketLine
         public Quantity $quantity,
         public DateTimeImmutable $createdAt,
         public ?DateTimeImmutable $removedAt = null,
-        public string $kind = 'stock',
+        public BasketLineKind $kind = BasketLineKind::Stock,
         public ?string $returnItemId = null,
         public ?string $sourceOrderLineId = null,
         public ?Quantity $orderedQuantity = null,
@@ -32,7 +32,7 @@ final readonly class BasketLine
     {
         $amount = Money::ofCents($this->priceCents)->multiply($this->quantity)->cents;
 
-        return $this->kind === 'return' ? -$amount : $amount;
+        return $this->kind->isReturn() ? -$amount : $amount;
     }
 
     public function withQuantity(Quantity $quantity): self

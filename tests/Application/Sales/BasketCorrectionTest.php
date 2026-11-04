@@ -5,6 +5,7 @@ use Guixa\Sales\Application\StockCorrector;
 use Guixa\Sales\Application\WalletLedger;
 use Guixa\Sales\Domain\Basket;
 use Guixa\Sales\Domain\BasketLine;
+use Guixa\Sales\Domain\BasketState;
 use Guixa\Sales\Domain\Error\BasketCorrectionIdentityConflict;
 use Guixa\Sales\Domain\Error\BasketNotFound;
 use Guixa\Sales\Domain\Error\InvalidBasketCorrection;
@@ -18,7 +19,7 @@ use Tests\Support\InMemory\Sales\InMemoryBasketRepository;
 it('records one amount correction for a validated basket when the identity is replayed (R23, R32)', function () {
     $baskets = new InMemoryBasketRepository;
     $when = new DateTimeImmutable('2026-10-30T10:00:00+00:00');
-    $basket = new Basket('basket-1', 'household-1', 'Household K', 'draft', 'manager', $when, [
+    $basket = new Basket('basket-1', 'household-1', 'Household K', BasketState::Draft, 'manager', $when, [
         new BasketLine('line-1', 'basket-1', 'product-1', 'Oil', 'bottle', 1200, false, null, Quantity::fromString('1'), $when),
     ]);
     $baskets->save($basket);

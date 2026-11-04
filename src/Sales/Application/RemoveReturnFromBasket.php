@@ -19,10 +19,10 @@ final class RemoveReturnFromBasket
         Gate::forUser($actor)->authorize('manage-sales');
         $this->transactions->run(function () use ($basketId, $returnItemId): void {
             $basket = $this->baskets->lock($basketId) ?? throw BasketNotFound::withId($basketId);
-            if ($basket->state !== 'draft') {
+            if (! $basket->state->isDraft()) {
                 throw BasketNotEditable::create();
             }
-            $lines = array_map(fn ($line) => $line->kind === 'return' && $line->returnItemId === $returnItemId && $line->removedAt === null
+            $lines = array_map(fn ($line) => $line->kind->isReturn() && $line->returnItemId === $returnItemId && $line->removedAt === null
                 ? $line->removedAt($this->clock->now()) : $line, $basket->lines);
             $this->baskets->save($basket->withLines($lines));
         });

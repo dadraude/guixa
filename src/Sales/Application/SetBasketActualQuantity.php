@@ -35,11 +35,11 @@ final class SetBasketActualQuantity
             }
             $this->weeklySource->lockSettled((string) $peek->referenceCycleId);
             $basket = $this->baskets->lock($basketId) ?? throw BasketNotFound::withId($basketId);
-            if ($basket->state !== 'draft') {
+            if (! $basket->state->isDraft()) {
                 throw BasketNotEditable::create();
             }
             $line = $basket->activeLineFor($productId);
-            if ($line === null || $line->kind !== 'weekly' || (! $line->variable && ! $actual->isWhole())) {
+            if ($line === null || ! $line->kind->isWeekly() || (! $line->variable && ! $actual->isWhole())) {
                 throw InvalidBasketQuantity::create();
             }
 

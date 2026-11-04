@@ -17,7 +17,7 @@ final class ReadPendingWeeklyCycles
             if (! $basket->isWeekly() || $basket->referenceCycleId === null) {
                 continue;
             }
-            $pending = $basket->state === 'draft' || ($basket->state === 'validated' && ! $basket->goodsFullyReversed());
+            $pending = $basket->state->isDraft() || ($basket->state->isValidated() && ! $basket->goodsFullyReversed());
             if ($pending) {
                 $cycles[$basket->referenceCycleId] = true;
             }

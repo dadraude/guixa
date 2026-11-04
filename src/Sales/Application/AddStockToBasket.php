@@ -32,7 +32,7 @@ final class AddStockToBasket
 
         $this->transactions->run(function () use ($basketId, $productId, $addition): void {
             $basket = $this->baskets->lock($basketId) ?? throw BasketNotFound::withId($basketId);
-            if ($basket->state !== 'draft') {
+            if (! $basket->state->isDraft()) {
                 throw BasketNotEditable::create();
             }
             $product = $this->products->lock($productId);

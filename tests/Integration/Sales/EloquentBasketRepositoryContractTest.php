@@ -6,6 +6,7 @@ use App\Models\User;
 use Guixa\Catalog\Infrastructure\Persistence\ProducerModel;
 use Guixa\Sales\Domain\Basket;
 use Guixa\Sales\Domain\BasketLine;
+use Guixa\Sales\Domain\BasketState;
 use Guixa\Sales\Infrastructure\Persistence\EloquentBasketRepository;
 use Guixa\Shared\Domain\Quantity;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -70,7 +71,7 @@ final class EloquentBasketRepositoryContractTest extends TestCase
                     'Earlier oil', 'bottle', 1199, false, null, Quantity::fromString('0.125'),
                     $created->modify('-1 hour'), $removed);
             }
-            $repository->save(new Basket($id, $household, 'Household K', 'draft', $manager,
+            $repository->save(new Basket($id, $household, 'Household K', BasketState::Draft, $manager,
                 $created->modify("+{$index} day"), $lines));
         }
 

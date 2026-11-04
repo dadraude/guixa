@@ -14,7 +14,7 @@ final readonly class Basket
         public string $id,
         public string $householdId,
         public string $householdName,
-        public string $state,
+        public BasketState $state,
         public ?string $createdBy,
         public DateTimeImmutable $createdAt,
         public array $lines = [],
@@ -29,7 +29,7 @@ final readonly class Basket
         public array $adjustments = [],
         /** @var list<BasketCollectionEvent> */
         public array $collectionEvents = [],
-        public string $kind = 'stock',
+        public BasketKind $kind = BasketKind::Stock,
         public ?string $sourceOrderId = null,
         public ?string $referenceCycleId = null,
         /** A weekly basket created after the base was validated, holding only the lines that arrived late (R19). */
@@ -39,7 +39,7 @@ final readonly class Basket
     /** @return list<BasketLine> */
     public function activeLines(): array
     {
-        if ($this->state === 'cancelled') {
+        if ($this->state->isCancelled()) {
             return [];
         }
 
@@ -59,7 +59,7 @@ final readonly class Basket
 
     public function draft(): self
     {
-        if ($this->state !== 'draft') {
+        if (! $this->state->isDraft()) {
             throw new DomainException('Only draft baskets can be changed.');
         }
 
@@ -106,7 +106,7 @@ final readonly class Basket
     {
         $hadGoods = false;
         foreach ($this->activeLines() as $line) {
-            if ($line->kind !== 'stock') {
+            if (! $line->kind->isStock()) {
                 // Returned empties still have to be collected, so the basket is not fully reversed.
                 return false;
             }
@@ -121,7 +121,7 @@ final readonly class Basket
 
     public function withAdjustment(BasketAdjustment $adjustment): self
     {
-        if (! in_array($this->state, ['validated', 'collected'], true) || $adjustment->basketId !== $this->id) {
+        if (! $this->state->isSettled() || $adjustment->basketId !== $this->id) {
             throw new DomainException('Only a validated basket can be corrected.');
         }
 
@@ -138,16 +138,16 @@ final readonly class Basket
             throw new DomainException('A basket needs contents before validation.');
         }
 
-        return new self($this->id, $this->householdId, $this->householdName, 'validated',
+        return new self($this->id, $this->householdId, $this->householdName, BasketState::Validated,
             $this->createdBy, $this->createdAt, $this->lines, $actorId, $when, $this->totalCents(), kind: $this->kind, sourceOrderId: $this->sourceOrderId, referenceCycleId: $this->referenceCycleId, late: $this->late);
     }
 
     public function collected(string $actorId, DateTimeImmutable $when, ?string $eventId = null): self
     {
-        if ($this->state === 'collected') {
+        if ($this->state->isCollected()) {
             return $this;
         }
-        if ($this->state !== 'validated') {
+        if (! $this->state->isValidated()) {
             throw new DomainException('Only validated baskets can be collected.');
         }
 
@@ -156,7 +156,7 @@ final readonly class Basket
             $events[] = new BasketCollectionEvent($eventId, $this->id, 'collected', $actorId, $when);
         }
 
-        return new self($this->id, $this->householdId, $this->householdName, 'collected',
+        return new self($this->id, $this->householdId, $this->householdName, BasketState::Collected,
             $this->createdBy, $this->createdAt, $this->lines, $this->validatedBy, $this->validatedAt,
             $this->validatedTotalCents, $this->collectedBy ?? $actorId, $this->collectedAt ?? $when,
             adjustments: $this->adjustments, collectionEvents: $events, kind: $this->kind, sourceOrderId: $this->sourceOrderId, referenceCycleId: $this->referenceCycleId, late: $this->late);
@@ -164,12 +164,12 @@ final readonly class Basket
 
     public function collectionCorrected(BasketCollectionEvent $correction): self
     {
-        if ($this->state !== 'collected' || $correction->basketId !== $this->id
+        if (! $this->state->isCollected() || $correction->basketId !== $this->id
             || $correction->type !== 'corrected' || trim($correction->reason ?? '') === '') {
             throw InvalidBasketCollectionCorrection::create();
         }
 
-        return new self($this->id, $this->householdId, $this->householdName, 'validated',
+        return new self($this->id, $this->householdId, $this->householdName, BasketState::Validated,
             $this->createdBy, $this->createdAt, $this->lines, $this->validatedBy, $this->validatedAt,
             $this->validatedTotalCents, $this->collectedBy, $this->collectedAt, $this->cancelledBy,
             $this->cancelledAt, $this->adjustments, [...$this->collectionEvents, $correction], kind: $this->kind, sourceOrderId: $this->sourceOrderId, referenceCycleId: $this->referenceCycleId, late: $this->late);
@@ -179,13 +179,37 @@ final readonly class Basket
     {
         $this->draft();
 
-        return new self($this->id, $this->householdId, $this->householdName, 'cancelled',
+        return new self($this->id, $this->householdId, $this->householdName, BasketState::Cancelled,
             $this->createdBy, $this->createdAt, $this->lines, cancelledBy: $actorId, cancelledAt: $when, kind: $this->kind, sourceOrderId: $this->sourceOrderId, referenceCycleId: $this->referenceCycleId, late: $this->late);
+    }
+
+    /** Lines can still be added, removed or re-quantified, and the basket validated. */
+    public function isEditable(): bool
+    {
+        return $this->state->isDraft();
+    }
+
+    /** An independent draft can be cancelled; a weekly one follows its source order instead. */
+    public function canBeCancelled(): bool
+    {
+        return $this->state->isDraft() && ! $this->isWeekly();
+    }
+
+    /** Validated and still holding goods to hand over. */
+    public function isPendingCollection(): bool
+    {
+        return $this->state->isValidated() && ! $this->goodsFullyReversed();
+    }
+
+    /** Validated, but every good was returned: nothing is left to collect. */
+    public function isGoodsReversed(): bool
+    {
+        return $this->state->isValidated() && $this->goodsFullyReversed();
     }
 
     public function isWeekly(): bool
     {
-        return $this->kind === 'weekly';
+        return $this->kind->isWeekly();
     }
 
     /** Staff sets what the household really takes of a weekly product, zero included, before validation. */
@@ -194,7 +218,7 @@ final readonly class Basket
         $this->draft();
         $changed = false;
         $lines = array_map(function (BasketLine $line) use ($productId, $actual, &$changed) {
-            if ($line->kind !== 'weekly' || $line->removedAt !== null || $line->productId !== $productId) {
+            if (! $line->kind->isWeekly() || $line->removedAt !== null || $line->productId !== $productId) {
                 return $line;
             }
             $changed = true;
@@ -216,7 +240,7 @@ final readonly class Basket
      */
     public function synchronizedWith(array $source, DateTimeImmutable $when): self
     {
-        if (! $this->isWeekly() || ! in_array($this->state, ['draft', 'nothing_to_collect'], true)) {
+        if (! $this->isWeekly() || ! $this->state->followsSource()) {
             return $this;
         }
 
@@ -227,7 +251,7 @@ final readonly class Basket
         $lines = [];
         $seen = [];
         foreach ($this->lines as $line) {
-            if ($line->kind !== 'weekly' || $line->removedAt !== null) {
+            if (! $line->kind->isWeekly() || $line->removedAt !== null) {
                 $lines[] = $line;
 
                 continue;
@@ -250,7 +274,7 @@ final readonly class Basket
 
         $candidate = $this->rebuilt($this->state, $lines);
 
-        return $candidate->rebuilt($candidate->hasContent() ? 'draft' : 'nothing_to_collect', $lines);
+        return $candidate->rebuilt($candidate->hasContent() ? BasketState::Draft : BasketState::NothingToCollect, $lines);
     }
 
     /**
@@ -261,7 +285,7 @@ final readonly class Basket
      */
     public function withLateLines(array $arrived): self
     {
-        if (! $this->isWeekly() || ! in_array($this->state, ['draft', 'nothing_to_collect'], true)) {
+        if (! $this->isWeekly() || ! $this->state->followsSource()) {
             throw new DomainException('Late lines can only join an unvalidated weekly basket.');
         }
 
@@ -284,14 +308,14 @@ final readonly class Basket
         $merged = [...$lines, ...array_values($bySource)];
         $candidate = $this->rebuilt($this->state, $merged);
 
-        return $candidate->rebuilt($candidate->hasContent() ? 'draft' : 'nothing_to_collect', $merged);
+        return $candidate->rebuilt($candidate->hasContent() ? BasketState::Draft : BasketState::NothingToCollect, $merged);
     }
 
     /** Something to collect: a stock or return line, or a weekly product that was allocated. */
     public function hasContent(): bool
     {
         foreach ($this->activeLines() as $line) {
-            if ($line->kind !== 'weekly' || ! ($line->allocatedQuantity?->isZero() ?? true)) {
+            if (! $line->kind->isWeekly() || ! ($line->allocatedQuantity?->isZero() ?? true)) {
                 return true;
             }
         }
@@ -300,7 +324,7 @@ final readonly class Basket
     }
 
     /** @param list<BasketLine> $lines */
-    private function rebuilt(string $state, array $lines): self
+    private function rebuilt(BasketState $state, array $lines): self
     {
         return new self($this->id, $this->householdId, $this->householdName, $state, $this->createdBy, $this->createdAt,
             $lines, kind: $this->kind, sourceOrderId: $this->sourceOrderId, referenceCycleId: $this->referenceCycleId, late: $this->late);

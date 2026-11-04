@@ -29,7 +29,7 @@ final class CorrectBasket
 
         $this->transactions->run(function () use ($actor, $basketId, $amountCents, $reason, $correctionId, $returnedGoods): void {
             $basket = $this->baskets->lock($basketId) ?? throw BasketNotFound::withId($basketId);
-            if (! in_array($basket->state, ['validated', 'collected'], true)) {
+            if (! $basket->state->isSettled()) {
                 throw InvalidBasketCorrection::create();
             }
             $adjustment = new BasketAdjustment($correctionId, $basketId, $amountCents, trim($reason),

@@ -125,11 +125,24 @@ const correctCollection = (reason: string, correctionId: string) =>
         { reason, correction_id: correctionId },
         { ...options, onSuccess: () => collectionPanel.value?.reset() },
     );
-const status = computed(() =>
-    props.basket.state === 'validated' && !props.basket.pendingCollection
-        ? 'reversed'
-        : props.basket.state,
-);
+const notices: Record<string, { test: string; text: string }> = {
+    reversed: {
+        test: 'goods-reversed',
+        text: trans('All goods were returned; nothing is left to collect.'),
+    },
+    collected: {
+        test: 'collected',
+        text: trans('This basket was collected.'),
+    },
+    nothing_to_collect: {
+        test: 'nothing-to-collect',
+        text: trans('There is nothing to collect in this basket.'),
+    },
+    cancelled: {
+        test: 'cancelled',
+        text: trans('This draft was cancelled.'),
+    },
+};
 const statusLabels: Record<string, string> = {
     draft: trans('Draft'),
     nothing_to_collect: trans('Nothing to collect'),
@@ -146,7 +159,7 @@ const statusLabels: Record<string, string> = {
         <Heading
             :title="trans('Basket: :name', { name: basket.householdName })"
             :description="
-                basket.kind !== 'weekly'
+                !basket.weekly
                     ? trans('Independent basket')
                     : basket.late
                       ? trans('Late basket')
@@ -161,14 +174,16 @@ const statusLabels: Record<string, string> = {
             {{ trans('All baskets') }}
         </Link>
         <InputError :message="errors.domain" data-test="domain-error" />
-        <Badge variant="secondary" :data-test="`basket-status-${status}`">{{
-            statusLabels[status] ?? status
-        }}</Badge>
+        <Badge
+            variant="secondary"
+            :data-test="`basket-status-${basket.status}`"
+            >{{ statusLabels[basket.status] ?? basket.status }}</Badge
+        >
 
         <WeeklyLines
-            v-if="basket.kind === 'weekly'"
+            v-if="basket.weekly"
             :lines="basket.weeklyLines"
-            :editable="basket.state === 'draft'"
+            :editable="basket.can.edit"
             :processing="processing"
             @save="saveActual"
         />
@@ -176,7 +191,7 @@ const statusLabels: Record<string, string> = {
         <StockLines
             :lines="basket.stockLines"
             :options="stockProducts"
-            :editable="basket.state === 'draft'"
+            :editable="basket.can.edit"
             :processing="processing"
             :errors="errors"
             :empty-message="trans('No stock has been added to this basket.')"
@@ -187,7 +202,7 @@ const statusLabels: Record<string, string> = {
         <ReturnLines
             :lines="basket.returnLines"
             :options="returnItems"
-            :editable="basket.state === 'draft'"
+            :editable="basket.can.edit"
             :processing="processing"
             :errors="errors"
             :empty-message="trans('No returns have been added to this basket.')"
@@ -212,7 +227,7 @@ const statusLabels: Record<string, string> = {
                     </dt>
                     <dd>{{ euros(basket.totalCents) }}</dd>
                 </div>
-                <div v-if="basket.state === 'draft'">
+                <div v-if="basket.projectedBalanceCents !== null">
                     <dt class="text-muted-foreground">
                         {{ trans('Projected balance') }}
                     </dt>
@@ -233,12 +248,12 @@ const statusLabels: Record<string, string> = {
         </section>
 
         <AmountAdjustments
-            v-if="basket.state === 'validated' || basket.state === 'collected'"
+            v-if="basket.settled"
             ref="adjustmentPanel"
             :original-cents="basket.totalCents"
             :effective-cents="basket.effectiveTotalCents"
             :adjustments="basket.adjustments"
-            :editable="true"
+            :editable="basket.can.correct"
             :stock-lines="basket.stockLines"
             :processing="processing"
             :errors="errors"
@@ -246,18 +261,18 @@ const statusLabels: Record<string, string> = {
         />
 
         <BasketCollectionHistory
-            v-if="basket.state === 'validated' || basket.state === 'collected'"
+            v-if="basket.settled"
             ref="collectionPanel"
-            :state="basket.state"
+            :collected="basket.collected"
             :events="basket.collectionEvents ?? []"
-            :editable="true"
+            :editable="basket.can.correctCollection"
             :processing="processing"
             :errors="errors"
             @submit="correctCollection"
         />
 
         <div
-            v-if="basket.state === 'draft'"
+            v-if="basket.can.validate"
             class="flex flex-wrap gap-2"
             data-test="draft-actions"
         >
@@ -272,7 +287,7 @@ const statusLabels: Record<string, string> = {
                 {{ trans('Validate basket') }}
             </Button>
             <Button
-                v-if="basket.kind !== 'weekly'"
+                v-if="basket.can.cancel"
                 type="button"
                 variant="outline"
                 class="min-h-11"
@@ -281,16 +296,8 @@ const statusLabels: Record<string, string> = {
                 >{{ trans('Cancel draft') }}</Button
             >
         </div>
-        <p
-            v-else-if="status === 'reversed'"
-            class="text-sm text-muted-foreground"
-            data-test="goods-reversed"
-            data-visual-page-focus-last
-        >
-            {{ trans('All goods were returned; nothing is left to collect.') }}
-        </p>
         <div
-            v-else-if="basket.state === 'validated'"
+            v-else-if="basket.can.markCollected"
             class="flex flex-col items-start gap-2"
             data-test="pending-collection"
         >
@@ -309,28 +316,12 @@ const statusLabels: Record<string, string> = {
             </Button>
         </div>
         <p
-            v-else-if="basket.state === 'collected'"
-            class="text-sm text-muted-foreground"
-            data-test="collected"
-            data-visual-page-focus-last
-        >
-            {{ trans('This basket was collected.') }}
-        </p>
-        <p
-            v-else-if="basket.state === 'nothing_to_collect'"
-            class="text-sm text-muted-foreground"
-            data-test="nothing-to-collect"
-            data-visual-page-focus-last
-        >
-            {{ trans('There is nothing to collect in this basket.') }}
-        </p>
-        <p
             v-else
             class="text-sm text-muted-foreground"
-            data-test="cancelled"
+            :data-test="notices[basket.status]?.test"
             data-visual-page-focus-last
         >
-            {{ trans('This draft was cancelled.') }}
+            {{ notices[basket.status]?.text }}
         </p>
     </div>
 </template>

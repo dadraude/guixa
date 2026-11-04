@@ -25,7 +25,7 @@ const events = [
 describe('basket collection history', () => {
     it('shows original and effective pending states without a correction action after correction', () => {
         const wrapper = mount(BasketCollectionHistory, {
-            props: { state: 'validated', events, editable: true },
+            props: { collected: false, events, editable: false },
             global: { plugins: [{ install: installTranslations }] },
         });
         expect(
@@ -44,7 +44,7 @@ describe('basket collection history', () => {
 
     it('submits a trimmed reason and stable identity until success, then resets', async () => {
         const wrapper = mount(BasketCollectionHistory, {
-            props: { state: 'collected', events: [events[0]], editable: true },
+            props: { collected: true, events: [events[0]], editable: true },
             global: { plugins: [{ install: installTranslations }] },
         });
         const form = wrapper.get('[data-test="collection-correction-form"]');
@@ -70,7 +70,7 @@ describe('basket collection history', () => {
 
     it('keeps a household member read-only even when collected', () => {
         const wrapper = mount(BasketCollectionHistory, {
-            props: { state: 'collected', events, editable: false },
+            props: { collected: true, events, editable: false },
             global: { plugins: [{ install: installTranslations }] },
         });
         expect(

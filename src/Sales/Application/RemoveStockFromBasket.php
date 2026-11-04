@@ -19,7 +19,7 @@ final class RemoveStockFromBasket
         Gate::forUser($actor)->authorize('manage-sales');
         $this->transactions->run(function () use ($basketId, $productId): void {
             $basket = $this->baskets->lock($basketId) ?? throw BasketNotFound::withId($basketId);
-            if ($basket->state !== 'draft') {
+            if (! $basket->state->isDraft()) {
                 throw BasketNotEditable::create();
             }
             $lines = array_map(fn ($line) => $line->productId === $productId && $line->removedAt === null

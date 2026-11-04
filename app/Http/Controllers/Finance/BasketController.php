@@ -54,10 +54,10 @@ final class BasketController extends Controller
 
         return Inertia::render('Finance/Baskets/Show', [
             'basket' => BasketRow::from($record, $balance($actor, $record->householdId)),
-            'stockProducts' => $record->state === 'draft'
+            'stockProducts' => $record->can->edit
                 ? array_map(StockLevelRow::from(...), array_values(array_filter($stock($actor), fn (StockLevelData $level) => $level->active)))
                 : [],
-            'returnItems' => $record->state === 'draft'
+            'returnItems' => $record->can->edit
                 ? array_map(ReturnItemRow::from(...), $returns($actor))
                 : [],
         ]);

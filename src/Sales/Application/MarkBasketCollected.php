@@ -19,10 +19,10 @@ final class MarkBasketCollected
         $this->transactions->run(function () use ($actor, $basketId): void {
             $basket = $this->baskets->lock($basketId) ?? throw BasketNotFound::withId($basketId);
             Gate::forUser($actor)->authorize('collectFor', ['household', $basket->householdId]);
-            if ($basket->state === 'collected') {
+            if ($basket->state->isCollected()) {
                 return;
             }
-            if ($basket->state !== 'validated') {
+            if (! $basket->state->isValidated()) {
                 throw BasketNotEditable::create();
             }
             $this->baskets->save($basket->collected($actor->accountId, $this->clock->now(), $this->baskets->nextId()));

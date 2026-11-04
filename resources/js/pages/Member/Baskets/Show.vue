@@ -32,11 +32,28 @@ const collect = () =>
             onFinish: () => (processing.value = false),
         },
     );
-const status = computed(() =>
-    props.basket.state === 'validated' && !props.basket.pendingCollection
-        ? 'reversed'
-        : props.basket.state,
-);
+const notices: Record<string, { test: string; text: string }> = {
+    draft: {
+        test: 'draft-preparation',
+        text: trans('Draft basket in preparation.'),
+    },
+    reversed: {
+        test: 'goods-reversed',
+        text: trans('All goods were returned; nothing is left to collect.'),
+    },
+    collected: {
+        test: 'collected',
+        text: trans('This basket was collected.'),
+    },
+    nothing_to_collect: {
+        test: 'nothing-to-collect',
+        text: trans('There is nothing to collect in this basket.'),
+    },
+    cancelled: {
+        test: 'cancelled',
+        text: trans('This draft was cancelled.'),
+    },
+};
 const statusLabels: Record<string, string> = {
     draft: trans('In preparation'),
     nothing_to_collect: trans('Nothing to collect'),
@@ -53,7 +70,7 @@ const statusLabels: Record<string, string> = {
         <Heading
             :title="trans('Basket: :name', { name: basket.householdName })"
             :description="
-                basket.kind !== 'weekly'
+                !basket.weekly
                     ? trans('Independent basket')
                     : basket.late
                       ? trans('Late basket')
@@ -67,11 +84,13 @@ const statusLabels: Record<string, string> = {
         >
             {{ trans('All baskets') }}
         </Link>
-        <Badge variant="secondary" :data-test="`basket-status-${status}`">{{
-            statusLabels[status] ?? status
-        }}</Badge>
+        <Badge
+            variant="secondary"
+            :data-test="`basket-status-${basket.status}`"
+            >{{ statusLabels[basket.status] ?? basket.status }}</Badge
+        >
         <WeeklyLines
-            v-if="basket.kind === 'weekly'"
+            v-if="basket.weekly"
             :lines="basket.weeklyLines"
             :editable="false"
             :processing="false"
@@ -107,7 +126,7 @@ const statusLabels: Record<string, string> = {
                     </dt>
                     <dd>{{ euros(basket.totalCents) }}</dd>
                 </div>
-                <div v-if="basket.state === 'draft'">
+                <div v-if="basket.projectedBalanceCents !== null">
                     <dt class="text-muted-foreground">
                         {{ trans('Projected balance') }}
                     </dt>
@@ -119,14 +138,14 @@ const statusLabels: Record<string, string> = {
                 class="inline-flex min-h-11 items-center text-sm underline"
                 data-test="wallet-link"
                 :data-visual-page-focus-last="
-                    basket.state === 'validated' ? undefined : ''
+                    basket.can.markCollected ? undefined : ''
                 "
             >
                 {{ trans('View household Wallet statement') }}
             </Link>
         </section>
         <AmountAdjustments
-            v-if="basket.state === 'validated' || basket.state === 'collected'"
+            v-if="basket.settled"
             :original-cents="basket.totalCents"
             :effective-cents="basket.effectiveTotalCents"
             :adjustments="basket.adjustments"
@@ -134,19 +153,13 @@ const statusLabels: Record<string, string> = {
             :editable="false"
         />
         <BasketCollectionHistory
-            v-if="basket.state === 'validated' || basket.state === 'collected'"
-            :state="basket.state"
+            v-if="basket.settled"
+            :collected="basket.collected"
             :events="basket.collectionEvents ?? []"
             :editable="false"
         />
-        <p v-if="basket.state === 'draft'" data-test="draft-preparation">
-            {{ trans('Draft basket in preparation.') }}
-        </p>
-        <p v-else-if="status === 'reversed'" data-test="goods-reversed">
-            {{ trans('All goods were returned; nothing is left to collect.') }}
-        </p>
         <div
-            v-else-if="basket.state === 'validated'"
+            v-if="basket.can.markCollected"
             class="flex flex-col items-start gap-2"
             data-test="pending-collection"
         >
@@ -163,17 +176,8 @@ const statusLabels: Record<string, string> = {
             </Button>
             <InputError :message="errors.domain" data-test="domain-error" />
         </div>
-        <p v-else-if="basket.state === 'collected'" data-test="collected">
-            {{ trans('This basket was collected.') }}
-        </p>
-        <p
-            v-else-if="basket.state === 'nothing_to_collect'"
-            data-test="nothing-to-collect"
-        >
-            {{ trans('There is nothing to collect in this basket.') }}
-        </p>
-        <p v-else data-test="cancelled">
-            {{ trans('This draft was cancelled.') }}
+        <p v-else :data-test="notices[basket.status]?.test">
+            {{ notices[basket.status]?.text }}
         </p>
     </div>
 </template>

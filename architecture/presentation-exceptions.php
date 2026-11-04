@@ -5,11 +5,6 @@
 // offends. Fix a file, then delete its line here.
 return [
     'A13' => [
-        'resources/js/components/baskets/BasketCollectionHistory.vue',
-        'resources/js/pages/Finance/Baskets/Index.vue',
-        'resources/js/pages/Finance/Baskets/Show.vue',
-        'resources/js/pages/Member/Baskets/Index.vue',
-        'resources/js/pages/Member/Baskets/Show.vue',
         // Starter-kit flash status, not a domain state; leaves when the page receives a flag.
         'resources/js/pages/settings/Profile.vue',
     ],
@@ -28,20 +23,5 @@ return [
         'app/Http/Controllers/Manage/PickupController.php',
         'app/Http/Controllers/Manage/ReceptionController.php',
     ],
-    'A17' => [
-        'src/Sales/Application/AddReturnToBasket.php',
-        'src/Sales/Application/AddStockToBasket.php',
-        'src/Sales/Application/BasketData.php',
-        'src/Sales/Application/CancelDraftBasket.php',
-        'src/Sales/Application/MarkBasketCollected.php',
-        'src/Sales/Application/ReadPendingWeeklyCycles.php',
-        'src/Sales/Application/ReadWeeklyBasketStates.php',
-        'src/Sales/Application/RemoveReturnFromBasket.php',
-        'src/Sales/Application/RemoveStockFromBasket.php',
-        'src/Sales/Application/SetBasketActualQuantity.php',
-        'src/Sales/Application/ValidateBasket.php',
-        'src/Sales/Domain/Basket.php',
-        'src/Sales/Domain/BasketLine.php',
-        'src/Sales/Infrastructure/Persistence/EloquentBasketRepository.php',
-    ],
+    'A17' => [],
 ];

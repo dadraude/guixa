@@ -5,7 +5,7 @@ import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 
 const props = defineProps<{
-    state: string;
+    collected: boolean;
     events: App.Http.BasketCollectionEventRow[];
     editable: boolean;
     processing?: boolean;
@@ -21,7 +21,7 @@ const original = computed(() =>
 );
 
 function submit() {
-    if (props.state !== 'collected' || !reason.value.trim()) return;
+    if (!props.editable || !reason.value.trim()) return;
     emit('submit', reason.value.trim(), correctionId.value);
 }
 
@@ -54,7 +54,7 @@ defineExpose({ reset });
                 </dt>
                 <dd data-test="effective-collection">
                     {{
-                        state === 'collected'
+                        collected
                             ? trans('Collected')
                             : trans('Pending collection')
                     }}
@@ -88,7 +88,7 @@ defineExpose({ reset });
             </li>
         </ol>
         <form
-            v-if="editable && state === 'collected'"
+            v-if="editable"
             class="space-y-3"
             data-test="collection-correction-form"
             @submit.prevent="submit"

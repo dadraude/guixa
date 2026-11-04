@@ -3,7 +3,9 @@
 namespace Guixa\Sales\Application;
 
 use Guixa\Sales\Domain\Basket;
+use Guixa\Sales\Domain\BasketKind;
 use Guixa\Sales\Domain\BasketRepository;
+use Guixa\Sales\Domain\BasketState;
 use Guixa\Shared\Domain\Clock;
 
 /**
@@ -21,8 +23,8 @@ final class CreateWeeklyBasket
         }
 
         $id = $this->baskets->nextId();
-        $basket = new Basket($id, $source->householdId, $source->householdName, 'draft', null, $this->clock->now(),
-            ($this->lines)($source, $id), kind: 'weekly', sourceOrderId: $source->sourceOrderId, referenceCycleId: $source->cycleId);
+        $basket = new Basket($id, $source->householdId, $source->householdName, BasketState::Draft, null, $this->clock->now(),
+            ($this->lines)($source, $id), kind: BasketKind::Weekly, sourceOrderId: $source->sourceOrderId, referenceCycleId: $source->cycleId);
 
         $this->baskets->save($basket->hasContent() ? $basket : $basket->synchronizedWith($basket->lines, $this->clock->now()));
     }

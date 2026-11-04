@@ -6,6 +6,7 @@ import { createSSRApp, nextTick } from 'vue';
 import { renderToString } from 'vue/server-renderer';
 import { installTranslations } from '@/lib/i18n';
 import Show from './Show.vue';
+import { withServerFlags } from '@/testing/basketFlags';
 
 vi.mock('@inertiajs/vue3', async () => {
     const { defineComponent, h } = await import('vue');
@@ -24,46 +25,49 @@ vi.mock('@inertiajs/vue3', async () => {
     };
 });
 
-const basket: App.Http.BasketRow = {
-    id: 'basket-own',
-    householdId: 'household-own',
-    householdName: 'La Figuera',
-    state: 'draft',
-    stockLines: [
-        {
-            stockProductId: 'oil',
-            name: 'Olive oil',
-            unit: 'bottle',
-            quantity: '2.000',
-            unitPriceCents: 1200,
-            amountCents: 2400,
-            effectiveQuantity: '2.000',
-            effectiveAmountCents: 2400,
-        },
-    ],
-    returnLines: [
-        {
-            returnItemId: 'jar',
-            name: 'Glass jar',
-            amountCents: 50,
-            quantity: 2,
-            creditCents: 100,
-        },
-    ],
-    totalCents: 2300,
-    effectiveTotalCents: 2300,
-    adjustments: [],
-    collectionEvents: [],
-    pendingCollection: true,
-    weeklyLines: [],
-    kind: 'stock',
-    referenceCycleId: null,
-    late: false,
-    balanceCents: -500,
-    projectedBalanceCents: -2800,
-    validatedAt: null,
-    collectedAt: null,
-};
+const basket = withServerFlags(
+    {
+        id: 'basket-own',
+        householdId: 'household-own',
+        householdName: 'La Figuera',
+        state: 'draft',
+        stockLines: [
+            {
+                stockProductId: 'oil',
+                name: 'Olive oil',
+                unit: 'bottle',
+                quantity: '2.000',
+                unitPriceCents: 1200,
+                amountCents: 2400,
+                effectiveQuantity: '2.000',
+                effectiveAmountCents: 2400,
+            },
+        ],
+        returnLines: [
+            {
+                returnItemId: 'jar',
+                name: 'Glass jar',
+                amountCents: 50,
+                quantity: 2,
+                creditCents: 100,
+            },
+        ],
+        totalCents: 2300,
+        effectiveTotalCents: 2300,
+        adjustments: [],
+        collectionEvents: [],
+        pendingCollection: true,
+        weeklyLines: [],
+        kind: 'stock',
+        referenceCycleId: null,
+        late: false,
+        balanceCents: -500,
+        projectedBalanceCents: -2800,
+        validatedAt: null,
+        collectedAt: null,
+    },
+    'member',
+);
 
 async function render(record = basket) {
     const app = createSSRApp(Show, { basket: record });
@@ -73,16 +77,26 @@ async function render(record = basket) {
 
 describe('member basket detail', () => {
     it('titles a late weekly basket apart from the base weekly basket (R19)', async () => {
-        const base = await render({
-            ...basket,
-            kind: 'weekly',
-            late: false,
-        } as typeof basket);
-        const late = await render({
-            ...basket,
-            kind: 'weekly',
-            late: true,
-        } as typeof basket);
+        const base = await render(
+            withServerFlags(
+                {
+                    ...basket,
+                    kind: 'weekly',
+                    late: false,
+                },
+                'member',
+            ) as typeof basket,
+        );
+        const late = await render(
+            withServerFlags(
+                {
+                    ...basket,
+                    kind: 'weekly',
+                    late: true,
+                },
+                'member',
+            ) as typeof basket,
+        );
 
         expect(base).toContain('Cistella setmanal');
         expect(base).not.toContain('Cistella tardana');
@@ -90,12 +104,17 @@ describe('member basket detail', () => {
     });
 
     it('shows a never-collected validated basket as pending and read-only', async () => {
-        const html = await render({
-            ...basket,
-            state: 'validated',
-            collectionEvents: [],
-            collectedAt: null,
-        });
+        const html = await render(
+            withServerFlags(
+                {
+                    ...basket,
+                    state: 'validated',
+                    collectionEvents: [],
+                    collectedAt: null,
+                },
+                'member',
+            ),
+        );
         expect(html).toContain('data-test="original-collection"');
         expect(html).toContain('Encara no s’ha recollit');
         expect(html).toContain('data-test="effective-collection"');
@@ -107,26 +126,31 @@ describe('member basket detail', () => {
     });
 
     it('shows original collection and correction history without a staff form (R23b)', async () => {
-        const html = await render({
-            ...basket,
-            state: 'validated',
-            collectionEvents: [
+        const html = await render(
+            withServerFlags(
                 {
-                    id: 'event-1',
-                    type: 'collected',
-                    recordedBy: 'manager',
-                    occurredAt: '2026-10-30T10:00:00+00:00',
-                    reason: null,
+                    ...basket,
+                    state: 'validated',
+                    collectionEvents: [
+                        {
+                            id: 'event-1',
+                            type: 'collected',
+                            recordedBy: 'manager',
+                            occurredAt: '2026-10-30T10:00:00+00:00',
+                            reason: null,
+                        },
+                        {
+                            id: 'event-2',
+                            type: 'corrected',
+                            recordedBy: 'finance',
+                            occurredAt: '2026-10-30T11:00:00+00:00',
+                            reason: 'Wrong mark',
+                        },
+                    ],
                 },
-                {
-                    id: 'event-2',
-                    type: 'corrected',
-                    recordedBy: 'finance',
-                    occurredAt: '2026-10-30T11:00:00+00:00',
-                    reason: 'Wrong mark',
-                },
-            ],
-        });
+                'member',
+            ),
+        );
         expect(html).toContain('data-test="original-collection"');
         expect(html).toContain('data-test="effective-collection"');
         expect(html).toContain('Wrong mark');
@@ -134,22 +158,27 @@ describe('member basket detail', () => {
     });
 
     it('shows corrected amounts and reason without staff controls (R23, R31)', async () => {
-        const html = await render({
-            ...basket,
-            state: 'validated',
-            totalCents: 1200,
-            effectiveTotalCents: 1000,
-            adjustments: [
+        const html = await render(
+            withServerFlags(
                 {
-                    id: 'correction-1',
-                    amountCents: 200,
-                    reason: 'Corrected price',
-                    recordedBy: 'manager',
-                    occurredAt: '2026-10-30T11:00:00+00:00',
-                    lines: [],
+                    ...basket,
+                    state: 'validated',
+                    totalCents: 1200,
+                    effectiveTotalCents: 1000,
+                    adjustments: [
+                        {
+                            id: 'correction-1',
+                            amountCents: 200,
+                            reason: 'Corrected price',
+                            recordedBy: 'manager',
+                            occurredAt: '2026-10-30T11:00:00+00:00',
+                            lines: [],
+                        },
+                    ],
                 },
-            ],
-        });
+                'member',
+            ),
+        );
         expect(html).toContain('data-test="original-basket-total"');
         expect(html).toContain('data-test="effective-basket-total"');
         expect(html).toContain('Corrected price');
@@ -175,7 +204,9 @@ describe('member basket detail', () => {
     it.each(['collected', 'cancelled'] as const)(
         'renders %s as read-only retained history',
         async (state) => {
-            const html = await render({ ...basket, state });
+            const html = await render(
+                withServerFlags({ ...basket, state }, 'member'),
+            );
             expect(html).toContain(`data-test="basket-status-${state}"`);
             if (state === 'cancelled')
                 expect(html).toMatch(
@@ -188,7 +219,9 @@ describe('member basket detail', () => {
     it.each(['draft', 'collected', 'cancelled'] as const)(
         'offers no collect action for %s (R23b)',
         async (state) => {
-            const html = await render({ ...basket, state });
+            const html = await render(
+                withServerFlags({ ...basket, state }, 'member'),
+            );
             expect(html).not.toContain('data-test="collect-basket"');
             expect(html).not.toContain('data-test="domain-error"');
         },
@@ -198,7 +231,12 @@ describe('member basket detail', () => {
         const put = vi.spyOn(router, 'put');
         put.mockClear();
         const wrapper = mount(Show, {
-            props: { basket: { ...basket, state: 'validated' } },
+            props: {
+                basket: withServerFlags(
+                    { ...basket, state: 'validated' },
+                    'member',
+                ),
+            },
             global: { plugins: [{ install: installTranslations }] },
         });
         try {
