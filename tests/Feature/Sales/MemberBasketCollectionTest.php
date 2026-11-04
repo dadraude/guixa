@@ -112,7 +112,8 @@ it('collects despite negative balance and no receipt, and reports draft or cance
     $this->from("/baskets/{$draft}")->put("/baskets/{$draft}/collection")->assertSessionHasErrors(['domain' => 'Només es pot recollir una cistella validada.']);
     $this->from("/baskets/{$cancelled}")->put("/baskets/{$cancelled}/collection")->assertSessionHasErrors(['domain' => 'Només es pot recollir una cistella validada.']);
     $this->put("/baskets/{$debt}/collection")->assertRedirect()->assertSessionHasNoErrors();
-    expect(DB::table('baskets')->whereIn('id', [$draft, $cancelled])->pluck('state')->all())->toEqual(['draft', 'cancelled'])
+    expect(DB::table('baskets')->where('id', $draft)->value('state'))->toBe('draft')
+        ->and(DB::table('baskets')->where('id', $cancelled)->value('state'))->toBe('cancelled')
         ->and(DB::table('baskets')->where('id', $debt)->value('state'))->toBe('collected')
         ->and(DB::table('wallet_movements')->where('household_id', $household)->sum('amount_cents'))->toBeLessThan(0);
 });
