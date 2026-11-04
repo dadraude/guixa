@@ -88,7 +88,7 @@ it('shows the settlement warning, deactivates with a separate action, and lists 
     $this->actingAs($manager)->get(route('manage.households.show', $householdId))
         ->assertInertia(fn (Assert $page) => $page
             ->where('deactivationWarning.balanceCents', 500)
-            ->where('deactivationWarning.pendingPickups', []));
+            ->where('deactivationWarning.openBaskets', []));
 
     $this->actingAs($manager)->post(route('manage.households.deactivate', $householdId))->assertRedirect();
 
@@ -102,7 +102,7 @@ it('shows the settlement warning, deactivates with a separate action, and lists 
         ->assertInertia(fn (Assert $page) => $page->where('household.active', true));
 });
 
-it('keeps pending pickups and wallet adjustments available after deactivation (R35a, S58)', function () {
+it('keeps open baskets and wallet adjustments available after deactivation (R35a, S58)', function () {
     $manager = accountWithRole(Role::Manager);
     $this->actingAs($manager)->post(route('manage.households.store'), ['name' => 'Household H']);
     $householdId = DB::table('households')->value('id');
@@ -118,8 +118,8 @@ it('keeps pending pickups and wallet adjustments available after deactivation (R
 
     $this->actingAs($manager)->get(route('manage.households.show', $householdId))
         ->assertInertia(fn (Assert $page) => $page
-            ->where('deactivationWarning.pendingPickups.0.cycleId', $cycleId)
-            ->where('deactivationWarning.pendingPickups.0.pickupDate', '2026-10-28'));
+            ->where('deactivationWarning.openBaskets.0.basketId', $basketId)
+            ->where('deactivationWarning.openBaskets.0.status', 'draft'));
 
     $this->actingAs($manager)->post(route('manage.households.deactivate', $householdId))->assertRedirect();
     expect(DB::table('baskets')->where('id', $basketId)->value('state'))->toBe('draft');
@@ -135,7 +135,7 @@ it('keeps pending pickups and wallet adjustments available after deactivation (R
     $this->actingAs($manager)->get(route('manage.households.index'))
         ->assertInertia(fn (Assert $page) => $page
             ->where('toSettle.0.balanceCents', 0)
-            ->where('toSettle.0.pendingPickups.0.cycleId', $cycleId));
+            ->where('toSettle.0.openBaskets.0.basketId', $basketId));
 
     DB::table('baskets')->where('id', $basketId)->update(['state' => 'collected']);
     $this->actingAs($manager)->get(route('manage.households.index'))

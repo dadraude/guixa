@@ -3,7 +3,7 @@
 namespace Guixa\Membership\Application;
 
 use Guixa\Membership\Domain\HouseholdBalances;
-use Guixa\Membership\Domain\HouseholdPickups;
+use Guixa\Membership\Domain\HouseholdBaskets;
 use Guixa\Membership\Domain\HouseholdRepository;
 use Guixa\Shared\Application\Actor;
 use Illuminate\Support\Facades\Gate;
@@ -13,7 +13,7 @@ final class ListHouseholdsToSettle
     public function __construct(
         private readonly HouseholdRepository $households,
         private readonly HouseholdBalances $balances,
-        private readonly HouseholdPickups $pickups,
+        private readonly HouseholdBaskets $baskets,
     ) {}
 
     /** @return list<HouseholdSettlement> */
@@ -28,13 +28,13 @@ final class ListHouseholdsToSettle
             }
 
             $balance = $this->balances->balanceCents($household->id);
-            $pickups = $this->pickups->pendingFor($household->id);
+            $openBaskets = $this->baskets->openFor($household->id);
 
-            if ($balance === 0 && $pickups === []) {
+            if ($balance === 0 && $openBaskets === []) {
                 continue;
             }
 
-            $rows[] = new HouseholdSettlement($household->id, $household->name, $balance, $pickups);
+            $rows[] = new HouseholdSettlement($household->id, $household->name, $balance, $openBaskets);
         }
 
         usort($rows, fn (HouseholdSettlement $a, HouseholdSettlement $b) => [$a->householdName, $a->householdId] <=> [$b->householdName, $b->householdId]);

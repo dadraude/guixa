@@ -4,7 +4,7 @@ namespace Guixa\Membership\Application;
 
 use Guixa\Membership\Domain\Error\HouseholdNotFound;
 use Guixa\Membership\Domain\HouseholdBalances;
-use Guixa\Membership\Domain\HouseholdPickups;
+use Guixa\Membership\Domain\HouseholdBaskets;
 use Guixa\Membership\Domain\HouseholdRepository;
 use Guixa\Shared\Application\Actor;
 use Illuminate\Support\Facades\Gate;
@@ -14,7 +14,7 @@ final class GetHouseholdDeactivationWarning
     public function __construct(
         private readonly HouseholdRepository $households,
         private readonly HouseholdBalances $balances,
-        private readonly HouseholdPickups $pickups,
+        private readonly HouseholdBaskets $baskets,
     ) {}
 
     public function __invoke(Actor $actor, string $householdId): HouseholdSettlement
@@ -26,7 +26,7 @@ final class GetHouseholdDeactivationWarning
             $household->id,
             $household->name,
             $this->balances->balanceCents($householdId),
-            $this->pickups->pendingFor($householdId),
+            $this->baskets->openFor($householdId),
         );
     }
 }

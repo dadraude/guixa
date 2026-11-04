@@ -26,7 +26,7 @@ return [
         ],
         'Membership' => [
             'owns' => 'Accounts, households, roles, invitations and household lifecycle.',
-            'dependencies' => ['Catalog', 'Ordering', 'Shared', 'Wallet'],
+            'dependencies' => ['Catalog', 'Ordering', 'Sales', 'Shared', 'Wallet'],
             'exports' => [
                 'Application\RestoreProducerRole' => ['Catalog'],
                 'Application\SuspendProducerRole' => ['Catalog'],
@@ -46,8 +46,6 @@ return [
                 'Application\CloseCycleAfterBasketValidation' => ['Sales'],
                 'Application\HasUnsettledLines' => ['Catalog'],
                 'Application\StopParticipatingWhereNotSent' => ['Catalog'],
-                'Application\PendingPickupData' => ['Membership'],
-                'Application\ReadPendingPickups' => ['Membership'],
             ],
         ],
         'Shared' => [
@@ -77,6 +75,8 @@ return [
                 'Application\ReadWeeklyBasketStates' => ['Ordering'],
                 'Application\ReadPendingWeeklyCycles' => ['Ordering'],
                 'Application\ReadHouseholdContainerBalances' => ['Ordering'],
+                'Application\ReadOpenHouseholdBaskets' => ['Membership'],
+                'Application\OpenBasketData' => ['Membership'],
                 'Application\WeeklyBasketStateData' => ['Ordering'],
                 'Application\WeeklyBaseData' => ['Ordering'],
                 'Application\WeeklyBaseLineData' => ['Ordering'],
