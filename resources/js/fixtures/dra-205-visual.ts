@@ -597,6 +597,9 @@ if (state === 'settlement-details' && pageName === 'Manage/Households/Index') {
 }
 if (state === 'status') {
     visualProps.status = 'verification-link-sent';
+    if (pageName === 'auth/VerifyEmail') {
+        visualProps.verificationLinkSent = true;
+    }
     if (pageName === 'settings/Profile') {
         visualProps.mustVerifyEmail = true;
         visualProps.auth.user.email_verified_at = null;
