@@ -290,7 +290,7 @@ const pageProps: Record<string, Record<string, unknown>> = {
         product: stockProduct,
         cycles: [{ id: cycleId, pickupDate }],
     },
-    'Orders/Edit': { order },
+    'Orders/Edit': { order, preview: { totalCents: 0, amountCents: {} } },
     'Orders/Index': {
         cycles: [
             { cycleId, pickupDate, open: true, cancelled: false, lineCount: 1 },

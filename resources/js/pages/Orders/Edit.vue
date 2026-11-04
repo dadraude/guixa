@@ -1,19 +1,21 @@
 <script setup lang="ts">
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
-import { computed, reactive, ref } from 'vue';
+import { computed, onBeforeUnmount, reactive, ref, watch } from 'vue';
 import MemberBasketController from '@/actions/App/Http/Controllers/Member/BasketController';
 import OrderController from '@/actions/App/Http/Controllers/OrderController';
 import { ArrowLeft } from '@lucide/vue';
 import { trans } from 'laravel-vue-i18n';
 import OrderPageHeader from '@/components/orders/OrderPageHeader.vue';
 import OrderProductRow from '@/components/orders/OrderProductRow.vue';
-import { formatMoney, formatPickupDate } from '@/lib/locale';
+import { euros } from '@/components/pickup/euros';
+import { formatPickupDate } from '@/lib/locale';
 import InputError from '@/components/InputError.vue';
 import { orderRows, type OrderRow } from '@/lib/orderRows';
-import { lineCents, orderTotal } from '@/lib/orderTotal';
 
 const props = defineProps<{
     order: App.Http.OrderRow;
+    /** What the quantities typed so far cost, priced by the server. */
+    preview: App.Http.OrderPreviewRow;
 }>();
 
 const page = usePage();
@@ -28,16 +30,28 @@ const drafts = reactive<Record<string, string>>({});
 const draftOf = (row: OrderRow) =>
     drafts[row.productId] ?? (row.quantity || '0');
 
-const total = computed(() =>
-    orderTotal(
-        groups.value.flatMap((group) =>
-            group.rows.map((row) => ({
-                price: row.price,
-                quantity: row.notDelivered ? '0' : draftOf(row),
-            })),
-        ),
-    ),
-);
+// The server prices what is typed: a short pause after the last keystroke asks for a new preview.
+const PREVIEW_DELAY_MS = 250;
+let previewTimer: ReturnType<typeof setTimeout> | undefined;
+
+function refreshPreview() {
+    router.get(
+        OrderController.edit.url({ cycle: props.order.cycleId }),
+        { typed: { ...drafts } },
+        {
+            only: ['preview'],
+            preserveScroll: true,
+            preserveState: true,
+            replace: true,
+        },
+    );
+}
+
+watch(drafts, () => {
+    clearTimeout(previewTimer);
+    previewTimer = setTimeout(refreshPreview, PREVIEW_DELAY_MS);
+});
+onBeforeUnmount(() => clearTimeout(previewTimer));
 
 const saving = ref<string | null>(null);
 
@@ -72,9 +86,6 @@ function remove(productId: string) {
         },
     );
 }
-
-const lineTotal = (price: string, quantity: string) =>
-    (lineCents({ price, quantity }) / 100).toFixed(2);
 </script>
 
 <template>
@@ -181,11 +192,7 @@ const lineTotal = (price: string, quantity: string) =>
                         :key="row.productId"
                         :row="row"
                         :quantity="draftOf(row)"
-                        :amount="
-                            row.notDelivered
-                                ? '0.00'
-                                : lineTotal(row.price, draftOf(row))
-                        "
+                        :amount-cents="preview.amountCents[row.productId] ?? 0"
                         :open="group.open"
                         :saving="saving === row.productId"
                         :dirty="row.productId in drafts"
@@ -202,7 +209,7 @@ const lineTotal = (price: string, quantity: string) =>
         >
             <span class="text-lg font-medium">{{ trans('Total') }}</span>
             <span class="pilot-amount text-2xl font-semibold">{{
-                formatMoney(total)
+                euros(preview.totalCents)
             }}</span>
         </div>
     </div>

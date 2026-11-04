@@ -203,6 +203,10 @@ readonly variable: boolean,
 readonly quantity: string,
 readonly notDelivered: boolean,
 };
+export type OrderPreviewRow = {
+readonly totalCents: number,
+readonly amountCents: Record<string, number>,
+};
 export type OrderProducerRow = {
 readonly producerId: string,
 readonly producerName: string,

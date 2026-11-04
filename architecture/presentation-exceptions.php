@@ -8,9 +8,7 @@ return [
         // Starter-kit flash status, not a domain state; leaves when the page receives a flag.
         'resources/js/pages/settings/Profile.vue',
     ],
-    'A14' => [
-        'resources/js/lib/orderTotal.ts',
-    ],
+    'A14' => [],
     'A15' => [],
     'A16' => [
         'app/Http/Controllers/DashboardController.php',

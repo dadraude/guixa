@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Http\MemberCycleRow;
+use App\Http\OrderPreviewRow;
 use App\Http\OrderRow;
 use Guixa\Catalog\Application\GetProducer;
 use Guixa\Ordering\Application\GetHouseholdOrder;
 use Guixa\Ordering\Application\ListMemberCycles;
+use Guixa\Ordering\Application\PreviewOrderAmounts;
 use Guixa\Ordering\Application\RemoveMarkedLine;
 use Guixa\Ordering\Application\SetOrderLine;
 use Guixa\Ordering\Domain\Error\CycleNotFound;
@@ -33,7 +35,7 @@ class OrderController extends Controller
     }
 
     /** The member's household order in a cycle (R7). */
-    public function edit(string $cycle, Actor $actor, GetHouseholdOrder $getHouseholdOrder, GetProducer $getProducer): Response
+    public function edit(Request $request, string $cycle, Actor $actor, GetHouseholdOrder $getHouseholdOrder, GetProducer $getProducer, PreviewOrderAmounts $preview): Response
     {
         try {
             $order = $getHouseholdOrder($actor, $cycle);
@@ -51,7 +53,11 @@ class OrderController extends Controller
             $names[$producerId] = $getProducer($producerId)->name ?? $producerId;
         }
 
-        return Inertia::render('Orders/Edit', ['order' => OrderRow::from($order, $names)]);
+        return Inertia::render('Orders/Edit', [
+            'order' => OrderRow::from($order, $names),
+            // The quantities being typed travel as ?typed[productId]=text; the server prices them.
+            'preview' => fn () => OrderPreviewRow::from($preview($actor, $cycle, $this->typedQuantities($request))),
+        ]);
     }
 
     /** Sets a line's quantity; zero removes it (R9). */
@@ -70,5 +76,18 @@ class OrderController extends Controller
         $removeMarkedLine($actor, $cycle, $product);
 
         return back();
+    }
+
+    /** @return array<string, string> */
+    private function typedQuantities(Request $request): array
+    {
+        $typed = [];
+        foreach ((array) $request->query('typed', []) as $productId => $quantity) {
+            if (is_string($quantity)) {
+                $typed[(string) $productId] = $quantity;
+            }
+        }
+
+        return $typed;
     }
 }
