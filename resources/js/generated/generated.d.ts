@@ -163,7 +163,7 @@ export type HouseholdSettlementRow = {
 readonly householdId: string,
 readonly householdName: string,
 readonly balanceCents: number,
-readonly pendingPickups: App.Http.PendingPickupRow[],
+readonly openBaskets: App.Http.OpenBasketRow[],
 };
 export type HouseholdSummaryRow = {
 readonly id: string,
@@ -193,6 +193,11 @@ readonly unit: string,
 readonly price: string,
 readonly variable: boolean,
 };
+export type OpenBasketRow = {
+readonly basketId: string,
+readonly status: string,
+readonly date: string,
+};
 export type OrderLineRow = {
 readonly productId: string,
 readonly producerId: string,
@@ -221,10 +226,6 @@ readonly cancelled: boolean,
 readonly producers: App.Http.OrderProducerRow[],
 readonly lines: App.Http.OrderLineRow[],
 readonly basketId: string | null,
-};
-export type PendingPickupRow = {
-readonly cycleId: string,
-readonly pickupDate: string,
 };
 export type PickupSummaryRow = {
 readonly basketId: string,

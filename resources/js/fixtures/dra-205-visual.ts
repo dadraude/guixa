@@ -106,7 +106,7 @@ const settlement = {
     householdId,
     householdName: household.name,
     balanceCents: 2000,
-    pendingPickups: [{ cycleId, pickupDate }],
+    openBaskets: [{ basketId: 'basket-1', status: 'draft', date: pickupDate }],
 };
 const reception = {
     cycleId,
@@ -594,9 +594,9 @@ if (state === 'inactive-household' && pageName === 'Manage/Households/Show') {
     visualProps.household.active = false;
 }
 if (state === 'settlement-details' && pageName === 'Manage/Households/Index') {
-    visualProps.toSettle[0].pendingPickups = [
-        { cycleId, pickupDate },
-        { cycleId: 'cycle-2', pickupDate: '2026-11-12' },
+    visualProps.toSettle[0].openBaskets = [
+        { basketId: 'basket-1', status: 'draft', date: pickupDate },
+        { basketId: 'basket-2', status: 'validated', date: '2026-11-12' },
     ];
     visualProps.toSettle[0].balanceCents = -1200;
 }

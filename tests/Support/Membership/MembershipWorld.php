@@ -36,7 +36,7 @@ use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Role;
 use Tests\Support\FrozenClock;
 use Tests\Support\InMemory\FakeHouseholdBalances;
-use Tests\Support\InMemory\FakeHouseholdPickups;
+use Tests\Support\InMemory\FakeHouseholdBaskets;
 use Tests\Support\InMemory\FakeProducerDirectory;
 use Tests\Support\InMemory\ImmediateTransactionRunner;
 use Tests\Support\InMemory\InMemoryAccountRepository;
@@ -52,7 +52,7 @@ final class MembershipWorld
 
     public readonly FakeHouseholdBalances $balances;
 
-    public readonly FakeHouseholdPickups $pickups;
+    public readonly FakeHouseholdBaskets $openBaskets;
 
     public readonly DeactivateHousehold $deactivateHousehold;
 
@@ -128,7 +128,7 @@ final class MembershipWorld
     {
         $this->clock = new FrozenClock($now);
         $this->balances = new FakeHouseholdBalances;
-        $this->pickups = new FakeHouseholdPickups;
+        $this->openBaskets = new FakeHouseholdBaskets;
         $this->households = new InMemoryHouseholdRepository;
         $this->accounts = new InMemoryAccountRepository;
         $this->invitations = new InMemoryInvitationRepository;
@@ -163,8 +163,8 @@ final class MembershipWorld
         $this->listHouseholds = new ListHouseholds($this->households, $this->accounts);
         $this->deactivateHousehold = new DeactivateHousehold($this->households, $this->accounts, $this->transactions, $this->clock);
         $this->reactivateHousehold = new ReactivateHousehold($this->households, $this->transactions);
-        $this->getHouseholdDeactivationWarning = new GetHouseholdDeactivationWarning($this->households, $this->balances, $this->pickups);
-        $this->listHouseholdsToSettle = new ListHouseholdsToSettle($this->households, $this->balances, $this->pickups);
+        $this->getHouseholdDeactivationWarning = new GetHouseholdDeactivationWarning($this->households, $this->balances, $this->openBaskets);
+        $this->listHouseholdsToSettle = new ListHouseholdsToSettle($this->households, $this->balances, $this->openBaskets);
         $this->listProducerAccounts = new ListProducerAccounts($this->accounts);
         $this->getHouseholds = new GetHouseholds($this->households);
         $this->getHousehold = new GetHousehold($this->households, $this->accounts, $this->invitations, $this->clock);

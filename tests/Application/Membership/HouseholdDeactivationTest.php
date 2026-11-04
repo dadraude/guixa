@@ -2,15 +2,27 @@
 
 use Guixa\Membership\Application\GetHouseholdDeactivationWarning;
 use Guixa\Membership\Application\ListHouseholdsToSettle;
-use Guixa\Membership\Domain\ValueObject\PendingHouseholdPickup;
-use Guixa\Membership\Infrastructure\Ordering\OrderingHouseholdPickups;
+use Guixa\Membership\Domain\ValueObject\OpenHouseholdBasket;
+use Guixa\Membership\Infrastructure\Sales\SalesHouseholdBaskets;
 use Guixa\Membership\Infrastructure\Wallet\WalletHouseholdBalances;
-use Guixa\Ordering\Application\ReadPendingPickups;
-use Guixa\Ordering\Application\WeeklySourceData;
+use Guixa\Ordering\Application\ReadCyclePickupDates;
 use Guixa\Ordering\Domain\Cycle;
 use Guixa\Ordering\Domain\Error\NoHousehold;
 use Guixa\Ordering\Domain\Order;
 use Guixa\Ordering\Domain\OrderLine;
+use Guixa\Sales\Application\MarkBasketCollected;
+use Guixa\Sales\Application\ReadOpenHouseholdBaskets;
+use Guixa\Sales\Application\StockSeller;
+use Guixa\Sales\Application\ValidateBasket;
+use Guixa\Sales\Application\WalletLedger;
+use Guixa\Sales\Domain\Basket;
+use Guixa\Sales\Domain\BasketKind;
+use Guixa\Sales\Domain\BasketLine;
+use Guixa\Sales\Domain\BasketLineKind;
+use Guixa\Sales\Domain\BasketState;
+use Guixa\Sales\Domain\StockProducts;
+use Guixa\Sales\Domain\ValueObject\StockProductSnapshot;
+use Guixa\Sales\Infrastructure\Ordering\OrderingCyclePickupDates;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Money;
 use Guixa\Shared\Domain\Quantity;
@@ -19,7 +31,10 @@ use Guixa\Wallet\Application\ReadHouseholdBalance;
 use Guixa\Wallet\Application\RecordCorrection;
 use Guixa\Wallet\Application\RecordTopUp;
 use Illuminate\Auth\Access\AuthorizationException;
+use Tests\Support\InMemory\ImmediateTransactionRunner;
 use Tests\Support\InMemory\InMemoryMovementRepository;
+use Tests\Support\InMemory\Sales\InMemoryBasketRepository;
+use Tests\Support\InMemory\Sales\NoWeeklyBasketSource;
 use Tests\Support\Membership\MembershipWorld;
 use Tests\Support\Ordering\OrderingWorld;
 
@@ -27,16 +42,16 @@ beforeEach(function () {
     $this->world = new MembershipWorld;
 });
 
-it('warns with the balance and pending pickups before manual deactivation (R35a, S58)', function () {
+it('warns with the balance and open baskets before manual deactivation (R35a, S58)', function () {
     $household = ($this->world->createHousehold)($this->world->manager, 'H');
     $this->world->balances->set($household, -500);
-    $this->world->pickups->set($household, [new PendingHouseholdPickup('cycle-1', '2026-10-28')]);
+    $this->world->openBaskets->set($household, [new OpenHouseholdBasket('basket-1', 'draft', '2026-10-28')]);
 
     $warning = ($this->world->getHouseholdDeactivationWarning)($this->world->manager, $household);
 
     expect($warning->balanceCents)->toBe(-500)
-        ->and($warning->pendingPickups)->toHaveCount(1)
-        ->and($warning->pendingPickups[0]->cycleId)->toBe('cycle-1')
+        ->and($warning->openBaskets)->toHaveCount(1)
+        ->and($warning->openBaskets[0]->basketId)->toBe('basket-1')
         ->and($this->world->households->get($household)->isActive())->toBeTrue();
 });
 
@@ -45,7 +60,7 @@ it('atomically deactivates a household and unlinks every member while preserving
     $anna = ($this->world->addMember)($this->world->manager, $household, 'Anna', 'anna@example.org');
     $biel = ($this->world->addMember)($this->world->manager, $household, 'Biel', 'biel@example.org');
     $this->world->balances->set($household, -500);
-    $this->world->pickups->set($household, [new PendingHouseholdPickup('cycle-1', '2026-10-28')]);
+    $this->world->openBaskets->set($household, [new OpenHouseholdBasket('basket-1', 'draft', '2026-10-28')]);
 
     ($this->world->deactivateHousehold)($this->world->manager, $household);
 
@@ -55,7 +70,7 @@ it('atomically deactivates a household and unlinks every member while preserving
         ->and(($this->world->listHouseholdsToSettle)($this->world->manager))->toHaveCount(1);
 });
 
-it('lists inactive households until both their balance and pickups are settled (R35a, S43, S58)', function () {
+it('lists inactive households until both their balance and baskets are settled (R35a, S43, S58)', function () {
     $household = ($this->world->createHousehold)($this->world->manager, 'H');
     $member = ($this->world->addMember)($this->world->manager, $household, 'Anna', 'anna@example.org');
     $this->world->balances->set($household, 1200);
@@ -63,10 +78,22 @@ it('lists inactive households until both their balance and pickups are settled (
 
     expect(($this->world->listHouseholdsToSettle)($this->world->manager))->toHaveCount(1);
     $this->world->balances->set($household, 0);
-    $this->world->pickups->set($household, [new PendingHouseholdPickup('cycle-1', '2026-10-28')]);
+    $this->world->openBaskets->set($household, [new OpenHouseholdBasket('basket-1', 'draft', '2026-10-28')]);
     expect(($this->world->listHouseholdsToSettle)($this->world->manager))->toHaveCount(1);
-    $this->world->pickups->set($household, []);
+    $this->world->openBaskets->set($household, []);
     expect(($this->world->listHouseholdsToSettle)($this->world->manager))->toBe([]);
+});
+
+it('drops a reactivated household from the settlement list while its baskets stay open (R35a)', function () {
+    $household = ($this->world->createHousehold)($this->world->manager, 'H');
+    $this->world->openBaskets->set($household, [new OpenHouseholdBasket('basket-1', 'validated', '2026-10-28')]);
+    ($this->world->deactivateHousehold)($this->world->manager, $household);
+    expect(($this->world->listHouseholdsToSettle)($this->world->manager))->toHaveCount(1);
+
+    ($this->world->reactivateHousehold)($this->world->manager, $household);
+
+    expect(($this->world->listHouseholdsToSettle)($this->world->manager))->toBe([])
+        ->and(($this->world->getHouseholdDeactivationWarning)($this->world->manager, $household)->openBaskets)->toHaveCount(1);
 });
 
 it('reactivates manually and restricts household state changes to managers (R35a)', function () {
@@ -78,7 +105,7 @@ it('reactivates manually and restricts household state changes to managers (R35a
     expect($this->world->households->get($household)->isActive())->toBeTrue();
 });
 
-it('keeps a real ordered line and pickup through deactivation until pickup and wallet settle (R35a, S58)', function () {
+it('keeps a real ordered line and basket through deactivation until the basket is collected and the wallet settles (R35a, S58)', function () {
     $membership = $this->world;
     $ordering = new OrderingWorld;
     $household = ($membership->createHousehold)($membership->manager, 'H');
@@ -105,38 +132,74 @@ it('keeps a real ordered line and pickup through deactivation until pickup and w
         )],
     );
     $ordering->orders->add($order);
-    $ordering->baskets->createWeeklyBase(WeeklySourceData::of($order));
+    $sales = new InMemoryBasketRepository;
+    $when = new DateTimeImmutable('2026-11-06');
+    $basketId = 'weekly-basket-1';
+    $sales->save(new Basket($basketId, $household, 'H', BasketState::Draft, null, $when, [
+        new BasketLine('line-1', $basketId, $productId, 'Bread', 'loaf', 500, false, null, Quantity::fromString('1'), $when, kind: BasketLineKind::Weekly),
+    ], kind: BasketKind::Weekly, sourceOrderId: $order->id, referenceCycleId: $cycleId));
     $movements = new InMemoryMovementRepository;
     $receiptId = (new RecordTopUp($movements, $ordering->clock))($membership->manager, $household, 500, 'Opening receipt');
     $correction = new RecordCorrection($movements, $ordering->clock);
     $correction($membership->manager, $household, -1000, 'Opening adjustment', null, $receiptId, 'opening-adjustment');
     $balances = new WalletHouseholdBalances(new ReadHouseholdBalance($movements));
-    $pickups = new OrderingHouseholdPickups(new ReadPendingPickups($ordering->cycles, $ordering->baskets));
-    $warning = new GetHouseholdDeactivationWarning($membership->households, $balances, $pickups);
-    $toSettle = new ListHouseholdsToSettle($membership->households, $balances, $pickups);
+    $baskets = new SalesHouseholdBaskets(new ReadOpenHouseholdBaskets($sales, new OrderingCyclePickupDates(new ReadCyclePickupDates($ordering->cycles))));
+    $charge = new ChargeForBasket($movements, $ordering->clock);
+    $products = new class implements StockProducts
+    {
+        public function lock(string $productId): ?StockProductSnapshot
+        {
+            return null;
+        }
+    };
+    $stockSeller = new class implements StockSeller
+    {
+        public function sell(Actor $actor, string $productId, string $quantity, string $basketId): void {}
+    };
+    $wallet = new class($charge) implements WalletLedger
+    {
+        public function __construct(private readonly ChargeForBasket $charge) {}
+
+        public function charge(Actor $actor, string $householdId, string $basketId, int $totalCents): void
+        {
+            ($this->charge)($actor, $householdId, $basketId, $totalCents);
+        }
+
+        public function balance(Actor $actor, string $householdId): int
+        {
+            return 0;
+        }
+
+        public function correct(Actor $actor, string $householdId, string $basketId, int $amountCents, string $reason, string $correctionId): void {}
+    };
+    $transactions = new ImmediateTransactionRunner;
+    $validate = new ValidateBasket($sales, $products, $stockSeller, $wallet, new NoWeeklyBasketSource, $transactions, $ordering->clock);
+    $collect = new MarkBasketCollected($sales, $transactions, $ordering->clock);
+    $warning = new GetHouseholdDeactivationWarning($membership->households, $balances, $baskets);
+    $toSettle = new ListHouseholdsToSettle($membership->households, $balances, $baskets);
 
     expect($warning($membership->manager, $household)->balanceCents)->toBe(-500)
-        ->and($warning($membership->manager, $household)->pendingPickups[0]->cycleId)->toBe($cycleId);
+        ->and($warning($membership->manager, $household)->openBaskets[0]->basketId)->toBe($basketId)
+        ->and($warning($membership->manager, $household)->openBaskets[0]->date)->toBe('2026-11-07');
 
     ($membership->deactivateHousehold)($membership->manager, $household);
 
     expect($membership->accounts->get($anna)->householdId)->toBeNull()
         ->and($membership->accounts->get($biel)->householdId)->toBeNull()
         ->and($ordering->orders->ofHousehold($cycleId, $household)->lines()[0]->productId)->toBe($productId)
-        ->and($ordering->baskets->stateOfHousehold($cycleId, $household))->toBe('draft')
+        ->and($sales->get($basketId)->state)->toBe(BasketState::Draft)
         ->and($toSettle($membership->manager))->toHaveCount(1);
     $unlinkedAnna = new Actor($anna, [], $membership->accounts->get($anna)->householdId);
     expect(fn () => ($ordering->setOrderLine)($unlinkedAnna, $cycleId, $productId, '1'))->toThrow(NoHousehold::class);
 
     // Sales validates the base (one Wallet charge by basket) and the household later collects it.
-    $ordering->baskets->validate($order->id);
-    (new ChargeForBasket($movements, $ordering->clock))($ordering->manager, $household, 'basket-1', 500);
+    $validate($ordering->manager, $basketId);
     expect($balances->balanceCents($household))->toBe(-1000)
         ->and($toSettle($membership->manager))->toHaveCount(1);
 
-    $ordering->baskets->collect($order->id);
+    $collect($ordering->manager, $basketId);
     (new RecordTopUp($movements, $ordering->clock))($ordering->manager, $household, 1000, 'Settlement');
     expect($balances->balanceCents($household))->toBe(0)
-        ->and($ordering->baskets->stateOfHousehold($cycleId, $household))->toBe('collected')
+        ->and($sales->get($basketId)->state)->toBe(BasketState::Collected)
         ->and($toSettle($membership->manager))->toBe([]);
 });

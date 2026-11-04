@@ -2,23 +2,23 @@
 
 namespace Guixa\Membership\Application;
 
-use Guixa\Membership\Domain\ValueObject\PendingHouseholdPickup;
+use Guixa\Membership\Domain\ValueObject\OpenHouseholdBasket;
 
 final readonly class HouseholdSettlement
 {
-    /** @var list<PendingPickupData> */
-    public array $pendingPickups;
+    /** @var list<OpenHouseholdBasketData> */
+    public array $openBaskets;
 
-    /** @param list<PendingHouseholdPickup> $pendingPickups */
+    /** @param list<OpenHouseholdBasket> $openBaskets */
     public function __construct(
         public string $householdId,
         public string $householdName,
         public int $balanceCents,
-        array $pendingPickups,
+        array $openBaskets,
     ) {
-        $this->pendingPickups = array_map(
-            fn (PendingHouseholdPickup $pickup) => new PendingPickupData($pickup->cycleId, $pickup->pickupDate),
-            $pendingPickups,
+        $this->openBaskets = array_map(
+            fn (OpenHouseholdBasket $basket) => new OpenHouseholdBasketData($basket->basketId, $basket->status, $basket->date),
+            $openBaskets,
         );
     }
 }

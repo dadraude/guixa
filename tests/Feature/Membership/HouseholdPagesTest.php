@@ -4,7 +4,6 @@ use App\Models\User;
 use Guixa\Shared\Domain\Role;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Str;
 use Inertia\Testing\AssertableInertia as Assert;
 
 function accountWithRole(Role $role): User
@@ -88,7 +87,7 @@ it('shows the settlement warning, deactivates with a separate action, and lists 
     $this->actingAs($manager)->get(route('manage.households.show', $householdId))
         ->assertInertia(fn (Assert $page) => $page
             ->where('deactivationWarning.balanceCents', 500)
-            ->where('deactivationWarning.pendingPickups', []));
+            ->where('deactivationWarning.openBaskets', []));
 
     $this->actingAs($manager)->post(route('manage.households.deactivate', $householdId))->assertRedirect();
 
@@ -102,42 +101,47 @@ it('shows the settlement warning, deactivates with a separate action, and lists 
         ->assertInertia(fn (Assert $page) => $page->where('household.active', true));
 });
 
-it('keeps pending pickups and wallet adjustments available after deactivation (R35a, S58)', function () {
-    $manager = accountWithRole(Role::Manager);
-    $this->actingAs($manager)->post(route('manage.households.store'), ['name' => 'Household H']);
-    $householdId = DB::table('households')->value('id');
-    $cycleId = (string) Str::uuid7();
-    $orderId = (string) Str::uuid7();
-    DB::table('cycles')->insert(['id' => $cycleId, 'pickup_date' => '2026-10-28', 'settled_at' => now()]);
-    DB::table('orders')->insert(['id' => $orderId, 'cycle_id' => $cycleId, 'household_id' => $householdId]);
-    $basketId = (string) Str::uuid7();
-    DB::table('baskets')->insert([
-        'id' => $basketId, 'household_id' => $householdId, 'household_name' => 'Household H', 'kind' => 'weekly', 'state' => 'draft',
-        'created_by' => null, 'created_at' => now(), 'source_order_id' => $orderId, 'reference_cycle_id' => $cycleId,
-    ]);
+it('keeps open baskets and wallet adjustments available after deactivation until Finance validates and collects them (R35a, S58)', function () {
+    $week = twoHouseholdWeek(500);
+    ['manager' => $manager, 'cycle' => $cycleId] = $week;
+    $householdId = $week['households']['A'];
+    $basketId = $week['baskets']['A'];
+    $finance = accountWithRole(Role::Finance);
+    $pickupDate = substr((string) DB::table('cycles')->where('id', $cycleId)->value('pickup_date'), 0, 10);
+    $state = fn () => DB::table('baskets')->where('id', $basketId)->value('state');
+    $charges = fn () => DB::table('wallet_movements')->where('basket_id', $basketId)->count();
+    $toSettle = fn () => $this->actingAs($manager)->get(route('manage.households.index'));
 
     $this->actingAs($manager)->get(route('manage.households.show', $householdId))
         ->assertInertia(fn (Assert $page) => $page
-            ->where('deactivationWarning.pendingPickups.0.cycleId', $cycleId)
-            ->where('deactivationWarning.pendingPickups.0.pickupDate', '2026-10-28'));
+            ->where('deactivationWarning.openBaskets.0.basketId', $basketId)
+            ->where('deactivationWarning.openBaskets.0.status', 'draft')
+            ->where('deactivationWarning.openBaskets.0.date', $pickupDate));
 
     $this->actingAs($manager)->post(route('manage.households.deactivate', $householdId))->assertRedirect();
-    expect(DB::table('baskets')->where('id', $basketId)->value('state'))->toBe('draft');
-    $this->actingAs($manager)->post(route('manage.households.wallet.top-ups.store', $householdId), ['amount' => '5.00'])->assertRedirect();
-    $receiptId = DB::table('wallet_movements')->where('household_id', $householdId)->where('type', 'top_up')->value('id');
-    $this->actingAs($manager)->post(route('manage.households.wallet.corrections.store', $householdId), [
-        'amount' => '-5.00',
-        'note' => 'settled',
-        'source_movement_id' => $receiptId,
-        'correction_id' => (string) Str::uuid7(),
-    ])->assertRedirect()->assertSessionHasNoErrors();
+    expect($state())->toBe('draft');
+    $toSettle()->assertInertia(fn (Assert $page) => $page
+        ->where('toSettle.0.householdId', $householdId)
+        ->where('toSettle.0.balanceCents', 0)
+        ->where('toSettle.0.openBaskets.0.status', 'draft'));
 
-    $this->actingAs($manager)->get(route('manage.households.index'))
-        ->assertInertia(fn (Assert $page) => $page
-            ->where('toSettle.0.balanceCents', 0)
-            ->where('toSettle.0.pendingPickups.0.cycleId', $cycleId));
+    $this->actingAs($finance)->post(route('finance.baskets.validate', $basketId))->assertRedirect()->assertSessionHasNoErrors();
+    expect($state())->toBe('validated')
+        ->and($charges())->toBe(1);
+    $toSettle()->assertInertia(fn (Assert $page) => $page
+        ->where('toSettle.0.balanceCents', -2000)
+        ->where('toSettle.0.openBaskets.0.status', 'validated')
+        ->where('toSettle.0.openBaskets.0.date', $pickupDate));
 
-    DB::table('baskets')->where('id', $basketId)->update(['state' => 'collected']);
-    $this->actingAs($manager)->get(route('manage.households.index'))
-        ->assertInertia(fn (Assert $page) => $page->where('toSettle', []));
+    $this->actingAs($manager)->post(route('manage.households.wallet.top-ups.store', $householdId), ['amount' => '20.00'])->assertRedirect();
+    $toSettle()->assertInertia(fn (Assert $page) => $page
+        ->where('toSettle.0.balanceCents', 0)
+        ->where('toSettle.0.openBaskets.0.basketId', $basketId));
+
+    $movements = DB::table('wallet_movements')->count();
+    $this->actingAs($finance)->put(route('finance.baskets.collect', $basketId))->assertRedirect()->assertSessionHasNoErrors();
+    expect($state())->toBe('collected')
+        ->and($charges())->toBe(1)
+        ->and(DB::table('wallet_movements')->count())->toBe($movements);
+    $toSettle()->assertInertia(fn (Assert $page) => $page->where('toSettle', []));
 });

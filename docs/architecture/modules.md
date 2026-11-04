@@ -19,7 +19,7 @@ modules. `Platform` below names framework persistence ownership, not a `src/Plat
 | Module     | Owns today                                                                                                                   | Allowed dependencies                                 |
 | ---------- | ---------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
 | Catalog    | Producers; all product identity, metadata, classification and administration                                                 | Membership, Ordering, Sales, Stock, Shared           |
-| Membership | Accounts, households, roles, invitations and household lifecycle                                                             | Catalog, Ordering, Wallet, Shared                    |
+| Membership | Accounts, households, roles, invitations and household lifecycle                                                             | Catalog, Sales, Wallet, Shared                       |
 | Ordering   | Weekly demand, cycles, cutoffs, producer orders, reception and allocation; settlement hands orders to Sales                  | Catalog, Membership, Sales, Shared                   |
 | Sales      | Stock offers, weekly base baskets and independent stock/return baskets: actuals, validation, late weekly baskets, collection | Catalog, Membership, Ordering, Stock, Wallet, Shared |
 | Stock      | Return items, append-only stock movements and availability                                                                   | Catalog, Shared                                      |
@@ -52,9 +52,9 @@ else in a module is private to that module for integration purposes, even when P
 | Membership → Ordering    | GetHouseholds, GetProducerAccountEmail                                                                                                    | HouseholdData                                             |
 | Membership → Sales       | ReadActiveHouseholds                                                                                                                      | ActiveHouseholdData                                       |
 | Ordering → Catalog       | CheckProductUsage, HasUnsettledLines, StopParticipatingWhereNotSent                                                                       | —                                                         |
-| Ordering → Membership    | ReadPendingPickups                                                                                                                        | PendingPickupData                                         |
-| Ordering → Sales         | LockWeeklyBasketSource, CloseCycleAfterBasketValidation                                                                                   | —                                                         |
+| Ordering → Sales         | LockWeeklyBasketSource, CloseCycleAfterBasketValidation, ReadCyclePickupDates                                                             | —                                                         |
 | Sales → Catalog          | HasProductHistory                                                                                                                         | —                                                         |
+| Sales → Membership       | ReadOpenHouseholdBaskets                                                                                                                  | OpenBasketData                                            |
 | Sales → Ordering         | CreateWeeklyBasket, SyncWeeklyBasket, AddLateWeeklyLines, ReadWeeklyBasketStates, ReadPendingWeeklyCycles, ReadHouseholdContainerBalances | WeeklyBaseData, WeeklyBaseLineData, WeeklyBasketStateData |
 | Stock → Catalog          | CheckProductUsage, GetAvailableQuantities                                                                                                 | —                                                         |
 | Stock → Sales            | GetAvailableQuantities, SellBasketStock, CorrectBasketStock                                                                               | —                                                         |
@@ -128,7 +128,7 @@ Retain the rollback and concurrency tests when changing either workflow. Modules
 `TransactionRunner`; mail is scheduled after commit.
 
 Actor-based operations retain their own authorization checks. Internal read queries such as
-`ReadPendingPickups` and `ReadHouseholdBalance` accept no Actor because their caller already authorizes
+`ReadOpenHouseholdBaskets` and `ReadHouseholdBalance` accept no Actor because their caller already authorizes
 the user operation. An export is permission to depend on a symbol, not user authorization.
 
 ## Enforcement and maintenance

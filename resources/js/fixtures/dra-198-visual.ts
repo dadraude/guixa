@@ -103,7 +103,7 @@ const settlement = {
     householdId,
     householdName: household.name,
     balanceCents: 2000,
-    pendingPickups: [{ cycleId, pickupDate }],
+    openBaskets: [{ basketId: 'basket-1', status: 'draft', date: pickupDate }],
 };
 const reception = {
     cycleId,
