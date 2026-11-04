@@ -599,6 +599,7 @@ if (state === 'status') {
     visualProps.status = 'verification-link-sent';
     if (pageName === 'settings/Profile') {
         visualProps.mustVerifyEmail = true;
+        visualProps.verificationLinkSent = true;
         visualProps.auth.user.email_verified_at = null;
     }
 }
