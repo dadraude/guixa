@@ -16,7 +16,7 @@ defineOptions({
 });
 
 defineProps<{
-    status?: string;
+    verificationLinkSent: boolean;
 }>();
 </script>
 
@@ -24,7 +24,7 @@ defineProps<{
     <Head :title="trans('Email verification')" />
 
     <div
-        v-if="status === 'verification-link-sent'"
+        v-if="verificationLinkSent"
         class="pilot-status mb-4 text-center text-sm font-medium"
     >
         {{

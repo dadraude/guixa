@@ -80,7 +80,7 @@ class FortifyServiceProvider extends ServiceProvider
         ]));
 
         Fortify::verifyEmailView(fn (Request $request) => Inertia::render('auth/VerifyEmail', [
-            'status' => $request->session()->get('status'),
+            'verificationLinkSent' => $request->session()->get('status') === 'verification-link-sent',
         ]));
 
         Fortify::twoFactorChallengeView(fn () => Inertia::render('auth/TwoFactorChallenge'));
