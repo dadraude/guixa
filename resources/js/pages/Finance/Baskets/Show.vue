@@ -19,12 +19,14 @@ import InputError from '@/components/InputError.vue';
 import StockLines from '@/components/pickup/StockLines.vue';
 import ReturnLines from '@/components/pickup/ReturnLines.vue';
 import { euros } from '@/components/pickup/euros';
+import { formatQuantity } from '@/lib/locale';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useTemplateRef } from 'vue';
 
 const props = defineProps<{
     basket: App.Http.BasketRow;
+    containerBalance: number;
     stockProducts: App.Http.StockLevelRow[];
     returnItems: App.Http.ReturnItemRow[];
 }>();
@@ -232,6 +234,12 @@ const statusLabels: Record<string, string> = {
                         {{ trans('Projected balance') }}
                     </dt>
                     <dd>{{ euros(basket.projectedBalanceCents) }}</dd>
+                </div>
+                <div data-test="container-balance">
+                    <dt class="text-muted-foreground">
+                        {{ trans('Containers to return') }}
+                    </dt>
+                    <dd>{{ formatQuantity(String(containerBalance)) }}</dd>
                 </div>
             </dl>
             <Link

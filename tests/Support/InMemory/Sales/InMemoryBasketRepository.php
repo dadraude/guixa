@@ -158,6 +158,12 @@ final class InMemoryBasketRepository implements BasketRepository
             fn (Basket $basket) => $basket->householdId === $householdId));
     }
 
+    public function settledForHouseholds(array $householdIds): array
+    {
+        return array_values(array_filter($this->baskets,
+            fn (Basket $basket) => in_array($basket->householdId, $householdIds, true) && $basket->state->isSettled()));
+    }
+
     public function hasProductHistory(string $productId): bool
     {
         foreach ($this->baskets as $basket) {

@@ -94,4 +94,32 @@ final class EloquentBasketRepositoryContractTest extends TestCase
         $this->assertNotNull($listed[2]->lines[0]->removedAt);
         $this->assertSame([], $listed[2]->activeLines());
     }
+
+    public function test_settled_read_uses_a_fixed_number_of_queries_whatever_the_number_of_households(): void
+    {
+        [$repository, $manager, $household, $product] = $this->basketWorld();
+        $other = (string) Str::uuid7();
+        DB::table('households')->insert(['id' => $other, 'name' => 'Household O', 'created_at' => now(), 'updated_at' => now()]);
+        $when = new \DateTimeImmutable('2026-10-30T10:00:00+00:00');
+        foreach ([$household, $other, $household] as $owner) {
+            $id = $repository->nextId();
+            $line = new BasketLine($repository->nextId(), $id, $product, 'Oil', 'bottle', 1200, false, '1', Quantity::fromString('1'), $when);
+            $repository->save(new Basket($id, $owner, 'Household', BasketState::Draft, $manager, $when, [$line]));
+            $repository->save($repository->get($id)->validated($manager, $when));
+        }
+
+        DB::enableQueryLog();
+        DB::flushQueryLog();
+        try {
+            $settled = $repository->settledForHouseholds([$household, $other]);
+            $queryCount = count(DB::getQueryLog());
+        } finally {
+            DB::disableQueryLog();
+            DB::flushQueryLog();
+        }
+
+        $this->assertCount(3, $settled);
+        // Baskets, lines, adjustments and collection events; adjustment lines load only when an adjustment exists.
+        $this->assertSame(4, $queryCount);
+    }
 }

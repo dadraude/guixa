@@ -8,5 +8,6 @@ final readonly class HouseholdContainerCountData
         public string $householdId,
         public string $householdName,
         public int $count,
+        public int $balance,
     ) {}
 }

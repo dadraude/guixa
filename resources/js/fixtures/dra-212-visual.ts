@@ -110,6 +110,7 @@ const props = {
         },
     ],
     basket,
+    containerBalance: 3,
     stockProducts:
         basketState === 'draft' && state !== 'disabled'
             ? [

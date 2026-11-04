@@ -44,6 +44,7 @@ final class GetContainerCount
         $baskets = $this->baskets->snapshot($cycleId);
         $ids = array_values(array_unique(array_map(fn ($order) => $order->householdId, $orders)));
         $names = $this->households->find($ids);
+        $balances = $this->baskets->containerBalances($ids);
         $rows = [];
         $total = 0;
 
@@ -56,10 +57,10 @@ final class GetContainerCount
                     continue;
                 }
 
-                $count += $this->roundedContainers($this->taken($baskets->effective($order->householdId, $line->productId), $line), $line->containersPerUnit);
+                $count += $this->taken($baskets->effective($order->householdId, $line->productId), $line)->containersAt($line->containersPerUnit);
             }
 
-            $rows[] = new HouseholdContainerCountData($order->householdId, $names[$order->householdId]->name ?? $order->householdId, $count);
+            $rows[] = new HouseholdContainerCountData($order->householdId, $names[$order->householdId]->name ?? $order->householdId, $count, $balances[$order->householdId]);
             $total += $count;
         }
 
@@ -72,17 +73,5 @@ final class GetContainerCount
     private function taken(?int $effective, OrderLine $line): Quantity
     {
         return $effective === null ? $line->allocated : Quantity::ofThousandths($effective);
-    }
-
-    private function roundedContainers(Quantity $quantity, Quantity $containersPerUnit): int
-    {
-        $wholeQuantity = intdiv($quantity->thousandths, 1000);
-        $fractionalQuantity = $quantity->thousandths % 1000;
-        $wholeRate = intdiv($containersPerUnit->thousandths, 1000);
-        $fractionalRate = $containersPerUnit->thousandths % 1000;
-        $fractionalProduct = ($wholeQuantity * $fractionalRate + $fractionalQuantity * $wholeRate) * 1000
-            + $fractionalQuantity * $fractionalRate;
-
-        return $wholeQuantity * $wholeRate + intdiv($fractionalProduct + 999999, 1000000);
     }
 }

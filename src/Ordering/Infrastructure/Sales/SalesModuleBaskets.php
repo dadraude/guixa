@@ -10,6 +10,7 @@ use Guixa\Ordering\Domain\WeeklyBasketEntry;
 use Guixa\Ordering\Domain\WeeklyBasketSnapshot;
 use Guixa\Sales\Application\AddLateWeeklyLines;
 use Guixa\Sales\Application\CreateWeeklyBasket;
+use Guixa\Sales\Application\ReadHouseholdContainerBalances;
 use Guixa\Sales\Application\ReadPendingWeeklyCycles;
 use Guixa\Sales\Application\ReadWeeklyBasketStates;
 use Guixa\Sales\Application\SyncWeeklyBasket;
@@ -25,6 +26,7 @@ final class SalesModuleBaskets implements SalesBaskets
         private readonly AddLateWeeklyLines $late,
         private readonly ReadWeeklyBasketStates $states,
         private readonly ReadPendingWeeklyCycles $pending,
+        private readonly ReadHouseholdContainerBalances $balances,
         private readonly Households $households,
     ) {}
 
@@ -56,6 +58,11 @@ final class SalesModuleBaskets implements SalesBaskets
             fn (WeeklyBasketStateData $basket) => new WeeklyBasketEntry($basket->basketId, $basket->householdId, $basket->state, $basket->late, $basket->effective),
             $states,
         ));
+    }
+
+    public function containerBalances(array $householdIds): array
+    {
+        return ($this->balances)($householdIds);
     }
 
     private function baseOf(WeeklySourceData $source): WeeklyBaseData

@@ -224,7 +224,12 @@ const order = {
 const pages: Record<string, { component: string; props: object }> = {
     finance: {
         component: 'Finance/Baskets/Show',
-        props: { basket, stockProducts: [], returnItems: [] },
+        props: {
+            basket,
+            containerBalance: 3,
+            stockProducts: [],
+            returnItems: [],
+        },
     },
     member: { component: 'Member/Baskets/Show', props: { basket } },
     reception: {

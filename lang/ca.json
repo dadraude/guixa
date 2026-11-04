@@ -181,6 +181,8 @@
     "Total to charge": "Total a cobrar",
     "Completed": "Completada",
     "Containers to collect": "Envasos per recollir",
+    "Containers to return": "Envasos per retornar",
+    "Containers to return: :count": "Envasos per retornar: :count",
     "Cycle total": "Total del cicle",
     "Balance": "Saldo",
     "Pending pickups": "Recollides pendents",

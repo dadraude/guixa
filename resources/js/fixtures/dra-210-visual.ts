@@ -138,7 +138,11 @@ const propsByPage: Record<string, Record<string, unknown>> = {
         households:
             state === 'empty' ? [] : [{ id: householdId, name: householdName }],
     },
-    'Finance/Baskets/Show': { basket, stockProducts: [stock] },
+    'Finance/Baskets/Show': {
+        basket,
+        containerBalance: 3,
+        stockProducts: [stock],
+    },
     'Wallet/Statement': {
         household:
             role === 'manager'
