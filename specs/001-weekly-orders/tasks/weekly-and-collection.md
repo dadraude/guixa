@@ -113,8 +113,7 @@ Acceptance:
 - The balance is derived: effective validated weekly/stock lines add quantity × snapshotted containers
   per unit, ceil per line; validated return lines reduce it. No money movement is added (the container
   price is already in the product price).
-- Open question to settle before coding: a return larger than the balance is shown to the Manager and
-  its handling is undecided.
+- The balance may be negative; a return is never rejected for exceeding it (R18a, S92).
 
 Verify S60 (per household), S80 and S92 with late physical pickup then a new independent basket, multiple
 baskets and corrected effective quantities. Test household scoping server-side.
