@@ -10,13 +10,6 @@ return [
     ],
     'A14' => [],
     'A15' => [],
-    'A16' => [
-        'app/Http/Controllers/DashboardController.php',
-        'app/Http/Controllers/Finance/BasketController.php',
-        'app/Http/Controllers/Manage/CycleController.php',
-        'app/Http/Controllers/Manage/HouseholdController.php',
-        'app/Http/Controllers/Manage/PickupController.php',
-        'app/Http/Controllers/Manage/ReceptionController.php',
-    ],
+    'A16' => [],
     'A17' => [],
 ];

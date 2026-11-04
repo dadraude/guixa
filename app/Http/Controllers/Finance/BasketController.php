@@ -17,9 +17,8 @@ use Guixa\Sales\Application\ListActiveHouseholds;
 use Guixa\Sales\Application\ListBaskets;
 use Guixa\Sales\Domain\Error\BasketNotFound;
 use Guixa\Shared\Application\Actor;
+use Guixa\Stock\Application\ListActiveStock;
 use Guixa\Stock\Application\ListReturnItems;
-use Guixa\Stock\Application\ListStock;
-use Guixa\Stock\Application\StockLevelData;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -43,7 +42,7 @@ final class BasketController extends Controller
         return to_route('finance.baskets.show', ['basket' => $id]);
     }
 
-    public function show(string $basket, Actor $actor, GetBasket $get, GetBasketBalance $balance, ListStock $stock,
+    public function show(string $basket, Actor $actor, GetBasket $get, GetBasketBalance $balance, ListActiveStock $stock,
         ListReturnItems $returns): Response
     {
         try {
@@ -55,7 +54,7 @@ final class BasketController extends Controller
         return Inertia::render('Finance/Baskets/Show', [
             'basket' => BasketRow::from($record, $balance($actor, $record->householdId)),
             'stockProducts' => $record->can->edit
-                ? array_map(StockLevelRow::from(...), array_values(array_filter($stock($actor), fn (StockLevelData $level) => $level->active)))
+                ? array_map(StockLevelRow::from(...), $stock($actor))
                 : [],
             'returnItems' => $record->can->edit
                 ? array_map(ReturnItemRow::from(...), $returns($actor))

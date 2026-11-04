@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\CycleRow;
 use App\Http\CycleSummaryRow;
 use App\Http\ProducerOptionRow;
+use Guixa\Catalog\Application\ListActiveProducers;
 use Guixa\Catalog\Application\ListProducers;
 use Guixa\Catalog\Application\ProducerData;
 use Guixa\Ordering\Application\GetContainerCount;
@@ -23,15 +24,14 @@ use Inertia\Response;
 
 class CycleController extends Controller
 {
-    public function index(Actor $actor, ListCycles $listCycles, ListProducers $listProducers, GetPickupWeekday $getPickupWeekday): Response
+    public function index(Actor $actor, ListCycles $listCycles, ListProducers $listProducers, ListActiveProducers $listActiveProducers, GetPickupWeekday $getPickupWeekday): Response
     {
         $producers = $listProducers($actor);
         $names = array_column(array_map(fn (ProducerData $producer) => ['id' => $producer->id, 'name' => $producer->name], $producers), 'name', 'id');
-        $active = array_filter($producers, fn (ProducerData $producer) => $producer->active);
 
         return Inertia::render('Manage/Cycles/Index', [
             'cycles' => array_map(fn ($cycle) => CycleRow::from($cycle, $names), $listCycles($actor)),
-            'producers' => array_map(ProducerOptionRow::from(...), array_values($active)),
+            'producers' => array_map(ProducerOptionRow::from(...), $listActiveProducers($actor)),
             'pickupWeekday' => $getPickupWeekday($actor),
         ]);
     }
