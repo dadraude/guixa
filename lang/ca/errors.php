@@ -71,6 +71,7 @@ return [
     'UnknownProducer' => 'No s’ha trobat aquest productor.',
     'RedistributionBlockedByValidatedBasket' => 'Una cistella ja validada conté aquest producte, així que no es pot redistribuir. Corregeix aquesta cistella des de les seves correccions.',
     'CycleClosed' => 'Aquest cicle està tancat i no es pot modificar.',
+    'CycleSettled' => 'Aquest cicle ja està liquidat i no s’hi poden afegir més productors.',
     'CycleCancelled' => 'Aquest cicle s’ha cancel·lat. No se’n pot modificar la comanda.',
     'CycleNotFound' => 'No s’ha trobat aquest cicle de comanda.',
     'FractionalQuantityNotAllowed' => 'Aquest producte s’ha de demanar en unitats senceres.',

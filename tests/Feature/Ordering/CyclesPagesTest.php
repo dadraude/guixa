@@ -349,3 +349,33 @@ it('answers with the domain error when the cycle is already cancelled (R4b)', fu
         ->assertRedirect('/manage/cycles')
         ->assertSessionHasErrors('domain');
 });
+
+it('refuses to add a producer to a settled cycle and shows the domain error (R4a, S51)', function () {
+    pickupOnSaturdays();
+    $manager = accountWith(Role::Manager);
+    $baker = cyclesBaker();
+    $this->actingAs($manager)->post('/manage/cycles', ['pickup_date' => upcoming()->toDateString()]);
+    $cycleId = DB::table('cycles')->value('id');
+    DB::table('cycles')->where('id', $cycleId)->update(['settled_at' => now()]);
+
+    $this->actingAs($manager)->from('/manage/cycles')->post("/manage/cycles/{$cycleId}/producers/{$baker->id}")
+        ->assertSessionHasErrors(['domain' => __('errors.CycleSettled')]);
+
+    expect(DB::table('cycle_producers')->where('cycle_id', $cycleId)->exists())->toBeFalse();
+});
+
+it('refuses to make a stopped producer participate again in a settled cycle (R4a, S51)', function () {
+    pickupOnSaturdays();
+    $manager = accountWith(Role::Manager);
+    $baker = cyclesBaker();
+    $this->actingAs($manager)->post('/manage/cycles', ['pickup_date' => upcoming()->toDateString()]);
+    $cycleId = DB::table('cycles')->value('id');
+    $this->actingAs($manager)->post("/manage/cycles/{$cycleId}/producers/{$baker->id}");
+    $this->actingAs($manager)->delete("/manage/cycles/{$cycleId}/producers/{$baker->id}");
+    DB::table('cycles')->where('id', $cycleId)->update(['settled_at' => now()]);
+
+    $this->actingAs($manager)->from('/manage/cycles')->put("/manage/cycles/{$cycleId}/producers/{$baker->id}")
+        ->assertSessionHasErrors(['domain' => __('errors.CycleSettled')]);
+
+    expect(DB::table('cycle_producers')->where('cycle_id', $cycleId)->value('participating'))->toBeFalse();
+});

@@ -7,6 +7,7 @@ use Guixa\Ordering\Application\ReopenProducerOrder;
 use Guixa\Ordering\Application\ValidateReception;
 use Guixa\Ordering\Domain\Error\CycleClosed;
 use Guixa\Ordering\Domain\Error\CycleNotFound;
+use Guixa\Ordering\Domain\Error\CycleSettled;
 use Guixa\Ordering\Domain\Error\PickupNotPending;
 use Guixa\Ordering\Domain\Error\ProducerDistributed;
 use Guixa\Ordering\Domain\Error\ProducerNotDistributed;
@@ -874,3 +875,36 @@ it('keeps the next cycle editable while the previous cycle is settled with a val
         ->and($order->lines())->toHaveCount(1)
         ->and($order->lines()[0]->ordered->toString())->toBe('3.000');
 })->group('R4', 'S9', 'S26');
+
+it('adds a producer to a cycle until it is settled, then refuses it (R4a, S51)', function () {
+    $early = '00000000-0000-7000-8000-0000000000b8';
+    $late = '00000000-0000-7000-8000-0000000000b9';
+    $this->world->rules->activate($early, 3, '20:00');
+    $this->world->rules->activate($late, 3, '20:00');
+    ($this->onlyBaker)();
+
+    ($this->world->addParticipant)($this->world->manager, $this->cycleId, $early);
+    expect(($this->settled)())->toBeFalse();
+
+    ($this->world->stopParticipating)($this->world->manager, $this->cycleId, $early);
+    ($this->bakerSent)();
+    ($this->validate)();
+    ($this->distribute)();
+
+    expect(($this->settled)())->toBeTrue()
+        ->and(fn () => ($this->world->addParticipant)($this->world->manager, $this->cycleId, $late))->toThrow(CycleSettled::class);
+})->group('R4a', 'S51');
+
+it('lets a stopped producer participate again until the cycle is settled, then refuses it (R4a, S51)', function () {
+    ($this->onlyBaker)();
+    $again = fn () => ($this->world->participateAgain)($this->world->manager, $this->cycleId, OrderingWorld::GROWER);
+
+    $again();
+    ($this->onlyBaker)();
+    ($this->bakerSent)();
+    ($this->validate)();
+    ($this->distribute)();
+
+    expect(($this->settled)())->toBeTrue()
+        ->and($again)->toThrow(CycleSettled::class);
+})->group('R4a', 'S51');

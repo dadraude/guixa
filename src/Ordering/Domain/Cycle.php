@@ -8,6 +8,7 @@ use Guixa\Ordering\Domain\Error\CutoffNotInFuture;
 use Guixa\Ordering\Domain\Error\CutoffOutsideWindow;
 use Guixa\Ordering\Domain\Error\CycleCancelled;
 use Guixa\Ordering\Domain\Error\CycleClosed;
+use Guixa\Ordering\Domain\Error\CycleSettled;
 use Guixa\Ordering\Domain\Error\NotOnPickupWeekday;
 use Guixa\Ordering\Domain\Error\PickupDateNotInFuture;
 use Guixa\Ordering\Domain\Error\ProducerClosed;
@@ -68,11 +69,14 @@ final class Cycle
 
     /**
      * The cutoff is computed once, from the rule as it is now, and never recomputed; it is null when
-     * that moment has already passed (R4a, R5). A producer already in the cycle is left as it is.
+     * that moment has already passed (R4a, R5). Refused once the cycle is settled (R4a).
+     * A producer already in the cycle is left as it is.
      */
     public function addParticipant(string $producerId, CutoffRule $rule, DateTimeImmutable $now): void
     {
         $this->assertNotCancelled();
+
+        $this->assertNotSettled();
 
         if (isset($this->producerOrders[$producerId])) {
             return;
@@ -93,6 +97,7 @@ final class Cycle
     public function participateAgain(string $producerId): void
     {
         $this->assertNotCancelled();
+        $this->assertNotSettled();
         $this->unsentProducerOrderOf($producerId)->participateAgain();
     }
 
@@ -406,6 +411,13 @@ final class Cycle
         $participating = array_filter($this->producerOrders, fn (ProducerOrder $order) => $order->isParticipating());
 
         return $participating !== [] && array_filter($participating, fn (ProducerOrder $order) => ! $order->isDistributed()) === [];
+    }
+
+    private function assertNotSettled(): void
+    {
+        if ($this->isSettled()) {
+            throw CycleSettled::withId($this->id);
+        }
     }
 
     private function assertNotCancelled(): void

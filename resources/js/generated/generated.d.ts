@@ -131,6 +131,7 @@ readonly pickupDate: string,
 readonly cancelled: boolean,
 readonly participants: App.Http.CycleParticipantRow[],
 readonly closed: boolean,
+readonly settled: boolean,
 };
 export type CycleSummaryRow = {
 readonly cycleId: string,
