@@ -76,8 +76,10 @@ Before opening a task's PR (its Linear issue tracks the status), compare the cod
 and the task's allocated acceptance scope for every linked `R#` and scenario. If a requirement is
 shared, verify this task's part and the named owner/dependency for the remainder; do not claim the
 whole requirement complete or record its planned remainder as a deviation. Carry that allocation in
-implementer and reviewer handoffs. Write actual mismatches back to the affected document and log a
-**Deviation**; a behavior change still needs the user's decision.
+implementer and reviewer handoffs. Write actual `plan.md`/`tasks.md` mismatches back in the task PR
+and log a **Deviation**. A mismatch with `spec.md` or an area file goes to the stacked spec-sync PR
+([Sync requirements documents](../../../skills/agent-workflow/core/task.md#sync-requirements-documents)),
+logged as a **Change**; merging that PR is the user's decision.
 
 Done when the allocated acceptance scope matches the code, its tests pass and any remainder retains
 an explicit owner.

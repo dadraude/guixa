@@ -96,6 +96,23 @@ or send an already-pushed branch into the pre-push amend/rebase loop. Never forc
 Record the confirmed PR as `pending-ci`, retaining its worktree, database and reservation. Publication
 is not full validation. A feature-branch push alone does not trigger the configured PR workflow.
 
+### Sync requirements documents
+
+Once the task PR is confirmed, the implementation owner compares its full diff against the profile's
+requirements documents and returns `none`, or each requirement/scenario the code now contradicts or
+extends, with code evidence. Plan/task deviations the profile lets the task PR carry stay in it.
+
+When a requirements document must change, the implementation owner writes those edits and their
+history entries in the profile's spec-sync worktree, on the spec-sync branch created from the task
+branch. A fresh reviewer checks that the edits describe the published code and add no new behaviour.
+A publisher then opens a stacked PR whose base is the task branch, and links each PR from the other.
+The stacked PR is the proposal; accepting the requirement change stays the user's decision.
+
+New task commits that change behaviour repeat the comparison: merge the task branch into the
+spec-sync branch as a new commit and update its edits. Record the spec-sync PR, or `none`, with the
+task; an unrun comparison is missing proof. After the task PR integrates, retarget the stacked PR to
+the configured base before the user merges it.
+
 ## 7. Observe CI and close
 
 Use authorized read access to resolve expected checks from the current workflow/scripts and any
