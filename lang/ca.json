@@ -666,5 +666,6 @@
     "Effective after corrections: :quantity": "Efectiu després de les correccions: :quantity",
     "Actual :name": "Real :name",
     "Actual quantity differs from the allocation: this blocks nothing": "La quantitat real difereix de l'assignació: això no bloqueja res",
-    "Actual": "Real"
+    "Actual": "Real",
+    "A member updates their order and the total follows.": "Una persona sòcia actualitza la comanda i el total s’actualitza."
 }

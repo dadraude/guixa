@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PackageCheck, ShoppingBasket, UsersRound } from '@lucide/vue';
+import { useMediaQuery } from '@vueuse/core';
 import { trans } from 'laravel-vue-i18n';
 import AppLogoIcon from '@/components/AppLogoIcon.vue';
 import { Button } from '@/components/ui/button';
@@ -8,6 +8,9 @@ defineProps<{
     authenticated: boolean;
     actionHref: string;
 }>();
+
+const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
+const compact = useMediaQuery('(max-width: 639px)');
 </script>
 
 <template>
@@ -59,53 +62,47 @@ defineProps<{
                     </Button>
                 </section>
 
-                <section
-                    class="grid min-w-0 gap-5 rounded-2xl border border-border bg-card p-4 shadow-sm sm:p-7"
-                    data-visual-panel
-                    :aria-label="trans('Your work, organized')"
-                >
-                    <h2 class="text-lg font-semibold">
-                        {{ trans('Your work, organized') }}
-                    </h2>
-                    <ul class="grid min-w-0 gap-3">
-                        <li
-                            class="flex min-w-0 flex-wrap items-center gap-2 rounded-xl bg-muted p-2"
-                        >
-                            <ShoppingBasket
-                                class="size-5 shrink-0 text-primary"
-                                aria-hidden="true"
-                            />
-                            <span
-                                class="min-w-0 flex-[1_1_8rem] font-medium [overflow-wrap:anywhere]"
-                                >{{ trans('Orders') }}</span
-                            >
-                        </li>
-                        <li
-                            class="flex min-w-0 flex-wrap items-center gap-2 rounded-xl bg-muted p-2"
-                        >
-                            <PackageCheck
-                                class="size-5 shrink-0 text-primary"
-                                aria-hidden="true"
-                            />
-                            <span
-                                class="min-w-0 flex-[1_1_8rem] font-medium [overflow-wrap:anywhere]"
-                                >{{ trans('Pickups') }}</span
-                            >
-                        </li>
-                        <li
-                            class="flex min-w-0 flex-wrap items-center gap-2 rounded-xl bg-muted p-2"
-                        >
-                            <UsersRound
-                                class="size-5 shrink-0 text-primary"
-                                aria-hidden="true"
-                            />
-                            <span
-                                class="min-w-0 flex-[1_1_8rem] font-medium [overflow-wrap:anywhere]"
-                                >{{ trans('Households') }}</span
-                            >
-                        </li>
-                    </ul>
-                </section>
+                <figure class="min-w-0" data-visual-panel>
+                    <!-- Filmed from the stageshow demo; the poster is its final frame, shown under reduced motion -->
+                    <picture v-if="reducedMotion">
+                        <source
+                            media="(max-width: 639px)"
+                            srcset="/images/welcome/order-hero-compact.png"
+                        />
+                        <img
+                            src="/images/welcome/order-hero.png"
+                            :alt="
+                                trans(
+                                    'A member updates their order and the total follows.',
+                                )
+                            "
+                            class="h-auto w-full"
+                        />
+                    </picture>
+                    <video
+                        v-else
+                        class="h-auto w-full"
+                        autoplay
+                        loop
+                        muted
+                        playsinline
+                        :aria-label="
+                            trans(
+                                'A member updates their order and the total follows.',
+                            )
+                        "
+                        :poster="
+                            compact
+                                ? '/images/welcome/order-hero-compact.png'
+                                : '/images/welcome/order-hero.png'
+                        "
+                        :src="
+                            compact
+                                ? '/images/welcome/order-hero-compact.webm'
+                                : '/images/welcome/order-hero.webm'
+                        "
+                    />
+                </figure>
             </main>
         </div>
     </div>
