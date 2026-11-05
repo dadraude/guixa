@@ -92,8 +92,11 @@ Each worker command sets its own cwd and environment; never rely on shell state 
 cd "$WORKTREE" && PATH="$WORKTREE_ROOT/.bin:$PATH" node .agent-workflow/scripts/task-command.mjs "$NN" -- <executable> <arguments>
 ```
 
-Before setup, privately copy `$REPO_ROOT/.env` to the new task worktree, replace its `DB_DATABASE`
-with `TEST_DB`, and verify the replacement without logging credentials. Never change the source `.env`.
+Task worktrees have no `.env`: never read, copy or create any `.env*` file (user policy denies it).
+The coordinator generates one throwaway key with `php -r 'echo "base64:".base64_encode(random_bytes(32));'`
+and passes it as `APP_KEY`, with `DB_USERNAME=postgres`, in the environment of the wrapper command
+above; the wrapper sets `DB_DATABASE` to `TEST_DB` and `phpunit.xml` supplies the rest. The coordinator
+creates `TEST_DB` on the local Postgres before dispatch.
 All setup, tests and artisan commands use the guarded worktree prefix above; the user's `guixa` database and
 shared `guixa_test` are not task databases. If isolated database configuration cannot be verified, stop.
 
