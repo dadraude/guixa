@@ -291,6 +291,21 @@ it('shares leftover grams one by one to the earliest lines (R15, R17, S12)', fun
         ->and(($this->product)($this->cheese)->balanced)->toBeTrue();
 });
 
+it('breaks a remainder tie by line creation: removing and re-adding gives a new moment, changing the quantity keeps it (R15)', function () {
+    ($this->order)('A', $this->cheese, '1');
+    ($this->order)('B', $this->cheese, '1');
+    ($this->order)('C', $this->cheese, '1');
+    ($this->order)('A', $this->cheese, '0');
+    ($this->order)('A', $this->cheese, '1');
+    ($this->order)('B', $this->cheese, '2');
+    ($this->order)('B', $this->cheese, '1');
+    ($this->send)();
+
+    ($this->setReceived)($this->cheese, '1');
+
+    expect(($this->shares)($this->cheese))->toBe(['Household A' => '0.333', 'Household B' => '0.334', 'Household C' => '0.333']);
+});
+
 it('refuses a received total in fractions for a non-variable product (R9, R15)', function () {
     ($this->orderBreadLikeS10)();
 

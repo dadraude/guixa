@@ -11,6 +11,7 @@ use Guixa\Sales\Application\CreateStockBasket;
 use Guixa\Sales\Application\MarkBasketCollected;
 use Guixa\Sales\Application\ValidateBasket;
 use Guixa\Shared\Application\Actor;
+use Guixa\Stock\Application\RecordStockAdjustment;
 use Guixa\Stock\Application\RecordStockEntry;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -168,6 +169,42 @@ final class BasketConcurrencyTest extends TestCase
     }
 
     #[Test]
+    public function a_negative_adjustment_racing_a_sale_waits_for_it_and_cannot_take_stock_below_zero(): void
+    {
+        [$actor, $household, $products] = $this->world(['Oil' => '5']);
+        $basket = $this->draft($actor, $household, [$products['Oil'] => '3']);
+
+        DB::beginTransaction();
+        app(ValidateBasket::class)($actor, $basket);
+        $pipes = $this->startAdjustment($actor->accountId, $products['Oil'], '-4');
+        $this->waitForLock($pipes);
+        DB::commit();
+
+        $this->assertSame('NotEnoughStock', $this->finish($pipes));
+        $this->assertSame(0, DB::table('stock_movements')->where('product_id', $products['Oil'])->where('type', 'adjustment')->count());
+        $this->assertSame(2.0, (float) DB::table('stock_movements')->where('product_id', $products['Oil'])->sum('quantity'));
+        $this->assertSame('validated', DB::table('baskets')->where('id', $basket)->value('state'));
+    }
+
+    #[Test]
+    public function a_sale_racing_a_stock_adjustment_waits_for_it_and_is_rejected_when_stock_no_longer_suffices(): void
+    {
+        [$actor, $household, $products] = $this->world(['Oil' => '5']);
+        $basket = $this->draft($actor, $household, [$products['Oil'] => '3']);
+
+        DB::beginTransaction();
+        app(RecordStockAdjustment::class)($actor, $products['Oil'], '-3', 'inventory count', null);
+        $pipes = $this->start($actor->accountId, $basket);
+        $this->waitForLock($pipes);
+        DB::commit();
+
+        $this->assertSame('NotEnoughStock', $this->finish($pipes));
+        $this->assertSame('draft', DB::table('baskets')->where('id', $basket)->value('state'));
+        $this->assertSame(2.0, (float) DB::table('stock_movements')->where('product_id', $products['Oil'])->sum('quantity'));
+        $this->assertSame(0, DB::table('wallet_movements')->where('basket_id', $basket)->count());
+    }
+
+    #[Test]
     public function opposite_draft_line_order_uses_the_same_product_lock_order_and_both_complete(): void
     {
         [$actor, $household, $products] = $this->world(['Oil' => '2', 'Rice' => '2']);
@@ -223,6 +260,29 @@ final class BasketConcurrencyTest extends TestCase
     {
         $pipes = [];
         $this->other = proc_open([PHP_BINARY, dirname(__DIR__, 2).'/Support/Sales/validate_basket.php', $accountId, $basketId],
+            [1 => ['pipe', 'w'], 2 => ['pipe', 'w']], $pipes, null,
+            [...getenv(), 'DB_DATABASE' => DB::connection()->getDatabaseName()]);
+        $this->assertIsResource($this->other);
+
+        return $pipes;
+    }
+
+    /** @return array<int,resource> */
+    private function startAdjustment(string $accountId, string $productId, string $quantity): array
+    {
+        $script = <<<'PHP'
+        require getcwd().'/vendor/autoload.php';
+        $app = require getcwd().'/bootstrap/app.php';
+        $app->make(\Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+        try {
+            $app->make(\Guixa\Stock\Application\RecordStockAdjustment::class)(\Guixa\Shared\Application\Actor::manager($argv[1]), $argv[2], $argv[3], 'inventory count', null);
+            echo 'adjusted';
+        } catch (\Throwable $error) {
+            echo (new \ReflectionClass($error))->getShortName();
+        }
+        PHP;
+        $pipes = [];
+        $this->other = proc_open([PHP_BINARY, '-r', $script, '--', $accountId, $productId, $quantity],
             [1 => ['pipe', 'w'], 2 => ['pipe', 'w']], $pipes, null,
             [...getenv(), 'DB_DATABASE' => DB::connection()->getDatabaseName()]);
         $this->assertIsResource($this->other);
