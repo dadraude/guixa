@@ -25,7 +25,7 @@ schema directly, without a legacy import, data backfill or compatibility layer.
 - Laravel 13 **Vue starter kit** (Inertia 3 + Vue 3 + TS + Vite, Tailwind 4 + shadcn-vue, Fortify auth). Public registration disabled.
 - Postgres via `DB_CONNECTION=pgsql`; a separate `guixa_test` database for integration tests.
 - `composer.json` autoloads `Guixa\` → `src/`.
-- Dev tooling: `spatie/laravel-typescript-transformer`, Pest arch tests (A1–A8, A10–A12), Oxlint rules (A9), Vitest,
+- Dev tooling: `spatie/laravel-typescript-transformer`, Pest arch tests (A1–A8, A10–A17; A13–A17 are the presentation rules, enforced by `PresentationRulesTest`), Oxlint rules (A9), Vitest,
   Pint, Larastan, Oxfmt. Vite+ (`vp`) runs Oxlint, Oxfmt and Vitest.
 - GitHub Actions workflow on pull requests: Pint `--test`, Larastan, `vp check` (Oxlint + Oxfmt), vue-tsc,
   Pest against a Postgres service, Vitest.
@@ -58,13 +58,13 @@ Ordering -> Catalog       ProductCatalog / ProducerCutoffRules (weekly products 
 Ordering -> Sales         SalesBaskets (create/sync drafts; validation status and effective quantities)
 Ordering -> Membership    ProducerNotifier / Households
 Sales    -> Catalog       product identity/eligibility through its catalogue adapter
-Sales    -> Ordering      WeeklyBasketSource (ready source, source lock, cycle closure) / WeeklySourceOrders (cycle of a source order, orders of a cycle)
-Sales    -> Stock         StockCatalog / StockSeller / ReturnItemCatalog / BasketStockCorrections
+Sales    -> Ordering      WeeklyBasketSource (ready source, source lock, cycle closure) / WeeklySourceOrders (cycle of a source order, orders of a cycle) / CyclePickupDates (pickup date of each cycle)
+Sales    -> Catalog/Stock StockProducts (stock identity and product lock; Catalog adapter) / StockOfferCatalog / StockQuantities / StockSeller / StockCorrector / ReturnItems
 Sales    -> Wallet        WalletLedger (one charge/credit; reasoned corrections)
 Sales    -> Membership    Households (identity and active state)
-Stock    -> Catalog       StockProducts (stock identity/metadata and product lock)
+Stock    -> Catalog       StockProductRepository (stock identity/metadata and product lock; Catalog adapter)
 Catalog  -> Ordering      ProducerCycles / ProductUsage (weekly rules and retained references)
-Catalog  -> Sales/Stock   ProductUsage / StockAvailability (history; pure quantity query)
+Catalog  -> Ordering/Sales/Stock   ProductUsage (retained use: Ordering `CheckProductUsage`, Sales `HasProductHistory`, Stock `CheckProductUsage`) / StockAvailability (pure quantity query)
 Catalog  -> Membership    ProducerAccess
 Membership -> Catalog     ProducerDirectory
 Membership -> Wallet      HouseholdBalances
@@ -158,6 +158,8 @@ Use cases
 | `SuspendProducerRole`, `RestoreProducerRole` | — (called by Catalog) | R3a |
 | `ListProducerAccounts` (producer id → account email and whether its invitation is pending; the producers admin page shows it and hides the invite form for producers that have one) | manager | R36, S57 |
 | `GetProducerAccountEmail` | — (called by Ordering) | R12a |
+| `GetWalletHousehold` (a household's id, name and active state for the wallet pages) | finance, manager | R31 |
+| `ListActiveHouseholds`, `ListOtherHouseholds` (every household but the given one, for `MoveMember`), `CountHouseholds`, `CountAccounts` | manager | R33, R36a (admin pages, dashboard counts) |
 | `GetHouseholds` (household ids → name and active by id; unknown ids left out) | — (called by Ordering) | R13, R16, R19 |
 | `CreateFirstManager` (rejected once any manager exists) | — (installation command) | R36a |
 
@@ -220,8 +222,9 @@ reads them afterwards, in a new statement, so a waiting transaction sees the oth
 | `ListStockOfferProducts` | Internal Sales read in T54; active stock metadata including products of inactive producers, without quantity |
 | `GetOrderableProduct`, `ListOrderableProducts` | Internal; active weekly products of active producers only |
 | `ListProducerProductsForReception` | Internal; weekly products including inactive records/producers; never stock |
-| `GetStockProductData`, `ListStockProductData` | Internal metadata queries; mode stock, with producer id/name; stock sale does not require producer active |
-| `LockProductForUse` | Internal; locks, verifies expected mode and operation-specific active rules, returns a snapshot |
+| `GetStockProduct`, `ListStockProducts` | Internal metadata queries; mode stock, with producer id/name; stock sale does not require producer active |
+| `LockWeeklyProduct`, `LockStockProduct` | Internal; lock, verify the expected mode and operation-specific active rules, return a snapshot |
+| `CreateStockProduct`, `UpdateStockProduct`, `DeactivateStockProduct`, `ReactivateStockProduct` | Manager; stock-mode administration from the producer context |
 | `CreateProducer`, `ListProducers`, `DeactivateProducer`, `ReactivateProducer` | Existing Manager permissions |
 | `GetProducer`, `GetProducerCutoffRule`, `SetDefaultCutoff`, `GetDefaultCutoff` | Existing internal/own-producer rules |
 
@@ -320,9 +323,9 @@ constructor cycle. Stock-only validation does not call Ordering readiness/closur
 | `GetProducerCycleSummary`, `GetCycleSummary` | Own producer / Manager, with existing privacy and cancellation rules |
 | `GetReception`, `AddUnorderedProduct`, `SetReceivedTotal`, `SetAllocation` | Manager; weekly only; existing sent/editable/quantity guards |
 | `ValidateReception`, `MarkProducerDistributed`, `ReopenProducerOrder` | Manager; existing balance guards and closed-cycle restriction |
-| `GetContainerCount` | Manager; read each household's accumulated container balance from Sales (validated lines minus return lines), not per cycle |
-| `HasUnsettledLines`, `HasProductHistory`, `StopParticipatingWhereNotSent` | Internal queries/command for Catalog; history includes cancelled/removed records |
-| `GetWeeklyBasketSource`, `LockWeeklyBasketSource`, `CloseCycleAfterBasketValidation`, `ReadSourceOrderCycles`, `ReadCycleSourceOrders` | Internal Sales interface; snapshots/readiness/closure and source-order lookups only |
+| `GetContainerCount` | Manager; per cycle, the expected container count of its orders, plus each household's accumulated balance read from Sales (validated lines minus return lines) |
+| `HasUnsettledLines`, `CheckProductUsage`, `StopParticipatingWhereNotSent` | Internal queries/command for Catalog; usage includes cancelled/removed records |
+| `WeeklySourceData`, `LockWeeklyBasketSource`, `CloseCycleAfterBasketValidation`, `ReadSourceOrderCycles`, `ReadCycleSourceOrders`, `ReadCyclePickupDates` | Internal Sales interface; snapshots/readiness/closure, source-order and pickup-date lookups only |
 
 The existing `ProductCatalog`, `ProducerCutoffRules`, `ProducerNotifier`, `Households`, repository
 and clock ports remain, with a Sales port replacing the pickup-facing Stock/Wallet ports. Sending
@@ -387,6 +390,11 @@ recorded through Wallet independently: real money received is not undone because
 basket state plus unique source references in stock/wallet persistence; duplicate validation never creates
 another sale or charge. No eventually consistent event is used for charge/stock invariants.
 
+**Lock order.** Every weekly mutation locks cycle, then basket, then product (in product-id order),
+never the reverse. Stock add/remove on a weekly draft takes no cycle lock: it locks only the basket
+(`AddStockToBasket` also locks the stock product it adds), which serializes it with source sync and
+validation, since those lock the same basket row after the cycle.
+
 ### Collection and corrections
 
 Validation creates pending collection. Finance, Manager or a current member of that same household
@@ -446,7 +454,7 @@ another event or sequence number.
 | `ListMemberBaskets`, `GetMemberBasket` | Current own-household member; repository filters by household for list and identifier reads |
 | `ListPendingCollections`, `ListMemberPendingCollections`, `ReadPendingCollections` | All (optionally one weekly cycle) for Finance/Manager; own household for members through the separate member query; internal read without actor; all use `BasketRepository::pendingCollections`; include closed-cycle and cycleless baskets, exclude drafts |
 | `ListStockOffers` | T54 Member or Manager; active stock including zero, inactive producer allowed; no reservation/edit capability. Finance sales-staff access belongs to a later slice. |
-| `HasProductHistory`, `ReadOpenHouseholdBaskets`, `ReadWeeklyBasketStates`, `ReadEffectiveWeeklyQuantities`, `ReadContainerCounts` | Internal Catalog/Ordering/Membership queries; include history only where requested |
+| `HasProductHistory`, `ReadOpenHouseholdBaskets`, `ReadWeeklyBasketStates`, `ReadHouseholdContainerBalances` | Internal Catalog/Ordering/Membership queries; include history only where requested. Effective weekly quantities reach Ordering through its `SalesBaskets` port |
 
 Pending collection lists are ordered by validation instant, then UUID; monetary movement lists keep
 their existing recorded-time/id ordering. Per-basket container totals sum rounded-up line snapshot counts; the household balance sums validated
@@ -468,7 +476,7 @@ optional note/cycleId, and optional basketId/correctionId. Entries are positive,
 non-zero with a mandatory note, sales are negative with a basket source. Availability is the sum
 of committed movements; it never goes negative. A basket sale is recorded on validation, not collection.
 
-`StockProducts` is a Stock-owned port whose Catalog adapter locks and verifies the authoritative
+`StockProductRepository` is a Stock-owned port (Sales has its own `StockProducts` port) whose Catalog adapter locks and verifies the authoritative
 product id/mode. The same product-row lock protects both stock consistency and classification/deletion
 races. The Stock repository reads/inserts only its own movement tables; it does not import a Catalog
 model or directly lock a foreign-context persistence class. All stock writers use this protocol.
@@ -480,13 +488,14 @@ Catalog's pure internal metadata queries; quantity-only queries never call Catal
 | `CreateReturnItem`, `UpdateReturnItem`, `DeactivateReturnItem`, `ReactivateReturnItem` | Existing Manager-only administration |
 | `ListReturnItems` | Manager catalogue view and Finance's read-only basket return picker; no Finance editing |
 | `RecordStockEntry`, `RecordStockAdjustment` | Manager; stock mode only; positive entry / non-zero justified adjustment |
-| `ListStock`, `ListStockMovements` | Manager; metadata from Catalog, quantity/history from ledger |
+| `ListStock`, `ListActiveStock` | Manager; metadata from Catalog, current quantity from ledger |
+| `ListStockMovements` | Planned (pending T76, gated by a new requirement): the movement history is not built; the movements page shows only the current level and the forms |
+| `SetStockAvailable` | Manager; sets the available quantity after an inventory count and records an adjustment of the difference (R27) |
 | `GetReturnItem` | Internal read of a return item snapshot for Sales through its own return-items port |
-| Stock-side `ListStockOffers` | Planned later Sales basket query; not the T54 discovery composition |
 | `SellBasketStock` | Internal Sales operation, records the already-authorized actor and the basket source; locks and checks stock |
 | `CorrectBasketStock` | Internal Sales correction with source/reason; cannot make stock negative |
 | `GetAvailableQuantities` | T54 quantity-only batch query for Catalog and Sales discovery; no Catalog callback |
-| `HasProductMovements` | Internal history query for Catalog |
+| `CheckProductUsage` | Internal movement-history query for Catalog |
 
 Sale uniqueness is by basket/product; corrections have their own stable source ids. Product ids
 remain locked in ascending order for multi-product writes. Finance accesses sale/correction use cases
@@ -517,6 +526,7 @@ cannot supply a cycle id or use that legacy path.
 | `RecordCorrection` | Finance/Manager for agreed receipt/basket corrections; mandatory reason/source |
 | `ChargeForBasket` | Internal Sales call carrying the authorized actor and basket id; charge/credit/zero |
 | `GetBalance` | Internal query for authorized Sales/Membership compositions |
+| `ReadHouseholdBalance` | Internal, no actor; Membership's household settlement (R35a) |
 | `GetWalletStatement` | Own household member / Finance / Manager |
 
 No paid/partially-paid state exists on a basket. A receipt can cover several charges or leave credit.
@@ -589,12 +599,12 @@ All route middleware is backed by Application gate/policy checks against the exp
 | Route / area | Page/action and use cases |
 | --- | --- |
 | `/cycles/{cycle}/order` and its line mutations | Existing `Orders/Edit` and SetOrderLine; weekly only, references to base/related baskets; archived lines hidden |
-| `/baskets`, `/baskets/{basket}` | Proposed `Baskets/Index`, `Baskets/Show`; member's own household, ordered-versus-actual content, validation/collection state and global wallet link |
+| `/baskets`, `/baskets/{basket}` | `Member/Baskets/Index`, `Member/Baskets/Show`; member's own household, ordered-versus-actual content, validation/collection state and global wallet link |
 | `PUT /baskets/{basket}/collection` | Own-household member action; validated basket only; `MarkBasketCollected`, no financial effect |
 | `/stock` | T54 `Stock/Index`; member read-only stock catalogue, active products incl zero sold out, producer/unit/current price/quantity |
-| `/finance/baskets`, `/finance/baskets/create`, `/finance/baskets/{basket}` | Proposed `Finance/Baskets/Index`, `Create`, `Show`; Manager or Finance; household selection, draft/validated/pending filters, immutable history |
-| `POST /finance/baskets` | `CreateStockBasket`; active household, optional reference cycle inherited when opened from a collection |
-| `PUT .../lines/{line}`, `POST/DELETE .../stock-lines`, `POST/DELETE .../return-lines` | Draft actual quantities and stock/return contents; archive removals |
+| `/finance/baskets`, `/finance/baskets/create`, `/finance/baskets/{basket}` | `Finance/Baskets/Index`, `Create`, `Show`; Manager or Finance; household selection, draft/validated/pending filters, immutable history |
+| `POST /finance/baskets` | `CreateStockBasket`; takes only `household_id` (active household, no cycle) |
+| `PUT {basket}/weekly-lines/{product}`, `POST/DELETE .../stock-lines` (delete by product), `POST/DELETE .../return-lines` (delete by return item) | Draft actual quantities and stock/return contents; archive removals |
 | `POST .../validation`, `PUT .../collection`, `POST .../corrections` | `ValidateBasket`, `MarkBasketCollected`, `CorrectBasket`; distinct actions with distinct effects |
 | `POST .../cancellation`, `POST .../collection-corrections` | Cancel a stock draft / justified staff correction of collection state |
 | `/finance/households/{household}/wallet` and receipt/correction posts | Reuse `Wallet/Statement` and confirmed top-up/correction forms, gated Finance/Manager |
@@ -614,10 +624,10 @@ Persistent pending-collection indication:
   and cycleless purchases. Use pending/preparation labels accurately; draft is not ready for collection.
 - Finance/Manager see all pending collections with household, validation date.
 - Cycle list/detail retain a pending-count badge/link after weekly closure, counting weekly baskets only. Collection removes the corresponding pending item without reopening or recharging.
-- Adapt feature 002's dashboard data source from pending pickup cycle ids to Sales basket summaries (member
+- Adapt feature 002's dashboard data source from pending pickup cycle ids to Sales basket summaries read through `ListMemberPendingCollections` (members) and `ListPendingCollections` (staff) (member
   `pendingPickups` lists basket id, validation date, weekly and late flags; Finance/Manager get the total); `?pending=1` on
   `/baskets` and `/finance/baskets` (with `cycle` for staff) lists them, and cycle list/detail link to that view through
-  `SalesBaskets::pendingCollectionCounts`; preserve unrelated dashboard cards. An overdue date alone never produces an abandoned/cancelled state.
+  `SalesBaskets::pendingCollectionCounts` (the dashboard reads the Sales summaries, not that port); preserve unrelated dashboard cards. An overdue date alone never produces an abandoned/cancelled state.
 
 Concrete reuse inspected before planning:
 - `resources/js/components/StockProductFields.vue` supplies catalogue field presentation; retain it
@@ -1096,7 +1106,7 @@ for CI's full validation.
 | Application | **Every scenario S1–S92**, with in-memory repositories and `FrozenClock` | `tests/Application/<Context>` |
 | Infrastructure | Each Eloquent repository against `guixa_test` (constraints, locks, numeric mapping) | `tests/Integration` |
 | HTTP | Role gates, wiring, `assertInertia` props, error → 422 and `AuthorizationException` → 403 mapping | `tests/Feature` |
-| Architecture | A1–A12 (A9 through Oxlint); explicitly register Sales contracts as its slices land | `tests/Architecture` |
+| Architecture | A1–A17 (A9 through Oxlint); explicitly register Sales contracts as its slices land | `tests/Architecture` |
 | Translations | Every key used in PHP (`__()`, `trans()`) and Vue (`trans()`, `$t`), and every domain error class, has a `ca` translation | `tests/Architecture` |
 | Frontend | Display totals, A9 via Oxlint | `resources/js/**/*.spec.ts` |
 

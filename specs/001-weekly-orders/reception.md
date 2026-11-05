@@ -12,7 +12,8 @@ Checking each producer's delivery against the orders, allocating it to household
   product sent it shows the ordered total, the received total (initially equal to the ordered total) and
   the allocation of every household that ordered it (initially equal to its ordered quantity).
   A manager can also add any weekly product of that producer that nobody ordered, active or not, with
-  its received total (initially 0) and no allocations. Stock products cannot be added to reception
+  its received total (initially 0) and no allocations. Adding such a product again replaces its received
+  total; if goods of it had already been received, the redistribution rules of R18 apply. Stock products cannot be added to reception
   or allocated through it: they enter stock through R26 and are added to baskets through R20.
   A weekly product only has to be active, and so does its producer, when a household orders it:
   once the goods have arrived their active state no longer matters here.
@@ -37,7 +38,9 @@ Checking each producer's delivery against the orders, allocating it to household
   An allocation to a household without a line for that product takes a snapshot of the product (R10)
   when it is set, even if the product has been deactivated since.
 - **R17** For each product, the reception shows the difference between the received total and the sum of
-  allocations. A product is *balanced* when the difference is 0. Unbalanced products are flagged.
+  the actual quantities in the baskets (the allocations, as adjusted at pickup, R19a). A product is
+  *balanced* when the difference is 0. Unbalanced products are flagged. Only the gate to distribute
+  uses the allocations alone (R18).
 - **R17a** **Validating.** After checking what arrived, a manager marks a producer's reception as
   *validated*. Changing a received total afterwards clears the validation.
 - **R18** **Distributing.** A manager marks a producer order distributed only when its reception is
@@ -45,7 +48,8 @@ Checking each producer's delivery against the orders, allocating it to household
   (R19a). The reception becomes read-only; it may reopen until weekly cycle closure (R24b).
   The cycle first settles when every participating producer is distributed. Marked and nonparticipating
   lines leave active fulfilment, retaining history; they are never received or charged. Settlement
-  creates one base basket draft per household order (R19), without a charge.
+  creates one base basket draft per household order (R19), without a charge; an order with no lines
+  produces no base basket.
   After a permitted reopen, a product whose previous received total was 0 is a *late arrival*: it is
   allocated as usual and each household's share is added to its open weekly draft in the cycle,
   reviving a nothing-to-collect base (R24a); a household whose weekly baskets in the cycle are all

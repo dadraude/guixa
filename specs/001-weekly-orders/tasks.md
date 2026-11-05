@@ -21,6 +21,7 @@ Source: [spec](spec.md) and areas · [plan](plan.md) · [coverage allocation](ta
 | [tasks/weekly-and-collection.md](tasks/weekly-and-collection.md) | T59–T63/T67: weekly cutover, supplements, collection, indicators, lifecycle and cleanup; T33 closure |
 | [tasks/coverage.md](tasks/coverage.md) | All 65 requirements and 91 scenarios (S1–S92, S90 retired): retained responsibility and amendment responsibility |
 | [tasks/traceability.md](tasks/traceability.md) | T33 audit: assertion-level evidence and verdict for every requirement and scenario, closure prerequisites and gaps filled |
+| [tasks/audit-2026-11-05.md](tasks/audit-2026-11-05.md) | T69–T76: follow-up tasks from the 2026-11-05 SDD↔code audit (documents, bugfixes, refactors, tests, send button, movement history) |
 | [tasks/baseline.md](tasks/baseline.md) | Historical T01–T51 scopes, approval gates and dated evidence; superseded behavior is explicitly historical |
 
 IDs are feature-global. Detail files do not start separate numbering or redefine dependencies.
@@ -70,7 +71,7 @@ See [current translation contracts](plan.md#translations); the linked T36 baseli
 ## Canonical task registry
 
 For T01–T51 except T33, linked scopes are historical: keep delivered behavior that the amendment
-preserves; implement changed behavior through T52–T68. Existing issue IDs keep their lineage; explicit scope narrowing below is accepted, never a silent repurposing.
+preserves; implement changed behavior through T52–T68; T69–T76 are the 2026-11-05 audit follow-ups. Existing issue IDs keep their lineage; explicit scope narrowing below is accepted, never a silent repurposing.
 
 | ID | Task | Covers | After |
 | --- | --- | --- | --- |
@@ -142,6 +143,30 @@ preserves; implement changed behavior through T52–T68. Existing issue IDs keep
 | T66 | <a id="t66"></a>[Correct collection marks without financial effects](tasks/sales.md#t66) | R23b, R24a; collection correction, history and replay invariants | T56, T65 |
 | T67 | <a id="t67"></a>[Keep pending collection visible across pages and cycle closure](tasks/weekly-and-collection.md#t67) | R23a, R24, R24b, R35; S26/S42/S54/S83 (indicators; one shared `pendingCollections` query) | T60, T61 |
 | T68 | <a id="t68"></a>[Correct physical goods and effective basket quantities](tasks/sales.md#t68) | R23, R24a, R27, R28, R32; S86; full-reversal and signed-quantity invariants | T58, T57 |
+| T69 | <a id="t69"></a>[Align 001 documents with the delivered code](tasks/audit-2026-11-05.md#t69) | Documents only: plan; R4b, R12a, R14, R17, R18, R23b, R27, R31 wording; dashboard interim description | T68 |
+| T70 | <a id="t70"></a>[Refuse adding a producer to a settled cycle](tasks/audit-2026-11-05.md#t70) | R4a; S51 (settled boundary) | T69 |
+| T71 | <a id="t71"></a>[Inventory count inside the stock lock](tasks/audit-2026-11-05.md#t71) | R27, R28; S23 | T69 |
+| T72 | <a id="t72"></a>[Remove the duplicate manager wallet and cycle pickups index](tasks/audit-2026-11-05.md#t72) | R31; household wallet and cycle pickups routes | T69 |
+| T73 | <a id="t73"></a>[Delete dead cycle code and fix stale docblocks](tasks/audit-2026-11-05.md#t73) | R4b; code hygiene, no behaviour change | T69 |
+| T74 | <a id="t74"></a>[Fill the audited test gaps](tasks/audit-2026-11-05.md#t74) | S27, S61, S69, S87 | T69 |
+| T75 | <a id="t75"></a>[Manager send button for producer orders](tasks/audit-2026-11-05.md#t75) | R12a; S36 | T69 |
+| T76 | <a id="t76"></a>[Stock movement history](tasks/audit-2026-11-05.md#t76) | New requirement (spec first, gated); R28 | T69 |
+
+## Linear mapping — 2026-11-05 audit tasks
+
+All eight are children of the non-executable parent
+[DRA-239](https://linear.app/draude/issue/DRA-239) (no Tnn, no ready label), like DRA-206 for T52–T63.
+
+| Task | Linear issue | After |
+| --- | --- | --- |
+| [T69](#t69) | [DRA-231](https://linear.app/draude/issue/DRA-231) | T68 |
+| [T70](#t70) | [DRA-232](https://linear.app/draude/issue/DRA-232) | T69 |
+| [T71](#t71) | [DRA-233](https://linear.app/draude/issue/DRA-233) | T69 |
+| [T72](#t72) | [DRA-234](https://linear.app/draude/issue/DRA-234) | T69 |
+| [T73](#t73) | [DRA-235](https://linear.app/draude/issue/DRA-235) | T69 |
+| [T74](#t74) | [DRA-236](https://linear.app/draude/issue/DRA-236) | T69 |
+| [T75](#t75) | [DRA-237](https://linear.app/draude/issue/DRA-237) | T69 |
+| [T76](#t76) | [DRA-238](https://linear.app/draude/issue/DRA-238) | T69 |
 
 ## Linear publication and current gates
 
@@ -171,8 +196,8 @@ does not block any child. Existing issues keep their original parents.
 | [T57](#t57) | [DRA-212](https://linear.app/draude/issue/DRA-212/t57-basket-contents-returns-and-member-view) | DRA-211 | — |
 | [T58](#t58) | [DRA-213](https://linear.app/draude/issue/DRA-213/t58-append-only-basket-corrections) | DRA-212 | — |
 | [T59](#t59) | [DRA-214](https://linear.app/draude/issue/DRA-214/t59-weekly-basket-cutover-and-redistribution) | DRA-180, DRA-176, DRA-213 | — |
-| [T60](#t60) | [DRA-215](https://linear.app/draude/issue/DRA-215/t60-late-supplements-and-container-attribution) | DRA-214, DRA-181 | — |
-| [T61](#t61) | [DRA-216](https://linear.app/draude/issue/DRA-216/t61-self-collection-and-persistent-pending-indicators) | DRA-215 | DRA-202, DRA-203 (context only) |
+| [T60](#t60) | [DRA-215](https://linear.app/draude/issue/DRA-215/t60-household-container-balance) | DRA-214, DRA-181 | — |
+| [T61](#t61) | [DRA-216](https://linear.app/draude/issue/DRA-216/t61-collect-an-own-household-validated-basket) | DRA-215 | DRA-202, DRA-203 (context only) |
 | [T62](#t62) | [DRA-217](https://linear.app/draude/issue/DRA-217/t62-household-obligations-across-lifecycle-changes) | DRA-214, DRA-182 | — |
 | [T63](#t63) | [DRA-218](https://linear.app/draude/issue/DRA-218/t63-remove-superseded-pickup-ownership-and-schema) | DRA-209, DRA-216, DRA-217 | — |
 

@@ -111,14 +111,15 @@ Catalog, cycles and cutoffs, ordering, sending orders to producers and what prod
 
 - **R12a** **Sending.** Once a participating producer is closed, a manager sends its order. The producer
   is notified with the total quantity per product, without household names. Lines marked *will not be
-  delivered* are left out. A producer order can be sent only once.
+  delivered* are left out. A producer order can be sent only once, and not when the producer has no
+  account to notify.
   A participating producer that closes with no line to send is sent, validated and distributed
   automatically; nothing is notified. A cycle with no participating producer never settles: a manager
   adds producers or cancels it (R4b).
 - **R12** A producer sees the total quantity per product of a cycle only once its order is sent,
   without household names. Before that, the producer sees nothing for that cycle.
 - **R13** A manager sees, per cycle, totals per producer and product and the breakdown per household.
-  A cancelled cycle still opens and is shown as cancelled, with no totals (its orders were discarded, R4b).
+  A cancelled cycle still opens and is shown as cancelled, with no totals (its orders are retained as history, R4b).
 
 ## Acceptance scenarios
 

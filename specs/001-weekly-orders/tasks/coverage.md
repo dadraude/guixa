@@ -56,7 +56,7 @@ semicolon identify retained work; the amendment owner implements the stated chan
 | [R23](../pickup.md) | [T58](../tasks.md#t58) (amount), [T68](../tasks.md#t68) (goods/effective quantities), [T59](../tasks.md#t59) (weekly) |
 | [R23a](../pickup.md) | [T65](../tasks.md#t65) (read), [T59](../tasks.md#t59) (weekly), [T61](../tasks.md#t61) (action), [T67](../tasks.md#t67) (indicators) |
 | [R23b](../pickup.md) | [T55](../tasks.md#t55) (staff collection), [T66](../tasks.md#t66) (correction), [T61](../tasks.md#t61) (member action) |
-| [R24](../pickup.md) | [T67](../tasks.md#t67) |
+| [R24](../pickup.md) | [T55](../tasks.md#t55), [T59](../tasks.md#t59), [T67](../tasks.md#t67) |
 | [R24a](../pickup.md) | [T55](../tasks.md#t55)/[T57](../tasks.md#t57) (contents), [T68](../tasks.md#t68) (reversal), [T59](../tasks.md#t59) (weekly empty), [T65](../tasks.md#t65) (read) |
 | [R24b](../pickup.md) | [T59](../tasks.md#t59) (closure), [T60](../tasks.md#t60) (supplements), [T67](../tasks.md#t67) (indicators) |
 | [R25](../stock-wallet.md) | [T24](../tasks.md#t24); [T52](../tasks.md#t52)/[T53](../tasks.md#t53) |
