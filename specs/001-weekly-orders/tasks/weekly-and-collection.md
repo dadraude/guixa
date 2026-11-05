@@ -1,6 +1,6 @@
 # 001 — Weekly integration and collection task details
 
-Part of the [canonical registry](../tasks.md); dependencies live there. Status: the revised delivery boundaries below are **proposed (2026-10-31)**; product acceptance is unchanged.
+Part of the [canonical registry](../tasks.md); dependencies live there. Status: the revised delivery boundaries below were accepted (2026-10-31) and are delivered; product acceptance is unchanged.
 Authoritative behavior: [spec](../spec.md) and its areas; technical contracts: [plan](../plan.md).
 Every slice includes its affected adapters, tests, translations, UI evidence and document reconciliation.
 Paths in the ownership notes are edit surfaces, not new cross-context domain dependencies.

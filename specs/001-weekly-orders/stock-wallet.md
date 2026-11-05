@@ -31,7 +31,9 @@ Stock movements and return items, global household wallets and receipts, househo
 - **R26** A manager records entries for stock products only (quantity > 0, optional note,
   e.g. "bought from X"). A weekly product cannot receive stock entries or adjustments (R27).
 - **R27** A manager records stock adjustments (positive or negative, mandatory note, e.g. "broken jar",
-  "inventory count", optional cycle). Available stock can never go below 0.
+  "inventory count", optional cycle). Available stock can never go below 0. After an inventory count a
+  manager may instead set the available quantity directly; the system records an adjustment for the
+  difference.
 - **R28** Available stock = Σ entries + Σ adjustments − Σ quantities sold at validated baskets,
   including signed corrective movements. Validation records the sale once (R22); physical collection
   records no stock movement. Stock movements are never edited or deleted.
@@ -45,7 +47,7 @@ Stock movements and return items, global household wallets and receipts, househo
 - **R30** Balance = Σ top-ups + Σ credits − Σ charges ± corrections. It may be negative, with no limit.
 - **R31** Members see their household balance and every movement. Charges/credits show their basket
   and optional cycle; corrections preserve the original source and optional cycle. Finance and Manager
-  can read household statements for the operations they perform. Baskets have no paid/part-paid status.
+  can read the statement of any household. Baskets have no paid/part-paid status.
 - **R32** Movements are never edited or deleted. Finance or a manager fixes mistakes with a new
   correcting movement: non-zero amount, mandatory reason, original source and optional basket/cycle
   reference. A correction does not rewrite the receipt, validated basket or original charge. Linked

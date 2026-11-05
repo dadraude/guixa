@@ -15,8 +15,7 @@ producer closes, a manager sends it the order, checks the delivery and allocates
 Once distribution settles, each household order produces a basket draft. Finance or a manager checks
 actual quantities and validates the basket, charging the household wallet and selling any stock in one
 operation. Physical collection is recorded separately and can happen later, including after cycle closure.
-Additional stock baskets can be created at any time, without a weekly order or cycle. A supplement from
-a collection may reference its original cycle for grouping and container counts. Confirmed money received
+Additional stock baskets can be created at any time, without a weekly order or cycle. Confirmed money received
 is recorded manually as a separate credit to the household's global wallet.
 
 ## Glossary
@@ -62,7 +61,7 @@ gap (02:30 becomes 03:30), and a local time that happens twice means its first o
 Every recorded movement (wallet, stock) is dated at the moment it is recorded; that moment orders history
 and defines a balance on a given day. Basket creation, validation, collection marks and corrections also
 record their application-action instant and actor. A late notice can explain an earlier handover in a
-note; an origin-cycle reference never backdates a charge, movement or collection mark.
+note; a late notice never backdates a charge, movement or collection mark.
 
 ## Roles
 
@@ -95,6 +94,19 @@ Requirements (`R#`) and acceptance scenarios (`S#`) live in one file per area; n
 
 [diagrams.md](diagrams.md) draws the amended contexts, model relations and weekly/independent sales flow.
 The requirements in these areas define behaviour; [plan.md](plan.md) records the accepted design.
+
+## Dashboard (interim)
+
+This describes what the dashboard shows today, not a requirement of 001; a new dashboard spec will
+replace it. Every account sees the Dashboard page; the cards depend on its roles:
+
+- **Member with a household:** the next pickup date (first non-cancelled cycle of the household, or
+  none), the household's wallet balance, the number of open cycles, and the household's validated
+  baskets pending collection (R23a, R24) with a link to all of them (shown only when there are some).
+- **Manager or Finance:** the number of baskets pending collection, linking to the pending list (shown only when there are some).
+- **Manager:** a cooperative summary with the totals of cycles, households and accounts.
+- **Member, producer and manager:** shortcuts to the areas the account can use (orders and wallet, production,
+  administration).
 
 ## Out of scope (for now)
 

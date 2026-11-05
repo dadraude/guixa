@@ -63,7 +63,7 @@ Weekly base and independent stock baskets, actual contents, validation, global W
   collected. Record who/when; repeated marking preserves the first record and has no money/stock effect.
   A member cannot mark another household's basket, validate a draft or record a receipt. An already
   physically taken stock purchase reported later can be registered, validated and marked collected by
-  staff, preserving the recording date and origin-cycle reference.
+  staff, preserving the recording date.
 - **R24** **Delayed collection.** A validated basket stays pending until physically collected or explicitly resolved through justified
   correction. Passing the pickup date alone is not abandonment, cancellation, a refund or return of stock.
   Collection can be recorded on a later day and does not depend on whether the global Wallet is in debt.
