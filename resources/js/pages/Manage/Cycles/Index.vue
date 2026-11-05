@@ -254,6 +254,7 @@ function cutoffLabel(value: string | null) {
                     v-if="
                         !cycle.cancelled &&
                         !cycle.closed &&
+                        !cycle.settled &&
                         missingProducers(cycle).length
                     "
                     class="border-t pt-2"

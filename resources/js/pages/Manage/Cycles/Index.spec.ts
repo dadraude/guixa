@@ -35,6 +35,7 @@ describe('manager cycles', () => {
                         pickupDate: '2026-11-07',
                         cancelled: false,
                         closed: false,
+                        settled: false,
                         participants: [
                             {
                                 producerId: 'baker',
@@ -101,6 +102,7 @@ describe('manager cycles', () => {
                     pickupDate: '2026-11-07',
                     cancelled: false,
                     closed: true,
+                    settled: false,
                     participants: [
                         {
                             producerId: 'baker',
@@ -137,6 +139,7 @@ describe('manager cycles', () => {
                     pickupDate: '2026-11-07',
                     cancelled: false,
                     closed: false,
+                    settled: false,
                     participants: [
                         {
                             producerId: 'baker',
@@ -160,5 +163,34 @@ describe('manager cycles', () => {
         expect(html).toContain('data-test="manage-cycle-baker"');
         expect(html).toContain('data-test="add-cycle-grower"');
         expect(html).toContain('sense tancament programat');
+    });
+
+    it('hides the add-producer form once the cycle is settled', async () => {
+        const app = createSSRApp(Index, {
+            cycles: [
+                {
+                    id: 'cycle',
+                    pickupDate: '2026-11-07',
+                    cancelled: false,
+                    closed: false,
+                    settled: true,
+                    participants: [
+                        {
+                            producerId: 'baker',
+                            producerName: 'Forn',
+                            participating: true,
+                            cutoff: null,
+                            open: false,
+                        },
+                    ],
+                },
+            ],
+            producers: [{ id: 'grower', name: 'Hort' }],
+            pickupWeekday: 6,
+            pendingCollections: {},
+        });
+        installTranslations(app);
+        const html = await renderToString(app);
+        expect(html).not.toContain('data-test="add-cycle-grower"');
     });
 });
