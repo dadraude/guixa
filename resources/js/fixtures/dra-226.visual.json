@@ -375,7 +375,10 @@
                                 "selector": "[data-test=\"collection-correction-form\"]",
                                 "count": 0
                             },
-                            { "selector": "#main-content button", "count": 0 }
+                            {
+                                "selector": "[data-test=\"collect-basket\"]",
+                                "count": 1
+                            }
                         ]
                     }
                 },

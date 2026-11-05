@@ -3,6 +3,7 @@ import '../../../public/theme-colors.css';
 import { createInertiaApp } from '@inertiajs/vue3';
 import type { DefineComponent } from 'vue';
 import AppLayout from '@/layouts/AppLayout.vue';
+import { financeBasketRow } from './financeBasketRow';
 import { installTranslations } from '@/lib/i18n';
 
 const components = import.meta.glob('../pages/Finance/Baskets/Show.vue', {
@@ -40,7 +41,7 @@ const returnQuantity =
 const totalCents =
     (showStock ? stockAmount : 0) - (showReturn ? returnQuantity * 50 : 0);
 const balanceCents = basketState === 'validated' ? -totalCents : 0;
-const basket = {
+const basket = financeBasketRow({
     id: basketId,
     householdId,
     householdName:
@@ -78,7 +79,7 @@ const basket = {
     validatedAt:
         basketState === 'validated' ? '2026-10-30T09:00:00+01:00' : null,
     collectedAt: null,
-};
+});
 const props = {
     name: 'Guixa',
     locale: 'ca',

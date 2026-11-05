@@ -3,6 +3,7 @@ import '../../../public/theme-colors.css';
 import { createInertiaApp } from '@inertiajs/vue3';
 import type { DefineComponent } from 'vue';
 import AppLayout from '@/layouts/AppLayout.vue';
+import { financeBasketRow } from './financeBasketRow';
 import { installTranslations } from '@/lib/i18n';
 
 const query = new URLSearchParams(location.search);
@@ -93,7 +94,7 @@ const basketState = nothing
         : 'validated';
 const draft = basketState === 'draft';
 const total = nothing ? 0 : late ? 800 : differs ? 1050 : 3640;
-const basket = {
+const basket = financeBasketRow({
     id: ids.basket,
     householdId: ids.household,
     householdName: 'La Figuera',
@@ -136,7 +137,7 @@ const basket = {
     weeklyLines,
     kind: 'weekly',
     late,
-};
+});
 // The text of errors.RedistributionBlockedByValidatedBasket in lang/ca/errors.php.
 const rejection =
     'Un cistell ja validat conté aquest producte, així que no es pot redistribuir. Corregeix aquest cistell des de les seves correccions.';

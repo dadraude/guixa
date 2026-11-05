@@ -3,6 +3,7 @@ import '../../../public/theme-colors.css';
 import { createInertiaApp } from '@inertiajs/vue3';
 import type { DefineComponent } from 'vue';
 import AppLayout from '@/layouts/AppLayout.vue';
+import { financeBasketRow } from './financeBasketRow';
 import { installTranslations } from '@/lib/i18n';
 
 const query = new URLSearchParams(location.search);
@@ -34,55 +35,59 @@ function oilId() {
 function honeyId() {
     return '0198f0a0-0000-7000-8000-000000000233';
 }
-const basket = {
-    id: '0198f0a0-0000-7000-8000-000000000229',
-    householdId: '0198f0a0-0000-7000-8000-000000000230',
-    householdName: 'La Figuera',
-    state: 'validated',
-    stockLines: [
-        {
-            stockProductId: oilId(),
-            name: state === 'long' ? longText : 'Oli',
-            unit: 'ampolla',
-            quantity: '3.000',
-            unitPriceCents: 1200,
-            amountCents: 3600,
-            effectiveQuantity: oilEffective,
-            effectiveAmountCents: Number(oilEffective) * 1200,
-        },
-        {
-            stockProductId: honeyId(),
-            name: 'Mel',
-            unit: 'pot',
-            quantity: '1.000',
-            unitPriceCents: 500,
-            amountCents: 500,
-            effectiveQuantity: honeyEffective,
-            effectiveAmountCents: Number(honeyEffective) * 500,
-        },
-    ],
-    returnLines: [],
-    totalCents: 4100,
-    effectiveTotalCents: reversed ? 0 : partial ? 2900 : 4100,
-    adjustments: partial
-        ? [
-              {
-                  id: '0198f0a0-0000-7000-8000-000000000234',
-                  amountCents: reversed ? 4100 : 1200,
-                  reason: state === 'long' ? longText : 'Una ampolla ha tornat',
-                  recordedBy: 'Finances',
-                  occurredAt: '2026-11-02T11:00:00+00:00',
-                  lines: adjustmentLines,
-              },
-          ]
-        : [],
-    collectionEvents: [],
-    pendingCollection: !reversed,
-    balanceCents: -4100,
-    projectedBalanceCents: -4100,
-    validatedAt: '2026-11-02T09:00:00+00:00',
-    collectedAt: null,
-};
+const basket = financeBasketRow(
+    {
+        id: '0198f0a0-0000-7000-8000-000000000229',
+        householdId: '0198f0a0-0000-7000-8000-000000000230',
+        householdName: 'La Figuera',
+        state: 'validated',
+        stockLines: [
+            {
+                stockProductId: oilId(),
+                name: state === 'long' ? longText : 'Oli',
+                unit: 'ampolla',
+                quantity: '3.000',
+                unitPriceCents: 1200,
+                amountCents: 3600,
+                effectiveQuantity: oilEffective,
+                effectiveAmountCents: Number(oilEffective) * 1200,
+            },
+            {
+                stockProductId: honeyId(),
+                name: 'Mel',
+                unit: 'pot',
+                quantity: '1.000',
+                unitPriceCents: 500,
+                amountCents: 500,
+                effectiveQuantity: honeyEffective,
+                effectiveAmountCents: Number(honeyEffective) * 500,
+            },
+        ],
+        returnLines: [],
+        totalCents: 4100,
+        effectiveTotalCents: reversed ? 0 : partial ? 2900 : 4100,
+        adjustments: partial
+            ? [
+                  {
+                      id: '0198f0a0-0000-7000-8000-000000000234',
+                      amountCents: reversed ? 4100 : 1200,
+                      reason:
+                          state === 'long' ? longText : 'Una ampolla ha tornat',
+                      recordedBy: 'Finances',
+                      occurredAt: '2026-11-02T11:00:00+00:00',
+                      lines: adjustmentLines,
+                  },
+              ]
+            : [],
+        collectionEvents: [],
+        pendingCollection: !reversed,
+        balanceCents: -4100,
+        projectedBalanceCents: -4100,
+        validatedAt: '2026-11-02T09:00:00+00:00',
+        collectedAt: null,
+    },
+    role === 'member' ? 'member' : 'staff',
+);
 const components = import.meta.glob('../pages/**/*.vue', {
     eager: true,
 }) as Record<string, { default: DefineComponent }>;
