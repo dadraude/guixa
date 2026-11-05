@@ -84,7 +84,7 @@
             "@php artisan config:clear --ansi",
             "@lint:check",
             "@types:check",
-            "@php artisan test --parallel --coverage --min=0"
+            "@php artisan test --parallel --coverage --min=75"
         ],
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
