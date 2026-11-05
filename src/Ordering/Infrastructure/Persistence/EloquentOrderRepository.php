@@ -62,7 +62,7 @@ final class EloquentOrderRepository implements OrderRepository
         );
     }
 
-    public function deleteOfCycle(string $cycleId): void
+    public function archiveOfCycle(string $cycleId): void
     {
         DB::table('orders')->where('cycle_id', $cycleId)->update(['cancelled_at' => now()]);
     }

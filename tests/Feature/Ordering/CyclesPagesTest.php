@@ -327,7 +327,7 @@ it('keeps the cancel route to managers (R4b)', function () {
     $this->actingAs(accountWith(Role::Member, Role::Producer))->post("/manage/cycles/{$cycleId}/cancel")->assertForbidden();
 });
 
-it('cancels a cycle, discards its orders and shows it as cancelled (R4b, S37)', function () {
+it('cancels a cycle, retains its orders as cancelled and shows it as cancelled (R4b, S37)', function () {
     [$cycleId] = openCycleWithBaker();
     $manager = accountWith(Role::Manager);
 

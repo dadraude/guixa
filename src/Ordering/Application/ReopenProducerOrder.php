@@ -8,7 +8,7 @@ use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Application\TransactionRunner;
 use Illuminate\Support\Facades\Gate;
 
-/** Takes a distributed producer back to its reception, e.g. when goods arrive late; before settlement only for now (R18, S29). */
+/** Takes a distributed producer back to its reception, e.g. when goods arrive late; allowed until the cycle closes (R18, S29). */
 final class ReopenProducerOrder
 {
     public function __construct(

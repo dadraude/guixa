@@ -366,7 +366,7 @@ final class Cycle
         }
     }
 
-    /** Cancels the cycle; its orders are discarded by the caller. Refused once any producer order is sent (R4b, D14, S37). */
+    /** Cancels the cycle; its orders are archived by the caller. Refused once any producer order is sent (R4b, D14, S37). */
     public function cancel(DateTimeImmutable $now): void
     {
         $this->assertNotCancelled();

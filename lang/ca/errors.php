@@ -15,7 +15,6 @@ return [
     'CutoffNotInFuture' => 'El termini ha de ser posterior al moment actual.',
     'CutoffOutsideWindow' => 'El termini ha de ser entre sis dies abans de la recollida i el dia anterior.',
     'CycleAlreadyExists' => 'Ja hi ha un cicle amb aquesta data de recollida.',
-    'CycleAlreadySettled' => 'Aquest cicle ja està liquidat i no es pot reobrir la comanda del productor.',
     'CycleNotSettled' => 'Aquest cicle encara no està liquidat i no té cistelles setmanals.',
     'ReceptionReopened' => 'Hi ha una recepció d’aquest cicle reoberta. Cal tornar-la a repartir abans de validar les cistelles setmanals o canviar-ne les quantitats reals. Avisa qui gestiona la recepció.',
     'EmailAlreadyInUse' => 'Aquesta adreça electrònica ja pertany a un compte.',

@@ -28,7 +28,7 @@ final class InMemoryOrderRepository extends InMemoryRepository implements OrderR
         $this->save($order);
     }
 
-    public function deleteOfCycle(string $cycleId): void
+    public function archiveOfCycle(string $cycleId): void
     {
         foreach ($this->all() as $order) {
             if ($order->cycleId === $cycleId) {
