@@ -10,6 +10,9 @@ catalog:
     vite-plus: 1.4.0
 overrides:
     vite@*: 'catalog:'
+    # js-beautify (via @vue/test-utils) pins vulnerable glob 13 / minimatch 10; it only uses them in its CLI.
+    glob@<14.0.2: '>=14.0.2'
+    minimatch@<11.0.1: '>=11.0.1'
 peerDependencyRules:
     allowAny:
         - vite
