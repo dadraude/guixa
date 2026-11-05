@@ -20,11 +20,14 @@ Pre-authorized:
 - Push the task branch, open its PR against `main`, and push new commits for CI fixes and
   merges of `main` when the PR conflicts.
 - Edit admitted `plan.md`/`tasks.md` and create one Deviation file per entry in `history/` (see `specs/README.md#history`).
+- Create the spec-sync worktree and branch, edit `spec.md`/area files there with their Change entries,
+  open its stacked PR against the task branch, and retarget it to `main` once the task PR merges.
+  Merging it is the user's acceptance of the spec change.
 
 Ask first:
 
 - Merging any PR (the user merges).
-- Product decisions: `spec.md` changes, OQ answers, behaviour changes.
+- Product decisions: `spec.md` changes outside a spec-sync PR, OQ answers, behaviour changes.
 - Publishing new tickets; reorganizing existing tickets, relations, labels or automations.
 - Force-push, pushing to `main`, rewriting published history, other remotes, workspaces or credentials,
   deleting branches or tickets, the `guixa`/`guixa_test` databases, machine configuration.
@@ -45,6 +48,8 @@ Ask first:
 | Task branch                               | `feature/dra-NN-<3-6 title words>`; `chore/` for tooling, test support or CI; `docs/` for documents only                                                                                                                            |
 | Worktree root                             | Sibling of the selected repository: `<repo-parent>/<repo-name>-worktrees`                                                                                                                                                           |
 | Task worktree                             | `<worktree-root>/dra-NN`                                                                                                                                                                                                            |
+| Requirements documents                    | The feature's `specs/NNN-feature/spec.md` and its area files; `plan.md`/`tasks.md` deviations stay in the task PR                                                                                                                   |
+| Spec-sync branch / worktree               | `docs/NNN-tnn-spec-sync` (no `DRA-NN`: Linear would move the issue on merge) / `<worktree-root>/dra-NN-spec-sync`                                                                                                                   |
 | Implementation owner record               | `<worktree>/.agent-workflow/implementation-owner.json` (ignored runtime state; retain until integration)                                                                                                                            |
 | Test database                             | `guixa_test_draNN`; parallel workers may add `_test_N`                                                                                                                                                                              |
 | Limits                                    | 3 pipelines; 3 substantive reviews; 2 mechanical follow-up reviews; 2 consecutive product failures per stage; 2 unsuccessful corrections per stable mechanism (`recovery`); 8 total correction attempts per stage (`recoveryTotal`) |

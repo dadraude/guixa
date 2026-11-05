@@ -20,8 +20,9 @@ proof that prerequisite code exists in the base. Missing tooling/evidence keeps 
 
 Before admitting new work, check each live task worktree's PR. When its integration is verified as in
 [scheduling](scheduling.md#integration-and-release), run the profile's cleanup serially: remove the
-clean worktree and drop its task databases. Keep and report a dirty worktree, an unverifiable PR, or a
-closed-unmerged PR until the user confirms it is abandoned.
+clean worktree and drop its task databases. If the task has an open spec-sync PR, retarget it to the
+configured base and keep its worktree until that PR integrates too. Keep and report a dirty worktree,
+an unverifiable PR, or a closed-unmerged PR until the user confirms it is abandoned.
 
 ## Report the batch
 
@@ -54,7 +55,7 @@ On resume reconstruct reservations from live worktrees, retained disposition/own
 Recover each task's recorded implementer identity using [implementation ownership](handoff.md#implementation-ownership);
 resume that worker for corrections instead of dispatching a new implementer.
 
-Return one table: task, outcome (pending-ci/ci-failed/ci-passed/stopped/waiting-integration), PR, review rounds, deviations, retained
+Return one table: task, outcome (pending-ci/ci-failed/ci-passed/stopped/waiting-integration), PR, spec-sync PR (or `none`), review rounds, deviations, retained
 worktree, reserved surfaces and predecessor PRs. Include pending checks, unresolved decisions and observed stage durations from the retained task record.
 Report missing historical timings explicitly; preserve holds and deferred ownership across sessions.
 A PR is not an integrated task. Do not mark missing proof as passed.

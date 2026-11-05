@@ -77,6 +77,8 @@ Rules:
 - A requirement change edits the spec first, then the plan and tasks it affects, and logs a **Change**.
 - A task is not done until any deviation found while coding is written back to the spec or plan it
   affects and logged as a **Deviation**. Code never silently disagrees with its documents.
+- When a task PR makes `spec.md` or an area file stale, the agent opens a stacked spec-sync PR on the
+  task branch with the edits and a **Change** entry; merging it accepts the change.
 - Open questions block only the requirements that depend on them. When resolved, the answer is logged as a **Q&A**.
 - Before a spec is accepted, walk the gap families in `.claude/skills/spec-gaps/SKILL.md`.
 
