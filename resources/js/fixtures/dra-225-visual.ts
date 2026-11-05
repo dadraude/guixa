@@ -4,6 +4,7 @@ import { createInertiaApp } from '@inertiajs/vue3';
 import type { DefineComponent } from 'vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { installTranslations } from '@/lib/i18n';
+import { financeBasketRow } from './financeBasketRow';
 
 const query = new URLSearchParams(window.location.search);
 const view = query.get('view') === 'detail' ? 'Show' : 'Index';
@@ -59,23 +60,26 @@ const returnLines =
               },
           ];
 const totalCents = stockLines.length ? 2300 : 0;
-const basket = {
-    id: basketId,
-    householdId,
-    householdName,
-    state: basketState,
-    stockLines,
-    returnLines,
-    totalCents,
-    balanceCents: -500,
-    projectedBalanceCents: -500 - totalCents,
-    validatedAt:
-        basketState === 'validated' || basketState === 'collected'
-            ? '2026-10-30T10:00:00+00:00'
-            : null,
-    collectedAt:
-        basketState === 'collected' ? '2026-10-31T11:00:00+00:00' : null,
-};
+const basket = financeBasketRow(
+    {
+        id: basketId,
+        householdId,
+        householdName,
+        state: basketState,
+        stockLines,
+        returnLines,
+        totalCents,
+        balanceCents: -500,
+        projectedBalanceCents: -500 - totalCents,
+        validatedAt:
+            basketState === 'validated' || basketState === 'collected'
+                ? '2026-10-30T10:00:00+00:00'
+                : null,
+        collectedAt:
+            basketState === 'collected' ? '2026-10-31T11:00:00+00:00' : null,
+    },
+    role === 'finance' ? 'staff' : 'member',
+);
 const summaryOf = (id: string, createdAt: string, validatedAt: string) => ({
     id,
     householdName,

@@ -448,7 +448,12 @@
                             },
                             {
                                 "selector": "#main-content button",
-                                "count": 0
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"collect-basket\"]",
+                                "count": 1,
+                                "minHeight": 44
                             },
                             {
                                 "selector": "#main-content a[href^=\"/finance/\"]",

@@ -411,7 +411,7 @@
                 "role": "manager"
             },
             "root": "#main-content",
-            "panels": "#main-content section,#main-content form,#main-content .pilot-list,#main-content .pilot-layout-panel,#main-content .pilot-layout-notice,#main-content table",
+            "panels": "#main-content section,#main-content form,#main-content .pilot-list:has(li),#main-content .pilot-layout-panel,#main-content .pilot-layout-notice,#main-content table",
             "content": "#main-content h1,#main-content h2,#main-content h3,#main-content p,#main-content label,#main-content input,#main-content a,#main-content button,#main-content th,#main-content td,#main-content li,#main-content dt,#main-content dd",
             "fonts": ["16px Nunito Variable"],
             "focus": [
@@ -1312,11 +1312,11 @@
                                 "contrast": 4.5
                             },
                             {
-                                "selector": "[data-test=\"basket-source-text\"]",
+                                "selector": "[data-test=\"basket-source-link\"]",
                                 "count": 1
                             },
                             {
-                                "selector": "[data-test=\"basket-source-link\"]",
+                                "selector": "[data-test=\"basket-source-text\"]",
                                 "count": 0
                             },
                             {
@@ -1328,7 +1328,7 @@
                                 "count": 5
                             },
                             {
-                                "selector": "#main-content tbody tr:first-child [data-test=\"basket-source-text\"]",
+                                "selector": "#main-content tbody tr:first-child [data-test=\"basket-source-link\"]",
                                 "count": 1,
                                 "text": "Cistella: 0198f0a0-0000-7000-8000-000000000021"
                             }
@@ -1363,7 +1363,7 @@
                                 "contrast": 4.5
                             },
                             {
-                                "selector": "[data-test=\"basket-source-text\"]",
+                                "selector": "[data-test=\"basket-source-link\"]",
                                 "count": 0
                             },
                             {
@@ -1401,11 +1401,11 @@
                                 "contrast": 4.5
                             },
                             {
-                                "selector": "[data-test=\"basket-source-text\"]",
+                                "selector": "[data-test=\"basket-source-link\"]",
                                 "count": 2
                             },
                             {
-                                "selector": "[data-test=\"basket-source-link\"]",
+                                "selector": "[data-test=\"basket-source-text\"]",
                                 "count": 0
                             },
                             {
@@ -1413,12 +1413,12 @@
                                 "count": 5
                             },
                             {
-                                "selector": "#main-content tbody tr:first-child [data-test=\"basket-source-text\"]",
+                                "selector": "#main-content tbody tr:first-child [data-test=\"basket-source-link\"]",
                                 "count": 1,
                                 "text": "Cistella: 0198f0a0-0000-7000-8000-000000000021"
                             },
                             {
-                                "selector": "#main-content tbody tr:nth-child(2) [data-test=\"basket-source-text\"]",
+                                "selector": "#main-content tbody tr:nth-child(2) [data-test=\"basket-source-link\"]",
                                 "count": 1,
                                 "text": "Cistella: 0198f0a0-0000-7000-8000-000000000024"
                             }
