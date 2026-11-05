@@ -5,7 +5,7 @@ Part of the [canonical registry](../tasks.md); dependencies live there. Technica
 scenario keeps passing on SQLite. Nothing is in production, so there is no data migration.
 
 Every task keeps the required suite green. T77, T78 and T80 make the code portable while CI still runs
-on PostgreSQL, and are independent of each other. T79 is the single switch: it moves tests, CI and the
+on PostgreSQL. T77 and T78 are independent; T80 follows T78 because both edit the migrations. T79 is the single switch: it moves tests, CI and the
 task tooling to SQLite at once. T81 removes what PostgreSQL left behind.
 
 From T78 onwards CI also runs an optional `sqlite` job: the backend suite on in-memory SQLite, reported
