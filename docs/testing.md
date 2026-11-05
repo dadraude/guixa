@@ -14,12 +14,13 @@ Use the project's PHP 8.5 runtime; the configured local option is the sibling wo
 PostgreSQL 17, and Redis 7. Local managed services need PostgreSQL and Redis available; a
 matching container setup is not configured in this repository.
 
-Before setup, copy the main checkout's `.env` privately into the task worktree, set
-`DB_DATABASE=guixa_test_draNN`, and verify that value without printing credentials.
-Do not modify the source `.env`. Check `.env.testing` if present and ensure neither it
-nor inherited database settings override the task database. The task wrapper validates these
-settings, the PHPUnit configuration, and cached configuration before launching a child.
-Stop if it rejects isolation; do not substitute `guixa` or shared `guixa_test`.
+Task worktrees have no `.env`: never read, copy or create any `.env*` file. The coordinator
+creates `guixa_test_draNN` on the local PostgreSQL before dispatch and generates one throwaway
+key with `php -r 'echo "base64:".base64_encode(random_bytes(32));'`. Pass it as `APP_KEY`, with
+`DB_USERNAME=postgres`, in the environment of every guarded invocation below; the wrapper sets
+`DB_DATABASE` to the task database and `phpunit.xml` supplies the rest. The task wrapper validates
+the database settings, the PHPUnit configuration, and cached configuration before launching a
+child. Stop if it rejects isolation; do not substitute `guixa` or shared `guixa_test`.
 
 Run setup and application commands from the task worktree through the wrapper below. Replace
 `NN` with the assigned **digits**, and `WORKTREE_ROOT` with the sibling worktree root;
@@ -34,9 +35,9 @@ Do not clear a shared Redis database.
 
 ```sh
 cd "$WORKTREE"
-REDIS_PREFIX="guixa-test-draNN:" PATH="$WORKTREE_ROOT/.bin:$PATH" node .agent-workflow/scripts/task-command.mjs NN -- composer install
-REDIS_PREFIX="guixa-test-draNN:" PATH="$WORKTREE_ROOT/.bin:$PATH" node .agent-workflow/scripts/task-command.mjs NN -- pnpm install --frozen-lockfile
-REDIS_PREFIX="guixa-test-draNN:" PATH="$WORKTREE_ROOT/.bin:$PATH" node .agent-workflow/scripts/task-command.mjs NN -- php artisan test --filter=TestName
+APP_KEY="$APP_KEY" DB_USERNAME=postgres REDIS_PREFIX="guixa-test-draNN:" PATH="$WORKTREE_ROOT/.bin:$PATH" node .agent-workflow/scripts/task-command.mjs NN -- composer install
+APP_KEY="$APP_KEY" DB_USERNAME=postgres REDIS_PREFIX="guixa-test-draNN:" PATH="$WORKTREE_ROOT/.bin:$PATH" node .agent-workflow/scripts/task-command.mjs NN -- pnpm install --frozen-lockfile
+APP_KEY="$APP_KEY" DB_USERNAME=postgres REDIS_PREFIX="guixa-test-draNN:" PATH="$WORKTREE_ROOT/.bin:$PATH" node .agent-workflow/scripts/task-command.mjs NN -- php artisan test --filter=TestName
 ```
 
 A frontend build is needed only when the focused test requires its Vite manifest or when
@@ -54,8 +55,8 @@ consume a changed contract. PHP test suites are `Unit`, `Application`, `Integrat
 runner's path selector:
 
 ```sh
-REDIS_PREFIX="guixa-test-draNN:" PATH="$WORKTREE_ROOT/.bin:$PATH" node .agent-workflow/scripts/task-command.mjs NN -- php artisan test tests/Application/Membership/AccountManagementTest.php
-REDIS_PREFIX="guixa-test-draNN:" PATH="$WORKTREE_ROOT/.bin:$PATH" node .agent-workflow/scripts/task-command.mjs NN -- pnpm exec vp test run resources/js/pages/Orders/Edit.spec.ts
+APP_KEY="$APP_KEY" DB_USERNAME=postgres REDIS_PREFIX="guixa-test-draNN:" PATH="$WORKTREE_ROOT/.bin:$PATH" node .agent-workflow/scripts/task-command.mjs NN -- php artisan test tests/Application/Membership/AccountManagementTest.php
+APP_KEY="$APP_KEY" DB_USERNAME=postgres REDIS_PREFIX="guixa-test-draNN:" PATH="$WORKTREE_ROOT/.bin:$PATH" node .agent-workflow/scripts/task-command.mjs NN -- pnpm exec vp test run resources/js/pages/Orders/Edit.spec.ts
 ```
 
 These are existing example paths; select the files relevant to your change. The frontend
