@@ -43,6 +43,8 @@ describe('manager cycles', () => {
                                 participating: true,
                                 cutoff: '2026-11-06T14:00:00',
                                 open: true,
+                                sent: false,
+                                canSendManually: false,
                             },
                         ],
                     },
@@ -181,6 +183,8 @@ describe('manager cycles', () => {
                             participating: true,
                             cutoff: null,
                             open: false,
+                            sent: true,
+                            canSendManually: false,
                         },
                     ],
                 },
@@ -192,5 +196,50 @@ describe('manager cycles', () => {
         installTranslations(app);
         const html = await renderToString(app);
         expect(html).not.toContain('data-test="add-cycle-grower"');
+    });
+
+    it('shows a Sent status on a producer whose order was sent (R12a)', async () => {
+        const app = createSSRApp(Index, {
+            cycles: [
+                {
+                    id: 'cycle',
+                    pickupDate: '2026-11-07',
+                    cancelled: false,
+                    closed: false,
+                    settled: false,
+                    participants: [
+                        {
+                            producerId: 'baker',
+                            producerName: 'Forn',
+                            participating: true,
+                            cutoff: null,
+                            open: false,
+                            sent: true,
+                            canSendManually: false,
+                        },
+                        {
+                            producerId: 'grower',
+                            producerName: 'Hort',
+                            participating: true,
+                            cutoff: null,
+                            open: false,
+                            sent: false,
+                            canSendManually: false,
+                        },
+                    ],
+                },
+            ],
+            producers: [],
+            pickupWeekday: 6,
+            pendingCollections: {},
+        });
+        installTranslations(app);
+        const html = await renderToString(app);
+        const row = (id: string) =>
+            html
+                .split(`data-test="participant-cycle-${id}"`)[1]
+                .split('</li>')[0];
+        expect(row('baker')).toContain('Enviada');
+        expect(row('grower')).not.toContain('Enviada');
     });
 });

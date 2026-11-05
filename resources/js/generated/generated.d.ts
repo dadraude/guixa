@@ -124,6 +124,8 @@ readonly producerName: string,
 readonly participating: boolean,
 readonly cutoff: string | null,
 readonly open: boolean,
+readonly sent: boolean,
+readonly canSendManually: boolean,
 };
 export type CycleRow = {
 readonly id: string,

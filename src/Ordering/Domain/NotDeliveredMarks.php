@@ -57,6 +57,23 @@ final class NotDeliveredMarks
         return $marked;
     }
 
+    /**
+     * The derived marks of every given order, which sending, the scheduler and the manual-send read share.
+     *
+     * @param  list<Order>  $orders
+     * @return array<string, array<string, true>> derived marks per order id
+     */
+    public function derivedOfAll(Cycle $cycle, array $orders): array
+    {
+        $marked = [];
+
+        foreach ($orders as $order) {
+            $marked[$order->id] = $this->derivedOf($cycle, $order);
+        }
+
+        return $marked;
+    }
+
     /** @param  array<string, int>  $unavailable  product ids unavailable in the cycle, as keys */
     private function isMarked(OrderLine $line, Cycle $cycle, array $unavailable): bool
     {

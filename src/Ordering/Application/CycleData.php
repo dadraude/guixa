@@ -19,7 +19,8 @@ final readonly class CycleData
         public bool $settled = false,
     ) {}
 
-    public static function of(Cycle $cycle, DateTimeImmutable $now, DateTimeZone $timezone): self
+    /** @param  list<string>  $manuallySendable  producers whose order a manager can send now */
+    public static function of(Cycle $cycle, DateTimeImmutable $now, DateTimeZone $timezone, array $manuallySendable = []): self
     {
         return new self(
             $cycle->id,
@@ -31,6 +32,8 @@ final readonly class CycleData
                     $order->isParticipating(),
                     $order->cutoff()?->setTimezone($timezone)->format('c'),
                     $cycle->isOpenFor($order->producerId, $now),
+                    $order->isSent(),
+                    in_array($order->producerId, $manuallySendable, true),
                 ),
                 $cycle->producerOrders(),
             ),

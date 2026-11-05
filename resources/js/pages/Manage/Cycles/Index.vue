@@ -220,6 +220,11 @@ function cutoffLabel(value: string | null) {
                                 "
                                 :tone="participant.open ? 'success' : 'neutral'"
                             />
+                            <StatusIndicator
+                                v-if="participant.sent"
+                                :label="trans('Sent')"
+                                tone="success"
+                            />
                             {{ cutoffLabel(participant.cutoff) }}
                         </span>
                         <Button

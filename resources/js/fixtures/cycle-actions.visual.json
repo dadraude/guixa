@@ -129,6 +129,101 @@
                             "text": 200
                         }
                     ]
+                },
+                {
+                    "id": "send-order",
+                    "query": {
+                        "state": "send-order"
+                    },
+                    "ready": "dialog[open] [data-test=\"send-order\"]",
+                    "settled": ["dialog[open]"],
+                    "checks": {
+                        "panels": "dialog[open]",
+                        "content": "dialog[open] h2,dialog[open] p,dialog[open] label,dialog[open] input,dialog[open] button,dialog[open] summary",
+                        "focus": ["[data-test=\"send-order-button\"]"],
+                        "root": "body",
+                        "assertions": [
+                            {
+                                "selector": "dialog[open] [data-test=\"send-order\"] button",
+                                "minHeight": 44
+                            }
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "send-order-confirm",
+                    "query": {
+                        "state": "send-order-confirm"
+                    },
+                    "ready": "dialog[open] [data-test=\"confirm-send-order\"]",
+                    "settled": ["dialog[open]"],
+                    "checks": {
+                        "panels": "dialog[open]",
+                        "content": "dialog[open] h2,dialog[open] p,dialog[open] label,dialog[open] input,dialog[open] button,dialog[open] summary",
+                        "focus": [
+                            "[data-test=\"cancel-send-order\"]",
+                            "[data-test=\"confirm-send-order\"]"
+                        ],
+                        "root": "body",
+                        "assertions": [
+                            {
+                                "selector": "dialog[open] [data-test=\"send-order\"] button",
+                                "minHeight": 44
+                            }
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "sent",
+                    "query": {
+                        "state": "sent"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
                 }
             ]
         }
