@@ -7,6 +7,8 @@ import sys
 
 
 JOBS = ("frontend", "backend", "tooling")
+# Run on every change, outside path selection.
+ALWAYS = ("docs", "audit")
 TOOLING = ("skills/", ".agents/", ".claude/", ".codex/", ".agent-workflow/")
 
 
@@ -37,9 +39,9 @@ def failed_jobs(needs):
     failures = []
     if any(outputs.get(job) not in ("true", "false") for job in JOBS):
         failures.append("changes")
-    for job in ("changes", "docs", *JOBS):
+    for job in ("changes", *ALWAYS, *JOBS):
         result = needs.get(job, {}).get("result")
-        required = job in ("changes", "docs") or (
+        required = job == "changes" or job in ALWAYS or (
             needs.get("changes", {}).get("outputs", {}).get(job) == "true"
         )
         if result != "success" and (required or result != "skipped"):

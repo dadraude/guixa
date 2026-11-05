@@ -114,6 +114,14 @@
         "allow-plugins": {
             "pestphp/pest-plugin": true,
             "php-http/discovery": true
+        },
+        "audit": {
+            "ignore": {
+                "PKSA-qhjm-rpqc-qkn6": {
+                    "apply": "audit",
+                    "reason": "Dev-only (shared temp dir on multi-user machines). Pest 5.3.3 conflicts with phpunit/phpunit >=13.4.4; remove when Pest allows the patched PHPUnit. Review by 2026-12-05."
+                }
+            }
         }
     },
     "minimum-stability": "stable",

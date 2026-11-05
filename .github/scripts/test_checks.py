@@ -49,6 +49,7 @@ class GateTest(unittest.TestCase):
         return {
             "changes": {"result": "success", "outputs": {job: str(job in selected).lower() for job in JOBS}},
             "docs": {"result": "success"},
+            "audit": {"result": "success"},
             **{job: {"result": "success" if job in selected else "skipped"} for job in JOBS},
         }
 
@@ -57,7 +58,7 @@ class GateTest(unittest.TestCase):
         self.assertEqual(failed_jobs(self.needs(JOBS)), [])
 
     def test_failed_cancelled_and_unexpectedly_skipped_required_jobs_fail(self):
-        for job in ("changes", "docs", *JOBS):
+        for job in ("changes", "docs", "audit", *JOBS):
             for result in ("failure", "cancelled", "skipped", None):
                 with self.subTest(job=job, result=result):
                     needs = self.needs(JOBS)
@@ -77,7 +78,7 @@ class GateTest(unittest.TestCase):
                 self.assertEqual(failed_jobs(needs), ["changes"])
 
     def test_missing_job_results_fail_closed(self):
-        self.assertEqual(set(failed_jobs({})), {"changes", "docs", *JOBS})
+        self.assertEqual(set(failed_jobs({})), {"changes", "docs", "audit", *JOBS})
 
 
 class DiffTest(unittest.TestCase):

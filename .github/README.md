@@ -33,5 +33,9 @@ python3 -B -m unittest discover -s .github/scripts -p 'test_*.py'
 No application behavior changed; these regression checks and workflow syntax
 validation are the focused checks for this CI refactor.
 
+The `audit` job also always runs `composer audit --locked` and `pnpm audit`, and any
+finding fails `ci`. Accept a Composer advisory only in `composer.json` under
+`config.audit.ignore`, with a reason that names the blocker and an expiry date.
+
 Dependabot checks Composer, npm and GitHub Actions dependencies weekly. Composer
 minor and patch updates are grouped after a five-day cooldown.
