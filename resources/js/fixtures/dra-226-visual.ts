@@ -3,6 +3,7 @@ import '../../../public/theme-colors.css';
 import { createInertiaApp, router } from '@inertiajs/vue3';
 import type { DefineComponent } from 'vue';
 import AppLayout from '@/layouts/AppLayout.vue';
+import { financeBasketRow } from './financeBasketRow';
 import { installTranslations } from '@/lib/i18n';
 
 const query = new URLSearchParams(location.search);
@@ -54,31 +55,34 @@ if (state === 'recollected') {
         reason: null,
     });
 }
-const basket = {
-    id: '0198f0a0-0000-7000-8000-000000000229',
-    householdId: '0198f0a0-0000-7000-8000-000000000230',
-    householdName: state === 'long' ? longText : 'La Figuera',
-    state: collected ? 'collected' : 'validated',
-    stockLines: [
-        {
-            stockProductId: '0198f0a0-0000-7000-8000-000000000231',
-            name: 'Oli',
-            unit: 'ampolla',
-            quantity: '1.000',
-            unitPriceCents: 1200,
-            amountCents: 1200,
-        },
-    ],
-    returnLines: [],
-    totalCents: 1200,
-    effectiveTotalCents: 1200,
-    adjustments: [],
-    collectionEvents: events,
-    balanceCents: -1200,
-    projectedBalanceCents: -1200,
-    validatedAt: '2026-11-01T09:00:00+00:00',
-    collectedAt: state === 'never' ? null : original.occurredAt,
-};
+const basket = financeBasketRow(
+    {
+        id: '0198f0a0-0000-7000-8000-000000000229',
+        householdId: '0198f0a0-0000-7000-8000-000000000230',
+        householdName: state === 'long' ? longText : 'La Figuera',
+        state: collected ? 'collected' : 'validated',
+        stockLines: [
+            {
+                stockProductId: '0198f0a0-0000-7000-8000-000000000231',
+                name: 'Oli',
+                unit: 'ampolla',
+                quantity: '1.000',
+                unitPriceCents: 1200,
+                amountCents: 1200,
+            },
+        ],
+        returnLines: [],
+        totalCents: 1200,
+        effectiveTotalCents: 1200,
+        adjustments: [],
+        collectionEvents: events,
+        balanceCents: -1200,
+        projectedBalanceCents: -1200,
+        validatedAt: '2026-11-01T09:00:00+00:00',
+        collectedAt: state === 'never' ? null : original.occurredAt,
+    },
+    role === 'member' ? 'member' : 'staff',
+);
 const components = import.meta.glob('../pages/**/*.vue', {
     eager: true,
 }) as Record<string, { default: DefineComponent }>;

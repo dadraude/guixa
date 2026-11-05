@@ -3,6 +3,7 @@ import '../../../public/theme-colors.css';
 import { createInertiaApp, http } from '@inertiajs/vue3';
 import type { DefineComponent } from 'vue';
 import AppLayout from '@/layouts/AppLayout.vue';
+import { financeBasketRow } from './financeBasketRow';
 import { installTranslations } from '@/lib/i18n';
 
 const query = new URLSearchParams(window.location.search);
@@ -64,7 +65,7 @@ const stock = {
 const totalCents = state === 'empty' || state === 'cancelled' ? 0 : 1300;
 const balanceCents =
     basketState === 'draft' || basketState === 'cancelled' ? 500 : -800;
-const basket = {
+const basket = financeBasketRow({
     id: basketId,
     householdId,
     householdName,
@@ -77,7 +78,7 @@ const basket = {
     validatedAt: basketState === 'draft' ? null : '2026-10-30T09:00:00+01:00',
     collectedAt:
         basketState === 'collected' ? '2026-10-30T10:00:00+01:00' : null,
-};
+});
 const summaries =
     state === 'empty'
         ? []
