@@ -1800,6 +1800,12 @@ html:has(.coop-manager-shell) {
     color: var(--sidebar-foreground);
 }
 
+/* The global focus ring is the brand green, the sidebar's own background. */
+.reference-style [data-sidebar='sidebar'],
+html:has(.reference-style) [data-sidebar='sidebar'][data-mobile='true'] {
+    --ring: var(--sidebar-foreground);
+}
+
 /* The mobile sheet is portalled under body, outside .reference-style. */
 html:has(.reference-style) [data-sidebar='sidebar'][data-mobile='true'] {
     --sidebar-background: var(--palette-brand);
@@ -1830,6 +1836,7 @@ html.dark:has(.reference-style) [data-sidebar='sidebar'][data-mobile='true'] {
     min-height: 2.75rem;
     overflow: visible;
     white-space: normal;
+    cursor: pointer;
 }
 
 :is(
