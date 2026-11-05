@@ -185,7 +185,7 @@ it('fails closed for unknown tables and dynamic table names', function (string $
 
 it('permits only the exact declared table-free advisory lock SQL', function () {
     $checker = new ModuleContract(require dirname(__DIR__, 2).'/architecture/modules.php');
-    $path = 'src/Membership/Infrastructure/Persistence/DatabaseHouseholdRepository.php';
+    $path = 'src/Shared/Infrastructure/PostgresLocks.php';
     $source = '<?php use Illuminate\Support\Facades\DB; ';
     expect($checker->violations($path, $source."DB::select('select pg_advisory_xact_lock(191983, 1)');"))->toBe([])
         ->and(implode("\n", $checker->violations($path, $source."DB::select('select * from users');")))->toContain('raw SQL requires a reviewed declaration');
