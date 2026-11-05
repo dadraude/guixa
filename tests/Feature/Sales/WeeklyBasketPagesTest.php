@@ -153,3 +153,31 @@ it('rejects a hand-set allocation of a product a validated basket contains with 
 
     expect([DB::table('order_lines')->orderBy('id')->pluck('allocated_quantity', 'id')->all(), DB::table('basket_lines')->orderBy('id')->get()->map(fn ($row) => (array) $row)->all(), DB::table('wallet_movements')->count()])->toBe($before);
 });
+
+it('redistributes after an actual-quantity adjustment without repeating any charge or touching the frozen basket (R18, R19a, S61)', function () {
+    $week = twoHouseholdWeek();
+    $reception = "/manage/cycles/{$week['cycle']}/receptions/{$week['producer']}";
+    $this->actingAs($week['manager'])->put("/finance/baskets/{$week['baskets']['A']}/weekly-lines/{$week['loaf']}", ['quantity' => '3'])->assertRedirect();
+    $this->post("/finance/baskets/{$week['baskets']['A']}/validation")->assertRedirect();
+    $charges = fn () => DB::table('wallet_movements')->orderBy('basket_id')->get()->map(fn ($row) => [$row->basket_id, $row->amount_cents])->all();
+    $frozen = fn () => (array) DB::table('basket_lines')->where('basket_id', $week['baskets']['A'])->first();
+    $chargesBefore = $charges();
+    $frozenBefore = $frozen();
+
+    $this->delete("{$reception}/distribution")->assertRedirect();
+    $this->post("{$reception}/validate")->assertRedirect();
+    $this->post("{$reception}/distribution")->assertRedirect()->assertSessionHasNoErrors();
+
+    expect($chargesBefore)->toBe([[$week['baskets']['A'], -1050]])
+        ->and($charges())->toBe($chargesBefore)
+        ->and($frozen())->toBe($frozenBefore)
+        ->and((float) $frozen()['quantity'])->toBe(3.0)
+        ->and((float) $frozen()['allocated_quantity'])->toBe(4.0)
+        ->and(DB::table('baskets')->where('id', $week['baskets']['A'])->value('validated_total_cents'))->toBe(1050)
+        ->and(DB::table('baskets')->where('id', $week['baskets']['B'])->value('state'))->toBe('draft');
+
+    $this->get("/finance/baskets/{$week['baskets']['A']}")->assertInertia(fn (Assert $page) => $page
+        ->where('basket.weeklyLines.0.allocated', '4.000')
+        ->where('basket.weeklyLines.0.quantity', '3.000')
+        ->where('basket.weeklyLines.0.differsFromAllocation', true));
+});
