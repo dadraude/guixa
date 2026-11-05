@@ -296,5 +296,7 @@ Acceptance:
 - Collect each delivery's assertion-level acceptance evidence and current integration identities; investigate confirmed gaps rather than rerunning every prior suite. Record focused checks, independent review, required visual reports and exact-candidate CI evidence.
   Only then mark feature 001 Done in `specs/README.md`, with deviations reconciled in spec/plan and immutable history entries.
 
+Evidence: [traceability audit](traceability.md) (2026-11-05).
+
 Ownership: tests and missing assertions, traceability evidence and final feature documentation. No
 unapproved product choices, publishing or new implementation work is authorized by this document acceptance.

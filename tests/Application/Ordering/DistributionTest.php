@@ -1,5 +1,6 @@
 <?php
 
+use Guixa\Ordering\Application\CloseCycleAfterBasketValidation;
 use Guixa\Ordering\Application\CycleSettlement;
 use Guixa\Ordering\Application\MarkProducerDistributed;
 use Guixa\Ordering\Application\ReopenProducerOrder;
@@ -826,3 +827,50 @@ it('keeps a marked line of a validated basket in the order while the cycle stays
 
     expect(fn () => ($this->world->removeMarkedLine)($this->households['A'], $this->cycleId, $this->rye))->toThrow(PickupNotPending::class);
 })->group('R23');
+
+it('closes the cycle when the last draft is validated while validated baskets stay pending collection, then rejects reopening (R23a, R24b, S54, S83)', function () {
+    ($this->onlyBaker)();
+    ($this->order)('A', $this->bread, '4');
+    ($this->order)('B', $this->bread, '4');
+    ($this->order)('C', $this->rye, '1');
+    ($this->send)();
+    ($this->setReceived)($this->rye, '0');
+    ($this->validate)();
+    ($this->distribute)();
+    $close = fn () => (new CloseCycleAfterBasketValidation($this->world->cycles, $this->world->baskets, $this->world->clock))($this->cycleId);
+    $isClosed = fn () => $this->world->cycles->get($this->cycleId)->isClosed();
+
+    ($this->freeze)('A');
+    $close();
+    expect(($this->pickup)('C'))->toBe('nothing_to_collect')
+        ->and($isClosed())->toBeFalse();
+
+    ($this->freeze)('B');
+    $close();
+    expect($isClosed())->toBeTrue()
+        ->and([($this->pickup)('A'), ($this->pickup)('B')])->toBe(['validated', 'validated'])
+        ->and(fn () => ($this->reopen)())->toThrow(CycleClosed::class);
+
+    $this->world->baskets->collect($this->world->orders->ofHousehold($this->cycleId, DIST_A)->id);
+    expect(($this->pickup)('A'))->toBe('collected')
+        ->and(($this->pickup)('B'))->toBe('validated')
+        ->and($isClosed())->toBeTrue();
+})->group('R23a', 'R24b', 'S54', 'S83');
+
+it('keeps the next cycle editable while the previous cycle is settled with a validated basket pending collection (R4, S9, S26)', function () {
+    ($this->onlyBaker)();
+    ($this->bakerSent)();
+    ($this->validate)();
+    ($this->distribute)();
+    ($this->freeze)('A');
+    $next = ($this->world->openCycle)($this->world->manager, '2026-11-14', [OrderingWorld::BAKER]);
+
+    ($this->world->setOrderLine)($this->households['A'], $next, $this->bread, '2');
+    ($this->world->setOrderLine)($this->households['A'], $next, $this->bread, '3');
+
+    $order = $this->world->orders->ofHousehold($next, DIST_A);
+    expect(($this->pickup)('A'))->toBe('validated')
+        ->and($this->world->cycles->get($next)->isSettled())->toBeFalse()
+        ->and($order->lines())->toHaveCount(1)
+        ->and($order->lines()[0]->ordered->toString())->toBe('3.000');
+})->group('R4', 'S9', 'S26');

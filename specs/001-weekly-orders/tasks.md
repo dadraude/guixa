@@ -19,7 +19,8 @@ Source: [spec](spec.md) and areas · [plan](plan.md) · [coverage allocation](ta
 | [tasks/catalog.md](tasks/catalog.md) | T52–T54: unified producer catalogue, safe history and stock visibility |
 | [tasks/sales.md](tasks/sales.md) | T55–T58 and T64–T66/T68: independent basket, Finance, returns, receipts, member reads and corrections |
 | [tasks/weekly-and-collection.md](tasks/weekly-and-collection.md) | T59–T63/T67: weekly cutover, supplements, collection, indicators, lifecycle and cleanup; T33 closure |
-| [tasks/coverage.md](tasks/coverage.md) | All 65 requirements and 90 scenarios: retained responsibility and amendment responsibility |
+| [tasks/coverage.md](tasks/coverage.md) | All 65 requirements and 91 scenarios (S1–S92, S90 retired): retained responsibility and amendment responsibility |
+| [tasks/traceability.md](tasks/traceability.md) | T33 audit: assertion-level evidence and verdict for every requirement and scenario, closure prerequisites and gaps filled |
 | [tasks/baseline.md](tasks/baseline.md) | Historical T01–T51 scopes, approval gates and dated evidence; superseded behavior is explicitly historical |
 
 IDs are feature-global. Detail files do not start separate numbering or redefine dependencies.
