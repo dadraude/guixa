@@ -234,6 +234,23 @@ it('sets an absolute stock count through an audited adjustment', function () {
     expect(DB::table('stock_movements')->count())->toBe(2);
 });
 
+it('stores the inventory count note in the application locale', function () {
+    $product = honey();
+    $manager = accountWith(Role::Manager);
+    app()->setLocale('en');
+
+    $this->actingAs($manager)->put("/manage/stock/{$product->id}/available", ['available' => '3'])
+        ->assertRedirect('/manage/stock');
+
+    expect(DB::table('stock_movements')->where('note', 'Inventory count')->count())->toBe(1);
+});
+
+it('answers 404 when setting the count of an unknown product', function () {
+    $this->actingAs(accountWith(Role::Manager))
+        ->put('/manage/stock/'.Str::uuid7().'/available', ['available' => '3'])
+        ->assertNotFound();
+});
+
 it('rejects an invalid absolute stock count', function () {
     $product = honey();
     $this->actingAs(accountWith(Role::Manager))

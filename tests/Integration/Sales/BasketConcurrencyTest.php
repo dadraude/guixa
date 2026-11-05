@@ -187,6 +187,23 @@ final class BasketConcurrencyTest extends TestCase
     }
 
     #[Test]
+    public function an_inventory_count_waits_for_a_sale_and_still_leaves_exactly_the_counted_quantity(): void
+    {
+        [$actor, $household, $products] = $this->world(['Oil' => '5']);
+        $basket = $this->draft($actor, $household, [$products['Oil'] => '3']);
+
+        DB::beginTransaction();
+        app(ValidateBasket::class)($actor, $basket);
+        $pipes = $this->startSetAvailable($actor->accountId, $products['Oil'], '4');
+        $this->waitForLock($pipes);
+        DB::commit();
+
+        $this->assertSame('done', $this->finish($pipes));
+        $this->assertSame(4.0, (float) DB::table('stock_movements')->where('product_id', $products['Oil'])->sum('quantity'));
+        $this->assertSame(1, DB::table('stock_movements')->where('product_id', $products['Oil'])->where('type', 'adjustment')->count());
+    }
+
+    #[Test]
     public function a_sale_racing_a_stock_adjustment_waits_for_it_and_is_rejected_when_stock_no_longer_suffices(): void
     {
         [$actor, $household, $products] = $this->world(['Oil' => '5']);
@@ -283,6 +300,18 @@ final class BasketConcurrencyTest extends TestCase
         PHP;
         $pipes = [];
         $this->other = proc_open([PHP_BINARY, '-r', $script, '--', $accountId, $productId, $quantity],
+            [1 => ['pipe', 'w'], 2 => ['pipe', 'w']], $pipes, null,
+            [...getenv(), 'DB_DATABASE' => DB::connection()->getDatabaseName()]);
+        $this->assertIsResource($this->other);
+
+        return $pipes;
+    }
+
+    /** @return array<int,resource> */
+    private function startSetAvailable(string $accountId, string $productId, string $available): array
+    {
+        $pipes = [];
+        $this->other = proc_open([PHP_BINARY, dirname(__DIR__, 2).'/Support/Scripts/set_stock_available.php', $accountId, $productId, $available],
             [1 => ['pipe', 'w'], 2 => ['pipe', 'w']], $pipes, null,
             [...getenv(), 'DB_DATABASE' => DB::connection()->getDatabaseName()]);
         $this->assertIsResource($this->other);
