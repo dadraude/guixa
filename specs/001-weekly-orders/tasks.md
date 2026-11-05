@@ -151,11 +151,11 @@ preserves; implement changed behavior through T52–T68; T69–T76 are the 2026-
 | T74 | <a id="t74"></a>[Fill the audited test gaps](tasks/audit-2026-11-05.md#t74)                                          | S27, S61, S69, S87                                                                                                                                                                          | T69                                                                                      |
 | T75 | <a id="t75"></a>[Manager send button for producer orders](tasks/audit-2026-11-05.md#t75)                             | R12a; S36                                                                                                                                                                                   | T69                                                                                      |
 | T76 | <a id="t76"></a>[Stock movement history](tasks/audit-2026-11-05.md#t76)                                              | New requirement (spec first, gated); R28                                                                                                                                                    | T69                                                                                      |
-| T77 | <a id="t77"></a>[SQLite connection, serialised writes and the Locks port](tasks/sqlite.md#t77)                       | ADR 0002 rules 1–2; no behaviour change                                                                                                                                                     | T69                                                                                      |
-| T78 | <a id="t78"></a>[Rewrite the schema as portable SQLite migrations](tasks/sqlite.md#t78)                              | ADR 0002 rules 3–4; S1–S92 regression boundary                                                                                                                                              | T77                                                                                      |
-| T79 | <a id="t79"></a>[Concurrency tests for the single-writer model](tasks/sqlite.md#t79)                                 | ADR 0002 rule 6; R19–R24 invariants                                                                                                                                                         | T78                                                                                      |
-| T80 | <a id="t80"></a>[Store timestamps in UTC](tasks/sqlite.md#t80)                                                       | ADR 0002 rule 5; cutoff scenarios                                                                                                                                                           | T78                                                                                      |
-| T81 | <a id="t81"></a>[CI, tooling and documentation on SQLite](tasks/sqlite.md#t81)                                       | ADR 0002 consequences; documents and tooling only                                                                                                                                           | T79, T80                                                                                 |
+| T77 | <a id="t77"></a>[The Locks port, with a PostgreSQL adapter](tasks/sqlite.md#t77) | ADR 0002 rule 2; no behaviour change | T69 |
+| T78 | <a id="t78"></a>[Rewrite the schema as portable migrations](tasks/sqlite.md#t78) | ADR 0002 rules 3–4; S1–S92 regression boundary | T69 |
+| T79 | <a id="t79"></a>[Switch to SQLite](tasks/sqlite.md#t79) | ADR 0002 rules 1, 2 and 6; R19–R24 invariants | T77, T78, T80 |
+| T80 | <a id="t80"></a>[Store timestamps in UTC](tasks/sqlite.md#t80) | ADR 0002 rule 5; cutoff scenarios | T69 |
+| T81 | <a id="t81"></a>[Remove PostgreSQL leftovers](tasks/sqlite.md#t81) | ADR 0002 consequences; documents and tooling only | T79 |
 
 ## Linear mapping — 2026-11-05 audit tasks
 
@@ -180,11 +180,11 @@ All five are children of the non-executable parent
 
 | Task        | Linear issue                                       | After    |
 | ----------- | -------------------------------------------------- | -------- |
-| [T77](#t77) | [DRA-242](https://linear.app/draude/issue/DRA-242) | T69      |
-| [T78](#t78) | [DRA-243](https://linear.app/draude/issue/DRA-243) | T77      |
-| [T79](#t79) | [DRA-244](https://linear.app/draude/issue/DRA-244) | T78      |
-| [T80](#t80) | [DRA-245](https://linear.app/draude/issue/DRA-245) | T78      |
-| [T81](#t81) | [DRA-246](https://linear.app/draude/issue/DRA-246) | T79, T80 |
+| [T77](#t77) | [DRA-242](https://linear.app/draude/issue/DRA-242) | T69 |
+| [T78](#t78) | [DRA-243](https://linear.app/draude/issue/DRA-243) | T69 |
+| [T79](#t79) | [DRA-244](https://linear.app/draude/issue/DRA-244) | T77, T78, T80 |
+| [T80](#t80) | [DRA-245](https://linear.app/draude/issue/DRA-245) | T69 |
+| [T81](#t81) | [DRA-246](https://linear.app/draude/issue/DRA-246) | T79 |
 
 ## Linear publication and current gates
 
