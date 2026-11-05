@@ -206,3 +206,8 @@ reported, not retried destructively.
   the existing branch/type convention. PR body: delivered behavior, covered R#/scenarios, review rounds,
   Deviations (or None). Do not add provider attribution.
 - Read Linear status back after integration rather than assuming the merge moved it.
+- Coverage ratchet: CI fails below the `--min` in the `test:coverage` script (`composer.json`). When a
+  task changes or builds on existing `app/` or `src/` code whose tests are thin, add meaningful tests
+  for that code's uncovered behavior in the same task, within the touched files and their direct
+  collaborators. Do not pad with assertion-free tests. Report the CI coverage total in the PR body and,
+  when it rose, raise `--min` to the new total rounded down. Never lower it without the user's decision.

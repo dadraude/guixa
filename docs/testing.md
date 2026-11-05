@@ -95,3 +95,11 @@ full local check, not the default focused loop. CI always runs `docs`, selects
 aggregate `ci` check to pass. The backend CI job provisions PostgreSQL and Redis,
 runs `composer setup`, then `composer test`; reproduce only the failing part
 locally unless a broader run is needed to diagnose it.
+
+## Coverage
+
+`composer test:coverage` runs the PHP suite with coverage of `app/` and `src/` and fails below its
+`--min` (see `composer.json`). CI runs it in the backend job. The local PHP 8.5 build has no coverage
+driver, so read the total from the CI log. Feature work raises the floor: add tests for the
+under-covered existing code a task touches, then raise `--min` to the new total rounded down, as the
+[workflow profile](../.agent-workflow/profile.md) describes.
