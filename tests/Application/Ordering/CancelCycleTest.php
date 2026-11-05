@@ -23,7 +23,7 @@ beforeEach(function () {
     $this->cycle = fn () => collect(($this->world->listCycles)($this->world->manager))->firstWhere('id', $this->cycleId);
 });
 
-it('discards the orders of a cancelled cycle and shows it as cancelled (R4b, S37)', function () {
+it('retains the orders of a cancelled cycle as cancelled and shows it as cancelled (R4b, S37)', function () {
     ($this->world->cancelCycle)($this->world->manager, $this->cycleId);
 
     expect(($this->cycle)()->cancelled)->toBeTrue()

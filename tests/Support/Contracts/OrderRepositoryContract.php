@@ -110,7 +110,7 @@ trait OrderRepositoryContract
         $order = $repository->lockFor(self::CYCLE, self::HOUSEHOLD);
         $order->setLine($this->product(self::BREAD, 'Loaf', 350), Quantity::fromString('1'), $cycle, $repository->nextId(), self::ANNA, $this->madrid('2026-10-22 10:00'));
         $repository->add($order);
-        $repository->deleteOfCycle(self::CYCLE);
+        $repository->archiveOfCycle(self::CYCLE);
 
         $this->assertNull($repository->ofHousehold(self::CYCLE, self::HOUSEHOLD));
         $this->assertSame([], $repository->ofCycle(self::CYCLE));
@@ -212,7 +212,7 @@ trait OrderRepositoryContract
         $this->assertSame([], $repository->idsOfCycle('00000000-0000-7000-8000-0000000000c9'));
 
         // Cancelling the cycle's orders keeps them findable by id.
-        $repository->deleteOfCycle(self::CYCLE);
+        $repository->archiveOfCycle(self::CYCLE);
         $kept = $repository->cycleIdsOfOrders([$first->id, $second->id]);
         ksort($kept);
         $this->assertSame(array_fill_keys($ids, self::CYCLE), $kept);
@@ -361,7 +361,7 @@ trait OrderRepositoryContract
         $repository->add($order);
         $other = $repository->lockFor(self::CYCLE, self::OTHER_HOUSEHOLD);
 
-        $repository->deleteOfCycle(self::CYCLE);
+        $repository->archiveOfCycle(self::CYCLE);
 
         $this->assertNull($repository->ofHousehold(self::CYCLE, self::HOUSEHOLD));
         $this->assertNull($repository->ofHousehold(self::CYCLE, self::OTHER_HOUSEHOLD));

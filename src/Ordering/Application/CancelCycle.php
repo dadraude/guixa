@@ -19,7 +19,7 @@ final class CancelCycle
         private readonly Clock $clock,
     ) {}
 
-    /** The cycle shows as cancelled and its orders are discarded, since nothing was charged (R4b, S37). */
+    /** The cycle shows as cancelled and its orders are archived (retained as cancelled), since nothing was charged (R4b, S37). */
     public function __invoke(Actor $actor, string $cycleId): void
     {
         Gate::forUser($actor)->authorize('manage');
@@ -30,7 +30,7 @@ final class CancelCycle
             $cycle = $this->cycles->getForUpdate($cycleId) ?? throw CycleNotFound::withId($cycleId);
             $cycle->cancel($now);
             $this->cycles->add($cycle);
-            $this->orders->deleteOfCycle($cycleId);
+            $this->orders->archiveOfCycle($cycleId);
         });
     }
 }

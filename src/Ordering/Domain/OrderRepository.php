@@ -9,8 +9,8 @@ interface OrderRepository
     /** Stores the order and its lines, replacing what was stored. */
     public function add(Order $order): void;
 
-    /** Discards every order of a cycle, lines included (R4b, D14). */
-    public function deleteOfCycle(string $cycleId): void;
+    /** Archives every order of a cycle by marking it cancelled; orders and lines are retained (R4b, D14). */
+    public function archiveOfCycle(string $cycleId): void;
 
     /**
      * Stores the *will not be delivered* mark on these lines of the order, so later catalog changes do not affect
