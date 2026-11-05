@@ -490,7 +490,8 @@ Catalog's pure internal metadata queries; quantity-only queries never call Catal
 | `RecordStockEntry`, `RecordStockAdjustment` | Manager; stock mode only; positive entry / non-zero justified adjustment |
 | `ListStock`, `ListActiveStock` | Manager; metadata from Catalog, current quantity from ledger |
 | `ListStockMovements` | Planned (pending T76, gated by a new requirement): the movement history is not built; the movements page shows only the current level and the forms |
-| `SetStockAvailable` | Manager; sets the available quantity after an inventory count and records an adjustment of the difference (R27) |
+| `SetStockAvailable` | Manager; sets the available quantity after an inventory count: inside one transaction it locks the product, reads the available quantity under that lock and records an adjustment of the difference (R27). The caller passes the note already translated, since Application takes no framework i18n (A2) |
+| `AppendStockAdjustment` | Internal step for `RecordStockAdjustment` and `SetStockAvailable`; builds and records the adjustment, takes no lock: the caller holds the product lock in its transaction |
 | `GetReturnItem` | Internal read of a return item snapshot for Sales through its own return-items port |
 | `SellBasketStock` | Internal Sales operation, records the already-authorized actor and the basket source; locks and checks stock |
 | `CorrectBasketStock` | Internal Sales correction with source/reason; cannot make stock negative |

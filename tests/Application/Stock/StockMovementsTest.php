@@ -8,11 +8,13 @@ use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Error\InvalidQuantity;
 use Guixa\Shared\Domain\Money;
 use Guixa\Shared\Domain\Role;
+use Guixa\Stock\Application\AppendStockAdjustment;
 use Guixa\Stock\Application\GetReturnItem;
 use Guixa\Stock\Application\ListStock;
 use Guixa\Stock\Application\RecordStockAdjustment;
 use Guixa\Stock\Application\RecordStockEntry;
 use Guixa\Stock\Application\SellBasketStock;
+use Guixa\Stock\Application\SetStockAvailable;
 use Guixa\Stock\Domain\Error\AdjustmentNoteRequired;
 use Guixa\Stock\Domain\Error\InvalidMovementQuantity;
 use Guixa\Stock\Domain\Error\NotEnoughStock;
@@ -39,8 +41,10 @@ beforeEach(function () {
     $transactions = new ImmediateTransactionRunner;
     $this->manager = Actor::manager('manager-account');
 
+    $append = new AppendStockAdjustment($this->movements, $ledger, $this->clock);
     $this->entry = new RecordStockEntry($this->products, $this->movements, $ledger, $transactions, $this->clock);
-    $this->adjust = new RecordStockAdjustment($this->products, $this->movements, $ledger, $transactions, $this->clock);
+    $this->adjust = new RecordStockAdjustment($this->products, $append, $transactions);
+    $this->setAvailable = new SetStockAvailable($this->products, $this->movements, $append, $transactions);
     $this->sell = new SellBasketStock($this->products, $this->movements, $ledger, $transactions, $this->clock);
     $this->listStock = new ListStock($this->products, $this->movements);
     $this->returnItem = new GetReturnItem($this->returnItems);
@@ -85,7 +89,7 @@ it('rejects weekly Catalog IDs for inventory entry and adjustment while acceptin
     $ledger = new StockLedger($movements);
     $transactions = new ImmediateTransactionRunner;
     $entry = new RecordStockEntry($port, $movements, $ledger, $transactions, $this->clock);
-    $adjust = new RecordStockAdjustment($port, $movements, $ledger, $transactions, $this->clock);
+    $adjust = new RecordStockAdjustment($port, new AppendStockAdjustment($movements, $ledger, $this->clock), $transactions);
 
     expect(fn () => $entry($catalog->manager, $weeklyId, '1', null))->toThrow(StockProductNotFound::class)
         ->and(fn () => $adjust($catalog->manager, $weeklyId, '1', 'count', null))->toThrow(StockProductNotFound::class)
@@ -243,4 +247,54 @@ it('shows Finance only active stock for basket selection while retaining Manager
         ->and(($this->listStock)($this->manager))->toHaveCount(1);
     expect(fn () => ($this->entry)($finance, $this->honeyId, '1', null))->toThrow(AuthorizationException::class)
         ->and(fn () => ($this->adjust)($finance, $this->honeyId, '1', 'note', null))->toThrow(AuthorizationException::class);
+});
+
+it('sets the counted quantity from the level read under the product lock (R27)', function () {
+    ($this->entry)($this->manager, $this->honeyId, '10', null);
+    $this->products->locked = [];
+
+    ($this->setAvailable)($this->manager, $this->honeyId, '8.500', 'count');
+
+    $adjustment = $this->movements->forProduct($this->honeyId)[1];
+    expect(($this->available)())->toBe('8.500')
+        ->and($this->products->locked)->toBe([$this->honeyId])
+        ->and($adjustment->type)->toBe(MovementType::Adjustment)
+        ->and($adjustment->quantity->toString())->toBe('-1.500')
+        ->and($adjustment->note)->toBe('count');
+});
+
+it('records nothing when the counted quantity equals the available one, or can raise it from zero (R27)', function () {
+    ($this->setAvailable)($this->manager, $this->honeyId, '0', 'count');
+    expect($this->movements->forProduct($this->honeyId))->toBe([]);
+
+    ($this->setAvailable)($this->manager, $this->honeyId, '2.250', 'count');
+    expect(($this->available)())->toBe('2.250');
+});
+
+it('rejects an inventory count for an unknown product and a negative count (R27)', function () {
+    expect(fn () => ($this->setAvailable)($this->manager, 'missing', '1', 'count'))->toThrow(StockProductNotFound::class)
+        ->and(fn () => ($this->setAvailable)($this->manager, $this->honeyId, '-1', 'count'))->toThrow(InvalidQuantity::class)
+        ->and($this->movements->forProduct($this->honeyId))->toBe([]);
+});
+
+it('rejects an inventory count for a weekly Catalog product (R25)', function () {
+    $catalog = new CatalogWorld;
+    $producerId = ($catalog->createProducer)($catalog->manager, 'Beekeeper', 3, '20:00');
+    $weeklyId = ($catalog->createProduct)($catalog->producerActor($producerId), $producerId, 'Honey', 'jar', 500, false, null);
+    $port = new CatalogStockProductRepository(
+        new GetStockProduct($catalog->products),
+        new ListStockProducts($catalog->products),
+        new LockStockProduct($catalog->products),
+    );
+    $movements = new InMemoryStockMovementRepository;
+    $append = new AppendStockAdjustment($movements, new StockLedger($movements), $this->clock);
+    $setAvailable = new SetStockAvailable($port, $movements, $append, new ImmediateTransactionRunner);
+
+    expect(fn () => $setAvailable($catalog->manager, $weeklyId, '1', 'count'))->toThrow(StockProductNotFound::class)
+        ->and($movements->forProduct($weeklyId))->toBe([]);
+});
+
+it('forbids a non-manager from setting the available quantity', function () {
+    expect(fn () => ($this->setAvailable)(Actor::producer('p', 'producer'), $this->honeyId, '1', 'count'))
+        ->toThrow(AuthorizationException::class);
 });
