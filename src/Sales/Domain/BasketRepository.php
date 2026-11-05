@@ -37,5 +37,12 @@ interface BasketRepository
      */
     public function settledForHouseholds(array $householdIds): array;
 
+    /**
+     * Validated baskets with effective goods still to collect, for one household or all, ordered by validation instant then id.
+     *
+     * @return list<Basket>
+     */
+    public function pendingCollections(?string $householdId = null): array;
+
     public function hasProductHistory(string $productId): bool;
 }

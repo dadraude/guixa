@@ -8,6 +8,8 @@ import { installTranslations } from '@/lib/i18n';
 const query = new URLSearchParams(window.location.search);
 const view = query.get('view') === 'detail' ? 'Show' : 'Index';
 const state = query.get('state') ?? 'populated';
+const role = query.get('role') === 'finance' ? 'finance' : 'member';
+const pending = query.get('pending') === '1';
 const mode = query.get('mode');
 const fixtureUrl = window.location.href;
 const fixturePath = window.location.pathname + window.location.search;
@@ -26,9 +28,11 @@ const longText =
     'La Figuera de la Vall de les terres altes amb un nom extraordinàriament llarg que descriu la casa i els seus productes';
 const longState = state === 'long';
 const householdName = longState ? longText : 'La Figuera';
-const basketState = ['empty-draft', 'long', 'populated'].includes(state)
-    ? 'draft'
-    : state;
+const basketState = pending
+    ? 'validated'
+    : ['empty-draft', 'long', 'populated'].includes(state)
+      ? 'draft'
+      : state;
 const stockLines =
     state === 'empty-draft' || state === 'cancelled'
         ? []
@@ -72,23 +76,39 @@ const basket = {
     collectedAt:
         basketState === 'collected' ? '2026-10-31T11:00:00+00:00' : null,
 };
+const summaryOf = (id: string, createdAt: string, validatedAt: string) => ({
+    id,
+    householdName,
+    state: basketState,
+    status: basketState,
+    totalCents,
+    createdAt,
+    pendingCollection: basketState === 'validated',
+    validatedAt: basketState === 'validated' ? validatedAt : null,
+});
 const summaries =
     state === 'empty'
         ? []
-        : [
-              {
-                  id: basketId,
-                  householdName,
-                  state: basketState,
-                  totalCents,
-                  createdAt: '2026-10-30 10:00',
-              },
-          ];
+        : pending
+          ? [
+                summaryOf(basketId, '2026-10-30 10:00', '2026-11-05 08:15'),
+                summaryOf(
+                    '0198f0a0-0000-7000-8000-000000000106',
+                    '2026-11-02 09:30',
+                    '2026-11-05 12:40',
+                ),
+                summaryOf(
+                    '0198f0a0-0000-7000-8000-000000000107',
+                    '2026-11-04 16:45',
+                    '2026-11-06 17:05',
+                ),
+            ]
+          : [summaryOf(basketId, '2026-10-30 10:00', '')];
 const components = import.meta.glob('../pages/**/*.vue', {
     eager: true,
 }) as Record<string, { default: DefineComponent }>;
 const page = {
-    component: `Member/Baskets/${view}`,
+    component: `${role === 'finance' ? 'Finance' : 'Member'}/Baskets/${view}`,
     url: fixturePath,
     version: 'dra-225',
     props: {
@@ -106,10 +126,16 @@ const page = {
                 created_at: '2026-10-01T12:00:00Z',
                 updated_at: '2026-10-01T12:00:00Z',
             },
-            roles: ['member'],
+            roles: [role],
         },
-        roleAreas: [{ role: 'member', label: 'Orders', href: '/' }],
-        ...(view === 'Show' ? { basket } : { baskets: summaries }),
+        roleAreas: [
+            {
+                role,
+                label: role === 'finance' ? 'Finance' : 'Orders',
+                href: role === 'finance' ? '/finance/baskets' : '/',
+            },
+        ],
+        ...(view === 'Show' ? { basket } : { baskets: summaries, pending }),
     },
 };
 const initialPage = document.createElement('script');

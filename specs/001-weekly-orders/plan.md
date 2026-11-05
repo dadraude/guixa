@@ -443,7 +443,7 @@ another event or sequence number.
 | `CorrectBasket`, `CorrectBasketCollection` | Finance/Manager; mandatory reason, append-only history |
 | `ListBaskets`, `GetBasket` | Finance / Manager; existing operational reads remain staff-only |
 | `ListMemberBaskets`, `GetMemberBasket` | Current own-household member; repository filters by household for list and identifier reads |
-| `ListPendingCollections`, `ReadPendingCollections` | All for Finance/Manager; own household for members; include closed-cycle and cycleless baskets |
+| `ListPendingCollections`, `ListMemberPendingCollections`, `ReadPendingCollections` | All (optionally one weekly cycle) for Finance/Manager; own household for members through the separate member query; internal read without actor; all use `BasketRepository::pendingCollections`; include closed-cycle and cycleless baskets, exclude drafts |
 | `ListStockOffers` | T54 Member or Manager; active stock including zero, inactive producer allowed; no reservation/edit capability. Finance sales-staff access belongs to a later slice. |
 | `HasProductHistory`, `ReadOpenHouseholdBaskets`, `ReadWeeklyBasketStates`, `ReadEffectiveWeeklyQuantities`, `ReadContainerCounts` | Internal Catalog/Ordering/Membership queries; include history only where requested |
 
@@ -613,8 +613,10 @@ Persistent pending-collection indication:
   and cycleless purchases. Use pending/preparation labels accurately; draft is not ready for collection.
 - Finance/Manager see all pending collections with household, validation date.
 - Cycle list/detail retain a pending-count badge/link after weekly closure, counting weekly baskets only. Collection removes the corresponding pending item without reopening or recharging.
-- Adapt feature 002's dashboard data source from pending pickup cycle ids to Sales basket summaries;
-  preserve unrelated dashboard cards. An overdue date alone never produces an abandoned/cancelled state.
+- Adapt feature 002's dashboard data source from pending pickup cycle ids to Sales basket summaries (member
+  `pendingPickups` lists basket id, validation date, weekly and late flags; Finance/Manager get the total); `?pending=1` on
+  `/baskets` and `/finance/baskets` (with `cycle` for staff) lists them, and cycle list/detail link to that view through
+  `SalesBaskets::pendingCollectionCounts`; preserve unrelated dashboard cards. An overdue date alone never produces an abandoned/cancelled state.
 
 Concrete reuse inspected before planning:
 - `resources/js/components/StockProductFields.vue` supplies catalogue field presentation; retain it

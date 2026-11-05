@@ -15,6 +15,15 @@ vi.mock('@inertiajs/vue3', () => ({
     }),
 }));
 
+vi.mock('@/actions/App/Http/Controllers/Member/BasketController', () => ({
+    default: {
+        index: { url: () => '/baskets?pending=1' },
+        show: { url: () => '/baskets/basket' },
+    },
+}));
+vi.mock('@/actions/App/Http/Controllers/Finance/BasketController', () => ({
+    default: { index: { url: () => '/finance/baskets?pending=1' } },
+}));
 vi.mock('@/actions/App/Http/Controllers/OrderController', () => ({
     default: { index: () => '/' },
 }));
@@ -140,5 +149,79 @@ describe('dashboard presentation', () => {
         expect(html).toContain('Cicles');
         expect(html).toContain('Comptes');
         expect(html.match(/text-lg font-semibold/g)).toHaveLength(2);
+    });
+
+    it('lists pending collections from validated baskets, late and cycleless included, and links to all of them (R24, S42)', async () => {
+        const base = {
+            roles: ['member'],
+            isManager: false,
+            isMember: true,
+            nextPickup: null,
+            openCycles: 0,
+            balance: 5000,
+            managerSummary: null,
+        };
+        const populated = createSSRApp(Dashboard, {
+            ...base,
+            pendingPickups: [
+                {
+                    basketId: 'closed',
+                    validatedAt: '2026-11-03',
+                    weekly: true,
+                    late: false,
+                },
+                {
+                    basketId: 'late',
+                    validatedAt: '2026-11-04',
+                    weekly: true,
+                    late: true,
+                },
+                {
+                    basketId: 'stock',
+                    validatedAt: '2026-11-05',
+                    weekly: false,
+                    late: false,
+                },
+            ],
+        });
+        installTranslations(populated);
+        const html = await renderToString(populated);
+        expect(html.match(/<li class="pilot-list-row"/g)).toHaveLength(3);
+        expect(html).toContain('Cistella tardana');
+        expect(html).toContain('Totes les recollides pendents');
+
+        const empty = createSSRApp(Dashboard, { ...base, pendingPickups: [] });
+        installTranslations(empty);
+        expect(await renderToString(empty)).not.toContain(
+            'data-test="pending-pickups"',
+        );
+    });
+
+    it('shows Finance and Manager the exact total of pending collections only when there are some', async () => {
+        const props = {
+            roles: ['finance'],
+            isManager: false,
+            isMember: false,
+            nextPickup: null,
+            openCycles: 0,
+            balance: null,
+            pendingPickups: [],
+            managerSummary: null,
+        };
+        const some = createSSRApp(Dashboard, {
+            ...props,
+            staffPendingCollections: { count: 4 },
+        });
+        installTranslations(some);
+        expect(await renderToString(some)).toContain('Recollides pendents: 4');
+
+        const none = createSSRApp(Dashboard, {
+            ...props,
+            staffPendingCollections: { count: 0 },
+        });
+        installTranslations(none);
+        expect(await renderToString(none)).not.toContain(
+            'data-test="staff-pending-collections"',
+        );
     });
 });

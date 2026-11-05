@@ -17,10 +17,10 @@ final class ReadOpenHouseholdBaskets
     /** @return list<OpenBasketData> weekly, stock and return baskets still to validate or to collect, oldest date first; a weekly basket is dated by its cycle's pickup, any other by its creation */
     public function __invoke(string $householdId): array
     {
-        $open = array_values(array_filter(
-            $this->baskets->listForHousehold($householdId),
-            fn (Basket $basket) => $basket->state->isDraft() || $basket->isPendingCollection(),
-        ));
+        $open = [
+            ...array_filter($this->baskets->listForHousehold($householdId), fn (Basket $basket) => $basket->state->isDraft()),
+            ...$this->baskets->pendingCollections($householdId),
+        ];
         $pickupDates = $this->pickupDates->forCycles(array_values(array_filter(array_map(
             fn (Basket $basket) => $basket->isWeekly() ? $basket->referenceCycleId : null,
             $open,

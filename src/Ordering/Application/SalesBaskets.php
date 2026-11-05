@@ -23,4 +23,7 @@ interface SalesBaskets extends WeeklyBasketView
 
     /** @return list<string> cycles where the household has a weekly base to validate or to collect */
     public function pendingCycleIds(string $householdId): array;
+
+    /** @return array<string, int> weekly baskets pending collection by cycle id, whatever the cycle's state; none for cycles without any */
+    public function pendingCollectionCounts(): array;
 }

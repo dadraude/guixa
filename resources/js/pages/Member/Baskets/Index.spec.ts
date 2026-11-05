@@ -14,8 +14,8 @@ vi.mock('@inertiajs/vue3', () => ({
     }),
 }));
 
-async function render(baskets: App.Http.BasketSummaryRow[]) {
-    const app = createSSRApp(Index, { baskets });
+async function render(baskets: App.Http.BasketSummaryRow[], pending = false) {
+    const app = createSSRApp(Index, { baskets, pending });
     installTranslations(app);
     return renderToString(app);
 }
@@ -30,6 +30,7 @@ describe('member basket list', () => {
                 status: 'draft',
                 totalCents: 2300,
                 createdAt: '2026-10-30 10:00',
+                validatedAt: null,
                 pendingCollection: false,
             },
             {
@@ -39,6 +40,7 @@ describe('member basket list', () => {
                 status: 'validated',
                 totalCents: -100,
                 createdAt: '2026-10-31 10:00',
+                validatedAt: null,
                 pendingCollection: true,
             },
             {
@@ -48,6 +50,7 @@ describe('member basket list', () => {
                 status: 'cancelled',
                 totalCents: 0,
                 createdAt: '2026-11-01 10:00',
+                validatedAt: null,
                 pendingCollection: false,
             },
         ]);
@@ -68,5 +71,41 @@ describe('member basket list', () => {
         const html = await render([]);
         expect(html).toContain('Encara no hi ha cap cistella.');
         expect(html).not.toContain('<button');
+    });
+
+    it('says nothing is pending collection when the pending view is empty', async () => {
+        const html = await render([], true);
+        expect(html).toContain('Cap cistella pendent de recollida.');
+        expect(html).not.toContain('Encara no hi ha cap cistella.');
+    });
+
+    it('shows the validation date instead of the creation date in the pending view', async () => {
+        const html = await render(
+            [
+                {
+                    id: 'basket-one',
+                    householdName: 'La Figuera',
+                    state: 'validated',
+                    status: 'validated',
+                    totalCents: 100,
+                    createdAt: '2026-10-30 10:00',
+                    validatedAt: '2026-11-05 08:15',
+                    pendingCollection: true,
+                },
+            ],
+            true,
+        );
+        expect(html).toMatch(
+            /data-test="validated-at"[^>]*>[^<]*5 de nov\. 2026, 8:15/,
+        );
+        expect(html).not.toContain('30 d’oct. 2026');
+        expect(html).toMatch(/<h1[^>]*>\s*Recollides pendents/);
+        expect(html).toMatch(/data-test="all-baskets"/);
+    });
+
+    it('keeps the plain title and no back link in the full list', async () => {
+        const html = await render([]);
+        expect(html).toMatch(/<h1[^>]*>\s*Cistelles/);
+        expect(html).not.toContain('data-test="all-baskets"');
     });
 });

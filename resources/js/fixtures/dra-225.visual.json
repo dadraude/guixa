@@ -894,6 +894,437 @@
                     }
                 }
             ]
+        },
+        {
+            "path": "/visual-dra-225.html",
+            "root": "#main-content",
+            "panels": "#main-content .pilot-layout-panel,#main-content .pilot-list-row,#main-content .pilot-layout-notice",
+            "content": "#main-content h1,#main-content h2,#main-content h3,#main-content p,#main-content a,#main-content li,#main-content dt,#main-content dd",
+            "fonts": ["16px Nunito Variable"],
+            "id": "member-pending-list",
+            "query": {
+                "view": "list",
+                "pending": "1"
+            },
+            "focus": ["#main-content a[data-visual-page-focus-first]"],
+            "states": [
+                {
+                    "id": "populated",
+                    "query": {
+                        "state": "populated"
+                    },
+                    "ready": "body[data-visual-ready=\"populated\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"basket-list\"] > li",
+                                "count": 3
+                            },
+                            {
+                                "selector": "[data-test=\"status-validated\"]",
+                                "count": 3
+                            },
+                            {
+                                "selector": "[data-test=\"empty-baskets\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content a[href^=\"/finance/\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content form",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"validated-at\"]",
+                                "count": 3
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "count": 1,
+                                "text": "Recollides pendents"
+                            },
+                            {
+                                "selector": "[data-test=\"all-baskets\"]",
+                                "count": 1,
+                                "text": "Totes les cistelles",
+                                "minHeight": 44
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "empty",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "ready": "body[data-visual-ready=\"empty\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "focus": [],
+                        "noFocusReason": "Empty pending list has no page action.",
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"empty-baskets\"]",
+                                "count": 1,
+                                "text": "Cap cistella pendent de recollida."
+                            },
+                            {
+                                "selector": "[data-test=\"basket-list\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"validated-at\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "count": 1,
+                                "text": "Recollides pendents"
+                            },
+                            {
+                                "selector": "[data-test=\"all-baskets\"]",
+                                "count": 1,
+                                "text": "Totes les cistelles",
+                                "minHeight": 44
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "long",
+                    "query": {
+                        "state": "long"
+                    },
+                    "ready": "body[data-visual-ready=\"long\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"basket-list\"] > li",
+                                "count": 3
+                            },
+                            {
+                                "selector": "[data-test=\"status-validated\"]",
+                                "count": 3
+                            },
+                            {
+                                "selector": "[data-test=\"validated-at\"]",
+                                "count": 3
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "count": 1,
+                                "text": "Recollides pendents"
+                            },
+                            {
+                                "selector": "[data-test=\"all-baskets\"]",
+                                "count": 1,
+                                "text": "Totes les cistelles",
+                                "minHeight": 44
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "path": "/visual-dra-225.html",
+            "root": "#main-content",
+            "panels": "#main-content .pilot-layout-panel,#main-content .pilot-list-row,#main-content .pilot-layout-notice",
+            "content": "#main-content h1,#main-content h2,#main-content h3,#main-content p,#main-content a,#main-content li,#main-content dt,#main-content dd",
+            "fonts": ["16px Nunito Variable"],
+            "id": "finance-pending-list",
+            "query": {
+                "view": "list",
+                "pending": "1",
+                "role": "finance"
+            },
+            "focus": [
+                "#main-content a[data-visual-page-focus-first]",
+                "#main-content a[data-visual-page-focus-last]"
+            ],
+            "states": [
+                {
+                    "id": "populated",
+                    "query": {
+                        "state": "populated"
+                    },
+                    "ready": "body[data-visual-ready=\"populated\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"basket-list\"] > li",
+                                "count": 3
+                            },
+                            {
+                                "selector": "[data-test=\"status-validated\"]",
+                                "count": 3
+                            },
+                            {
+                                "selector": "[data-test=\"empty-baskets\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content a[href^=\"/finance/\"]",
+                                "count": 5
+                            },
+                            {
+                                "selector": "#main-content form",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"validated-at\"]",
+                                "count": 3
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "count": 1,
+                                "text": "Recollides pendents"
+                            },
+                            {
+                                "selector": "[data-test=\"all-baskets\"]",
+                                "count": 1,
+                                "text": "Totes les cistelles",
+                                "minHeight": 44
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "empty",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "ready": "body[data-visual-ready=\"empty\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "focus": [
+                            "#main-content a[data-visual-page-focus-first]"
+                        ],
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"empty-baskets\"]",
+                                "count": 1,
+                                "text": "Cap cistella pendent de recollida."
+                            },
+                            {
+                                "selector": "[data-test=\"basket-list\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"validated-at\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "count": 1,
+                                "text": "Recollides pendents"
+                            },
+                            {
+                                "selector": "[data-test=\"all-baskets\"]",
+                                "count": 1,
+                                "text": "Totes les cistelles",
+                                "minHeight": 44
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "long",
+                    "query": {
+                        "state": "long"
+                    },
+                    "ready": "body[data-visual-ready=\"long\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"basket-list\"] > li",
+                                "count": 3
+                            },
+                            {
+                                "selector": "[data-test=\"status-validated\"]",
+                                "count": 3
+                            },
+                            {
+                                "selector": "[data-test=\"validated-at\"]",
+                                "count": 3
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "count": 1,
+                                "text": "Recollides pendents"
+                            },
+                            {
+                                "selector": "[data-test=\"all-baskets\"]",
+                                "count": 1,
+                                "text": "Totes les cistelles",
+                                "minHeight": 44
+                            }
+                        ]
+                    }
+                }
+            ]
         }
     ]
 }

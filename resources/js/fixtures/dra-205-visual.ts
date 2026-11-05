@@ -180,7 +180,21 @@ const pageProps: Record<string, Record<string, unknown>> = {
         nextPickup: pickupDate,
         openCycles: 1,
         balance: 2000,
-        pendingPickups: [{ cycleId, pickupDate }],
+        pendingPickups: [
+            {
+                basketId: 'visual-basket',
+                validatedAt: pickupDate,
+                weekly: true,
+                late: false,
+            },
+            {
+                basketId: 'visual-late-basket',
+                validatedAt: pickupDate,
+                weekly: true,
+                late: true,
+            },
+        ],
+        staffPendingCollections: { count: 3 },
         managerSummary: {
             cycles: 1,
             activeCycles: 1,
@@ -211,8 +225,13 @@ const pageProps: Record<string, Record<string, unknown>> = {
         cycles: [cycle],
         producers: [{ id: producerId, name: producer.name }],
         pickupWeekday: 4,
+        pendingCollections: { [cycleId]: 2 },
     },
     'Manage/Cycles/Show': {
+        pendingCollections: {
+            count: 2,
+            href: `/finance/baskets?pending=1&cycle=${cycleId}`,
+        },
         summary: {
             cycleId,
             pickupDate,
@@ -412,6 +431,11 @@ const page = {
                           label: 'Cooperative',
                           href: '/manage/cycles',
                       },
+                      {
+                          role: 'finance',
+                          label: 'Finance',
+                          href: '/finance/baskets',
+                      },
                       { role: 'member', label: 'Member', href: '/orders' },
                       {
                           role: 'producer',
@@ -496,6 +520,10 @@ if (pageName === 'Dashboard') {
         role === 'manager' ? visualProps.managerSummary : null;
     visualProps.pendingPickups =
         role === 'member' ? visualProps.pendingPickups : [];
+    visualProps.staffPendingCollections =
+        role === 'manager' || role === 'finance'
+            ? visualProps.staffPendingCollections
+            : null;
     visualProps.nextPickup = role === 'member' ? visualProps.nextPickup : null;
     visualProps.openCycles = role === 'member' ? visualProps.openCycles : 0;
     visualProps.balance = role === 'member' ? visualProps.balance : null;
@@ -524,6 +552,7 @@ if (state === 'empty') {
         visualProps.nextPickup = null;
         visualProps.openCycles = 0;
         visualProps.pendingPickups = [];
+        visualProps.staffPendingCollections = { count: 0 };
         if (role === 'manager') {
             visualProps.managerSummary = {
                 cycles: 0,
@@ -653,6 +682,10 @@ if (
     visualProps.cycles[0].closed = state === 'closed-cycle';
     visualProps.cycles[0].cancelled = state === 'cancelled-cycle';
 }
+if (pageName === 'Manage/Cycles/Index' && state === 'no-pending')
+    visualProps.pendingCollections = {};
+if (pageName === 'Manage/Cycles/Show' && state === 'no-pending')
+    visualProps.pendingCollections = { count: 0, href: null };
 if (pageName === 'Manage/Cycles/Show' && state === 'cancelled-cycle')
     visualProps.summary.cancelled = true;
 if (pageName === 'Orders/Index' && state === 'closed-and-cancelled')
@@ -983,6 +1016,11 @@ void createInertiaApp({
             case 'default':
                 return true;
             case 'empty':
+                if (pageName === 'Dashboard' && role === 'finance')
+                    return (
+                        mainText().length > 0 &&
+                        !visible('[data-test="staff-pending-collections"]')
+                    );
                 if (pageName === 'Dashboard')
                     return role === 'manager'
                         ? mainText().includes('0') && !mainText().includes('1')
@@ -1191,6 +1229,14 @@ void createInertiaApp({
                 return (
                     mainText().includes(trans('Disable 2FA')) &&
                     mainText().includes(trans('2FA recovery codes'))
+                );
+            case 'no-pending':
+                return (
+                    visible(
+                        pageName === 'Manage/Cycles/Index'
+                            ? '[data-test="cycle-cycle-1"]'
+                            : '[data-test="container-counts"]',
+                    ) && !visible('[data-test="pending-collections"]')
                 );
             case 'closed-cycle':
                 return (

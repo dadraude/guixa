@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import { formatPickupDate, formatQuantity } from '@/lib/locale';
-import { Head } from '@inertiajs/vue3';
+import { Head, Link } from '@inertiajs/vue3';
 import { trans } from 'laravel-vue-i18n';
 import CycleController from '@/actions/App/Http/Controllers/Manage/CycleController';
 import Heading from '@/components/Heading.vue';
+import { Button } from '@/components/ui/button';
 
 defineProps<{
     summary: App.Http.CycleSummaryRow;
     containers: App.Http.ContainerCountRow;
+    pendingCollections: { count: number; href: string | null };
 }>();
 
 defineOptions({
@@ -33,6 +35,22 @@ defineOptions({
             "
             :description="trans('What was ordered, per producer and product')"
         />
+
+        <Button
+            v-if="pendingCollections.href !== null"
+            as-child
+            variant="outline"
+            class="min-h-11 self-start"
+            ><Link
+                :href="pendingCollections.href"
+                data-test="pending-collections"
+                >{{
+                    trans('Pending collections: :count', {
+                        count: String(pendingCollections.count),
+                    })
+                }}</Link
+            ></Button
+        >
 
         <p
             v-if="summary.cancelled"

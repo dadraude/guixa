@@ -4,10 +4,11 @@ import { trans } from 'laravel-vue-i18n';
 import BasketController from '@/actions/App/Http/Controllers/Member/BasketController';
 import Heading from '@/components/Heading.vue';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { euros } from '@/components/pickup/euros';
 import { formatEventDateTime } from '@/lib/locale';
 
-defineProps<{ baskets: App.Http.BasketSummaryRow[] }>();
+defineProps<{ baskets: App.Http.BasketSummaryRow[]; pending: boolean }>();
 const statusLabels: Record<string, string> = {
     draft: trans('In preparation'),
     reversed: trans('Goods fully reversed'),
@@ -18,18 +19,33 @@ const statusLabels: Record<string, string> = {
 </script>
 
 <template>
-    <Head :title="trans('Baskets')" />
+    <Head :title="pending ? trans('Pending collections') : trans('Baskets')" />
     <div class="pilot-page pilot-layout-page">
         <Heading
-            :title="trans('Baskets')"
+            :title="pending ? trans('Pending collections') : trans('Baskets')"
             :description="trans('Your household baskets')"
         />
+        <Button
+            v-if="pending"
+            as-child
+            variant="outline"
+            class="min-h-11 self-start"
+            ><Link
+                :href="BasketController.index.url()"
+                data-test="all-baskets"
+                >{{ trans('All baskets') }}</Link
+            ></Button
+        >
         <p
             v-if="baskets.length === 0"
             class="pilot-layout-notice text-sm text-muted-foreground"
             data-test="empty-baskets"
         >
-            {{ trans('No baskets yet.') }}
+            {{
+                pending
+                    ? trans('No baskets are pending collection.')
+                    : trans('No baskets yet.')
+            }}
         </p>
         <ul v-else class="pilot-list" data-test="basket-list">
             <li
@@ -46,9 +62,17 @@ const statusLabels: Record<string, string> = {
                     >
                         {{ basket.householdName }}
                     </Link>
-                    <span class="text-xs text-muted-foreground">{{
-                        formatEventDateTime(basket.createdAt)
-                    }}</span>
+                    <span
+                        class="text-xs text-muted-foreground"
+                        :data-test="pending ? 'validated-at' : undefined"
+                        >{{
+                            formatEventDateTime(
+                                pending && basket.validatedAt
+                                    ? basket.validatedAt
+                                    : basket.createdAt,
+                            )
+                        }}</span
+                    >
                 </div>
                 <Badge
                     variant="secondary"

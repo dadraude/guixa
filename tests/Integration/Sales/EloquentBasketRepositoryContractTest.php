@@ -41,6 +41,14 @@ final class EloquentBasketRepositoryContractTest extends TestCase
         return [new EloquentBasketRepository, $manager, $household, $product, $returnA, $returnB];
     }
 
+    protected function anotherHousehold(): string
+    {
+        $household = (string) Str::uuid7();
+        DB::table('households')->insert(['id' => $household, 'name' => 'Household Other', 'created_at' => now(), 'updated_at' => now()]);
+
+        return $household;
+    }
+
     protected function weeklySource(): array
     {
         $household = (string) Str::uuid7();

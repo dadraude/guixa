@@ -21,6 +21,8 @@ import { computed } from 'vue';
 import { formatEuroAmount } from '@/lib/formatEuroAmount';
 import { formatQuantity } from '@/lib/locale';
 import type { NavItem } from '@/types';
+import MemberBasketController from '@/actions/App/Http/Controllers/Member/BasketController';
+import FinanceBasketController from '@/actions/App/Http/Controllers/Finance/BasketController';
 import OrderController from '@/actions/App/Http/Controllers/OrderController';
 import WalletController from '@/actions/App/Http/Controllers/WalletController';
 import CycleController from '@/actions/App/Http/Controllers/Manage/CycleController';
@@ -33,7 +35,12 @@ import SettingsController from '@/actions/App/Http/Controllers/Manage/SettingsCo
 import ProductController from '@/actions/App/Http/Controllers/Producer/ProductController';
 import CutoffController from '@/actions/App/Http/Controllers/Producer/CutoffController';
 
-type PendingPickup = { cycleId: string; pickupDate: string };
+type PendingPickup = {
+    basketId: string;
+    validatedAt: string | null;
+    weekly: boolean;
+    late: boolean;
+};
 
 type ManagerSummary = {
     cycles: number;
@@ -54,6 +61,7 @@ const props = defineProps<{
     openCycles: number;
     balance: number | null;
     pendingPickups: PendingPickup[];
+    staffPendingCollections?: { count: number } | null;
     managerSummary: ManagerSummary | null;
 }>();
 
@@ -224,17 +232,64 @@ const isProducer = computed(() => props.roles.includes('producer'));
                     {{ trans('Pending pickups') }}
                 </h2>
             </div>
-            <ul class="pilot-list">
+            <ul class="pilot-list" data-test="pending-pickups">
                 <li
                     v-for="p in pendingPickups"
-                    :key="p.cycleId"
+                    :key="p.basketId"
                     class="pilot-list-row"
                 >
-                    <span class="text-sm">{{
-                        formattedDate(p.pickupDate)
+                    <Link
+                        :href="
+                            MemberBasketController.show.url({
+                                basket: p.basketId,
+                            })
+                        "
+                        class="inline-flex min-h-11 items-center text-sm underline"
+                        >{{
+                            p.validatedAt
+                                ? formattedDate(p.validatedAt)
+                                : trans('Pending collection')
+                        }}</Link
+                    >
+                    <span v-if="p.late" class="text-xs text-muted-foreground">{{
+                        trans('Late basket')
                     }}</span>
                 </li>
             </ul>
+            <Link
+                :href="
+                    MemberBasketController.index.url({ query: { pending: 1 } })
+                "
+                class="inline-flex min-h-11 items-center text-sm underline"
+                data-test="pending-pickups-all"
+                >{{ trans('All pending collections') }}</Link
+            >
+        </section>
+
+        <section
+            v-if="staffPendingCollections && staffPendingCollections.count > 0"
+            class="pilot-layout-panel"
+            :aria-label="trans('pending collections')"
+        >
+            <div class="pilot-layout-panel-header">
+                <h2 class="text-lg font-semibold">
+                    {{ trans('Pending collections') }}
+                </h2>
+            </div>
+            <Link
+                :href="
+                    FinanceBasketController.index.url({
+                        query: { pending: 1 },
+                    })
+                "
+                class="inline-flex min-h-11 items-center text-sm underline"
+                data-test="staff-pending-collections"
+                >{{
+                    trans('Pending collections: :count', {
+                        count: String(staffPendingCollections.count),
+                    })
+                }}</Link
+            >
         </section>
 
         <section

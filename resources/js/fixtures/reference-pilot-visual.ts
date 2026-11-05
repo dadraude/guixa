@@ -74,6 +74,7 @@ const page = {
                             ],
                   producers: [{ id: 'producer-1', name: producerName }],
                   pickupWeekday: 4,
+                  pendingCollections: {},
               }
             : {
                   producers:

@@ -1,11 +1,19 @@
 // @vitest-environment jsdom
 import { describe, expect, it, vi } from 'vite-plus/test';
-import { createSSRApp } from 'vue';
+import { createSSRApp, defineComponent, h } from 'vue';
 import { renderToString } from 'vue/server-renderer';
 import { installTranslations } from '@/lib/i18n';
 import Show from './Show.vue';
 
-vi.mock('@inertiajs/vue3', () => ({ Head: () => null }));
+vi.mock('@inertiajs/vue3', () => ({
+    Head: () => null,
+    Link: defineComponent({
+        setup:
+            (_, { slots }) =>
+            () =>
+                h('a', slots.default?.()),
+    }),
+}));
 
 describe('Cycle container summary', () => {
     it('shows each household its accumulated balance to return, negative included (R18a, S92)', async () => {
@@ -33,6 +41,10 @@ describe('Cycle container summary', () => {
                     },
                 ],
             },
+            pendingCollections: {
+                count: 2,
+                href: '/finance/baskets?pending=1',
+            },
         });
         installTranslations(app);
 
@@ -40,6 +52,9 @@ describe('Cycle container summary', () => {
 
         expect(html).toMatch(
             /data-test="container-balance-h"[^>]*>Envasos per retornar: −2</,
+        );
+        expect(html).toMatch(
+            /data-test="pending-collections"[^>]*>Recollides pendents: 2</,
         );
         expect(html).toMatch(
             /data-test="container-balance-k"[^>]*>Envasos per retornar: 5</,
