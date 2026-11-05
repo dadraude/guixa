@@ -274,7 +274,7 @@
             "id": "finance-basket-detail",
             "path": "/visual-dra-211.html",
             "root": "#main-content",
-            "panels": "#main-content section,#main-content form,#main-content .pilot-list,#main-content .pilot-layout-panel,#main-content .pilot-layout-notice,#main-content table",
+            "panels": "#main-content section,#main-content form,#main-content .pilot-list:has(li),#main-content .pilot-layout-panel,#main-content .pilot-layout-notice,#main-content table",
             "content": "#main-content h1,#main-content h2,#main-content h3,#main-content p,#main-content label,#main-content input,#main-content a,#main-content button,#main-content th,#main-content td,#main-content li",
             "fonts": ["16px Nunito Variable"],
             "focus": [
@@ -494,7 +494,17 @@
                             },
                             {
                                 "selector": ".pilot-wallet-forms",
-                                "count": 0
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"record-top-up\"]",
+                                "count": 1,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"record-correction\"]",
+                                "count": 1,
+                                "minHeight": 44
                             },
                             {
                                 "selector": "[data-test=\"basket-source-link\"]",
@@ -520,11 +530,9 @@
                         "assertions": [
                             {
                                 "selector": ".pilot-wallet-forms",
-                                "count": 0
+                                "count": 1
                             }
-                        ],
-                        "focus": [],
-                        "noFocusReason": "A Finance statement with no movements has no receipt forms or back-to-admin link."
+                        ]
                     }
                 },
                 {
@@ -701,11 +709,11 @@
                                 "count": 0
                             },
                             {
-                                "selector": "[data-test=\"basket-source-link\"]",
+                                "selector": "[data-test=\"basket-source-text\"]",
                                 "count": 0
                             },
                             {
-                                "selector": "[data-test=\"basket-source-text\"]",
+                                "selector": "[data-test=\"basket-source-link\"]",
                                 "count": 1
                             },
                             {

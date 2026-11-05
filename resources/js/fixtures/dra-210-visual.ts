@@ -87,16 +87,22 @@ const summaries =
                 id: `${basketId}-${index}`,
                 householdName: `${householdName} ${index + 1}`,
                 state: 'validated',
+                status: 'validated',
                 totalCents: 1300,
                 createdAt: '2026-10-30 09:00',
+                pendingCollection: true,
+                validatedAt: '2026-10-30 09:00',
             }))
           : [
                 {
                     id: basketId,
                     householdName,
                     state: 'validated',
+                    status: 'validated',
                     totalCents: 1300,
                     createdAt: '2026-10-30 09:00',
+                    pendingCollection: true,
+                    validatedAt: '2026-10-30 09:00',
                 },
             ];
 const wallet = {
@@ -116,6 +122,8 @@ const wallet = {
                               : 'Compra de cistella',
                       cycleId: null,
                       basketId,
+                      sourceMovementId: null,
+                      recordedBy: null,
                   },
                   ...(state === 'long'
                       ? [
@@ -128,13 +136,15 @@ const wallet = {
                                 cycleId: null,
                                 basketId:
                                     '0198f0a0-0000-7000-8000-000000000024',
+                                sourceMovementId: null,
+                                recordedBy: null,
                             },
                         ]
                       : []),
               ],
 };
 const propsByPage: Record<string, Record<string, unknown>> = {
-    'Finance/Baskets/Index': { baskets: summaries },
+    'Finance/Baskets/Index': { baskets: summaries, pending: false },
     'Finance/Baskets/Create': {
         households:
             state === 'empty' ? [] : [{ id: householdId, name: householdName }],
@@ -143,6 +153,7 @@ const propsByPage: Record<string, Record<string, unknown>> = {
         basket,
         containerBalance: 3,
         stockProducts: [stock],
+        returnItems: [],
     },
     'Wallet/Statement': {
         household:
@@ -150,6 +161,10 @@ const propsByPage: Record<string, Record<string, unknown>> = {
                 ? { id: householdId, name: householdName }
                 : null,
         wallet,
+        canManageReceipts: role === 'manager',
+        ...(role === 'manager'
+            ? { householdReturnHref: `/manage/households/${householdId}` }
+            : {}),
     },
 };
 const page = {

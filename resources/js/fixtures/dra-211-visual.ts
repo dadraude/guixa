@@ -138,12 +138,16 @@ const propsByPage: Record<string, Record<string, unknown>> = {
         basket,
         containerBalance: 3,
         stockProducts: basketState === 'draft' ? [stock] : [],
+        returnItems: [],
     },
     'Wallet/Statement': {
         wallet,
         household:
             role === 'member' ? null : { id: householdId, name: householdName },
-        canManageReceipts: role === 'manager',
+        canManageReceipts: role !== 'member',
+        ...(role === 'manager'
+            ? { householdReturnHref: `/manage/households/${householdId}` }
+            : {}),
     },
 };
 const page = {
