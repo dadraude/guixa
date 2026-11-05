@@ -32,7 +32,6 @@ final readonly class Basket
         public array $collectionEvents = [],
         public BasketKind $kind = BasketKind::Stock,
         public ?string $sourceOrderId = null,
-        public ?string $referenceCycleId = null,
         /** A weekly basket created after the base was validated, holding only the lines that arrived late (R19). */
         public bool $late = false,
     ) {}
@@ -73,7 +72,7 @@ final readonly class Basket
         $this->draft();
 
         return new self($this->id, $this->householdId, $this->householdName, $this->state,
-            $this->createdBy, $this->createdAt, $lines, kind: $this->kind, sourceOrderId: $this->sourceOrderId, referenceCycleId: $this->referenceCycleId, late: $this->late);
+            $this->createdBy, $this->createdAt, $lines, kind: $this->kind, sourceOrderId: $this->sourceOrderId, late: $this->late);
     }
 
     public function totalCents(): int
@@ -143,7 +142,7 @@ final readonly class Basket
         return new self($this->id, $this->householdId, $this->householdName, $this->state,
             $this->createdBy, $this->createdAt, $this->lines, $this->validatedBy, $this->validatedAt,
             $this->validatedTotalCents, $this->collectedBy, $this->collectedAt, $this->cancelledBy,
-            $this->cancelledAt, [...$this->adjustments, $adjustment], $this->collectionEvents, kind: $this->kind, sourceOrderId: $this->sourceOrderId, referenceCycleId: $this->referenceCycleId, late: $this->late);
+            $this->cancelledAt, [...$this->adjustments, $adjustment], $this->collectionEvents, kind: $this->kind, sourceOrderId: $this->sourceOrderId, late: $this->late);
     }
 
     public function validated(string $actorId, DateTimeImmutable $when): self
@@ -154,7 +153,7 @@ final readonly class Basket
         }
 
         return new self($this->id, $this->householdId, $this->householdName, BasketState::Validated,
-            $this->createdBy, $this->createdAt, $this->lines, $actorId, $when, $this->totalCents(), kind: $this->kind, sourceOrderId: $this->sourceOrderId, referenceCycleId: $this->referenceCycleId, late: $this->late);
+            $this->createdBy, $this->createdAt, $this->lines, $actorId, $when, $this->totalCents(), kind: $this->kind, sourceOrderId: $this->sourceOrderId, late: $this->late);
     }
 
     public function collected(string $actorId, DateTimeImmutable $when, ?string $eventId = null): self
@@ -174,7 +173,7 @@ final readonly class Basket
         return new self($this->id, $this->householdId, $this->householdName, BasketState::Collected,
             $this->createdBy, $this->createdAt, $this->lines, $this->validatedBy, $this->validatedAt,
             $this->validatedTotalCents, $this->collectedBy ?? $actorId, $this->collectedAt ?? $when,
-            adjustments: $this->adjustments, collectionEvents: $events, kind: $this->kind, sourceOrderId: $this->sourceOrderId, referenceCycleId: $this->referenceCycleId, late: $this->late);
+            adjustments: $this->adjustments, collectionEvents: $events, kind: $this->kind, sourceOrderId: $this->sourceOrderId, late: $this->late);
     }
 
     public function collectionCorrected(BasketCollectionEvent $correction): self
@@ -187,7 +186,7 @@ final readonly class Basket
         return new self($this->id, $this->householdId, $this->householdName, BasketState::Validated,
             $this->createdBy, $this->createdAt, $this->lines, $this->validatedBy, $this->validatedAt,
             $this->validatedTotalCents, $this->collectedBy, $this->collectedAt, $this->cancelledBy,
-            $this->cancelledAt, $this->adjustments, [...$this->collectionEvents, $correction], kind: $this->kind, sourceOrderId: $this->sourceOrderId, referenceCycleId: $this->referenceCycleId, late: $this->late);
+            $this->cancelledAt, $this->adjustments, [...$this->collectionEvents, $correction], kind: $this->kind, sourceOrderId: $this->sourceOrderId, late: $this->late);
     }
 
     public function cancelled(string $actorId, DateTimeImmutable $when): self
@@ -195,7 +194,7 @@ final readonly class Basket
         $this->draft();
 
         return new self($this->id, $this->householdId, $this->householdName, BasketState::Cancelled,
-            $this->createdBy, $this->createdAt, $this->lines, cancelledBy: $actorId, cancelledAt: $when, kind: $this->kind, sourceOrderId: $this->sourceOrderId, referenceCycleId: $this->referenceCycleId, late: $this->late);
+            $this->createdBy, $this->createdAt, $this->lines, cancelledBy: $actorId, cancelledAt: $when, kind: $this->kind, sourceOrderId: $this->sourceOrderId, late: $this->late);
     }
 
     /** Lines can still be added, removed or re-quantified, and the basket validated. */
@@ -342,6 +341,6 @@ final readonly class Basket
     private function rebuilt(BasketState $state, array $lines): self
     {
         return new self($this->id, $this->householdId, $this->householdName, $state, $this->createdBy, $this->createdAt,
-            $lines, kind: $this->kind, sourceOrderId: $this->sourceOrderId, referenceCycleId: $this->referenceCycleId, late: $this->late);
+            $lines, kind: $this->kind, sourceOrderId: $this->sourceOrderId, late: $this->late);
     }
 }

@@ -41,7 +41,7 @@ it('records inventory against the same Catalog product created for a producer (R
         ->post("/manage/stock/{$product->id}/entries", ['quantity' => '5'])
         ->assertRedirect("/manage/stock/{$product->id}/movements");
 
-    expect(DB::table('stock_movements')->where('stock_product_id', $product->id)->count())->toBe(1);
+    expect(DB::table('stock_movements')->where('product_id', $product->id)->count())->toBe(1);
 });
 
 it('rejects weekly Catalog IDs at inventory entry and adjustment without movements (R26, R27, S76)', function () {

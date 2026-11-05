@@ -37,7 +37,7 @@ it('settles into one uncharged weekly base basket that validates once, closes th
     expect($basket)->not->toBeNull()
         ->and($basket->kind)->toBe('weekly')
         ->and($basket->state)->toBe('draft')
-        ->and($basket->reference_cycle_id)->toBe($cycleId)
+        ->and($order->cycle_id)->toBe($cycleId)
         ->and($basket->validated_total_cents)->toBeNull();
     $line = DB::table('basket_lines')->where('basket_id', $basket->id)->first();
     expect($line->kind)->toBe('weekly')
@@ -51,7 +51,7 @@ it('settles into one uncharged weekly base basket that validates once, closes th
 
     expect(fn () => DB::transaction(fn () => DB::table('baskets')->insert([
         'id' => (string) Str::uuid7(), 'household_id' => $household, 'household_name' => 'Household A', 'kind' => 'weekly', 'state' => 'draft',
-        'created_by' => null, 'created_at' => now(), 'source_order_id' => $order->id, 'reference_cycle_id' => $cycleId,
+        'created_by' => null, 'created_at' => now(), 'source_order_id' => $order->id,
     ])))->toThrow(QueryException::class);
 
     $finance = accountWith(Role::Finance);

@@ -19,8 +19,7 @@ use Guixa\Ordering\Application\SetReceivedTotal;
 use Guixa\Ordering\Application\ValidateReception;
 use Guixa\Ordering\Domain\CooperativeSettings;
 use Guixa\Ordering\Domain\CycleRepository;
-use Guixa\Sales\Application\BasketData;
-use Guixa\Sales\Application\ListBaskets;
+use Guixa\Sales\Application\FindWeeklyBaseBasket;
 use Guixa\Sales\Application\MarkBasketCollected;
 use Guixa\Sales\Application\ValidateBasket;
 use Guixa\Shared\Application\Actor;
@@ -122,9 +121,7 @@ final class DemoSeeder extends Seeder
     /** Settlement created one draft base basket per household; the first household's is validated and collected. */
     private function collectFirstBasket(Actor $manager, string $cycleId, string $householdId): void
     {
-        $basket = collect(app(ListBaskets::class)($manager))->first(
-            fn (BasketData $basket) => $basket->kind === 'weekly' && $basket->referenceCycleId === $cycleId && $basket->householdId === $householdId,
-        );
+        $basket = app(FindWeeklyBaseBasket::class)($manager, $cycleId, $householdId);
         app(ValidateBasket::class)($manager, $basket->id);
         app(MarkBasketCollected::class)($manager, $basket->id);
     }

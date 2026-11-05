@@ -7,14 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * @property string $id
- * @property string $stock_product_id
+ * @property string $product_id
  * @property string $type
  * @property string $quantity
  * @property string $occurred_at
  * @property string $recorded_by
  * @property ?string $note
  * @property ?string $cycle_id
- * @property ?string $order_id
  * @property ?string $basket_id
  * @property ?string $correction_id
  */

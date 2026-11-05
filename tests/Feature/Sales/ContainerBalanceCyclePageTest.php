@@ -15,7 +15,7 @@ it('reads each household balance from Sales baskets on the Manage cycle page, ne
     $honey = (string) Str::uuid7();
     DB::table('products')->insert(['id' => $honey, 'producer_id' => $producer->id, 'stock' => true, 'name' => 'Honey',
         'unit' => 'jar', 'price_cents' => 700, 'variable' => false, 'active' => true, 'containers_per_unit' => '1']);
-    DB::table('stock_movements')->insert(['id' => (string) Str::uuid7(), 'stock_product_id' => $honey,
+    DB::table('stock_movements')->insert(['id' => (string) Str::uuid7(), 'product_id' => $honey,
         'type' => 'entry', 'quantity' => '20', 'occurred_at' => now(), 'recorded_by' => $manager->id]);
     $jar = app(CreateReturnItem::class)(Actor::manager($manager->id), 'Glass jar', 50);
     $households = [];

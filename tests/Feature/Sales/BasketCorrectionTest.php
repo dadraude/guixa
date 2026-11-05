@@ -120,7 +120,7 @@ it('corrects a validated net-zero basket through its basket source without a bas
     $product = (string) Str::uuid7();
     DB::table('products')->insert(['id' => $product, 'producer_id' => $producer->id, 'stock' => true,
         'name' => 'Oil', 'unit' => 'bottle', 'price_cents' => 50, 'variable' => false, 'active' => true]);
-    DB::table('stock_movements')->insert(['id' => (string) Str::uuid7(), 'stock_product_id' => $product,
+    DB::table('stock_movements')->insert(['id' => (string) Str::uuid7(), 'product_id' => $product,
         'type' => 'entry', 'quantity' => '1', 'occurred_at' => now(), 'recorded_by' => $manager->id]);
     $item = app(CreateReturnItem::class)(Actor::manager($manager->id), 'Jar', 50);
     $this->actingAs($manager)->post('/finance/baskets', ['household_id' => $household])->assertRedirect();

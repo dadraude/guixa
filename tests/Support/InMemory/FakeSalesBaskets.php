@@ -83,14 +83,6 @@ final class FakeSalesBaskets implements SalesBaskets
         }
     }
 
-    public function pendingCycleIds(string $householdId): array
-    {
-        return array_values(array_unique(array_map(fn (WeeklySourceData $source) => $source->cycleId, array_filter($this->created,
-            fn (WeeklySourceData $source) => $source->householdId === $householdId
-                && (in_array($this->states[$source->orderId], ['draft', 'validated'], true)
-                    || array_filter($this->lates[$source->orderId] ?? [], fn (array $late) => in_array($late['state'], ['draft', 'validated'], true)) !== [])))));
-    }
-
     public function pendingCollectionCounts(): array
     {
         $counts = [];

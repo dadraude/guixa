@@ -37,7 +37,6 @@ final readonly class BasketRow
         public bool $weekly,
         public array $weeklyLines = [],
         public string $kind = 'stock',
-        public ?string $referenceCycleId = null,
         public bool $late = false,
     ) {}
 
@@ -54,6 +53,6 @@ final readonly class BasketRow
             array_map(BasketCollectionEventRow::from(...), $basket->collectionEvents),
             $basket->pendingCollection, BasketActionsRow::from($basket->can), $basket->status, $basket->settled,
             $basket->collected, $basket->weekly, array_map(BasketWeeklyLineRow::from(...), $basket->weeklyLines),
-            $basket->kind, $basket->referenceCycleId, $basket->late);
+            $basket->kind, $basket->late);
     }
 }

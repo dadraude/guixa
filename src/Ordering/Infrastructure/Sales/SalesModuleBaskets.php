@@ -12,7 +12,6 @@ use Guixa\Sales\Application\AddLateWeeklyLines;
 use Guixa\Sales\Application\CreateWeeklyBasket;
 use Guixa\Sales\Application\ReadHouseholdContainerBalances;
 use Guixa\Sales\Application\ReadPendingCollections;
-use Guixa\Sales\Application\ReadPendingWeeklyCycles;
 use Guixa\Sales\Application\ReadWeeklyBasketStates;
 use Guixa\Sales\Application\SyncWeeklyBasket;
 use Guixa\Sales\Application\WeeklyBaseData;
@@ -26,7 +25,6 @@ final class SalesModuleBaskets implements SalesBaskets
         private readonly SyncWeeklyBasket $sync,
         private readonly AddLateWeeklyLines $late,
         private readonly ReadWeeklyBasketStates $states,
-        private readonly ReadPendingWeeklyCycles $pending,
         private readonly ReadPendingCollections $collections,
         private readonly ReadHouseholdContainerBalances $balances,
         private readonly Households $households,
@@ -47,19 +45,14 @@ final class SalesModuleBaskets implements SalesBaskets
         ($this->late)($this->baseOf($source), $productIds);
     }
 
-    public function pendingCycleIds(string $householdId): array
-    {
-        return ($this->pending)($householdId);
-    }
-
     public function pendingCollectionCounts(): array
     {
         $counts = [];
         foreach (($this->collections)() as $pending) {
-            if (! $pending->weekly || $pending->referenceCycleId === null) {
+            if (! $pending->weekly || $pending->cycleId === null) {
                 continue;
             }
-            $counts[$pending->referenceCycleId] = ($counts[$pending->referenceCycleId] ?? 0) + 1;
+            $counts[$pending->cycleId] = ($counts[$pending->cycleId] ?? 0) + 1;
         }
 
         return $counts;

@@ -36,7 +36,7 @@ final class EloquentProductRepositoryTest extends TestCase
     }
 
     #[Test]
-    public function it_round_trips_a_stock_product_identity_and_mode_through_catalog(): void
+    public function it_round_trips_a_product_identity_and_stock_mode_through_catalog(): void
     {
         $repository = $this->repository();
         $producerId = $this->newProducerId();

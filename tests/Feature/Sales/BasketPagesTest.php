@@ -38,7 +38,7 @@ it('creates, adds, validates and collects through Manager routes while denying m
     $product = (string) Str::uuid7();
     DB::table('products')->insert(['id' => $product, 'producer_id' => $producer->id, 'stock' => true,
         'name' => 'Oil', 'unit' => 'bottle', 'price_cents' => 1200, 'variable' => false, 'active' => true]);
-    DB::table('stock_movements')->insert(['id' => (string) Str::uuid7(), 'stock_product_id' => $product,
+    DB::table('stock_movements')->insert(['id' => (string) Str::uuid7(), 'product_id' => $product,
         'type' => 'entry', 'quantity' => '2', 'occurred_at' => now(), 'recorded_by' => $manager->id]);
 
     $this->actingAs($manager)->post('/finance/baskets', ['household_id' => $household])->assertRedirect();
@@ -94,7 +94,7 @@ it('lets a Manager remove stock and cancel a draft through HTTP while retaining 
     $product = (string) Str::uuid7();
     DB::table('products')->insert(['id' => $product, 'producer_id' => $producer->id, 'stock' => true,
         'name' => 'Oil', 'unit' => 'bottle', 'price_cents' => 1200, 'variable' => false, 'active' => true]);
-    DB::table('stock_movements')->insert(['id' => (string) Str::uuid7(), 'stock_product_id' => $product,
+    DB::table('stock_movements')->insert(['id' => (string) Str::uuid7(), 'product_id' => $product,
         'type' => 'entry', 'quantity' => '2', 'occurred_at' => now(), 'recorded_by' => $manager->id]);
 
     $this->actingAs($manager)->post('/finance/baskets', ['household_id' => $household])->assertRedirect();
@@ -163,7 +163,7 @@ it('shows the household container balance on the Finance detail across baskets, 
     $product = (string) Str::uuid7();
     DB::table('products')->insert(['id' => $product, 'producer_id' => $producer->id, 'stock' => true,
         'name' => 'Honey', 'unit' => 'jar', 'price_cents' => 700, 'variable' => false, 'active' => true, 'containers_per_unit' => '1']);
-    DB::table('stock_movements')->insert(['id' => (string) Str::uuid7(), 'stock_product_id' => $product,
+    DB::table('stock_movements')->insert(['id' => (string) Str::uuid7(), 'product_id' => $product,
         'type' => 'entry', 'quantity' => '10', 'occurred_at' => now(), 'recorded_by' => $manager->id]);
     $item = app(CreateReturnItem::class)(Actor::manager($manager->id), 'Glass jar', 50);
     $newBasket = function () use ($household): string {

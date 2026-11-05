@@ -6,10 +6,6 @@ use DateTimeImmutable;
 use Guixa\Ordering\Domain\Order;
 use Guixa\Ordering\Domain\OrderLine;
 use Guixa\Ordering\Domain\OrderRepository;
-use Guixa\Ordering\Domain\PickupAdjustment;
-use Guixa\Ordering\Domain\PickupStatus;
-use Guixa\Ordering\Domain\ReturnLine;
-use Guixa\Ordering\Domain\StockLine;
 use Guixa\Shared\Domain\Money;
 use Guixa\Shared\Domain\Quantity;
 use Illuminate\Support\Facades\DB;
@@ -30,15 +26,6 @@ final class EloquentOrderRepository implements OrderRepository
             'cycle_id' => $order->cycleId,
             'household_id' => $order->householdId,
         ]);
-        DB::table('orders')->where('id', $order->id)->update([
-            'pickup_status' => $order->pickup()->value,
-            'pickup_done_at' => $order->pickupDoneAt()?->format('Y-m-d\TH:i:s.uP'),
-            'charged_cents' => $order->charged()?->cents,
-        ]);
-
-        $this->storeAdjustments($order);
-        $this->storeStockLines($order);
-        $this->storeReturnLines($order);
 
         $lines = $order->lines();
         DB::table('order_lines')
@@ -66,90 +53,12 @@ final class EloquentOrderRepository implements OrderRepository
                 'allocated_quantity' => $line->allocated->toString(),
                 'allocated_by_hand' => $line->allocatedByHand,
                 'dropped' => $line->dropped,
-                'delivered_quantity' => $line->delivered?->toString(),
                 'created_at' => $line->createdAt->format('Y-m-d\TH:i:s.uP'),
                 'added_by' => $line->addedBy,
                 'removed_at' => null,
             ], $lines),
             ['id'],
-            ['product_name', 'unit', 'unit_price_cents', 'variable', 'containers_per_unit', 'ordered_quantity', 'allocated_quantity', 'allocated_by_hand', 'dropped', 'delivered_quantity'],
-        );
-    }
-
-    private function storeAdjustments(Order $order): void
-    {
-        foreach ($order->adjustments() as $adjustment) {
-            // Existing history is immutable: only newly assigned ids are inserted, never updated or deleted.
-            DB::table('order_pickup_adjustments')->insertOrIgnore([
-                'id' => $adjustment->id,
-                'order_id' => $order->id,
-                'product_id' => $adjustment->productId,
-                'name' => $adjustment->name,
-                'unit' => $adjustment->unit,
-                'unit_price_cents' => $adjustment->unitPrice->cents,
-                'quantity_delta_thousandths' => $adjustment->quantityDeltaThousandths,
-                'amount_cents' => $adjustment->amount->cents,
-                'target_quantity' => $adjustment->target->toString(),
-                'recorded_at' => $adjustment->recordedAt->format('Y-m-d\TH:i:s.uP'),
-                'recorded_by' => $adjustment->recordedBy,
-            ]);
-        }
-    }
-
-    private function storeStockLines(Order $order): void
-    {
-        $lines = $order->stockLines();
-        DB::table('order_stock_lines')
-            ->where('order_id', $order->id)
-            ->whereNull('removed_at')
-            ->whereNotIn('id', array_map(fn (StockLine $line) => $line->id, $lines))
-            ->update(['removed_at' => now()]);
-
-        if ($lines === []) {
-            return;
-        }
-
-        DB::table('order_stock_lines')->upsert(
-            array_map(fn (StockLine $line) => [
-                'id' => $line->id,
-                'order_id' => $order->id,
-                'stock_product_id' => $line->stockProductId,
-                'name' => $line->name,
-                'unit' => $line->unit,
-                'unit_price_cents' => $line->unitPrice->cents,
-                'variable' => $line->variable,
-                'containers_per_unit' => $line->containersPerUnit?->toString(),
-                'quantity' => $line->quantity->toString(),
-                'removed_at' => null,
-            ], $lines),
-            ['id'],
-            ['quantity'],
-        );
-    }
-
-    private function storeReturnLines(Order $order): void
-    {
-        $lines = $order->returnLines();
-        DB::table('order_return_lines')
-            ->where('order_id', $order->id)
-            ->whereNotIn('id', array_map(fn (ReturnLine $line) => $line->id, $lines))
-            ->delete();
-
-        if ($lines === []) {
-            return;
-        }
-
-        DB::table('order_return_lines')->upsert(
-            array_map(fn (ReturnLine $line) => [
-                'id' => $line->id,
-                'order_id' => $order->id,
-                'return_item_id' => $line->returnItemId,
-                'name' => $line->name,
-                'amount_cents' => $line->amount->cents,
-                'quantity' => $line->quantity,
-            ], $lines),
-            ['id'],
-            ['quantity'],
+            ['product_name', 'unit', 'unit_price_cents', 'variable', 'containers_per_unit', 'ordered_quantity', 'allocated_quantity', 'allocated_by_hand', 'dropped'],
         );
     }
 
@@ -203,18 +112,24 @@ final class EloquentOrderRepository implements OrderRepository
             ->get()
             ->groupBy('order_id');
 
-        $orderIds = array_map(fn (stdClass $row) => $row->id, $rows);
-        $stockByOrder = DB::table('order_stock_lines')->whereIn('order_id', $orderIds)->whereNull('removed_at')->orderBy('id')->get()->groupBy('order_id');
-        $returnsByOrder = DB::table('order_return_lines')->whereIn('order_id', $orderIds)->orderBy('id')->get()->groupBy('order_id');
-        $adjustmentsByOrder = DB::table('order_pickup_adjustments')->whereIn('order_id', $orderIds)->orderBy('recorded_at')->orderBy('id')->get()->groupBy('order_id');
-
         return array_map(fn (stdClass $row) => $this->toDomain(
             $row,
             array_values($linesByOrder->get($row->id, collect())->all()),
-            array_values($stockByOrder->get($row->id, collect())->all()),
-            array_values($returnsByOrder->get($row->id, collect())->all()),
-            array_values($adjustmentsByOrder->get($row->id, collect())->all()),
         ), $rows);
+    }
+
+    public function cycleIdsOfOrders(array $orderIds): array
+    {
+        if ($orderIds === []) {
+            return [];
+        }
+
+        return DB::table('orders')->whereIn('id', $orderIds)->pluck('cycle_id', 'id')->all();
+    }
+
+    public function idsOfCycle(string $cycleId): array
+    {
+        return array_values(DB::table('orders')->where('cycle_id', $cycleId)->orderBy('id')->pluck('id')->all());
     }
 
     /** @return array<string, int> */
@@ -233,17 +148,6 @@ final class EloquentOrderRepository implements OrderRepository
             ->all();
     }
 
-    public function pendingPickupCycleIdsOfHousehold(string $householdId): array
-    {
-        return array_values(DB::table('orders')
-            ->where('household_id', $householdId)
-            ->whereNull('cancelled_at')
-            ->where('pickup_status', PickupStatus::Pending->value)
-            ->pluck('cycle_id')
-            ->map(fn ($cycleId): string => (string) $cycleId)
-            ->all());
-    }
-
     public function lockFor(string $cycleId, string $householdId): Order
     {
         // The unique (cycle, household) index makes a second concurrent insert wait for the first and then do nothing.
@@ -257,11 +161,6 @@ final class EloquentOrderRepository implements OrderRepository
     public function hasWeeklyReference(string $productId): bool
     {
         return DB::table('order_lines')->where('product_id', $productId)->exists();
-    }
-
-    public function hasStockReference(string $productId): bool
-    {
-        return DB::table('order_stock_lines')->where('stock_product_id', $productId)->exists();
     }
 
     public function hasUnsettledLinesOf(string $productId): bool
@@ -278,11 +177,8 @@ final class EloquentOrderRepository implements OrderRepository
 
     /**
      * @param  list<stdClass>|null  $lineRows  the order's lines when already loaded
-     * @param  list<stdClass>|null  $stockRows  the order's stock lines when already loaded
-     * @param  list<stdClass>|null  $returnRows  the order's return lines when already loaded
-     * @param  list<stdClass>|null  $adjustmentRows  append-only adjustment history when already loaded
      */
-    private function toDomain(stdClass $row, ?array $lineRows = null, ?array $stockRows = null, ?array $returnRows = null, ?array $adjustmentRows = null): Order
+    private function toDomain(stdClass $row, ?array $lineRows = null): Order
     {
         $lineRows ??= DB::table('order_lines')
             ->where('order_id', $row->id)
@@ -308,7 +204,6 @@ final class EloquentOrderRepository implements OrderRepository
                 $line->added_by,
                 (bool) $line->allocated_by_hand,
                 (bool) $line->dropped,
-                $line->delivered_quantity === null ? null : Quantity::fromString($line->delivered_quantity),
             ))
             ->all();
 
@@ -317,61 +212,6 @@ final class EloquentOrderRepository implements OrderRepository
             $row->cycle_id,
             $row->household_id,
             array_values($lines),
-            PickupStatus::from($row->pickup_status),
-            $this->stockLines($stockRows ?? $this->rowsOf('order_stock_lines', $row->id)),
-            $this->returnLines($returnRows ?? $this->rowsOf('order_return_lines', $row->id)),
-            $row->pickup_done_at === null ? null : new DateTimeImmutable($row->pickup_done_at),
-            $row->charged_cents === null ? null : Money::ofCents($row->charged_cents),
-            $this->adjustments($adjustmentRows ?? array_values(DB::table('order_pickup_adjustments')->where('order_id', $row->id)->orderBy('recorded_at')->orderBy('id')->get()->all())),
-        );
-    }
-
-    /**
-     * @param  list<stdClass>  $rows
-     * @return list<PickupAdjustment>
-     */
-    private function adjustments(array $rows): array
-    {
-        return array_map(fn (stdClass $row) => new PickupAdjustment(
-            $row->id, $row->product_id, $row->name, $row->unit, Money::ofCents($row->unit_price_cents),
-            (int) $row->quantity_delta_thousandths, Money::ofCents($row->amount_cents),
-            Quantity::fromString($row->target_quantity), new DateTimeImmutable($row->recorded_at), $row->recorded_by,
-        ), $rows);
-    }
-
-    /** @return list<stdClass> */
-    private function rowsOf(string $table, string $orderId): array
-    {
-        return array_values(DB::table($table)->where('order_id', $orderId)->when(in_array($table, ['order_stock_lines'], true), fn ($query) => $query->whereNull('removed_at'))->orderBy('id')->get()->all());
-    }
-
-    /**
-     * @param  list<stdClass>  $rows
-     * @return list<StockLine>
-     */
-    private function stockLines(array $rows): array
-    {
-        return array_map(fn (stdClass $line) => new StockLine(
-            $line->id,
-            $line->stock_product_id,
-            $line->name,
-            $line->unit,
-            Money::ofCents($line->unit_price_cents),
-            (bool) $line->variable,
-            $line->containers_per_unit === null ? null : Quantity::fromString($line->containers_per_unit),
-            Quantity::fromString($line->quantity),
-        ), $rows);
-    }
-
-    /**
-     * @param  list<stdClass>  $rows
-     * @return list<ReturnLine>
-     */
-    private function returnLines(array $rows): array
-    {
-        return array_map(
-            fn (stdClass $line) => new ReturnLine($line->id, $line->return_item_id, $line->name, Money::ofCents($line->amount_cents), (int) $line->quantity),
-            $rows,
         );
     }
 }

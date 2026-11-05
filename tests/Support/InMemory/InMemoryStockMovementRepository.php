@@ -14,13 +14,13 @@ final class InMemoryStockMovementRepository extends InMemoryRepository implement
     {
         if ($movement->correctionId !== null) {
             foreach ($this->all() as $existing) {
-                if ($existing->correctionId === $movement->correctionId && $existing->stockProductId === $movement->stockProductId) {
+                if ($existing->correctionId === $movement->correctionId && $existing->productId === $movement->productId) {
                     throw new DomainException('This basket correction was already recorded for the product.');
                 }
             }
         } elseif ($movement->basketId !== null) {
             foreach ($this->all() as $existing) {
-                if ($existing->basketId === $movement->basketId && $existing->stockProductId === $movement->stockProductId) {
+                if ($existing->basketId === $movement->basketId && $existing->productId === $movement->productId) {
                     throw new DomainException('This basket sale was already recorded for the product.');
                 }
             }
@@ -29,22 +29,22 @@ final class InMemoryStockMovementRepository extends InMemoryRepository implement
         $this->save($movement);
     }
 
-    public function forProduct(string $stockProductId): array
+    public function forProduct(string $productId): array
     {
-        $movements = array_values(array_filter($this->all(), fn (StockMovement $movement) => $movement->stockProductId === $stockProductId));
+        $movements = array_values(array_filter($this->all(), fn (StockMovement $movement) => $movement->productId === $productId));
         usort($movements, fn (StockMovement $a, StockMovement $b) => [$a->occurredAt, $a->id] <=> [$b->occurredAt, $b->id]);
 
         return $movements;
     }
 
-    public function hasProductReference(string $stockProductId): bool
+    public function hasProductReference(string $productId): bool
     {
-        return $this->forProduct($stockProductId) !== [];
+        return $this->forProduct($productId) !== [];
     }
 
-    public function available(string $stockProductId): SignedQuantity
+    public function available(string $productId): SignedQuantity
     {
-        return $this->availableByProduct()[$stockProductId] ?? SignedQuantity::ofThousandths(0);
+        return $this->availableByProduct()[$productId] ?? SignedQuantity::ofThousandths(0);
     }
 
     public function availableByProduct(): array
@@ -52,7 +52,7 @@ final class InMemoryStockMovementRepository extends InMemoryRepository implement
         $totals = [];
 
         foreach ($this->all() as $movement) {
-            $totals[$movement->stockProductId] = ($totals[$movement->stockProductId] ?? SignedQuantity::ofThousandths(0))->plus($movement->quantity);
+            $totals[$movement->productId] = ($totals[$movement->productId] ?? SignedQuantity::ofThousandths(0))->plus($movement->quantity);
         }
 
         return $totals;

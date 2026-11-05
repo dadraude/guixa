@@ -58,7 +58,7 @@ Ordering -> Catalog       ProductCatalog / ProducerCutoffRules (weekly products 
 Ordering -> Sales         SalesBaskets (create/sync drafts; validation status and effective quantities)
 Ordering -> Membership    ProducerNotifier / Households
 Sales    -> Catalog       product identity/eligibility through its catalogue adapter
-Sales    -> Ordering      WeeklyBasketSource (ready source, source lock, cycle closure)
+Sales    -> Ordering      WeeklyBasketSource (ready source, source lock, cycle closure) / WeeklySourceOrders (cycle of a source order, orders of a cycle)
 Sales    -> Stock         StockCatalog / StockSeller / ReturnItemCatalog / BasketStockCorrections
 Sales    -> Wallet        WalletLedger (one charge/credit; reasoned corrections)
 Sales    -> Membership    Households (identity and active state)
@@ -322,7 +322,7 @@ constructor cycle. Stock-only validation does not call Ordering readiness/closur
 | `ValidateReception`, `MarkProducerDistributed`, `ReopenProducerOrder` | Manager; existing balance guards and closed-cycle restriction |
 | `GetContainerCount` | Manager; read each household's accumulated container balance from Sales (validated lines minus return lines), not per cycle |
 | `HasUnsettledLines`, `HasProductHistory`, `StopParticipatingWhereNotSent` | Internal queries/command for Catalog; history includes cancelled/removed records |
-| `GetWeeklyBasketSource`, `LockWeeklyBasketSource`, `CloseCycleAfterBasketValidation` | Internal Sales interface; snapshots/readiness/closure only |
+| `GetWeeklyBasketSource`, `LockWeeklyBasketSource`, `CloseCycleAfterBasketValidation`, `ReadSourceOrderCycles`, `ReadCycleSourceOrders` | Internal Sales interface; snapshots/readiness/closure and source-order lookups only |
 
 The existing `ProductCatalog`, `ProducerCutoffRules`, `ProducerNotifier`, `Households`, repository
 and clock ports remain, with a Sales port replacing the pickup-facing Stock/Wallet ports. Sending
@@ -337,7 +337,8 @@ validate/distribute through the scheduler and common settlement (D10).
 draft/validated/cancelled/nothing-to-collect state, creation/validation
 actor/time and the immutable validated total. A base basket is unique per source order; any number of
 stock-only baskets can exist for a household without a source order or cycle.
-A weekly base uses its source cycle through its source order. Any other basket, including one added
+A weekly base uses its source cycle through its source order: the basket stores no cycle column, and Sales
+resolves a source order's cycle, or a cycle's source orders, through Ordering's narrow read exports. Any other basket, including one added
 after a validated basket, has no cycle. It never imports the weekly contents again.
 
 The household container balance is a derived read model, not a stored duplicate: per household, the sum
@@ -480,9 +481,9 @@ Catalog's pure internal metadata queries; quantity-only queries never call Catal
 | `ListReturnItems` | Manager catalogue view and Finance's read-only basket return picker; no Finance editing |
 | `RecordStockEntry`, `RecordStockAdjustment` | Manager; stock mode only; positive entry / non-zero justified adjustment |
 | `ListStock`, `ListStockMovements` | Manager; metadata from Catalog, quantity/history from ledger |
-| `GetStockOffer`, `GetReturnItem` | Internal Ordering reads for stock/return snapshots; Sales also reads `GetReturnItem` through its own return-items port |
+| `GetReturnItem` | Internal read of a return item snapshot for Sales through its own return-items port |
 | Stock-side `ListStockOffers` | Planned later Sales basket query; not the T54 discovery composition |
-| `SellStock` | Internal Sales operation, records the already-authorized actor; locks and checks stock |
+| `SellBasketStock` | Internal Sales operation, records the already-authorized actor and the basket source; locks and checks stock |
 | `CorrectBasketStock` | Internal Sales correction with source/reason; cannot make stock negative |
 | `GetAvailableQuantities` | T54 quantity-only batch query for Catalog and Sales discovery; no Catalog callback |
 | `HasProductMovements` | Internal history query for Catalog |

@@ -42,7 +42,6 @@ final class EloquentBasketRepository implements BasketRepository
             'household_name' => $basket->householdName,
             'kind' => $basket->kind->value,
             'source_order_id' => $basket->sourceOrderId,
-            'reference_cycle_id' => $basket->referenceCycleId,
             'late' => $basket->late,
             'state' => $basket->state->value,
             'created_by' => $basket->createdBy,
@@ -240,9 +239,13 @@ final class EloquentBasketRepository implements BasketRepository
         return $model === null ? null : $this->toDomain($model);
     }
 
-    public function weeklyOfCycle(string $cycleId): array
+    public function weeklyOfSourceOrders(array $sourceOrderIds): array
     {
-        return array_values(BasketModel::query()->where('kind', BasketKind::Weekly->value)->where('reference_cycle_id', $cycleId)
+        if ($sourceOrderIds === []) {
+            return [];
+        }
+
+        return array_values(BasketModel::query()->where('kind', BasketKind::Weekly->value)->whereIn('source_order_id', $sourceOrderIds)
             ->with(['lines', 'adjustments.lines', 'collectionEvents'])->orderBy('id')->get()
             ->map(fn (BasketModel $model) => $this->toDomain($model))->all());
     }
@@ -326,7 +329,7 @@ final class EloquentBasketRepository implements BasketRepository
             array_values($model->collectionEvents->map(fn (BasketCollectionEventModel $event) => new BasketCollectionEvent(
                 $event->id, $event->basket_id, $event->type, $event->recorded_by,
                 new DateTimeImmutable($event->occurred_at), $event->reason))->all()),
-            BasketKind::from($model->kind), $model->source_order_id, $model->reference_cycle_id, (bool) $model->late);
+            BasketKind::from($model->kind), $model->source_order_id, (bool) $model->late);
     }
 
     private function containerSnapshot(BasketLineModel $line): ?string

@@ -135,7 +135,6 @@ const basket = {
     pendingCollection: basketState === 'validated',
     weeklyLines,
     kind: 'weekly',
-    referenceCycleId: ids.cycle,
     late,
 };
 // The text of errors.RedistributionBlockedByValidatedBasket in lang/ca/errors.php.

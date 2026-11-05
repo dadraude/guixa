@@ -22,7 +22,7 @@ function validatedStockBasket(object $test, string $stockQuantity = '5', string 
     $product = (string) Str::uuid7();
     DB::table('products')->insert(['id' => $product, 'producer_id' => $producer->id, 'stock' => true,
         'name' => 'Oil', 'unit' => 'bottle', 'price_cents' => 1200, 'variable' => false, 'active' => true]);
-    DB::table('stock_movements')->insert(['id' => (string) Str::uuid7(), 'stock_product_id' => $product,
+    DB::table('stock_movements')->insert(['id' => (string) Str::uuid7(), 'product_id' => $product,
         'type' => 'entry', 'quantity' => $stockQuantity, 'occurred_at' => now(), 'recorded_by' => $manager->id]);
     $test->actingAs($manager)->post('/finance/baskets', ['household_id' => $household])->assertRedirect();
     $basket = DB::table('baskets')->value('id');
@@ -58,7 +58,7 @@ it('persists returned goods with linked stock and wallet corrections and shows o
         ->and(DB::table('baskets')->where('id', $basket)->first())->toEqual($original)
         ->and(DB::table('stock_movements')->where('id', $sale->id)->first())->toEqual($sale)
         ->and(DB::table('wallet_movements')->where('id', $charge->id)->first())->toEqual($charge)
-        ->and((float) DB::table('stock_movements')->where('stock_product_id', $product)->sum('quantity'))->toBe(3.0);
+        ->and((float) DB::table('stock_movements')->where('product_id', $product)->sum('quantity'))->toBe(3.0);
 
     $this->get("/finance/baskets/{$basket}")->assertInertia(fn (Assert $page) => $page
         ->where('basket.totalCents', 3600)->where('basket.effectiveTotalCents', 2400)
@@ -93,7 +93,7 @@ it('rolls back every effect when the wallet fails after the stock write (S86, R2
     expect(DB::table('basket_adjustments')->where('basket_id', $basket)->count())->toBe(0)
         ->and(DB::table('basket_adjustment_lines')->count())->toBe(0)
         ->and(DB::table('stock_movements')->whereNotNull('correction_id')->count())->toBe(0)
-        ->and((float) DB::table('stock_movements')->where('stock_product_id', $product)->sum('quantity'))->toBe(2.0)
+        ->and((float) DB::table('stock_movements')->where('product_id', $product)->sum('quantity'))->toBe(2.0)
         ->and(app(GetBasket::class)(Actor::manager($manager->id), $basket)->stockLines[0]->effectiveQuantity)->toBe('3.000');
 });
 
@@ -103,7 +103,7 @@ it('rolls back the first stock write when a later stock correction fails (S86, R
     $second = (string) Str::uuid7();
     DB::table('products')->insert(['id' => $second, 'producer_id' => $producer, 'stock' => true,
         'name' => 'Honey', 'unit' => 'jar', 'price_cents' => 500, 'variable' => false, 'active' => true]);
-    DB::table('stock_movements')->insert(['id' => (string) Str::uuid7(), 'stock_product_id' => $second,
+    DB::table('stock_movements')->insert(['id' => (string) Str::uuid7(), 'product_id' => $second,
         'type' => 'entry', 'quantity' => '5', 'occurred_at' => now(), 'recorded_by' => $manager->id]);
     $real = app(StockCorrector::class);
     app()->instance(StockCorrector::class, new class($real) implements StockCorrector
@@ -125,14 +125,14 @@ it('rolls back the first stock write when a later stock correction fails (S86, R
     $this->post("/finance/baskets/{$other}/stock-lines", ['stock_product_id' => $product, 'stock_quantity' => '1'])->assertRedirect();
     $this->post("/finance/baskets/{$other}/stock-lines", ['stock_product_id' => $second, 'stock_quantity' => '1'])->assertRedirect();
     $this->post("/finance/baskets/{$other}/validation")->assertRedirect();
-    $before = (float) DB::table('stock_movements')->whereIn('stock_product_id', [$product, $second])->sum('quantity');
+    $before = (float) DB::table('stock_movements')->whereIn('product_id', [$product, $second])->sum('quantity');
 
     expect(fn () => app(CorrectBasket::class)(Actor::manager($manager->id), $other, 1700, 'Both came back',
         (string) Str::uuid7(), [$product => '1', $second => '1']))->toThrow(RuntimeException::class, 'Stock unavailable');
 
     expect(DB::table('basket_adjustments')->where('basket_id', $other)->count())->toBe(0)
         ->and(DB::table('stock_movements')->whereNotNull('correction_id')->count())->toBe(0)
-        ->and((float) DB::table('stock_movements')->whereIn('stock_product_id', [$product, $second])->sum('quantity'))->toBe($before);
+        ->and((float) DB::table('stock_movements')->whereIn('product_id', [$product, $second])->sum('quantity'))->toBe($before);
 });
 
 it('shows a fully reversed basket as not pending and keeps the original contents (R24a, R23)', function () {
@@ -141,7 +141,7 @@ it('shows a fully reversed basket as not pending and keeps the original contents
     $this->post("/finance/baskets/{$basket}/corrections", ['amount_cents' => 3600, 'reason' => 'All back',
         'correction_id' => (string) Str::uuid7(), 'returned_goods' => [['stock_product_id' => $product, 'quantity' => '3']]])->assertRedirect();
 
-    expect((float) DB::table('stock_movements')->where('stock_product_id', $product)->sum('quantity'))->toBe(5.0)
+    expect((float) DB::table('stock_movements')->where('product_id', $product)->sum('quantity'))->toBe(5.0)
         ->and(DB::table('basket_lines')->where('basket_id', $basket)->value('quantity'))->toBe('3.000');
     $this->get("/finance/baskets/{$basket}")->assertInertia(fn (Assert $page) => $page
         ->where('basket.pendingCollection', false)->where('basket.state', 'validated')

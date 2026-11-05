@@ -19,7 +19,7 @@ final readonly class BasketData
         public ?DateTimeImmutable $collectedAt, public int $effectiveTotalCents, public array $adjustments,
         public array $collectionEvents, public bool $pendingCollection, public BasketActions $can,
         public string $status, public bool $settled, public bool $collected, public bool $weekly, public bool $draft,
-        public array $weeklyLines = [], public string $kind = 'stock', public ?string $referenceCycleId = null, public bool $late = false) {}
+        public array $weeklyLines = [], public string $kind = 'stock', public bool $late = false) {}
 
     public static function from(Basket $basket, bool $forStaff = true): self
     {
@@ -37,6 +37,6 @@ final readonly class BasketData
             $basket->state->isSettled(), $basket->state->isCollected(), $basket->isWeekly(), $basket->state->isDraft(),
             array_map(fn ($line) => BasketWeeklyLineData::from($line, $basket->effectiveQuantityText($line), $basket->effectiveAmountCents($line)),
                 array_values(array_filter($basket->activeLines(), fn ($line) => $line->kind->isWeekly()))),
-            $basket->kind->value, $basket->referenceCycleId, $basket->late);
+            $basket->kind->value, $basket->late);
     }
 }

@@ -30,12 +30,12 @@ trait BasketRepositoryContract
     public function it_keeps_one_base_and_at_most_one_open_late_draft_per_source_order(): void
     {
         [$repository, $manager, $household] = $this->basketWorld();
-        [$orderId, $cycleId] = $this->weeklySource();
+        [$orderId] = $this->weeklySource();
         $at = new DateTimeImmutable('2026-11-07T10:00:00+00:00');
         $weekly = fn (string $id, bool $late, BasketState $state = BasketState::Draft) => new Basket($id, $household, 'Household K', $state, null, $at, [],
             validatedBy: $state === BasketState::Validated ? $manager : null, validatedAt: $state === BasketState::Validated ? $at : null,
             validatedTotalCents: $state === BasketState::Validated ? 0 : null,
-            kind: BasketKind::Weekly, sourceOrderId: $orderId, referenceCycleId: $cycleId, late: $late);
+            kind: BasketKind::Weekly, sourceOrderId: $orderId, late: $late);
         $base = $repository->nextId();
         $first = $repository->nextId();
         $repository->save($weekly($base, false));
@@ -53,7 +53,8 @@ trait BasketRepositoryContract
         $repository->save($weekly($second, true));
         $this->assertSame($second, $repository->getOpenLateBySourceOrder($orderId)->id);
         $this->assertSame($base, $repository->getBySourceOrder($orderId)->id);
-        $this->assertCount(3, $repository->weeklyOfCycle($cycleId));
+        $this->assertCount(3, $repository->weeklyOfSourceOrders([$orderId]));
+        $this->assertSame([], $repository->weeklyOfSourceOrders([]));
 
         // A late draft corrected to zero (nothing to collect) still holds the open slot.
         $repository->save($weekly($second, true, BasketState::NothingToCollect));

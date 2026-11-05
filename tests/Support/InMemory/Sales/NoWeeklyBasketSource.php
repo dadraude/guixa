@@ -10,4 +10,14 @@ final class NoWeeklyBasketSource implements WeeklyBasketSource
     public function lockSettled(string $cycleId): void {}
 
     public function closeIfFinished(string $cycleId): void {}
+
+    public function cyclesOf(array $sourceOrderIds): array
+    {
+        return [];
+    }
+
+    public function ofCycle(string $cycleId): array
+    {
+        return [];
+    }
 }

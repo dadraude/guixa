@@ -12,6 +12,7 @@ final class ReadOpenHouseholdBaskets
     public function __construct(
         private readonly BasketRepository $baskets,
         private readonly CyclePickupDates $pickupDates,
+        private readonly WeeklySourceOrders $sourceOrders,
     ) {}
 
     /** @return list<OpenBasketData> weekly, stock and return baskets still to validate or to collect, oldest date first; a weekly basket is dated by its cycle's pickup, any other by its creation */
@@ -21,15 +22,16 @@ final class ReadOpenHouseholdBaskets
             ...array_filter($this->baskets->listForHousehold($householdId), fn (Basket $basket) => $basket->state->isDraft()),
             ...$this->baskets->pendingCollections($householdId),
         ];
-        $pickupDates = $this->pickupDates->forCycles(array_values(array_filter(array_map(
-            fn (Basket $basket) => $basket->isWeekly() ? $basket->referenceCycleId : null,
+        $cycles = $this->sourceOrders->cyclesOf(array_values(array_filter(array_map(
+            fn (Basket $basket) => $basket->isWeekly() ? $basket->sourceOrderId : null,
             $open,
         ))));
+        $pickupDates = $this->pickupDates->forCycles(array_values(array_unique($cycles)));
         $data = array_map(
             fn (Basket $basket) => new OpenBasketData(
                 $basket->id,
                 $basket->state->value,
-                $this->dateOf($basket, $pickupDates),
+                $this->dateOf($basket, $cycles, $pickupDates),
             ),
             $open,
         );
@@ -39,11 +41,15 @@ final class ReadOpenHouseholdBaskets
         return $data;
     }
 
-    /** @param array<string, string> $pickupDates */
-    private function dateOf(Basket $basket, array $pickupDates): string
+    /**
+     * @param  array<string, string>  $cycles  cycle id by source order id
+     * @param  array<string, string>  $pickupDates  Y-m-d by cycle id
+     */
+    private function dateOf(Basket $basket, array $cycles, array $pickupDates): string
     {
-        if ($basket->isWeekly() && $basket->referenceCycleId !== null) {
-            return $pickupDates[$basket->referenceCycleId] ?? $basket->createdAt->format('Y-m-d');
+        $cycleId = $basket->isWeekly() ? ($cycles[(string) $basket->sourceOrderId] ?? null) : null;
+        if ($cycleId !== null) {
+            return $pickupDates[$cycleId] ?? $basket->createdAt->format('Y-m-d');
         }
 
         return $basket->createdAt->format('Y-m-d');

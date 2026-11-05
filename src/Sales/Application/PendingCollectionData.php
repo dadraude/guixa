@@ -12,7 +12,7 @@ final readonly class PendingCollectionData
         public string $householdId,
         public string $householdName,
         public bool $weekly,
-        public ?string $referenceCycleId,
+        public ?string $cycleId,
         public bool $late,
         public DateTimeImmutable $validatedAt,
         public int $totalCents,

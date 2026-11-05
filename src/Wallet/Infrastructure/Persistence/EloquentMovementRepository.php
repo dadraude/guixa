@@ -6,7 +6,6 @@ use DateTimeImmutable;
 use Guixa\Shared\Domain\Money;
 use Guixa\Wallet\Domain\Error\BasketAlreadyCharged;
 use Guixa\Wallet\Domain\Error\CorrectionIdentityConflict;
-use Guixa\Wallet\Domain\Error\PickupAlreadyCharged;
 use Guixa\Wallet\Domain\Movement;
 use Guixa\Wallet\Domain\MovementRepository;
 use Guixa\Wallet\Domain\MovementType;
@@ -46,10 +45,6 @@ final class EloquentMovementRepository implements MovementRepository
                 }
 
                 throw CorrectionIdentityConflict::create();
-            }
-
-            if ($movement->isChargeOrCredit() && str_contains($e->getMessage(), 'wallet_movements_one_charge_per_cycle')) {
-                throw PickupAlreadyCharged::create();
             }
 
             if ($movement->isChargeOrCredit() && str_contains($e->getMessage(), 'wallet_movements_one_charge_per_basket')) {
