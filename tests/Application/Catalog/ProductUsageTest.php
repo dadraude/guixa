@@ -73,6 +73,15 @@ it('derives stock use from movements without relying on quantity on hand (R1b, R
             return [];
         }
 
+        public function pendingCollections(?string $householdId = null): array
+        {
+            $pending = array_filter($this->list(), fn (Basket $basket) => $basket->isPendingCollection()
+                && ($householdId === null || $basket->householdId === $householdId));
+            usort($pending, fn (Basket $a, Basket $b) => [$a->validatedAt, $a->id] <=> [$b->validatedAt, $b->id]);
+
+            return array_values($pending);
+        }
+
         public function hasProductHistory(string $productId): bool
         {
             return isset($this->used[$productId]);
