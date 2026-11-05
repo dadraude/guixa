@@ -284,19 +284,6 @@ const pageProps: Record<string, Record<string, unknown>> = {
         otherHouseholds: [],
         deactivationWarning: settlement,
     },
-    'Manage/Pickups/Index': {
-        cycleId,
-        closed: false,
-        pickups: [
-            {
-                basketId: 'basket',
-                householdId,
-                householdName: household.name,
-                status: 'draft',
-                totalCents: 640,
-            },
-        ],
-    },
     'Manage/Producers/Index': { producers: [producer] },
     'Manage/Reception/Show': {
         reception,
@@ -538,7 +525,6 @@ if (state === 'empty') {
             'Manage/Accounts/Index': 'accounts',
             'Manage/Cycles/Index': 'cycles',
             'Manage/Households/Index': 'households',
-            'Manage/Pickups/Index': 'pickups',
             'Manage/Producers/Index': 'producers',
             'Manage/ReturnItems/Index': 'items',
             'Manage/Stock/Index': 'products',
@@ -987,8 +973,6 @@ void createInertiaApp({
             'Manage/Cycles/Index': 'No cycles yet.',
             'Manage/Cycles/Show': 'Nobody has ordered yet.',
             'Manage/Households/Index': 'There are no households yet.',
-            'Manage/Pickups/Index':
-                'No household has a weekly basket in this cycle yet.',
             'Manage/Producers/Index': 'No producers yet.',
             'Manage/Reception/Show': 'Nothing was ordered from this producer.',
             'Manage/ReturnItems/Index': 'No return items yet.',

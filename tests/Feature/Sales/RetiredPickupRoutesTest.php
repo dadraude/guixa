@@ -4,14 +4,13 @@ use Guixa\Shared\Domain\Role;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 
-it('exposes only the read-only staff pickup pages: nothing completes, charges or abandons a pickup (T63)', function () {
+it('exposes only the household pickup redirect: nothing completes, charges or abandons a pickup (T63)', function () {
     $pickupRoutes = collect(Route::getRoutes()->getRoutes())
         ->filter(fn ($route) => str_contains($route->uri(), '/pickups'))
         ->map(fn ($route) => implode('|', $route->methods()).' '.$route->uri())
         ->values()->all();
 
     expect($pickupRoutes)->toBe([
-        'GET|HEAD manage/cycles/{cycle}/pickups',
         'GET|HEAD manage/cycles/{cycle}/pickups/{household}',
     ]);
 

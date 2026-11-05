@@ -172,9 +172,9 @@ describe('statement navigation boundaries', () => {
             household,
             wallet,
             canManageReceipts: true,
-            receiptAction: '/manage/households/household-one/wallet/top-ups',
+            receiptAction: '/finance/households/household-one/wallet/top-ups',
             correctionAction:
-                '/manage/households/household-one/wallet/corrections',
+                '/finance/households/household-one/wallet/corrections',
             householdReturnHref: '/manage/households/household-one',
         });
         installTranslations(manager);

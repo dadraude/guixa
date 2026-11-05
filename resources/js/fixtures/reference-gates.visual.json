@@ -889,99 +889,6 @@
             ]
         },
         {
-            "id": "manage-pickups-index",
-            "path": "/visual-dra-205.html",
-            "query": {
-                "page": "Manage/Pickups/Index",
-                "role": "manager",
-                "route": "/manage/cycles/cycle-1/pickups"
-            },
-            "root": ".reference-style",
-            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
-            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
-            "fonts": ["16px Nunito Variable"],
-            "focus": [
-                "button[data-sidebar=\"trigger\"]",
-                "[data-visual-page-focus-first]",
-                "[data-visual-page-focus-last]"
-            ],
-            "states": [
-                {
-                    "id": "default",
-                    "cases": [
-                        {
-                            "width": 375,
-                            "mode": "light",
-                            "text": 100
-                        },
-                        {
-                            "width": 375,
-                            "mode": "dark",
-                            "text": 100
-                        },
-                        {
-                            "width": 1280,
-                            "mode": "light",
-                            "text": 100
-                        },
-                        {
-                            "width": 1280,
-                            "mode": "dark",
-                            "text": 100
-                        },
-                        {
-                            "width": 1024,
-                            "mode": "light",
-                            "text": 200
-                        },
-                        {
-                            "width": 1024,
-                            "mode": "dark",
-                            "text": 200
-                        }
-                    ]
-                },
-                {
-                    "id": "empty",
-                    "query": {
-                        "state": "empty"
-                    },
-                    "cases": [
-                        {
-                            "width": 375,
-                            "mode": "light",
-                            "text": 100
-                        },
-                        {
-                            "width": 1024,
-                            "mode": "dark",
-                            "text": 200
-                        }
-                    ],
-                    "ready": "body[data-visual-ready=\"empty\"]"
-                },
-                {
-                    "id": "long-content",
-                    "query": {
-                        "state": "long-content"
-                    },
-                    "cases": [
-                        {
-                            "width": 375,
-                            "mode": "light",
-                            "text": 100
-                        },
-                        {
-                            "width": 1024,
-                            "mode": "dark",
-                            "text": 200
-                        }
-                    ],
-                    "ready": "body[data-visual-ready=\"long-content\"]"
-                }
-            ]
-        },
-        {
             "id": "manage-producers-index",
             "path": "/visual-dra-205.html",
             "query": {
@@ -3486,7 +3393,7 @@
             "query": {
                 "page": "Wallet/Statement",
                 "role": "manager",
-                "route": "/manage/households/household-1/wallet"
+                "route": "/finance/households/household-1/wallet"
             },
             "root": ".reference-style",
             "panels": "#main-content .pilot-wallet-forms .pilot-layout-panel, #main-content .pilot-wallet-table tbody tr, #main-content .pilot-layout-notice, [data-sidebar=\"sidebar\"]",

@@ -134,7 +134,6 @@ describe('pilot theme page selection', () => {
         ['Manage/Producers/Index', true],
         ['Manage/Cycles/Index', true],
         ['Manage/Cycles/Show', true],
-        ['Manage/Pickups/Index', true],
         ['Manage/Reception/Show', true],
         ['Manage/Settings', true],
         ['Manage/Stock/Index', true],

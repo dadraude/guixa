@@ -178,33 +178,6 @@ const reception = {
         },
     ],
 };
-const pickups = (
-    state === 'late-closed'
-        ? [
-              ['validated', 'La Figuera', 3640, false],
-              ['draft', 'La Figuera', 800, true],
-              [
-                  'collected',
-                  'Mas Roig amb un nom de llar prou llarg per comprovar el sagnat',
-                  1400,
-                  false,
-              ],
-              ['nothing_to_collect', 'Cal Pere', 0, false],
-          ]
-        : [
-              ['draft', 'Casa Alba', 1050, false],
-              ['validated', 'La Figuera', 3640, false],
-              ['collected', 'Mas Roig', 1400, false],
-              ['nothing_to_collect', 'Cal Pere', 0, false],
-          ]
-).map(([status, name, totalCents, late], index) => ({
-    basketId: `basket-${index}`,
-    householdId: late ? 'household-0' : `household-${index}`,
-    householdName: name,
-    status,
-    totalCents,
-    late,
-}));
 const order = {
     cycleId: ids.cycle,
     pickupDate: '2026-11-05',
@@ -244,10 +217,6 @@ const pages: Record<string, { component: string; props: object }> = {
             },
             households: [household],
         },
-    },
-    pickups: {
-        component: 'Manage/Pickups/Index',
-        props: { cycleId: ids.cycle, closed: state === 'late-closed', pickups },
     },
     orders: {
         component: 'Orders/Edit',

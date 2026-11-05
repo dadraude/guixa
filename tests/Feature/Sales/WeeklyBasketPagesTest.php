@@ -2,6 +2,7 @@
 
 use Guixa\Shared\Domain\Role;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Inertia\Testing\AssertableInertia as Assert;
 
@@ -76,25 +77,14 @@ it('shows a member ordered, allocated and actual quantities of their own weekly 
     $this->get("/cycles/{$week['cycle']}/order")->assertInertia(fn (Assert $page) => $page->where('order.basketId', $week['baskets']['A']));
 });
 
-it('lists the weekly baskets of a settled cycle for the Manager and redirects a household to its basket (R19, R24)', function () {
+it('redirects the old household pickup URL to its basket and retires the cycle pickups index (R19, R24)', function () {
     $week = twoHouseholdWeek();
-    $this->actingAs($week['manager'])->post("/finance/baskets/{$week['baskets']['A']}/validation")->assertRedirect();
 
-    $this->get("/manage/cycles/{$week['cycle']}/pickups")->assertOk()->assertInertia(fn (Assert $page) => $page
-        ->component('Manage/Pickups/Index')
-        ->where('closed', false)
-        ->where('pickups.0.householdName', 'Household A')
-        ->where('pickups.0.status', 'validated')
-        ->where('pickups.0.totalCents', 1400)
-        ->where('pickups.1.status', 'draft')
-        ->has('pickups', 2));
-    $this->get("/manage/cycles/{$week['cycle']}/pickups/{$week['households']['A']}")
+    $this->actingAs($week['manager'])->get("/manage/cycles/{$week['cycle']}/pickups/{$week['households']['A']}")
         ->assertRedirect(route('finance.baskets.show', $week['baskets']['A']));
     $this->get("/manage/cycles/{$week['cycle']}/pickups/".Str::uuid7())->assertNotFound();
-    $this->actingAs(memberOf($week['households']['A']))->get("/manage/cycles/{$week['cycle']}/pickups")->assertForbidden();
-
-    DB::table('cycles')->where('id', $week['cycle'])->update(['settled_at' => null]);
-    $this->actingAs($week['manager'])->get("/manage/cycles/{$week['cycle']}/pickups")->assertNotFound();
+    $this->get("/manage/cycles/{$week['cycle']}/pickups")->assertNotFound();
+    expect(Route::has('manage.cycles.pickups.index'))->toBeFalse();
 });
 
 it('keeps the unvalidated base in step with a reopened reception and refuses validation until it is distributed again (R18, S29, S30)', function () {

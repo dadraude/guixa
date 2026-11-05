@@ -53,7 +53,6 @@ it('lets every demo role log in and open its main screens', function (string $em
         $cycle = DB::table('cycles')->whereNotNull('settled_at')->value('id');
         $producer = DB::table('producers')->value('id');
         $this->get(route('manage.cycles.receptions.show', [$cycle, $producer]))->assertOk();
-        $this->get(route('manage.cycles.pickups.index', $cycle))->assertOk();
     }
 })->with([
     'manager' => ['gestora@demo.guixa.test', ['/dashboard', '/manage/households', '/manage/producers', '/manage/cycles', '/manage/stock']],

@@ -272,19 +272,6 @@ const pageProps: Record<string, Record<string, unknown>> = {
         otherHouseholds: [],
         deactivationWarning: settlement,
     },
-    'Manage/Pickups/Index': {
-        cycleId,
-        closed: false,
-        pickups: [
-            {
-                basketId: 'basket',
-                householdId,
-                householdName: household.name,
-                status: 'draft',
-                totalCents: 640,
-            },
-        ],
-    },
     'Manage/Producers/Index': { producers: [producer] },
     'Manage/Reception/Show': {
         reception,

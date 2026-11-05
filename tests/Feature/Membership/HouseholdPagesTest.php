@@ -82,7 +82,7 @@ it('shows the settlement warning, deactivates with a separate action, and lists 
     $manager = accountWithRole(Role::Manager);
     $this->actingAs($manager)->post(route('manage.households.store'), ['name' => 'Household H']);
     $householdId = DB::table('households')->value('id');
-    $this->actingAs($manager)->post(route('manage.households.wallet.top-ups.store', $householdId), ['amount' => '5.00']);
+    $this->actingAs($manager)->post(route('finance.households.wallet.top-ups.store', $householdId), ['amount' => '5.00']);
 
     $this->actingAs($manager)->get(route('manage.households.show', $householdId))
         ->assertInertia(fn (Assert $page) => $page
@@ -133,7 +133,7 @@ it('keeps open baskets and wallet adjustments available after deactivation until
         ->where('toSettle.0.openBaskets.0.status', 'validated')
         ->where('toSettle.0.openBaskets.0.date', $pickupDate));
 
-    $this->actingAs($manager)->post(route('manage.households.wallet.top-ups.store', $householdId), ['amount' => '20.00'])->assertRedirect();
+    $this->actingAs($manager)->post(route('finance.households.wallet.top-ups.store', $householdId), ['amount' => '20.00'])->assertRedirect();
     $toSettle()->assertInertia(fn (Assert $page) => $page
         ->where('toSettle.0.balanceCents', 0)
         ->where('toSettle.0.openBaskets.0.basketId', $basketId));

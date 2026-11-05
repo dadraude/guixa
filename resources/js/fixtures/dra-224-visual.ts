@@ -131,8 +131,8 @@ const page = {
         ...(role === 'manager'
             ? { householdReturnHref: `/manage/households/${householdId}` }
             : {}),
-        receiptAction: `/${role === 'manager' ? 'manage' : 'finance'}/households/${householdId}/wallet/top-ups`,
-        correctionAction: `/${role === 'manager' ? 'manage' : 'finance'}/households/${householdId}/wallet/corrections`,
+        receiptAction: `/finance/households/${householdId}/wallet/top-ups`,
+        correctionAction: `/finance/households/${householdId}/wallet/corrections`,
         correctionId: '0198f0a0-0000-7000-8000-000000000039',
         status: state === 'populated' ? 'Ingrés registrat.' : null,
     },

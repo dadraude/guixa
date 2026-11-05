@@ -83,4 +83,22 @@ describe('shared app navigation', () => {
             currentNavigationItem(memberItems, '/baskets/example')?.title,
         ).toBe('My baskets');
     });
+
+    it('keeps Households selected for a manager on the shared Finance wallet, and leaves Finance-only users unchanged', () => {
+        const wallet =
+            '/finance/households/12345678-1234-1234-1234-123456789abc/wallet';
+
+        expect(
+            currentNavigationItem(
+                navigationItemsFor([{ role: 'manager' }]),
+                wallet,
+            )?.title,
+        ).toBe('Households');
+        expect(
+            currentNavigationItem(
+                navigationItemsFor([{ role: 'finance' }]),
+                wallet,
+            ),
+        ).toBeUndefined();
+    });
 });
