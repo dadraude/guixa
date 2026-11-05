@@ -228,14 +228,6 @@ readonly producers: App.Http.OrderProducerRow[],
 readonly lines: App.Http.OrderLineRow[],
 readonly basketId: string | null,
 };
-export type PickupSummaryRow = {
-readonly basketId: string,
-readonly householdId: string,
-readonly householdName: string,
-readonly status: string,
-readonly totalCents: number,
-readonly late: boolean,
-};
 export type ProducerCycleSummaryRow = {
 readonly cycleId: string,
 readonly pickupDate: string,

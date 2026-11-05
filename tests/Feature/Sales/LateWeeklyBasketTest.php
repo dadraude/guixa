@@ -107,7 +107,7 @@ it('keeps a validated basket pending and charged once after the planned pickup d
         ->and(DB::table('wallet_movements')->count())->toBe(1);
 });
 
-it('lists the late basket as its own marked row after the base and sends the old pickup URL to the base basket (R19, R24)', function () {
+it('gives the late basket its own page and sends the old pickup URL to the base basket (R19, R24)', function () {
     $week = lateArrivalWeek();
     $reception = $week['reception'];
     $this->delete("{$reception}/distribution")->assertRedirect();
@@ -119,9 +119,6 @@ it('lists the late basket as its own marked row after the base and sends the old
     $this->get("/finance/baskets/{$late}")->assertInertia(fn (AssertableInertia $page) => $page->where('basket.late', true));
     $this->get("/finance/baskets/{$week['baskets']['A']}")->assertInertia(fn (AssertableInertia $page) => $page->where('basket.late', false));
     $this->get("/manage/cycles/{$week['cycle']}/pickups/{$week['households']['A']}")->assertRedirect("/finance/baskets/{$week['baskets']['A']}");
-    $this->get("/manage/cycles/{$week['cycle']}/pickups")->assertInertia(fn (AssertableInertia $page) => $page
-        ->where('pickups', fn ($rows) => collect($rows)->where('householdId', $week['households']['A'])->map(fn ($row) => [$row['basketId'], $row['late']])->values()->all()
-            === [[$week['baskets']['A'], false], [$late, true]]));
 });
 
 it('gives the validated household a late weekly basket when an unordered product is added after the reopen and allocated to it by hand (R14, R16, R18, R19, S40)', function () {

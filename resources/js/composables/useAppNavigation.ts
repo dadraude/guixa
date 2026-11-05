@@ -110,6 +110,7 @@ export function navigationSectionsFor(
                               title: 'Households',
                               href: HouseholdController.index(),
                               icon: Home,
+                              alsoActiveOn: ['/finance/households'],
                           },
                           {
                               title: 'Baskets',
@@ -179,20 +180,24 @@ export function currentNavigationItem(
 ): NavItem | undefined {
     const currentPath = pathOf(currentUrl);
 
-    return [...items]
-        .filter((item) => {
-            const destination = pathOf(toUrl(item.href));
+    const matchingDestination = (item: NavItem): string | undefined =>
+        [pathOf(toUrl(item.href)), ...(item.alsoActiveOn ?? [])]
+            .filter(
+                (destination) =>
+                    currentPath === destination ||
+                    currentPath.startsWith(`${destination}/`),
+            )
+            .sort((left, right) => right.length - left.length)[0];
 
-            return (
-                currentPath === destination ||
-                currentPath.startsWith(`${destination}/`)
-            );
-        })
+    return items
+        .map((item) => ({ item, destination: matchingDestination(item) }))
+        .filter(
+            (match): match is { item: NavItem; destination: string } =>
+                match.destination !== undefined,
+        )
         .sort(
-            (left, right) =>
-                pathOf(toUrl(right.href)).length -
-                pathOf(toUrl(left.href)).length,
-        )[0];
+            (left, right) => right.destination.length - left.destination.length,
+        )[0]?.item;
 }
 
 export function useAppNavigation() {

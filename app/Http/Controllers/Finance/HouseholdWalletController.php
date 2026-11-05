@@ -14,6 +14,7 @@ use Guixa\Wallet\Application\GetWalletStatement;
 use Guixa\Wallet\Application\RecordCorrection;
 use Guixa\Wallet\Application\RecordTopUp;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -32,6 +33,7 @@ final class HouseholdWalletController extends Controller
             'wallet' => WalletStatementRow::from($getStatement($actor, $household)),
             'household' => new WalletHouseholdRow($name->id, $name->name),
             'canManageReceipts' => true,
+            ...(Gate::forUser($actor)->allows('manage') ? ['householdReturnHref' => route('manage.households.show', ['household' => $household])] : []),
             'receiptAction' => route('finance.households.wallet.top-ups.store', ['household' => $household]),
             'correctionAction' => route('finance.households.wallet.corrections.store', ['household' => $household]),
             'correctionId' => (string) Str::uuid7(),

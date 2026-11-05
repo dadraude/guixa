@@ -16,8 +16,8 @@ it('moves Anna to J with her own login while H keeps its order, balance and hist
     $biel = memberOf($h, 'Biel');
     $manager = accountWith(Role::Manager);
     $this->actingAs($anna)->put("/cycles/{$cycleId}/order/lines/{$loaf}", ['quantity' => '2'])->assertRedirect();
-    $this->actingAs($manager)->post("/manage/households/{$h}/wallet/top-ups", ['amount' => '12.00'])->assertRedirect();
-    $this->post("/manage/households/{$j}/wallet/top-ups", ['amount' => '3.00'])->assertRedirect();
+    $this->actingAs($manager)->post("/finance/households/{$h}/wallet/top-ups", ['amount' => '12.00'])->assertRedirect();
+    $this->post("/finance/households/{$j}/wallet/top-ups", ['amount' => '3.00'])->assertRedirect();
 
     $this->put("/manage/accounts/{$anna->id}/household", ['household_id' => $j])->assertRedirect()->assertSessionHasNoErrors();
 

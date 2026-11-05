@@ -129,7 +129,7 @@ it('keeps Finance out of account, catalogue, cycle, reception, stock administrat
     $this->get('/manage/producers')->assertForbidden();
     $this->get('/manage/return-items')->assertForbidden();
     $this->put('/manage/accounts/'.$finance->id.'/finance-role')->assertForbidden();
-    $this->post('/manage/households/'.Str::uuid7().'/wallet/top-ups', ['amount' => '1'])->assertForbidden();
+    $this->post('/manage/households', ['name' => 'X'])->assertForbidden();
     $this->get('/dashboard')->assertInertia(fn (Assert $page) => $page
         ->where('auth.roles', ['finance'])->has('roleAreas', 1)->where('roleAreas.0.role', 'finance'));
 });

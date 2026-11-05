@@ -21,7 +21,6 @@ use App\Http\Controllers\Manage\CycleParticipantController;
 use App\Http\Controllers\Manage\FinanceRoleController;
 use App\Http\Controllers\Manage\HouseholdController;
 use App\Http\Controllers\Manage\HouseholdMemberController;
-use App\Http\Controllers\Manage\HouseholdWalletController;
 use App\Http\Controllers\Manage\InvitationController;
 use App\Http\Controllers\Manage\ManagerRoleController;
 use App\Http\Controllers\Manage\PickupController;
@@ -173,7 +172,6 @@ Route::middleware(['auth', 'verified', 'role:manager'])->prefix('manage')->name(
     });
 
     Route::prefix('cycles/{cycle}/pickups')->whereUuid(['cycle', 'household'])->group(function () {
-        Route::get('/', [PickupController::class, 'index'])->name('cycles.pickups.index');
         Route::get('{household}', [PickupController::class, 'show'])->name('cycles.pickups.show');
     });
 
@@ -189,15 +187,6 @@ Route::middleware(['auth', 'verified', 'role:manager'])->prefix('manage')->name(
     Route::post('households/{household}/members', [HouseholdMemberController::class, 'store'])
         ->whereUuid('household')
         ->name('households.members.store');
-    Route::get('households/{household}/wallet', [HouseholdWalletController::class, 'show'])
-        ->whereUuid('household')
-        ->name('households.wallet.show');
-    Route::post('households/{household}/wallet/top-ups', [HouseholdWalletController::class, 'topUp'])
-        ->whereUuid('household')
-        ->name('households.wallet.top-ups.store');
-    Route::post('households/{household}/wallet/corrections', [HouseholdWalletController::class, 'correct'])
-        ->whereUuid('household')
-        ->name('households.wallet.corrections.store');
 
     Route::get('producers', [ProducerController::class, 'index'])->name('producers.index');
     Route::post('producers', [ProducerController::class, 'store'])->name('producers.store');

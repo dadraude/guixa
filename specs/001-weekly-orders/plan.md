@@ -300,8 +300,8 @@ allocation write and on re-distribution), resetting the actual quantity only of 
 changed; a validated base is never synchronized. Weekly validation and actual-quantity edits are refused
 while a producer is reopened after settlement. A scheduler-created base has no creator (`baskets.created_by`
 is nullable). The drafts-only/all choice and reception adjustments to validated baskets are removed
-(Change 2026-11-03). Staff reach a cycle's bases from the pickups list; the old per-household pickup URL redirects
-to the basket.
+(Change 2026-11-03). Staff reach a cycle's bases through `/finance/baskets?pending=1&cycle=`; the cycle pickups index is removed (T72, DRA-234)
+and only the old per-household pickup URL remains, redirecting to the basket.
 
 Ordering's `SalesBaskets` port creates/synchronizes sources and reads validation/effective-quantity
 summaries. Sales's `WeeklyBasketSource` calls narrow Ordering use cases for source readiness, its
@@ -608,7 +608,7 @@ All route middleware is backed by Application gate/policy checks against the exp
 | `PUT {basket}/weekly-lines/{product}`, `POST/DELETE .../stock-lines` (delete by product), `POST/DELETE .../return-lines` (delete by return item) | Draft actual quantities and stock/return contents; archive removals |
 | `POST .../validation`, `PUT .../collection`, `POST .../corrections` | `ValidateBasket`, `MarkBasketCollected`, `CorrectBasket`; distinct actions with distinct effects |
 | `POST .../cancellation`, `POST .../collection-corrections` | Cancel a stock draft / justified staff correction of collection state |
-| `/finance/households/{household}/wallet` and receipt/correction posts | Reuse `Wallet/Statement` and confirmed top-up/correction forms, gated Finance/Manager |
+| `/finance/households/{household}/wallet` and receipt/correction posts | The only household wallet route (T72; the `/manage/households/{household}/wallet` copy is removed). Reuse `Wallet/Statement` and confirmed top-up/correction forms, gated Finance/Manager; a Manager also gets `householdReturnHref` to the manager household page, Finance-only gets none |
 | `/manage/producers/{producer}/products` | Manager catalogue page listing both modes and their allowed actions; entry from producer administration |
 | `/manage/producers/{producer}/products/...` | Stock product creation/edit/deactivate/reactivate/unused-delete from producer context; Manager only |
 | `/producer/products/...` | T54 index composes own weekly administration and read-only own stock with quantities; no stock-mode change by producer |

@@ -146,7 +146,7 @@ it('shows a basket-sourced charge on Manager and member Wallet statements while 
         'type' => 'charge', 'amount_cents' => -1200, 'occurred_at' => now(),
         'recorded_by' => $manager->id, 'basket_id' => $basket]);
 
-    $this->actingAs($manager)->get("/manage/households/{$household}/wallet")
+    $this->actingAs($manager)->get("/finance/households/{$household}/wallet")
         ->assertInertia(fn (Assert $page) => $page->where('wallet.movements.0.basketId', $basket));
     $this->actingAs(memberOf($household))->get('/wallet')
         ->assertInertia(fn (Assert $page) => $page->where('wallet.movements.0.basketId', $basket));
