@@ -16,19 +16,28 @@ use Guixa\Sales\Application\GetBasketBalance;
 use Guixa\Sales\Application\GetHouseholdContainerBalance;
 use Guixa\Sales\Application\ListActiveHouseholds;
 use Guixa\Sales\Application\ListBaskets;
+use Guixa\Sales\Application\ListPendingCollections;
 use Guixa\Sales\Domain\Error\BasketNotFound;
 use Guixa\Shared\Application\Actor;
 use Guixa\Stock\Application\ListActiveStock;
 use Guixa\Stock\Application\ListReturnItems;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
 final class BasketController extends Controller
 {
-    public function index(Actor $actor, ListBaskets $list): Response
+    public function index(Request $request, Actor $actor, ListBaskets $list, ListPendingCollections $pending): Response
     {
-        return Inertia::render('Finance/Baskets/Index', ['baskets' => array_map(BasketSummaryRow::from(...), $list($actor))]);
+        $baskets = $request->boolean('pending')
+            ? $pending($actor, $request->string('cycle')->toString() ?: null)
+            : $list($actor);
+
+        return Inertia::render('Finance/Baskets/Index', [
+            'baskets' => array_map(BasketSummaryRow::from(...), $baskets),
+            'pending' => $request->boolean('pending'),
+        ]);
     }
 
     public function create(Actor $actor, ListActiveHouseholds $households): Response

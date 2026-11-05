@@ -139,7 +139,7 @@ preserves; implement changed behavior through T52–T68. Existing issue IDs keep
 | T64 | <a id="t64"></a>[Record and correct confirmed global receipts](tasks/sales.md#t64) | R21, R29–R32, R36c; S19 (receipt), S24, S84 (receipts), S85 | T56 |
 | T65 | <a id="t65"></a>[Read own-household basket contents and status](tasks/sales.md#t65) | R19a, R21, R23a, R24a, R31, R35; own-household read and privacy invariants | T55, T38 |
 | T66 | <a id="t66"></a>[Correct collection marks without financial effects](tasks/sales.md#t66) | R23b, R24a; collection correction, history and replay invariants | T56, T65 |
-| T67 | <a id="t67"></a>[Keep pending collection visible across pages and cycle closure](tasks/weekly-and-collection.md#t67) | R23a, R24, R24b, R35; S26/S42/S54/S83 (indicators) | T60, T61 |
+| T67 | <a id="t67"></a>[Keep pending collection visible across pages and cycle closure](tasks/weekly-and-collection.md#t67) | R23a, R24, R24b, R35; S26/S42/S54/S83 (indicators; one shared `pendingCollections` query) | T60, T61 |
 | T68 | <a id="t68"></a>[Correct physical goods and effective basket quantities](tasks/sales.md#t68) | R23, R24a, R27, R28, R32; S86; full-reversal and signed-quantity invariants | T58, T57 |
 
 ## Linear publication and current gates

@@ -75,6 +75,8 @@ return [
                 'Application\AddLateWeeklyLines' => ['Ordering'],
                 'Application\ReadWeeklyBasketStates' => ['Ordering'],
                 'Application\ReadPendingWeeklyCycles' => ['Ordering'],
+                'Application\ReadPendingCollections' => ['Ordering'],
+                'Application\PendingCollectionData' => ['Ordering'],
                 'Application\ReadHouseholdContainerBalances' => ['Ordering'],
                 'Application\ReadOpenHouseholdBaskets' => ['Membership'],
                 'Application\OpenBasketData' => ['Membership'],

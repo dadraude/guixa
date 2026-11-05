@@ -179,7 +179,8 @@ First checkpoint: one closed-cycle pending basket appears with the correct count
 collection removes it while the cycle stays closed and ledger is unchanged. Widen the same query to
 dashboard/list and role cases; include source-scoped HTTP privacy and PostgreSQL reads.
 Paths: Sales pending queries/adapters (planned per plan), existing Dashboard, cycle list/detail and
-basket views, T61 collection action. Reuse layouts/navigation.
+basket views, T61 collection action. Reuse layouts/navigation. Delivered through `BasketRepository::pendingCollections`
+(both adapters); T62's draft obligations compose drafts with it, and the draft-inclusive `ReadPendingPickups` chain is left for T63.
 Focused checks: pending query/HTTP and membership regressions, dashboard/cycle/basket components,
 translations, exact effective-count fixtures. Related: DRA-202/DRA-203 as context only, never blockers.
 Dependency reasons: T60 supplies independent baskets; T61 supplies member collection

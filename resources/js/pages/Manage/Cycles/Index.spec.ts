@@ -48,6 +48,7 @@ describe('manager cycles', () => {
                 ],
                 producers: [{ id: 'baker', name: 'Forn' }],
                 pickupWeekday: 6,
+                pendingCollections: {},
             },
             global: { plugins: [{ install: installTranslations }] },
         });
@@ -113,6 +114,7 @@ describe('manager cycles', () => {
             ],
             producers: [{ id: 'grower', name: 'Hort' }],
             pickupWeekday: 6,
+            pendingCollections: { cycle: 2 },
         });
         installTranslations(app);
         const html = await renderToString(app);
@@ -122,6 +124,9 @@ describe('manager cycles', () => {
         expect(html).not.toContain('data-test="manage-cycle"');
         expect(html).not.toContain('data-test="add-cycle-grower"');
         expect(html).toContain('<dialog');
+        expect(html).toMatch(
+            /data-test="pending-collections"[^>]*>Recollides pendents: 2</,
+        );
     });
 
     it('offers per-producer management and a real add-producer form for open cycles', async () => {
@@ -148,6 +153,7 @@ describe('manager cycles', () => {
                 { id: 'grower', name: 'Hort' },
             ],
             pickupWeekday: 6,
+            pendingCollections: {},
         });
         installTranslations(app);
         const html = await renderToString(app);

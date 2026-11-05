@@ -107,6 +107,15 @@ beforeEach(function () {
             return [];
         }
 
+        public function pendingCollections(?string $householdId = null): array
+        {
+            $pending = array_filter($this->list(), fn (Basket $basket) => $basket->isPendingCollection()
+                && ($householdId === null || $basket->householdId === $householdId));
+            usort($pending, fn (Basket $a, Basket $b) => [$a->validatedAt, $a->id] <=> [$b->validatedAt, $b->id]);
+
+            return array_values($pending);
+        }
+
         public function hasProductHistory(string $productId): bool
         {
             foreach ($this->rows as $basket) {

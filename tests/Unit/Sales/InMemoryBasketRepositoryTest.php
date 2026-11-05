@@ -15,6 +15,11 @@ final class InMemoryBasketRepositoryTest extends TestCase
         return [new InMemoryBasketRepository, 'manager', 'household', 'product', 'return-a', 'return-b'];
     }
 
+    protected function anotherHousehold(): string
+    {
+        return 'another-household';
+    }
+
     protected function weeklySource(): array
     {
         return ['order', 'cycle'];

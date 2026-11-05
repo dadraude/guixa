@@ -23,6 +23,9 @@ trait BasketRepositoryContract
     /** @return array{string, string} a source order id and its cycle id that weekly baskets can reference */
     abstract protected function weeklySource(): array;
 
+    /** @return string the id of a second household that baskets can belong to */
+    abstract protected function anotherHousehold(): string;
+
     #[Test]
     public function it_keeps_one_base_and_at_most_one_open_late_draft_per_source_order(): void
     {
@@ -389,5 +392,39 @@ trait BasketRepositoryContract
         }
         $this->assertSame([], $repository->settledForHouseholds([]));
         $this->assertSame([], $repository->settledForHouseholds(['00000000-0000-7000-8000-000000000099']));
+    }
+
+    #[Test]
+    public function it_reads_pending_collections_by_validation_instant_then_id_excluding_drafts_collected_and_fully_reversed_goods(): void
+    {
+        [$repository, $manager, $household, $product] = $this->basketWorld();
+        $other = $this->anotherHousehold();
+        $validate = function (string $at, ?string $forHousehold = null) use ($repository, $manager, $household, $product): string {
+            $basket = $this->basket($repository, $manager, $forHousehold ?? $household, []);
+            $repository->save($basket->withLines([$this->line($repository, $basket->id, $product)]));
+            $repository->save($repository->get($basket->id)->validated($manager, new DateTimeImmutable($at)));
+
+            return $basket->id;
+        };
+        $late = $validate('2026-11-09T10:00:00+00:00');
+        $first = $validate('2026-11-08T10:00:00+00:00');
+        $second = $validate('2026-11-08T10:00:00+00:00');
+        $collected = $validate('2026-11-07T10:00:00+00:00');
+        $repository->save($repository->get($collected)->collected($manager, new DateTimeImmutable('2026-11-10T10:00:00+00:00'), $repository->nextId()));
+        $reversed = $validate('2026-11-07T11:00:00+00:00');
+        $repository->save($repository->get($reversed)->withAdjustment(new BasketAdjustment($repository->nextId(), $reversed, 1200, 'Returned',
+            $manager, new DateTimeImmutable('2026-11-10T10:00:00+00:00'), [BasketAdjustmentLine::fromDecimal($product, '-1.000')])));
+        $draft = $this->basket($repository, $manager, $household, []);
+        $repository->save($draft->withLines([$this->line($repository, $draft->id, $product)]));
+        $otherHousehold = $validate('2026-11-06T10:00:00+00:00', $other);
+
+        $pair = [$first, $second];
+        sort($pair);
+        $ids = fn (array $rows) => array_map(fn (Basket $basket) => $basket->id, $rows);
+
+        $this->assertSame([$otherHousehold, ...$pair, $late], $ids($repository->pendingCollections()));
+        $this->assertSame([...$pair, $late], $ids($repository->pendingCollections($household)));
+        $this->assertSame([$otherHousehold], $ids($repository->pendingCollections($other)));
+        $this->assertSame([], $repository->pendingCollections('00000000-0000-7000-8000-000000000098'));
     }
 }

@@ -58,7 +58,21 @@
                             "mode": "dark",
                             "text": 200
                         }
-                    ]
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"staff-pending-collections\"]",
+                                "count": 1,
+                                "text": "Recollides pendents: 3",
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"pending-pickups\"]",
+                                "count": 0
+                            }
+                        ]
+                    }
                 },
                 {
                     "id": "empty",
@@ -77,7 +91,132 @@
                             "text": 200
                         }
                     ],
-                    "ready": "body[data-visual-ready=\"empty\"]"
+                    "ready": "body[data-visual-ready=\"empty\"]",
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"staff-pending-collections\"]",
+                                "count": 0
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "long-content",
+                    "query": {
+                        "state": "long-content"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"long-content\"]"
+                }
+            ]
+        },
+        {
+            "id": "dashboard-finance",
+            "path": "/visual-dra-205.html",
+            "query": {
+                "page": "Dashboard",
+                "role": "finance"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "button[data-sidebar=\"trigger\"]",
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"staff-pending-collections\"]",
+                                "count": 1,
+                                "text": "Recollides pendents: 3",
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"pending-pickups\"]",
+                                "count": 0
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "empty",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"empty\"]",
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"staff-pending-collections\"]",
+                                "count": 0
+                            }
+                        ],
+                        "panels": "#main-content",
+                        "focus": [],
+                        "noFocusReason": "A Finance dashboard with nothing pending has no actionable content."
+                    }
                 },
                 {
                     "id": "long-content",
@@ -150,7 +289,24 @@
                             "mode": "dark",
                             "text": 200
                         }
-                    ]
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"pending-pickups\"] > li",
+                                "count": 2
+                            },
+                            {
+                                "selector": "[data-test=\"pending-pickups-all\"]",
+                                "count": 1,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"staff-pending-collections\"]",
+                                "count": 0
+                            }
+                        ]
+                    }
                 },
                 {
                     "id": "empty",
@@ -169,7 +325,15 @@
                             "text": 200
                         }
                     ],
-                    "ready": "body[data-visual-ready=\"empty\"]"
+                    "ready": "body[data-visual-ready=\"empty\"]",
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"pending-pickups\"]",
+                                "count": 0
+                            }
+                        ]
+                    }
                 },
                 {
                     "id": "long-content",
@@ -447,7 +611,17 @@
                             "mode": "dark",
                             "text": 200
                         }
-                    ]
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"pending-collections\"]",
+                                "count": 1,
+                                "text": "Recollides pendents: 2",
+                                "minHeight": 44
+                            }
+                        ]
+                    }
                 },
                 {
                     "id": "empty",
@@ -687,7 +861,21 @@
                             "text": 200
                         }
                     ],
-                    "ready": "body[data-visual-ready=\"closed-cycle\"]"
+                    "ready": "body[data-visual-ready=\"closed-cycle\"]",
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"pending-collections\"]",
+                                "count": 1,
+                                "text": "Recollides pendents: 2",
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test^=\"manage-\"]",
+                                "count": 0
+                            }
+                        ]
+                    }
                 },
                 {
                     "id": "cancelled-cycle",
@@ -707,6 +895,38 @@
                         }
                     ],
                     "ready": "body[data-visual-ready=\"cancelled-cycle\"]"
+                },
+                {
+                    "id": "no-pending",
+                    "query": {
+                        "state": "no-pending"
+                    },
+                    "ready": "body[data-visual-ready=\"no-pending\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"pending-collections\"]",
+                                "count": 0
+                            }
+                        ]
+                    }
                 }
             ]
         },
@@ -755,7 +975,17 @@
                             "mode": "dark",
                             "text": 200
                         }
-                    ]
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"pending-collections\"]",
+                                "count": 1,
+                                "text": "Recollides pendents: 2",
+                                "minHeight": 44
+                            }
+                        ]
+                    }
                 },
                 {
                     "id": "empty",
@@ -813,6 +1043,38 @@
                         }
                     ],
                     "ready": "body[data-visual-ready=\"cancelled-cycle\"]"
+                },
+                {
+                    "id": "no-pending",
+                    "query": {
+                        "state": "no-pending"
+                    },
+                    "ready": "body[data-visual-ready=\"no-pending\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"pending-collections\"]",
+                                "count": 0
+                            }
+                        ]
+                    }
                 }
             ]
         },

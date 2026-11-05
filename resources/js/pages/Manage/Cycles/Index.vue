@@ -10,6 +10,7 @@ import CycleManageDialog from './CycleManageDialog.vue';
 import { Button } from '@/components/ui/button';
 import Heading from '@/components/Heading.vue';
 import StatusIndicator from '@/components/StatusIndicator.vue';
+import BasketController from '@/actions/App/Http/Controllers/Finance/BasketController';
 
 defineOptions({
     layout: {
@@ -20,6 +21,7 @@ const props = defineProps<{
     cycles: App.Http.CycleRow[];
     producers: App.Http.ProducerOptionRow[];
     pickupWeekday: number | null;
+    pendingCollections: Record<string, number>;
 }>();
 const weekdays = [
     trans('Monday'),
@@ -141,6 +143,27 @@ function cutoffLabel(value: string | null) {
                         />
                     </div>
                     <div class="pilot-action-row">
+                        <Button
+                            v-if="(pendingCollections[cycle.id] ?? 0) > 0"
+                            as-child
+                            variant="outline"
+                            class="min-h-11"
+                            ><Link
+                                :href="
+                                    BasketController.index.url({
+                                        query: { pending: 1, cycle: cycle.id },
+                                    })
+                                "
+                                data-test="pending-collections"
+                                >{{
+                                    trans('Pending collections: :count', {
+                                        count: String(
+                                            pendingCollections[cycle.id],
+                                        ),
+                                    })
+                                }}</Link
+                            ></Button
+                        >
                         <Button as-child variant="outline" class="min-h-11"
                             ><Link
                                 :href="CycleController.show(cycle.id)"

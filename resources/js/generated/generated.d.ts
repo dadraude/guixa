@@ -92,6 +92,7 @@ readonly totalCents: number,
 readonly createdAt: string,
 readonly pendingCollection: boolean,
 readonly status: string,
+readonly validatedAt: string | null,
 };
 export type BasketWeeklyLineRow = {
 readonly productId: string,

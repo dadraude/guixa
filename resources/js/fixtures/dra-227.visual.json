@@ -1,0 +1,953 @@
+{
+    "baseUrl": "http://127.0.0.1:5227",
+    "rootFontPx": 16,
+    "darkSelector": "html.dark",
+    "matrix": {
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark", "system-light", "system-dark"],
+        "text": [100, 200]
+    },
+    "views": [
+        {
+            "id": "dashboard-manager",
+            "path": "/visual-dra-205.html",
+            "query": {
+                "page": "Dashboard",
+                "role": "manager"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "button[data-sidebar=\"trigger\"]",
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"staff-pending-collections\"]",
+                                "count": 1,
+                                "text": "Recollides pendents: 3",
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"pending-pickups\"]",
+                                "count": 0
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "empty",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"empty\"]",
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"staff-pending-collections\"]",
+                                "count": 0
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "dashboard-finance",
+            "path": "/visual-dra-205.html",
+            "query": {
+                "page": "Dashboard",
+                "role": "finance"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "button[data-sidebar=\"trigger\"]",
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"staff-pending-collections\"]",
+                                "count": 1,
+                                "text": "Recollides pendents: 3",
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"pending-pickups\"]",
+                                "count": 0
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "empty",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"empty\"]",
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"staff-pending-collections\"]",
+                                "count": 0
+                            }
+                        ],
+                        "panels": "#main-content",
+                        "focus": [],
+                        "noFocusReason": "A Finance dashboard with nothing pending has no actionable content."
+                    }
+                }
+            ]
+        },
+        {
+            "id": "dashboard-member",
+            "path": "/visual-dra-205.html",
+            "query": {
+                "page": "Dashboard",
+                "role": "member"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "button[data-sidebar=\"trigger\"]",
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"pending-pickups\"] > li",
+                                "count": 2
+                            },
+                            {
+                                "selector": "[data-test=\"pending-pickups-all\"]",
+                                "count": 1,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"staff-pending-collections\"]",
+                                "count": 0
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "empty",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"empty\"]",
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"pending-pickups\"]",
+                                "count": 0
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "manage-cycles-index",
+            "path": "/visual-dra-205.html",
+            "query": {
+                "page": "Manage/Cycles/Index"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "button[data-sidebar=\"trigger\"]",
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"pending-collections\"]",
+                                "count": 1,
+                                "text": "Recollides pendents: 2",
+                                "minHeight": 44
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "closed-cycle",
+                    "query": {
+                        "state": "closed-cycle"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"closed-cycle\"]",
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"pending-collections\"]",
+                                "count": 1,
+                                "text": "Recollides pendents: 2",
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test^=\"manage-\"]",
+                                "count": 0
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "no-pending",
+                    "query": {
+                        "state": "no-pending"
+                    },
+                    "ready": "body[data-visual-ready=\"no-pending\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"pending-collections\"]",
+                                "count": 0
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "manage-cycles-show",
+            "path": "/visual-dra-205.html",
+            "query": {
+                "page": "Manage/Cycles/Show"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["button[data-sidebar=\"trigger\"]"],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"pending-collections\"]",
+                                "count": 1,
+                                "text": "Recollides pendents: 2",
+                                "minHeight": 44
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "no-pending",
+                    "query": {
+                        "state": "no-pending"
+                    },
+                    "ready": "body[data-visual-ready=\"no-pending\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"pending-collections\"]",
+                                "count": 0
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "path": "/visual-dra-225.html",
+            "root": "#main-content",
+            "panels": "#main-content .pilot-layout-panel,#main-content .pilot-list-row,#main-content .pilot-layout-notice",
+            "content": "#main-content h1,#main-content h2,#main-content h3,#main-content p,#main-content a,#main-content li,#main-content dt,#main-content dd",
+            "fonts": ["16px Nunito Variable"],
+            "id": "member-pending-list",
+            "query": {
+                "view": "list",
+                "pending": "1"
+            },
+            "focus": ["#main-content a[data-visual-page-focus-first]"],
+            "states": [
+                {
+                    "id": "populated",
+                    "query": {
+                        "state": "populated"
+                    },
+                    "ready": "body[data-visual-ready=\"populated\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"basket-list\"] > li",
+                                "count": 3
+                            },
+                            {
+                                "selector": "[data-test=\"status-validated\"]",
+                                "count": 3
+                            },
+                            {
+                                "selector": "[data-test=\"empty-baskets\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content a[href^=\"/finance/\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content form",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"validated-at\"]",
+                                "count": 3
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "count": 1,
+                                "text": "Recollides pendents"
+                            },
+                            {
+                                "selector": "[data-test=\"all-baskets\"]",
+                                "count": 1,
+                                "text": "Totes les cistelles",
+                                "minHeight": 44
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "empty",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "ready": "body[data-visual-ready=\"empty\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "focus": [],
+                        "noFocusReason": "Empty pending list has no page action.",
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"empty-baskets\"]",
+                                "count": 1,
+                                "text": "Cap cistella pendent de recollida."
+                            },
+                            {
+                                "selector": "[data-test=\"basket-list\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"validated-at\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "count": 1,
+                                "text": "Recollides pendents"
+                            },
+                            {
+                                "selector": "[data-test=\"all-baskets\"]",
+                                "count": 1,
+                                "text": "Totes les cistelles",
+                                "minHeight": 44
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "long",
+                    "query": {
+                        "state": "long"
+                    },
+                    "ready": "body[data-visual-ready=\"long\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"basket-list\"] > li",
+                                "count": 3
+                            },
+                            {
+                                "selector": "[data-test=\"status-validated\"]",
+                                "count": 3
+                            },
+                            {
+                                "selector": "[data-test=\"validated-at\"]",
+                                "count": 3
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "count": 1,
+                                "text": "Recollides pendents"
+                            },
+                            {
+                                "selector": "[data-test=\"all-baskets\"]",
+                                "count": 1,
+                                "text": "Totes les cistelles",
+                                "minHeight": 44
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "path": "/visual-dra-225.html",
+            "root": "#main-content",
+            "panels": "#main-content .pilot-layout-panel,#main-content .pilot-list-row,#main-content .pilot-layout-notice",
+            "content": "#main-content h1,#main-content h2,#main-content h3,#main-content p,#main-content a,#main-content li,#main-content dt,#main-content dd",
+            "fonts": ["16px Nunito Variable"],
+            "id": "finance-pending-list",
+            "query": {
+                "view": "list",
+                "pending": "1",
+                "role": "finance"
+            },
+            "focus": [
+                "#main-content a[data-visual-page-focus-first]",
+                "#main-content a[data-visual-page-focus-last]"
+            ],
+            "states": [
+                {
+                    "id": "populated",
+                    "query": {
+                        "state": "populated"
+                    },
+                    "ready": "body[data-visual-ready=\"populated\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"basket-list\"] > li",
+                                "count": 3
+                            },
+                            {
+                                "selector": "[data-test=\"status-validated\"]",
+                                "count": 3
+                            },
+                            {
+                                "selector": "[data-test=\"empty-baskets\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content a[href^=\"/finance/\"]",
+                                "count": 5
+                            },
+                            {
+                                "selector": "#main-content form",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"validated-at\"]",
+                                "count": 3
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "count": 1,
+                                "text": "Recollides pendents"
+                            },
+                            {
+                                "selector": "[data-test=\"all-baskets\"]",
+                                "count": 1,
+                                "text": "Totes les cistelles",
+                                "minHeight": 44
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "empty",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "ready": "body[data-visual-ready=\"empty\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "focus": [
+                            "#main-content a[data-visual-page-focus-first]"
+                        ],
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"empty-baskets\"]",
+                                "count": 1,
+                                "text": "Cap cistella pendent de recollida."
+                            },
+                            {
+                                "selector": "[data-test=\"basket-list\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"validated-at\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "count": 1,
+                                "text": "Recollides pendents"
+                            },
+                            {
+                                "selector": "[data-test=\"all-baskets\"]",
+                                "count": 1,
+                                "text": "Totes les cistelles",
+                                "minHeight": 44
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "long",
+                    "query": {
+                        "state": "long"
+                    },
+                    "ready": "body[data-visual-ready=\"long\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"basket-list\"] > li",
+                                "count": 3
+                            },
+                            {
+                                "selector": "[data-test=\"status-validated\"]",
+                                "count": 3
+                            },
+                            {
+                                "selector": "[data-test=\"validated-at\"]",
+                                "count": 3
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "count": 1,
+                                "text": "Recollides pendents"
+                            },
+                            {
+                                "selector": "[data-test=\"all-baskets\"]",
+                                "count": 1,
+                                "text": "Totes les cistelles",
+                                "minHeight": 44
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    ]
+}

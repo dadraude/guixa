@@ -11,6 +11,7 @@ use Guixa\Ordering\Domain\WeeklyBasketSnapshot;
 use Guixa\Sales\Application\AddLateWeeklyLines;
 use Guixa\Sales\Application\CreateWeeklyBasket;
 use Guixa\Sales\Application\ReadHouseholdContainerBalances;
+use Guixa\Sales\Application\ReadPendingCollections;
 use Guixa\Sales\Application\ReadPendingWeeklyCycles;
 use Guixa\Sales\Application\ReadWeeklyBasketStates;
 use Guixa\Sales\Application\SyncWeeklyBasket;
@@ -26,6 +27,7 @@ final class SalesModuleBaskets implements SalesBaskets
         private readonly AddLateWeeklyLines $late,
         private readonly ReadWeeklyBasketStates $states,
         private readonly ReadPendingWeeklyCycles $pending,
+        private readonly ReadPendingCollections $collections,
         private readonly ReadHouseholdContainerBalances $balances,
         private readonly Households $households,
     ) {}
@@ -48,6 +50,19 @@ final class SalesModuleBaskets implements SalesBaskets
     public function pendingCycleIds(string $householdId): array
     {
         return ($this->pending)($householdId);
+    }
+
+    public function pendingCollectionCounts(): array
+    {
+        $counts = [];
+        foreach (($this->collections)() as $pending) {
+            if (! $pending->weekly || $pending->referenceCycleId === null) {
+                continue;
+            }
+            $counts[$pending->referenceCycleId] = ($counts[$pending->referenceCycleId] ?? 0) + 1;
+        }
+
+        return $counts;
     }
 
     public function snapshot(string $cycleId): WeeklyBasketSnapshot

@@ -177,7 +177,14 @@ const pageProps: Record<string, Record<string, unknown>> = {
         nextPickup: pickupDate,
         openCycles: 1,
         balance: 2000,
-        pendingPickups: [{ cycleId, pickupDate }],
+        pendingPickups: [
+            {
+                basketId: 'visual-basket',
+                validatedAt: pickupDate,
+                weekly: true,
+                late: false,
+            },
+        ],
         managerSummary: {
             cycles: 1,
             activeCycles: 1,
@@ -208,8 +215,13 @@ const pageProps: Record<string, Record<string, unknown>> = {
         cycles: [cycle],
         producers: [{ id: producerId, name: producer.name }],
         pickupWeekday: 4,
+        pendingCollections: { [cycleId]: 2 },
     },
     'Manage/Cycles/Show': {
+        pendingCollections: {
+            count: 2,
+            href: `/finance/baskets?pending=1&cycle=${cycleId}`,
+        },
         summary: {
             cycleId,
             pickupDate,

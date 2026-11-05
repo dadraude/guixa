@@ -8,8 +8,9 @@ use Guixa\Membership\Application\CountHouseholds;
 use Guixa\Ordering\Application\CountCycles;
 use Guixa\Ordering\Application\CountOpenMemberCycles;
 use Guixa\Ordering\Application\ListMemberCycles;
-use Guixa\Ordering\Application\PendingPickupData;
-use Guixa\Ordering\Application\ReadPendingPickups;
+use Guixa\Sales\Application\BasketData;
+use Guixa\Sales\Application\ListMemberPendingCollections;
+use Guixa\Sales\Application\ListPendingCollections;
 use Guixa\Shared\Application\Actor;
 use Guixa\Wallet\Application\ReadHouseholdBalance;
 use Inertia\Inertia;
@@ -26,7 +27,8 @@ class DashboardController extends Controller
         CountAccounts $countAccounts,
         CountProducers $countProducers,
         ReadHouseholdBalance $readHouseholdBalance,
-        ReadPendingPickups $readPendingPickups,
+        ListMemberPendingCollections $memberPending,
+        ListPendingCollections $staffPending,
     ): Response {
         $roles = $actor->roleNames();
         $isManager = in_array('manager', $roles, true);
@@ -50,12 +52,19 @@ class DashboardController extends Controller
         $pendingPickups = [];
         if ($hasHousehold) {
             $pendingPickups = array_map(
-                fn (PendingPickupData $p) => [
-                    'cycleId' => $p->cycleId,
-                    'pickupDate' => $p->pickupDate,
+                fn (BasketData $basket) => [
+                    'basketId' => $basket->id,
+                    'validatedAt' => $basket->validatedAt?->setTimezone(new \DateTimeZone(config('guixa.timezone')))->format('Y-m-d'),
+                    'weekly' => $basket->weekly,
+                    'late' => $basket->late,
                 ],
-                $readPendingPickups($actor->householdId),
+                $memberPending($actor),
             );
+        }
+
+        $staffPendingCollections = null;
+        if (array_intersect(['manager', 'finance'], $roles) !== []) {
+            $staffPendingCollections = ['count' => count($staffPending($actor))];
         }
 
         $managerSummary = null;
@@ -85,6 +94,7 @@ class DashboardController extends Controller
             'openCycles' => $hasHousehold ? $countOpenMemberCycles($actor) : 0,
             'balance' => $balance,
             'pendingPickups' => $pendingPickups,
+            'staffPendingCollections' => $staffPendingCollections,
             'managerSummary' => $managerSummary,
         ]);
     }

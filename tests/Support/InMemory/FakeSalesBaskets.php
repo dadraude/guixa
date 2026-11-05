@@ -91,6 +91,20 @@ final class FakeSalesBaskets implements SalesBaskets
                     || array_filter($this->lates[$source->orderId] ?? [], fn (array $late) => in_array($late['state'], ['draft', 'validated'], true)) !== [])))));
     }
 
+    public function pendingCollectionCounts(): array
+    {
+        $counts = [];
+        foreach ($this->created as $source) {
+            $validated = (int) ($this->states[$source->orderId] === 'validated')
+                + count(array_filter($this->lates[$source->orderId] ?? [], fn (array $late) => $late['state'] === 'validated'));
+            if ($validated > 0) {
+                $counts[$source->cycleId] = ($counts[$source->cycleId] ?? 0) + $validated;
+            }
+        }
+
+        return $counts;
+    }
+
     public function snapshot(string $cycleId): WeeklyBasketSnapshot
     {
         $entries = [];
