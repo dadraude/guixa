@@ -56,6 +56,7 @@ return [
     'ProducerNotDistributed' => 'La comanda d’aquest productor encara no s’ha repartit.',
     'ProducerNotFound' => 'No s’ha trobat aquest productor.',
     'ProducerNotInCycle' => 'Aquest productor no participa en aquest cicle.',
+    'ProducerOrderEmpty' => 'La comanda d’aquest productor és buida: s’envia automàticament quan es tanca.',
     'ProducerOrderNotSent' => 'La comanda d’aquest productor encara no s’ha enviat i no té recepció.',
     'ProducerStillOpen' => 'El termini d’aquest productor encara és obert i no es pot enviar la comanda.',
     'ProductAlreadyOrdered' => 'Aquest producte ja s’ha demanat i és present a la recepció.',

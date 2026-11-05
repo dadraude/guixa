@@ -18,6 +18,7 @@ use App\Http\Controllers\Manage\CycleCancellationController;
 use App\Http\Controllers\Manage\CycleController;
 use App\Http\Controllers\Manage\CycleCutoffController;
 use App\Http\Controllers\Manage\CycleParticipantController;
+use App\Http\Controllers\Manage\CycleProducerOrderController;
 use App\Http\Controllers\Manage\FinanceRoleController;
 use App\Http\Controllers\Manage\HouseholdController;
 use App\Http\Controllers\Manage\HouseholdMemberController;
@@ -155,6 +156,9 @@ Route::middleware(['auth', 'verified', 'role:manager'])->prefix('manage')->name(
     Route::delete('cycles/{cycle}/producers/{producer}', [CycleParticipantController::class, 'destroy'])
         ->whereUuid(['cycle', 'producer'])
         ->name('cycles.producers.destroy');
+    Route::post('cycles/{cycle}/producers/{producer}/send', [CycleProducerOrderController::class, 'send'])
+        ->whereUuid(['cycle', 'producer'])
+        ->name('cycles.producers.send');
     Route::prefix('cycles/{cycle}/producers/{producer}/cutoff')->whereUuid(['cycle', 'producer'])->group(function () {
         Route::put('/', [CycleCutoffController::class, 'update'])->name('cycles.producers.cutoff.update');
         Route::post('close', [CycleCutoffController::class, 'close'])->name('cycles.producers.cutoff.close');

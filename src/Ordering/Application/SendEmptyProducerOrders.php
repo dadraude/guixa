@@ -58,11 +58,7 @@ final class SendEmptyProducerOrders
         }
 
         $orders = $this->orders->ofCycle($cycleId);
-        $marked = [];
-
-        foreach ($orders as $order) {
-            $marked[$order->id] = $this->marks->derivedOf($cycle, $order);
-        }
+        $marked = $this->marks->derivedOfAll($cycle, $orders);
 
         foreach ($cycle->producersReadyToSend($now) as $producerId) {
             if ($cycle->totalsToSend($producerId, $orders, $marked) !== []) {

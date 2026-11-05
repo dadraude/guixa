@@ -20,6 +20,7 @@ use Guixa\Ordering\Application\ListMemberCycles;
 use Guixa\Ordering\Application\OpenCycle;
 use Guixa\Ordering\Application\ParticipateAgain;
 use Guixa\Ordering\Application\RemoveMarkedLine;
+use Guixa\Ordering\Application\SendableTotals;
 use Guixa\Ordering\Application\SendEmptyProducerOrders;
 use Guixa\Ordering\Application\SendProducerOrder;
 use Guixa\Ordering\Application\SetAllocation;
@@ -162,7 +163,7 @@ final class OrderingWorld
         $this->cancelCycle = new CancelCycle($this->cycles, $this->orders, $transactions, $this->clock);
         $this->closeProducerNow = new CloseProducerNow($this->cycles, $transactions, $this->clock);
         $this->clearCutoff = new ClearCutoff($this->cycles, $transactions);
-        $this->listCycles = new ListCycles($this->cycles, $this->clock);
+        $this->listCycles = new ListCycles($this->cycles, $this->clock, new SendableTotals($this->orders, $this->catalog, $this->availability));
         $this->listMemberCycles = new ListMemberCycles($this->cycles, $this->orders, $this->clock);
         $this->setOrderLine = new SetOrderLine($this->cycles, $this->orders, $this->catalog, $this->availability, $transactions, $this->clock);
         $this->getHouseholdOrder = new GetHouseholdOrder($this->cycles, $this->orders, $this->catalog, $this->availability, $this->clock, $this->baskets);

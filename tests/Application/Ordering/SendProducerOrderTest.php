@@ -6,6 +6,7 @@ use Guixa\Ordering\Domain\Error\ProducerClosed;
 use Guixa\Ordering\Domain\Error\ProducerHasNoAccount;
 use Guixa\Ordering\Domain\Error\ProducerNotInCycle;
 use Guixa\Ordering\Domain\Error\ProducerNotParticipating;
+use Guixa\Ordering\Domain\Error\ProducerOrderEmpty;
 use Guixa\Ordering\Domain\Error\ProducerOrderSent;
 use Guixa\Ordering\Domain\Error\ProducerStillOpen;
 use Guixa\Shared\Application\Actor;
@@ -133,6 +134,20 @@ it('refuses to send when the producer has no account and sends once it has one (
     ($this->send)();
 
     expect($this->world->notifier->notified)->toHaveCount(1);
+});
+
+it('refuses an order that is empty under the lock when asked to, and rolls the send back (R12a, D10)', function () {
+    ($this->order)($this->anna, $this->jam, '2');
+    ($this->closeBaker)();
+    $this->world->catalog->deactivate($this->jam);
+
+    expect(fn () => ($this->world->sendProducerOrder)($this->world->manager, $this->cycleId, OrderingWorld::BAKER, refuseEmpty: true))
+        ->toThrow(ProducerOrderEmpty::class)
+        ->and(($this->storedMarks)(SEND_HOUSEHOLD_H))->toBe([]);
+
+    ($this->send)();
+
+    expect($this->world->notifier->notified)->toBe([]);
 });
 
 it('lets only a manager send a producer order (R12a)', function () {

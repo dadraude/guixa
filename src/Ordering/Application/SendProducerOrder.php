@@ -5,6 +5,7 @@ namespace Guixa\Ordering\Application;
 use Guixa\Ordering\Domain\CycleRepository;
 use Guixa\Ordering\Domain\Error\CycleNotFound;
 use Guixa\Ordering\Domain\Error\ProducerHasNoAccount;
+use Guixa\Ordering\Domain\Error\ProducerOrderEmpty;
 use Guixa\Ordering\Domain\NotDeliveredMarks;
 use Guixa\Ordering\Domain\OrderRepository;
 use Guixa\Ordering\Domain\ProducerNotifier;
@@ -33,27 +34,28 @@ final class SendProducerOrder
 
     /**
      * Freezes the producer's cutoff, stores the marked lines as not delivered and tells the producer what to deliver
-     * after the commit (R6b, R12a, D9). The cycle is locked `FOR UPDATE`, so a line change racing the send either
+     * after the commit (R6b, R12a, D9). With `$refuseEmpty` an order with nothing to send is refused under the lock and
+     * rolled back, since only the scheduler sends and settles those (D10). The cycle is locked `FOR UPDATE`, so a line change racing the send either
      * landed before it or is rejected.
      */
-    public function __invoke(Actor $actor, string $cycleId, string $producerId): void
+    public function __invoke(Actor $actor, string $cycleId, string $producerId, bool $refuseEmpty = false): void
     {
         Gate::forUser($actor)->authorize('manage');
 
         $now = $this->clock->now()->setTimezone($this->clock->timezone());
 
-        $this->transactions->run(function () use ($cycleId, $producerId, $now) {
+        $this->transactions->run(function () use ($cycleId, $producerId, $now, $refuseEmpty) {
             $cycle = $this->cycles->getForUpdate($cycleId) ?? throw CycleNotFound::withId($cycleId);
             $cycle->send($producerId, $now);
 
             $orders = $this->orders->ofCycle($cycleId);
-            $marked = [];
-
-            foreach ($orders as $order) {
-                $marked[$order->id] = $this->marks->derivedOf($cycle, $order);
-            }
+            $marked = $this->marks->derivedOfAll($cycle, $orders);
 
             $totals = $cycle->totalsToSend($producerId, $orders, $marked);
+
+            if ($refuseEmpty && $totals === []) {
+                throw ProducerOrderEmpty::withId($producerId);
+            }
 
             if ($totals !== [] && ! $this->notifier->canNotify($producerId)) {
                 throw ProducerHasNoAccount::withId($producerId);

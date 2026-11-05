@@ -16,6 +16,9 @@ const producerName =
         ? 'Cooperativa de pagesia agroecològica de la vall del riu i les muntanyes'
         : 'La Figuera';
 
+const sendStates = ['send-order', 'send-order-confirm'];
+const isSendState = sendStates.includes(state ?? '');
+
 const mode = query.get('mode');
 localStorage.setItem(
     'appearance',
@@ -61,13 +64,18 @@ const page = {
                                     pickupDate: '2026-11-05',
                                     cancelled: false,
                                     closed: false,
+                                    settled: false,
                                     participants: [
                                         {
                                             producerId: 'producer-1',
                                             producerName,
                                             participating: true,
                                             cutoff: '2026-11-03T20:00:00+01:00',
-                                            open: true,
+                                            open:
+                                                !isSendState &&
+                                                state !== 'sent',
+                                            sent: state === 'sent',
+                                            canSendManually: isSendState,
                                         },
                                     ],
                                 },
@@ -123,6 +131,7 @@ void createInertiaApp({
             'drawer',
             'cycle-management',
             'producer-management',
+            ...sendStates,
         ].includes(state ?? '')
     )
         return;
@@ -130,7 +139,7 @@ void createInertiaApp({
         const trigger = document.querySelector<HTMLButtonElement>(
             state === 'cycle-management'
                 ? '[data-test="manage-cycle-1"]'
-                : state === 'producer-management'
+                : state === 'producer-management' || isSendState
                   ? '[data-test="manage-cycle-1-producer-1"]'
                   : state === 'dialog'
                     ? '[data-test="open-create-cycle"]'
@@ -144,6 +153,15 @@ void createInertiaApp({
                     'dialog[open] details',
                 );
                 if (details) details.open = true;
+            }, 50);
+        }
+        if (state === 'send-order-confirm') {
+            window.setTimeout(() => {
+                document
+                    .querySelector<HTMLButtonElement>(
+                        '[data-test="send-order-button"]',
+                    )
+                    ?.click();
             }, 50);
         }
         return true;

@@ -614,6 +614,7 @@ All route middleware is backed by Application gate/policy checks against the exp
 | `/producer/products/...` | T54 index composes own weekly administration and read-only own stock with quantities; no stock-mode change by producer |
 | `/manage/products/{product}/classification` | Manager-only unused-mode change; no producer reassignment |
 | `/manage/stock/{product}/movements` and entries/adjustments | Existing inventory administration patterns; Catalog ids, Manager-only general inventory operations |
+| `POST /manage/cycles/{cycle}/producers/{producer}/send` | `SendProducerOrderManually` (wraps `SendProducerOrder` with `refuseEmpty`) from the producer management dialog of `Manage/Cycles/Index`; Manager only; the button shows when `canSendManually` (closed, participating, unsent and with lines to send; empty orders are sent by the scheduler, so the use case refuses them under the cycle lock with `ProducerOrderEmpty`) and confirms first because it emails the producer; the row shows a Sent status via `sent`; domain errors (still open, already sent, empty, no account) show in the dialog (R12a, S36) |
 | `/manage/accounts/{account}/finance-role` | Grant/remove Finance on the existing account administration page, Manager only |
 
 `RoleAreas`, shared Inertia `roles`/`roleAreas` and `useAppNavigation` expose a Finance area for Finance
