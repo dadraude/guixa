@@ -42,25 +42,25 @@ These exports are for calls **between modules**. Symbols in this table live in t
 `Application` namespace. The manifest also lists the DTOs that cross these interfaces. Everything
 else in a module is private to that module for integration purposes, even when PHP declares it public.
 
-| Owner → permitted caller | Exported operations                                                                                                                                               | Exported DTOs                                                                    |
-| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
-| Catalog → Membership     | GetProducer                                                                                                                                                       | ProducerData                                                                     |
-| Catalog → Ordering       | GetProducerCutoffRule, GetOrderableProduct, ListOrderableProducts, ListProducerProductsForReception, LockWeeklyProduct                                            | ProducerCutoffRuleData, OrderableProductData                                     |
-| Catalog → Stock          | GetStockProduct, ListStockProducts, LockStockProduct                                                                                                              | StockProductData                                                                 |
-| Catalog → Sales          | ListStockOfferProducts, LockStockProduct                                                                                                                          | StockOfferProductData, StockProductData                                          |
-| Membership → Catalog     | RestoreProducerRole, SuspendProducerRole                                                                                                                          | —                                                                                |
-| Membership → Ordering    | GetHouseholds, GetProducerAccountEmail                                                                                                                            | HouseholdData                                                                    |
-| Membership → Sales       | ReadActiveHouseholds                                                                                                                                              | ActiveHouseholdData                                                              |
-| Ordering → Catalog       | CheckProductUsage, HasUnsettledLines, StopParticipatingWhereNotSent                                                                                               | —                                                                                |
-| Ordering → Sales         | LockWeeklyBasketSource, CloseCycleAfterBasketValidation, ReadCyclePickupDates                                                                                     | —                                                                                |
-| Sales → Catalog          | HasProductHistory                                                                                                                                                 | —                                                                                |
-| Sales → Membership       | ReadOpenHouseholdBaskets                                                                                                                                          | OpenBasketData                                                                   |
-| Sales → Ordering         | CreateWeeklyBasket, SyncWeeklyBasket, AddLateWeeklyLines, ReadWeeklyBasketStates, ReadPendingWeeklyCycles, ReadPendingCollections, ReadHouseholdContainerBalances | WeeklyBaseData, WeeklyBaseLineData, WeeklyBasketStateData, PendingCollectionData |
-| Stock → Catalog          | CheckProductUsage, GetAvailableQuantities                                                                                                                         | —                                                                                |
-| Stock → Sales            | GetAvailableQuantities, SellBasketStock, CorrectBasketStock                                                                                                       | —                                                                                |
-| Stock → Sales            | GetReturnItem                                                                                                                                                     | ReturnItemData                                                                   |
-| Wallet → Membership      | ReadHouseholdBalance                                                                                                                                              | —                                                                                |
-| Wallet → Sales           | ChargeForBasket, GetBalance, RecordCorrection                                                                                                                     | —                                                                                |
+| Owner → permitted caller | Exported operations                                                                                                                      | Exported DTOs                                                                    |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| Catalog → Membership     | GetProducer                                                                                                                              | ProducerData                                                                     |
+| Catalog → Ordering       | GetProducerCutoffRule, GetOrderableProduct, ListOrderableProducts, ListProducerProductsForReception, LockWeeklyProduct                   | ProducerCutoffRuleData, OrderableProductData                                     |
+| Catalog → Stock          | GetStockProduct, ListStockProducts, LockStockProduct                                                                                     | StockProductData                                                                 |
+| Catalog → Sales          | ListStockOfferProducts, LockStockProduct                                                                                                 | StockOfferProductData, StockProductData                                          |
+| Membership → Catalog     | RestoreProducerRole, SuspendProducerRole                                                                                                 | —                                                                                |
+| Membership → Ordering    | GetHouseholds, GetProducerAccountEmail                                                                                                   | HouseholdData                                                                    |
+| Membership → Sales       | ReadActiveHouseholds                                                                                                                     | ActiveHouseholdData                                                              |
+| Ordering → Catalog       | CheckProductUsage, HasUnsettledLines, StopParticipatingWhereNotSent                                                                      | —                                                                                |
+| Ordering → Sales         | LockWeeklyBasketSource, CloseCycleAfterBasketValidation, ReadCyclePickupDates, ReadSourceOrderCycles, ReadCycleSourceOrders              | —                                                                                |
+| Sales → Catalog          | HasProductHistory                                                                                                                        | —                                                                                |
+| Sales → Membership       | ReadOpenHouseholdBaskets                                                                                                                 | OpenBasketData                                                                   |
+| Sales → Ordering         | CreateWeeklyBasket, SyncWeeklyBasket, AddLateWeeklyLines, ReadWeeklyBasketStates, ReadPendingCollections, ReadHouseholdContainerBalances | WeeklyBaseData, WeeklyBaseLineData, WeeklyBasketStateData, PendingCollectionData |
+| Stock → Catalog          | CheckProductUsage, GetAvailableQuantities                                                                                                | —                                                                                |
+| Stock → Sales            | GetAvailableQuantities, SellBasketStock, CorrectBasketStock                                                                              | —                                                                                |
+| Stock → Sales            | GetReturnItem                                                                                                                            | ReturnItemData                                                                   |
+| Wallet → Membership      | ReadHouseholdBalance                                                                                                                     | —                                                                                |
+| Wallet → Sales           | ChargeForBasket, GetBalance, RecordCorrection                                                                                            | —                                                                                |
 
 Shared explicitly exports `Application\Actor`, `ActorResolver`, `TransactionRunner`, and
 `Domain\Money`, `Quantity`, `Clock`, `LocalTime`, `Role`, plus `InvalidLocalTime` and `InvalidQuantity`
@@ -87,16 +87,16 @@ Each table has one owner in the manifest. A foreign key to another module's tabl
 permission to query or update that table. Production module queries and model mappings belong in the
 owning module's Infrastructure. Cross-module access goes through the declared interface.
 
-| Owner      | Tables                                                                                                                                                                         |
-| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Catalog    | producers, products                                                                                                                                                            |
-| Membership | users, account_roles, households, invitations                                                                                                                                  |
-| Ordering   | cooperative_settings, cycles, cycle_producers, orders, order_lines, product_unavailabilities, received_totals, order_stock_lines, order_return_lines, order_pickup_adjustments |
-| Sales      | baskets, basket_lines, basket_adjustments, basket_adjustment_lines, basket_collection_events                                                                                   |
-| Stock      | return_items, stock_movements                                                                                                                                                  |
-| Wallet     | wallet_movements                                                                                                                                                               |
-| Platform   | password_reset_tokens, sessions, cache, cache_locks, jobs, job_batches, failed_jobs, passkeys                                                                                  |
-| Shared     | None                                                                                                                                                                           |
+| Owner      | Tables                                                                                                        |
+| ---------- | ------------------------------------------------------------------------------------------------------------- |
+| Catalog    | producers, products                                                                                           |
+| Membership | users, account_roles, households, invitations                                                                 |
+| Ordering   | cooperative_settings, cycles, cycle_producers, orders, order_lines, product_unavailabilities, received_totals |
+| Sales      | baskets, basket_lines, basket_adjustments, basket_adjustment_lines, basket_collection_events                  |
+| Stock      | return_items, stock_movements                                                                                 |
+| Wallet     | wallet_movements                                                                                              |
+| Platform   | password_reset_tokens, sessions, cache, cache_locks, jobs, job_batches, failed_jobs, passkeys                 |
+| Shared     | None                                                                                                          |
 
 Platform tables are managed through Laravel/Fortify infrastructure. Naming them here does not give
 business modules direct access. Historical migrations may span modules: tests reconcile their
@@ -110,11 +110,10 @@ Existing exceptions are intentionally narrow:
 - `app/Models/User.php` maps Membership's `users` for framework authentication, retaining A6's existing
   exception. Authentication-related model use by Fortify remains governed by the host integration;
   the checker does not attempt runtime tracking of every model instance.
-- Ordering's private `EloquentOrderRepository::rowsOf($table, ...)` is the sole declared dynamic-table
-  helper. Every direct method or static call must supply a literal table name owned by Ordering.
-  The table parameter may only be passed by value to `DB::table` or the existing `in_array` filter;
-  reassignment, reference aliases and other uses fail the check. An unresolved argument, foreign
-  table, public helper, or undeclared dynamic access also fails.
+- No dynamic-table helper is declared: `dynamic_tables` is empty, so a non-literal table name or an
+  undeclared helper fails the check. The checker still supports a reviewed declaration, and its tests
+  prove the mechanism with their own manifest; the retired Ordering `rowsOf` helper and its
+  `order_stock_lines`, `order_return_lines` and `order_pickup_adjustments` tables stay forbidden.
 - Membership's exact `select pg_advisory_xact_lock(191983, 1)` SQL is allowed in its household
   repository. It locks a Membership operation without accessing a table. Other raw SQL needs review.
 
@@ -182,7 +181,14 @@ weekly demand from Sales baskets, validation and collection. T59 completed that 
 longer has Stock or Wallet permissions, and Sales owns weekly actuals, validation and collection.
 Finance is a permission area; Wallet remains the money ledger and Stock the inventory owner.
 
-Left for T63: the retired `order_stock_lines`, `order_return_lines`, `order_pickup_adjustments` tables,
-the `orders.pickup_status`/`charged_cents` columns and `order_lines.delivered_quantity`, the unused Order
-pickup methods, `ChargeForPickup` and the Stock `SellStock`,
-`GetStockOffer`, `LockStockOffer` use cases.
+DRA-218 (T63) removed the superseded pickup ownership. Ordering keeps weekly demand only: no
+`CompletePickup`, charge-on-collection or automatic not-collected charging, no stock, return, delivered
+quantity or pickup-adjustment state, and none of the `order_stock_lines`, `order_return_lines`,
+`order_pickup_adjustments` tables or `orders.pickup_*`/`charged_cents`/`order_lines.delivered_quantity`
+columns. Stock keeps no order-sale source: a sale needs a basket (`stock_movements.order_id` is gone) and
+`SellStock`, `GetStockOffer` and `LockStockOffer` are removed; `StockProduct` stays the Catalog-backed read and
+lock snapshot above. Wallet charges and credits carry only a basket reference, with one per basket and no
+household/cycle uniqueness (`ChargeForPickup`, `PickupAlreadyCharged` removed). A basket stores its source
+order and no cycle (`baskets.reference_cycle_id` is gone): Sales resolves a source order's cycle, and a
+cycle's source orders, through its `WeeklySourceOrders` port, which Ordering serves with the narrow
+`ReadSourceOrderCycles` and `ReadCycleSourceOrders` exports.

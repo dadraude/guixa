@@ -15,7 +15,6 @@ use Guixa\Sales\Application\ValidateBasket;
 use Guixa\Sales\Application\WalletLedger;
 use Guixa\Sales\Application\WeeklyBaseData;
 use Guixa\Sales\Application\WeeklyBaseLineData;
-use Guixa\Sales\Application\WeeklyBasketSource;
 use Guixa\Sales\Domain\HouseholdDirectory;
 use Guixa\Sales\Domain\ReturnItems;
 use Guixa\Sales\Domain\StockProducts;
@@ -29,7 +28,7 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Tests\Support\FrozenClock;
 use Tests\Support\InMemory\ImmediateTransactionRunner;
 use Tests\Support\InMemory\Sales\InMemoryBasketRepository;
-use Tests\Support\InMemory\Sales\NoWeeklyBasketSource;
+use Tests\Support\InMemory\Sales\InMemoryWeeklyBasketSource;
 
 beforeEach(function () {
     $this->manager = Actor::manager('manager');
@@ -92,24 +91,14 @@ beforeEach(function () {
     $add = new AddStockToBasket($this->baskets, $products, $quantities, $transactions, $clock);
     $addReturn = new AddReturnToBasket($this->baskets, $returnItems, $transactions, $clock);
     $this->products = $products;
-    $this->closedCycles = [];
-    $weeklySource = new class($this) implements WeeklyBasketSource
-    {
-        public function __construct(private readonly object $test) {}
-
-        public function lockSettled(string $cycleId): void {}
-
-        public function closeIfFinished(string $cycleId): void
-        {
-            $this->test->closedCycles[] = $cycleId;
-        }
-    };
+    $weeklySource = new InMemoryWeeklyBasketSource(['order-1' => 'cycle']);
+    $this->weeklySource = $weeklySource;
     $validate = new ValidateBasket($this->baskets, $products, $stock, $wallet, $weeklySource, $transactions, $clock);
     $this->validate = $validate;
     $this->collect = new MarkBasketCollected($this->baskets, $transactions, $clock);
     $this->balance = new GetHouseholdContainerBalance($this->baskets);
     $this->correct = new CorrectBasket($this->baskets, $wallet, $stock, $transactions, $clock);
-    $this->setActual = new SetBasketActualQuantity($this->baskets, new NoWeeklyBasketSource, $transactions);
+    $this->setActual = new SetBasketActualQuantity($this->baskets, $weeklySource, $transactions);
     $this->weekly = new CreateWeeklyBasket($this->baskets, new BuildWeeklyBasketLines($this->baskets, $clock), $clock);
 
     /** Creates a basket for the household, fills it with product => quantity and return jars, and returns its id. */
@@ -204,7 +193,7 @@ it('keeps counting a validated weekly basket once a new cycleless basket is vali
     ($this->weekly)(new WeeklyBaseData('order-1', 'cycle', 'h', 'Household H', [$line]));
     $weekly = $this->baskets->getBySourceOrder('order-1');
     ($this->validate)($this->manager, $weekly->id);
-    expect($this->closedCycles)->toBe(['cycle'])
+    expect($this->weeklySource->calls)->toBe(['lock:cycle', 'close:cycle'])
         ->and(($this->read)())->toBe(2);
 
     $late = ($this->draft)('h', ['honey' => '1']);
@@ -212,8 +201,8 @@ it('keeps counting a validated weekly basket once a new cycleless basket is vali
     ($this->collect)($this->manager, $late);
 
     expect($this->baskets->get($late)->state->value)->toBe('collected')
-        ->and($this->baskets->get($late)->referenceCycleId)->toBeNull()
-        ->and($this->baskets->get($weekly->id)->referenceCycleId)->toBe('cycle')
+        ->and($this->baskets->get($late)->sourceOrderId)->toBeNull()
+        ->and($this->weeklySource->cyclesOf([(string) $this->baskets->get($weekly->id)->sourceOrderId]))->toBe(['order-1' => 'cycle'])
         ->and($this->baskets->get($weekly->id)->state->value)->toBe('validated')
         ->and(($this->read)())->toBe(3);
 });

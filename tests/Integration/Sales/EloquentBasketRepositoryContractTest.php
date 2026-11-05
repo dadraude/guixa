@@ -11,6 +11,7 @@ use Guixa\Sales\Infrastructure\Persistence\EloquentBasketRepository;
 use Guixa\Shared\Domain\Quantity;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Tests\Support\Contracts\BasketRepositoryContract;
 use Tests\TestCase;
@@ -59,6 +60,22 @@ final class EloquentBasketRepositoryContractTest extends TestCase
         DB::table('orders')->insert(['id' => $order, 'cycle_id' => $cycle, 'household_id' => $household]);
 
         return [$order, $cycle];
+    }
+
+    public function test_baskets_carry_no_cycle_reference_and_weekly_ones_need_a_source_order(): void
+    {
+        $this->assertFalse(Schema::hasColumn('baskets', 'reference_cycle_id'));
+
+        [$orderId] = $this->weeklySource();
+        $household = (string) DB::table('orders')->where('id', $orderId)->value('household_id');
+        $weekly = fn (?string $source) => fn () => DB::transaction(fn () => DB::table('baskets')->insert([
+            'id' => (string) Str::uuid7(), 'household_id' => $household, 'household_name' => 'Household W', 'kind' => 'weekly',
+            'state' => 'draft', 'created_by' => null, 'created_at' => now(), 'source_order_id' => $source,
+        ]));
+
+        $this->assertRejected($weekly(null));
+        $weekly($orderId)();
+        $this->assertSame(1, DB::table('baskets')->where('source_order_id', $orderId)->count());
     }
 
     public function test_list_loads_all_basket_lines_adjustments_and_collection_events_in_four_queries_without_losing_snapshots(): void

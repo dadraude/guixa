@@ -22,23 +22,22 @@ final class EloquentStockMovementRepository implements StockMovementRepository
         // A savepoint keeps the caller's transaction usable after a rejected duplicate sale.
         DB::transaction(fn () => StockMovementModel::query()->create([
             'id' => $movement->id,
-            'stock_product_id' => $movement->stockProductId,
+            'product_id' => $movement->productId,
             'type' => $movement->type->value,
             'quantity' => $movement->quantity->toString(),
             'occurred_at' => $movement->occurredAt->format(DATE_ATOM),
             'recorded_by' => $movement->recordedBy,
             'note' => $movement->note,
             'cycle_id' => $movement->cycleId,
-            'order_id' => $movement->orderId,
             'basket_id' => $movement->basketId,
             'correction_id' => $movement->correctionId,
         ]));
     }
 
-    public function forProduct(string $stockProductId): array
+    public function forProduct(string $productId): array
     {
         $movements = StockMovementModel::query()
-            ->where('stock_product_id', $stockProductId)
+            ->where('product_id', $productId)
             ->orderBy('occurred_at')
             ->orderBy('id')
             ->get()
@@ -48,15 +47,15 @@ final class EloquentStockMovementRepository implements StockMovementRepository
         return array_values($movements);
     }
 
-    public function hasProductReference(string $stockProductId): bool
+    public function hasProductReference(string $productId): bool
     {
-        return StockMovementModel::query()->where('stock_product_id', $stockProductId)->exists();
+        return StockMovementModel::query()->where('product_id', $productId)->exists();
     }
 
-    public function available(string $stockProductId): SignedQuantity
+    public function available(string $productId): SignedQuantity
     {
         $total = StockMovementModel::query()
-            ->where('stock_product_id', $stockProductId)
+            ->where('product_id', $productId)
             ->selectRaw('coalesce(sum(quantity * 1000), 0)::bigint as total')
             ->value('total');
 
@@ -66,9 +65,9 @@ final class EloquentStockMovementRepository implements StockMovementRepository
     public function availableByProduct(): array
     {
         $totals = StockMovementModel::query()
-            ->selectRaw('stock_product_id, sum(quantity * 1000)::bigint as total')
-            ->groupBy('stock_product_id')
-            ->pluck('total', 'stock_product_id');
+            ->selectRaw('product_id, sum(quantity * 1000)::bigint as total')
+            ->groupBy('product_id')
+            ->pluck('total', 'product_id');
 
         return $totals->map(fn ($total) => $this->sum($total))->all();
     }
@@ -82,14 +81,13 @@ final class EloquentStockMovementRepository implements StockMovementRepository
     {
         return StockMovement::restore(
             $model->id,
-            $model->stock_product_id,
+            $model->product_id,
             MovementType::from($model->type),
             SignedQuantity::fromString($model->quantity),
             new DateTimeImmutable($model->occurred_at),
             $model->recorded_by,
             $model->note,
             $model->cycle_id,
-            $model->order_id,
             $model->basket_id,
             $model->correction_id,
         );

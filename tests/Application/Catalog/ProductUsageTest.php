@@ -40,7 +40,7 @@ it('derives stock use from movements without relying on quantity on hand (R1b, R
             return null;
         }
 
-        public function weeklyOfCycle(string $cycleId): array
+        public function weeklyOfSourceOrders(array $sourceOrderIds): array
         {
             return [];
         }

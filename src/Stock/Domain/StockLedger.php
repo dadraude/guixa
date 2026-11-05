@@ -11,10 +11,10 @@ final class StockLedger
 
     public function record(StockMovement $movement): void
     {
-        $available = $this->movements->available($movement->stockProductId);
+        $available = $this->movements->available($movement->productId);
 
         if ($available->plus($movement->quantity)->isNegative()) {
-            throw NotEnoughStock::for($movement->stockProductId, $available->toString(), $movement->quantity->toString());
+            throw NotEnoughStock::for($movement->productId, $available->toString(), $movement->quantity->toString());
         }
 
         $this->movements->add($movement);

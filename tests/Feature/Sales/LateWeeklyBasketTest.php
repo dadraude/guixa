@@ -1,6 +1,6 @@
 <?php
 
-use Guixa\Ordering\Application\ReadPendingPickups;
+use Guixa\Sales\Application\ReadOpenHouseholdBaskets;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
@@ -25,7 +25,7 @@ it('revives the nothing-to-collect base and gives the validated household a late
         ->and(DB::table('baskets')->where('id', $week['baskets']['A'])->value('state'))->toBe('validated')
         ->and(DB::table('basket_lines')->where('basket_id', $week['baskets']['A'])->orderBy('id')->get()->map(fn ($row) => (array) $row)->all())->toBe($validatedBase)
         ->and($late)->toHaveCount(1)
-        ->and([$late[0]->kind, $late[0]->state, $late[0]->reference_cycle_id, $late[0]->validated_total_cents])->toBe(['weekly', 'draft', $week['cycle'], null])
+        ->and([$late[0]->kind, $late[0]->state, DB::table('orders')->where('id', $late[0]->source_order_id)->value('cycle_id'), $late[0]->validated_total_cents])->toBe(['weekly', 'draft', $week['cycle'], null])
         ->and($lateLines)->toHaveCount(1)
         ->and([$lateLines[0]->product_id, (float) $lateLines[0]->ordered_quantity, (float) $lateLines[0]->allocated_quantity, (float) $lateLines[0]->quantity])->toBe([$week['cherries'], 1.0, 1.0, 1.0])
         ->and(DB::table('wallet_movements')->count())->toBe(1)
@@ -64,7 +64,7 @@ it('refuses a second open late draft or a second base for one source order in th
     $week = lateArrivalWeek();
     $row = fn (bool $late, string $state = 'draft') => [
         'id' => (string) Str::uuid7(), 'household_id' => $week['households']['A'], 'household_name' => 'Household A', 'kind' => 'weekly', 'state' => $state,
-        'created_by' => null, 'created_at' => now(), 'source_order_id' => $week['orders']['A'], 'reference_cycle_id' => $week['cycle'], 'late' => $late,
+        'created_by' => null, 'created_at' => now(), 'source_order_id' => $week['orders']['A'], 'late' => $late,
     ];
     DB::table('baskets')->insert($row(true));
 
@@ -82,9 +82,9 @@ it('closes the cycle when the last draft is validated while validated baskets st
     expect(DB::table('baskets')->where('id', $week['baskets']['K'])->value('state'))->toBe('nothing_to_collect')
         ->and(DB::table('cycles')->where('id', $week['cycle'])->value('closed_at'))->not->toBeNull()
         ->and(DB::table('baskets')->whereIn('id', [$week['baskets']['A'], $week['baskets']['B']])->pluck('state')->all())->toBe(['validated', 'validated']);
-    $pending = app(ReadPendingPickups::class);
-    expect(array_map(fn ($pickup) => $pickup->cycleId, $pending($week['households']['A'])))->toBe([$week['cycle']])
-        ->and($pending($week['households']['K']))->toBe([]);
+    $open = app(ReadOpenHouseholdBaskets::class);
+    expect(array_map(fn ($basket) => [$basket->basketId, $basket->status], $open($week['households']['A'])))->toBe([[$week['baskets']['A'], 'validated']])
+        ->and($open($week['households']['K']))->toBe([]);
 
     $this->delete("{$week['reception']}/distribution")->assertSessionHasErrors('domain');
     $this->post("/finance/baskets/{$week['baskets']['A']}/corrections", [

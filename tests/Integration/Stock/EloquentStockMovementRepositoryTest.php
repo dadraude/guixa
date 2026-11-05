@@ -12,6 +12,7 @@ use Guixa\Stock\Infrastructure\Persistence\EloquentStockMovementRepository;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\Support\Contracts\StockMovementRepositoryContract;
@@ -27,7 +28,7 @@ final class EloquentStockMovementRepositoryTest extends TestCase
         return new EloquentStockMovementRepository;
     }
 
-    protected function stockProductId(): string
+    protected function productId(): string
     {
         $producer = ProducerModel::query()->create(['name' => 'Beekeeper', 'active' => true, 'cutoff_days_before' => 3, 'cutoff_time' => '20:00']);
 
@@ -69,9 +70,9 @@ final class EloquentStockMovementRepositoryTest extends TestCase
     private function insert(array $overrides): void
     {
         DB::table('stock_movements')->insert([
-            'id' => (string) Str::uuid7(), 'stock_product_id' => $this->stockProductId(), 'type' => 'entry', 'quantity' => '1.000',
+            'id' => (string) Str::uuid7(), 'product_id' => $this->productId(), 'type' => 'entry', 'quantity' => '1.000',
             'occurred_at' => '2026-10-22T10:00:00+00:00', 'recorded_by' => (string) Str::uuid7(),
-            'note' => null, 'cycle_id' => null, 'order_id' => null, ...$overrides,
+            'note' => null, 'cycle_id' => null, ...$overrides,
         ]);
     }
 
@@ -91,17 +92,23 @@ final class EloquentStockMovementRepositoryTest extends TestCase
     }
 
     #[Test]
-    public function the_database_refuses_a_sale_that_is_not_negative_or_has_no_order(): void
+    public function the_database_refuses_a_sale_that_is_not_negative_or_has_no_basket(): void
     {
-        $this->assertThrows(fn () => $this->insert(['type' => 'sale', 'quantity' => '1.000', 'order_id' => (string) Str::uuid7()]), QueryException::class);
-        $this->assertThrows(fn () => $this->insert(['type' => 'sale', 'quantity' => '-1.000', 'order_id' => null]), QueryException::class);
+        $this->assertThrows(fn () => $this->insert(['type' => 'sale', 'quantity' => '1.000', 'basket_id' => $this->basket()]), QueryException::class);
+        $this->assertThrows(fn () => $this->insert(['type' => 'sale', 'quantity' => '-1.000', 'basket_id' => null]), QueryException::class);
+    }
+
+    #[Test]
+    public function the_schema_keeps_no_order_sale_source_on_stock_movements(): void
+    {
+        $this->assertFalse(Schema::hasColumn('stock_movements', 'order_id'));
     }
 
     #[Test]
     public function the_database_refuses_an_unknown_type_and_an_unknown_stock_product(): void
     {
         $this->assertThrows(fn () => $this->insert(['type' => 'gift']), QueryException::class);
-        $this->assertThrows(fn () => $this->insert(['stock_product_id' => (string) Str::uuid7()]), QueryException::class);
+        $this->assertThrows(fn () => $this->insert(['product_id' => (string) Str::uuid7()]), QueryException::class);
     }
 
     #[Test]
@@ -127,7 +134,7 @@ final class EloquentStockMovementRepositoryTest extends TestCase
     public function a_stock_entry_locks_the_catalog_product_before_summing_and_inserting_a_movement(): void
     {
         $repository = $this->repository();
-        $productId = $this->stockProductId();
+        $productId = $this->productId();
         DB::flushQueryLog();
         DB::enableQueryLog();
 

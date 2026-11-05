@@ -6,6 +6,8 @@ use Guixa\Membership\Domain\ValueObject\OpenHouseholdBasket;
 use Guixa\Membership\Infrastructure\Sales\SalesHouseholdBaskets;
 use Guixa\Membership\Infrastructure\Wallet\WalletHouseholdBalances;
 use Guixa\Ordering\Application\ReadCyclePickupDates;
+use Guixa\Ordering\Application\ReadCycleSourceOrders;
+use Guixa\Ordering\Application\ReadSourceOrderCycles;
 use Guixa\Ordering\Domain\Cycle;
 use Guixa\Ordering\Domain\Error\NoHousehold;
 use Guixa\Ordering\Domain\Order;
@@ -23,6 +25,7 @@ use Guixa\Sales\Domain\BasketState;
 use Guixa\Sales\Domain\StockProducts;
 use Guixa\Sales\Domain\ValueObject\StockProductSnapshot;
 use Guixa\Sales\Infrastructure\Ordering\OrderingCyclePickupDates;
+use Guixa\Sales\Infrastructure\Ordering\OrderingWeeklySourceOrders;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Money;
 use Guixa\Shared\Domain\Quantity;
@@ -137,13 +140,13 @@ it('keeps a real ordered line and basket through deactivation until the basket i
     $basketId = 'weekly-basket-1';
     $sales->save(new Basket($basketId, $household, 'H', BasketState::Draft, null, $when, [
         new BasketLine('line-1', $basketId, $productId, 'Bread', 'loaf', 500, false, null, Quantity::fromString('1'), $when, kind: BasketLineKind::Weekly),
-    ], kind: BasketKind::Weekly, sourceOrderId: $order->id, referenceCycleId: $cycleId));
+    ], kind: BasketKind::Weekly, sourceOrderId: $order->id));
     $movements = new InMemoryMovementRepository;
     $receiptId = (new RecordTopUp($movements, $ordering->clock))($membership->manager, $household, 500, 'Opening receipt');
     $correction = new RecordCorrection($movements, $ordering->clock);
     $correction($membership->manager, $household, -1000, 'Opening adjustment', null, $receiptId, 'opening-adjustment');
     $balances = new WalletHouseholdBalances(new ReadHouseholdBalance($movements));
-    $baskets = new SalesHouseholdBaskets(new ReadOpenHouseholdBaskets($sales, new OrderingCyclePickupDates(new ReadCyclePickupDates($ordering->cycles))));
+    $baskets = new SalesHouseholdBaskets(new ReadOpenHouseholdBaskets($sales, new OrderingCyclePickupDates(new ReadCyclePickupDates($ordering->cycles)), new OrderingWeeklySourceOrders(new ReadSourceOrderCycles($ordering->orders), new ReadCycleSourceOrders($ordering->orders))));
     $charge = new ChargeForBasket($movements, $ordering->clock);
     $products = new class implements StockProducts
     {

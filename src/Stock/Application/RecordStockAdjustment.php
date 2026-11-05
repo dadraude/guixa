@@ -24,13 +24,13 @@ final class RecordStockAdjustment
     ) {}
 
     /** @param  string  $quantity  Positive or negative, not zero, with at most 3 decimals. */
-    public function __invoke(Actor $actor, string $stockProductId, string $quantity, string $note, ?string $cycleId): void
+    public function __invoke(Actor $actor, string $productId, string $quantity, string $note, ?string $cycleId): void
     {
         Gate::forUser($actor)->authorize('manage');
 
         $movement = StockMovement::adjustment(
             $this->movements->nextId(),
-            $stockProductId,
+            $productId,
             SignedQuantity::fromString($quantity),
             $this->clock->now(),
             $actor->accountId,
@@ -38,9 +38,9 @@ final class RecordStockAdjustment
             $cycleId,
         );
 
-        $this->transactions->run(function () use ($stockProductId, $movement): void {
-            if ($this->products->lock($stockProductId) === null) {
-                throw StockProductNotFound::withId($stockProductId);
+        $this->transactions->run(function () use ($productId, $movement): void {
+            if ($this->products->lock($productId) === null) {
+                throw StockProductNotFound::withId($productId);
             }
 
             $this->ledger->record($movement);

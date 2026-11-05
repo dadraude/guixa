@@ -24,22 +24,22 @@ final class RecordStockEntry
     ) {}
 
     /** @param  string  $quantity  A quantity greater than zero, with at most 3 decimals. */
-    public function __invoke(Actor $actor, string $stockProductId, string $quantity, ?string $note): void
+    public function __invoke(Actor $actor, string $productId, string $quantity, ?string $note): void
     {
         Gate::forUser($actor)->authorize('manage');
 
         $movement = StockMovement::entry(
             $this->movements->nextId(),
-            $stockProductId,
+            $productId,
             Quantity::fromString($quantity),
             $this->clock->now(),
             $actor->accountId,
             $note,
         );
 
-        $this->transactions->run(function () use ($stockProductId, $movement): void {
-            if ($this->products->lock($stockProductId) === null) {
-                throw StockProductNotFound::withId($stockProductId);
+        $this->transactions->run(function () use ($productId, $movement): void {
+            if ($this->products->lock($productId) === null) {
+                throw StockProductNotFound::withId($productId);
             }
 
             $this->ledger->record($movement);

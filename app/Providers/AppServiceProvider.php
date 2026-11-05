@@ -60,6 +60,7 @@ use Guixa\Sales\Application\StockCorrector as BasketStockCorrector;
 use Guixa\Sales\Application\StockSeller as BasketStockSeller;
 use Guixa\Sales\Application\WalletLedger as BasketWalletLedger;
 use Guixa\Sales\Application\WeeklyBasketSource;
+use Guixa\Sales\Application\WeeklySourceOrders;
 use Guixa\Sales\Domain\BasketRepository;
 use Guixa\Sales\Domain\CyclePickupDates;
 use Guixa\Sales\Domain\HouseholdDirectory;
@@ -72,6 +73,7 @@ use Guixa\Sales\Infrastructure\Catalog\CatalogStockProducts;
 use Guixa\Sales\Infrastructure\Membership\MembershipHouseholdDirectory;
 use Guixa\Sales\Infrastructure\Ordering\OrderingCyclePickupDates;
 use Guixa\Sales\Infrastructure\Ordering\OrderingWeeklyBasketSource;
+use Guixa\Sales\Infrastructure\Ordering\OrderingWeeklySourceOrders;
 use Guixa\Sales\Infrastructure\Persistence\EloquentBasketRepository;
 use Guixa\Sales\Infrastructure\Stock\StockBasketCorrector;
 use Guixa\Sales\Infrastructure\Stock\StockBasketSeller;
@@ -125,6 +127,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(BasketStockCorrector::class, StockBasketCorrector::class);
         $this->app->bind(BasketWalletLedger::class, WalletBasketLedger::class);
         $this->app->bind(WeeklyBasketSource::class, OrderingWeeklyBasketSource::class);
+        $this->app->bind(WeeklySourceOrders::class, OrderingWeeklySourceOrders::class);
         $this->app->bind(CyclePickupDates::class, OrderingCyclePickupDates::class);
         $this->app->bind(MovementRepository::class, EloquentMovementRepository::class);
 

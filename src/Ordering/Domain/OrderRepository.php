@@ -29,14 +29,22 @@ interface OrderRepository
     public function ofCycle(string $cycleId): array;
 
     /**
+     * Where orders belong, cancelled ones included, for readers that only hold an order id.
+     *
+     * @param  list<string>  $orderIds
+     * @return array<string, string> cycle id by order id
+     */
+    public function cycleIdsOfOrders(array $orderIds): array;
+
+    /** @return list<string> ids of every order of the cycle, cancelled ones included, sorted */
+    public function idsOfCycle(string $cycleId): array;
+
+    /**
      * How many lines the household has in each cycle, by cycle id; a cycle where it has no line is absent.
      *
      * @return array<string, int>
      */
     public function lineCountsOfHousehold(string $householdId): array;
-
-    /** @return list<string> cycle ids with a pending pickup for this household */
-    public function pendingPickupCycleIdsOfHousehold(string $householdId): array;
 
     /**
      * The household's order in the cycle, created empty if it has none, and locked until the surrounding
@@ -46,9 +54,6 @@ interface OrderRepository
 
     /** Whether retained or current weekly lines reference the product. */
     public function hasWeeklyReference(string $productId): bool;
-
-    /** Whether retained or current temporary pickup stock lines reference the product. */
-    public function hasStockReference(string $productId): bool;
 
     /** Whether any order has a line of this product in a cycle that is not settled (R1). */
     public function hasUnsettledLinesOf(string $productId): bool;

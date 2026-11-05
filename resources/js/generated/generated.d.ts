@@ -71,7 +71,6 @@ readonly collected: boolean,
 readonly weekly: boolean,
 readonly weeklyLines: App.Http.BasketWeeklyLineRow[],
 readonly kind: string,
-readonly referenceCycleId: string | null,
 readonly late: boolean,
 };
 export type BasketStockLineRow = {
@@ -408,11 +407,6 @@ readonly movements: App.Http.WalletMovementRow[],
 }
 }
 declare namespace Guixa {
-namespace Ordering {
-namespace Domain {
-export type PickupStatus = 'none' | 'pending' | 'nothing_to_collect' | 'completed' | 'not_collected';
-}
-}
 namespace Sales {
 namespace Domain {
 export type BasketKind = 'stock' | 'weekly';

@@ -9,11 +9,10 @@ use Guixa\Shared\Domain\Error\InvalidQuantity;
 use Guixa\Shared\Domain\Money;
 use Guixa\Shared\Domain\Role;
 use Guixa\Stock\Application\GetReturnItem;
-use Guixa\Stock\Application\GetStockOffer;
 use Guixa\Stock\Application\ListStock;
 use Guixa\Stock\Application\RecordStockAdjustment;
 use Guixa\Stock\Application\RecordStockEntry;
-use Guixa\Stock\Application\SellStock;
+use Guixa\Stock\Application\SellBasketStock;
 use Guixa\Stock\Domain\Error\AdjustmentNoteRequired;
 use Guixa\Stock\Domain\Error\InvalidMovementQuantity;
 use Guixa\Stock\Domain\Error\NotEnoughStock;
@@ -42,9 +41,8 @@ beforeEach(function () {
 
     $this->entry = new RecordStockEntry($this->products, $this->movements, $ledger, $transactions, $this->clock);
     $this->adjust = new RecordStockAdjustment($this->products, $this->movements, $ledger, $transactions, $this->clock);
-    $this->sell = new SellStock($this->products, $this->movements, $ledger, $transactions, $this->clock);
+    $this->sell = new SellBasketStock($this->products, $this->movements, $ledger, $transactions, $this->clock);
     $this->listStock = new ListStock($this->products, $this->movements);
-    $this->offer = new GetStockOffer($this->products, $this->movements);
     $this->returnItem = new GetReturnItem($this->returnItems);
 
     $honey = $this->products->create('Honey', 'jar', Money::ofCents(650), false, '2.000');
@@ -147,18 +145,18 @@ it('requires a note and a non-zero quantity on an adjustment (R27)', function ()
 it('subtracts what is sold from the available stock (R28)', function () {
     ($this->entry)($this->manager, $this->honeyId, '10', null);
 
-    ($this->sell)($this->manager, $this->honeyId, '3', 'order-1');
+    ($this->sell)($this->manager, $this->honeyId, '3', 'basket-1');
 
     expect(($this->available)())->toBe('7.000');
     $sale = $this->movements->forProduct($this->honeyId)[1];
-    expect($sale->type)->toBe(MovementType::Sale)->and($sale->orderId)->toBe('order-1')
+    expect($sale->type)->toBe(MovementType::Sale)->and($sale->basketId)->toBe('basket-1')
         ->and($sale->quantity->toString())->toBe('-3.000');
 });
 
 it('refuses to sell more than is available and records nothing (R22, R27, S45)', function () {
     ($this->entry)($this->manager, $this->honeyId, '2', null);
 
-    expect(fn () => ($this->sell)($this->manager, $this->honeyId, '2.001', 'order-1'))->toThrow(NotEnoughStock::class);
+    expect(fn () => ($this->sell)($this->manager, $this->honeyId, '2.001', 'basket-1'))->toThrow(NotEnoughStock::class);
 
     expect(($this->available)())->toBe('2.000')
         ->and($this->movements->forProduct($this->honeyId))->toHaveCount(1);
@@ -166,16 +164,16 @@ it('refuses to sell more than is available and records nothing (R22, R27, S45)',
 
 it('refuses a second sale once the first took the last of the stock (S45)', function () {
     ($this->entry)($this->manager, $this->honeyId, '1', null);
-    ($this->sell)($this->manager, $this->honeyId, '1', 'order-1');
+    ($this->sell)($this->manager, $this->honeyId, '1', 'basket-1');
 
-    expect(fn () => ($this->sell)($this->manager, $this->honeyId, '1', 'order-2'))->toThrow(NotEnoughStock::class);
+    expect(fn () => ($this->sell)($this->manager, $this->honeyId, '1', 'basket-2'))->toThrow(NotEnoughStock::class);
 });
 
 it('lists every stock product with its available quantity, zero when it has no movements (R28)', function () {
     $oil = $this->products->create('Oil', 'bottle', Money::ofCents(900), true, null);
     $this->products->add($oil);
     ($this->entry)($this->manager, $this->honeyId, '10', null);
-    ($this->sell)($this->manager, $this->honeyId, '4', 'order-1');
+    ($this->sell)($this->manager, $this->honeyId, '4', 'basket-1');
 
     $levels = collect(($this->listStock)($this->manager));
 
@@ -188,7 +186,7 @@ it('lists every stock product with its available quantity, zero when it has no m
 it('offers a stock product with its current price, containers and available quantity (R20)', function () {
     ($this->entry)($this->manager, $this->honeyId, '5', null);
 
-    $offer = ($this->offer)($this->honeyId);
+    $offer = collect(($this->listStock)($this->manager))->firstWhere('id', $this->honeyId);
 
     expect($offer->name)->toBe('Honey')
         ->and($offer->unit)->toBe('jar')
@@ -200,10 +198,9 @@ it('offers a stock product with its current price, containers and available quan
 });
 
 it('still offers a deactivated stock product, flagged inactive (S55)', function () {
-    $honey = $this->products->get($this->honeyId);
     $this->products->deactivate($this->honeyId);
 
-    expect(($this->offer)($this->honeyId)->active)->toBeFalse();
+    expect(collect(($this->listStock)($this->manager))->firstWhere('id', $this->honeyId)->active)->toBeFalse();
 });
 
 it('offers a return item with its current amount (R20a)', function () {
@@ -218,8 +215,7 @@ it('offers a return item with its current amount (R20a)', function () {
 it('fails on an unknown stock product or return item', function () {
     expect(fn () => ($this->entry)($this->manager, 'missing', '1', null))->toThrow(StockProductNotFound::class);
     expect(fn () => ($this->adjust)($this->manager, 'missing', '1', 'why', null))->toThrow(StockProductNotFound::class);
-    expect(fn () => ($this->sell)($this->manager, 'missing', '1', 'order-1'))->toThrow(StockProductNotFound::class);
-    expect(fn () => ($this->offer)('missing'))->toThrow(StockProductNotFound::class);
+    expect(fn () => ($this->sell)($this->manager, 'missing', '1', 'basket-1'))->toThrow(StockProductNotFound::class);
     expect(fn () => ($this->returnItem)('missing'))->toThrow(ReturnItemNotFound::class);
 });
 

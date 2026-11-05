@@ -32,16 +32,13 @@ return new class extends Migration
         DB::statement(<<<'SQL'
             ALTER TABLE wallet_movements ADD CONSTRAINT wallet_movements_shape CHECK (
                 (type = 'top_up' AND amount_cents > 0 AND cycle_id IS NULL AND basket_id IS NULL)
-                OR (type = 'charge' AND amount_cents < 0 AND ((cycle_id IS NOT NULL AND basket_id IS NULL) OR (cycle_id IS NULL AND basket_id IS NOT NULL)))
-                OR (type = 'credit' AND amount_cents > 0 AND ((cycle_id IS NOT NULL AND basket_id IS NULL) OR (cycle_id IS NULL AND basket_id IS NOT NULL)))
+                OR (type = 'charge' AND amount_cents < 0 AND cycle_id IS NULL AND basket_id IS NOT NULL)
+                OR (type = 'credit' AND amount_cents > 0 AND cycle_id IS NULL AND basket_id IS NOT NULL)
                 OR (type = 'correction' AND amount_cents <> 0 AND note IS NOT NULL AND btrim(note) <> '' AND NOT (cycle_id IS NOT NULL AND basket_id IS NOT NULL))
             )
         SQL);
         DB::statement("ALTER TABLE wallet_movements ADD CONSTRAINT wallet_correction_source_shape CHECK ((type = 'correction') OR source_movement_id IS NULL)");
 
-        DB::statement(
-            "CREATE UNIQUE INDEX wallet_movements_one_charge_per_cycle ON wallet_movements (household_id, cycle_id) WHERE type IN ('charge', 'credit')",
-        );
         DB::statement("CREATE UNIQUE INDEX wallet_movements_one_charge_per_basket ON wallet_movements (basket_id) WHERE type IN ('charge', 'credit') AND basket_id IS NOT NULL");
         DB::statement('CREATE INDEX wallet_movements_source_id ON wallet_movements (source_movement_id) WHERE source_movement_id IS NOT NULL');
     }

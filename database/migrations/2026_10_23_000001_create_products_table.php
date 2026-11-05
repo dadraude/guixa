@@ -23,12 +23,10 @@ return new class extends Migration
 
         DB::statement('ALTER TABLE products ADD CONSTRAINT products_price_not_negative CHECK (price_cents >= 0)');
         DB::statement('ALTER TABLE products ADD CONSTRAINT products_containers_per_unit_positive CHECK (containers_per_unit > 0)');
-        Schema::table('stock_movements', fn (Blueprint $table) => $table->foreign('stock_product_id')->references('id')->on('products'));
     }
 
     public function down(): void
     {
-        Schema::table('stock_movements', fn (Blueprint $table) => $table->dropForeign(['stock_product_id']));
         Schema::dropIfExists('products');
     }
 };

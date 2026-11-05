@@ -18,7 +18,7 @@ function weeklyWithHoney(): array
     $producer = ProducerModel::query()->create(['name' => 'Beekeeper', 'active' => true, 'cutoff_days_before' => 3, 'cutoff_time' => '20:00']);
     $honey = (string) Str::uuid7();
     DB::table('products')->insert(['id' => $honey, 'producer_id' => $producer->id, 'stock' => true, 'name' => 'Honey', 'unit' => 'jar', 'price_cents' => 600, 'variable' => false, 'active' => true]);
-    DB::table('stock_movements')->insert(['id' => (string) Str::uuid7(), 'stock_product_id' => $honey, 'type' => 'entry', 'quantity' => '5', 'occurred_at' => now(), 'recorded_by' => $week['manager']->id]);
+    DB::table('stock_movements')->insert(['id' => (string) Str::uuid7(), 'product_id' => $honey, 'type' => 'entry', 'quantity' => '5', 'occurred_at' => now(), 'recorded_by' => $week['manager']->id]);
     test()->actingAs($week['manager'])->post("/finance/baskets/{$week['baskets']['A']}/stock-lines", ['stock_product_id' => $honey, 'stock_quantity' => '2'])->assertRedirect();
 
     return ['week' => $week, 'honey' => $honey];
@@ -51,12 +51,12 @@ it('keeps a stock line through a reception sync and charges weekly plus stock on
     expect(DB::table('basket_lines')->where('basket_id', $week['baskets']['A'])->where('kind', 'stock')->pluck('quantity')->map(fn ($q) => (float) $q)->all())->toBe([2.0]);
     $this->post("/finance/baskets/{$week['baskets']['A']}/validation")->assertRedirect()->assertSessionHasNoErrors();
 
-    $sale = DB::table('stock_movements')->where('stock_product_id', $honey)->where('basket_id', $week['baskets']['A'])->get();
+    $sale = DB::table('stock_movements')->where('product_id', $honey)->where('basket_id', $week['baskets']['A'])->get();
     expect(DB::table('wallet_movements')->where('basket_id', $week['baskets']['A'])->pluck('amount_cents')->all())->toBe([-3200])
         ->and(DB::table('baskets')->where('id', $week['baskets']['A'])->value('validated_total_cents'))->toBe(3200)
         ->and($sale)->toHaveCount(1)
         ->and((float) $sale[0]->quantity)->toBe(-2.0)
-        ->and((float) DB::table('stock_movements')->where('stock_product_id', $honey)->sum('quantity'))->toBe(3.0);
+        ->and((float) DB::table('stock_movements')->where('product_id', $honey)->sum('quantity'))->toBe(3.0);
 
     $movements = [DB::table('wallet_movements')->count(), DB::table('stock_movements')->count()];
     $this->put("/finance/baskets/{$week['baskets']['A']}/collection")->assertRedirect();
@@ -110,6 +110,16 @@ it('rolls a weekly validation back whole when the Wallet or the closure fails af
             if ($this->fail) {
                 throw new RuntimeException('Closure failed');
             }
+        }
+
+        public function cyclesOf(array $sourceOrderIds): array
+        {
+            return $this->real->cyclesOf($sourceOrderIds);
+        }
+
+        public function ofCycle(string $cycleId): array
+        {
+            return $this->real->ofCycle($cycleId);
         }
     });
 

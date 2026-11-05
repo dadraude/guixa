@@ -47,7 +47,6 @@ const basket = withServerFlags(
         pendingCollection: true,
         weeklyLines: [],
         kind: 'stock',
-        referenceCycleId: null,
         late: false,
         balanceCents: 0,
         projectedBalanceCents: 50,

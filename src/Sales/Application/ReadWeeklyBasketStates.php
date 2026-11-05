@@ -3,12 +3,11 @@
 namespace Guixa\Sales\Application;
 
 use Guixa\Sales\Domain\Basket;
-use Guixa\Sales\Domain\BasketRepository;
 
 /** Internal query for Ordering: every weekly basket, base or late, attributed to a cycle with its state and effective quantities. */
 final class ReadWeeklyBasketStates
 {
-    public function __construct(private readonly BasketRepository $baskets) {}
+    public function __construct(private readonly WeeklyBasketsOfCycle $weeklyBaskets) {}
 
     /** @return list<WeeklyBasketStateData> */
     public function __invoke(string $cycleId): array
@@ -29,6 +28,6 @@ final class ReadWeeklyBasketStates
             return new WeeklyBasketStateData($basket->householdId, $basket->state->value,
                 array_map(fn (string $productId) => $basket->effectiveQuantity($productId), array_combine(array_keys($products), array_keys($products))),
                 $basket->id, $basket->late);
-        }, $this->baskets->weeklyOfCycle($cycleId));
+        }, ($this->weeklyBaskets)($cycleId));
     }
 }

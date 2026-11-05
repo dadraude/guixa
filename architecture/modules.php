@@ -45,6 +45,8 @@ return [
                 'Application\LockWeeklyBasketSource' => ['Sales'],
                 'Application\CloseCycleAfterBasketValidation' => ['Sales'],
                 'Application\ReadCyclePickupDates' => ['Sales'],
+                'Application\ReadSourceOrderCycles' => ['Sales'],
+                'Application\ReadCycleSourceOrders' => ['Sales'],
                 'Application\HasUnsettledLines' => ['Catalog'],
                 'Application\StopParticipatingWhereNotSent' => ['Catalog'],
             ],
@@ -74,7 +76,6 @@ return [
                 'Application\SyncWeeklyBasket' => ['Ordering'],
                 'Application\AddLateWeeklyLines' => ['Ordering'],
                 'Application\ReadWeeklyBasketStates' => ['Ordering'],
-                'Application\ReadPendingWeeklyCycles' => ['Ordering'],
                 'Application\ReadPendingCollections' => ['Ordering'],
                 'Application\PendingCollectionData' => ['Ordering'],
                 'Application\ReadHouseholdContainerBalances' => ['Ordering'],
@@ -122,10 +123,6 @@ return [
         'order_lines' => 'Ordering',
         'product_unavailabilities' => 'Ordering',
         'received_totals' => 'Ordering',
-        // Retired by T59; no active writer. T63 drops them.
-        'order_stock_lines' => 'Ordering',
-        'order_return_lines' => 'Ordering',
-        'order_pickup_adjustments' => 'Ordering',
         'baskets' => 'Sales',
         'basket_lines' => 'Sales',
         'basket_adjustments' => 'Sales',
@@ -155,14 +152,7 @@ return [
             'reason' => 'Existing Fortify authentication model; the explicit Eloquent exception in A6.',
         ],
     ],
-    'dynamic_tables' => [
-        'src/Ordering/Infrastructure/Persistence/EloquentOrderRepository.php' => [
-            'rowsOf' => [
-                'parameter' => 'table',
-                'reason' => 'Private helper with an unchanged table parameter and literal table names at every call site.',
-            ],
-        ],
-    ],
+    'dynamic_tables' => [],
     'sql_exceptions' => [
         'src/Membership/Infrastructure/Persistence/DatabaseHouseholdRepository.php' => [
             'select pg_advisory_xact_lock(191983, 1)' => 'Serializes Membership changes without reading or writing a table.',

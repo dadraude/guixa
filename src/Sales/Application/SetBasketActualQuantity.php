@@ -3,6 +3,7 @@
 namespace Guixa\Sales\Application;
 
 use DomainException;
+use Guixa\Sales\Domain\Basket;
 use Guixa\Sales\Domain\BasketRepository;
 use Guixa\Sales\Domain\Error\BasketNotEditable;
 use Guixa\Sales\Domain\Error\BasketNotFound;
@@ -33,7 +34,7 @@ final class SetBasketActualQuantity
             if (! $peek->isWeekly()) {
                 throw BasketNotEditable::create();
             }
-            $this->weeklySource->lockSettled((string) $peek->referenceCycleId);
+            $this->weeklySource->lockSettled($this->cycleOf($peek));
             $basket = $this->baskets->lock($basketId) ?? throw BasketNotFound::withId($basketId);
             if (! $basket->state->isDraft()) {
                 throw BasketNotEditable::create();
@@ -45,5 +46,12 @@ final class SetBasketActualQuantity
 
             $this->baskets->save($basket->withActualQuantity($productId, $actual));
         });
+    }
+
+    private function cycleOf(Basket $weekly): string
+    {
+        $sourceOrderId = (string) $weekly->sourceOrderId;
+
+        return $this->weeklySource->cyclesOf([$sourceOrderId])[$sourceOrderId] ?? throw BasketNotFound::withId($weekly->id);
     }
 }

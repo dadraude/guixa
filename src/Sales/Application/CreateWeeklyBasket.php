@@ -24,7 +24,7 @@ final class CreateWeeklyBasket
 
         $id = $this->baskets->nextId();
         $basket = new Basket($id, $source->householdId, $source->householdName, BasketState::Draft, null, $this->clock->now(),
-            ($this->lines)($source, $id), kind: BasketKind::Weekly, sourceOrderId: $source->sourceOrderId, referenceCycleId: $source->cycleId);
+            ($this->lines)($source, $id), kind: BasketKind::Weekly, sourceOrderId: $source->sourceOrderId);
 
         $this->baskets->save($basket->hasContent() ? $basket : $basket->synchronizedWith($basket->lines, $this->clock->now()));
     }

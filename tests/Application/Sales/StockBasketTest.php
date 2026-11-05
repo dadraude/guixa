@@ -74,7 +74,7 @@ beforeEach(function () {
             return null;
         }
 
-        public function weeklyOfCycle(string $cycleId): array
+        public function weeklyOfSourceOrders(array $sourceOrderIds): array
         {
             return [];
         }

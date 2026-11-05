@@ -172,7 +172,7 @@ Route::middleware(['auth', 'verified', 'role:manager'])->prefix('manage')->name(
         Route::delete('distribution', [ReceptionDistributionController::class, 'destroy'])->name('cycles.receptions.distribution.destroy');
     });
 
-    Route::prefix('cycles/{cycle}/pickups')->whereUuid(['cycle', 'household', 'product', 'stockProduct', 'returnItem'])->group(function () {
+    Route::prefix('cycles/{cycle}/pickups')->whereUuid(['cycle', 'household'])->group(function () {
         Route::get('/', [PickupController::class, 'index'])->name('cycles.pickups.index');
         Route::get('{household}', [PickupController::class, 'show'])->name('cycles.pickups.show');
     });

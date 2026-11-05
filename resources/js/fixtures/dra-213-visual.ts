@@ -69,7 +69,6 @@ const basket = withServerFlags(
         pendingCollection: state === 'validated' || state === 'corrected',
         weeklyLines: [],
         kind: 'stock',
-        referenceCycleId: null,
         late: false,
     },
     role === 'member' ? 'member' : 'staff',

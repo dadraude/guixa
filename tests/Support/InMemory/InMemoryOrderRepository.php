@@ -4,7 +4,6 @@ namespace Tests\Support\InMemory;
 
 use Guixa\Ordering\Domain\Order;
 use Guixa\Ordering\Domain\OrderRepository;
-use Guixa\Ordering\Domain\PickupStatus;
 
 /** @extends InMemoryRepository<Order> */
 final class InMemoryOrderRepository extends InMemoryRepository implements OrderRepository
@@ -12,8 +11,8 @@ final class InMemoryOrderRepository extends InMemoryRepository implements OrderR
     /** @var array<string, true> */
     private array $weeklyHistory = [];
 
-    /** @var array<string, true> */
-    private array $stockHistory = [];
+    /** @var array<string, string> cycle id by id of orders whose cycle was cancelled; only the id lookups still see them */
+    private array $cancelledOrderCycles = [];
 
     public function add(Order $order): void
     {
@@ -23,12 +22,6 @@ final class InMemoryOrderRepository extends InMemoryRepository implements OrderR
             foreach ($previous->lines() as $line) {
                 if (! in_array($line->id, $currentLineIds, true)) {
                     $this->weeklyHistory[$line->productId] = true;
-                }
-            }
-            $currentStockIds = array_column($order->stockLines(), 'id');
-            foreach ($previous->stockLines() as $line) {
-                if (! in_array($line->id, $currentStockIds, true)) {
-                    $this->stockHistory[$line->stockProductId] = true;
                 }
             }
         }
@@ -42,9 +35,7 @@ final class InMemoryOrderRepository extends InMemoryRepository implements OrderR
                 foreach ($order->lines() as $line) {
                     $this->weeklyHistory[$line->productId] = true;
                 }
-                foreach ($order->stockLines() as $line) {
-                    $this->stockHistory[$line->stockProductId] = true;
-                }
+                $this->cancelledOrderCycles[$order->id] = $order->cycleId;
                 $this->remove($order->id);
                 unset($this->notDelivered[$order->id]);
             }
@@ -88,6 +79,31 @@ final class InMemoryOrderRepository extends InMemoryRepository implements OrderR
         return array_values(array_filter($this->all(), fn (Order $order) => $order->cycleId === $cycleId));
     }
 
+    public function cycleIdsOfOrders(array $orderIds): array
+    {
+        return array_intersect_key($this->cycleIdsByOrderId(), array_flip($orderIds));
+    }
+
+    public function idsOfCycle(string $cycleId): array
+    {
+        $ids = array_keys(array_filter($this->cycleIdsByOrderId(), fn (string $cycle) => $cycle === $cycleId));
+        sort($ids);
+
+        return $ids;
+    }
+
+    /** @return array<string, string> cycle id by order id, cancelled ones included */
+    private function cycleIdsByOrderId(): array
+    {
+        $cycles = $this->cancelledOrderCycles;
+
+        foreach ($this->all() as $order) {
+            $cycles[$order->id] = $order->cycleId;
+        }
+
+        return $cycles;
+    }
+
     public function lineCountsOfHousehold(string $householdId): array
     {
         $counts = [];
@@ -99,14 +115,6 @@ final class InMemoryOrderRepository extends InMemoryRepository implements OrderR
         }
 
         return $counts;
-    }
-
-    public function pendingPickupCycleIdsOfHousehold(string $householdId): array
-    {
-        return array_values(array_map(
-            fn (Order $order) => $order->cycleId,
-            array_filter($this->all(), fn (Order $order) => $order->householdId === $householdId && $order->pickup() === PickupStatus::Pending),
-        ));
     }
 
     public function lockFor(string $cycleId, string $householdId): Order
@@ -131,22 +139,6 @@ final class InMemoryOrderRepository extends InMemoryRepository implements OrderR
         foreach ($this->all() as $order) {
             if ($order->hasLine($productId)) {
                 return true;
-            }
-        }
-
-        return false;
-    }
-
-    public function hasStockReference(string $productId): bool
-    {
-        if (isset($this->stockHistory[$productId])) {
-            return true;
-        }
-        foreach ($this->all() as $order) {
-            foreach ($order->stockLines() as $line) {
-                if ($line->stockProductId === $productId) {
-                    return true;
-                }
             }
         }
 

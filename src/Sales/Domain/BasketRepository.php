@@ -16,8 +16,11 @@ interface BasketRepository
     /** The source order's late weekly basket that is not validated yet (draft, or nothing to collect after a correction to zero), if any. */
     public function getOpenLateBySourceOrder(string $orderId): ?Basket;
 
-    /** @return list<Basket> every weekly basket attributed to the cycle, base and late, by id */
-    public function weeklyOfCycle(string $cycleId): array;
+    /**
+     * @param  list<string>  $sourceOrderIds
+     * @return list<Basket> every weekly basket, base and late, of these source orders, by id
+     */
+    public function weeklyOfSourceOrders(array $sourceOrderIds): array;
 
     public function lock(string $id): ?Basket;
 

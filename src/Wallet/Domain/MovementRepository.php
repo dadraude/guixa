@@ -9,7 +9,7 @@ interface MovementRepository
 {
     public function nextId(): string;
 
-    /** @throws Error\PickupAlreadyCharged when the household already has a charge or credit for that cycle */
+    /** @throws Error\BasketAlreadyCharged when the basket already has a charge or credit */
     public function add(Movement $movement): void;
 
     public function findById(string $movementId): ?Movement;

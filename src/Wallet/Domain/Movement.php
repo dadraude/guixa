@@ -38,26 +38,6 @@ final readonly class Movement
         return new self($id, $householdId, MovementType::TopUp, $amount, $occurredAt, $recordedBy, self::cleanNote($note), null);
     }
 
-    /** @param Money $total what the household owes for the cycle, greater than zero */
-    public static function charge(string $id, string $householdId, Money $total, string $cycleId, DateTimeImmutable $occurredAt, string $recordedBy): self
-    {
-        if ($total->cents <= 0) {
-            throw InvalidChargeAmount::create();
-        }
-
-        return new self($id, $householdId, MovementType::Charge, $total->negate(), $occurredAt, $recordedBy, null, $cycleId);
-    }
-
-    /** @param Money $total what the household is owed for the cycle (returned containers), greater than zero */
-    public static function credit(string $id, string $householdId, Money $total, string $cycleId, DateTimeImmutable $occurredAt, string $recordedBy): self
-    {
-        if ($total->cents <= 0) {
-            throw InvalidChargeAmount::create();
-        }
-
-        return new self($id, $householdId, MovementType::Credit, $total, $occurredAt, $recordedBy, null, $cycleId);
-    }
-
     public static function basketCharge(string $id, string $householdId, Money $total, string $basketId, DateTimeImmutable $occurredAt, string $recordedBy): self
     {
         if ($total->cents <= 0) {

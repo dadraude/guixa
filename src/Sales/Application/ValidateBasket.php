@@ -2,6 +2,7 @@
 
 namespace Guixa\Sales\Application;
 
+use Guixa\Sales\Domain\Basket;
 use Guixa\Sales\Domain\BasketRepository;
 use Guixa\Sales\Domain\Error\BasketAlreadyValidated;
 use Guixa\Sales\Domain\Error\BasketHasNoContents;
@@ -26,9 +27,10 @@ final class ValidateBasket
         Gate::forUser($actor)->authorize('manage-sales');
         $this->transactions->run(function () use ($actor, $basketId): void {
             $source = $this->baskets->get($basketId) ?? throw BasketNotFound::withId($basketId);
-            if ($source->referenceCycleId !== null && $source->kind->isWeekly()) {
+            $cycleId = $this->cycleOf($source);
+            if ($cycleId !== null) {
                 // The cycle lock comes before the basket lock, like every other weekly mutation.
-                $this->weeklySource->lockSettled($source->referenceCycleId);
+                $this->weeklySource->lockSettled($cycleId);
             }
             $basket = $this->baskets->lock($basketId) ?? throw BasketNotFound::withId($basketId);
             if ($basket->state->isSettled()) {
@@ -58,9 +60,19 @@ final class ValidateBasket
                 $this->wallet->charge($actor, $basket->householdId, $basketId, $validated->validatedTotalCents);
             }
             $this->baskets->save($validated);
-            if ($basket->kind->isWeekly() && $basket->referenceCycleId !== null) {
-                $this->weeklySource->closeIfFinished($basket->referenceCycleId);
+            if ($cycleId !== null) {
+                $this->weeklySource->closeIfFinished($cycleId);
             }
         });
+    }
+
+    /** The source cycle of a weekly basket, or null for any other basket or an unknown source order. */
+    private function cycleOf(Basket $basket): ?string
+    {
+        if (! $basket->kind->isWeekly()) {
+            return null;
+        }
+
+        return $this->weeklySource->cyclesOf([(string) $basket->sourceOrderId])[(string) $basket->sourceOrderId] ?? null;
     }
 }

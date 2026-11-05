@@ -11,11 +11,10 @@ return new class extends Migration
     {
         Schema::table('baskets', function (Blueprint $table) {
             $table->foreignUuid('source_order_id')->nullable()->unique()->constrained('orders');
-            $table->foreignUuid('reference_cycle_id')->nullable()->constrained('cycles');
             // The scheduler settles cycles without an actor, so a system-created weekly base has no creator.
             $table->uuid('created_by')->nullable()->change();
         });
-        DB::statement("ALTER TABLE baskets ADD CONSTRAINT baskets_weekly_source CHECK ((kind = 'weekly' AND source_order_id IS NOT NULL AND reference_cycle_id IS NOT NULL) OR (kind = 'stock' AND source_order_id IS NULL))");
+        DB::statement("ALTER TABLE baskets ADD CONSTRAINT baskets_weekly_source CHECK ((kind = 'weekly' AND source_order_id IS NOT NULL) OR (kind = 'stock' AND source_order_id IS NULL))");
 
         Schema::table('basket_lines', function (Blueprint $table) {
             $table->foreignUuid('source_order_line_id')->nullable()->constrained('order_lines');
@@ -49,7 +48,6 @@ return new class extends Migration
         });
         DB::statement('ALTER TABLE baskets DROP CONSTRAINT baskets_weekly_source');
         Schema::table('baskets', function (Blueprint $table) {
-            $table->dropConstrainedForeignId('reference_cycle_id');
             $table->dropConstrainedForeignId('source_order_id');
         });
     }

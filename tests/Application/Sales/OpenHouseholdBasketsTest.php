@@ -21,7 +21,7 @@ use Guixa\Shared\Domain\Quantity;
 use Tests\Support\FrozenClock;
 use Tests\Support\InMemory\ImmediateTransactionRunner;
 use Tests\Support\InMemory\Sales\InMemoryBasketRepository;
-use Tests\Support\InMemory\Sales\NoWeeklyBasketSource;
+use Tests\Support\InMemory\Sales\InMemoryWeeklyBasketSource;
 
 beforeEach(function () {
     $this->manager = Actor::manager('manager');
@@ -58,9 +58,10 @@ beforeEach(function () {
             return array_intersect_key(['cycle-1' => '2026-11-07', 'cycle-2' => '2026-10-31'], array_flip($cycleIds));
         }
     };
-    $this->validate = new ValidateBasket($this->baskets, $products, $stock, $wallet, new NoWeeklyBasketSource, $transactions, $clock);
+    $this->source = new InMemoryWeeklyBasketSource;
+    $this->validate = new ValidateBasket($this->baskets, $products, $stock, $wallet, $this->source, $transactions, $clock);
     $this->collect = new MarkBasketCollected($this->baskets, $transactions, $clock);
-    $this->open = new ReadOpenHouseholdBaskets($this->baskets, $pickupDates);
+    $this->open = new ReadOpenHouseholdBaskets($this->baskets, $pickupDates, $this->source);
 
     /** Saves a basket of the household in the given state; weekly ones hold a weekly line, the others a returned jar. */
     $this->basket = function (string $id, string $household, BasketState $state, bool $weekly, string $created = '2026-11-02', ?string $cycle = null): Basket {
@@ -68,14 +69,18 @@ beforeEach(function () {
         $line = $weekly
             ? new BasketLine("{$id}-line", $id, 'bread', 'Bread', 'loaf', 300, false, null, Quantity::fromString('1'), $when, kind: BasketLineKind::Weekly)
             : new BasketLine("{$id}-line", $id, null, 'Jar', 'jar', 50, false, null, Quantity::fromString('1'), $when, kind: BasketLineKind::Return, returnItemId: 'jar');
+        $sourceOrderId = $weekly ? "order-{$id}" : null;
+        if ($sourceOrderId !== null && $cycle !== null) {
+            $this->source->place($sourceOrderId, $cycle);
+        }
         $draft = new Basket($id, $household, 'Household', BasketState::Draft, null, $when, [$line],
-            kind: $weekly ? BasketKind::Weekly : BasketKind::Stock, referenceCycleId: $cycle);
+            kind: $weekly ? BasketKind::Weekly : BasketKind::Stock, sourceOrderId: $sourceOrderId);
         $basket = match ($state) {
             BasketState::Draft => $draft,
             BasketState::Validated => $draft->validated('manager', $when),
             BasketState::Collected => $draft->validated('manager', $when)->collected('manager', $when),
             BasketState::Cancelled => $draft->cancelled('manager', $when),
-            BasketState::NothingToCollect => new Basket($id, $household, 'Household', $state, null, $when, [$line], kind: BasketKind::Weekly, referenceCycleId: $cycle),
+            BasketState::NothingToCollect => new Basket($id, $household, 'Household', $state, null, $when, [$line], kind: BasketKind::Weekly, sourceOrderId: $sourceOrderId),
         };
         $this->baskets->save($basket);
 

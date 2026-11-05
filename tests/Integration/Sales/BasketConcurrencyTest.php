@@ -115,7 +115,7 @@ final class BasketConcurrencyTest extends TestCase
         $this->assertSame(1, DB::table('basket_adjustments')->where('basket_id', $basket)->count());
         $this->assertSame(1, DB::table('stock_movements')->whereNotNull('correction_id')->count());
         $this->assertSame(1, DB::table('wallet_movements')->where('basket_id', $basket)->where('type', 'correction')->count());
-        $this->assertSame(4.0, (float) DB::table('stock_movements')->where('stock_product_id', $product)->sum('quantity'));
+        $this->assertSame(4.0, (float) DB::table('stock_movements')->where('product_id', $product)->sum('quantity'));
     }
 
     #[Test]

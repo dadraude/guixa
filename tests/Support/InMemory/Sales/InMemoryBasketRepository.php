@@ -98,7 +98,7 @@ final class InMemoryBasketRepository implements BasketRepository
                 $basket->validatedTotalCents, $basket->collectedBy, $basket->collectedAt, $basket->cancelledBy,
                 $basket->cancelledAt, $basket->adjustments,
                 [new BasketCollectionEvent($this->nextId(), $basket->id, 'collected', $basket->collectedBy, $basket->collectedAt)],
-                $basket->kind, $basket->sourceOrderId, $basket->referenceCycleId, $basket->late);
+                $basket->kind, $basket->sourceOrderId, $basket->late);
         }
         $this->baskets[$basket->id] = $basket;
     }
@@ -130,9 +130,9 @@ final class InMemoryBasketRepository implements BasketRepository
         return null;
     }
 
-    public function weeklyOfCycle(string $cycleId): array
+    public function weeklyOfSourceOrders(array $sourceOrderIds): array
     {
-        return array_values(array_filter($this->baskets, fn (Basket $basket) => $basket->kind === BasketKind::Weekly && $basket->referenceCycleId === $cycleId));
+        return array_values(array_filter($this->baskets, fn (Basket $basket) => $basket->kind === BasketKind::Weekly && in_array($basket->sourceOrderId, $sourceOrderIds, true)));
     }
 
     public function lock(string $id): ?Basket

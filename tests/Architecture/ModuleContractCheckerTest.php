@@ -117,6 +117,41 @@ it('rejects a foreign table even without a foreign class import', function (stri
     'inferred model mapping' => 'class Product extends \\Illuminate\\Database\\Eloquent\\Model {}',
 ]);
 
+/** The checker still supports a reviewed dynamic-table helper; the shipped manifest declares none, so these examples declare their own. */
+function manifestWithDynamicHelper(): array
+{
+    $manifest = require dirname(__DIR__, 2).'/architecture/modules.php';
+    $manifest['dynamic_tables'] = [
+        'src/Ordering/Infrastructure/Persistence/EloquentOrderRepository.php' => [
+            'rowsOf' => ['parameter' => 'table', 'reason' => 'Checker example only: a private helper with literal table names at every call site.'],
+        ],
+    ];
+
+    return $manifest;
+}
+
+it('keeps the retired Ordering stock, return and adjustment tables and their dynamic helper forbidden', function () {
+    $manifest = require dirname(__DIR__, 2).'/architecture/modules.php';
+    $checker = new ModuleContract($manifest);
+    $source = <<<'SOURCE'
+<?php
+namespace Guixa\Ordering\Infrastructure\Persistence;
+use Illuminate\Support\Facades\DB;
+final class EloquentOrderRepository {
+    private function rowsOf(string $table, string $orderId): array { return DB::table($table)->get()->all(); }
+    public function load(string $id): array { return $this->rowsOf('order_lines', $id); }
+}
+SOURCE;
+
+    expect($manifest['dynamic_tables'])->toBe([])
+        ->and($manifest['tables'])->not->toHaveKeys(['order_stock_lines', 'order_return_lines', 'order_pickup_adjustments', 'stock_products'])
+        ->and(implode("\n", $checker->violations('src/Ordering/Infrastructure/Persistence/EloquentOrderRepository.php', $source)))->toContain('dynamic table access requires a reviewed declaration');
+    foreach (['order_stock_lines', 'order_return_lines', 'order_pickup_adjustments'] as $table) {
+        expect(implode("\n", $checker->violations('src/Ordering/Infrastructure/Persistence/Probe.php', "<?php use Illuminate\\Support\\Facades\\DB; DB::table('{$table}')->get();")))
+            ->toContain("table {$table} has no declared owner");
+    }
+});
+
 it('allows owned tables only from Infrastructure', function () {
     $checker = new ModuleContract(require dirname(__DIR__, 2).'/architecture/modules.php');
     $source = "<?php use Illuminate\\Support\\Facades\\DB; DB::table('orders')->update(['pickup_status' => 'completed']);";
@@ -157,7 +192,7 @@ it('permits only the exact declared table-free advisory lock SQL', function () {
 });
 
 it('checks every literal caller of the existing private dynamic-table helper', function (string $argument, string $message) {
-    $checker = new ModuleContract(require dirname(__DIR__, 2).'/architecture/modules.php');
+    $checker = new ModuleContract(manifestWithDynamicHelper());
     $source = <<<'SOURCE'
 <?php
 namespace Guixa\Ordering\Infrastructure\Persistence;
@@ -174,7 +209,7 @@ SOURCE;
         expect($issues)->toContain($message);
     }
 })->with([
-    ["'order_stock_lines'", ''],
+    ["'order_lines'", ''],
     ["'products'", 'products belongs to Catalog'],
     ['$table', 'dynamic table access requires a reviewed declaration'],
 ]);
@@ -215,14 +250,14 @@ it('rejects direct business model access from the application host', function (s
 })->with(['routes/web.php', 'app/Console/Commands/Probe.php']);
 
 it('checks static and nullsafe callers of the declared dynamic-table helper', function (string $call) {
-    $checker = new ModuleContract(require dirname(__DIR__, 2).'/architecture/modules.php');
+    $checker = new ModuleContract(manifestWithDynamicHelper());
     $source = <<<'SOURCE'
 <?php
 namespace Guixa\Ordering\Infrastructure\Persistence;
 use Illuminate\Support\Facades\DB;
 final class EloquentOrderRepository {
     private function rowsOf(string $table, string $orderId): array { return DB::table($table)->get()->all(); }
-    public function load(string $id): array { $this->rowsOf('order_stock_lines', $id); return CALL; }
+    public function load(string $id): array { $this->rowsOf('order_lines', $id); return CALL; }
 }
 SOURCE;
     expect(implode("\n", $checker->violations('src/Ordering/Infrastructure/Persistence/EloquentOrderRepository.php', str_replace('CALL', $call, $source))))
@@ -241,14 +276,14 @@ it('rejects callbacks and unrelated reads in the read-only exception', function 
 ]);
 
 it('requires the declared dynamic-table parameter to remain unchanged', function (string $mutation) {
-    $checker = new ModuleContract(require dirname(__DIR__, 2).'/architecture/modules.php');
+    $checker = new ModuleContract(manifestWithDynamicHelper());
     $source = <<<'SOURCE'
 <?php
 namespace Guixa\Ordering\Infrastructure\Persistence;
 use Illuminate\Support\Facades\DB;
 final class EloquentOrderRepository {
     private function rowsOf(string $table, string $orderId): array { MUTATION return DB::table($table)->get()->all(); }
-    public function load(string $id): array { return $this->rowsOf('order_stock_lines', $id); }
+    public function load(string $id): array { return $this->rowsOf('order_lines', $id); }
 }
 SOURCE;
     expect(implode("\n", $checker->violations('src/Ordering/Infrastructure/Persistence/EloquentOrderRepository.php', str_replace('MUTATION', $mutation, $source))))

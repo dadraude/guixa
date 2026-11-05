@@ -48,6 +48,6 @@ final class AddLateWeeklyLines
 
         $id = $this->baskets->nextId();
         $this->baskets->save(new Basket($id, $source->householdId, $source->householdName, BasketState::Draft, null, $this->clock->now(),
-            ($this->lines)($arrived, $id), kind: BasketKind::Weekly, sourceOrderId: $source->sourceOrderId, referenceCycleId: $source->cycleId, late: true));
+            ($this->lines)($arrived, $id), kind: BasketKind::Weekly, sourceOrderId: $source->sourceOrderId, late: true));
     }
 }
