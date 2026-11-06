@@ -20,20 +20,10 @@ return new class extends Migration
             $table->foreignUuid('cycle_id')->nullable()->constrained('cycles');
             $table->foreignUuid('basket_id')->nullable()->constrained('baskets');
             $table->foreignUuid('correction_id')->nullable()->constrained('basket_adjustments');
-
             $table->index(['product_id', 'occurred_at']);
         });
-
-        DB::statement(<<<'SQL'
-            ALTER TABLE stock_movements ADD CONSTRAINT stock_movements_type_matches_shape CHECK (
-                (type = 'entry' AND quantity > 0 AND basket_id IS NULL AND correction_id IS NULL)
-                OR (type = 'adjustment' AND quantity <> 0 AND btrim(coalesce(note, '')) <> ''
-                    AND ((basket_id IS NULL AND correction_id IS NULL) OR (basket_id IS NOT NULL AND correction_id IS NOT NULL)))
-                OR (type = 'sale' AND quantity < 0 AND basket_id IS NOT NULL AND correction_id IS NULL)
-            )
-        SQL);
-        DB::statement("CREATE UNIQUE INDEX stock_movements_one_sale_per_basket_product ON stock_movements (basket_id, product_id) WHERE type = 'sale' AND basket_id IS NOT NULL");
-        DB::statement('CREATE UNIQUE INDEX stock_movements_one_correction_per_product ON stock_movements (correction_id, product_id) WHERE correction_id IS NOT NULL');
+        DB::statement("create unique index stock_movements_one_sale_per_basket_product on stock_movements (basket_id, product_id) where type = 'sale' and basket_id is not null");
+        DB::statement('create unique index stock_movements_one_correction_per_product on stock_movements (correction_id, product_id) where correction_id is not null');
     }
 
     public function down(): void

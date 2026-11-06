@@ -193,3 +193,12 @@ it('replays the same correction identity once and rejects a changed payload (R32
         ->and(($this->statement)($finance, $this->household)->movements)->toHaveCount(2);
     expect(fn () => ($this->correct)($finance, $this->household, -3000, 'changed', null, $receipt, 'correction-1'))->toThrow(CorrectionIdentityConflict::class);
 });
+
+it('refuses a correction that carries both a cycle and a basket, or a basket and a receipt source (R32, wallet movement shape)', function () {
+    $finance = new Actor('finance', [Role::Finance]);
+    $receipt = ($this->topUp)($finance, $this->household, 5000);
+
+    expect(fn () => ($this->correct)($finance, $this->household, -500, 'both', 'cycle-1', null, 'correction-1', 'basket-1'))->toThrow(InvalidCorrectionSource::class)
+        ->and(fn () => ($this->correct)($finance, $this->household, -500, 'both', null, $receipt, 'correction-2', 'basket-1'))->toThrow(InvalidCorrectionSource::class);
+    expect(($this->statement)($finance, $this->household)->movements)->toHaveCount(1);
+});

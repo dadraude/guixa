@@ -56,7 +56,7 @@ final class EloquentStockMovementRepository implements StockMovementRepository
     {
         $total = StockMovementModel::query()
             ->where('product_id', $productId)
-            ->selectRaw('coalesce(sum(quantity * 1000), 0)::bigint as total')
+            ->selectRaw('cast(coalesce(round(sum(quantity * 1000)), 0) as bigint) as total')
             ->value('total');
 
         return $this->sum($total);
@@ -65,7 +65,7 @@ final class EloquentStockMovementRepository implements StockMovementRepository
     public function availableByProduct(): array
     {
         $totals = StockMovementModel::query()
-            ->selectRaw('product_id, sum(quantity * 1000)::bigint as total')
+            ->selectRaw('product_id, cast(round(sum(quantity * 1000)) as bigint) as total')
             ->groupBy('product_id')
             ->pluck('total', 'product_id');
 
