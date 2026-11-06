@@ -92,13 +92,14 @@ const lines =
               ),
           ];
 const paged = state !== 'empty';
+// page-empty is page 3 of 100 movements: 50 per page, so the last page is 2.
+const pastEnd = state === 'page-empty';
 const history = {
     lines,
-    total: lines.length + (paged ? 100 : 0), // page-empty: a page past the end of 100 movements
-    page: 2,
-    prevUrl: paged ? `${location.pathname}?page=1` : null,
-    nextUrl:
-        paged && state !== 'page-empty' ? `${location.pathname}?page=3` : null,
+    total: lines.length + (paged ? 100 : 0),
+    page: pastEnd ? 3 : 2,
+    prevUrl: paged ? `${location.pathname}?page=${pastEnd ? 2 : 1}` : null,
+    nextUrl: paged && !pastEnd ? `${location.pathname}?page=3` : null,
 };
 const product = { name: 'Mel', unit: 'pot', available: '7.000' };
 const stockRow = (n: number, name: string) => ({
