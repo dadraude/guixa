@@ -18,7 +18,8 @@ document.documentElement.classList.toggle('dark', mode === 'dark');
 document.documentElement.style.fontSize =
     query.get('text') === '200' ? '32px' : '16px';
 
-const id = (n: number) => `0198f0a0-0000-7000-8000-${String(n).padStart(12, '0')}`;
+const id = (n: number) =>
+    `0198f0a0-0000-7000-8000-${String(n).padStart(12, '0')}`;
 const longNote =
     'Ajust per inventari: dues ampolles trencades durant el transport de la collita de tardor fins al magatzem de la cooperativa';
 const sees = view === 'producer' ? null : id(900);
@@ -47,19 +48,48 @@ const lines =
     state === 'empty'
         ? []
         : [
-              line(4, 'correction', '1.000', '7.000', 'Recompte equivocat', 'Anna Soler', false, sees),
-              line(3, 'sale', '-3.000', '6.000', null, 'Anna Soler', false, sees),
+              line(
+                  4,
+                  'correction',
+                  '1.000',
+                  '7.000',
+                  'Recompte equivocat',
+                  'Anna Soler',
+                  false,
+                  sees,
+              ),
+              line(
+                  3,
+                  'sale',
+                  '-3.000',
+                  '6.000',
+                  null,
+                  'Anna Soler',
+                  false,
+                  sees,
+              ),
               line(
                   2,
                   'adjustment',
                   '-1.000',
                   '9.000',
                   state === 'long' ? longNote : 'Pot trencat',
-                  state === 'long' ? 'Maria de la Concepció Fernández-Villalonga' : 'Biel Puig',
+                  state === 'long'
+                      ? 'Maria de la Concepció Fernández-Villalonga'
+                      : 'Biel Puig',
                   true,
                   null,
               ),
-              line(1, 'entry', '10.000', '10.000', 'Comprat a X', 'Biel Puig', false, null),
+              line(
+                  1,
+                  'entry',
+                  '10.000',
+                  '10.000',
+                  'Comprat a X',
+                  'Biel Puig',
+                  false,
+                  null,
+              ),
           ];
 const paged = state === 'empty' ? false : true;
 const history = {
@@ -82,7 +112,10 @@ const stockRow = (n: number, name: string) => ({
     available: '7.000',
 });
 
-const pages: Record<string, { component: string; props: object; role: string }> = {
+const pages: Record<
+    string,
+    { component: string; props: object; role: string }
+> = {
     manager: {
         component: 'Manage/Stock/Movements',
         role: 'manager',
@@ -106,7 +139,13 @@ const pages: Record<string, { component: string; props: object; role: string }> 
         component: 'Finance/Stock/Index',
         role: 'finance',
         props: {
-            products: [stockRow(100, 'Mel'), stockRow(101, 'Oli d’oliva verge extra de la collita de tardor')],
+            products: [
+                stockRow(100, 'Mel'),
+                stockRow(
+                    101,
+                    'Oli d’oliva verge extra de la collita de tardor',
+                ),
+            ],
         },
     },
 };
@@ -138,7 +177,12 @@ const page = {
         roleAreas: [
             {
                 role: current.role,
-                label: current.role === 'producer' ? 'Production' : current.role === 'manager' ? 'Cooperative' : 'Finance',
+                label:
+                    current.role === 'producer'
+                        ? 'Production'
+                        : current.role === 'manager'
+                          ? 'Cooperative'
+                          : 'Finance',
                 href: '/',
             },
         ],
@@ -151,7 +195,8 @@ initialPage.dataset.page = 'app';
 initialPage.textContent = JSON.stringify(page);
 document.body.append(initialPage);
 void createInertiaApp({
-    resolve: (name) => components[`../../resources/js/pages/${name}.vue`].default,
+    resolve: (name) =>
+        components[`../../resources/js/pages/${name}.vue`].default,
     layout: () => AppLayout,
     withApp: (app, { page }) => installTranslations(app, page.props.locale),
     progress: false,

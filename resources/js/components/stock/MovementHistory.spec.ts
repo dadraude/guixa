@@ -58,25 +58,27 @@ describe('stock movement history', () => {
             'Ana Buyer',
         );
         expect(
-            wrapper.get('[data-test="movement-basket-link"]').attributes('href'),
+            wrapper
+                .get('[data-test="movement-basket-link"]')
+                .attributes('href'),
         ).toContain('basket-1');
     });
 
     it('drops the basket column when no line carries a basket', () => {
         const wrapper = mountHistory(history([line({ basketId: null })]));
 
-        expect(wrapper.find('[data-test="movement-basket-link"]').exists()).toBe(
-            false,
-        );
+        expect(
+            wrapper.find('[data-test="movement-basket-link"]').exists(),
+        ).toBe(false);
         expect(wrapper.findAll('th')).toHaveLength(7);
     });
 
     it('shows the empty state without a table', () => {
         const wrapper = mountHistory(history([]));
 
-        expect(wrapper.find('[data-test="movement-history-empty"]').exists()).toBe(
-            true,
-        );
+        expect(
+            wrapper.find('[data-test="movement-history-empty"]').exists(),
+        ).toBe(true);
         expect(wrapper.find('table').exists()).toBe(false);
     });
 

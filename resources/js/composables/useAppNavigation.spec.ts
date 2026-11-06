@@ -89,7 +89,11 @@ describe('shared app navigation', () => {
         const history =
             '/finance/stock/12345678-1234-1234-1234-123456789abc/movements';
 
-        expect(finance.map((item) => item.title)).toEqual(['Dashboard', 'Baskets', 'Stock']);
+        expect(finance.map((item) => item.title)).toEqual([
+            'Dashboard',
+            'Baskets',
+            'Stock',
+        ]);
         expect(currentNavigationItem(finance, history)?.title).toBe('Stock');
     });
 
