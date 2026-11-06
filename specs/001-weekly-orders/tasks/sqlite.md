@@ -21,10 +21,11 @@ port's contract and one write use case through it. Runs on PostgreSQL; the SQLit
 ## T78
 
 **Rewrite the schema as portable migrations.** Replace the existing migrations with one clean set per
-context. Declare CHECK constraints and partial unique indexes inline in `create table` /
-`create index`; no `ALTER ... CONSTRAINT`. Port the raw SQL: `::bigint` in
-`EloquentStockMovementRepository`, `btrim` in the basket adjustment CHECK, `lower(...)` ordering and
-email lookups. Use only syntax both engines accept. Add the optional `sqlite` CI job. Done when the
+context, built with the schema builder. Drop every CHECK constraint (ADR 0002 rule 3): before
+removing one, make sure a domain or Application test proves its invariant (if none does, add the
+domain guard and its test), and remove database tests that only exercise the CHECK. Keep partial unique indexes as portable `create index ... where`; no
+`ALTER ... CONSTRAINT`. Port the raw SQL: `::bigint` in `EloquentStockMovementRepository`,
+`lower(...)` ordering and email lookups. Use only syntax both engines accept. Add the optional `sqlite` CI job. Done when the
 suite is green on PostgreSQL and `migrate:fresh` succeeds in the `sqlite` job.
 
 ## T79
