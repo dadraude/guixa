@@ -17,14 +17,14 @@ return new class extends Migration
             $table->string('state');
             // The scheduler settles cycles without an actor, so a system-created weekly base has no creator.
             $table->foreignUuid('created_by')->nullable()->constrained('users');
-            $table->timestampTz('created_at');
+            $table->dateTime('created_at', 6);
             $table->foreignUuid('validated_by')->nullable()->constrained('users');
-            $table->timestampTz('validated_at')->nullable();
+            $table->dateTime('validated_at', 6)->nullable();
             $table->integer('validated_total_cents')->nullable();
             $table->foreignUuid('collected_by')->nullable()->constrained('users');
-            $table->timestampTz('collected_at')->nullable();
+            $table->dateTime('collected_at', 6)->nullable();
             $table->foreignUuid('cancelled_by')->nullable()->constrained('users');
-            $table->timestampTz('cancelled_at')->nullable();
+            $table->dateTime('cancelled_at', 6)->nullable();
             $table->foreignUuid('source_order_id')->nullable()->constrained('orders');
             $table->boolean('late')->default(false);
             $table->index(['household_id', 'created_at']);
@@ -47,8 +47,8 @@ return new class extends Migration
             $table->decimal('quantity', 10, 3);
             $table->decimal('ordered_quantity', 10, 3)->nullable();
             $table->decimal('allocated_quantity', 10, 3)->nullable();
-            $table->timestampTz('created_at');
-            $table->timestampTz('removed_at')->nullable();
+            $table->dateTime('created_at', 6);
+            $table->dateTime('removed_at', 6)->nullable();
             $table->index('product_id');
         });
         DB::statement('create unique index basket_lines_one_active_product on basket_lines (basket_id, product_id) where removed_at is null');
@@ -61,7 +61,7 @@ return new class extends Migration
             $table->unsignedInteger('sequence');
             $table->string('type');
             $table->foreignUuid('recorded_by')->constrained('users');
-            $table->timestampTz('occurred_at');
+            $table->dateTime('occurred_at', 6);
             $table->text('reason')->nullable();
             $table->index(['basket_id', 'occurred_at']);
             $table->unique(['basket_id', 'sequence']);
@@ -73,7 +73,7 @@ return new class extends Migration
             $table->integer('amount_cents');
             $table->text('reason');
             $table->foreignUuid('recorded_by')->constrained('users');
-            $table->timestampTz('occurred_at');
+            $table->dateTime('occurred_at', 6);
             $table->index(['basket_id', 'occurred_at', 'id']);
         });
 

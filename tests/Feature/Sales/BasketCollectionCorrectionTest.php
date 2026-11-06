@@ -5,6 +5,7 @@ use Guixa\Sales\Application\GetBasket;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Clock;
 use Guixa\Shared\Domain\Role;
+use Guixa\Shared\Domain\UtcTimestamp;
 use Guixa\Stock\Application\CreateReturnItem;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -63,7 +64,7 @@ it('allows Finance to correct a stock basket and shows history only to its house
         'stock' => true, 'name' => 'Oil', 'unit' => 'bottle', 'price_cents' => 1200,
         'variable' => false, 'active' => true]);
     DB::table('stock_movements')->insert(['id' => (string) Str::uuid7(), 'product_id' => $product,
-        'type' => 'entry', 'quantity' => '2', 'occurred_at' => now(), 'recorded_by' => $manager->id]);
+        'type' => 'entry', 'quantity' => '2', 'occurred_at' => UtcTimestamp::toStorage(now()), 'recorded_by' => $manager->id]);
 
     $this->actingAs($manager)->post('/finance/baskets', ['household_id' => $household])->assertRedirect();
     $basket = DB::table('baskets')->value('id');

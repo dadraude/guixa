@@ -4,6 +4,7 @@ use Guixa\Catalog\Infrastructure\Persistence\ProducerModel;
 use Guixa\Sales\Application\WalletLedger;
 use Guixa\Sales\Application\WeeklyBasketSource;
 use Guixa\Shared\Application\Actor;
+use Guixa\Shared\Domain\UtcTimestamp;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -18,7 +19,7 @@ function weeklyWithHoney(): array
     $producer = ProducerModel::query()->create(['name' => 'Beekeeper', 'active' => true, 'cutoff_days_before' => 3, 'cutoff_time' => '20:00']);
     $honey = (string) Str::uuid7();
     DB::table('products')->insert(['id' => $honey, 'producer_id' => $producer->id, 'stock' => true, 'name' => 'Honey', 'unit' => 'jar', 'price_cents' => 600, 'variable' => false, 'active' => true]);
-    DB::table('stock_movements')->insert(['id' => (string) Str::uuid7(), 'product_id' => $honey, 'type' => 'entry', 'quantity' => '5', 'occurred_at' => now(), 'recorded_by' => $week['manager']->id]);
+    DB::table('stock_movements')->insert(['id' => (string) Str::uuid7(), 'product_id' => $honey, 'type' => 'entry', 'quantity' => '5', 'occurred_at' => UtcTimestamp::toStorage(now()), 'recorded_by' => $week['manager']->id]);
     test()->actingAs($week['manager'])->post("/finance/baskets/{$week['baskets']['A']}/stock-lines", ['stock_product_id' => $honey, 'stock_quantity' => '2'])->assertRedirect();
 
     return ['week' => $week, 'honey' => $honey];

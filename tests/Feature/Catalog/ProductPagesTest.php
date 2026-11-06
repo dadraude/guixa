@@ -4,6 +4,7 @@ use App\Models\User;
 use Guixa\Catalog\Infrastructure\Persistence\ProducerModel;
 use Guixa\Catalog\Infrastructure\Persistence\ProductModel;
 use Guixa\Shared\Domain\Role;
+use Guixa\Shared\Domain\UtcTimestamp;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -206,7 +207,7 @@ it('keeps the unit and the variable flag while the product has lines in a cycle 
     DB::table('order_lines')->insert([
         'id' => (string) Str::uuid7(), 'order_id' => $orderId, 'product_id' => $product->id, 'producer_id' => $baker->id,
         'product_name' => 'Bread', 'unit' => 'loaf', 'unit_price_cents' => 350, 'variable' => false,
-        'ordered_quantity' => '1', 'allocated_quantity' => '1', 'created_at' => now(), 'added_by' => $account->id,
+        'ordered_quantity' => '1', 'allocated_quantity' => '1', 'created_at' => UtcTimestamp::toStorage(now()), 'added_by' => $account->id,
     ]);
 
     $this->actingAs($account)
@@ -220,7 +221,7 @@ it('keeps the unit and the variable flag while the product has lines in a cycle 
         ->assertRedirect('/producer/products');
     expect($product->refresh()->name)->toBe('Rye bread');
 
-    DB::table('cycles')->where('id', $cycleId)->update(['settled_at' => now()]);
+    DB::table('cycles')->where('id', $cycleId)->update(['settled_at' => UtcTimestamp::toStorage(now())]);
 
     $this->actingAs($account)
         ->put("/producer/products/{$product->id}", ['name' => 'Rye bread', 'unit' => 'kg', 'price' => '4.00', 'variable' => true, 'containers_per_unit' => null])

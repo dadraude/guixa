@@ -4,6 +4,7 @@ use Carbon\CarbonImmutable;
 use Guixa\Catalog\Infrastructure\Persistence\ProducerModel;
 use Guixa\Shared\Domain\Clock;
 use Guixa\Shared\Domain\Role;
+use Guixa\Shared\Domain\UtcTimestamp;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Inertia\Testing\AssertableInertia as Assert;
@@ -21,7 +22,7 @@ function stockScenario(int $priceCents, string $available, bool $producerActive 
     $producer = ProducerModel::query()->create(['name' => 'Beekeeper', 'active' => $producerActive, 'cutoff_days_before' => 3, 'cutoff_time' => '20:00']);
     $product = (string) Str::uuid7();
     DB::table('products')->insert(['id' => $product, 'producer_id' => $producer->id, 'stock' => true, 'name' => 'Honey', 'unit' => 'jar', 'price_cents' => $priceCents, 'variable' => false, 'active' => true]);
-    DB::table('stock_movements')->insert(['id' => (string) Str::uuid7(), 'product_id' => $product, 'type' => 'entry', 'quantity' => $available, 'occurred_at' => now(), 'recorded_by' => accountWith(Role::Manager)->id]);
+    DB::table('stock_movements')->insert(['id' => (string) Str::uuid7(), 'product_id' => $product, 'type' => 'entry', 'quantity' => $available, 'occurred_at' => UtcTimestamp::toStorage(now()), 'recorded_by' => accountWith(Role::Manager)->id]);
 
     return [$household, $product, $producer->id];
 }
@@ -94,7 +95,7 @@ it('records a later supplementary basket as its own sale and charge without touc
     $producer = ProducerModel::query()->create(['name' => 'Beekeeper', 'active' => true, 'cutoff_days_before' => 3, 'cutoff_time' => '20:00']);
     $honey = (string) Str::uuid7();
     DB::table('products')->insert(['id' => $honey, 'producer_id' => $producer->id, 'stock' => true, 'name' => 'Honey', 'unit' => 'jar', 'price_cents' => 700, 'variable' => false, 'active' => true]);
-    DB::table('stock_movements')->insert(['id' => (string) Str::uuid7(), 'product_id' => $honey, 'type' => 'entry', 'quantity' => '3', 'occurred_at' => now(), 'recorded_by' => $finance->id]);
+    DB::table('stock_movements')->insert(['id' => (string) Str::uuid7(), 'product_id' => $honey, 'type' => 'entry', 'quantity' => '3', 'occurred_at' => UtcTimestamp::toStorage(now()), 'recorded_by' => $finance->id]);
     $this->actingAs($finance);
     $late = stockBasketOf($household, $honey, '1');
     $this->post("/finance/baskets/{$late}/validation")->assertRedirect();

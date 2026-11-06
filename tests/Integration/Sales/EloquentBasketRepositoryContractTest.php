@@ -9,6 +9,7 @@ use Guixa\Sales\Domain\BasketLine;
 use Guixa\Sales\Domain\BasketState;
 use Guixa\Sales\Infrastructure\Persistence\EloquentBasketRepository;
 use Guixa\Shared\Domain\Quantity;
+use Guixa\Shared\Domain\UtcTimestamp;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -70,7 +71,7 @@ final class EloquentBasketRepositoryContractTest extends TestCase
         $household = (string) DB::table('orders')->where('id', $orderId)->value('household_id');
         $weekly = fn (?string $source) => fn () => DB::transaction(fn () => DB::table('baskets')->insert([
             'id' => (string) Str::uuid7(), 'household_id' => $household, 'household_name' => 'Household W', 'kind' => 'weekly',
-            'state' => 'draft', 'created_by' => null, 'created_at' => now(), 'source_order_id' => $source,
+            'state' => 'draft', 'created_by' => null, 'created_at' => UtcTimestamp::toStorage(now()), 'source_order_id' => $source,
         ]));
 
         $weekly($orderId)();

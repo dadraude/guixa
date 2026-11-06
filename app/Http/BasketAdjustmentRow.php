@@ -2,6 +2,7 @@
 
 namespace App\Http;
 
+use DateTimeZone;
 use Guixa\Sales\Application\BasketAdjustmentData;
 use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 
@@ -15,7 +16,7 @@ final readonly class BasketAdjustmentRow
     public static function from(BasketAdjustmentData $adjustment): self
     {
         return new self($adjustment->id, $adjustment->amountCents, $adjustment->reason,
-            $adjustment->recordedBy, $adjustment->occurredAt->format(DATE_ATOM),
+            $adjustment->recordedBy, $adjustment->occurredAt->setTimezone(new DateTimeZone(config('guixa.timezone')))->format(DATE_ATOM),
             array_map(BasketAdjustmentLineRow::from(...), $adjustment->lines));
     }
 }

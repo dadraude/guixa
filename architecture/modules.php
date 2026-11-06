@@ -61,6 +61,7 @@ return [
                 'Application\TransactionRunner' => ['Catalog', 'Membership', 'Ordering', 'Sales', 'Stock', 'Wallet'],
                 'Domain\Clock' => ['Catalog', 'Membership', 'Ordering', 'Sales', 'Stock', 'Wallet'],
                 'Domain\Money' => ['Catalog', 'Membership', 'Ordering', 'Sales', 'Stock', 'Wallet'],
+                'Domain\UtcTimestamp' => ['Membership', 'Ordering', 'Sales', 'Stock', 'Wallet'],
                 'Domain\Quantity' => ['Catalog', 'Membership', 'Ordering', 'Sales', 'Stock', 'Wallet'],
                 'Domain\LocalTime' => ['Catalog', 'Membership', 'Ordering', 'Stock', 'Wallet'],
                 'Domain\Role' => ['Catalog', 'Membership', 'Ordering', 'Sales', 'Stock', 'Wallet'],

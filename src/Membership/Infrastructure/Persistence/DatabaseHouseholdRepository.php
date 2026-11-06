@@ -2,10 +2,10 @@
 
 namespace Guixa\Membership\Infrastructure\Persistence;
 
-use DateTimeImmutable;
 use Guixa\Membership\Domain\Household;
 use Guixa\Membership\Domain\HouseholdRepository;
 use Guixa\Shared\Application\Locks;
+use Guixa\Shared\Domain\UtcTimestamp;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -33,7 +33,7 @@ final class DatabaseHouseholdRepository implements HouseholdRepository
             [[
                 'id' => $household->id,
                 'name' => $household->name,
-                'deactivated_at' => $household->deactivatedAt?->format(DATE_ATOM),
+                'deactivated_at' => UtcTimestamp::toStorage($household->deactivatedAt),
                 'created_at' => $now,
                 'updated_at' => $now,
             ]],
@@ -72,7 +72,7 @@ final class DatabaseHouseholdRepository implements HouseholdRepository
         return Household::restore(
             $row->id,
             $row->name,
-            $row->deactivated_at === null ? null : new DateTimeImmutable($row->deactivated_at),
+            UtcTimestamp::fromStorage($row->deactivated_at),
         );
     }
 }

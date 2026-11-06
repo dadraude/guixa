@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('households', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('name');
-            $table->timestampTz('deactivated_at')->nullable();
+            $table->dateTime('deactivated_at', 6)->nullable();
             $table->timestamps();
         });
 
@@ -28,8 +28,8 @@ return new class extends Migration
             $table->timestamps();
             $table->foreignUuid('household_id')->nullable()->constrained('households');
             $table->foreignUuid('producer_id')->nullable()->unique()->constrained('producers');
-            $table->timestampTz('activated_at')->nullable();
-            $table->timestampTz('deactivated_at')->nullable();
+            $table->dateTime('activated_at', 6)->nullable();
+            $table->dateTime('deactivated_at', 6)->nullable();
         });
 
         Schema::create('account_roles', function (Blueprint $table) {
@@ -41,7 +41,7 @@ return new class extends Migration
         Schema::create('invitations', function (Blueprint $table) {
             $table->foreignUuid('account_id')->primary()->constrained('users')->cascadeOnDelete();
             $table->string('token_hash')->unique();
-            $table->timestampTz('sent_at');
+            $table->dateTime('sent_at', 6);
         });
     }
 

@@ -6,6 +6,7 @@ use App\Models\User;
 use Guixa\Catalog\Infrastructure\Persistence\ProducerModel;
 use Guixa\Catalog\Infrastructure\Persistence\ProductModel;
 use Guixa\Shared\Application\Actor;
+use Guixa\Shared\Domain\UtcTimestamp;
 use Guixa\Stock\Application\RecordStockEntry;
 use Guixa\Stock\Domain\StockMovementRepository;
 use Guixa\Stock\Infrastructure\Persistence\EloquentStockMovementRepository;
@@ -42,7 +43,7 @@ final class EloquentStockMovementRepositoryTest extends TestCase
     {
         $id = (string) Str::uuid7();
         DB::table('basket_adjustments')->insert(['id' => $id, 'basket_id' => $basket, 'amount_cents' => 100,
-            'reason' => 'Came back', 'recorded_by' => User::factory()->create()->id, 'occurred_at' => now()]);
+            'reason' => 'Came back', 'recorded_by' => User::factory()->create()->id, 'occurred_at' => UtcTimestamp::toStorage(now())]);
 
         return $id;
     }
@@ -55,7 +56,7 @@ final class EloquentStockMovementRepositoryTest extends TestCase
         DB::table('baskets')->insert([
             'id' => $id, 'household_id' => $household, 'household_name' => 'Household',
             'kind' => 'stock', 'state' => 'draft', 'created_by' => User::factory()->create()->id,
-            'created_at' => now(),
+            'created_at' => UtcTimestamp::toStorage(now()),
         ]);
 
         return $id;
@@ -71,7 +72,7 @@ final class EloquentStockMovementRepositoryTest extends TestCase
     {
         DB::table('stock_movements')->insert([
             'id' => (string) Str::uuid7(), 'product_id' => $this->productId(), 'type' => 'entry', 'quantity' => '1.000',
-            'occurred_at' => '2026-10-22T10:00:00+00:00', 'recorded_by' => (string) Str::uuid7(),
+            'occurred_at' => '2026-10-22 10:00:00', 'recorded_by' => (string) Str::uuid7(),
             'note' => null, 'cycle_id' => null, ...$overrides,
         ]);
     }

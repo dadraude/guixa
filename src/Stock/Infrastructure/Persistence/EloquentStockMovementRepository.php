@@ -2,7 +2,7 @@
 
 namespace Guixa\Stock\Infrastructure\Persistence;
 
-use DateTimeImmutable;
+use Guixa\Shared\Domain\UtcTimestamp;
 use Guixa\Stock\Domain\MovementType;
 use Guixa\Stock\Domain\StockMovement;
 use Guixa\Stock\Domain\StockMovementRepository;
@@ -25,7 +25,7 @@ final class EloquentStockMovementRepository implements StockMovementRepository
             'product_id' => $movement->productId,
             'type' => $movement->type->value,
             'quantity' => $movement->quantity->toString(),
-            'occurred_at' => $movement->occurredAt->format(DATE_ATOM),
+            'occurred_at' => UtcTimestamp::toStorage($movement->occurredAt),
             'recorded_by' => $movement->recordedBy,
             'note' => $movement->note,
             'cycle_id' => $movement->cycleId,
@@ -84,7 +84,7 @@ final class EloquentStockMovementRepository implements StockMovementRepository
             $model->product_id,
             MovementType::from($model->type),
             SignedQuantity::fromString($model->quantity),
-            new DateTimeImmutable($model->occurred_at),
+            UtcTimestamp::fromStorage($model->occurred_at),
             $model->recorded_by,
             $model->note,
             $model->cycle_id,

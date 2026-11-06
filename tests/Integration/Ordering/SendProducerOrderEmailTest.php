@@ -9,6 +9,7 @@ use Guixa\Ordering\Application\SetOrderLine;
 use Guixa\Ordering\Domain\Error\ProducerHasNoAccount;
 use Guixa\Ordering\Infrastructure\Membership\ProducerNotifierMail;
 use Guixa\Shared\Application\Actor;
+use Guixa\Shared\Domain\UtcTimestamp;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -63,7 +64,7 @@ final class SendProducerOrderEmailTest extends TestCase
         $member = Actor::memberOf($this->anna, $this->household);
         app(SetOrderLine::class)($member, $this->cycle, $this->products[0], '2');
         app(SetOrderLine::class)($member, $this->cycle, $this->products[1], '1');
-        DB::table('cycle_producers')->where('cycle_id', $this->cycle)->update(['closes_at' => now()->subMinute()->toIso8601String()]);
+        DB::table('cycle_producers')->where('cycle_id', $this->cycle)->update(['closes_at' => UtcTimestamp::toStorage(now()->subMinute())]);
         DB::table('products')->where('id', $this->products[1])->update(['active' => false]);
     }
 
@@ -107,7 +108,7 @@ final class SendProducerOrderEmailTest extends TestCase
     public function the_scheduled_command_sends_a_closed_producer_with_no_line_to_send_without_email(): void
     {
         Mail::fake();
-        DB::table('cycle_producers')->where('cycle_id', $this->cycle)->update(['closes_at' => now()->subMinute()->toIso8601String()]);
+        DB::table('cycle_producers')->where('cycle_id', $this->cycle)->update(['closes_at' => UtcTimestamp::toStorage(now()->subMinute())]);
 
         app(SendEmptyProducerOrders::class)();
 

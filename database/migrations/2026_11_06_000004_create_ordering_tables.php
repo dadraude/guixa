@@ -19,9 +19,9 @@ return new class extends Migration
         Schema::create('cycles', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->date('pickup_date');
-            $table->timestampTz('cancelled_at')->nullable();
-            $table->timestampTz('settled_at')->nullable();
-            $table->timestampTz('closed_at')->nullable();
+            $table->dateTime('cancelled_at', 6)->nullable();
+            $table->dateTime('settled_at', 6)->nullable();
+            $table->dateTime('closed_at', 6)->nullable();
         });
         DB::statement('create unique index cycles_pickup_date_live_unique on cycles (pickup_date) where cancelled_at is null');
 
@@ -29,10 +29,10 @@ return new class extends Migration
             $table->foreignUuid('cycle_id')->constrained('cycles');
             $table->foreignUuid('producer_id')->constrained('producers');
             $table->boolean('participating')->default(true);
-            $table->timestampTz('closes_at')->nullable();
-            $table->timestampTz('sent_at')->nullable();
-            $table->timestampTz('validated_at')->nullable();
-            $table->timestampTz('distributed_at')->nullable();
+            $table->dateTime('closes_at', 6)->nullable();
+            $table->dateTime('sent_at', 6)->nullable();
+            $table->dateTime('validated_at', 6)->nullable();
+            $table->dateTime('distributed_at', 6)->nullable();
             $table->primary(['cycle_id', 'producer_id']);
         });
 
@@ -40,7 +40,7 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->foreignUuid('cycle_id')->constrained('cycles');
             $table->foreignUuid('household_id')->constrained('households');
-            $table->timestampTz('cancelled_at', 6)->nullable();
+            $table->dateTime('cancelled_at', 6)->nullable();
             $table->unique(['cycle_id', 'household_id']);
         });
 
@@ -57,8 +57,8 @@ return new class extends Migration
             $table->decimal('ordered_quantity', 10, 3);
             $table->decimal('allocated_quantity', 10, 3);
             $table->boolean('allocated_by_hand')->default(false);
-            $table->timestampTz('created_at', 6);
-            $table->timestampTz('removed_at', 6)->nullable();
+            $table->dateTime('created_at', 6);
+            $table->dateTime('removed_at', 6)->nullable();
             $table->foreignUuid('added_by')->constrained('users');
             $table->boolean('not_delivered')->default(false);
             $table->boolean('dropped')->default(false);
