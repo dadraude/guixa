@@ -45,7 +45,7 @@ const line = (
     basketId,
 });
 const lines =
-    state === 'empty'
+    state === 'empty' || state === 'page-empty'
         ? []
         : [
               line(
@@ -91,13 +91,14 @@ const lines =
                   null,
               ),
           ];
-const paged = state === 'empty' ? false : true;
+const paged = state !== 'empty';
 const history = {
     lines,
-    total: lines.length + (paged ? 100 : 0),
+    total: lines.length + (paged ? 100 : 0), // page-empty: a page past the end of 100 movements
     page: 2,
     prevUrl: paged ? `${location.pathname}?page=1` : null,
-    nextUrl: paged ? `${location.pathname}?page=3` : null,
+    nextUrl:
+        paged && state !== 'page-empty' ? `${location.pathname}?page=3` : null,
 };
 const product = { name: 'Mel', unit: 'pot', available: '7.000' };
 const stockRow = (n: number, name: string) => ({

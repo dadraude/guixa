@@ -518,6 +518,71 @@
                         "focus": [],
                         "noFocusReason": "An empty history has no controls."
                     }
+                },
+                {
+                    "id": "page-empty",
+                    "query": {
+                        "state": "page-empty"
+                    },
+                    "ready": "body[data-visual-ready=\"finance-page-empty\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"movement-history-page-empty\"]",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"movement-history-empty\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"movement-line\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"movement-paging\"] a[rel=\"prev\"]",
+                                "count": 1,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"movement-paging\"] a[rel=\"next\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"movement-paging\"] > span:not([aria-hidden])",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content header p",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h2",
+                                "contrast": 4.5
+                            }
+                        ],
+                        "focus": [
+                            "#main-content [data-test=\"movement-paging\"] a[rel=\"prev\"]"
+                        ]
+                    }
                 }
             ]
         },
@@ -820,6 +885,21 @@
                     "cases": [
                         {
                             "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
                             "mode": "dark",
                             "text": 100
                         }
