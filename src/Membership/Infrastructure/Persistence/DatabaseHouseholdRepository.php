@@ -5,6 +5,7 @@ namespace Guixa\Membership\Infrastructure\Persistence;
 use DateTimeImmutable;
 use Guixa\Membership\Domain\Household;
 use Guixa\Membership\Domain\HouseholdRepository;
+use Guixa\Shared\Application\Locks;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -12,10 +13,11 @@ use stdClass;
 
 final class DatabaseHouseholdRepository implements HouseholdRepository
 {
+    public function __construct(private readonly Locks $locks) {}
+
     public function lockMembershipChanges(): void
     {
-        // One transaction lock makes membership and household-state reads current before any write.
-        DB::select('select pg_advisory_xact_lock(191983, 1)');
+        $this->locks->acquire(Locks::MEMBERSHIP_CHANGES);
     }
 
     public function nextId(): string
