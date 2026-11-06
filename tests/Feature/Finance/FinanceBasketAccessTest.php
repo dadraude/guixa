@@ -6,7 +6,6 @@ use Guixa\Sales\Application\GetBasket;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Application\ActorResolver;
 use Guixa\Shared\Domain\Role;
-use Guixa\Shared\Domain\UtcTimestamp;
 use Guixa\Stock\Application\CreateReturnItem;
 use Guixa\Stock\Application\DeactivateReturnItem;
 use Guixa\Stock\Application\UpdateReturnItem;
@@ -44,7 +43,7 @@ it('lets Finance-only create, add, validate and collect an independent basket wi
     DB::table('products')->insert(['id' => $product, 'producer_id' => $producer->id, 'stock' => true,
         'name' => 'Oil', 'unit' => 'bottle', 'price_cents' => 1200, 'variable' => false, 'active' => true]);
     DB::table('stock_movements')->insert(['id' => (string) Str::uuid7(), 'product_id' => $product,
-        'type' => 'entry', 'quantity' => '2', 'occurred_at' => UtcTimestamp::toStorage(now()), 'recorded_by' => $manager->id]);
+        'type' => 'entry', 'quantity' => '2', 'occurred_at' => now(), 'recorded_by' => $manager->id]);
 
     $this->actingAs($finance)->get('/finance/baskets')->assertOk();
     $this->get('/finance/baskets/create')->assertOk();

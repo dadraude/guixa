@@ -11,7 +11,6 @@ use Guixa\Ordering\Application\AddUnorderedProduct;
 use Guixa\Ordering\Application\SetOrderLine;
 use Guixa\Ordering\Domain\Error\ProductNotOrderable;
 use Guixa\Shared\Application\Actor;
-use Guixa\Shared\Domain\UtcTimestamp;
 use Guixa\Stock\Application\RecordStockEntry;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -63,7 +62,7 @@ final class ProductUseConcurrencyTest extends TestCase
     {
         foreach (['classify-stock' => 'ProductUsed', 'delete-weekly' => 'ProductUsed'] as $index => $expected) {
             [$producer, $product, $cycle] = $this->weeklyWorld(count(DB::table('cycles')->get()) + 10);
-            DB::table('cycle_producers')->where('cycle_id', $cycle)->where('producer_id', $producer)->update(['sent_at' => UtcTimestamp::toStorage(now())]);
+            DB::table('cycle_producers')->where('cycle_id', $cycle)->where('producer_id', $producer)->update(['sent_at' => now()]);
             DB::beginTransaction();
             try {
                 app(AddUnorderedProduct::class)(Actor::manager((string) Str::uuid7()), $cycle, $producer, $product, '0');
@@ -128,7 +127,7 @@ final class ProductUseConcurrencyTest extends TestCase
     public function a_reception_write_rejected_after_classification_commits_no_use(): void
     {
         [$producer, $product, $cycle] = $this->weeklyWorld(0);
-        DB::table('cycle_producers')->where('cycle_id', $cycle)->where('producer_id', $producer)->update(['sent_at' => UtcTimestamp::toStorage(now())]);
+        DB::table('cycle_producers')->where('cycle_id', $cycle)->where('producer_id', $producer)->update(['sent_at' => now()]);
         app(ChangeProductClassification::class)(Actor::manager((string) Str::uuid7()), $product, true);
         $this->assertThrows(
             fn () => app(AddUnorderedProduct::class)(Actor::manager((string) Str::uuid7()), $cycle, $producer, $product, '0'),

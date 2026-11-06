@@ -82,13 +82,11 @@ use Guixa\Sales\Infrastructure\Stock\StockQuantitiesAdapter;
 use Guixa\Sales\Infrastructure\Wallet\WalletBasketLedger;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Application\ActorResolver;
-use Guixa\Shared\Application\Locks;
 use Guixa\Shared\Application\TransactionRunner;
 use Guixa\Shared\Domain\Clock;
 use Guixa\Shared\Domain\Role;
 use Guixa\Shared\Infrastructure\DatabaseActorResolver;
 use Guixa\Shared\Infrastructure\DatabaseTransactionRunner;
-use Guixa\Shared\Infrastructure\PostgresLocks;
 use Guixa\Shared\Infrastructure\SystemClock;
 use Guixa\Stock\Domain\ReturnItemRepository;
 use Guixa\Stock\Domain\StockMovementRepository;
@@ -114,7 +112,6 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->singleton(Clock::class, fn (): Clock => new SystemClock(config('guixa.timezone')));
         $this->app->bind(TransactionRunner::class, DatabaseTransactionRunner::class);
-        $this->app->bind(Locks::class, PostgresLocks::class);
         $this->app->bind(ActorResolver::class, DatabaseActorResolver::class);
         $this->app->bind(StockProductRepository::class, CatalogStockProductRepository::class);
         $this->app->bind(ReturnItemRepository::class, EloquentReturnItemRepository::class);

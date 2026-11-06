@@ -11,7 +11,6 @@ use Guixa\Membership\Domain\Household;
 use Guixa\Membership\Domain\ValueObject\Email;
 use Guixa\Membership\Infrastructure\Persistence\DatabaseAccountRepository;
 use Guixa\Membership\Infrastructure\Persistence\DatabaseHouseholdRepository;
-use Guixa\Shared\Infrastructure\PostgresLocks;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Tests\Support\Contracts\AccountRepositoryContract;
@@ -46,7 +45,7 @@ final class DatabaseAccountRepositoryTest extends TestCase
     protected function householdId(): string
     {
         if ($this->householdId === null) {
-            $households = new DatabaseHouseholdRepository(new PostgresLocks);
+            $households = new DatabaseHouseholdRepository;
             $household = Household::create($households->nextId(), 'Casa Roca');
             $households->save($household);
             $this->householdId = $household->id;

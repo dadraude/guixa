@@ -2,12 +2,12 @@
 
 namespace Guixa\Membership\Infrastructure\Persistence;
 
+use DateTimeImmutable;
 use DateTimeZone;
 use Guixa\Membership\Domain\Account;
 use Guixa\Membership\Domain\AccountRepository;
 use Guixa\Membership\Domain\ValueObject\Email;
 use Guixa\Shared\Domain\Role;
-use Guixa\Shared\Domain\UtcTimestamp;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -123,8 +123,8 @@ final class DatabaseAccountRepository implements AccountRepository
             'email' => $account->email->value,
             'household_id' => $account->householdId,
             'producer_id' => $account->producerId,
-            'activated_at' => UtcTimestamp::toStorage($account->activatedAt),
-            'deactivated_at' => UtcTimestamp::toStorage($account->deactivatedAt),
+            'activated_at' => $account->activatedAt?->format(DATE_ATOM),
+            'deactivated_at' => $account->deactivatedAt?->format(DATE_ATOM),
             'updated_at' => Carbon::now(),
         ];
 
@@ -133,7 +133,7 @@ final class DatabaseAccountRepository implements AccountRepository
         if ($stored !== null) {
             // Accepting the invitation proves the address; later saves must not touch the verification time.
             if ($stored->activated_at === null && $account->activatedAt !== null) {
-                // Laravel's `email_verified_at` is a second-precision column: write UTC without microseconds.
+                // A plain `timestamp` column drops the offset, so write the UTC wall-clock time.
                 $columns['email_verified_at'] = $account->activatedAt->setTimezone(new DateTimeZone('UTC'))->format('Y-m-d H:i:s');
             }
 
@@ -160,8 +160,8 @@ final class DatabaseAccountRepository implements AccountRepository
             $roles,
             $row->household_id,
             $row->producer_id,
-            UtcTimestamp::fromStorage($row->activated_at),
-            UtcTimestamp::fromStorage($row->deactivated_at),
+            $row->activated_at === null ? null : new DateTimeImmutable($row->activated_at),
+            $row->deactivated_at === null ? null : new DateTimeImmutable($row->deactivated_at),
         );
     }
 }

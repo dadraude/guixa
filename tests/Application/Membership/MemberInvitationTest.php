@@ -8,8 +8,6 @@ use Guixa\Membership\Domain\Error\InvitationAlreadyAccepted;
 use Guixa\Membership\Domain\Error\InvitationExpired;
 use Guixa\Membership\Domain\Error\InvitationNotValid;
 use Guixa\Membership\Domain\Household;
-use Guixa\Membership\Domain\Invitation;
-use Guixa\Shared\Domain\UtcTimestamp;
 use Illuminate\Auth\Access\AuthorizationException;
 use Tests\Support\Membership\MembershipWorld;
 
@@ -182,15 +180,6 @@ it('lists households with their member count and shows a household with its pend
     $this->world->clock->travelTo('2026-10-29 10:00:01');
 
     expect(($this->world->getHousehold)($this->world->manager, $householdId)->members[0]->invitationExpired)->toBeTrue();
-});
-
-it('shows the invitation expiry in the cooperative timezone when the stored instant is UTC', function () {
-    [$householdId, $accountId] = householdWithAnna($this->world);
-    $this->world->invitations->save(Invitation::restore($accountId, Invitation::hash('token'), UtcTimestamp::fromStorage('2026-10-28 23:30:00')));
-
-    $detail = ($this->world->getHousehold)($this->world->manager, $householdId);
-
-    expect($detail->members[0]->invitationExpiresAt)->toBe('2026-11-05T00:30:00+01:00');
 });
 
 // S56 — Only managers create households (R33)

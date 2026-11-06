@@ -2,7 +2,6 @@
 
 use App\Models\User;
 use Guixa\Shared\Domain\Role;
-use Guixa\Shared\Domain\UtcTimestamp;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Inertia\Testing\AssertableInertia as Assert;
@@ -46,7 +45,7 @@ it('shows the products with their availability and no quantities before the orde
 
 it('shows the total per product without household names once the order is sent (R12, S7)', function () {
     [$producer, $cycleId] = producerSummaryFixture();
-    DB::table('cycle_producers')->where('cycle_id', $cycleId)->update(['closes_at' => UtcTimestamp::toStorage(now()->subHour()), 'sent_at' => UtcTimestamp::toStorage(now())]);
+    DB::table('cycle_producers')->where('cycle_id', $cycleId)->update(['closes_at' => now()->subHour(), 'sent_at' => now()]);
 
     $this->actingAs($producer)->get("/producer/cycles/{$cycleId}")
         ->assertOk()

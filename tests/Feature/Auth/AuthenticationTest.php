@@ -3,7 +3,6 @@
 namespace Tests\Feature\Auth;
 
 use App\Models\User;
-use Guixa\Shared\Domain\UtcTimestamp;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -85,7 +84,7 @@ class AuthenticationTest extends TestCase
 
     public function test_ineligible_accounts_do_not_rehash_on_login(): void
     {
-        foreach ([['activated_at' => null], ['deactivated_at' => UtcTimestamp::toStorage(now())]] as $attributes) {
+        foreach ([['activated_at' => null], ['deactivated_at' => now()]] as $attributes) {
             $user = User::factory()->manager()->create($attributes);
             $originalHash = $this->setOutdatedPassword($user);
 

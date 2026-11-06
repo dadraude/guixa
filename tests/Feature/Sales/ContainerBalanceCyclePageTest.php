@@ -3,7 +3,6 @@
 use Guixa\Catalog\Infrastructure\Persistence\ProducerModel;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Role;
-use Guixa\Shared\Domain\UtcTimestamp;
 use Guixa\Stock\Application\CreateReturnItem;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -17,7 +16,7 @@ it('reads each household balance from Sales baskets on the Manage cycle page, ne
     DB::table('products')->insert(['id' => $honey, 'producer_id' => $producer->id, 'stock' => true, 'name' => 'Honey',
         'unit' => 'jar', 'price_cents' => 700, 'variable' => false, 'active' => true, 'containers_per_unit' => '1']);
     DB::table('stock_movements')->insert(['id' => (string) Str::uuid7(), 'product_id' => $honey,
-        'type' => 'entry', 'quantity' => '20', 'occurred_at' => UtcTimestamp::toStorage(now()), 'recorded_by' => $manager->id]);
+        'type' => 'entry', 'quantity' => '20', 'occurred_at' => now(), 'recorded_by' => $manager->id]);
     $jar = app(CreateReturnItem::class)(Actor::manager($manager->id), 'Glass jar', 50);
     $households = [];
     foreach (['A', 'B'] as $name) {

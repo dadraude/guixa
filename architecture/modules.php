@@ -52,16 +52,14 @@ return [
             ],
         ],
         'Shared' => [
-            'owns' => 'Shared values, actor contracts, clock, transaction and lock abstractions.',
+            'owns' => 'Shared values, actor contracts, clock and transaction abstractions.',
             'dependencies' => [],
             'exports' => [
                 'Application\Actor' => ['Catalog', 'Membership', 'Ordering', 'Sales', 'Stock', 'Wallet'],
                 'Application\ActorResolver' => ['Catalog', 'Membership', 'Ordering', 'Stock', 'Wallet'],
-                'Application\Locks' => ['Membership'],
                 'Application\TransactionRunner' => ['Catalog', 'Membership', 'Ordering', 'Sales', 'Stock', 'Wallet'],
                 'Domain\Clock' => ['Catalog', 'Membership', 'Ordering', 'Sales', 'Stock', 'Wallet'],
                 'Domain\Money' => ['Catalog', 'Membership', 'Ordering', 'Sales', 'Stock', 'Wallet'],
-                'Domain\UtcTimestamp' => ['Membership', 'Ordering', 'Sales', 'Stock', 'Wallet'],
                 'Domain\Quantity' => ['Catalog', 'Membership', 'Ordering', 'Sales', 'Stock', 'Wallet'],
                 'Domain\LocalTime' => ['Catalog', 'Membership', 'Ordering', 'Stock', 'Wallet'],
                 'Domain\Role' => ['Catalog', 'Membership', 'Ordering', 'Sales', 'Stock', 'Wallet'],
@@ -156,7 +154,7 @@ return [
     ],
     'dynamic_tables' => [],
     'sql_exceptions' => [
-        'src/Shared/Infrastructure/PostgresLocks.php' => [
+        'src/Membership/Infrastructure/Persistence/DatabaseHouseholdRepository.php' => [
             'select pg_advisory_xact_lock(191983, 1)' => 'Serializes Membership changes without reading or writing a table.',
         ],
     ],

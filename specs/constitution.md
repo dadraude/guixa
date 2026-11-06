@@ -12,13 +12,13 @@ in the app (e.g. the pickup weekday): those live in a single-row settings table.
 - Inertia 3 + Vue 3 (Composition API, `<script setup lang="ts">`), built with Vite. No Livewire, no separate SPA/API.
 - UI: Tailwind 4 and shadcn-vue (on Reka UI), copied into `resources/js/components/ui` as the starter kit
   ships them. No other component library.
-- SQLite in every environment ([ADR 0002](../docs/adr/0002-sqlite-as-the-only-database.md)).
+- PostgreSQL in every environment except fast unit tests.
 - Pest for backend tests, Vitest for Vue components with client-side logic.
 - PHP DTOs passed as Inertia props generate their TypeScript types (`spatie/laravel-typescript-transformer`);
   never hand-written duplicates.
 - Code quality: Pint and Larastan (PHPStan) for PHP; Oxlint and Oxfmt for TypeScript and Vue, through Vite+
   (`vp check`) as the starter kit ships them.
-- CI on GitHub Actions runs lint, static analysis, Pest (architecture tests included) against SQLite
+- CI on GitHub Actions runs lint, static analysis, Pest (architecture tests included) against Postgres
   and Vitest on every pull request; a red build blocks the merge.
 - Mail: the `log` driver in tests, Mailpit in development.
 
@@ -121,7 +121,7 @@ exceptions, check coverage and the transition to the separately planned Sales mo
 - Always TDD: write the failing test first and watch it fail for the right reason, then the minimum code
   to pass, then refactor while green. No production code without a failing test that demands it. The only
   exceptions are changes with no executable behavior (docs, config), and each one states why.
-- Early returns, small classes with one responsibility, explicit names. Comments only for _why_.
+- Early returns, small classes with one responsibility, explicit names. Comments only for *why*.
 - Code, tests and specs are written in English. Domain glossary keeps the Catalan term for reference.
 
 ## UI

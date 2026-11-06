@@ -4,7 +4,6 @@ use Guixa\Catalog\Infrastructure\Persistence\ProducerModel;
 use Guixa\Sales\Application\CreateStockBasket;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Role;
-use Guixa\Shared\Domain\UtcTimestamp;
 use Guixa\Stock\Application\CreateReturnItem;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -103,7 +102,7 @@ it('collects despite negative balance and no receipt, and reports draft or cance
     DB::table('products')->insert(['id' => $product, 'producer_id' => $producer->id, 'stock' => true,
         'name' => 'Oil', 'unit' => 'bottle', 'price_cents' => 1200, 'variable' => false, 'active' => true]);
     DB::table('stock_movements')->insert(['id' => (string) Str::uuid7(), 'product_id' => $product,
-        'type' => 'entry', 'quantity' => '2', 'occurred_at' => UtcTimestamp::toStorage(now()), 'recorded_by' => $manager->id]);
+        'type' => 'entry', 'quantity' => '2', 'occurred_at' => now(), 'recorded_by' => $manager->id]);
     $debt = app(CreateStockBasket::class)(Actor::manager($manager->id), $household);
     $this->post("/finance/baskets/{$debt}/stock-lines", ['stock_product_id' => $product, 'stock_quantity' => '1'])->assertRedirect();
     $this->post("/finance/baskets/{$debt}/validation")->assertRedirect();

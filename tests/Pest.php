@@ -4,7 +4,6 @@ use App\Models\User;
 use Carbon\CarbonImmutable;
 use Guixa\Catalog\Infrastructure\Persistence\ProducerModel;
 use Guixa\Shared\Domain\Role;
-use Guixa\Shared\Domain\UtcTimestamp;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -155,7 +154,7 @@ function cycleWithBaker(?CarbonImmutable $cutoff = null): array
     $cycleId = (string) Str::uuid7();
     DB::table('cycles')->insert(['id' => $cycleId, 'pickup_date' => CarbonImmutable::now()->addDays(30)->toDateString()]);
     DB::table('cycle_producers')->insert([
-        'cycle_id' => $cycleId, 'producer_id' => $baker->id, 'participating' => true, 'closes_at' => UtcTimestamp::toStorage($cutoff),
+        'cycle_id' => $cycleId, 'producer_id' => $baker->id, 'participating' => true, 'closes_at' => $cutoff?->toDateTimeString(),
     ]);
 
     return [$cycleId, $baker, $loaf];
@@ -177,7 +176,7 @@ function twoHouseholdWeek(int $loafPriceCents = 350): array
         test()->actingAs(memberOf($households[$name], "Member {$name}"))->put("/cycles/{$cycleId}/order/lines/{$loaf}", ['quantity' => $quantity])->assertRedirect();
         app('auth')->forgetGuards();
     }
-    DB::table('cycle_producers')->where('cycle_id', $cycleId)->update(['closes_at' => UtcTimestamp::toStorage(now()->subHour()), 'sent_at' => UtcTimestamp::toStorage(now())]);
+    DB::table('cycle_producers')->where('cycle_id', $cycleId)->update(['closes_at' => now()->subHour(), 'sent_at' => now()]);
     $manager = accountWith(Role::Manager);
     $reception = "/manage/cycles/{$cycleId}/receptions/{$baker->id}";
     test()->actingAs($manager)->put("{$reception}/products/{$loaf}/received", ['received' => '6'])->assertRedirect();
@@ -223,7 +222,7 @@ function lateArrivalWeek(bool $withSpareDraft = false): array
         }
         app('auth')->forgetGuards();
     }
-    DB::table('cycle_producers')->where('cycle_id', $cycleId)->update(['closes_at' => UtcTimestamp::toStorage(now()->subHour()), 'sent_at' => UtcTimestamp::toStorage(now())]);
+    DB::table('cycle_producers')->where('cycle_id', $cycleId)->update(['closes_at' => now()->subHour(), 'sent_at' => now()]);
     $manager = accountWith(Role::Manager);
     $reception = "/manage/cycles/{$cycleId}/receptions/{$baker->id}";
     test()->actingAs($manager)->put("{$reception}/products/{$cherries}/received", ['received' => '0'])->assertRedirect();

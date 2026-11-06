@@ -5,7 +5,6 @@ use Guixa\Ordering\Application\SetOrderLine;
 use Guixa\Ordering\Infrastructure\Membership\ProducerNotifierMail;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Role;
-use Guixa\Shared\Domain\UtcTimestamp;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
@@ -31,7 +30,7 @@ function sendWorld(): array
 function closeProducer(string $cycle, string $producer): void
 {
     DB::table('cycle_producers')->where('cycle_id', $cycle)->where('producer_id', $producer)
-        ->update(['closes_at' => UtcTimestamp::toStorage(now()->subMinute())]);
+        ->update(['closes_at' => now()->subMinute()->toIso8601String()]);
 }
 
 function sentAt(string $cycle, string $producer): ?string
@@ -113,7 +112,7 @@ it('refuses to send in a cancelled cycle (R4b)', function () {
     [$cycle, $baker] = sendWorld();
     User::factory()->create(['producer_id' => $baker]);
     closeProducer($cycle, $baker);
-    DB::table('cycles')->where('id', $cycle)->update(['cancelled_at' => UtcTimestamp::toStorage(now())]);
+    DB::table('cycles')->where('id', $cycle)->update(['cancelled_at' => now()]);
 
     $this->actingAs(accountWith(Role::Manager))->from('/manage/cycles')
         ->post("/manage/cycles/{$cycle}/producers/{$baker}/send")

@@ -4,7 +4,6 @@ use Carbon\CarbonImmutable;
 use Guixa\Catalog\Infrastructure\Persistence\ProducerModel;
 use Guixa\Shared\Domain\Clock;
 use Guixa\Shared\Domain\Role;
-use Guixa\Shared\Domain\UtcTimestamp;
 use Illuminate\Support\Facades\DB;
 use Inertia\Testing\AssertableInertia as Assert;
 use Tests\Support\FrozenClock;
@@ -357,7 +356,7 @@ it('refuses to add a producer to a settled cycle and shows the domain error (R4a
     $baker = cyclesBaker();
     $this->actingAs($manager)->post('/manage/cycles', ['pickup_date' => upcoming()->toDateString()]);
     $cycleId = DB::table('cycles')->value('id');
-    DB::table('cycles')->where('id', $cycleId)->update(['settled_at' => UtcTimestamp::toStorage(now())]);
+    DB::table('cycles')->where('id', $cycleId)->update(['settled_at' => now()]);
 
     $this->actingAs($manager)->from('/manage/cycles')->post("/manage/cycles/{$cycleId}/producers/{$baker->id}")
         ->assertSessionHasErrors(['domain' => __('errors.CycleSettled')]);
@@ -373,7 +372,7 @@ it('refuses to make a stopped producer participate again in a settled cycle (R4a
     $cycleId = DB::table('cycles')->value('id');
     $this->actingAs($manager)->post("/manage/cycles/{$cycleId}/producers/{$baker->id}");
     $this->actingAs($manager)->delete("/manage/cycles/{$cycleId}/producers/{$baker->id}");
-    DB::table('cycles')->where('id', $cycleId)->update(['settled_at' => UtcTimestamp::toStorage(now())]);
+    DB::table('cycles')->where('id', $cycleId)->update(['settled_at' => now()]);
 
     $this->actingAs($manager)->from('/manage/cycles')->put("/manage/cycles/{$cycleId}/producers/{$baker->id}")
         ->assertSessionHasErrors(['domain' => __('errors.CycleSettled')]);

@@ -2,10 +2,9 @@
 
 namespace Guixa\Membership\Infrastructure\Persistence;
 
+use DateTimeImmutable;
 use Guixa\Membership\Domain\Household;
 use Guixa\Membership\Domain\HouseholdRepository;
-use Guixa\Shared\Application\Locks;
-use Guixa\Shared\Domain\UtcTimestamp;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -13,11 +12,10 @@ use stdClass;
 
 final class DatabaseHouseholdRepository implements HouseholdRepository
 {
-    public function __construct(private readonly Locks $locks) {}
-
     public function lockMembershipChanges(): void
     {
-        $this->locks->acquire(Locks::MEMBERSHIP_CHANGES);
+        // One transaction lock makes membership and household-state reads current before any write.
+        DB::select('select pg_advisory_xact_lock(191983, 1)');
     }
 
     public function nextId(): string
@@ -33,7 +31,7 @@ final class DatabaseHouseholdRepository implements HouseholdRepository
             [[
                 'id' => $household->id,
                 'name' => $household->name,
-                'deactivated_at' => UtcTimestamp::toStorage($household->deactivatedAt),
+                'deactivated_at' => $household->deactivatedAt?->format(DATE_ATOM),
                 'created_at' => $now,
                 'updated_at' => $now,
             ]],
@@ -72,7 +70,7 @@ final class DatabaseHouseholdRepository implements HouseholdRepository
         return Household::restore(
             $row->id,
             $row->name,
-            UtcTimestamp::fromStorage($row->deactivated_at),
+            $row->deactivated_at === null ? null : new DateTimeImmutable($row->deactivated_at),
         );
     }
 }

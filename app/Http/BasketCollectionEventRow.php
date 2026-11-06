@@ -2,7 +2,6 @@
 
 namespace App\Http;
 
-use DateTimeZone;
 use Guixa\Sales\Application\BasketCollectionEventData;
 use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 
@@ -15,6 +14,6 @@ final readonly class BasketCollectionEventRow
     public static function from(BasketCollectionEventData $event): self
     {
         return new self($event->id, $event->type, $event->recordedBy,
-            $event->occurredAt->setTimezone(new DateTimeZone(config('guixa.timezone')))->format(DATE_ATOM), $event->reason);
+            $event->occurredAt->format(DATE_ATOM), $event->reason);
     }
 }
