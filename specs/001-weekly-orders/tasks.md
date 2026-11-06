@@ -19,7 +19,7 @@ Source: [spec](spec.md) and areas · [plan](plan.md) · [coverage allocation](ta
 | [tasks/catalog.md](tasks/catalog.md) | T52–T54: unified producer catalogue, safe history and stock visibility |
 | [tasks/sales.md](tasks/sales.md) | T55–T58 and T64–T66/T68: independent basket, Finance, returns, receipts, member reads and corrections |
 | [tasks/weekly-and-collection.md](tasks/weekly-and-collection.md) | T59–T63/T67: weekly cutover, supplements, collection, indicators, lifecycle and cleanup; T33 closure |
-| [tasks/coverage.md](tasks/coverage.md) | All 65 requirements and 91 scenarios (S1–S92, S90 retired): retained responsibility and amendment responsibility |
+| [tasks/coverage.md](tasks/coverage.md) | All 66 requirements and 92 scenarios (S1–S93, S90 retired): retained responsibility and amendment responsibility |
 | [tasks/traceability.md](tasks/traceability.md) | T33 audit: assertion-level evidence and verdict for every requirement and scenario, closure prerequisites and gaps filled |
 | [tasks/audit-2026-11-05.md](tasks/audit-2026-11-05.md) | T69–T76: follow-up tasks from the 2026-11-05 SDD↔code audit (documents, bugfixes, refactors, tests, send button, movement history) |
 | [tasks/baseline.md](tasks/baseline.md) | Historical T01–T51 scopes, approval gates and dated evidence; superseded behavior is explicitly historical |
@@ -150,7 +150,7 @@ preserves; implement changed behavior through T52–T68; T69–T76 are the 2026-
 | T73 | <a id="t73"></a>[Delete dead cycle code and fix stale docblocks](tasks/audit-2026-11-05.md#t73) | R4b; code hygiene, no behaviour change | T69 |
 | T74 | <a id="t74"></a>[Fill the audited test gaps](tasks/audit-2026-11-05.md#t74) | S27, S61, S69, S87 | T69 |
 | T75 | <a id="t75"></a>[Manager send button for producer orders](tasks/audit-2026-11-05.md#t75) | R12a; S36 | T69 |
-| T76 | <a id="t76"></a>[Stock movement history](tasks/audit-2026-11-05.md#t76) | New requirement (spec first, gated); R28 | T69 |
+| T76 | <a id="t76"></a>[Stock movement history](tasks/audit-2026-11-05.md#t76) | R25b, R28a, R36c; S93 | T69 |
 
 ## Linear mapping — 2026-11-05 audit tasks
 
