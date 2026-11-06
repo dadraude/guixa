@@ -198,7 +198,6 @@ jobs:
     needs: changes
     if: needs.changes.outputs.backend == 'true'
     runs-on: ubuntu-latest
-    continue-on-error: true
 
     services:
       redis:
@@ -251,8 +250,35 @@ jobs:
       - name: Migrate a fresh SQLite database
         run: php artisan migrate:fresh --force
 
+      # Failures are expected until T79 (DRA-244); the summary below reports them without turning the job red.
       - name: Run PHP tests on SQLite
-        run: php artisan test --parallel
+        id: sqlite-tests
+        continue-on-error: true
+        run: php artisan test --parallel --log-junit "$RUNNER_TEMP/sqlite-junit.xml"
+
+      - name: Summarise SQLite test results
+        if: always()
+        env:
+          OUTCOME: ${{ steps.sqlite-tests.outcome }}
+          JUNIT: ${{ runner.temp }}/sqlite-junit.xml
+        run: |
+          python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import os, xml.etree.ElementTree as ET
+          print('## SQLite test results (optional)')
+          print()
+          print(f"Test step outcome: `{os.environ['OUTCOME']}`")
+          print()
+          try:
+              root = ET.parse(os.environ['JUNIT']).getroot()
+              suite = root.find('testsuite') if root.tag == 'testsuites' else root
+              print('| Tests | Failures | Errors | Skipped |')
+              print('| ---: | ---: | ---: | ---: |')
+              print('| ' + ' | '.join(suite.get(k, '0') for k in ('tests', 'failures', 'errors', 'skipped')) + ' |')
+          except (OSError, ET.ParseError, AttributeError):
+              print('No JUnit report was written, so there are no totals to show.')
+          print()
+          print('Failures are expected until T79 (DRA-244) makes this job required.')
+          PY
 
   tooling:
     needs: changes
