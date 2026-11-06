@@ -8,7 +8,7 @@ Existing presentation tasks T37–T51 retain their regression/visual scopes and 
 
 ## Requirements
 
-All 65 current requirement IDs, ordered as declared in the area specifications. Entries before a
+All 66 current requirement IDs, ordered as declared in the area specifications. Entries before a
 semicolon identify retained work; the amendment owner implements the stated changed boundary.
 
 | Rule | Delivery responsibility |
@@ -61,11 +61,12 @@ semicolon identify retained work; the amendment owner implements the stated chan
 | [R24b](../pickup.md) | [T59](../tasks.md#t59) (closure), [T60](../tasks.md#t60) (supplements), [T67](../tasks.md#t67) (indicators) |
 | [R25](../stock-wallet.md) | [T24](../tasks.md#t24); [T52](../tasks.md#t52)/[T53](../tasks.md#t53) |
 | [R25a](../stock-wallet.md) | [T53](../tasks.md#t53)/[T55](../tasks.md#t55) |
-| [R25b](../stock-wallet.md) | [T52](../tasks.md#t52)/[T54](../tasks.md#t54) |
+| [R25b](../stock-wallet.md) | [T52](../tasks.md#t52)/[T54](../tasks.md#t54); [T76](../tasks.md#t76) (own movement history) |
 | [R25c](../stock-wallet.md) | [T54](../tasks.md#t54) |
 | [R26](../stock-wallet.md) | [T25](../tasks.md#t25); [T52](../tasks.md#t52) |
 | [R27](../stock-wallet.md) | [T25](../tasks.md#t25); [T52](../tasks.md#t52)/[T68](../tasks.md#t68) |
 | [R28](../stock-wallet.md) | [T25](../tasks.md#t25); [T54](../tasks.md#t54)/[T55](../tasks.md#t55)/[T68](../tasks.md#t68) |
+| [R28a](../stock-wallet.md) | [T76](../tasks.md#t76) |
 | [R29](../stock-wallet.md) | [T26](../tasks.md#t26); [T64](../tasks.md#t64) |
 | [R30](../stock-wallet.md) | [T26](../tasks.md#t26); [T55](../tasks.md#t55)/[T64](../tasks.md#t64) |
 | [R31](../stock-wallet.md) | [T26](../tasks.md#t26); [T55](../tasks.md#t55) (source), [T56](../tasks.md#t56) (Finance read), [T64](../tasks.md#t64) (receipts), [T65](../tasks.md#t65) (member read), [T58](../tasks.md#t58)/[T68](../tasks.md#t68) (adjustments) |
@@ -77,7 +78,7 @@ semicolon identify retained work; the amendment owner implements the stated chan
 | [R36](../stock-wallet.md) | [T08](../tasks.md#t08)/[T09](../tasks.md#t09) |
 | [R36a](../stock-wallet.md) | [T04](../tasks.md#t04)/[T07](../tasks.md#t07)/[T34](../tasks.md#t34); [T56](../tasks.md#t56) |
 | [R36b](../stock-wallet.md) | [T07](../tasks.md#t07); [T56](../tasks.md#t56)/[T62](../tasks.md#t62) |
-| [R36c](../stock-wallet.md) | [T56](../tasks.md#t56) (role/baskets), [T64](../tasks.md#t64) (receipts) |
+| [R36c](../stock-wallet.md) | [T56](../tasks.md#t56) (role/baskets), [T64](../tasks.md#t64) (receipts), [T76](../tasks.md#t76) (read-only stock history) |
 
 ## Scenarios
 
@@ -179,6 +180,7 @@ behavior and verify its regression through the new final contracts, not that the
 | S90 — retired | — | — |
 | [S91 — Successive late arrivals share one open draft](../pickup.md) | — | [T59](../tasks.md#t59) |
 | [S92 — Container balance accumulates per household](../reception.md) | — | [T60](../tasks.md#t60) |
+| [S93 — Stock movement history](../stock-wallet.md) | — | [T76](../tasks.md#t76) |
 
 ## Required checks beyond scenario identifiers
 
