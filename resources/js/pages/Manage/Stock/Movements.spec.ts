@@ -7,12 +7,7 @@ import { installTranslations } from '@/lib/i18n';
 
 vi.mock('@inertiajs/vue3', () => ({
     Head: () => null,
-    Link: defineComponent({
-        setup:
-            (_, { slots }) =>
-            () =>
-                h('a', slots.default?.()),
-    }),
+    router: { visit: vi.fn() },
     Form: defineComponent({
         setup:
             (_, { slots }) =>

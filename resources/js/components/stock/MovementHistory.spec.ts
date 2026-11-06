@@ -1,19 +1,8 @@
 // @vitest-environment jsdom
-import { describe, expect, it, vi } from 'vite-plus/test';
+import { describe, expect, it } from 'vite-plus/test';
 import { mount } from '@vue/test-utils';
-import { defineComponent, h } from 'vue';
 import MovementHistory from './MovementHistory.vue';
 import { installTranslations } from '@/lib/i18n';
-
-vi.mock('@inertiajs/vue3', () => ({
-    Link: defineComponent({
-        props: { href: { type: String, default: '' } },
-        setup:
-            (props, { slots }) =>
-            () =>
-                h('a', { href: props.href }, slots.default?.()),
-    }),
-}));
 
 const line = (overrides: Partial<App.Http.StockMovementRow> = {}) => ({
     id: 'one',
@@ -115,5 +104,29 @@ describe('stock movement history', () => {
                 .findAll('a')
                 .map((link) => link.attributes('href')),
         ).toEqual(['/p?page=2']);
+    });
+
+    it('asks the page to visit a link on a plain click, and leaves modified clicks to the browser', async () => {
+        const wrapper = mountHistory(
+            history([line()], {
+                page: 2,
+                prevUrl: '/p?page=1',
+                nextUrl: '/p?page=3',
+            }),
+        );
+
+        await wrapper.get('a[rel="next"]').trigger('click');
+        await wrapper.get('a[rel="prev"]').trigger('click', { ctrlKey: true });
+        await wrapper
+            .get('[data-test="movement-basket-link"]')
+            .trigger('click');
+
+        expect(wrapper.emitted('navigate')).toEqual([
+            ['/p?page=3'],
+            [expect.stringContaining('basket-1')],
+        ]);
+        expect(wrapper.get('a[rel="prev"]').attributes('href')).toBe(
+            '/p?page=1',
+        );
     });
 });

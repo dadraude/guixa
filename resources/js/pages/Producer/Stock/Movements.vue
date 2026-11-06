@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Head } from '@inertiajs/vue3';
+import { Head, router } from '@inertiajs/vue3';
 import { trans } from 'laravel-vue-i18n';
 import ProductController from '@/actions/App/Http/Controllers/Producer/ProductController';
 import Heading from '@/components/Heading.vue';
@@ -14,6 +14,8 @@ defineOptions({
         ],
     },
 });
+
+const visit = (url: string) => router.visit(url);
 
 defineProps<{
     product: { name: string; unit: string; available: string };
@@ -35,6 +37,6 @@ defineProps<{
             "
         />
 
-        <MovementHistory :history="history" />
+        <MovementHistory :history="history" @navigate="visit" />
     </div>
 </template>

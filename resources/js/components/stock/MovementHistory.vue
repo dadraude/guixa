@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Link } from '@inertiajs/vue3';
 import { trans } from 'laravel-vue-i18n';
 import { computed } from 'vue';
 import BasketController from '@/actions/App/Http/Controllers/Finance/BasketController';
@@ -14,6 +13,27 @@ import {
 const props = defineProps<{
     history: App.Http.StockMovementPageRow;
 }>();
+
+const basketUrl = (basket: string) => BasketController.show.url({ basket });
+
+// A9: the page navigates. Links keep their real href (new tab, copy link) and only a
+// plain left click asks the page to visit it.
+const emit = defineEmits<{ navigate: [url: string] }>();
+
+const follow = (event: MouseEvent, url: string) => {
+    if (
+        event.defaultPrevented ||
+        event.button !== 0 ||
+        event.metaKey ||
+        event.ctrlKey ||
+        event.shiftKey ||
+        event.altKey
+    )
+        return;
+
+    event.preventDefault();
+    emit('navigate', url);
+};
 
 const typeLabels: Record<string, string> = {
     entry: trans('stock.movement_types.entry'),
@@ -156,18 +176,17 @@ const showBaskets = computed(() =>
                                     aria-hidden="true"
                                     >{{ trans('Source') }}</span
                                 >
-                                <Link
+                                <a
                                     v-if="line.basketId"
-                                    :href="
-                                        BasketController.show.url({
-                                            basket: line.basketId,
-                                        })
-                                    "
+                                    :href="basketUrl(line.basketId)"
                                     class="inline-flex min-h-11 max-w-full items-center underline"
                                     data-test="movement-basket-link"
+                                    @click="
+                                        follow($event, basketUrl(line.basketId))
+                                    "
                                 >
                                     {{ trans('Basket') }}
-                                </Link>
+                                </a>
                             </td>
                         </tr>
                     </tbody>
@@ -187,9 +206,12 @@ const showBaskets = computed(() =>
                 class="min-h-11"
                 as-child
             >
-                <Link :href="history.prevUrl" rel="prev">{{
-                    trans('Previous page')
-                }}</Link>
+                <a
+                    :href="history.prevUrl"
+                    rel="prev"
+                    @click="follow($event, history.prevUrl)"
+                    >{{ trans('Previous page') }}</a
+                >
             </Button>
             <span v-else aria-hidden="true"></span>
             <span class="text-sm text-muted-foreground">{{
@@ -201,9 +223,12 @@ const showBaskets = computed(() =>
                 class="min-h-11"
                 as-child
             >
-                <Link :href="history.nextUrl" rel="next">{{
-                    trans('Next page')
-                }}</Link>
+                <a
+                    :href="history.nextUrl"
+                    rel="next"
+                    @click="follow($event, history.nextUrl)"
+                    >{{ trans('Next page') }}</a
+                >
             </Button>
             <span v-else aria-hidden="true"></span>
         </nav>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { formatPickupDate, formatQuantity } from '@/lib/locale';
 import { trans } from 'laravel-vue-i18n';
-import { Form, Head } from '@inertiajs/vue3';
+import { Form, Head, router } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 import StockMovementController from '@/actions/App/Http/Controllers/Manage/StockMovementController';
 import StockProductController from '@/actions/App/Http/Controllers/Manage/StockProductController';
@@ -21,6 +21,8 @@ defineOptions({
         ],
     },
 });
+
+const visit = (url: string) => router.visit(url);
 
 const props = defineProps<{
     product: App.Http.StockLevelRow;
@@ -178,6 +180,6 @@ const selectedAdjustmentCycleLabel = computed(
             </Button>
         </Form>
 
-        <MovementHistory :history="history" />
+        <MovementHistory :history="history" @navigate="visit" />
     </div>
 </template>
