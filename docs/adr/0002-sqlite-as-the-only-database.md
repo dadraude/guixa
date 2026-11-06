@@ -18,9 +18,11 @@ This supersedes the "PostgreSQL in every environment" line of the constitution.
 2. **Locking behind one port.** Repositories keep calling `lockForUpdate()`: it is a no-op on SQLite
    and becomes real on Postgres. The household advisory lock is replaced by a `Locks` port in
    Infrastructure, so only that class changes if the engine does.
-3. **Portable SQL only.** Constraints and partial unique indexes are declared in `create table` /
-   `create index` (SQLite cannot `ALTER ... ADD CONSTRAINT`), using syntax Postgres also accepts.
-   No `::` casts, `btrim`, `ilike` or other engine-specific functions.
+3. **Portable SQL only.** Tables are built with Laravel's schema builder; partial unique indexes use
+   a raw `create unique index ... where`. Everything uses syntax both engines accept. No `::` casts, `btrim`, `ilike` or other engine-specific functions. The database
+   keeps types, `not null`, foreign keys, and unique and partial unique indexes (`create index ...
+   where`). It has no CHECK constraints: the builder cannot declare them and SQLite cannot add them
+   after `create table`. The domain objects enforce those invariants, and their tests prove them.
 4. **Schema from scratch.** The existing migrations are replaced by one clean set per context.
 5. **Timestamps in UTC.** Stored as ISO-8601 text in UTC and converted to the cooperative's timezone
    at the edge, which also removes the local Madrid vs CI UTC mismatch.
