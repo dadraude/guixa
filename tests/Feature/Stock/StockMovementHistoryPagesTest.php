@@ -162,3 +162,15 @@ it('answers a page past the end with empty lines, a link back to the last page a
     $this->get("/manage/stock/{$this->honey->id}/movements?page=3")->assertOk()
         ->assertInertia(fn (Assert $page) => $page->has('history.lines', 0)->where('history.total', 4));
 });
+
+it('lists deactivated stock for Finance and Manager, marked inactive, with the history link (R28a)', function () {
+    $this->oil->update(['active' => false]);
+
+    foreach ([accountWith(Role::Finance), accountWith(Role::Manager)] as $actor) {
+        $this->actingAs($actor)->get('/finance/stock')->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('Finance/Stock/Index')
+                ->has('products', 2)
+                ->where('products', fn ($products) => $products->firstWhere('id', $this->oil->id)['active'] === false));
+    }
+});

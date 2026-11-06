@@ -19,7 +19,7 @@ final class StockController extends Controller
     public function index(Actor $actor, ListStock $list): Response
     {
         return Inertia::render('Finance/Stock/Index', [
-            'products' => array_map(StockLevelRow::from(...), $list($actor)),
+            'products' => array_map(StockLevelRow::from(...), $list($actor, includeInactive: true)),
         ]);
     }
 

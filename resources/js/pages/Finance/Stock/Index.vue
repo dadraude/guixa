@@ -3,6 +3,7 @@ import { Head, Link } from '@inertiajs/vue3';
 import { trans } from 'laravel-vue-i18n';
 import StockController from '@/actions/App/Http/Controllers/Finance/StockController';
 import Heading from '@/components/Heading.vue';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { formatMoney, formatQuantity } from '@/lib/locale';
 
@@ -48,6 +49,13 @@ defineProps<{
                     </p>
                 </div>
                 <div class="flex flex-wrap items-center gap-3 sm:justify-end">
+                    <Badge
+                        v-if="!product.active"
+                        variant="secondary"
+                        data-test="finance-stock-inactive"
+                    >
+                        {{ trans('Inactive') }}
+                    </Badge>
                     <span class="tabular-nums">
                         {{ formatQuantity(product.available) }}
                         {{ product.unit }}

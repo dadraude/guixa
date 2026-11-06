@@ -3,9 +3,19 @@
     "rootFontPx": 16,
     "darkSelector": "html.dark",
     "matrix": {
-        "widths": [375, 1024, 1280],
-        "modes": ["light", "dark"],
-        "text": [100, 200]
+        "widths": [
+            375,
+            1024,
+            1280
+        ],
+        "modes": [
+            "light",
+            "dark"
+        ],
+        "text": [
+            100,
+            200
+        ]
     },
     "views": [
         {
@@ -17,7 +27,9 @@
             "root": "#main-content",
             "panels": "#main-content form,#main-content .pilot-layout-panel:not(:has(table)),#main-content .pilot-layout-notice,#main-content .pilot-data-table tbody tr",
             "content": "#main-content h1,#main-content h2,#main-content p,#main-content label,#main-content input,#main-content button,#main-content a,#main-content td,#main-content li",
-            "fonts": ["16px Nunito Variable"],
+            "fonts": [
+                "16px Nunito Variable"
+            ],
             "focus": [
                 "#main-content #entry-quantity",
                 "#main-content [data-test=\"movement-paging\"] a[rel=\"prev\"]",
@@ -318,7 +330,9 @@
             "root": "#main-content",
             "panels": "#main-content form,#main-content .pilot-layout-panel:not(:has(table)),#main-content .pilot-layout-notice,#main-content .pilot-data-table tbody tr",
             "content": "#main-content h1,#main-content h2,#main-content p,#main-content label,#main-content input,#main-content button,#main-content a,#main-content td,#main-content li",
-            "fonts": ["16px Nunito Variable"],
+            "fonts": [
+                "16px Nunito Variable"
+            ],
             "focus": [
                 "#main-content [data-test=\"movement-paging\"] a[rel=\"prev\"]",
                 "#main-content [data-test=\"movement-paging\"] a[rel=\"next\"]"
@@ -530,7 +544,9 @@
             "root": "#main-content",
             "panels": "#main-content form,#main-content .pilot-layout-panel:not(:has(table)),#main-content .pilot-layout-notice,#main-content .pilot-data-table tbody tr",
             "content": "#main-content h1,#main-content h2,#main-content p,#main-content label,#main-content input,#main-content button,#main-content a,#main-content td,#main-content li",
-            "fonts": ["16px Nunito Variable"],
+            "fonts": [
+                "16px Nunito Variable"
+            ],
             "focus": [
                 "#main-content [data-test=\"movement-paging\"] a[rel=\"prev\"]",
                 "#main-content [data-test=\"movement-paging\"] a[rel=\"next\"]"
@@ -746,8 +762,12 @@
             "root": "#main-content",
             "panels": "#main-content .pilot-layout-panel,#main-content li",
             "content": "#main-content h1,#main-content h2,#main-content p,#main-content label,#main-content input,#main-content button,#main-content a,#main-content td,#main-content li",
-            "fonts": ["16px Nunito Variable"],
-            "focus": ["#main-content [data-test=\"finance-stock-product\"] a"],
+            "fonts": [
+                "16px Nunito Variable"
+            ],
+            "focus": [
+                "#main-content [data-test=\"finance-stock-product\"] a"
+            ],
             "states": [
                 {
                     "id": "populated",
@@ -806,6 +826,46 @@
                             },
                             {
                                 "selector": "#main-content header p",
+                                "contrast": 4.5
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "inactive",
+                    "query": {
+                        "state": "inactive"
+                    },
+                    "ready": "body[data-visual-ready=\"finance-list-inactive\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"finance-stock-product\"]",
+                                "count": 3
+                            },
+                            {
+                                "selector": "[data-test=\"finance-stock-inactive\"]",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"finance-stock-product\"] a",
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"finance-stock-product\"] p",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h1",
                                 "contrast": 4.5
                             }
                         ]

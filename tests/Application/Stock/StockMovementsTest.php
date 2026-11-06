@@ -249,6 +249,18 @@ it('shows Finance only active stock for basket selection while retaining Manager
         ->and(fn () => ($this->adjust)($finance, $this->honeyId, '1', 'note', null))->toThrow(AuthorizationException::class);
 });
 
+it('lets Finance ask for deactivated stock too, flagged inactive, without changing the default (R28a, R36c)', function () {
+    $finance = new Actor('finance', [Role::Finance]);
+    $this->products->deactivate($this->honeyId);
+
+    $levels = ($this->listStock)($finance, includeInactive: true);
+
+    expect($levels)->toHaveCount(1)->and($levels[0]->active)->toBeFalse()
+        ->and(($this->listStock)($finance))->toBe([])
+        ->and(fn () => ($this->listStock)(new Actor('member', [Role::Member]), includeInactive: true))
+        ->toThrow(AuthorizationException::class);
+});
+
 it('sets the counted quantity from the level read under the product lock (R27)', function () {
     ($this->entry)($this->manager, $this->honeyId, '10', null);
     $this->products->locked = [];

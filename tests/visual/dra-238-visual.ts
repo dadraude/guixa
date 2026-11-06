@@ -145,6 +145,9 @@ const pages: Record<
                     101,
                     'Oli d’oliva verge extra de la collita de tardor',
                 ),
+                ...(state === 'inactive'
+                    ? [{ ...stockRow(102, 'Mel de bruc'), active: false }]
+                    : []),
             ],
         },
     },
