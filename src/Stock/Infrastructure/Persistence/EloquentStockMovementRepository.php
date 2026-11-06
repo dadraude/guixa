@@ -2,7 +2,7 @@
 
 namespace Guixa\Stock\Infrastructure\Persistence;
 
-use Guixa\Shared\Domain\UtcTimestamp;
+use DateTimeImmutable;
 use Guixa\Stock\Domain\MovementType;
 use Guixa\Stock\Domain\StockMovement;
 use Guixa\Stock\Domain\StockMovementRepository;
@@ -25,7 +25,7 @@ final class EloquentStockMovementRepository implements StockMovementRepository
             'product_id' => $movement->productId,
             'type' => $movement->type->value,
             'quantity' => $movement->quantity->toString(),
-            'occurred_at' => UtcTimestamp::toStorage($movement->occurredAt),
+            'occurred_at' => $movement->occurredAt->format(DATE_ATOM),
             'recorded_by' => $movement->recordedBy,
             'note' => $movement->note,
             'cycle_id' => $movement->cycleId,
@@ -56,7 +56,7 @@ final class EloquentStockMovementRepository implements StockMovementRepository
     {
         $total = StockMovementModel::query()
             ->where('product_id', $productId)
-            ->selectRaw('cast(coalesce(round(sum(quantity * 1000)), 0) as bigint) as total')
+            ->selectRaw('coalesce(sum(quantity * 1000), 0)::bigint as total')
             ->value('total');
 
         return $this->sum($total);
@@ -65,7 +65,7 @@ final class EloquentStockMovementRepository implements StockMovementRepository
     public function availableByProduct(): array
     {
         $totals = StockMovementModel::query()
-            ->selectRaw('product_id, cast(round(sum(quantity * 1000)) as bigint) as total')
+            ->selectRaw('product_id, sum(quantity * 1000)::bigint as total')
             ->groupBy('product_id')
             ->pluck('total', 'product_id');
 
@@ -84,7 +84,7 @@ final class EloquentStockMovementRepository implements StockMovementRepository
             $model->product_id,
             MovementType::from($model->type),
             SignedQuantity::fromString($model->quantity),
-            UtcTimestamp::fromStorage($model->occurred_at),
+            new DateTimeImmutable($model->occurred_at),
             $model->recorded_by,
             $model->note,
             $model->cycle_id,

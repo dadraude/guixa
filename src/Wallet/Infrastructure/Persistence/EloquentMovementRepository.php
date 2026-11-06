@@ -2,8 +2,8 @@
 
 namespace Guixa\Wallet\Infrastructure\Persistence;
 
+use DateTimeImmutable;
 use Guixa\Shared\Domain\Money;
-use Guixa\Shared\Domain\UtcTimestamp;
 use Guixa\Wallet\Domain\Error\BasketAlreadyCharged;
 use Guixa\Wallet\Domain\Error\CorrectionIdentityConflict;
 use Guixa\Wallet\Domain\Movement;
@@ -29,7 +29,7 @@ final class EloquentMovementRepository implements MovementRepository
                 'household_id' => $movement->householdId,
                 'type' => $movement->type->value,
                 'amount_cents' => $movement->amount->cents,
-                'occurred_at' => UtcTimestamp::toStorage($movement->occurredAt),
+                'occurred_at' => $movement->occurredAt->format(DATE_ATOM),
                 'recorded_by' => $movement->recordedBy,
                 'note' => $movement->note,
                 'cycle_id' => $movement->cycleId,
@@ -87,7 +87,7 @@ final class EloquentMovementRepository implements MovementRepository
             $model->household_id,
             MovementType::from($model->type),
             Money::ofCents($model->amount_cents),
-            UtcTimestamp::fromStorage($model->occurred_at),
+            new DateTimeImmutable($model->occurred_at),
             $model->recorded_by,
             $model->note,
             $model->cycle_id,

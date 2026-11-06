@@ -7,7 +7,6 @@ use Guixa\Catalog\Infrastructure\Persistence\ProducerModel;
 use Guixa\Membership\Application\CanLogIn;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Role;
-use Guixa\Shared\Domain\UtcTimestamp;
 use Illuminate\Support\Facades\DB;
 
 function deactivationJordi(): ProducerModel
@@ -98,7 +97,7 @@ it('does not touch the cycles of another producer, nor a cancelled cycle (R3a)',
     $mine = deactivationCycleWith($jordi, now()->addDays(10)->toDateString());
     $theirs = deactivationCycleWith($other, now()->addDays(11)->toDateString());
     $cancelled = deactivationCycleWith($jordi, now()->addDays(12)->toDateString());
-    DB::table('cycles')->where('id', $cancelled)->update(['cancelled_at' => UtcTimestamp::toStorage(now())]);
+    DB::table('cycles')->where('id', $cancelled)->update(['cancelled_at' => now()]);
 
     $this->actingAs(accountWith(Role::Manager))->post("/manage/producers/{$jordi->id}/deactivation");
 

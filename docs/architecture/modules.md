@@ -24,7 +24,7 @@ modules. `Platform` below names framework persistence ownership, not a `src/Plat
 | Sales      | Stock offers, weekly base baskets and independent stock/return baskets: actuals, validation, late weekly baskets, collection | Catalog, Membership, Ordering, Stock, Wallet, Shared |
 | Stock      | Return items, append-only stock movements and availability                                                                   | Catalog, Shared                                      |
 | Wallet     | Append-only household money movements, balances, top-ups and corrections                                                     | Shared                                               |
-| Shared     | Money, Quantity, Clock, Actor, transaction and lock contracts                                                                | None                                                 |
+| Shared     | Money, Quantity, Clock, Actor and transaction contracts                                                                      | None                                                 |
 
 Reciprocal dependencies are intentional. Catalog asks Ordering and Sales about retained product use
 and changes producer participation; Ordering asks Catalog for eligible products. Read queries must remain narrow
@@ -114,9 +114,8 @@ Existing exceptions are intentionally narrow:
   undeclared helper fails the check. The checker still supports a reviewed declaration, and its tests
   prove the mechanism with their own manifest; the retired Ordering `rowsOf` helper and its
   `order_stock_lines`, `order_return_lines` and `order_pickup_adjustments` tables stay forbidden.
-- The exact `select pg_advisory_xact_lock(191983, 1)` SQL is allowed only in the Shared
-  `PostgresLocks` adapter, behind the `Locks` port. It locks a Membership operation without accessing
-  a table. Other raw SQL needs review.
+- Membership's exact `select pg_advisory_xact_lock(191983, 1)` SQL is allowed in its household
+  repository. It locks a Membership operation without accessing a table. Other raw SQL needs review.
 
 ## Transactions and authorization
 

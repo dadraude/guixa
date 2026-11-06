@@ -4,7 +4,6 @@ use Guixa\Catalog\Infrastructure\Persistence\ProducerModel;
 use Guixa\Sales\Application\CreateStockBasket;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Role;
-use Guixa\Shared\Domain\UtcTimestamp;
 use Guixa\Stock\Application\CreateReturnItem;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -40,7 +39,7 @@ it('creates, adds, validates and collects through Manager routes while denying m
     DB::table('products')->insert(['id' => $product, 'producer_id' => $producer->id, 'stock' => true,
         'name' => 'Oil', 'unit' => 'bottle', 'price_cents' => 1200, 'variable' => false, 'active' => true]);
     DB::table('stock_movements')->insert(['id' => (string) Str::uuid7(), 'product_id' => $product,
-        'type' => 'entry', 'quantity' => '2', 'occurred_at' => UtcTimestamp::toStorage(now()), 'recorded_by' => $manager->id]);
+        'type' => 'entry', 'quantity' => '2', 'occurred_at' => now(), 'recorded_by' => $manager->id]);
 
     $this->actingAs($manager)->post('/finance/baskets', ['household_id' => $household])->assertRedirect();
     $id = DB::table('baskets')->value('id');
@@ -96,7 +95,7 @@ it('lets a Manager remove stock and cancel a draft through HTTP while retaining 
     DB::table('products')->insert(['id' => $product, 'producer_id' => $producer->id, 'stock' => true,
         'name' => 'Oil', 'unit' => 'bottle', 'price_cents' => 1200, 'variable' => false, 'active' => true]);
     DB::table('stock_movements')->insert(['id' => (string) Str::uuid7(), 'product_id' => $product,
-        'type' => 'entry', 'quantity' => '2', 'occurred_at' => UtcTimestamp::toStorage(now()), 'recorded_by' => $manager->id]);
+        'type' => 'entry', 'quantity' => '2', 'occurred_at' => now(), 'recorded_by' => $manager->id]);
 
     $this->actingAs($manager)->post('/finance/baskets', ['household_id' => $household])->assertRedirect();
     $id = DB::table('baskets')->value('id');
@@ -144,7 +143,7 @@ it('shows a basket-sourced charge on Manager and member Wallet statements while 
     $manager = accountWith(Role::Manager);
     $basket = app(CreateStockBasket::class)(Actor::manager($manager->id), $household);
     DB::table('wallet_movements')->insert(['id' => (string) Str::uuid7(), 'household_id' => $household,
-        'type' => 'charge', 'amount_cents' => -1200, 'occurred_at' => UtcTimestamp::toStorage(now()),
+        'type' => 'charge', 'amount_cents' => -1200, 'occurred_at' => now(),
         'recorded_by' => $manager->id, 'basket_id' => $basket]);
 
     $this->actingAs($manager)->get("/finance/households/{$household}/wallet")
@@ -165,7 +164,7 @@ it('shows the household container balance on the Finance detail across baskets, 
     DB::table('products')->insert(['id' => $product, 'producer_id' => $producer->id, 'stock' => true,
         'name' => 'Honey', 'unit' => 'jar', 'price_cents' => 700, 'variable' => false, 'active' => true, 'containers_per_unit' => '1']);
     DB::table('stock_movements')->insert(['id' => (string) Str::uuid7(), 'product_id' => $product,
-        'type' => 'entry', 'quantity' => '10', 'occurred_at' => UtcTimestamp::toStorage(now()), 'recorded_by' => $manager->id]);
+        'type' => 'entry', 'quantity' => '10', 'occurred_at' => now(), 'recorded_by' => $manager->id]);
     $item = app(CreateReturnItem::class)(Actor::manager($manager->id), 'Glass jar', 50);
     $newBasket = function () use ($household): string {
         $this->post('/finance/baskets', ['household_id' => $household])->assertRedirect();

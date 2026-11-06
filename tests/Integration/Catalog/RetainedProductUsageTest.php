@@ -9,7 +9,6 @@ use Guixa\Catalog\Domain\Error\ProductUsed;
 use Guixa\Catalog\Infrastructure\Persistence\ProductModel;
 use Guixa\Ordering\Application\AddUnorderedProduct;
 use Guixa\Shared\Application\Actor;
-use Guixa\Shared\Domain\UtcTimestamp;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -79,7 +78,7 @@ final class RetainedProductUsageTest extends TestCase
         $product = $this->product($producer, stock: false);
         $cycle = (string) Str::uuid7();
         DB::table('cycles')->insert(['id' => $cycle, 'pickup_date' => now()->addDays(30)->toDateString()]);
-        DB::table('cycle_producers')->insert(['cycle_id' => $cycle, 'producer_id' => $producer, 'participating' => true, 'closes_at' => null, 'sent_at' => UtcTimestamp::toStorage(now())]);
+        DB::table('cycle_producers')->insert(['cycle_id' => $cycle, 'producer_id' => $producer, 'participating' => true, 'closes_at' => null, 'sent_at' => now()]);
         $manager = Actor::manager((string) Str::uuid7());
 
         app(AddUnorderedProduct::class)($manager, $cycle, $producer, $product, '0');
@@ -116,12 +115,12 @@ final class RetainedProductUsageTest extends TestCase
         DB::table('households')->insert(['id' => $household, 'name' => 'H', 'created_at' => now(), 'updated_at' => now()]);
         DB::table('baskets')->insert([
             'id' => $basket, 'household_id' => $household, 'household_name' => 'H', 'kind' => 'stock', 'state' => $basketState,
-            'created_by' => $creator, 'created_at' => UtcTimestamp::toStorage(now()), 'cancelled_by' => $basketState === 'cancelled' ? $creator : null,
-            'cancelled_at' => $basketState === 'cancelled' ? UtcTimestamp::toStorage(now()) : null,
+            'created_by' => $creator, 'created_at' => now(), 'cancelled_by' => $basketState === 'cancelled' ? $creator : null,
+            'cancelled_at' => $basketState === 'cancelled' ? now() : null,
         ]);
         DB::table('basket_lines')->insert([
             'id' => (string) Str::uuid7(), 'basket_id' => $basket, 'kind' => 'stock', 'product_id' => $product, 'name' => 'Honey', 'unit' => 'unit',
-            'price_cents' => 350, 'variable' => false, 'quantity' => '1', 'created_at' => UtcTimestamp::toStorage(now()), 'removed_at' => $removedAt,
+            'price_cents' => 350, 'variable' => false, 'quantity' => '1', 'created_at' => now(), 'removed_at' => $removedAt,
         ]);
     }
 }

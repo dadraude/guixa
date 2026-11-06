@@ -1,0 +1,50 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('orders', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->foreignUuid('cycle_id')->constrained('cycles');
+            $table->foreignUuid('household_id')->constrained('households');
+            $table->timestampTz('cancelled_at', 6)->nullable();
+            $table->unique(['cycle_id', 'household_id']);
+        });
+
+        Schema::create('order_lines', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->foreignUuid('order_id')->constrained('orders')->restrictOnDelete();
+            $table->foreignUuid('product_id')->constrained('products');
+            $table->foreignUuid('producer_id')->constrained('producers');
+            $table->string('product_name');
+            $table->string('unit');
+            $table->integer('unit_price_cents');
+            $table->boolean('variable');
+            $table->decimal('containers_per_unit', 10, 3)->nullable();
+            $table->decimal('ordered_quantity', 10, 3);
+            $table->decimal('allocated_quantity', 10, 3);
+            $table->boolean('allocated_by_hand')->default(false);
+            $table->timestampTz('created_at', 6);
+            $table->timestampTz('removed_at', 6)->nullable();
+            $table->foreignUuid('added_by')->constrained('users');
+            $table->boolean('not_delivered')->default(false);
+            $table->boolean('dropped')->default(false);
+        });
+
+        DB::statement('CREATE UNIQUE INDEX order_lines_one_active_product ON order_lines (order_id, product_id) WHERE removed_at IS NULL');
+        DB::statement('ALTER TABLE order_lines ADD CONSTRAINT order_lines_ordered_not_negative CHECK (ordered_quantity >= 0)');
+        DB::statement('ALTER TABLE order_lines ADD CONSTRAINT order_lines_allocated_not_negative CHECK (allocated_quantity >= 0)');
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('order_lines');
+        Schema::dropIfExists('orders');
+    }
+};

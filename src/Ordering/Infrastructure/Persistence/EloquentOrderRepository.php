@@ -2,12 +2,12 @@
 
 namespace Guixa\Ordering\Infrastructure\Persistence;
 
+use DateTimeImmutable;
 use Guixa\Ordering\Domain\Order;
 use Guixa\Ordering\Domain\OrderLine;
 use Guixa\Ordering\Domain\OrderRepository;
 use Guixa\Shared\Domain\Money;
 use Guixa\Shared\Domain\Quantity;
-use Guixa\Shared\Domain\UtcTimestamp;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use stdClass;
@@ -32,7 +32,7 @@ final class EloquentOrderRepository implements OrderRepository
             ->where('order_id', $order->id)
             ->whereNull('removed_at')
             ->whereNotIn('id', array_map(fn (OrderLine $line) => $line->id, $lines))
-            ->update(['removed_at' => UtcTimestamp::toStorage(now())]);
+            ->update(['removed_at' => now()]);
 
         if ($lines === []) {
             return;
@@ -53,7 +53,7 @@ final class EloquentOrderRepository implements OrderRepository
                 'allocated_quantity' => $line->allocated->toString(),
                 'allocated_by_hand' => $line->allocatedByHand,
                 'dropped' => $line->dropped,
-                'created_at' => UtcTimestamp::toStorage($line->createdAt),
+                'created_at' => $line->createdAt->format('Y-m-d\TH:i:s.uP'),
                 'added_by' => $line->addedBy,
                 'removed_at' => null,
             ], $lines),
@@ -64,7 +64,7 @@ final class EloquentOrderRepository implements OrderRepository
 
     public function archiveOfCycle(string $cycleId): void
     {
-        DB::table('orders')->where('cycle_id', $cycleId)->update(['cancelled_at' => UtcTimestamp::toStorage(now())]);
+        DB::table('orders')->where('cycle_id', $cycleId)->update(['cancelled_at' => now()]);
     }
 
     public function markNotDelivered(string $orderId, array $productIds): void
@@ -200,7 +200,7 @@ final class EloquentOrderRepository implements OrderRepository
                 $line->containers_per_unit === null ? null : Quantity::fromString($line->containers_per_unit),
                 Quantity::fromString($line->ordered_quantity),
                 Quantity::fromString($line->allocated_quantity),
-                UtcTimestamp::fromStorage($line->created_at),
+                new DateTimeImmutable($line->created_at),
                 $line->added_by,
                 (bool) $line->allocated_by_hand,
                 (bool) $line->dropped,

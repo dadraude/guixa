@@ -61,7 +61,7 @@ beforeEach(function () {
     $this->source = new InMemoryWeeklyBasketSource;
     $this->validate = new ValidateBasket($this->baskets, $products, $stock, $wallet, $this->source, $transactions, $clock);
     $this->collect = new MarkBasketCollected($this->baskets, $transactions, $clock);
-    $this->open = new ReadOpenHouseholdBaskets($this->baskets, $pickupDates, $this->source, $clock);
+    $this->open = new ReadOpenHouseholdBaskets($this->baskets, $pickupDates, $this->source);
 
     /** Saves a basket of the household in the given state; weekly ones hold a weekly line, the others a returned jar. */
     $this->basket = function (string $id, string $household, BasketState $state, bool $weekly, string $created = '2026-11-02', ?string $cycle = null): Basket {
@@ -139,10 +139,4 @@ it('keeps a household that is no longer active settling its baskets through the 
     expect(($this->summary)('gone'))->toBe([['stock-1', 'validated', '2026-11-03']]);
     ($this->collect)($this->manager, 'stock-1');
     expect(($this->summary)('gone'))->toBe([]);
-});
-
-it('dates a stock basket by its creation day in the cooperative timezone, not in UTC', function () {
-    ($this->basket)('late-evening', 'h', BasketState::Draft, false, '2026-11-02T23:30:00+00:00');
-
-    expect(($this->summary)('h'))->toBe([['late-evening', 'draft', '2026-11-03']]);
 });

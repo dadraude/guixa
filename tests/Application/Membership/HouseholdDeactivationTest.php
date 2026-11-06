@@ -146,7 +146,7 @@ it('keeps a real ordered line and basket through deactivation until the basket i
     $correction = new RecordCorrection($movements, $ordering->clock);
     $correction($membership->manager, $household, -1000, 'Opening adjustment', null, $receiptId, 'opening-adjustment');
     $balances = new WalletHouseholdBalances(new ReadHouseholdBalance($movements));
-    $baskets = new SalesHouseholdBaskets(new ReadOpenHouseholdBaskets($sales, new OrderingCyclePickupDates(new ReadCyclePickupDates($ordering->cycles)), new OrderingWeeklySourceOrders(new ReadSourceOrderCycles($ordering->orders), new ReadCycleSourceOrders($ordering->orders)), $ordering->clock));
+    $baskets = new SalesHouseholdBaskets(new ReadOpenHouseholdBaskets($sales, new OrderingCyclePickupDates(new ReadCyclePickupDates($ordering->cycles)), new OrderingWeeklySourceOrders(new ReadSourceOrderCycles($ordering->orders), new ReadCycleSourceOrders($ordering->orders))));
     $charge = new ChargeForBasket($movements, $ordering->clock);
     $products = new class implements StockProducts
     {

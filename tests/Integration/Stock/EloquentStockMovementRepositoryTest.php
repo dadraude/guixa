@@ -6,7 +6,6 @@ use App\Models\User;
 use Guixa\Catalog\Infrastructure\Persistence\ProducerModel;
 use Guixa\Catalog\Infrastructure\Persistence\ProductModel;
 use Guixa\Shared\Application\Actor;
-use Guixa\Shared\Domain\UtcTimestamp;
 use Guixa\Stock\Application\RecordStockEntry;
 use Guixa\Stock\Domain\StockMovementRepository;
 use Guixa\Stock\Infrastructure\Persistence\EloquentStockMovementRepository;
@@ -43,7 +42,7 @@ final class EloquentStockMovementRepositoryTest extends TestCase
     {
         $id = (string) Str::uuid7();
         DB::table('basket_adjustments')->insert(['id' => $id, 'basket_id' => $basket, 'amount_cents' => 100,
-            'reason' => 'Came back', 'recorded_by' => User::factory()->create()->id, 'occurred_at' => UtcTimestamp::toStorage(now())]);
+            'reason' => 'Came back', 'recorded_by' => User::factory()->create()->id, 'occurred_at' => now()]);
 
         return $id;
     }
@@ -56,7 +55,7 @@ final class EloquentStockMovementRepositoryTest extends TestCase
         DB::table('baskets')->insert([
             'id' => $id, 'household_id' => $household, 'household_name' => 'Household',
             'kind' => 'stock', 'state' => 'draft', 'created_by' => User::factory()->create()->id,
-            'created_at' => UtcTimestamp::toStorage(now()),
+            'created_at' => now(),
         ]);
 
         return $id;
@@ -72,9 +71,31 @@ final class EloquentStockMovementRepositoryTest extends TestCase
     {
         DB::table('stock_movements')->insert([
             'id' => (string) Str::uuid7(), 'product_id' => $this->productId(), 'type' => 'entry', 'quantity' => '1.000',
-            'occurred_at' => '2026-10-22 10:00:00', 'recorded_by' => (string) Str::uuid7(),
+            'occurred_at' => '2026-10-22T10:00:00+00:00', 'recorded_by' => (string) Str::uuid7(),
             'note' => null, 'cycle_id' => null, ...$overrides,
         ]);
+    }
+
+    #[Test]
+    public function the_database_refuses_an_entry_that_is_not_positive(): void
+    {
+        $this->assertThrows(fn () => $this->insert(['type' => 'entry', 'quantity' => '-1.000']), QueryException::class);
+        $this->assertThrows(fn () => $this->insert(['type' => 'entry', 'quantity' => '0.000']), QueryException::class);
+    }
+
+    #[Test]
+    public function the_database_refuses_an_adjustment_without_a_note_or_with_a_zero_quantity(): void
+    {
+        $this->assertThrows(fn () => $this->insert(['type' => 'adjustment', 'quantity' => '-1.000', 'note' => null]), QueryException::class);
+        $this->assertThrows(fn () => $this->insert(['type' => 'adjustment', 'quantity' => '-1.000', 'note' => '  ']), QueryException::class);
+        $this->assertThrows(fn () => $this->insert(['type' => 'adjustment', 'quantity' => '0.000', 'note' => 'why']), QueryException::class);
+    }
+
+    #[Test]
+    public function the_database_refuses_a_sale_that_is_not_negative_or_has_no_basket(): void
+    {
+        $this->assertThrows(fn () => $this->insert(['type' => 'sale', 'quantity' => '1.000', 'basket_id' => $this->basket()]), QueryException::class);
+        $this->assertThrows(fn () => $this->insert(['type' => 'sale', 'quantity' => '-1.000', 'basket_id' => null]), QueryException::class);
     }
 
     #[Test]
@@ -84,8 +105,9 @@ final class EloquentStockMovementRepositoryTest extends TestCase
     }
 
     #[Test]
-    public function the_database_refuses_an_unknown_stock_product(): void
+    public function the_database_refuses_an_unknown_type_and_an_unknown_stock_product(): void
     {
+        $this->assertThrows(fn () => $this->insert(['type' => 'gift']), QueryException::class);
         $this->assertThrows(fn () => $this->insert(['product_id' => (string) Str::uuid7()]), QueryException::class);
     }
 

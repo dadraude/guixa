@@ -49,7 +49,7 @@ final class EloquentCycleRepositoryTest extends TestCase
     #[Test]
     public function a_cancelled_cycle_does_not_take_its_pickup_date(): void
     {
-        $this->insertCycle('2026-11-07', '2026-10-30 10:00:00');
+        $this->insertCycle('2026-11-07', '2026-10-30 10:00:00+00');
         $this->insertCycle('2026-11-07');
 
         $this->assertTrue($this->repository()->existsOnPickupDate(new \DateTimeImmutable('2026-11-07')));
@@ -59,7 +59,7 @@ final class EloquentCycleRepositoryTest extends TestCase
     #[Test]
     public function the_pickup_date_ignores_cancelled_cycles_when_asking_whether_one_exists(): void
     {
-        $this->insertCycle('2026-11-07', '2026-10-30 10:00:00');
+        $this->insertCycle('2026-11-07', '2026-10-30 10:00:00+00');
 
         $this->assertFalse($this->repository()->existsOnPickupDate(new \DateTimeImmutable('2026-11-07')));
     }
@@ -89,8 +89,8 @@ final class EloquentCycleRepositoryTest extends TestCase
 
         DB::table('cycle_producers')->insert([
             ['cycle_id' => $cycleIds[0], 'producer_id' => $producerB, 'participating' => false,
-                'closes_at' => '2026-11-04 20:00:00', 'sent_at' => '2026-11-05 09:00:00',
-                'validated_at' => '2026-11-06 10:00:00', 'distributed_at' => '2026-11-07 11:00:00'],
+                'closes_at' => '2026-11-04 20:00:00+00', 'sent_at' => '2026-11-05 09:00:00+00',
+                'validated_at' => '2026-11-06 10:00:00+00', 'distributed_at' => '2026-11-07 11:00:00+00'],
             ['cycle_id' => $cycleIds[0], 'producer_id' => $producerA, 'participating' => true,
                 'closes_at' => null, 'sent_at' => null, 'validated_at' => null, 'distributed_at' => null],
             ['cycle_id' => $cycleIds[1], 'producer_id' => $producerA, 'participating' => true,

@@ -23,6 +23,17 @@ final class EloquentProducerRepositoryTest extends TestCase
     }
 
     #[Test]
+    public function the_database_refuses_a_cutoff_outside_one_to_six_days(): void
+    {
+        foreach ([0, 7] as $days) {
+            $this->assertThrows(fn () => DB::table('producers')->insert([
+                'id' => (string) Str::uuid7(), 'name' => 'Baker', 'active' => true,
+                'cutoff_days_before' => $days, 'cutoff_time' => '20:00',
+            ]), QueryException::class);
+        }
+    }
+
+    #[Test]
     public function the_database_refuses_an_account_pointing_at_an_unknown_producer(): void
     {
         $this->assertThrows(fn () => DB::table('users')->insert([

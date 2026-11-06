@@ -6,7 +6,6 @@ use App\Models\User;
 use Guixa\Ordering\Application\ReopenProducerOrder;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Role;
-use Guixa\Shared\Domain\UtcTimestamp;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -81,7 +80,7 @@ final class WeeklyReceptionRaceTest extends TestCase
             app('auth')->forgetGuards();
             $baskets[$name] = $household;
         }
-        DB::table('cycle_producers')->where('cycle_id', $cycle)->update(['closes_at' => UtcTimestamp::toStorage(now()->subHour()), 'sent_at' => UtcTimestamp::toStorage(now())]);
+        DB::table('cycle_producers')->where('cycle_id', $cycle)->update(['closes_at' => now()->subHour(), 'sent_at' => now()]);
         $manager = accountWith(Role::Manager);
         $reception = "/manage/cycles/{$cycle}/receptions/{$baker->id}";
         $this->actingAs($manager)->put("{$reception}/products/{$loaf}/received", ['received' => '6'])->assertRedirect();
