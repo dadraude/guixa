@@ -171,7 +171,7 @@ trait OrderRepositoryContract
         $repository = $this->repository();
         $now = $this->madrid('2026-10-22 10:00');
 
-        foreach ([self::HOUSEHOLD => '2', self::OTHER_HOUSEHOLD => '3'] as $household => $quantity) {
+        foreach ([self::OTHER_HOUSEHOLD => '3', self::HOUSEHOLD => '2'] as $household => $quantity) {
             $order = $repository->lockFor(self::CYCLE, $household);
             $order->setLine($this->product(self::BREAD, 'Loaf', 350), Quantity::fromString($quantity), $cycle, $repository->nextId(), self::ANNA, $now);
             $repository->add($order);
@@ -183,6 +183,8 @@ trait OrderRepositoryContract
         foreach ($orders as $order) {
             $quantities[$order->householdId] = $order->lines()[0]->ordered->toString();
         }
+        // OrderRepository::ofCycle lists the orders in no particular order.
+        ksort($quantities);
         $this->assertSame([self::HOUSEHOLD => '2.000', self::OTHER_HOUSEHOLD => '3.000'], $quantities);
     }
 
