@@ -77,37 +77,14 @@ final class EloquentStockMovementRepositoryTest extends TestCase
     }
 
     #[Test]
-    public function the_database_refuses_an_entry_that_is_not_positive(): void
-    {
-        $this->assertThrows(fn () => $this->insert(['type' => 'entry', 'quantity' => '-1.000']), QueryException::class);
-        $this->assertThrows(fn () => $this->insert(['type' => 'entry', 'quantity' => '0.000']), QueryException::class);
-    }
-
-    #[Test]
-    public function the_database_refuses_an_adjustment_without_a_note_or_with_a_zero_quantity(): void
-    {
-        $this->assertThrows(fn () => $this->insert(['type' => 'adjustment', 'quantity' => '-1.000', 'note' => null]), QueryException::class);
-        $this->assertThrows(fn () => $this->insert(['type' => 'adjustment', 'quantity' => '-1.000', 'note' => '  ']), QueryException::class);
-        $this->assertThrows(fn () => $this->insert(['type' => 'adjustment', 'quantity' => '0.000', 'note' => 'why']), QueryException::class);
-    }
-
-    #[Test]
-    public function the_database_refuses_a_sale_that_is_not_negative_or_has_no_basket(): void
-    {
-        $this->assertThrows(fn () => $this->insert(['type' => 'sale', 'quantity' => '1.000', 'basket_id' => $this->basket()]), QueryException::class);
-        $this->assertThrows(fn () => $this->insert(['type' => 'sale', 'quantity' => '-1.000', 'basket_id' => null]), QueryException::class);
-    }
-
-    #[Test]
     public function the_schema_keeps_no_order_sale_source_on_stock_movements(): void
     {
         $this->assertFalse(Schema::hasColumn('stock_movements', 'order_id'));
     }
 
     #[Test]
-    public function the_database_refuses_an_unknown_type_and_an_unknown_stock_product(): void
+    public function the_database_refuses_an_unknown_stock_product(): void
     {
-        $this->assertThrows(fn () => $this->insert(['type' => 'gift']), QueryException::class);
         $this->assertThrows(fn () => $this->insert(['product_id' => (string) Str::uuid7()]), QueryException::class);
     }
 

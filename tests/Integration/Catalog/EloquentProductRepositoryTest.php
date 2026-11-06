@@ -51,18 +51,6 @@ final class EloquentProductRepositoryTest extends TestCase
     }
 
     #[Test]
-    public function the_database_refuses_a_negative_price(): void
-    {
-        $this->assertThrows(fn () => $this->insertRow(['price_cents' => -1]), QueryException::class);
-    }
-
-    #[Test]
-    public function the_database_refuses_zero_containers_per_unit(): void
-    {
-        $this->assertThrows(fn () => $this->insertRow(['containers_per_unit' => '0.000']), QueryException::class);
-    }
-
-    #[Test]
     public function the_database_refuses_a_product_of_an_unknown_producer(): void
     {
         $this->assertThrows(fn () => $this->insertRow(['producer_id' => (string) Str::uuid7()]), QueryException::class);

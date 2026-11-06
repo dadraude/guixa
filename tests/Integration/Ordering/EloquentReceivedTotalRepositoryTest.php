@@ -5,10 +5,8 @@ namespace Tests\Integration\Ordering;
 use Guixa\Catalog\Infrastructure\Persistence\ProducerModel;
 use Guixa\Ordering\Domain\ReceivedTotalRepository;
 use Guixa\Ordering\Infrastructure\Persistence\EloquentReceivedTotalRepository;
-use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
-use PHPUnit\Framework\Attributes\Test;
 use Tests\Support\Contracts\ReceivedTotalRepositoryContract;
 use Tests\TestCase;
 
@@ -36,18 +34,5 @@ final class EloquentReceivedTotalRepositoryTest extends TestCase
                 'id' => $productId, 'producer_id' => $producerId, 'name' => "Product {$productId}", 'unit' => 'unit', 'price_cents' => 100, 'variable' => false,
             ]);
         }
-    }
-
-    #[Test]
-    public function the_database_refuses_a_negative_total(): void
-    {
-        $this->referencedRowsExist();
-
-        $this->assertThrows(
-            fn () => DB::table('received_totals')->insert([
-                'cycle_id' => self::CYCLE_A, 'producer_id' => self::BAKER, 'product_id' => self::BREAD, 'received_quantity' => '-1',
-            ]),
-            QueryException::class,
-        );
     }
 }

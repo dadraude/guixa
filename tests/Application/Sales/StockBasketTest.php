@@ -14,6 +14,8 @@ use Guixa\Sales\Application\StockSeller;
 use Guixa\Sales\Application\ValidateBasket;
 use Guixa\Sales\Application\WalletLedger;
 use Guixa\Sales\Domain\Basket;
+use Guixa\Sales\Domain\BasketKind;
+use Guixa\Sales\Domain\BasketLineKind;
 use Guixa\Sales\Domain\BasketRepository;
 use Guixa\Sales\Domain\BasketState;
 use Guixa\Sales\Domain\Error\BasketAlreadyValidated;
@@ -431,4 +433,21 @@ it('accepts the same Finance Actor through every public independent-basket use c
     expect($this->baskets->get($id)->state)->toBe(BasketState::Collected)
         ->and($this->stock->sales[0][0])->toBe('finance')
         ->and($this->wallet->charges[0][0])->toBe('finance');
+});
+
+it('creates an independent stock basket whose lines reference only their own kind (basket and line shape)', function () {
+    $id = ($this->create)($this->actor, 'household');
+    ($this->add)($this->actor, $id, 'oil', '1');
+    ($this->addReturn)($this->actor, $id, 'jar', '1');
+
+    $basket = $this->baskets->get($id);
+    [$stock, $return] = $basket->lines;
+
+    expect($basket->kind)->toBe(BasketKind::Stock)
+        ->and($basket->sourceOrderId)->toBeNull()
+        ->and($basket->late)->toBeFalse()
+        ->and($stock->kind)->toBe(BasketLineKind::Stock)
+        ->and([$stock->productId, $stock->returnItemId, $stock->sourceOrderLineId])->toBe(['oil', null, null])
+        ->and($return->kind)->toBe(BasketLineKind::Return)
+        ->and([$return->productId, $return->returnItemId, $return->sourceOrderLineId])->toBe([null, 'jar', null]);
 });

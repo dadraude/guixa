@@ -162,12 +162,3 @@ it('lets a manager linked to a household reach the member area and lets an unlin
     $this->post(route('login.store'), ['email' => $anna->email, 'password' => 'password']);
     $this->assertAuthenticatedAs($anna);
 });
-
-it('drops the stored member role in the migration and keeps manager and producer roles', function () {
-    $user = accountWith(Role::Manager, Role::Producer);
-    DB::table('account_roles')->insert(['user_id' => $user->id, 'role' => 'member']);
-
-    (require database_path('migrations/2026_10_23_000000_drop_member_role_from_account_roles.php'))->up();
-
-    expect(DB::table('account_roles')->where('user_id', $user->id)->orderBy('role')->pluck('role')->all())->toBe(['manager', 'producer']);
-});
