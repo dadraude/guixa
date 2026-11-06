@@ -44,7 +44,7 @@ schema directly, without a legacy import, data backfill or compatibility layer.
 | `Catalog` | Every product, immutable producer, stock flag, metadata and catalogue permissions | R1–R3c, R5, R25–R25c |
 | `Ordering` | Weekly demand, cycles, cutoffs, producer orders, reception and distribution | R3b–R18a, R24b |
 | `Sales` | Baskets, actual contents, validation, immutable sale snapshots, corrections and collection | R19–R24b |
-| `Stock` | Return items, immutable stock movements and availability | R20a, R26–R28 |
+| `Stock` | Return items, immutable stock movements, availability and movement history | R20a, R26–R28a |
 | `Wallet` | Global household balance, charges, confirmed receipts and corrections | R21–R22, R29–R32 |
 
 This is a modular monolith: one application and database, with context-local domain models.
@@ -63,6 +63,8 @@ Sales    -> Catalog/Stock StockProducts (stock identity and product lock; Catalo
 Sales    -> Wallet        WalletLedger (one charge/credit; reasoned corrections)
 Sales    -> Membership    Households (identity and active state)
 Stock    -> Catalog       StockProductRepository (stock identity/metadata and product lock; Catalog adapter)
+Stock    -> Membership    AccountNames (author names of movements, deactivated accounts included)
+Stock    -> Ordering      CyclePickupDates (pickup date shown for a movement's cycle)
 Catalog  -> Ordering      ProducerCycles / ProductUsage (weekly rules and retained references)
 Catalog  -> Ordering/Sales/Stock   ProductUsage (retained use: Ordering `CheckProductUsage`, Sales `HasProductHistory`, Stock `CheckProductUsage`) / StockAvailability (pure quantity query)
 Catalog  -> Membership    ProducerAccess
@@ -159,6 +161,7 @@ Use cases
 | `ListProducerAccounts` (producer id → account email and whether its invitation is pending; the producers admin page shows it and hides the invite form for producers that have one) | manager | R36, S57 |
 | `GetProducerAccountEmail` | — (called by Ordering) | R12a |
 | `GetWalletHousehold` (a household's id, name and active state for the wallet pages) | finance, manager | R31 |
+| `GetAccountNames` (account id → name in one batch, deactivated accounts included) | — (called by Stock) | R28a |
 | `ListActiveHouseholds`, `ListOtherHouseholds` (every household but the given one, for `MoveMember`), `CountHouseholds`, `CountAccounts` | manager | R33, R36a (admin pages, dashboard counts) |
 | `GetHouseholds` (household ids → name and active by id; unknown ids left out) | — (called by Ordering) | R13, R16, R19 |
 | `CreateFirstManager` (rejected once any manager exists) | — (installation command) | R36a |
@@ -488,8 +491,8 @@ Catalog's pure internal metadata queries; quantity-only queries never call Catal
 | `CreateReturnItem`, `UpdateReturnItem`, `DeactivateReturnItem`, `ReactivateReturnItem` | Existing Manager-only administration |
 | `ListReturnItems` | Manager catalogue view and Finance's read-only basket return picker; no Finance editing |
 | `RecordStockEntry`, `RecordStockAdjustment` | Manager; stock mode only; positive entry / non-zero justified adjustment |
-| `ListStock`, `ListActiveStock` | Manager; metadata from Catalog, current quantity from ledger |
-| `ListStockMovements` | Planned (pending T76, gated by a new requirement): the movement history is not built; the movements page shows only the current level and the forms |
+| `ListStock`, `ListActiveStock` | Manager; metadata from Catalog, current quantity from ledger. `ListStock` also serves Finance's read-only stock list (R28a) |
+| `ListStockMovements` | Manager or Finance for any stock product; a producer for their own (`owns` producer gate on the product's `producerId`), including inactive products and producers; weekly products are rejected as not stock. Returns one page of `StockMovementLine`s newest first and the total (R28a) |
 | `SetStockAvailable` | Manager; sets the available quantity after an inventory count: inside one transaction it locks the product, reads the available quantity under that lock and records an adjustment of the difference (R27). The caller passes the note already translated, since Application takes no framework i18n (A2) |
 | `AppendStockAdjustment` | Internal step for `RecordStockAdjustment` and `SetStockAvailable`; builds and records the adjustment, takes no lock: the caller holds the product lock in its transaction |
 | `GetReturnItem` | Internal read of a return item snapshot for Sales through its own return-items port |
@@ -497,6 +500,18 @@ Catalog's pure internal metadata queries; quantity-only queries never call Catal
 | `CorrectBasketStock` | Internal Sales correction with source/reason; cannot make stock negative |
 | `GetAvailableQuantities` | T54 quantity-only batch query for Catalog and Sales discovery; no Catalog callback |
 | `CheckProductUsage` | Internal movement-history query for Catalog |
+
+`ListStockMovements` reads the product's whole ledger oldest first, ordered by `(occurred_at, id)`
+(UUID v7 ids break ties stably), and accumulates the available stock after each movement, so the
+balance needs no stored column and the newest line equals `available` (R28). It then reverses the
+list and slices page `n` of 50; per-product ledgers are small, so no SQL window function or cursor is
+needed. A line's displayed type is `correction` when an adjustment has a `correctionId` (`CorrectBasketStock`
+records corrections as adjustments carrying the reason as note); otherwise its `MovementType`.
+`StockMovementLine` carries date, type, signed quantity, balance after, note, author name, optional
+cycle id and pickup date, and `?basketId`. Author names and cycle pickup dates are resolved in one
+batch each through `AccountNames` and `CyclePickupDates`. For an actor reaching the product only as
+its producer, the use case sets `basketId` to null, so the basket never leaves the server; Manager and
+Finance get it on sale and correction lines. The history is read-only and takes no lock.
 
 Sale uniqueness is by basket/product; corrections have their own stable source ids. Product ids
 remain locked in ascending order for multi-product writes. Finance accesses sale/correction use cases
@@ -613,7 +628,9 @@ All route middleware is backed by Application gate/policy checks against the exp
 | `/manage/producers/{producer}/products/...` | Stock product creation/edit/deactivate/reactivate/unused-delete from producer context; Manager only |
 | `/producer/products/...` | T54 index composes own weekly administration and read-only own stock with quantities; no stock-mode change by producer |
 | `/manage/products/{product}/classification` | Manager-only unused-mode change; no producer reassignment |
-| `/manage/stock/{product}/movements` and entries/adjustments | Existing inventory administration patterns; Catalog ids, Manager-only general inventory operations |
+| `/manage/stock/{product}/movements` and entries/adjustments | Existing inventory administration patterns; Catalog ids, Manager-only general inventory operations. The movements page adds the paged history (`?page=`, `ListStockMovements`) below the level and forms; sale and correction lines link to `/finance/baskets/{basket}` |
+| `/finance/stock`, `/finance/stock/{product}/movements` | Manager or Finance; read-only stock list (`ListStock`) and the paged history, with basket links; no entry/adjustment forms (R28a, R36c) |
+| `/producer/stock/{product}/movements` | Producer, own stock products only, linked from the stock section of `/producer/products`; the paged history without basket or household (R25b, R28a) |
 | `POST /manage/cycles/{cycle}/producers/{producer}/send` | `SendProducerOrderManually` (wraps `SendProducerOrder` with `refuseEmpty`) from the producer management dialog of `Manage/Cycles/Index`; Manager only; the button shows when `canSendManually` (closed, participating, unsent and with lines to send; empty orders are sent by the scheduler, so the use case refuses them under the cycle lock with `ProducerOrderEmpty`) and confirms first because it emails the producer; the row shows a Sent status via `sent`; domain errors (still open, already sent, empty, no account) show in the dialog (R12a, S36) |
 | `/manage/accounts/{account}/finance-role` | Grant/remove Finance on the existing account administration page, Manager only |
 
@@ -1195,6 +1212,15 @@ not application tests. Implementation and task creation require their own later 
 - **D25** Weekly closure depends on distribution and base basket validation, not collection. Late
   collections retain pending visual indicators after closure. Supplementary baskets carry no cycle and never gate or reopen it;
   containers are a per-household balance.
+- **D26** Stock movement history (R28a, T76) is computed on read from the immutable ledger: no stored
+  balance column, no new table or index (`stock_movements (product_id, occurred_at)` already serves it).
+  The producer view drops the basket in the use case, not in the page. One shared
+  `resources/js/components/stock/MovementHistory.vue` renders the lines and previous/next page links
+  for the three pages (Manager movements page, Finance stock history, producer stock history),
+  following `Wallet/Statement.vue`'s phone-first table/stacked-row pattern and `components/ui/`
+  (`badge` for the type, `button` links for paging). No pagination primitive exists in `components/ui/`,
+  so paging is two links driven by Laravel's `LengthAwarePaginator` built in the controller from the
+  use case's page and total. Type labels are translated under `stock.movement_types`.
 
 Dropped: D1 (pickup is a sequence of saved steps, R19–R22). D2 and D3 became spec rules (R4a, R6). D4 was
 replaced by R35 and R36b (unlinking keeps the account; deactivation is separate). D5, D6 and D8 became spec
