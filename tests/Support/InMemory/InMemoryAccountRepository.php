@@ -25,6 +25,21 @@ final class InMemoryAccountRepository extends InMemoryRepository implements Acco
         parent::save($item);
     }
 
+    public function namesByIds(array $ids): array
+    {
+        $names = [];
+
+        foreach (array_unique($ids) as $id) {
+            $account = $this->find($id);
+
+            if ($account !== null) {
+                $names[$id] = $account->name;
+            }
+        }
+
+        return $names;
+    }
+
     public function saveHouseholdLink(Account $account): void
     {
         $stored = $this->find($account->id);

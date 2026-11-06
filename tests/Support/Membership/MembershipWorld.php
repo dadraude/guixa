@@ -11,6 +11,7 @@ use Guixa\Membership\Application\CreateHousehold;
 use Guixa\Membership\Application\DeactivateAccount;
 use Guixa\Membership\Application\DeactivateEmptyHousehold;
 use Guixa\Membership\Application\DeactivateHousehold;
+use Guixa\Membership\Application\GetAccountNames;
 use Guixa\Membership\Application\GetHousehold;
 use Guixa\Membership\Application\GetHouseholdDeactivationWarning;
 use Guixa\Membership\Application\GetHouseholds;
@@ -100,6 +101,8 @@ final class MembershipWorld
 
     public readonly GetHouseholds $getHouseholds;
 
+    public readonly GetAccountNames $getAccountNames;
+
     public readonly MoveMember $moveMember;
 
     public readonly UnlinkMember $unlinkMember;
@@ -167,6 +170,7 @@ final class MembershipWorld
         $this->listHouseholdsToSettle = new ListHouseholdsToSettle($this->households, $this->balances, $this->openBaskets);
         $this->listProducerAccounts = new ListProducerAccounts($this->accounts);
         $this->getHouseholds = new GetHouseholds($this->households);
+        $this->getAccountNames = new GetAccountNames($this->accounts);
         $this->getHousehold = new GetHousehold($this->households, $this->accounts, $this->invitations, $this->clock);
 
         $deactivateEmptyHousehold = new DeactivateEmptyHousehold($this->households, $this->accounts, $this->clock);

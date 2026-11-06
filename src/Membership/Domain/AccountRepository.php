@@ -16,6 +16,12 @@ interface AccountRepository
 
     public function get(string $id): ?Account;
 
+    /**
+     * @param  list<string>  $ids
+     * @return array<string, string> name by account id in one read, deactivated accounts included; unknown ids are left out
+     */
+    public function namesByIds(array $ids): array;
+
     public function emailIsTaken(Email $email): bool;
 
     /** @return list<Account> every account, by name */

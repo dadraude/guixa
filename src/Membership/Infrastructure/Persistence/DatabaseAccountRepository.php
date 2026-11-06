@@ -50,6 +50,11 @@ final class DatabaseAccountRepository implements AccountRepository
         return $row === null ? null : $this->hydrate($row);
     }
 
+    public function namesByIds(array $ids): array
+    {
+        return DB::table('users')->whereIn('id', $ids)->pluck('name', 'id')->all();
+    }
+
     public function emailIsTaken(Email $email): bool
     {
         return DB::table('users')->whereRaw('lower(email) = ?', [$email->value])->exists();
