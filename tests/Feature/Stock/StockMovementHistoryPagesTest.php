@@ -151,3 +151,14 @@ it('pages the history 50 lines at a time with previous and next links (S93)', fu
             ->has('history.lines', 10)->where('history.page', 2)->where('history.nextUrl', null)
             ->where('history.prevUrl', url("/finance/stock/{$jam->id}/movements?page=1")));
 });
+
+it('answers a page past the end with empty lines, a link back to the last page and no error (S93)', function () {
+    $manager = accountWith(Role::Manager);
+
+    $this->actingAs($manager)->get("/finance/stock/{$this->honey->id}/movements?page=99999999999999999999")->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->has('history.lines', 0)->where('history.total', 4)->where('history.nextUrl', null)
+            ->where('history.prevUrl', url("/finance/stock/{$this->honey->id}/movements?page=1")));
+    $this->get("/manage/stock/{$this->honey->id}/movements?page=3")->assertOk()
+        ->assertInertia(fn (Assert $page) => $page->has('history.lines', 0)->where('history.total', 4));
+});

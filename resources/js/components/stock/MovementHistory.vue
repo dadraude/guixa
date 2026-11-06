@@ -35,14 +35,22 @@ const showBaskets = computed(() =>
         </h2>
 
         <p
-            v-if="history.lines.length === 0"
+            v-if="history.total === 0"
             class="pilot-layout-notice text-sm text-muted-foreground"
             data-test="movement-history-empty"
         >
             {{ trans('No movements yet.') }}
         </p>
 
-        <template v-else>
+        <p
+            v-else-if="history.lines.length === 0"
+            class="pilot-layout-notice text-sm text-muted-foreground"
+            data-test="movement-history-page-empty"
+        >
+            {{ trans('No movements on this page.') }}
+        </p>
+
+        <template v-if="history.lines.length > 0">
             <div class="pilot-wallet-movements">
                 <table
                     class="pilot-data-table pilot-wallet-table w-full text-sm"
@@ -165,39 +173,39 @@ const showBaskets = computed(() =>
                     </tbody>
                 </table>
             </div>
-
-            <nav
-                v-if="history.prevUrl || history.nextUrl"
-                class="mt-4 flex flex-wrap items-center justify-between gap-2"
-                :aria-label="trans('Pages')"
-                data-test="movement-paging"
-            >
-                <Button
-                    v-if="history.prevUrl"
-                    variant="outline"
-                    class="min-h-11"
-                    as-child
-                >
-                    <Link :href="history.prevUrl" rel="prev">{{
-                        trans('Previous page')
-                    }}</Link>
-                </Button>
-                <span v-else aria-hidden="true"></span>
-                <span class="text-sm text-muted-foreground">{{
-                    trans('Page :page', { page: String(history.page) })
-                }}</span>
-                <Button
-                    v-if="history.nextUrl"
-                    variant="outline"
-                    class="min-h-11"
-                    as-child
-                >
-                    <Link :href="history.nextUrl" rel="next">{{
-                        trans('Next page')
-                    }}</Link>
-                </Button>
-                <span v-else aria-hidden="true"></span>
-            </nav>
         </template>
+
+        <nav
+            v-if="history.prevUrl || history.nextUrl"
+            class="mt-4 flex flex-wrap items-center justify-between gap-2"
+            :aria-label="trans('Pages')"
+            data-test="movement-paging"
+        >
+            <Button
+                v-if="history.prevUrl"
+                variant="outline"
+                class="min-h-11"
+                as-child
+            >
+                <Link :href="history.prevUrl" rel="prev">{{
+                    trans('Previous page')
+                }}</Link>
+            </Button>
+            <span v-else aria-hidden="true"></span>
+            <span class="text-sm text-muted-foreground">{{
+                trans('Page :page', { page: String(history.page) })
+            }}</span>
+            <Button
+                v-if="history.nextUrl"
+                variant="outline"
+                class="min-h-11"
+                as-child
+            >
+                <Link :href="history.nextUrl" rel="next">{{
+                    trans('Next page')
+                }}</Link>
+            </Button>
+            <span v-else aria-hidden="true"></span>
+        </nav>
     </section>
 </template>

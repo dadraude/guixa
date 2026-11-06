@@ -22,12 +22,14 @@ final readonly class StockMovementPageRow
     public static function from(StockMovementPage $page, int $perPage, int $current, string $path): self
     {
         $paginator = new LengthAwarePaginator($page->lines, $page->total, $perPage, $current, ['path' => $path]);
+        // A page past the end links back to the last page, not to the one just before it.
+        $previous = $current > 1 ? $paginator->url(min($current - 1, $paginator->lastPage())) : null;
 
         return new self(
             array_map(StockMovementRow::from(...), $page->lines),
             $page->total,
             $paginator->currentPage(),
-            $paginator->previousPageUrl(),
+            $previous,
             $paginator->nextPageUrl(),
         );
     }

@@ -33,7 +33,7 @@ final class ListStockMovements
         $seesBaskets = $this->authorize($actor, $product);
 
         $newestFirst = array_reverse($this->withBalances($this->movements->forProduct($productId)));
-        $pageMovements = array_slice($newestFirst, (max($page, 1) - 1) * self::PER_PAGE, self::PER_PAGE);
+        $pageMovements = $this->pageOf($newestFirst, max($page, 1));
 
         $names = $this->accountNames->forAccounts(array_values(array_unique(array_map(
             fn (array $row) => $row['movement']->recordedBy,
@@ -51,6 +51,20 @@ final class ListStockMovements
             $product->unit(),
             ($newestFirst[0]['balance'] ?? SignedQuantity::ofThousandths(0))->toString(),
         );
+    }
+
+    /**
+     * @param  list<array{movement: StockMovement, balance: SignedQuantity}>  $newestFirst
+     * @return list<array{movement: StockMovement, balance: SignedQuantity}>
+     */
+    private function pageOf(array $newestFirst, int $page): array
+    {
+        // Checked before multiplying: a huge page number would overflow the offset.
+        if ($page > intdiv(count($newestFirst) + self::PER_PAGE - 1, self::PER_PAGE)) {
+            return [];
+        }
+
+        return array_slice($newestFirst, ($page - 1) * self::PER_PAGE, self::PER_PAGE);
     }
 
     /** @return bool whether the actor may see the baskets behind sales and corrections: a producer alone may not */

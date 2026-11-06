@@ -680,5 +680,6 @@
     "Next page": "Pàgina següent",
     "Page :page": "Pàgina :page",
     "Pages": "Pàgines",
-    "Available quantities and movement history": "Quantitats disponibles i historial de moviments"
+    "Available quantities and movement history": "Quantitats disponibles i historial de moviments",
+    "No movements on this page.": "Aquesta pàgina no té moviments."
 }

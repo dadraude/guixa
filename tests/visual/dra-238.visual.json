@@ -25,7 +25,7 @@
             ],
             "states": [
                 {
-                    "id": "populated",
+                    "id": "populated-narrow",
                     "query": {
                         "state": "populated"
                     },
@@ -40,7 +40,70 @@
                             "width": 375,
                             "mode": "dark",
                             "text": 100
-                        },
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"movement-line\"]",
+                                "count": 4
+                            },
+                            {
+                                "selector": "[data-test=\"movement-basket-link\"]",
+                                "count": 2,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"movement-paging\"] a",
+                                "count": 2,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content header p",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h2",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"movement-line\"] td",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"movement-line\"] [data-slot=\"badge\"]",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"movement-paging\"] a",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"movement-paging\"] > span:not([aria-hidden])",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"movement-basket-link\"]",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"movement-line\"] .pilot-cell-label",
+                                "contrast": 4.5
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "populated-wide",
+                    "query": {
+                        "state": "populated"
+                    },
+                    "ready": "body[data-visual-ready=\"manager-populated\"]",
+                    "cases": [
                         {
                             "width": 1280,
                             "mode": "light",
@@ -67,6 +130,42 @@
                                 "selector": "[data-test=\"movement-paging\"] a",
                                 "count": 2,
                                 "minHeight": 44
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content header p",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h2",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"movement-line\"] td",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"movement-line\"] [data-slot=\"badge\"]",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"movement-paging\"] a",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"movement-paging\"] > span:not([aria-hidden])",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"movement-basket-link\"]",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content thead th",
+                                "contrast": 4.5
                             }
                         ]
                     }
@@ -88,7 +187,59 @@
                             "mode": "dark",
                             "text": 200
                         }
-                    ]
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "#main-content h1",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content header p",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h2",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"movement-line\"] td",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"movement-line\"] [data-slot=\"badge\"]",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"movement-paging\"] a",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"movement-paging\"] > span:not([aria-hidden])",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"movement-basket-link\"]",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content label",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"record-entry\"]",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"record-adjustment\"]",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"movement-line\"] .pilot-cell-label",
+                                "contrast": 4.5
+                            }
+                        ]
+                    }
                 },
                 {
                     "id": "long-content",
@@ -102,7 +253,59 @@
                             "mode": "light",
                             "text": 200
                         }
-                    ]
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "#main-content h1",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content header p",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h2",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"movement-line\"] td",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"movement-line\"] [data-slot=\"badge\"]",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"movement-paging\"] a",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"movement-paging\"] > span:not([aria-hidden])",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"movement-basket-link\"]",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content label",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"record-entry\"]",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"record-adjustment\"]",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"movement-line\"] .pilot-cell-label",
+                                "contrast": 4.5
+                            }
+                        ]
+                    }
                 }
             ]
         },
@@ -122,7 +325,7 @@
             ],
             "states": [
                 {
-                    "id": "populated",
+                    "id": "populated-narrow",
                     "query": {
                         "state": "populated"
                     },
@@ -137,7 +340,70 @@
                             "width": 375,
                             "mode": "dark",
                             "text": 100
-                        },
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"movement-line\"]",
+                                "count": 4
+                            },
+                            {
+                                "selector": "[data-test=\"movement-basket-link\"]",
+                                "count": 2,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"movement-paging\"] a",
+                                "count": 2,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content header p",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h2",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"movement-line\"] td",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"movement-line\"] [data-slot=\"badge\"]",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"movement-paging\"] a",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"movement-paging\"] > span:not([aria-hidden])",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"movement-basket-link\"]",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"movement-line\"] .pilot-cell-label",
+                                "contrast": 4.5
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "populated-wide",
+                    "query": {
+                        "state": "populated"
+                    },
+                    "ready": "body[data-visual-ready=\"finance-populated\"]",
+                    "cases": [
                         {
                             "width": 1280,
                             "mode": "light",
@@ -164,6 +430,42 @@
                                 "selector": "[data-test=\"movement-paging\"] a",
                                 "count": 2,
                                 "minHeight": 44
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content header p",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h2",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"movement-line\"] td",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"movement-line\"] [data-slot=\"badge\"]",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"movement-paging\"] a",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"movement-paging\"] > span:not([aria-hidden])",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"movement-basket-link\"]",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content thead th",
+                                "contrast": 4.5
                             }
                         ]
                     }
@@ -179,9 +481,40 @@
                             "width": 375,
                             "mode": "dark",
                             "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
                         }
                     ],
                     "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"movement-history-empty\"]",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"movement-history-empty\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"movement-line\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content header p",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h2",
+                                "contrast": 4.5
+                            }
+                        ],
                         "focus": [],
                         "noFocusReason": "An empty history has no controls."
                     }
@@ -204,7 +537,7 @@
             ],
             "states": [
                 {
-                    "id": "populated",
+                    "id": "populated-narrow",
                     "query": {
                         "state": "populated"
                     },
@@ -219,7 +552,65 @@
                             "width": 375,
                             "mode": "dark",
                             "text": 100
-                        },
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"movement-line\"]",
+                                "count": 4
+                            },
+                            {
+                                "selector": "[data-test=\"movement-basket-link\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"movement-paging\"] a",
+                                "count": 2,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content header p",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h2",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"movement-line\"] td",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"movement-line\"] [data-slot=\"badge\"]",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"movement-paging\"] a",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"movement-paging\"] > span:not([aria-hidden])",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"movement-line\"] .pilot-cell-label",
+                                "contrast": 4.5
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "populated-wide",
+                    "query": {
+                        "state": "populated"
+                    },
+                    "ready": "body[data-visual-ready=\"producer-populated\"]",
+                    "cases": [
                         {
                             "width": 1280,
                             "mode": "light",
@@ -245,6 +636,38 @@
                                 "selector": "[data-test=\"movement-paging\"] a",
                                 "count": 2,
                                 "minHeight": 44
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content header p",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h2",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"movement-line\"] td",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"movement-line\"] [data-slot=\"badge\"]",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"movement-paging\"] a",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"movement-paging\"] > span:not([aria-hidden])",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content thead th",
+                                "contrast": 4.5
                             }
                         ]
                     }
@@ -261,7 +684,56 @@
                             "mode": "light",
                             "text": 200
                         }
-                    ]
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"movement-line\"]",
+                                "count": 4
+                            },
+                            {
+                                "selector": "[data-test=\"movement-basket-link\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"movement-paging\"] a",
+                                "count": 2,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content header p",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h2",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"movement-line\"] td",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"movement-line\"] [data-slot=\"badge\"]",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"movement-paging\"] a",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"movement-paging\"] > span:not([aria-hidden])",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"movement-line\"] .pilot-cell-label",
+                                "contrast": 4.5
+                            }
+                        ]
+                    }
                 }
             ]
         },
@@ -290,8 +762,18 @@
                             "text": 100
                         },
                         {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
                             "width": 1280,
                             "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
                             "text": 100
                         }
                     ],
@@ -303,7 +785,28 @@
                             },
                             {
                                 "selector": "[data-test=\"finance-stock-product\"] a",
-                                "minHeight": 44
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"finance-stock-product\"] h2",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"finance-stock-product\"] p",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"finance-stock-product\"] .tabular-nums",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content header p",
+                                "contrast": 4.5
                             }
                         ]
                     }

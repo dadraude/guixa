@@ -92,4 +92,28 @@ describe('stock movement history', () => {
             '/p?page=1',
         ]);
     });
+
+    it('says a page past the end is empty, not the whole history, and keeps the way back', () => {
+        const wrapper = mountHistory(
+            history([], {
+                total: 60,
+                page: 3,
+                prevUrl: '/p?page=2',
+                nextUrl: null,
+            }),
+        );
+
+        expect(
+            wrapper.find('[data-test="movement-history-empty"]').exists(),
+        ).toBe(false);
+        expect(
+            wrapper.get('[data-test="movement-history-page-empty"]').text(),
+        ).toBe('Aquesta pàgina no té moviments.');
+        expect(
+            wrapper
+                .get('[data-test="movement-paging"]')
+                .findAll('a')
+                .map((link) => link.attributes('href')),
+        ).toEqual(['/p?page=2']);
+    });
 });

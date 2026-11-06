@@ -189,3 +189,10 @@ it('carries the product header with the available stock, even for a deactivated 
         ->and($page->unit)->toBe('jar')
         ->and($page->available)->toBe('7.000');
 });
+
+it('returns no lines for a page past the last one, even for an absurd page number (S93)', function () {
+    $huge = ($this->history)($this->manager, $this->honeyId, PHP_INT_MAX);
+
+    expect($huge->lines)->toBe([])->and($huge->total)->toBe(4)
+        ->and(($this->history)($this->manager, $this->honeyId, 2)->lines)->toBe([]);
+});
