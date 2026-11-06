@@ -3,19 +3,9 @@
     "rootFontPx": 16,
     "darkSelector": "html.dark",
     "matrix": {
-        "widths": [
-            375,
-            1024,
-            1280
-        ],
-        "modes": [
-            "light",
-            "dark"
-        ],
-        "text": [
-            100,
-            200
-        ]
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark"],
+        "text": [100, 200]
     },
     "views": [
         {
@@ -25,11 +15,9 @@
                 "view": "manager"
             },
             "root": "#main-content",
-            "panels": "#main-content .pilot-layout-panel,#main-content li",
+            "panels": "#main-content form,#main-content .pilot-layout-panel:not(:has(table)),#main-content .pilot-layout-notice,#main-content .pilot-data-table tbody tr",
             "content": "#main-content h1,#main-content h2,#main-content p,#main-content label,#main-content input,#main-content button,#main-content a,#main-content td,#main-content li",
-            "fonts": [
-                "16px Nunito Variable"
-            ],
+            "fonts": ["16px Nunito Variable"],
             "focus": [
                 "#main-content #entry-quantity",
                 "#main-content [data-test=\"movement-paging\"] a[rel=\"prev\"]",
@@ -125,11 +113,9 @@
                 "view": "finance"
             },
             "root": "#main-content",
-            "panels": "#main-content .pilot-layout-panel,#main-content li",
+            "panels": "#main-content form,#main-content .pilot-layout-panel:not(:has(table)),#main-content .pilot-layout-notice,#main-content .pilot-data-table tbody tr",
             "content": "#main-content h1,#main-content h2,#main-content p,#main-content label,#main-content input,#main-content button,#main-content a,#main-content td,#main-content li",
-            "fonts": [
-                "16px Nunito Variable"
-            ],
+            "fonts": ["16px Nunito Variable"],
             "focus": [
                 "#main-content [data-test=\"movement-paging\"] a[rel=\"prev\"]",
                 "#main-content [data-test=\"movement-paging\"] a[rel=\"next\"]"
@@ -209,11 +195,9 @@
                 "view": "producer"
             },
             "root": "#main-content",
-            "panels": "#main-content .pilot-layout-panel,#main-content li",
+            "panels": "#main-content form,#main-content .pilot-layout-panel:not(:has(table)),#main-content .pilot-layout-notice,#main-content .pilot-data-table tbody tr",
             "content": "#main-content h1,#main-content h2,#main-content p,#main-content label,#main-content input,#main-content button,#main-content a,#main-content td,#main-content li",
-            "fonts": [
-                "16px Nunito Variable"
-            ],
+            "fonts": ["16px Nunito Variable"],
             "focus": [
                 "#main-content [data-test=\"movement-paging\"] a[rel=\"prev\"]",
                 "#main-content [data-test=\"movement-paging\"] a[rel=\"next\"]"
@@ -290,12 +274,8 @@
             "root": "#main-content",
             "panels": "#main-content .pilot-layout-panel,#main-content li",
             "content": "#main-content h1,#main-content h2,#main-content p,#main-content label,#main-content input,#main-content button,#main-content a,#main-content td,#main-content li",
-            "fonts": [
-                "16px Nunito Variable"
-            ],
-            "focus": [
-                "#main-content [data-test=\"finance-stock-product\"] a"
-            ],
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["#main-content [data-test=\"finance-stock-product\"] a"],
             "states": [
                 {
                     "id": "populated",
