@@ -3,6 +3,7 @@
 use Guixa\Catalog\Infrastructure\Persistence\ProducerModel;
 use Guixa\Catalog\Infrastructure\Persistence\ProductModel;
 use Guixa\Shared\Domain\Role;
+use Guixa\Shared\Domain\UtcTimestamp;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Inertia\Testing\AssertableInertia as Assert;
@@ -24,7 +25,7 @@ function receptionFixture(): array
         test()->actingAs(memberOf($households[$name], "Member {$name}"))->put("/cycles/{$cycleId}/order/lines/{$loaf}", ['quantity' => $quantity])->assertRedirect();
         app('auth')->forgetGuards();
     }
-    DB::table('cycle_producers')->where('cycle_id', $cycleId)->update(['closes_at' => now()->subHour(), 'sent_at' => now()]);
+    DB::table('cycle_producers')->where('cycle_id', $cycleId)->update(['closes_at' => UtcTimestamp::toStorage(now()->subHour()), 'sent_at' => UtcTimestamp::toStorage(now())]);
 
     return [$cycleId, $baker->id, $loaf, $rye, $households, accountWith(Role::Manager)];
 }
@@ -135,7 +136,7 @@ it('allocates by hand to a household that did not order, taking a snapshot of th
 
 it('refuses an allocation to a deactivated household (R16)', function () {
     [$cycleId, $producerId, $loaf, , $households, $manager] = receptionFixture();
-    DB::table('households')->where('id', $households['D'])->update(['deactivated_at' => now()]);
+    DB::table('households')->where('id', $households['D'])->update(['deactivated_at' => UtcTimestamp::toStorage(now())]);
 
     $this->actingAs($manager)->put("/manage/cycles/{$cycleId}/receptions/{$producerId}/products/{$loaf}/allocations/{$households['D']}", ['quantity' => '1'])
         ->assertSessionHasErrors('domain');
@@ -222,7 +223,7 @@ it('does not reopen a producer once the cycle is closed (R18)', function () {
     $this->actingAs($manager)->post("{$reception}/validate")->assertRedirect();
     $this->actingAs($manager)->post("{$reception}/distribution")->assertRedirect();
 
-    DB::table('cycles')->where('id', $cycleId)->update(['closed_at' => now()]);
+    DB::table('cycles')->where('id', $cycleId)->update(['closed_at' => UtcTimestamp::toStorage(now())]);
     $this->actingAs($manager)->delete("{$reception}/distribution")->assertSessionHasErrors('domain');
 });
 

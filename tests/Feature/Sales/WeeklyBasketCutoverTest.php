@@ -5,6 +5,7 @@ use Guixa\Catalog\Infrastructure\Persistence\ProducerModel;
 use Guixa\Ordering\Domain\Error\CycleNotSettled;
 use Guixa\Sales\Application\WeeklyBasketSource;
 use Guixa\Shared\Domain\Role;
+use Guixa\Shared\Domain\UtcTimestamp;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -21,7 +22,7 @@ function settledWeeklyFixture(): array
     DB::table('households')->insert(['id' => $household, 'name' => 'Household A', 'created_at' => now(), 'updated_at' => now()]);
     test()->actingAs(memberOf($household, 'Anna'))->put("/cycles/{$cycleId}/order/lines/{$loaf}", ['quantity' => '5'])->assertRedirect();
     app('auth')->forgetGuards();
-    DB::table('cycle_producers')->where('cycle_id', $cycleId)->update(['closes_at' => now()->subHour(), 'sent_at' => now()]);
+    DB::table('cycle_producers')->where('cycle_id', $cycleId)->update(['closes_at' => UtcTimestamp::toStorage(now()->subHour()), 'sent_at' => UtcTimestamp::toStorage(now())]);
 
     $manager = accountWith(Role::Manager);
     $reception = "/manage/cycles/{$cycleId}/receptions/{$baker->id}";
@@ -54,7 +55,7 @@ it('settles into one uncharged weekly base basket that validates once, closes th
 
     expect(fn () => DB::transaction(fn () => DB::table('baskets')->insert([
         'id' => (string) Str::uuid7(), 'household_id' => $household, 'household_name' => 'Household A', 'kind' => 'weekly', 'state' => 'draft',
-        'created_by' => null, 'created_at' => now(), 'source_order_id' => $order->id,
+        'created_by' => null, 'created_at' => UtcTimestamp::toStorage(now()), 'source_order_id' => $order->id,
     ])))->toThrow(QueryException::class);
 
     $finance = accountWith(Role::Finance);
@@ -92,7 +93,7 @@ it('reports the weekly source not ready until the last producer is distributed, 
     $this->actingAs(memberOf($household, 'Hana'))->put("/cycles/{$cycleId}/order/lines/{$loaf}", ['quantity' => '2'])->assertRedirect();
     $this->put("/cycles/{$cycleId}/order/lines/{$apples}", ['quantity' => '1'])->assertRedirect();
     app('auth')->forgetGuards();
-    DB::table('cycle_producers')->where('cycle_id', $cycleId)->update(['closes_at' => now()->subHour(), 'sent_at' => now()]);
+    DB::table('cycle_producers')->where('cycle_id', $cycleId)->update(['closes_at' => UtcTimestamp::toStorage(now()->subHour()), 'sent_at' => UtcTimestamp::toStorage(now())]);
     $manager = accountWith(Role::Manager);
     $distribute = function (string $producerId, string $product, string $received) use ($cycleId, $manager) {
         $reception = "/manage/cycles/{$cycleId}/receptions/{$producerId}";
@@ -111,7 +112,7 @@ it('reports the weekly source not ready until the last producer is distributed, 
     $beekeeper = ProducerModel::query()->create(['name' => 'Beekeeper', 'active' => true, 'cutoff_days_before' => 3, 'cutoff_time' => '20:00']);
     $honey = (string) Str::uuid7();
     DB::table('products')->insert(['id' => $honey, 'producer_id' => $beekeeper->id, 'stock' => true, 'name' => 'Honey', 'unit' => 'jar', 'price_cents' => 600, 'variable' => false, 'active' => true]);
-    DB::table('stock_movements')->insert(['id' => (string) Str::uuid7(), 'product_id' => $honey, 'type' => 'entry', 'quantity' => '3', 'occurred_at' => now(), 'recorded_by' => $manager->id]);
+    DB::table('stock_movements')->insert(['id' => (string) Str::uuid7(), 'product_id' => $honey, 'type' => 'entry', 'quantity' => '3', 'occurred_at' => UtcTimestamp::toStorage(now()), 'recorded_by' => $manager->id]);
     $finance = accountWith(Role::Finance);
     $this->actingAs($finance);
     $this->post('/finance/baskets', ['household_id' => $household])->assertRedirect();

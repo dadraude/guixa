@@ -28,7 +28,7 @@ final class InvitationMail extends Mailable
 
     public function localizedExpiry(): string
     {
-        $expiry = CarbonImmutable::instance($this->expiresAt);
+        $expiry = CarbonImmutable::instance($this->expiresAt)->setTimezone(config('guixa.timezone'));
         $expiry->locale('ca');
 
         return $expiry->isoFormat('D [de] MMMM [de] YYYY, HH:mm');

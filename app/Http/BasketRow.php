@@ -2,6 +2,7 @@
 
 namespace App\Http;
 
+use DateTimeZone;
 use Guixa\Sales\Application\BasketData;
 use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 
@@ -48,7 +49,7 @@ final readonly class BasketRow
             $basket->state, array_map(BasketStockLineRow::from(...), $basket->stockLines),
             array_map(BasketReturnLineRow::from(...), $basket->returnLines),
             $total, $balanceCents, $basket->draft ? $balanceCents - $total : null,
-            $basket->validatedAt?->format(DATE_ATOM), $basket->collectedAt?->format(DATE_ATOM),
+            $basket->validatedAt?->setTimezone(new DateTimeZone(config('guixa.timezone')))->format(DATE_ATOM), $basket->collectedAt?->setTimezone(new DateTimeZone(config('guixa.timezone')))->format(DATE_ATOM),
             $basket->effectiveTotalCents, array_map(BasketAdjustmentRow::from(...), $basket->adjustments),
             array_map(BasketCollectionEventRow::from(...), $basket->collectionEvents),
             $basket->pendingCollection, BasketActionsRow::from($basket->can), $basket->status, $basket->settled,

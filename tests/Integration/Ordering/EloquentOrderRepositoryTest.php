@@ -7,6 +7,7 @@ use Guixa\Catalog\Infrastructure\Persistence\ProducerModel;
 use Guixa\Ordering\Domain\OrderRepository;
 use Guixa\Ordering\Infrastructure\Persistence\EloquentOrderRepository;
 use Guixa\Shared\Domain\Quantity;
+use Guixa\Shared\Domain\UtcTimestamp;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -81,7 +82,7 @@ final class EloquentOrderRepositoryTest extends TestCase
         $order->setLine($this->product(self::BREAD, 'Loaf', 350), Quantity::fromString('2'), $cycle, $repository->nextId(), self::ANNA, $this->madrid('2026-10-22 10:00'));
         $repository->add($order);
 
-        DB::table('cycles')->where('id', self::CYCLE)->update(['settled_at' => now()]);
+        DB::table('cycles')->where('id', self::CYCLE)->update(['settled_at' => UtcTimestamp::toStorage(now())]);
 
         $this->assertFalse($repository->hasUnsettledLinesOf(self::BREAD));
     }

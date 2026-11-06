@@ -2,6 +2,7 @@
 
 use Guixa\Membership\Application\CanLogIn;
 use Guixa\Shared\Domain\Role;
+use Guixa\Shared\Domain\UtcTimestamp;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -109,7 +110,7 @@ it('ends the session of an account that is deactivated while logged in (R36b)', 
     $anna = memberOf($this->householdId);
     $this->actingAs($anna)->get(route('dashboard'))->assertOk();
 
-    DB::table('users')->where('id', $anna->id)->update(['deactivated_at' => now()]);
+    DB::table('users')->where('id', $anna->id)->update(['deactivated_at' => UtcTimestamp::toStorage(now())]);
 
     $this->actingAs($anna->fresh())->get(route('dashboard'))->assertRedirect(route('login'));
     $this->assertGuest();

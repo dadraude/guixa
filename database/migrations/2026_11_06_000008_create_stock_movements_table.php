@@ -14,7 +14,7 @@ return new class extends Migration
             $table->foreignUuid('product_id')->constrained('products');
             $table->string('type');
             $table->decimal('quantity', 12, 3);
-            $table->timestampTz('occurred_at');
+            $table->dateTime('occurred_at', 6);
             $table->uuid('recorded_by');
             $table->text('note')->nullable();
             $table->foreignUuid('cycle_id')->nullable()->constrained('cycles');

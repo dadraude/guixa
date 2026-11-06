@@ -116,7 +116,7 @@ it('shows each movement date in the cooperative timezone, not in UTC (Time)', fu
     $manager = accountWith(Role::Manager);
     DB::table('wallet_movements')->insert([
         'id' => (string) Str::uuid7(), 'household_id' => $household, 'type' => 'top_up', 'amount_cents' => 1000,
-        'occurred_at' => '2026-10-22 22:30:00+00', 'recorded_by' => $manager->id,
+        'occurred_at' => '2026-10-22 22:30:00', 'recorded_by' => $manager->id,
     ]);
 
     $this->actingAs($manager)->get("/finance/households/{$household}/wallet")

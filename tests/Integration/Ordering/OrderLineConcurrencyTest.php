@@ -8,6 +8,7 @@ use Guixa\Ordering\Application\SetOrderLine;
 use Guixa\Ordering\Domain\CycleRepository;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Clock;
+use Guixa\Shared\Domain\UtcTimestamp;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -89,7 +90,7 @@ final class OrderLineConcurrencyTest extends TestCase
         DB::table('producers')->insert(['id' => $openProducer, 'name' => 'Grower', 'active' => true, 'cutoff_days_before' => 3, 'cutoff_time' => '20:00']);
         DB::table('products')->where('id', $products[1])->update(['producer_id' => $openProducer]);
         DB::table('cycle_producers')->insert(['cycle_id' => $cycle, 'producer_id' => $openProducer, 'participating' => true, 'closes_at' => null]);
-        DB::table('cycle_producers')->where('cycle_id', $cycle)->where('producer_id', $sentProducer)->update(['closes_at' => now()->addHour()->toIso8601String()]);
+        DB::table('cycle_producers')->where('cycle_id', $cycle)->where('producer_id', $sentProducer)->update(['closes_at' => UtcTimestamp::toStorage(now()->addHour())]);
 
         return [$anna, $household, $cycle, $products, $sentProducer];
     }

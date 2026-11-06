@@ -5,6 +5,7 @@ namespace Guixa\Sales\Application;
 use Guixa\Sales\Domain\Basket;
 use Guixa\Sales\Domain\BasketRepository;
 use Guixa\Sales\Domain\CyclePickupDates;
+use Guixa\Shared\Domain\Clock;
 
 /** Internal query for Membership, which settles households its own manager-only use cases already authorised (R35a); it takes no actor. */
 final class ReadOpenHouseholdBaskets
@@ -13,6 +14,7 @@ final class ReadOpenHouseholdBaskets
         private readonly BasketRepository $baskets,
         private readonly CyclePickupDates $pickupDates,
         private readonly WeeklySourceOrders $sourceOrders,
+        private readonly Clock $clock,
     ) {}
 
     /** @return list<OpenBasketData> weekly, stock and return baskets still to validate or to collect, oldest date first; a weekly basket is dated by its cycle's pickup, any other by its creation */
@@ -49,9 +51,9 @@ final class ReadOpenHouseholdBaskets
     {
         $cycleId = $basket->isWeekly() ? ($cycles[(string) $basket->sourceOrderId] ?? null) : null;
         if ($cycleId !== null) {
-            return $pickupDates[$cycleId] ?? $basket->createdAt->format('Y-m-d');
+            return $pickupDates[$cycleId] ?? $basket->createdAt->setTimezone($this->clock->timezone())->format('Y-m-d');
         }
 
-        return $basket->createdAt->format('Y-m-d');
+        return $basket->createdAt->setTimezone($this->clock->timezone())->format('Y-m-d');
     }
 }

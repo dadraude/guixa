@@ -43,7 +43,7 @@ final class GetHousehold
             $account->name,
             $account->email->value,
             ! $account->hasAcceptedInvitation(),
-            $invitation?->expiresAt()->format(DATE_ATOM),
+            $invitation?->expiresAt()->setTimezone($this->clock->timezone())->format(DATE_ATOM),
             $invitation?->isExpiredAt($this->clock->now()) ?? false,
         );
     }

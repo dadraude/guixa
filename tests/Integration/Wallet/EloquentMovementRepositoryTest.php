@@ -3,6 +3,7 @@
 namespace Tests\Integration\Wallet;
 
 use App\Models\User;
+use Guixa\Shared\Domain\UtcTimestamp;
 use Guixa\Wallet\Domain\MovementRepository;
 use Guixa\Wallet\Infrastructure\Persistence\EloquentMovementRepository;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -44,7 +45,7 @@ final class EloquentMovementRepositoryTest extends TestCase
         DB::table('baskets')->insert([
             'id' => $id, 'household_id' => $household, 'household_name' => 'Household',
             'kind' => 'stock', 'state' => 'draft', 'created_by' => $this->account(),
-            'created_at' => now(),
+            'created_at' => UtcTimestamp::toStorage(now()),
         ]);
 
         return $id;

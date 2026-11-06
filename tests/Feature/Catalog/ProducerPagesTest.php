@@ -3,6 +3,7 @@
 use App\Models\User;
 use Guixa\Catalog\Infrastructure\Persistence\ProducerModel;
 use Guixa\Shared\Domain\Role;
+use Guixa\Shared\Domain\UtcTimestamp;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Inertia\Testing\AssertableInertia as Assert;
@@ -67,7 +68,7 @@ it('shows a producer that already has an account with its email and invitation s
             ->where('producers.0.accountEmail', 'baker@example.org')
             ->where('producers.0.accountInvitationPending', true));
 
-    DB::table('users')->where('email', 'baker@example.org')->update(['activated_at' => now()]);
+    DB::table('users')->where('email', 'baker@example.org')->update(['activated_at' => UtcTimestamp::toStorage(now())]);
 
     $this->actingAs($manager)->get('/manage/producers')
         ->assertInertia(fn (Assert $page) => $page

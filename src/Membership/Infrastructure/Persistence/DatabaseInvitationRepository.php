@@ -2,9 +2,9 @@
 
 namespace Guixa\Membership\Infrastructure\Persistence;
 
-use DateTimeImmutable;
 use Guixa\Membership\Domain\Invitation;
 use Guixa\Membership\Domain\InvitationRepository;
+use Guixa\Shared\Domain\UtcTimestamp;
 use Illuminate\Support\Facades\DB;
 use stdClass;
 
@@ -16,7 +16,7 @@ final class DatabaseInvitationRepository implements InvitationRepository
             [[
                 'account_id' => $invitation->accountId,
                 'token_hash' => $invitation->tokenHash,
-                'sent_at' => $invitation->sentAt->format(DATE_ATOM),
+                'sent_at' => UtcTimestamp::toStorage($invitation->sentAt),
             ]],
             ['account_id'],
             ['token_hash', 'sent_at'],
@@ -40,6 +40,6 @@ final class DatabaseInvitationRepository implements InvitationRepository
 
     private function hydrate(?stdClass $row): ?Invitation
     {
-        return $row === null ? null : Invitation::restore($row->account_id, $row->token_hash, new DateTimeImmutable($row->sent_at));
+        return $row === null ? null : Invitation::restore($row->account_id, $row->token_hash, UtcTimestamp::fromStorage($row->sent_at));
     }
 }

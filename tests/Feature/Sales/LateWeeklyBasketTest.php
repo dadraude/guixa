@@ -1,6 +1,7 @@
 <?php
 
 use Guixa\Sales\Application\ReadOpenHouseholdBaskets;
+use Guixa\Shared\Domain\UtcTimestamp;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
@@ -64,7 +65,7 @@ it('refuses a second open late draft or a second base for one source order in th
     $week = lateArrivalWeek();
     $row = fn (bool $late, string $state = 'draft') => [
         'id' => (string) Str::uuid7(), 'household_id' => $week['households']['A'], 'household_name' => 'Household A', 'kind' => 'weekly', 'state' => $state,
-        'created_by' => null, 'created_at' => now(), 'source_order_id' => $week['orders']['A'], 'late' => $late,
+        'created_by' => null, 'created_at' => UtcTimestamp::toStorage(now()), 'source_order_id' => $week['orders']['A'], 'late' => $late,
     ];
     DB::table('baskets')->insert($row(true));
 

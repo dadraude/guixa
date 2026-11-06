@@ -14,6 +14,7 @@ use Guixa\Sales\Domain\BasketRepository;
 use Guixa\Sales\Domain\BasketState;
 use Guixa\Sales\Domain\Error\BasketNotEditable;
 use Guixa\Shared\Domain\Quantity;
+use Guixa\Shared\Domain\UtcTimestamp;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use UnexpectedValueException;
@@ -45,14 +46,14 @@ final class EloquentBasketRepository implements BasketRepository
             'late' => $basket->late,
             'state' => $basket->state->value,
             'created_by' => $basket->createdBy,
-            'created_at' => $basket->createdAt->format(DATE_ATOM),
+            'created_at' => UtcTimestamp::toStorage($basket->createdAt),
             'validated_by' => $basket->validatedBy,
-            'validated_at' => $basket->validatedAt?->format(DATE_ATOM),
+            'validated_at' => UtcTimestamp::toStorage($basket->validatedAt),
             'validated_total_cents' => $basket->validatedTotalCents,
             'collected_by' => $basket->collectedBy,
-            'collected_at' => $basket->collectedAt?->format(DATE_ATOM),
+            'collected_at' => UtcTimestamp::toStorage($basket->collectedAt),
             'cancelled_by' => $basket->cancelledBy,
-            'cancelled_at' => $basket->cancelledAt?->format(DATE_ATOM),
+            'cancelled_at' => UtcTimestamp::toStorage($basket->cancelledAt),
         ]);
 
         foreach ($basket->lines as $line) {
@@ -70,8 +71,8 @@ final class EloquentBasketRepository implements BasketRepository
                 'variable' => $line->variable,
                 'containers_per_unit' => $line->containersPerUnit,
                 'quantity' => $line->quantity->toString(),
-                'created_at' => $line->createdAt->format(DATE_ATOM),
-                'removed_at' => $line->removedAt?->format(DATE_ATOM),
+                'created_at' => UtcTimestamp::toStorage($line->createdAt),
+                'removed_at' => UtcTimestamp::toStorage($line->removedAt),
             ]);
         }
 
@@ -81,7 +82,7 @@ final class EloquentBasketRepository implements BasketRepository
                 'amount_cents' => $adjustment->amountCents,
                 'reason' => $adjustment->reason,
                 'recorded_by' => $adjustment->recordedBy,
-                'occurred_at' => $adjustment->occurredAt->format(DATE_ATOM),
+                'occurred_at' => UtcTimestamp::toStorage($adjustment->occurredAt),
             ]);
             if (! $row->wasRecentlyCreated) {
                 continue;
@@ -98,7 +99,7 @@ final class EloquentBasketRepository implements BasketRepository
             && $basket->collectionEvents === []) {
             BasketCollectionEventModel::query()->create([
                 'id' => $this->nextId(), 'basket_id' => $basket->id, 'type' => 'collected',
-                'recorded_by' => $basket->collectedBy, 'occurred_at' => $basket->collectedAt->format(DATE_ATOM),
+                'recorded_by' => $basket->collectedBy, 'occurred_at' => UtcTimestamp::toStorage($basket->collectedAt),
                 'sequence' => $nextCollectionSequence++,
             ]);
         }
@@ -107,7 +108,7 @@ final class EloquentBasketRepository implements BasketRepository
             if ($existing !== null) {
                 if ($existing->basket_id !== $event->basketId || $existing->type !== $event->type
                     || $existing->recorded_by !== $event->recordedBy || $existing->reason !== $event->reason
-                    || $this->instant(new DateTimeImmutable($existing->occurred_at)) !== $this->instant($event->occurredAt)) {
+                    || $this->instant(UtcTimestamp::fromStorage($existing->occurred_at)) !== $this->instant($event->occurredAt)) {
                     throw BasketNotEditable::create();
                 }
 
@@ -115,7 +116,7 @@ final class EloquentBasketRepository implements BasketRepository
             }
             BasketCollectionEventModel::query()->create([
                 'id' => $event->id, 'basket_id' => $basket->id, 'type' => $event->type,
-                'recorded_by' => $event->recordedBy, 'occurred_at' => $event->occurredAt->format(DATE_ATOM),
+                'recorded_by' => $event->recordedBy, 'occurred_at' => UtcTimestamp::toStorage($event->occurredAt),
                 'reason' => $event->reason,
                 'sequence' => $nextCollectionSequence++,
             ]);
@@ -309,26 +310,26 @@ final class EloquentBasketRepository implements BasketRepository
             ->map(fn (BasketLineModel $line) => new BasketLine($line->id, $line->basket_id, $line->product_id,
                 $line->name, $line->unit, (int) $line->price_cents, (bool) $line->variable,
                 $this->containerSnapshot($line), Quantity::fromString((string) $line->quantity),
-                new DateTimeImmutable($line->created_at), $line->removed_at === null ? null : new DateTimeImmutable($line->removed_at),
+                UtcTimestamp::fromStorage($line->created_at), UtcTimestamp::fromStorage($line->removed_at),
                 BasketLineKind::from($line->kind), $line->return_item_id, $line->source_order_line_id,
                 $line->ordered_quantity === null ? null : Quantity::fromString((string) $line->ordered_quantity),
                 $line->allocated_quantity === null ? null : Quantity::fromString((string) $line->allocated_quantity)))
             ->all();
 
         return new Basket($model->id, $model->household_id, $model->household_name, BasketState::from($model->state),
-            $model->created_by, new DateTimeImmutable($model->created_at), array_values($lines),
-            $model->validated_by, $model->validated_at === null ? null : new DateTimeImmutable($model->validated_at),
+            $model->created_by, UtcTimestamp::fromStorage($model->created_at), array_values($lines),
+            $model->validated_by, UtcTimestamp::fromStorage($model->validated_at),
             $model->validated_total_cents === null ? null : (int) $model->validated_total_cents,
-            $model->collected_by, $model->collected_at === null ? null : new DateTimeImmutable($model->collected_at),
-            $model->cancelled_by, $model->cancelled_at === null ? null : new DateTimeImmutable($model->cancelled_at),
+            $model->collected_by, UtcTimestamp::fromStorage($model->collected_at),
+            $model->cancelled_by, UtcTimestamp::fromStorage($model->cancelled_at),
             array_values($model->adjustments->map(fn (BasketAdjustmentModel $adjustment) => new BasketAdjustment(
                 $adjustment->id, $adjustment->basket_id, (int) $adjustment->amount_cents,
-                $adjustment->reason, $adjustment->recorded_by, new DateTimeImmutable($adjustment->occurred_at),
+                $adjustment->reason, $adjustment->recorded_by, UtcTimestamp::fromStorage($adjustment->occurred_at),
                 array_values($adjustment->lines->map(fn (BasketAdjustmentLineModel $line) => BasketAdjustmentLine::fromDecimal(
                     $line->product_id, (string) $line->quantity_delta))->all())))->all()),
             array_values($model->collectionEvents->map(fn (BasketCollectionEventModel $event) => new BasketCollectionEvent(
                 $event->id, $event->basket_id, $event->type, $event->recorded_by,
-                new DateTimeImmutable($event->occurred_at), $event->reason))->all()),
+                UtcTimestamp::fromStorage($event->occurred_at), $event->reason))->all()),
             BasketKind::from($model->kind), $model->source_order_id, (bool) $model->late);
     }
 

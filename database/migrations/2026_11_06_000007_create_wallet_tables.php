@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignUuid('household_id')->constrained('households');
             $table->string('type');
             $table->integer('amount_cents');
-            $table->timestampTz('occurred_at');
+            $table->dateTime('occurred_at', 6);
             $table->foreignUuid('recorded_by')->constrained('users');
             $table->text('note')->nullable();
             // The cycle is a plain id: cycles belong to the Ordering context, so no foreign key.

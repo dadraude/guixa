@@ -4,6 +4,7 @@ use App\Models\User;
 use Guixa\Catalog\Infrastructure\Persistence\ProducerModel;
 use Guixa\Catalog\Infrastructure\Persistence\ProductModel;
 use Guixa\Shared\Domain\Role;
+use Guixa\Shared\Domain\UtcTimestamp;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Inertia\Testing\AssertableInertia as Assert;
@@ -44,7 +45,7 @@ it('shows active stock including zero with no cycle or stock writes (S73)', func
     DB::table('stock_movements')->insert([
         'id' => (string) Str::uuid7(),
         'product_id' => $honey->id, 'type' => 'entry', 'quantity' => '5.000',
-        'occurred_at' => now(), 'recorded_by' => accountWith(Role::Manager)->id,
+        'occurred_at' => UtcTimestamp::toStorage(now()), 'recorded_by' => accountWith(Role::Manager)->id,
     ]);
     $before = DB::table('stock_movements')->count();
     DB::flushQueryLog();

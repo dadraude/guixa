@@ -92,6 +92,14 @@ All cross-context writes in validation, redistribution or correction use the sam
   `SystemClock` (Infrastructure, reads `config('guixa.timezone')` ← `COOP_TIMEZONE`) and `FrozenClock` (`tests/Support`,
   any timezone). `LocalTime::at(date, HH:MM, timezone)` resolves a local time to one instant: a time that does
   not exist moves forward by the gap, a repeated one takes its first occurrence (Time, S38).
+- **Timestamp storage** (ADR 0002 rule 5): every domain `*_at` instant written through a repository is stored in UTC as `Y-m-d H:i:s.u` with no offset, in a Laravel
+  `dateTime(column, 6)` column (PostgreSQL `timestamp(6) without time zone`; on SQLite the column is declared `datetime` and its values are stored as TEXT). `Shared\Domain\UtcTimestamp`
+  is the one persistence edge: `toStorage()` converts any instant to that text and `fromStorage()` reads it back as a UTC
+  `DateTimeImmutable`. Persistence code never formats an instant itself and never lets the database session or the PHP
+  process timezone decide the stored value. Values are converted to the cooperative's timezone (`Clock::timezone()` or
+  `config('guixa.timezone')`) wherever they are formatted for people or bucketed by day: presenters in `app/Http`, `CycleData`, `GetHousehold`,
+  `ReadOpenHouseholdBaskets` and the invitation mail. Framework columns are out of scope of the `dateTime(6)` rule: `timestamps()` and `failed_jobs.failed_at` are second-precision and written by Laravel (`failed_at` uses `useCurrent()`, so it takes the database session timezone); `email_verified_at` is a second-precision framework column that the account repository writes as UTC (`Y-m-d H:i:s`).
+  `UtcTimestampStorageTest` sets the process and database session timezones to Madrid itself, so it runs without environment variables.
 - **`Actor`** (`Shared\\Application`; `Role` lives in `Shared\\Domain`) `final readonly`: `accountId` (UUID v7 string), `roles` (set of `Manager|Finance|Member|Producer`; `Member` is derived: present exactly when `householdId` is set, never stored), `?householdId`,
   `?producerId`. Built by an HTTP middleware from the authenticated account and passed to every use case.
   It carries identity and role facts; it does not throw permission exceptions.
@@ -542,7 +550,7 @@ referencing tables and Sales baskets precede stock/wallet sale-source references
 migration defines its final basket and correction references directly after baskets; no Wallet alteration
 chain or production backfill is required before launch. Existing unrelated
 settings, accounts, invitations, producers and return-item constraints remain.
-All ids are UUID v7; money is integer cents, quantities numeric(10,3), times timestamptz in UTC.
+All ids are UUID v7; money is integer cents, quantities numeric(10,3), times stored in UTC (see Timestamp storage).
 
 | Table | Relevant fields / constraints |
 | --- | --- |
