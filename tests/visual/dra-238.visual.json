@@ -26,7 +26,7 @@
             },
             "root": "#main-content",
             "panels": "#main-content .pilot-layout-panel,#main-content li",
-            "content": "#main-content h1,#main-content h2,#main-content p,#main-content label,#main-content input,#main-content button,#main-content a,#main-content th,#main-content td,#main-content li",
+            "content": "#main-content h1,#main-content h2,#main-content p,#main-content label,#main-content input,#main-content button,#main-content a,#main-content td,#main-content li",
             "fonts": [
                 "16px Nunito Variable"
             ],
@@ -126,7 +126,7 @@
             },
             "root": "#main-content",
             "panels": "#main-content .pilot-layout-panel,#main-content li",
-            "content": "#main-content h1,#main-content h2,#main-content p,#main-content label,#main-content input,#main-content button,#main-content a,#main-content th,#main-content td,#main-content li",
+            "content": "#main-content h1,#main-content h2,#main-content p,#main-content label,#main-content input,#main-content button,#main-content a,#main-content td,#main-content li",
             "fonts": [
                 "16px Nunito Variable"
             ],
@@ -210,7 +210,7 @@
             },
             "root": "#main-content",
             "panels": "#main-content .pilot-layout-panel,#main-content li",
-            "content": "#main-content h1,#main-content h2,#main-content p,#main-content label,#main-content input,#main-content button,#main-content a,#main-content th,#main-content td,#main-content li",
+            "content": "#main-content h1,#main-content h2,#main-content p,#main-content label,#main-content input,#main-content button,#main-content a,#main-content td,#main-content li",
             "fonts": [
                 "16px Nunito Variable"
             ],
@@ -289,7 +289,7 @@
             },
             "root": "#main-content",
             "panels": "#main-content .pilot-layout-panel,#main-content li",
-            "content": "#main-content h1,#main-content h2,#main-content p,#main-content label,#main-content input,#main-content button,#main-content a,#main-content th,#main-content td,#main-content li",
+            "content": "#main-content h1,#main-content h2,#main-content p,#main-content label,#main-content input,#main-content button,#main-content a,#main-content td,#main-content li",
             "fonts": [
                 "16px Nunito Variable"
             ],
