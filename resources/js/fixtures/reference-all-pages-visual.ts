@@ -291,6 +291,7 @@ const pageProps: Record<string, Record<string, unknown>> = {
     'Manage/Stock/Movements': {
         product: stockProduct,
         cycles: [{ id: cycleId, pickupDate }],
+        history: { lines: [], total: 0, page: 1, prevUrl: null, nextUrl: null },
     },
     'Orders/Edit': { order, preview: { totalCents: 0, amountCents: {} } },
     'Orders/Index': {
