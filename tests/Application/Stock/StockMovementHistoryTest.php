@@ -179,3 +179,13 @@ it('rejects an unknown product and a weekly product as not stock (S93, R28a)', f
         ->and(fn () => $history($catalog->producerActor($producerId), $weeklyId))->toThrow(StockProductNotFound::class)
         ->and($history($catalog->producerActor($producerId), $stockId)->total)->toBe(0);
 });
+
+it('carries the product header with the available stock, even for a deactivated product (R28, R28a)', function () {
+    $this->products->deactivate($this->honeyId);
+
+    $page = ($this->history)($this->finance, $this->honeyId);
+
+    expect($page->productName)->toBe('Honey')
+        ->and($page->unit)->toBe('jar')
+        ->and($page->available)->toBe('7.000');
+});

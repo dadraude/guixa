@@ -84,6 +84,15 @@ describe('shared app navigation', () => {
         ).toBe('My baskets');
     });
 
+    it('gives Finance-only users a Stock entry that stays selected on a product history', () => {
+        const finance = navigationItemsFor([{ role: 'finance' }]);
+        const history =
+            '/finance/stock/12345678-1234-1234-1234-123456789abc/movements';
+
+        expect(finance.map((item) => item.title)).toEqual(['Dashboard', 'Baskets', 'Stock']);
+        expect(currentNavigationItem(finance, history)?.title).toBe('Stock');
+    });
+
     it('keeps Households selected for a manager on the shared Finance wallet, and leaves Finance-only users unchanged', () => {
         const wallet =
             '/finance/households/12345678-1234-1234-1234-123456789abc/wallet';

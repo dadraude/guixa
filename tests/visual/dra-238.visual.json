@@ -1,0 +1,334 @@
+{
+    "baseUrl": "http://127.0.0.1:5238",
+    "rootFontPx": 16,
+    "darkSelector": "html.dark",
+    "matrix": {
+        "widths": [
+            375,
+            1024,
+            1280
+        ],
+        "modes": [
+            "light",
+            "dark"
+        ],
+        "text": [
+            100,
+            200
+        ]
+    },
+    "views": [
+        {
+            "id": "manager-movements",
+            "path": "/tests/visual/dra-238.html",
+            "query": {
+                "view": "manager"
+            },
+            "root": "#main-content",
+            "panels": "#main-content .pilot-layout-panel,#main-content li",
+            "content": "#main-content h1,#main-content h2,#main-content p,#main-content label,#main-content input,#main-content button,#main-content a,#main-content th,#main-content td,#main-content li",
+            "fonts": [
+                "16px Nunito Variable"
+            ],
+            "focus": [
+                "#main-content #entry-quantity",
+                "#main-content [data-test=\"movement-paging\"] a[rel=\"prev\"]",
+                "#main-content [data-test=\"movement-paging\"] a[rel=\"next\"]"
+            ],
+            "states": [
+                {
+                    "id": "populated",
+                    "query": {
+                        "state": "populated"
+                    },
+                    "ready": "body[data-visual-ready=\"manager-populated\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"movement-line\"]",
+                                "count": 4
+                            },
+                            {
+                                "selector": "[data-test=\"movement-basket-link\"]",
+                                "count": 2,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"movement-paging\"] a",
+                                "count": 2,
+                                "minHeight": 44
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "table-200",
+                    "query": {
+                        "state": "populated"
+                    },
+                    "ready": "body[data-visual-ready=\"manager-populated\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "long-content",
+                    "query": {
+                        "state": "long"
+                    },
+                    "ready": "body[data-visual-ready=\"manager-long\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "finance-history",
+            "path": "/tests/visual/dra-238.html",
+            "query": {
+                "view": "finance"
+            },
+            "root": "#main-content",
+            "panels": "#main-content .pilot-layout-panel,#main-content li",
+            "content": "#main-content h1,#main-content h2,#main-content p,#main-content label,#main-content input,#main-content button,#main-content a,#main-content th,#main-content td,#main-content li",
+            "fonts": [
+                "16px Nunito Variable"
+            ],
+            "focus": [
+                "#main-content [data-test=\"movement-paging\"] a[rel=\"prev\"]",
+                "#main-content [data-test=\"movement-paging\"] a[rel=\"next\"]"
+            ],
+            "states": [
+                {
+                    "id": "populated",
+                    "query": {
+                        "state": "populated"
+                    },
+                    "ready": "body[data-visual-ready=\"finance-populated\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"movement-line\"]",
+                                "count": 4
+                            },
+                            {
+                                "selector": "[data-test=\"movement-basket-link\"]",
+                                "count": 2,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"movement-paging\"] a",
+                                "count": 2,
+                                "minHeight": 44
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "empty",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "ready": "body[data-visual-ready=\"finance-empty\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "focus": [],
+                        "noFocusReason": "An empty history has no controls."
+                    }
+                }
+            ]
+        },
+        {
+            "id": "producer-history",
+            "path": "/tests/visual/dra-238.html",
+            "query": {
+                "view": "producer"
+            },
+            "root": "#main-content",
+            "panels": "#main-content .pilot-layout-panel,#main-content li",
+            "content": "#main-content h1,#main-content h2,#main-content p,#main-content label,#main-content input,#main-content button,#main-content a,#main-content th,#main-content td,#main-content li",
+            "fonts": [
+                "16px Nunito Variable"
+            ],
+            "focus": [
+                "#main-content [data-test=\"movement-paging\"] a[rel=\"prev\"]",
+                "#main-content [data-test=\"movement-paging\"] a[rel=\"next\"]"
+            ],
+            "states": [
+                {
+                    "id": "populated",
+                    "query": {
+                        "state": "populated"
+                    },
+                    "ready": "body[data-visual-ready=\"producer-populated\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"movement-line\"]",
+                                "count": 4
+                            },
+                            {
+                                "selector": "[data-test=\"movement-basket-link\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"movement-paging\"] a",
+                                "count": 2,
+                                "minHeight": 44
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "reflow-200",
+                    "query": {
+                        "state": "populated"
+                    },
+                    "ready": "body[data-visual-ready=\"producer-populated\"]",
+                    "cases": [
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "finance-stock-list",
+            "path": "/tests/visual/dra-238.html",
+            "query": {
+                "view": "finance-list"
+            },
+            "root": "#main-content",
+            "panels": "#main-content .pilot-layout-panel,#main-content li",
+            "content": "#main-content h1,#main-content h2,#main-content p,#main-content label,#main-content input,#main-content button,#main-content a,#main-content th,#main-content td,#main-content li",
+            "fonts": [
+                "16px Nunito Variable"
+            ],
+            "focus": [
+                "#main-content [data-test=\"finance-stock-product\"] a"
+            ],
+            "states": [
+                {
+                    "id": "populated",
+                    "query": {
+                        "state": "populated"
+                    },
+                    "ready": "body[data-visual-ready=\"finance-list-populated\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"finance-stock-product\"]",
+                                "count": 2
+                            },
+                            {
+                                "selector": "[data-test=\"finance-stock-product\"] a",
+                                "minHeight": 44
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -360,6 +360,25 @@ readonly containersPerUnit: string | null,
 readonly active: boolean,
 readonly available: string,
 };
+export type StockMovementPageRow = {
+readonly lines: App.Http.StockMovementRow[],
+readonly total: number,
+readonly page: number,
+readonly prevUrl: string | null,
+readonly nextUrl: string | null,
+};
+export type StockMovementRow = {
+readonly id: string,
+readonly occurredAt: string,
+readonly type: string,
+readonly quantity: string,
+readonly balanceAfter: string,
+readonly note: string | null,
+readonly authorName: string,
+readonly cycleId: string | null,
+readonly pickupDate: string | null,
+readonly basketId: string | null,
+};
 export type StockOfferRow = {
 readonly id: string,
 readonly producerId: string,

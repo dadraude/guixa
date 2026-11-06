@@ -8,6 +8,7 @@ import StockProductController from '@/actions/App/Http/Controllers/Manage/StockP
 import FormSelect from '@/components/FormSelect.vue';
 import Heading from '@/components/Heading.vue';
 import InputError from '@/components/InputError.vue';
+import MovementHistory from '@/components/stock/MovementHistory.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -24,6 +25,7 @@ defineOptions({
 const props = defineProps<{
     product: App.Http.StockLevelRow;
     cycles: App.Http.CycleOptionRow[];
+    history: App.Http.StockMovementPageRow;
 }>();
 
 const selectedAdjustmentCycleId = ref<string | null>(null);
@@ -46,7 +48,7 @@ const selectedAdjustmentCycleLabel = computed(
 <template>
     <Head :title="trans('Stock movements')" />
 
-    <div class="pilot-page pilot-layout-page pilot-manager-page max-w-xl">
+    <div class="pilot-page pilot-layout-page pilot-manager-page pilot-t44-page">
         <Heading
             :title="product.name"
             :description="
@@ -175,5 +177,7 @@ const selectedAdjustmentCycleLabel = computed(
                 {{ trans('Record adjustment') }}
             </Button>
         </Form>
+
+        <MovementHistory :history="history" />
     </div>
 </template>

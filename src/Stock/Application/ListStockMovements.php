@@ -47,6 +47,9 @@ final class ListStockMovements
         return new StockMovementPage(
             array_map(fn (array $row) => $this->toLine($row['movement'], $row['balance'], $names, $pickups, $seesBaskets), $pageMovements),
             count($newestFirst),
+            $product->name(),
+            $product->unit(),
+            ($newestFirst[0]['balance'] ?? SignedQuantity::ofThousandths(0))->toString(),
         );
     }
 
