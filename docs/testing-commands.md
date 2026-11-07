@@ -1,6 +1,6 @@
 # Testing commands
 
-CI keeps the path selection described in [the CI checks guide](../.github/README.md).
+CI keeps the path selection described in [the CI checks guide](ci-checks.md).
 The selected jobs still run their complete existing checks. This page describes
 the reusable tooling commands and the focused application checks used during an
 isolated task.

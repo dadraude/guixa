@@ -1,17 +1,17 @@
 # CI checks
 
-`workflows/tests.yml` starts on every pull request and every push to `main`.
-The `changes` job selects checks with `scripts/checks.py`; the final `ci` job
+`.github/workflows/tests.yml` starts on every pull request and every push to `main`.
+The `changes` job selects checks with `.github/scripts/checks.py`; the final `ci` job
 requires each selected check to succeed. Keep `ci` as the required branch check.
 
-| Changed paths | Selected checks |
-| --- | --- |
-| `docs/`, `specs/`, `odd/`, root Markdown | Formatting and lint (`docs`) |
-| `resources/js/`, `resources/css/` | `docs`, frontend build, types and tests |
-| `tests/`, `phpunit.xml`, `phpstan.neon` | `docs`, PHP format, analysis and tests (`backend`) |
+| Changed paths                                                    | Selected checks                                                     |
+| ---------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `docs/`, `specs/`, `odd/`, root Markdown                         | Formatting and lint (`docs`)                                        |
+| `resources/js/`, `resources/css/`                                | `docs`, frontend build, types and tests                             |
+| `tests/`, `phpunit.xml`, `phpstan.neon`                          | `docs`, PHP format, analysis and tests (`backend`)                  |
 | `skills/`, `.agents/`, `.claude/`, `.codex/`, `.agent-workflow/` | `docs`, workflow contracts, helpers and browser harness (`tooling`) |
-| Other application, shared or unknown paths | `docs`, `frontend`, `backend` |
-| `.github/` or any push to `main` | All checks |
+| Other application, shared or unknown paths                       | `docs`, `frontend`, `backend`                                       |
+| `.github/` or any push to `main`                                 | All checks                                                          |
 
 Mixed changes select the union of their checks. Renames consider both old and
 new paths, and deletions retain their checks. PHP production changes also run
