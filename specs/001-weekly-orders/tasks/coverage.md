@@ -54,7 +54,7 @@ semicolon identify retained work; the amendment owner implements the stated chan
 | [R21](../pickup.md) | [T55](../tasks.md#t55) (basket amounts), [T64](../tasks.md#t64) (receipts), [T57](../tasks.md#t57) (returns), [T65](../tasks.md#t65) (member read), [T59](../tasks.md#t59) (weekly) |
 | [R22](../pickup.md) | [T55](../tasks.md#t55)/[T57](../tasks.md#t57)/[T59](../tasks.md#t59) |
 | [R23](../pickup.md) | [T58](../tasks.md#t58) (amount), [T68](../tasks.md#t68) (goods/effective quantities), [T59](../tasks.md#t59) (weekly) |
-| [R23a](../pickup.md) | [T65](../tasks.md#t65) (read), [T59](../tasks.md#t59) (weekly), [T61](../tasks.md#t61) (action), [T67](../tasks.md#t67) (indicators) |
+| [R23a](../pickup.md) | [T65](../tasks.md#t65) (read), [T59](../tasks.md#t59) (weekly), [T61](../tasks.md#t61) (action), [T67](../tasks.md#t67) (indicators), [T82](../tasks.md#t82) (recorder names) |
 | [R23b](../pickup.md) | [T55](../tasks.md#t55) (staff collection), [T66](../tasks.md#t66) (correction), [T61](../tasks.md#t61) (member action) |
 | [R24](../pickup.md) | [T55](../tasks.md#t55), [T59](../tasks.md#t59), [T67](../tasks.md#t67) |
 | [R24a](../pickup.md) | [T55](../tasks.md#t55)/[T57](../tasks.md#t57) (contents), [T68](../tasks.md#t68) (reversal), [T59](../tasks.md#t59) (weekly empty), [T65](../tasks.md#t65) (read) |
@@ -69,7 +69,7 @@ semicolon identify retained work; the amendment owner implements the stated chan
 | [R28a](../stock-wallet.md) | [T76](../tasks.md#t76) |
 | [R29](../stock-wallet.md) | [T26](../tasks.md#t26); [T64](../tasks.md#t64) |
 | [R30](../stock-wallet.md) | [T26](../tasks.md#t26); [T55](../tasks.md#t55)/[T64](../tasks.md#t64) |
-| [R31](../stock-wallet.md) | [T26](../tasks.md#t26); [T55](../tasks.md#t55) (source), [T56](../tasks.md#t56) (Finance read), [T64](../tasks.md#t64) (receipts), [T65](../tasks.md#t65) (member read), [T58](../tasks.md#t58)/[T68](../tasks.md#t68) (adjustments) |
+| [R31](../stock-wallet.md) | [T26](../tasks.md#t26); [T55](../tasks.md#t55) (source), [T56](../tasks.md#t56) (Finance read), [T64](../tasks.md#t64) (receipts), [T65](../tasks.md#t65) (member read), [T58](../tasks.md#t58)/[T68](../tasks.md#t68) (adjustments), [T82](../tasks.md#t82) (author names) |
 | [R32](../stock-wallet.md) | [T26](../tasks.md#t26); [T64](../tasks.md#t64) (receipt), [T58](../tasks.md#t58) (amount), [T68](../tasks.md#t68) (goods) |
 | [R33](../stock-wallet.md) | [T06](../tasks.md#t06) |
 | [R34](../stock-wallet.md) | [T06](../tasks.md#t06) |

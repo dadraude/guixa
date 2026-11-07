@@ -58,7 +58,8 @@ Stock movements and return items, global household wallets and receipts, househo
 - **R30** Balance = Σ top-ups + Σ credits − Σ charges ± corrections. It may be negative, with no limit.
 - **R31** Members see their household balance and every movement. Charges/credits show their basket
   and optional cycle; corrections preserve the original source and optional cycle. Finance and Manager
-  can read the statement of any household. Baskets have no paid/part-paid status.
+  can read the statement of any household. Every movement shows its author's name (kept after that
+  account is deactivated), never an account identifier. Baskets have no paid/part-paid status.
 - **R32** Movements are never edited or deleted. Finance or a manager fixes mistakes with a new
   correcting movement: non-zero amount, mandatory reason, original source and optional basket/cycle
   reference. A correction does not rewrite the receipt, validated basket or original charge. Linked
