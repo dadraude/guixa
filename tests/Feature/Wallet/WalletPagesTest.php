@@ -50,7 +50,9 @@ it('records a top-up and a correction and shows both to the member (S24, R31)', 
             ->where('wallet.movements.0.type', 'correction')
             ->where('wallet.movements.0.amount', '-50.00')
             ->where('wallet.movements.0.sourceMovementId', $receiptId)
-            ->where('wallet.movements.0.recordedBy', $manager->id)
+            ->where('wallet.movements.0.authorName', $manager->name)
+            ->missing('wallet.movements.0.recordedBy')
+            ->where('wallet.movements.1.authorName', $manager->name)
             ->where('wallet.movements.1.type', 'top_up')
             ->where('wallet.movements.1.note', 'cash')
             ->where('household', null));

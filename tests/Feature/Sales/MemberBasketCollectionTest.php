@@ -46,7 +46,8 @@ it('lets a member collect their own validated basket over HTTP and refuses the i
         ->and(DB::table('basket_collection_events')->where('basket_id', $ownBasket)->count())->toBe(1)
         ->and($ledger())->toEqual($before);
     $this->get("/baskets/{$ownBasket}")->assertInertia(fn (Assert $page) => $page
-        ->where('basket.state', 'collected')->where('basket.collectionEvents.0.recordedBy', fn ($value) => $value !== null));
+        ->where('basket.state', 'collected')->where('basket.collectionEvents.0.authorName', 'Anna')
+        ->missing('basket.collectionEvents.0.recordedBy'));
 });
 
 it('denies collection after a move, unlink or deactivation and for non-member roles (R35)', function () {

@@ -18,6 +18,7 @@ use Guixa\Wallet\Domain\Error\InvalidTopUpAmount;
 use Illuminate\Auth\Access\AuthorizationException;
 use Tests\Support\FrozenClock;
 use Tests\Support\InMemory\InMemoryMovementRepository;
+use Tests\Support\InMemory\Wallet\FakeAccountNames;
 
 beforeEach(function () {
     $this->movements = new InMemoryMovementRepository;
@@ -29,7 +30,8 @@ beforeEach(function () {
     $this->correct = new RecordCorrection($this->movements, $this->clock);
     $this->charge = new ChargeForBasket($this->movements, $this->clock);
     $this->balance = new GetBalance($this->movements);
-    $this->statement = new GetWalletStatement($this->movements);
+    $this->names = new FakeAccountNames;
+    $this->statement = new GetWalletStatement($this->movements, $this->names);
 });
 
 it('records a top-up and a correcting movement that bring the balance back to zero (S24, R29, R32)', function () {
@@ -192,4 +194,29 @@ it('replays the same correction identity once and rejects a changed payload (R32
     expect($first)->toBe('correction-1')->and($replay)->toBe($first)
         ->and(($this->statement)($finance, $this->household)->movements)->toHaveCount(2);
     expect(fn () => ($this->correct)($finance, $this->household, -3000, 'changed', null, $receipt, 'correction-1'))->toThrow(CorrectionIdentityConflict::class);
+});
+
+it('names the author of each movement, corrections included, resolved in one batch (R31)', function () {
+    $this->names->know('manager-account', 'Maria Manager');
+    $receiptId = ($this->topUp)($this->manager, $this->household, 5000);
+    ($this->correct)(Actor::manager('second-account'), $this->household, -5000, 'duplicated', null, $receiptId, 'correction-1');
+    $this->names->know('second-account', 'Sergi Segon');
+    ($this->charge)($this->manager, $this->household, 'basket-1', 700);
+
+    $names = array_map(fn ($movement) => [$movement->type, $movement->authorName], ($this->statement)($this->member, $this->household)->movements);
+
+    expect($names)->toEqualCanonicalizing([['top_up', 'Maria Manager'], ['correction', 'Sergi Segon'], ['charge', 'Maria Manager']])
+        ->and($this->names->lookups)->toHaveCount(1)
+        ->and($this->names->lookups[0])->toHaveCount(2);
+});
+
+// Keeping a deactivated account's name is the AccountNames port contract, proven in WalletAccountNamesPortTest and SalesAccountNamesPortTest.
+it('leaves an unknown author name empty (R31)', function () {
+    $this->names->know('manager-account', 'Maria Manager');
+    ($this->topUp)($this->manager, $this->household, 1000);
+    ($this->topUp)(Actor::manager('unknown-account'), $this->household, 2000);
+
+    $names = array_map(fn ($movement) => $movement->authorName, ($this->statement)($this->member, $this->household)->movements);
+
+    expect($names)->toEqualCanonicalizing(['Maria Manager', '']);
 });

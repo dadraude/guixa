@@ -20,7 +20,7 @@ const adjustments = [
         id: 'correction-1',
         amountCents: 1200,
         reason: 'One bottle came back',
-        recordedBy: 'manager',
+        authorName: 'manager',
         occurredAt: '2026-11-02T11:00:00+00:00',
         lines: [{ stockProductId: 'oil', quantityDelta: '-1.000' }],
     },
@@ -41,6 +41,15 @@ function mountPanel(props: Record<string, unknown> = {}) {
 }
 
 describe('basket correction panel', () => {
+    it('shows the author name and date, and no dangling separator without a name', () => {
+        expect(mountPanel().text()).toContain('manager · 2026-11-02');
+        const unnamed = mountPanel({
+            adjustments: [{ ...adjustments[0], authorName: '' }],
+        });
+        expect(unnamed.text()).toContain('2026-11-02T11:00:00+00:00');
+        expect(unnamed.text()).not.toContain('· 2026');
+    });
+
     it('shows the returned quantity of each correction next to its reason', () => {
         const wrapper = mountPanel();
         const lines = wrapper.get(

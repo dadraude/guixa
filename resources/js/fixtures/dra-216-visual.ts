@@ -23,14 +23,14 @@ const events =
               {
                   id: '0198f0a0-0000-7000-8000-000000000216',
                   type: 'collected',
-                  recordedBy: 'Gestió',
+                  authorName: 'Gestió',
                   occurredAt: '2026-11-01T10:00:00+00:00',
                   reason: null,
               },
               {
                   id: '0198f0a0-0000-7000-8000-000000000217',
                   type: 'corrected',
-                  recordedBy: 'Finances',
+                  authorName: 'Finances',
                   occurredAt: '2026-11-01T11:00:00+00:00',
                   reason: 'Marcada per error',
               },

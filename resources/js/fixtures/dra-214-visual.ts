@@ -113,7 +113,7 @@ const basket = financeBasketRow({
                   id: '0198f0a0-0000-7000-8000-000000000220',
                   amountCents: -350,
                   reason: 'Correction: Pa de pagès',
-                  recordedBy: 'Gestora',
+                  authorName: 'Gestora',
                   occurredAt: '2026-11-05T11:00:00+00:00',
                   lines: [
                       { stockProductId: ids.bread, quantityDelta: '1.000' },
@@ -127,7 +127,7 @@ const basket = financeBasketRow({
                   {
                       id: '0198f0a0-0000-7000-8000-000000000221',
                       type: 'collected',
-                      recordedBy: 'Anna',
+                      authorName: 'Anna',
                       occurredAt: '2026-11-05T12:00:00+00:00',
                       reason: null,
                   },

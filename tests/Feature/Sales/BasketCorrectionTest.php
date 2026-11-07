@@ -35,10 +35,12 @@ it('replays a persisted amount correction and shows original and effective total
         ->and(app(GetBasket::class)(Actor::manager($manager->id), $basket)->effectiveTotalCents)->toBe(-30);
     $this->get("/finance/baskets/{$basket}")->assertInertia(fn (Assert $page) => $page
         ->where('basket.totalCents', -50)->where('basket.effectiveTotalCents', -30)
-        ->where('basket.adjustments.0.reason', 'Adjusted jar credit'));
+        ->where('basket.adjustments.0.reason', 'Adjusted jar credit')
+        ->where('basket.adjustments.0.authorName', $manager->name)->missing('basket.adjustments.0.recordedBy'));
     $this->actingAs($member)->get("/baskets/{$basket}")->assertInertia(fn (Assert $page) => $page
         ->where('basket.totalCents', -50)->where('basket.effectiveTotalCents', -30)
-        ->where('basket.adjustments.0.id', $identity));
+        ->where('basket.adjustments.0.id', $identity)
+        ->where('basket.adjustments.0.authorName', $manager->name)->missing('basket.adjustments.0.recordedBy'));
 
     $original = DB::table('baskets')->where('id', $basket)->first();
     $adjustment = DB::table('basket_adjustments')->where('id', $identity)->first();

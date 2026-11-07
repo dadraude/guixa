@@ -20,6 +20,10 @@ const original = computed(() =>
     props.events.find((event) => event.type === 'collected'),
 );
 
+function byAndAt(event: App.Http.BasketCollectionEventRow) {
+    return [event.authorName, event.occurredAt].filter(Boolean).join(' · ');
+}
+
 function submit() {
     if (!props.editable || !reason.value.trim()) return;
     emit('submit', reason.value.trim(), correctionId.value);
@@ -43,7 +47,7 @@ defineExpose({ reset });
                 </dt>
                 <dd data-test="original-collection" class="wrap-anywhere">
                     <template v-if="original">
-                        {{ original.recordedBy }} · {{ original.occurredAt }}
+                        {{ byAndAt(original) }}
                     </template>
                     <template v-else>{{ trans('Not yet collected') }}</template>
                 </dd>
@@ -83,7 +87,7 @@ defineExpose({ reset });
                     >
                 </span>
                 <span class="text-sm wrap-anywhere text-muted-foreground">
-                    {{ event.recordedBy }} · {{ event.occurredAt }}
+                    {{ byAndAt(event) }}
                 </span>
             </li>
         </ol>

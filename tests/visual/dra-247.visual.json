@@ -1,0 +1,327 @@
+{
+    "baseUrl": "http://127.0.0.1:5247",
+    "rootFontPx": 16,
+    "darkSelector": "html.dark",
+    "matrix": {
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark"],
+        "text": [100, 200]
+    },
+    "views": [
+        {
+            "id": "wallet-statement",
+            "path": "/resources/visual/dra-247.html",
+            "query": {
+                "page": "wallet"
+            },
+            "root": "#main-content",
+            "panels": "#main-content form,#main-content .pilot-layout-panel:not(:has(table)),#main-content .pilot-layout-notice",
+            "content": "#main-content h1,#main-content h2,#main-content p,#main-content small,#main-content label,#main-content input,#main-content button,#main-content a,#main-content td",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Read-only author text; no control was added or changed, focus order is covered by earlier statement and basket manifests.",
+            "states": [
+                {
+                    "id": "populated",
+                    "query": {
+                        "state": "populated"
+                    },
+                    "ready": "body[data-visual-ready=\"populated\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "#main-content table tbody tr small",
+                                "count": 2
+                            },
+                            {
+                                "selector": "#main-content table tbody tr small",
+                                "text": "Registrat per Anna Soler"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "long-name",
+                    "query": {
+                        "state": "long"
+                    },
+                    "ready": "body[data-visual-ready=\"long\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "#main-content table tbody tr small",
+                                "count": 2
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "empty-name",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "ready": "body[data-visual-ready=\"empty\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "#main-content table tbody tr small",
+                                "count": 0
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "finance-basket",
+            "path": "/resources/visual/dra-247.html",
+            "query": {
+                "page": "finance"
+            },
+            "root": "#main-content",
+            "panels": "#main-content .pilot-layout-panel,#main-content .pilot-list-row",
+            "content": "#main-content h1,#main-content h2,#main-content p,#main-content small,#main-content label,#main-content button,#main-content a,#main-content dt,#main-content dd,#main-content li,#main-content td,#main-content th",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Read-only author text; no control was added or changed, focus order is covered by earlier statement and basket manifests.",
+            "states": [
+                {
+                    "id": "populated",
+                    "query": {
+                        "state": "populated"
+                    },
+                    "ready": "body[data-visual-ready=\"populated\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"collection-history\"] li",
+                                "count": 2
+                            },
+                            {
+                                "selector": "[data-test=\"original-collection\"]",
+                                "text": "Anna Soler · 2026-11-01T10:00:00+00:00"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "long-name",
+                    "query": {
+                        "state": "long"
+                    },
+                    "ready": "body[data-visual-ready=\"long\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"original-collection\"]",
+                                "count": 1
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "empty-name",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "ready": "body[data-visual-ready=\"empty\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"original-collection\"]",
+                                "text": "2026-11-01T10:00:00+00:00"
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "member-basket",
+            "path": "/resources/visual/dra-247.html",
+            "query": {
+                "page": "member"
+            },
+            "root": "#main-content",
+            "panels": "#main-content .pilot-layout-panel,#main-content .pilot-list-row",
+            "content": "#main-content h1,#main-content h2,#main-content p,#main-content small,#main-content label,#main-content button,#main-content a,#main-content dt,#main-content dd,#main-content li,#main-content td,#main-content th",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Read-only author text; no control was added or changed, focus order is covered by earlier statement and basket manifests.",
+            "states": [
+                {
+                    "id": "populated",
+                    "query": {
+                        "state": "populated"
+                    },
+                    "ready": "body[data-visual-ready=\"populated\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"collection-history\"] li",
+                                "count": 2
+                            },
+                            {
+                                "selector": "[data-test=\"original-collection\"]",
+                                "text": "Anna Soler · 2026-11-01T10:00:00+00:00"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "long-name",
+                    "query": {
+                        "state": "long"
+                    },
+                    "ready": "body[data-visual-ready=\"long\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"original-collection\"]",
+                                "count": 1
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "empty-name",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "ready": "body[data-visual-ready=\"empty\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"original-collection\"]",
+                                "text": "2026-11-01T10:00:00+00:00"
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    ]
+}

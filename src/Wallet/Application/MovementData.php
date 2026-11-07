@@ -15,6 +15,6 @@ final readonly class MovementData
         public ?string $cycleId,
         public ?string $basketId = null,
         public ?string $sourceMovementId = null,
-        public ?string $recordedBy = null,
+        public string $authorName = '',
     ) {}
 }

@@ -30,7 +30,7 @@ return [
             'exports' => [
                 'Application\RestoreProducerRole' => ['Catalog'],
                 'Application\SuspendProducerRole' => ['Catalog'],
-                'Application\GetAccountNames' => ['Stock'],
+                'Application\GetAccountNames' => ['Sales', 'Stock', 'Wallet'],
                 'Application\GetHouseholds' => ['Ordering'],
                 'Application\HouseholdData' => ['Ordering'],
                 'Application\GetProducerAccountEmail' => ['Ordering'],
@@ -101,7 +101,7 @@ return [
         ],
         'Wallet' => [
             'owns' => 'Append-only household money movements, balances, top-ups and corrections.',
-            'dependencies' => ['Shared'],
+            'dependencies' => ['Membership', 'Shared'],
             'exports' => [
                 'Application\ReadHouseholdBalance' => ['Membership'],
                 'Application\RecordCorrection' => ['Sales'],

@@ -29,14 +29,14 @@ const collected = [
 const original = {
     id: '0198f0a0-0000-7000-8000-000000000226',
     type: 'collected',
-    recordedBy: 'Anna Soler',
+    authorName: 'Anna Soler',
     occurredAt: '2026-11-01T10:00:00+00:00',
     reason: null,
 };
 const correction = {
     id: '0198f0a0-0000-7000-8000-000000000227',
     type: 'corrected',
-    recordedBy: 'Finances',
+    authorName: 'Finances',
     occurredAt: '2026-11-01T11:00:00+00:00',
     reason: state === 'long' ? longText : 'Marcada per error',
 };
@@ -50,7 +50,7 @@ if (state === 'recollected') {
     events.push({
         id: '0198f0a0-0000-7000-8000-000000000228',
         type: 'collected',
-        recordedBy: 'Gestió',
+        authorName: 'Gestió',
         occurredAt: '2026-11-01T12:00:00+00:00',
         reason: null,
     });

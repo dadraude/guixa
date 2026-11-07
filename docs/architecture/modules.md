@@ -23,7 +23,7 @@ modules. `Platform` below names framework persistence ownership, not a `src/Plat
 | Ordering   | Weekly demand, cycles, cutoffs, producer orders, reception and allocation; settlement hands orders to Sales                  | Catalog, Membership, Sales, Shared                   |
 | Sales      | Stock offers, weekly base baskets and independent stock/return baskets: actuals, validation, late weekly baskets, collection | Catalog, Membership, Ordering, Stock, Wallet, Shared |
 | Stock      | Return items, append-only stock movements and availability                                                                   | Catalog, Membership, Ordering, Shared                |
-| Wallet     | Append-only household money movements, balances, top-ups and corrections                                                     | Shared                                               |
+| Wallet     | Append-only household money movements, balances, top-ups and corrections                                                     | Membership, Shared                                   |
 | Shared     | Money, Quantity, Clock, Actor and transaction contracts                                                                      | None                                                 |
 
 Reciprocal dependencies are intentional. Catalog asks Ordering and Sales about retained product use
@@ -51,7 +51,8 @@ else in a module is private to that module for integration purposes, even when P
 | Membership → Catalog     | RestoreProducerRole, SuspendProducerRole                                                                                                 | —                                                                                |
 | Membership → Stock       | GetAccountNames                                                                                                                          | —                                                                                |
 | Membership → Ordering    | GetHouseholds, GetProducerAccountEmail                                                                                                   | HouseholdData                                                                    |
-| Membership → Sales       | ReadActiveHouseholds                                                                                                                     | ActiveHouseholdData                                                              |
+| Membership → Sales       | GetAccountNames, ReadActiveHouseholds                                                                                                    | ActiveHouseholdData                                                              |
+| Membership → Wallet      | GetAccountNames                                                                                                                          | —                                                                                |
 | Ordering → Catalog       | CheckProductUsage, HasUnsettledLines, StopParticipatingWhereNotSent                                                                      | —                                                                                |
 | Ordering → Stock         | ReadCyclePickupDates                                                                                                                     | —                                                                                |
 | Ordering → Sales         | LockWeeklyBasketSource, CloseCycleAfterBasketValidation, ReadCyclePickupDates, ReadSourceOrderCycles, ReadCycleSourceOrders              | —                                                                                |

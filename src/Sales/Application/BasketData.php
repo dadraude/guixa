@@ -21,7 +21,8 @@ final readonly class BasketData
         public string $status, public bool $settled, public bool $collected, public bool $weekly, public bool $draft,
         public array $weeklyLines = [], public string $kind = 'stock', public bool $late = false) {}
 
-    public static function from(Basket $basket, bool $forStaff = true): self
+    /** @param array<string, string> $authorNames name by account id for adjustments and collection events */
+    public static function from(Basket $basket, bool $forStaff = true, array $authorNames = []): self
     {
         return new self($basket->id, $basket->householdId, $basket->householdName, $basket->state->value,
             array_map(fn ($line) => BasketLineData::from($line, $basket->effectiveQuantityText($line), $basket->effectiveAmountCents($line)),
@@ -29,8 +30,8 @@ final readonly class BasketData
             array_map(BasketReturnLineData::from(...), array_values(array_filter($basket->activeLines(), fn ($line) => $line->kind->isReturn()))),
             $basket->validatedTotalCents ?? $basket->totalCents(), $basket->createdAt,
             $basket->validatedAt, $basket->collectedAt, $basket->effectiveTotalCents(),
-            array_map(BasketAdjustmentData::from(...), $basket->adjustments),
-            array_map(BasketCollectionEventData::from(...), $basket->collectionEvents),
+            array_map(fn ($adjustment) => BasketAdjustmentData::from($adjustment, $authorNames), $basket->adjustments),
+            array_map(fn ($event) => BasketCollectionEventData::from($event, $authorNames), $basket->collectionEvents),
             $basket->isPendingCollection(),
             $forStaff ? BasketActions::forStaff($basket) : BasketActions::forMember($basket),
             $basket->isGoodsReversed() ? 'reversed' : $basket->state->value,

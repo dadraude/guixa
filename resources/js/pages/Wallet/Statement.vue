@@ -234,12 +234,12 @@ const typeLabels: Record<string, string> = {
                                 >
                                 {{ formatEventDateTime(movement.occurredAt) }}
                                 <small
-                                    v-if="movement.recordedBy"
-                                    class="block break-all text-muted-foreground"
+                                    v-if="movement.authorName"
+                                    class="block wrap-anywhere text-muted-foreground"
                                 >
                                     {{
-                                        trans('Recorded by :id', {
-                                            id: movement.recordedBy,
+                                        trans('Recorded by :name', {
+                                            name: movement.authorName,
                                         })
                                     }}
                                 </small>
