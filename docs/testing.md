@@ -2,7 +2,7 @@
 
 This guide describes the current commands. Local work uses focused checks; the pull request
 runs the selected complete CI jobs. See the [workflow profile](../.agent-workflow/profile.md)
-for task ownership and the [CI check map](../.github/README.md) for path-based job selection.
+for task ownership and the [CI check map](ci-checks.md) for path-based job selection.
 
 ## Isolate an application test
 
@@ -77,7 +77,7 @@ affected test was found. Keep the plan and results with task artifacts, not trac
 ## Reproduce a CI failure
 
 1. Read the failing job and step in `.github/workflows/tests.yml`, then the
-   [check map](../.github/README.md). Record the commit, job, failing test or command,
+   [check map](ci-checks.md). Record the commit, job, failing test or command,
    PHP/Node/service versions, timezone, and any fixture or seed input. Redact secrets.
 2. Recreate the relevant task environment above and run the failing test path or selector
    through the wrapper. Add adjacent tests for the same changed contract. For frontend
