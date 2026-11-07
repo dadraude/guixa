@@ -10,7 +10,7 @@
     "views": [
         {
             "id": "member-stock",
-            "path": "/visual-dra-209.html",
+            "path": "/resources/visual/dra-209.html",
             "query": {
                 "page": "Stock/Index"
             },
@@ -291,7 +291,7 @@
         },
         {
             "id": "producer-products",
-            "path": "/visual-dra-209.html",
+            "path": "/resources/visual/dra-209.html",
             "query": {
                 "page": "Producer/Products/Index"
             },

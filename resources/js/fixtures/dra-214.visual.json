@@ -10,7 +10,7 @@
     "views": [
         {
             "id": "finance-weekly-manager",
-            "path": "/visual-dra-214.html",
+            "path": "/resources/visual/dra-214.html",
             "query": {
                 "screen": "finance",
                 "role": "manager"
@@ -153,7 +153,7 @@
         },
         {
             "id": "finance-weekly-finance",
-            "path": "/visual-dra-214.html",
+            "path": "/resources/visual/dra-214.html",
             "query": {
                 "screen": "finance",
                 "role": "finance"
@@ -301,7 +301,7 @@
         },
         {
             "id": "member-weekly",
-            "path": "/visual-dra-214.html",
+            "path": "/resources/visual/dra-214.html",
             "query": {
                 "screen": "member",
                 "role": "member"
@@ -464,7 +464,7 @@
         },
         {
             "id": "reception-weekly",
-            "path": "/visual-dra-214.html",
+            "path": "/resources/visual/dra-214.html",
             "query": {
                 "screen": "reception",
                 "role": "manager"
@@ -553,7 +553,7 @@
         },
         {
             "id": "orders-settled",
-            "path": "/visual-dra-214.html",
+            "path": "/resources/visual/dra-214.html",
             "query": {
                 "screen": "orders",
                 "role": "member"

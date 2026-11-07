@@ -10,7 +10,7 @@
     "views": [
         {
             "id": "member-statement",
-            "path": "/visual-fixture.html",
+            "path": "/resources/visual/fixture.html",
             "query": { "scenario": "statement", "role": "member" },
             "root": "main",
             "panels": ".panel",

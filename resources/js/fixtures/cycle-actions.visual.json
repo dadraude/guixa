@@ -10,7 +10,7 @@
     "views": [
         {
             "id": "manager-cycles",
-            "path": "/visual-reference-pilot.html",
+            "path": "/resources/visual/reference-pilot.html",
             "query": {
                 "screen": "cycles"
             },

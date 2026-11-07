@@ -10,7 +10,7 @@
     "views": [
         {
             "id": "member-collection",
-            "path": "/visual-dra-216.html",
+            "path": "/resources/visual/dra-216.html",
             "query": {},
             "root": "#main-content",
             "panels": "#main-content .pilot-layout-panel,#main-content .pilot-list-row",

@@ -10,7 +10,7 @@
     "views": [
         {
             "id": "finance-goods",
-            "path": "/visual-dra-228.html",
+            "path": "/resources/visual/dra-228.html",
             "query": {
                 "role": "finance"
             },
@@ -241,7 +241,7 @@
         },
         {
             "id": "member-goods",
-            "path": "/visual-dra-228.html",
+            "path": "/resources/visual/dra-228.html",
             "query": {
                 "role": "member"
             },

@@ -5,7 +5,7 @@
     "views": [
         {
             "id": "welcome",
-            "path": "/visual-welcome.html",
+            "path": "/resources/visual/welcome.html",
             "root": "[data-visual-root]",
             "panels": "[data-visual-panel]",
             "content": "h1,h2,p,a,li",

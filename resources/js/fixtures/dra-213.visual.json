@@ -10,7 +10,7 @@
     "views": [
         {
             "id": "finance-basket-correction",
-            "path": "/visual-dra-213.html",
+            "path": "/resources/visual/dra-213.html",
             "query": { "role": "finance" },
             "root": "#main-content",
             "panels": "#main-content .pilot-layout-panel,#main-content .pilot-list-row",
@@ -186,7 +186,7 @@
         },
         {
             "id": "member-basket-correction",
-            "path": "/visual-dra-213.html",
+            "path": "/resources/visual/dra-213.html",
             "query": { "role": "member" },
             "root": "#main-content",
             "panels": "#main-content .pilot-layout-panel,#main-content .pilot-list-row",

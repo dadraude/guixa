@@ -10,7 +10,7 @@
     "views": [
         {
             "id": "finance-basket-container-balance",
-            "path": "/visual-dra-213.html",
+            "path": "/resources/visual/dra-213.html",
             "query": { "role": "finance" },
             "root": "#main-content",
             "panels": "#main-content .pilot-layout-panel,#main-content .pilot-list-row",
@@ -90,7 +90,7 @@
         },
         {
             "id": "cycle-container-balances",
-            "path": "/visual-dra-198.html",
+            "path": "/resources/visual/dra-198.html",
             "query": { "page": "Manage/Cycles/Show", "role": "manager" },
             "root": "#main-content [data-test=\"container-counts\"]",
             "panels": "#main-content [data-test=\"container-counts\"] li",

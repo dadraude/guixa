@@ -10,7 +10,7 @@
     "views": [
         {
             "id": "select-controls",
-            "path": "/visual-selects.html",
+            "path": "/resources/visual/selects.html",
             "root": "[data-visual-root]",
             "panels": ".visual-panel",
             "content": "h1,h2,label,input,button,a,[data-visual-text]",

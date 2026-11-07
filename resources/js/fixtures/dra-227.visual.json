@@ -10,7 +10,7 @@
     "views": [
         {
             "id": "dashboard-manager",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Dashboard",
                 "role": "manager"
@@ -105,7 +105,7 @@
         },
         {
             "id": "dashboard-finance",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Dashboard",
                 "role": "finance"
@@ -203,7 +203,7 @@
         },
         {
             "id": "dashboard-member",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Dashboard",
                 "role": "member"
@@ -301,7 +301,7 @@
         },
         {
             "id": "manage-cycles-index",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Manage/Cycles/Index"
             },
@@ -429,7 +429,7 @@
         },
         {
             "id": "manage-cycles-show",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Manage/Cycles/Show"
             },
@@ -519,7 +519,7 @@
             ]
         },
         {
-            "path": "/visual-dra-225.html",
+            "path": "/resources/visual/dra-225.html",
             "root": "#main-content",
             "panels": "#main-content .pilot-layout-panel,#main-content .pilot-list-row,#main-content .pilot-layout-notice",
             "content": "#main-content h1,#main-content h2,#main-content h3,#main-content p,#main-content a,#main-content li,#main-content dt,#main-content dd",
@@ -732,7 +732,7 @@
             ]
         },
         {
-            "path": "/visual-dra-225.html",
+            "path": "/resources/visual/dra-225.html",
             "root": "#main-content",
             "panels": "#main-content .pilot-layout-panel,#main-content .pilot-list-row,#main-content .pilot-layout-notice",
             "content": "#main-content h1,#main-content h2,#main-content h3,#main-content p,#main-content a,#main-content li,#main-content dt,#main-content dd",
