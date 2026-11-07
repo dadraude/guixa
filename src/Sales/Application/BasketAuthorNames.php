@@ -6,9 +6,9 @@ use Guixa\Sales\Domain\AccountNames;
 use Guixa\Sales\Domain\Basket;
 
 /** Resolves, in one batch, the names of everyone who adjusted a basket or recorded its collection (R23a). */
-final class BasketAuthorNames
+final readonly class BasketAuthorNames
 {
-    public function __construct(private readonly AccountNames $accountNames) {}
+    public function __construct(private AccountNames $accountNames) {}
 
     /** @return array<string, string> name by account id */
     public function of(Basket $basket): array
