@@ -61,7 +61,7 @@ Sales    -> Catalog       product identity/eligibility through its catalogue ada
 Sales    -> Ordering      WeeklyBasketSource (ready source, source lock, cycle closure) / WeeklySourceOrders (cycle of a source order, orders of a cycle) / CyclePickupDates (pickup date of each cycle)
 Sales    -> Catalog/Stock StockProducts (stock identity and product lock; Catalog adapter) / StockOfferCatalog / StockQuantities / StockSeller / StockCorrector / ReturnItems
 Sales    -> Wallet        WalletLedger (one charge/credit; reasoned corrections)
-Sales    -> Membership    Households (identity and active state)
+Sales    -> Membership    Households (identity and active state) / AccountNames (who recorded adjustments and collection marks)
 Stock    -> Catalog       StockProductRepository (stock identity/metadata and product lock; Catalog adapter)
 Stock    -> Membership    AccountNames (author names of movements, deactivated accounts included)
 Stock    -> Ordering      CyclePickupDates (pickup date shown for a movement's cycle)
@@ -69,6 +69,7 @@ Catalog  -> Ordering      ProducerCycles / ProductUsage (weekly rules and retain
 Catalog  -> Ordering/Sales/Stock   ProductUsage (retained use: Ordering `CheckProductUsage`, Sales `HasProductHistory`, Stock `CheckProductUsage`) / StockAvailability (pure quantity query)
 Catalog  -> Membership    ProducerAccess
 Membership -> Catalog     ProducerDirectory
+Wallet   -> Membership    AccountNames (author names of movements, deactivated accounts included)
 Membership -> Wallet      HouseholdBalances
 Membership -> Sales       HouseholdBaskets (unresolved drafts and collections for to-settle views)
 ```
@@ -161,7 +162,7 @@ Use cases
 | `ListProducerAccounts` (producer id → account email and whether its invitation is pending; the producers admin page shows it and hides the invite form for producers that have one) | manager | R36, S57 |
 | `GetProducerAccountEmail` | — (called by Ordering) | R12a |
 | `GetWalletHousehold` (a household's id, name and active state for the wallet pages) | finance, manager | R31 |
-| `GetAccountNames` (account id → name in one batch, deactivated accounts included) | — (called by Stock) | R28a |
+| `GetAccountNames` (account id → name in one batch, deactivated accounts included) | — (called by Stock, Sales, Wallet) | R28a, R23a, R31 |
 | `ListActiveHouseholds`, `ListOtherHouseholds` (every household but the given one, for `MoveMember`), `CountHouseholds`, `CountAccounts` | manager | R33, R36a (admin pages, dashboard counts) |
 | `GetHouseholds` (household ids → name and active by id; unknown ids left out) | — (called by Ordering) | R13, R16, R19 |
 | `CreateFirstManager` (rejected once any manager exists) | — (installation command) | R36a |
@@ -441,6 +442,11 @@ Collection history uses a basket-local append sequence assigned while holding th
 Event time and correction identity remain intact but do not determine causal display order when
 collection, correction and recollection share a stored second. Replaying a correction does not append
 another event or sequence number.
+`GetBasket` and `GetMemberBasket` resolve the recorders of a basket's adjustments and collection
+events in one batch through Sales' `AccountNames` port (Membership adapter over `GetAccountNames`)
+and pass the names to `BasketData`. `BasketAdjustmentData` and `BasketCollectionEventData` carry
+`authorName` in place of the account id, so no account identifier reaches the page (R23a); an
+unknown account gives an empty name. List queries resolve no names: only the basket pages show history.
 
 ### Application interface
 
@@ -543,7 +549,11 @@ cannot supply a cycle id or use that legacy path.
 | `ChargeForBasket` | Internal Sales call carrying the authorized actor and basket id; charge/credit/zero |
 | `GetBalance` | Internal query for authorized Sales/Membership compositions |
 | `ReadHouseholdBalance` | Internal, no actor; Membership's household settlement (R35a) |
-| `GetWalletStatement` | Own household member / Finance / Manager |
+| `GetWalletStatement` | Own household member / Finance / Manager; author names in one batch through Wallet's `AccountNames` port |
+
+`MovementData` and `WalletMovementRow` carry `authorName` in place of the recording account id, so the
+statement never shows an identifier (R31); an unknown account gives an empty name. The port mirrors
+Stock's: a Wallet `Domain` interface with a Membership adapter over `GetAccountNames`.
 
 No paid/partially-paid state exists on a basket. A receipt can cover several charges or leave credit.
 No payment-provider integration, producer invoicing, cash payout or automated bank reconciliation is

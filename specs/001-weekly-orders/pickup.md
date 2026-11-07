@@ -58,7 +58,9 @@ Weekly base and independent stock baskets, actual contents, validation, global W
   charges and global Wallet balance. Finance/Manager see the households needed to operate baskets and
   receipts. Keep a visual pending-collection indication after the planned date and after cycle closure:
   own baskets for members, all for staff, and a badge/link on the referenced closed cycle. Drafts are
-  labelled in preparation rather than ready to collect. No new push/email reminder is implied.
+  labelled in preparation rather than ready to collect. Adjustments and collection marks, including
+  their corrections, show who recorded them by name (kept after that account is deactivated), never an
+  account identifier. No new push/email reminder is implied.
 - **R23b** **Collection.** Finance, Manager or a current member of the basket's own household may mark a validated basket
   collected. Record who/when; repeated marking preserves the first record and has no money/stock effect.
   A member cannot mark another household's basket, validate a draft or record a receipt. An already
