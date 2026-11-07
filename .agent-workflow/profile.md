@@ -177,8 +177,9 @@ Only the coordinator runs shared `git fetch origin`, `git worktree add/remove`, 
 Create worktrees with `git worktree add "$WORKTREE" -b "$BRANCH" "$BASE_REF"`.
 
 After the task's PR is merged and its merged commit is contained in `origin/main`, remove only the
-clean, task-owned worktree (never `--force`) and run the existing guarded cleanup helper from the
-coordinator with the verified PHP runtime:
+clean, task-owned worktree (never `--force`), delete its local branch with `git branch -d` (never `-D`;
+a refusal means it is not integrated, so keep and report it) and run the existing guarded cleanup helper
+from the coordinator with the verified PHP runtime:
 `php .agent-workflow/scripts/drop-test-databases.php NN`.
 Its allowed namespace is `guixa_test_draNN` and its suffixed worker databases. A cleanup failure is
 reported, not retried destructively.
