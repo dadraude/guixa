@@ -20,7 +20,8 @@ proof that prerequisite code exists in the base. Missing tooling/evidence keeps 
 
 Before admitting new work, check each live task worktree's PR. When its integration is verified as in
 [scheduling](scheduling.md#integration-and-release), run the profile's cleanup serially: remove the
-clean worktree and drop its task databases. If the task has an open spec-sync PR, retarget it to the
+clean worktree, delete its local branch with `git branch -d` and drop its task databases. GitHub deletes
+the remote branch on merge; never delete it from here. If the task has an open spec-sync PR, retarget it to the
 configured base and keep its worktree until that PR integrates too. Keep and report a dirty worktree,
 an unverifiable PR, or a closed-unmerged PR until the user confirms it is abandoned.
 

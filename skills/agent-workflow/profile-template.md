@@ -75,7 +75,7 @@ inputs and current verification; full application CI remains candidate-bound.>
 disposition/reservations and stage timestamps in the implementation-owner record; initialize
 the shared state helper with profile limits `recovery` and `recoveryTotal`.>
 
-<Cleanup after verified integration: worktree removal and any project cleanup script under
+<Cleanup after verified integration: worktree removal, local branch deletion and any project cleanup script under
 `.agent-workflow/scripts/`.>
 
 ## Project conventions
