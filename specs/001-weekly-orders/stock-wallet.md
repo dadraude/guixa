@@ -45,7 +45,9 @@ Stock movements and return items, global household wallets and receipts, househo
   optional cycle. For managers and Finance, sale and correction lines link to their basket; a producer
   sees neither the basket nor the household. Lines are listed newest first in a stable order, 50 per
   page, without filters, so the newest line's available stock equals the current available quantity.
-  Consulting the history is read-only: only a manager records entries and adjustments (R26, R27).
+  Finance reaches each product's history from its read-only stock list, which includes deactivated
+  products marked inactive; the producer's own list does the same for their products. Consulting the
+  history is read-only: only a manager records entries and adjustments (R26, R27).
 
 ### Wallet
 
