@@ -10,7 +10,7 @@
     "views": [
         {
             "id": "dashboard-member",
-            "path": "/visual-dra-198.html",
+            "path": "/resources/visual/dra-198.html",
             "query": {
                 "page": "Dashboard",
                 "role": "member"
@@ -79,7 +79,7 @@
         },
         {
             "id": "dashboard-producer",
-            "path": "/visual-dra-198.html",
+            "path": "/resources/visual/dra-198.html",
             "query": {
                 "page": "Dashboard",
                 "role": "producer"
@@ -148,7 +148,7 @@
         },
         {
             "id": "dashboard-manager",
-            "path": "/visual-dra-198.html",
+            "path": "/resources/visual/dra-198.html",
             "query": {
                 "page": "Dashboard",
                 "role": "manager"
@@ -217,7 +217,7 @@
         },
         {
             "id": "wallet-member",
-            "path": "/visual-dra-198.html",
+            "path": "/resources/visual/dra-198.html",
             "query": {
                 "page": "Wallet/Statement",
                 "role": "member"
@@ -298,7 +298,7 @@
         },
         {
             "id": "wallet-manager",
-            "path": "/visual-dra-198.html",
+            "path": "/resources/visual/dra-198.html",
             "query": {
                 "page": "Wallet/Statement",
                 "role": "manager"
@@ -412,7 +412,7 @@
         },
         {
             "id": "producer-cutoff",
-            "path": "/visual-dra-198.html",
+            "path": "/resources/visual/dra-198.html",
             "query": {
                 "page": "Producer/Cutoff",
                 "role": "producer"
@@ -491,7 +491,7 @@
         },
         {
             "id": "producer-cycle-summary",
-            "path": "/visual-dra-198.html",
+            "path": "/resources/visual/dra-198.html",
             "query": {
                 "page": "Producer/CycleSummary",
                 "role": "producer"
@@ -588,7 +588,7 @@
         },
         {
             "id": "producer-products-index",
-            "path": "/visual-dra-198.html",
+            "path": "/resources/visual/dra-198.html",
             "query": {
                 "page": "Producer/Products/Index",
                 "role": "producer"
@@ -691,7 +691,7 @@
         },
         {
             "id": "producer-products-create",
-            "path": "/visual-dra-198.html",
+            "path": "/resources/visual/dra-198.html",
             "query": {
                 "page": "Producer/Products/Create",
                 "role": "producer"
@@ -770,7 +770,7 @@
         },
         {
             "id": "producer-products-edit",
-            "path": "/visual-dra-198.html",
+            "path": "/resources/visual/dra-198.html",
             "query": {
                 "page": "Producer/Products/Edit",
                 "role": "producer"

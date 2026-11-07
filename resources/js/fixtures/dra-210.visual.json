@@ -10,7 +10,7 @@
     "views": [
         {
             "id": "baskets-index",
-            "path": "/visual-dra-210.html",
+            "path": "/resources/visual/dra-210.html",
             "query": {
                 "page": "Finance/Baskets/Index",
                 "role": "manager"
@@ -189,7 +189,7 @@
         },
         {
             "id": "baskets-create",
-            "path": "/visual-dra-210.html",
+            "path": "/resources/visual/dra-210.html",
             "query": {
                 "page": "Finance/Baskets/Create",
                 "role": "manager"
@@ -405,7 +405,7 @@
         },
         {
             "id": "baskets-show",
-            "path": "/visual-dra-210.html",
+            "path": "/resources/visual/dra-210.html",
             "query": {
                 "page": "Finance/Baskets/Show",
                 "role": "manager"
@@ -1095,7 +1095,7 @@
         },
         {
             "id": "wallet-manager",
-            "path": "/visual-dra-210.html",
+            "path": "/resources/visual/dra-210.html",
             "query": {
                 "page": "Wallet/Statement",
                 "role": "manager"
@@ -1245,7 +1245,7 @@
         },
         {
             "id": "wallet-member",
-            "path": "/visual-dra-210.html",
+            "path": "/resources/visual/dra-210.html",
             "query": {
                 "page": "Wallet/Statement",
                 "role": "member"

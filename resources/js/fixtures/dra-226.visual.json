@@ -10,7 +10,7 @@
     "views": [
         {
             "id": "manager-collection",
-            "path": "/visual-dra-226.html",
+            "path": "/resources/visual/dra-226.html",
             "query": { "role": "manager" },
             "root": "#main-content",
             "panels": "#main-content .pilot-layout-panel,#main-content .pilot-list-row",
@@ -237,7 +237,7 @@
         },
         {
             "id": "finance-collection",
-            "path": "/visual-dra-226.html",
+            "path": "/resources/visual/dra-226.html",
             "query": { "role": "finance" },
             "root": "#main-content",
             "panels": "#main-content .pilot-layout-panel,#main-content .pilot-list-row",
@@ -313,7 +313,7 @@
         },
         {
             "id": "member-collection",
-            "path": "/visual-dra-226.html",
+            "path": "/resources/visual/dra-226.html",
             "query": { "role": "member" },
             "root": "#main-content",
             "panels": "#main-content .pilot-layout-panel,#main-content .pilot-list-row",

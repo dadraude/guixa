@@ -10,7 +10,7 @@
     "views": [
         {
             "id": "manage-accounts-index",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Manage/Accounts/Index",
                 "role": "manager",
@@ -176,7 +176,7 @@
         },
         {
             "id": "manage-cycles-index",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Manage/Cycles/Index",
                 "role": "manager",
@@ -501,7 +501,7 @@
         },
         {
             "id": "manage-cycles-show",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Manage/Cycles/Show",
                 "role": "manager",
@@ -609,7 +609,7 @@
         },
         {
             "id": "manage-households-index",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Manage/Households/Index",
                 "role": "manager",
@@ -740,7 +740,7 @@
         },
         {
             "id": "manage-households-show",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Manage/Households/Show",
                 "role": "manager",
@@ -890,7 +890,7 @@
         },
         {
             "id": "manage-producers-index",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Manage/Producers/Index",
                 "role": "manager",
@@ -1021,7 +1021,7 @@
         },
         {
             "id": "manage-reception-show",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Manage/Reception/Show",
                 "role": "manager",
@@ -1415,7 +1415,7 @@
         },
         {
             "id": "manage-returnitems-create",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Manage/ReturnItems/Create",
                 "role": "manager",
@@ -1508,7 +1508,7 @@
         },
         {
             "id": "manage-returnitems-edit",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Manage/ReturnItems/Edit",
                 "role": "manager",
@@ -1601,7 +1601,7 @@
         },
         {
             "id": "manage-returnitems-index",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Manage/ReturnItems/Index",
                 "role": "manager",
@@ -1697,7 +1697,7 @@
         },
         {
             "id": "manage-settings",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Manage/Settings",
                 "role": "manager",
@@ -1790,7 +1790,7 @@
         },
         {
             "id": "manage-stock-create",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Manage/Stock/Create",
                 "role": "manager",
@@ -1883,7 +1883,7 @@
         },
         {
             "id": "manage-stock-edit",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Manage/Stock/Edit",
                 "role": "manager",
@@ -1976,7 +1976,7 @@
         },
         {
             "id": "manage-stock-index",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Manage/Stock/Index",
                 "role": "manager",
@@ -2162,7 +2162,7 @@
         },
         {
             "id": "manage-stock-movements",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Manage/Stock/Movements",
                 "role": "manager",
@@ -2255,7 +2255,7 @@
         },
         {
             "id": "producer-cutoff",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Producer/Cutoff",
                 "role": "producer",
@@ -2348,7 +2348,7 @@
         },
         {
             "id": "producer-cyclesummary",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Producer/CycleSummary",
                 "role": "producer",
@@ -2466,7 +2466,7 @@
         },
         {
             "id": "producer-products-create",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Producer/Products/Create",
                 "role": "producer",
@@ -2559,7 +2559,7 @@
         },
         {
             "id": "producer-products-edit",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Producer/Products/Edit",
                 "role": "producer",
@@ -2652,7 +2652,7 @@
         },
         {
             "id": "producer-products-index",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Producer/Products/Index",
                 "role": "producer",
@@ -2790,7 +2790,7 @@
         },
         {
             "id": "welcome-authenticated",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Welcome",
                 "authenticated": "1",
@@ -2853,7 +2853,7 @@
         },
         {
             "id": "welcome-guest-control",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Welcome",
                 "route": "/"
@@ -2883,7 +2883,7 @@
         },
         {
             "id": "settings-appearance-manager",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "settings/Appearance",
                 "role": "manager",
@@ -2966,7 +2966,7 @@
         },
         {
             "id": "dashboard-member",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Dashboard",
                 "role": "member",
@@ -3063,7 +3063,7 @@
         },
         {
             "id": "orders-index",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Orders/Index",
                 "role": "member",
@@ -3118,7 +3118,7 @@
         },
         {
             "id": "wallet-statement-member",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Wallet/Statement",
                 "role": "member",
@@ -3169,7 +3169,7 @@
         },
         {
             "id": "settings-profile",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "settings/Profile",
                 "role": "member",
@@ -3224,7 +3224,7 @@
         },
         {
             "id": "dashboard-manager",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Dashboard",
                 "role": "manager",
@@ -3279,7 +3279,7 @@
         },
         {
             "id": "dashboard-producer",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Dashboard",
                 "role": "producer",
@@ -3334,7 +3334,7 @@
         },
         {
             "id": "orders-edit",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Orders/Edit",
                 "role": "member",
@@ -3389,7 +3389,7 @@
         },
         {
             "id": "wallet-statement-manager",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Wallet/Statement",
                 "role": "manager",
@@ -3444,7 +3444,7 @@
         },
         {
             "id": "settings-appearance-member",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "settings/Appearance",
                 "role": "member",
@@ -3500,7 +3500,7 @@
         },
         {
             "id": "settings-appearance-producer",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "settings/Appearance",
                 "role": "producer",
@@ -3556,7 +3556,7 @@
         },
         {
             "id": "settings-profile-manager",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "settings/Profile",
                 "role": "manager",
@@ -3611,7 +3611,7 @@
         },
         {
             "id": "settings-profile-producer",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "settings/Profile",
                 "role": "producer",
@@ -3666,7 +3666,7 @@
         },
         {
             "id": "settings-security-member",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "settings/Security",
                 "role": "member",
@@ -3721,7 +3721,7 @@
         },
         {
             "id": "settings-security-manager",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "settings/Security",
                 "role": "manager",
@@ -3776,7 +3776,7 @@
         },
         {
             "id": "settings-security-producer",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "settings/Security",
                 "role": "producer",

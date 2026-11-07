@@ -10,7 +10,7 @@
     "views": [
         {
             "id": "manager-wallet-statement",
-            "path": "/visual-dra-224.html",
+            "path": "/resources/visual/dra-224.html",
             "query": {
                 "role": "manager"
             },
@@ -177,7 +177,7 @@
         },
         {
             "id": "finance-wallet-statement",
-            "path": "/visual-dra-224.html",
+            "path": "/resources/visual/dra-224.html",
             "query": {
                 "role": "finance"
             },
@@ -386,7 +386,7 @@
         },
         {
             "id": "member-wallet-statement",
-            "path": "/visual-dra-224.html",
+            "path": "/resources/visual/dra-224.html",
             "query": {
                 "role": "member"
             },

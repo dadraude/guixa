@@ -9,7 +9,7 @@
     },
     "views": [
         {
-            "path": "/visual-dra-212.html",
+            "path": "/resources/visual/dra-212.html",
             "root": "#main-content",
             "panels": "#main-content section,#main-content form,#main-content .pilot-list:has(li),#main-content .pilot-layout-panel",
             "content": "#main-content h1,#main-content h2,#main-content h3,#main-content p,#main-content label,#main-content input,#main-content a,#main-content button,#main-content li,#main-content dd",
@@ -301,7 +301,7 @@
             ]
         },
         {
-            "path": "/visual-dra-212.html",
+            "path": "/resources/visual/dra-212.html",
             "root": "#main-content",
             "panels": "#main-content section,#main-content form,#main-content .pilot-list:has(li),#main-content .pilot-layout-panel",
             "content": "#main-content h1,#main-content h2,#main-content h3,#main-content p,#main-content label,#main-content input,#main-content a,#main-content button,#main-content li,#main-content dd",
@@ -432,7 +432,7 @@
             ]
         },
         {
-            "path": "/visual-dra-212.html",
+            "path": "/resources/visual/dra-212.html",
             "root": "#main-content",
             "panels": "#main-content section,#main-content form,#main-content .pilot-list:has(li),#main-content .pilot-layout-panel",
             "content": "#main-content h1,#main-content h2,#main-content h3,#main-content p,#main-content label,#main-content input,#main-content a,#main-content button,#main-content li,#main-content dd",

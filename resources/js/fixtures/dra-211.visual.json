@@ -10,7 +10,7 @@
     "views": [
         {
             "id": "manager-account-finance-role",
-            "path": "/visual-dra-211.html",
+            "path": "/resources/visual/dra-211.html",
             "root": "#main-content",
             "panels": "#main-content section,#main-content form,#main-content .pilot-list,#main-content .pilot-layout-panel,#main-content .pilot-layout-notice,#main-content table",
             "content": "#main-content h1,#main-content h2,#main-content h3,#main-content p,#main-content label,#main-content input,#main-content a,#main-content button,#main-content th,#main-content td,#main-content li",
@@ -118,7 +118,7 @@
         },
         {
             "id": "finance-baskets-index",
-            "path": "/visual-dra-211.html",
+            "path": "/resources/visual/dra-211.html",
             "root": "#main-content",
             "panels": "#main-content section,#main-content form,#main-content .pilot-list,#main-content .pilot-layout-panel,#main-content .pilot-layout-notice,#main-content table",
             "content": "#main-content h1,#main-content h2,#main-content h3,#main-content p,#main-content label,#main-content input,#main-content a,#main-content button,#main-content th,#main-content td,#main-content li",
@@ -190,7 +190,7 @@
         },
         {
             "id": "finance-baskets-create",
-            "path": "/visual-dra-211.html",
+            "path": "/resources/visual/dra-211.html",
             "root": "#main-content",
             "panels": "#main-content section,#main-content form,#main-content .pilot-list,#main-content .pilot-layout-panel,#main-content .pilot-layout-notice,#main-content table",
             "content": "#main-content h1,#main-content h2,#main-content h3,#main-content p,#main-content label,#main-content input,#main-content a,#main-content button,#main-content th,#main-content td,#main-content li",
@@ -272,7 +272,7 @@
         },
         {
             "id": "finance-basket-detail",
-            "path": "/visual-dra-211.html",
+            "path": "/resources/visual/dra-211.html",
             "root": "#main-content",
             "panels": "#main-content section,#main-content form,#main-content .pilot-list:has(li),#main-content .pilot-layout-panel,#main-content .pilot-layout-notice,#main-content table",
             "content": "#main-content h1,#main-content h2,#main-content h3,#main-content p,#main-content label,#main-content input,#main-content a,#main-content button,#main-content th,#main-content td,#main-content li",
@@ -431,7 +431,7 @@
         },
         {
             "id": "finance-wallet-statement",
-            "path": "/visual-dra-211.html",
+            "path": "/resources/visual/dra-211.html",
             "root": "#main-content",
             "panels": "#main-content .pilot-layout-panel:not(:has(.pilot-wallet-movements)),#main-content .pilot-wallet-table tbody tr,#main-content .pilot-layout-notice",
             "content": "#main-content h1,#main-content h2,#main-content h3,#main-content p,#main-content label,#main-content input,#main-content a,#main-content button,#main-content td,#main-content .pilot-cell-label",
@@ -553,7 +553,7 @@
         },
         {
             "id": "manager-wallet-statement",
-            "path": "/visual-dra-211.html",
+            "path": "/resources/visual/dra-211.html",
             "root": "#main-content",
             "panels": "#main-content .pilot-layout-panel:not(:has(.pilot-wallet-movements)),#main-content .pilot-wallet-table tbody tr,#main-content .pilot-layout-notice",
             "content": "#main-content h1,#main-content h2,#main-content h3,#main-content p,#main-content label,#main-content input,#main-content a,#main-content button,#main-content td,#main-content .pilot-cell-label",
@@ -650,7 +650,7 @@
         },
         {
             "id": "member-wallet-statement",
-            "path": "/visual-dra-211.html",
+            "path": "/resources/visual/dra-211.html",
             "root": "#main-content",
             "panels": "#main-content .pilot-layout-panel:not(:has(.pilot-wallet-movements)),#main-content .pilot-wallet-table tbody tr,#main-content .pilot-layout-notice",
             "content": "#main-content h1,#main-content h2,#main-content h3,#main-content p,#main-content label,#main-content input,#main-content a,#main-content button,#main-content td,#main-content .pilot-cell-label",

@@ -10,7 +10,7 @@
     "views": [
         {
             "id": "manage-producers-index",
-            "path": "/visual-dra-207.html",
+            "path": "/resources/visual/dra-207.html",
             "query": {
                 "page": "Manage/Producers/Index"
             },
@@ -101,7 +101,7 @@
         },
         {
             "id": "manage-stock-create",
-            "path": "/visual-dra-207.html",
+            "path": "/resources/visual/dra-207.html",
             "query": {
                 "page": "Manage/Stock/Create"
             },
@@ -211,7 +211,7 @@
         },
         {
             "id": "manage-stock-index",
-            "path": "/visual-dra-207.html",
+            "path": "/resources/visual/dra-207.html",
             "query": {
                 "page": "Manage/Stock/Index"
             },
@@ -350,7 +350,7 @@
         },
         {
             "id": "manage-stock-edit",
-            "path": "/visual-dra-207.html",
+            "path": "/resources/visual/dra-207.html",
             "query": {
                 "page": "Manage/Stock/Edit"
             },
@@ -441,7 +441,7 @@
         },
         {
             "id": "manage-stock-movements",
-            "path": "/visual-dra-207.html",
+            "path": "/resources/visual/dra-207.html",
             "query": {
                 "page": "Manage/Stock/Movements"
             },

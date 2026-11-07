@@ -10,7 +10,7 @@
     "views": [
         {
             "id": "manage-producers-index",
-            "path": "/visual-dra-208.html",
+            "path": "/resources/visual/dra-208.html",
             "query": {
                 "page": "Manage/Producers/Index"
             },
@@ -101,7 +101,7 @@
         },
         {
             "id": "manage-producers-products",
-            "path": "/visual-dra-208.html",
+            "path": "/resources/visual/dra-208.html",
             "query": {
                 "page": "Manage/Producers/Products"
             },
@@ -278,7 +278,7 @@
         },
         {
             "id": "manage-stock-index",
-            "path": "/visual-dra-208.html",
+            "path": "/resources/visual/dra-208.html",
             "query": {
                 "page": "Manage/Stock/Index"
             },
@@ -398,7 +398,7 @@
         },
         {
             "id": "manage-stock-create",
-            "path": "/visual-dra-208.html",
+            "path": "/resources/visual/dra-208.html",
             "query": {
                 "page": "Manage/Stock/Create"
             },
@@ -470,7 +470,7 @@
         },
         {
             "id": "manage-stock-edit",
-            "path": "/visual-dra-208.html",
+            "path": "/resources/visual/dra-208.html",
             "query": {
                 "page": "Manage/Stock/Edit"
             },
@@ -628,7 +628,7 @@
         },
         {
             "id": "producer-products-index",
-            "path": "/visual-dra-208.html",
+            "path": "/resources/visual/dra-208.html",
             "query": {
                 "page": "Producer/Products/Index"
             },
@@ -719,7 +719,7 @@
         },
         {
             "id": "producer-products-create",
-            "path": "/visual-dra-208.html",
+            "path": "/resources/visual/dra-208.html",
             "query": {
                 "page": "Producer/Products/Create"
             },
@@ -791,7 +791,7 @@
         },
         {
             "id": "producer-products-edit",
-            "path": "/visual-dra-208.html",
+            "path": "/resources/visual/dra-208.html",
             "query": {
                 "page": "Producer/Products/Edit"
             },
