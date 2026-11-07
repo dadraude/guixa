@@ -30,6 +30,7 @@ return [
             'exports' => [
                 'Application\RestoreProducerRole' => ['Catalog'],
                 'Application\SuspendProducerRole' => ['Catalog'],
+                'Application\GetAccountNames' => ['Stock'],
                 'Application\GetHouseholds' => ['Ordering'],
                 'Application\HouseholdData' => ['Ordering'],
                 'Application\GetProducerAccountEmail' => ['Ordering'],
@@ -44,7 +45,7 @@ return [
                 'Application\CheckProductUsage' => ['Catalog'],
                 'Application\LockWeeklyBasketSource' => ['Sales'],
                 'Application\CloseCycleAfterBasketValidation' => ['Sales'],
-                'Application\ReadCyclePickupDates' => ['Sales'],
+                'Application\ReadCyclePickupDates' => ['Sales', 'Stock'],
                 'Application\ReadSourceOrderCycles' => ['Sales'],
                 'Application\ReadCycleSourceOrders' => ['Sales'],
                 'Application\HasUnsettledLines' => ['Catalog'],
@@ -88,7 +89,7 @@ return [
         ],
         'Stock' => [
             'owns' => 'Return items, append-only inventory movements and available quantities.',
-            'dependencies' => ['Catalog', 'Shared'],
+            'dependencies' => ['Catalog', 'Membership', 'Ordering', 'Shared'],
             'exports' => [
                 'Application\CheckProductUsage' => ['Catalog'],
                 'Application\GetAvailableQuantities' => ['Catalog', 'Sales'],

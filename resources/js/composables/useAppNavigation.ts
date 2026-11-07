@@ -31,6 +31,7 @@ import CutoffController from '@/actions/App/Http/Controllers/Producer/CutoffCont
 import ProductController from '@/actions/App/Http/Controllers/Producer/ProductController';
 import WalletController from '@/actions/App/Http/Controllers/WalletController';
 import BasketController from '@/actions/App/Http/Controllers/Finance/BasketController';
+import FinanceStockController from '@/actions/App/Http/Controllers/Finance/StockController';
 import MemberBasketController from '@/actions/App/Http/Controllers/Member/BasketController';
 import { toUrl } from '@/lib/utils';
 import { dashboard } from '@/routes';
@@ -90,6 +91,12 @@ export function navigationSectionsFor(
                               title: 'Baskets',
                               href: BasketController.index(),
                               icon: ShoppingBasket,
+                          },
+                          {
+                              title: 'Stock',
+                              href: FinanceStockController.index(),
+                              icon: Package,
+                              alsoActiveOn: ['/finance/stock'],
                           },
                       ],
                   },

@@ -16,8 +16,13 @@ final class ListStock
         private readonly StockMovementRepository $movements,
     ) {}
 
-    /** @return list<StockLevelData> */
-    public function __invoke(Actor $actor): array
+    /**
+     * Finance sees only active stock unless it asks for the inactive ones too (the history list, R28a);
+     * a Manager always sees every product.
+     *
+     * @return list<StockLevelData>
+     */
+    public function __invoke(Actor $actor, bool $includeInactive = false): array
     {
         Gate::forUser($actor)->authorize('manage-sales');
 
@@ -37,7 +42,7 @@ final class ListStock
             ),
             array_values(array_filter(
                 $this->products->list(),
-                fn ($product) => $actor->hasRole(Role::Manager) || $product->isActive(),
+                fn ($product) => $includeInactive || $actor->hasRole(Role::Manager) || $product->isActive(),
             )),
         );
     }

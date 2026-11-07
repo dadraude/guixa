@@ -110,6 +110,22 @@ trait StockMovementRepositoryContract
     }
 
     #[Test]
+    public function it_breaks_ties_between_movements_of_the_same_instant_by_id(): void
+    {
+        $repository = $this->repository();
+        $productId = $this->productId();
+        $at = new DateTimeImmutable('2026-10-22T10:00:00+00:00');
+
+        foreach (['0198f0a0-0000-7000-8000-00000000000b' => '2', '0198f0a0-0000-7000-8000-00000000000a' => '1'] as $id => $quantity) {
+            $repository->add(StockMovement::entry($id, $productId, Quantity::fromString($quantity), $at, self::ACCOUNT, null));
+        }
+
+        $quantities = array_map(fn (StockMovement $movement) => $movement->quantity->toString(), $repository->forProduct($productId));
+
+        $this->assertSame(['1.000', '2.000'], $quantities);
+    }
+
+    #[Test]
     public function it_sums_the_available_stock_of_one_product(): void
     {
         $repository = $this->repository();

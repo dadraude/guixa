@@ -11,6 +11,7 @@ use App\Http\Controllers\Finance\BasketStockController;
 use App\Http\Controllers\Finance\BasketValidationController;
 use App\Http\Controllers\Finance\BasketWeeklyLineController;
 use App\Http\Controllers\Finance\HouseholdWalletController as FinanceHouseholdWalletController;
+use App\Http\Controllers\Finance\StockController as FinanceStockController;
 use App\Http\Controllers\Manage\AccountController;
 use App\Http\Controllers\Manage\AccountDeactivationController;
 use App\Http\Controllers\Manage\AccountHouseholdController;
@@ -46,6 +47,7 @@ use App\Http\Controllers\Producer\CutoffController;
 use App\Http\Controllers\Producer\CycleController as ProducerCycleController;
 use App\Http\Controllers\Producer\ProductAvailabilityController;
 use App\Http\Controllers\Producer\ProductController;
+use App\Http\Controllers\Producer\StockMovementController as ProducerStockMovementController;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\WalletController;
 use Illuminate\Support\Facades\Route;
@@ -84,6 +86,10 @@ Route::middleware(['auth', 'verified', 'role:manager,finance'])->prefix('finance
 
 Route::middleware(['auth', 'verified', 'role:manager,finance'])->get('finance/households/{household}/wallet', [FinanceHouseholdWalletController::class, 'show'])
     ->whereUuid('household')->name('finance.households.wallet.show');
+Route::middleware(['auth', 'verified', 'role:manager,finance'])->prefix('finance/stock')->name('finance.stock.')->whereUuid('stockProduct')->group(function () {
+    Route::get('/', [FinanceStockController::class, 'index'])->name('index');
+    Route::get('{stockProduct}/movements', [FinanceStockController::class, 'movements'])->name('movements.show');
+});
 Route::middleware(['auth', 'verified', 'role:manager,finance'])->prefix('finance/households/{household}/wallet')->whereUuid('household')->name('finance.households.wallet.')->group(function () {
     Route::post('top-ups', [FinanceHouseholdWalletController::class, 'topUp'])->name('top-ups.store');
     Route::post('corrections', [FinanceHouseholdWalletController::class, 'correct'])->name('corrections.store');
@@ -237,6 +243,8 @@ Route::middleware(['auth', 'verified', 'role:manager'])->prefix('manage')->name(
 });
 
 Route::middleware(['auth', 'verified', 'role:producer'])->prefix('producer')->name('producer.')->group(function () {
+    Route::get('stock/{stockProduct}/movements', [ProducerStockMovementController::class, 'show'])
+        ->whereUuid('stockProduct')->name('stock.movements.show');
     Route::get('cutoff', [CutoffController::class, 'show'])->name('cutoff.show');
     Route::put('cutoff', [CutoffController::class, 'update'])->name('cutoff.update');
 

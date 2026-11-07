@@ -44,6 +44,24 @@ trait AccountRepositoryContract
     }
 
     #[Test]
+    public function it_answers_the_names_of_the_accounts_asked_for_and_leaves_out_unknown_ones(): void
+    {
+        $repository = $this->repository();
+        $anna = Account::inviteMember($repository->nextId(), 'Anna', Email::from('anna@example.org'), $this->householdId());
+        $biel = Account::inviteMember($repository->nextId(), 'Biel', Email::from('biel@example.org'), $this->householdId());
+        $repository->save($anna);
+        $repository->save($biel);
+        $biel->acceptInvitation(new DateTimeImmutable('2026-10-22 10:00:00+00:00'));
+        $biel->deactivate(new DateTimeImmutable('2026-10-23 10:00:00+00:00'));
+        $repository->save($biel);
+
+        $names = $repository->namesByIds([$anna->id, $biel->id, $repository->nextId()]);
+
+        $this->assertSame([$anna->id => 'Anna', $biel->id => 'Biel'], $names);
+        $this->assertSame([], $repository->namesByIds([]));
+    }
+
+    #[Test]
     public function it_keeps_the_changes_of_a_saved_account(): void
     {
         $repository = $this->repository();

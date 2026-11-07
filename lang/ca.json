@@ -667,5 +667,19 @@
     "Actual :name": "Real :name",
     "Actual quantity differs from the allocation: this blocks nothing": "La quantitat real difereix de l'assignació: això no bloqueja res",
     "Actual": "Real",
-    "A member updates their order and the total follows.": "Una persona sòcia actualitza la comanda i el total s’actualitza."
+    "A member updates their order and the total follows.": "Una persona sòcia actualitza la comanda i el total s’actualitza.",
+    "stock.movement_types.entry": "Entrada",
+    "stock.movement_types.adjustment": "Ajust",
+    "stock.movement_types.sale": "Venda",
+    "stock.movement_types.correction": "Correcció",
+    "Movement history": "Historial de moviments",
+    "Available after": "Estoc després",
+    "Author": "Autoria",
+    "History": "Historial",
+    "Previous page": "Pàgina anterior",
+    "Next page": "Pàgina següent",
+    "Page :page": "Pàgina :page",
+    "Pages": "Pàgines",
+    "Available quantities and movement history": "Quantitats disponibles i historial de moviments",
+    "No movements on this page.": "Aquesta pàgina no té moviments."
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Manage;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Stock\ReadsStockHistory;
 use App\Http\CycleOptionRow;
 use App\Http\Requests\Manage\StockAdjustmentRequest;
 use App\Http\Requests\Manage\StockEntryRequest;
@@ -10,6 +11,7 @@ use App\Http\StockLevelRow;
 use Guixa\Ordering\Application\ListCycles;
 use Guixa\Shared\Application\Actor;
 use Guixa\Stock\Application\ListStock;
+use Guixa\Stock\Application\ListStockMovements;
 use Guixa\Stock\Application\RecordStockAdjustment;
 use Guixa\Stock\Application\RecordStockEntry;
 use Guixa\Stock\Application\SetStockAvailable;
@@ -21,7 +23,9 @@ use Inertia\Response;
 
 class StockMovementController extends Controller
 {
-    public function show(string $stockProduct, Actor $actor, ListStock $list, ListCycles $listCycles): Response
+    use ReadsStockHistory;
+
+    public function show(string $stockProduct, Request $request, Actor $actor, ListStock $list, ListCycles $listCycles, ListStockMovements $listMovements): Response
     {
         $level = collect($list($actor))->firstWhere('id', $stockProduct);
         abort_if($level === null, 404);
@@ -29,6 +33,7 @@ class StockMovementController extends Controller
         return Inertia::render('Manage/Stock/Movements', [
             'product' => StockLevelRow::from($level),
             'cycles' => array_map(CycleOptionRow::from(...), $listCycles($actor)),
+            'history' => $this->historyRow($request, $this->history($request, $actor, $listMovements, $stockProduct)),
         ]);
     }
 
