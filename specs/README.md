@@ -108,6 +108,7 @@ design principles and the gap analysis there.
 | --- | ------------------------------- | ------ |
 | 001 | [Weekly orders](001-weekly-orders/spec.md) | Spec + plan amended and accepted (2026-10-28): products, Sales baskets and Finance · [split task breakdown accepted](001-weekly-orders/tasks.md) · implementation status in Linear (Coop) |
 | 002 | [Actionable dashboard](002-actionable-dashboard/spec.md) | **Retired (2026-10-29)** · T01–T04 and DRA-201–DRA-204 canceled; historical request and discovery retained · no dashboard-content work authorized. A new spec needs completion of 001 and a new user decision. The independently shipped login destination (002 T05/R11) and 001 T61 basic dashboard summary remain in force. |
+| 003 | [Role management](003-role-management/spec.md) | Spec draft (2026-11-08): Catalogue and Receiver roles, Finance runs receptions, role management screen · supersedes Commissions |
 
 ## Roadmap
 
@@ -129,4 +130,4 @@ An entry gets an `NNN` ID and moves to *Features* when its spec starts. The orde
 | Monthly amount payable per producer | At month end, a report of what the cooperative must pay each producer for the products supplied. Basis undecided: validated reception or distributed goods. | Producer, Reception, Basket |
 | Container returns to producers | Containers taken back at pickup are tracked until the cooperative hands them back to their producer. | Container, Return item, Producer |
 | Admin rename | Manager becomes Admin (Administrador/a) in specs, code and screens, with no change in behaviour. Comes before Commissions. | Manager, Account |
-| Commissions | An Admin groups accounts into commissions and gives each permissions by area, such as producers and their products. [Decisions](../docs/commissions/2026-10-25-commission-decisions.md). | Account, Producer, Product, Admin |
+| ~~Commissions~~ | **Superseded by [003](003-role-management/spec.md) (2026-11-08):** fixed staff roles instead of configurable commissions. [Decisions](../docs/commissions/2026-10-25-commission-decisions.md) kept for history. | Account, Producer, Product, Admin |
