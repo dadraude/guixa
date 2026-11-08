@@ -113,6 +113,7 @@ return [
     'tables' => [
         'users' => 'Membership',
         'account_roles' => 'Membership',
+        'role_changes' => 'Membership',
         'households' => 'Membership',
         'invitations' => 'Membership',
         'producers' => 'Catalog',

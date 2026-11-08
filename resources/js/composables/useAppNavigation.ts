@@ -7,6 +7,7 @@ import {
     Package,
     Settings,
     Settings2,
+    ShieldCheck,
     ShoppingBasket,
     Sprout,
     Timer,
@@ -25,6 +26,7 @@ import CycleController from '@/actions/App/Http/Controllers/Manage/CycleControll
 import HouseholdController from '@/actions/App/Http/Controllers/Manage/HouseholdController';
 import ProducerController from '@/actions/App/Http/Controllers/Manage/ProducerController';
 import ReturnItemController from '@/actions/App/Http/Controllers/Manage/ReturnItemController';
+import RoleController from '@/actions/App/Http/Controllers/Manage/RoleController';
 import SettingsController from '@/actions/App/Http/Controllers/Manage/SettingsController';
 import StockProductController from '@/actions/App/Http/Controllers/Manage/StockProductController';
 import CutoffController from '@/actions/App/Http/Controllers/Producer/CutoffController';
@@ -155,6 +157,11 @@ export function navigationSectionsFor(
                               title: 'Accounts',
                               href: AccountController.index(),
                               icon: UserCog,
+                          },
+                          {
+                              title: 'Roles',
+                              href: RoleController.index(),
+                              icon: ShieldCheck,
                           },
                           {
                               title: 'Settings',

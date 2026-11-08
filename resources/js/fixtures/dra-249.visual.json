@@ -1,0 +1,258 @@
+{
+    "baseUrl": "http://127.0.0.1:5249",
+    "rootFontPx": 16,
+    "darkSelector": "html.dark",
+    "matrix": {
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark"],
+        "text": [100, 200]
+    },
+    "views": [
+        {
+            "id": "manager-roles",
+            "path": "/resources/js/fixtures/roles.html",
+            "root": ".pilot-manager-page",
+            "panels": ".pilot-manager-page > section",
+            "content": "h1,h2,p,label,input:not([type=hidden]),button",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "#search-manager",
+                "#search-finance",
+                "#search-catalogue",
+                "#search-receiver"
+            ],
+            "assertions": [
+                {
+                    "selector": "input[type=search]",
+                    "minHeight": 44
+                },
+                {
+                    "selector": "h2",
+                    "fontSizeRem": 1.125
+                },
+                {
+                    "selector": "h1, h2, p:not(.text-destructive), label, .material-status",
+                    "contrast": 4.5
+                }
+            ],
+            "states": [
+                {
+                    "id": "populated",
+                    "query": {
+                        "state": "populated"
+                    },
+                    "ready": "body[data-visual-ready=\"populated\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "results",
+                    "query": {
+                        "role": "catalogue",
+                        "q": "an",
+                        "state": "results"
+                    },
+                    "ready": "body[data-visual-ready=\"results\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "focus": [
+                            "#search-manager",
+                            "#search-finance",
+                            "#search-catalogue",
+                            "#search-receiver",
+                            "button[aria-label^='Grant Catalogue to']"
+                        ],
+                        "assertions": [
+                            {
+                                "selector": "input[type=search]",
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "h2",
+                                "fontSizeRem": 1.125
+                            },
+                            {
+                                "selector": "h1, h2, p:not(.text-destructive), label, .material-status",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "button",
+                                "minHeight": 44,
+                                "minWidth": 44
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "no-results",
+                    "query": {
+                        "role": "receiver",
+                        "q": "zzz",
+                        "state": "no-results"
+                    },
+                    "ready": "body[data-visual-ready=\"no-results\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "empty",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "ready": "body[data-visual-ready=\"empty\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "long",
+                    "query": {
+                        "state": "long"
+                    },
+                    "ready": "body[data-visual-ready=\"long\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "error",
+                    "query": {
+                        "role": "catalogue",
+                        "q": "an",
+                        "state": "error"
+                    },
+                    "ready": "body[data-visual-ready=\"error\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "focus": [
+                            "#search-manager",
+                            "#search-finance",
+                            "#search-catalogue",
+                            "#search-receiver",
+                            "button[aria-label^='Grant Catalogue to']"
+                        ],
+                        "assertions": [
+                            {
+                                "selector": "input[type=search]",
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "h2",
+                                "fontSizeRem": 1.125
+                            },
+                            {
+                                "selector": "h1, h2, p:not(.text-destructive), label, .material-status",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "button",
+                                "minHeight": 44,
+                                "minWidth": 44
+                            },
+                            {
+                                "selector": "div:not([style*='display: none']) > p.text-destructive",
+                                "count": 1,
+                                "contrast": 4.5
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -5,6 +5,7 @@ namespace Guixa\Membership\Infrastructure\Persistence;
 use DateTimeImmutable;
 use DateTimeZone;
 use Guixa\Membership\Domain\Account;
+use Guixa\Membership\Domain\AccountListing;
 use Guixa\Membership\Domain\AccountRepository;
 use Guixa\Membership\Domain\ValueObject\Email;
 use Guixa\Shared\Domain\Role;
@@ -104,6 +105,68 @@ final class DatabaseAccountRepository implements AccountRepository
         // In id order, so two transactions locking the same managers cannot deadlock. The managers are read
         // afterwards, in a new statement: it sees what the transaction that held the locks committed.
         $this->managerRows()->orderBy('id')->lockForUpdate()->get(['id']);
+    }
+
+    public function listStaffRoleHolders(): array
+    {
+        $holders = array_fill_keys(array_map(fn (Role $role) => $role->value, Role::staff()), []);
+
+        $rows = $this->listingRows()
+            ->join('account_roles', 'account_roles.user_id', '=', 'users.id')
+            ->whereIn('account_roles.role', array_keys($holders))
+            ->addSelect('account_roles.role as held_role')
+            ->get();
+
+        foreach ($rows as $row) {
+            $holders[$row->held_role][] = $this->listing($row);
+        }
+
+        return $holders;
+    }
+
+    public function searchStaffRoleCandidates(Role $role, string $query, int $limit): array
+    {
+        $query = trim($query);
+
+        if ($query === '') {
+            return [];
+        }
+
+        $pattern = '%'.addcslashes(mb_strtolower($query), '\\%_').'%';
+
+        return array_values($this->listingRows()
+            ->whereNull('users.deactivated_at')
+            ->whereNotIn('users.id', DB::table('account_roles')->select('user_id')->where('role', $role->value))
+            ->where(fn (Builder $match) => $match
+                ->whereRaw('lower(users.name) like ?', [$pattern])
+                ->orWhereRaw('lower(users.email) like ?', [$pattern]))
+            ->limit($limit)
+            ->get()
+            ->map($this->listing(...))
+            ->all());
+    }
+
+    /** Listings by name, then email, so every list reads the same way (R9). */
+    private function listingRows(): Builder
+    {
+        return DB::table('users')
+            ->leftJoin('invitations', 'invitations.account_id', '=', 'users.id')
+            ->select('users.id', 'users.name', 'users.email', 'users.activated_at', 'users.deactivated_at', 'invitations.sent_at')
+            ->orderByRaw('lower(users.name)')
+            ->orderByRaw('lower(users.email)')
+            ->orderBy('users.id');
+    }
+
+    private function listing(stdClass $row): AccountListing
+    {
+        return new AccountListing(
+            $row->id,
+            $row->name,
+            $row->email,
+            $row->activated_at === null ? null : new DateTimeImmutable($row->activated_at),
+            $row->deactivated_at === null ? null : new DateTimeImmutable($row->deactivated_at),
+            $row->sent_at === null ? null : new DateTimeImmutable($row->sent_at),
+        );
     }
 
     private function managerRows(): Builder

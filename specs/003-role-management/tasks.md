@@ -87,7 +87,7 @@ Frontier at proposal time: **T01**. After T01 merges: T02, T03 and T06 are ready
 - **Scope and path.** `Role::Catalogue`, `Role::Receiver`, `Role::staff()`, `isStaff()` in
   `src/Shared/Domain/Role.php`; migration adding the `account_roles.role` CHECK constraint (D6) and the
   `role_changes` table (D7). Membership: `Account::grantRole` with `NotAStaffRole`, `RoleAlreadyHeld`,
-  `AccountDeactivated`; `RoleChangeLog` port, `EloquentRoleChangeLog` and in-memory double; `GrantStaffRole`;
+  `AccountDeactivated`; `RoleChangeLog` port, `DatabaseRoleChangeLog` and in-memory double; `GrantStaffRole`;
   `ListStaffRoleHolders` (statuses, ordering; `canRemove` may be returned as false until T02);
   `SearchStaffRoleCandidates`; account repository read methods. Gate `manage-roles`. HTTP: `GET /manage/roles`
   with deferred `candidates` (D8), `POST /manage/roles/{role}/holders`. Page `Manage/Roles/Index.vue` with
@@ -109,9 +109,9 @@ Frontier at proposal time: **T01**. After T01 merges: T02, T03 and T06 are ready
     rejected with the reason and the screen shows the current holders; nothing is recorded (R13).
   - Granting Producer or Member through the route is 404; a non-manager gets 403 on every route.
   - Groups in order Manager, Finance, Catalogue, Receiver; holders and candidates by name then email (contract
-    tests on in-memory and Eloquent repositories).
+    tests on in-memory and Database repositories).
 - **First checkpoint.** Application test `GrantStaffRole` of Catalogue to an active account fails, then passes
-  with the Eloquent repository writing `account_roles` and `role_changes`; inspect both rows.
+  with the Database repositories writing `account_roles` and `role_changes`; inspect both rows.
 - **Size and rollout.** Roughly 500–700 authored lines (medium confidence): one enum change, one migration, one
   use case, two queries, one page with three components. Kept whole because a grant without the screen is not
   observable. Safe intermediate: granted Catalogue/Receiver accounts can log in but have no area until T03/T06.

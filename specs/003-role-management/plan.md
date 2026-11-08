@@ -124,10 +124,10 @@ deleted with their controllers and routes (R12; D3).
 
 ### Infrastructure
 
-- `EloquentAccountRepository` maps the two new role values; `listStaffRoleHolders()` and
+- `DatabaseAccountRepository` maps the two new role values; `listStaffRoleHolders()` and
   `searchStaffRoleCandidates(role, query, limit)` *(planned)* are read methods joining `users`,
   `account_roles` and `invitations`.
-- `EloquentRoleChangeLog` *(planned)* inserts into `role_changes`.
+- `DatabaseRoleChangeLog` *(planned)* inserts into `role_changes`.
 
 ## Catalog, Stock and Ordering: Catalogue powers
 
@@ -274,7 +274,7 @@ empty states, confirmations and the self-removal warning; `RoleAreas` labels; th
 | --- | --- | --- |
 | Domain | `Account::grantRole`/`removeRole` (staff only, deactivated, already/not held), `isActiveManager` with pending/expired/accepted, `Role::staff()` order | `tests/Unit/Membership` |
 | Application | **S1–S13**, each at least one test with in-memory repositories and `FrozenClock`; S4/S5 in Catalog, S7/S8/S12 in Ordering, S13 across Catalog and Ordering | `tests/Application/<Context>` |
-| Contracts | `RoleChangeLog`, the new account read methods (ordering, filters, status, limit) on in-memory and Eloquent | `tests/Support/Contracts`, `tests/Integration` |
+| Contracts | `RoleChangeLog`, the new account read methods (ordering, filters, status, limit) on in-memory and the Database repositories | `tests/Support/Contracts`, `tests/Integration` |
 | Integration | Two concurrent `RemoveStaffRole(Manager)` on the last two accepted managers: exactly one succeeds (R1, R13) | `tests/Integration` |
 | HTTP | Authorization matrix: each new or moved route against Manager, Finance, Catalogue, Receiver, Producer, member-only (S11); `assertInertia` props and `can` flags; old routes gone or redirecting | `tests/Feature` |
 | Architecture | A11/A12 with `role_changes`; A13 for the new pages | `tests/Architecture` |

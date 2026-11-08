@@ -3,6 +3,7 @@
 namespace Tests\Support\InMemory;
 
 use Guixa\Membership\Domain\Account;
+use Guixa\Membership\Domain\AccountListing;
 use Guixa\Membership\Domain\AccountRepository;
 use Guixa\Membership\Domain\ValueObject\Email;
 use Guixa\Shared\Domain\Role;
@@ -10,6 +11,9 @@ use Guixa\Shared\Domain\Role;
 /** @extends InMemoryRepository<Account> */
 final class InMemoryAccountRepository extends InMemoryRepository implements AccountRepository
 {
+    /** Pass the invitations the listings read their status from. */
+    public function __construct(private readonly ?InMemoryInvitationRepository $invitations = null) {}
+
     /** @param Account $item */
     public function save(object $item): void
     {
@@ -133,6 +137,57 @@ final class InMemoryAccountRepository extends InMemoryRepository implements Acco
         }
 
         return false;
+    }
+
+    public function listStaffRoleHolders(): array
+    {
+        $holders = array_fill_keys(array_map(fn (Role $role) => $role->value, Role::staff()), []);
+
+        foreach ($this->sortedByNameThenEmail() as $account) {
+            foreach ($account->roles as $role) {
+                if ($role->isStaff()) {
+                    $holders[$role->value][] = $this->listing($account);
+                }
+            }
+        }
+
+        return $holders;
+    }
+
+    public function searchStaffRoleCandidates(Role $role, string $query, int $limit): array
+    {
+        $query = mb_strtolower(trim($query));
+
+        if ($query === '') {
+            return [];
+        }
+
+        $matches = array_filter($this->sortedByNameThenEmail(), fn (Account $account) => $account->isActive()
+            && ! in_array($role, $account->roles, true)
+            && (str_contains(mb_strtolower($account->name), $query) || str_contains($account->email->value, $query)));
+
+        return array_map($this->listing(...), array_slice(array_values($matches), 0, $limit));
+    }
+
+    /** @return list<Account> */
+    private function sortedByNameThenEmail(): array
+    {
+        $accounts = $this->all();
+        usort($accounts, fn (Account $a, Account $b) => [mb_strtolower($a->name), $a->email->value, $a->id] <=> [mb_strtolower($b->name), $b->email->value, $b->id]);
+
+        return $accounts;
+    }
+
+    private function listing(Account $account): AccountListing
+    {
+        return new AccountListing(
+            $account->id,
+            $account->name,
+            $account->email->value,
+            $account->activatedAt,
+            $account->deactivatedAt,
+            $this->invitations?->forAccount($account->id)?->sentAt,
+        );
     }
 
     /** Nothing runs concurrently in memory. */

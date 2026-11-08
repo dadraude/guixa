@@ -93,7 +93,7 @@ owning module's Infrastructure. Cross-module access goes through the declared in
 | Owner      | Tables                                                                                                        |
 | ---------- | ------------------------------------------------------------------------------------------------------------- |
 | Catalog    | producers, products                                                                                           |
-| Membership | users, account_roles, households, invitations                                                                 |
+| Membership | users, account_roles, role_changes, households, invitations                                                   |
 | Ordering   | cooperative_settings, cycles, cycle_producers, orders, order_lines, product_unavailabilities, received_totals |
 | Sales      | baskets, basket_lines, basket_adjustments, basket_adjustment_lines, basket_collection_events                  |
 | Stock      | return_items, stock_movements                                                                                 |

@@ -44,6 +44,7 @@ return [
     'ManualAllocationsWouldBeLost' => 'Aquest canvi eliminaria les assignacions manuals.',
     'NameRequired' => 'Cal indicar un nom.',
     'NobodyOrderedProduct' => 'No es pot assignar proporcionalment un producte que ningú no ha demanat.',
+    'NotAStaffRole' => 'Aquest rol no es pot atorgar des de la gestió de rols.',
     'NotAllowed' => 'No tens permís per fer aquesta acció.',
     'NotOnPickupWeekday' => 'Aquesta data no coincideix amb el dia de recollida de la cooperativa.',
     'PickupDateNotInFuture' => 'La data de recollida ha de ser posterior a avui.',
@@ -86,5 +87,6 @@ return [
     'NotEnoughStock' => 'No hi ha prou estoc disponible per a aquesta quantitat.',
     'ProductNotOrderable' => 'Aquest producte no està disponible per demanar.',
     'ReturnItemNotFound' => 'No s’ha trobat aquest article retornable.',
+    'RoleAlreadyHeld' => 'Aquest compte ja té aquest rol.',
     'StockProductNotFound' => 'No s’ha trobat aquest producte d’estoc.',
 ];

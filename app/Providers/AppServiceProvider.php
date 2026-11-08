@@ -27,12 +27,14 @@ use Guixa\Membership\Domain\HouseholdRepository;
 use Guixa\Membership\Domain\InvitationRepository;
 use Guixa\Membership\Domain\InvitationSender;
 use Guixa\Membership\Domain\ProducerDirectory;
+use Guixa\Membership\Domain\RoleChangeLog;
 use Guixa\Membership\Infrastructure\Catalog\CatalogProducerDirectory;
 use Guixa\Membership\Infrastructure\Mail\MailInvitationSender;
 use Guixa\Membership\Infrastructure\Persistence\DatabaseAccountPasswords;
 use Guixa\Membership\Infrastructure\Persistence\DatabaseAccountRepository;
 use Guixa\Membership\Infrastructure\Persistence\DatabaseHouseholdRepository;
 use Guixa\Membership\Infrastructure\Persistence\DatabaseInvitationRepository;
+use Guixa\Membership\Infrastructure\Persistence\DatabaseRoleChangeLog;
 use Guixa\Membership\Infrastructure\Sales\SalesHouseholdBaskets;
 use Guixa\Membership\Infrastructure\Wallet\WalletHouseholdBalances;
 use Guixa\Ordering\Application\SalesBaskets;
@@ -147,6 +149,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(HouseholdBalances::class, WalletHouseholdBalances::class);
         $this->app->bind(HouseholdBaskets::class, SalesHouseholdBaskets::class);
         $this->app->bind(AccountRepository::class, DatabaseAccountRepository::class);
+        $this->app->bind(RoleChangeLog::class, DatabaseRoleChangeLog::class);
         $this->app->bind(InvitationRepository::class, DatabaseInvitationRepository::class);
         $this->app->bind(InvitationSender::class, MailInvitationSender::class);
         $this->app->bind(AccountPasswords::class, DatabaseAccountPasswords::class);
@@ -177,6 +180,8 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Gate::define('manage', fn (Actor $actor): bool => $actor->hasRole(Role::Manager));
+        Gate::define('manage-roles', fn (Actor $actor): bool => $actor->hasRole(Role::Manager));
+        Gate::define('staff-role', fn (Actor $actor, string $role): bool => Role::tryFrom($role)?->isStaff() ?? false);
         Gate::define('manage-sales', fn (Actor $actor): bool => $actor->hasAnyRole(Role::Manager->value, Role::Finance->value));
         Gate::define('manage-wallet', fn (Actor $actor): bool => $actor->hasAnyRole(Role::Manager->value, Role::Finance->value));
         Gate::define('view-stock-offers', fn (Actor $actor): bool => $actor->hasAnyRole(Role::Member->value, Role::Manager->value));
