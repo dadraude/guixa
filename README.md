@@ -54,7 +54,7 @@ php artisan migrate --seed
 composer dev
 ```
 
-Open <http://localhost:8000> and sign in as `gestora@demo.guixa.test` with password `demo-password`.
+Open <http://localhost:8000> and sign in as `gestora@demo.guixa.test` with password `password`.
 `DatabaseSeeder` calls `DemoSeeder`; its accounts are activated and verified.
 
 | Role              | Account                                                                                          |
