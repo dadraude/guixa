@@ -165,6 +165,8 @@ it('lets a manager linked to a household reach the member area and lets an unlin
 
 it('drops the stored member role in the migration and keeps manager and producer roles', function () {
     $user = accountWith(Role::Manager, Role::Producer);
+    // The row is legacy data from before the role CHECK constraint (D6), which no longer admits `member`.
+    DB::statement('alter table account_roles drop constraint account_roles_role_check');
     DB::table('account_roles')->insert(['user_id' => $user->id, 'role' => 'member']);
 
     (require database_path('migrations/2026_10_23_000000_drop_member_role_from_account_roles.php'))->up();

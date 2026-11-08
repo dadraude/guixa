@@ -5,6 +5,8 @@ namespace Guixa\Membership\Domain;
 use DateTimeImmutable;
 use Guixa\Membership\Domain\Error\AccountDeactivated;
 use Guixa\Membership\Domain\Error\InvitationAlreadyAccepted;
+use Guixa\Membership\Domain\Error\NotAStaffRole;
+use Guixa\Membership\Domain\Error\RoleAlreadyHeld;
 use Guixa\Membership\Domain\ValueObject\Email;
 use Guixa\Shared\Domain\Role;
 
@@ -103,6 +105,24 @@ final class Account
     public function unlink(): void
     {
         $this->householdId = null;
+    }
+
+    /** Pending and expired invitations can receive any staff role; a deactivated account cannot (R1, R2). */
+    public function grantRole(Role $role): void
+    {
+        if (! $role->isStaff()) {
+            throw NotAStaffRole::named($role->value);
+        }
+
+        if (! $this->isActive()) {
+            throw AccountDeactivated::for($this->id);
+        }
+
+        if (in_array($role, $this->roles, true)) {
+            throw RoleAlreadyHeld::for($this->id, $role);
+        }
+
+        $this->roles = [...$this->roles, $role];
     }
 
     public function grantManager(): void

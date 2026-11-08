@@ -3,6 +3,7 @@
 namespace Guixa\Membership\Domain;
 
 use Guixa\Membership\Domain\ValueObject\Email;
+use Guixa\Shared\Domain\Role;
 
 interface AccountRepository
 {
@@ -48,4 +49,18 @@ interface AccountRepository
      * "is this the last manager" run one after the other (R36a, R36b). Call it before `hasOtherActiveManager()`.
      */
     public function lockManagers(): void;
+
+    /**
+     * @return array<string, list<AccountListing>> the holders of every staff role by role value, deactivated accounts
+     *                                             included, each list by name then email (R9)
+     */
+    public function listStaffRoleHolders(): array;
+
+    /**
+     * Accounts whose name or email contains the query, case-insensitive, that are not deactivated and do not hold
+     * the role, by name then email. An empty query finds nothing (R10).
+     *
+     * @return list<AccountListing>
+     */
+    public function searchStaffRoleCandidates(Role $role, string $query, int $limit): array;
 }

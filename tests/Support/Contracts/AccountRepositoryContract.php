@@ -4,7 +4,9 @@ namespace Tests\Support\Contracts;
 
 use DateTimeImmutable;
 use Guixa\Membership\Domain\Account;
+use Guixa\Membership\Domain\AccountListing;
 use Guixa\Membership\Domain\AccountRepository;
+use Guixa\Membership\Domain\AccountStatus;
 use Guixa\Membership\Domain\ValueObject\Email;
 use Guixa\Shared\Domain\Role;
 use PHPUnit\Framework\Attributes\Test;
@@ -15,6 +17,9 @@ trait AccountRepositoryContract
     abstract protected function repository(): AccountRepository;
 
     abstract protected function householdId(): string;
+
+    /** Issues the account's invitation as sent at that instant, as the real invitation repository would. */
+    abstract protected function inviteAt(Account $account, DateTimeImmutable $sentAt): void;
 
     /** An existing producer for producer accounts to point at. */
     abstract protected function producerId(): string;
@@ -266,5 +271,114 @@ trait AccountRepositoryContract
 
         $repository->save(Account::inviteManager($repository->nextId(), 'Marta', Email::from('marta@example.org')));
         $this->assertTrue($repository->hasManager());
+    }
+
+    private function staffAccount(string $name, string $email, array $roles = [], bool $accepted = true, bool $deactivated = false): Account
+    {
+        $repository = $this->repository();
+        $account = Account::restore(
+            $repository->nextId(), $name, Email::from($email), $roles, null, null,
+            $accepted ? new DateTimeImmutable('2026-10-01 10:00:00+00:00') : null,
+            $deactivated ? new DateTimeImmutable('2026-10-02 10:00:00+00:00') : null,
+        );
+        $repository->save($account);
+
+        return $account;
+    }
+
+    /** @param list<AccountListing> $listings */
+    private function names(array $listings): array
+    {
+        return array_map(fn ($listing) => $listing->name, $listings);
+    }
+
+    #[Test]
+    public function it_lists_the_holders_of_each_staff_role_by_name_then_email_deactivated_included(): void
+    {
+        $repository = $this->repository();
+        $this->staffAccount('bernat', 'b@example.org', [Role::Catalogue]);
+        $this->staffAccount('Anna', 'z@example.org', [Role::Catalogue, Role::Manager]);
+        $this->staffAccount('Anna', 'a@example.org', [Role::Catalogue]);
+        $this->staffAccount('Carla', 'c@example.org', [Role::Receiver], deactivated: true);
+        $this->staffAccount('Dora', 'd@example.org', [Role::Producer]);
+
+        $holders = $repository->listStaffRoleHolders();
+
+        $this->assertSame(['Anna', 'Anna', 'bernat'], $this->names($holders['catalogue']));
+        $this->assertSame(['a@example.org', 'z@example.org', 'b@example.org'], array_map(fn ($listing) => $listing->email, $holders['catalogue']));
+        $this->assertSame(['Anna'], $this->names($holders['manager']));
+        $this->assertSame(['Carla'], $this->names($holders['receiver']));
+        $this->assertSame([], $holders['finance']);
+        $this->assertArrayNotHasKey('producer', $holders);
+    }
+
+    #[Test]
+    public function it_tells_the_status_of_each_listed_account(): void
+    {
+        $repository = $this->repository();
+        $now = new DateTimeImmutable('2026-11-09 10:00:00+00:00');
+        $this->staffAccount('Active', 'a@example.org', [Role::Finance]);
+        $this->staffAccount('Deactivated', 'd@example.org', [Role::Finance], deactivated: true);
+        $pending = $this->staffAccount('Pending', 'p@example.org', [Role::Finance], accepted: false);
+        $this->inviteAt($pending, new DateTimeImmutable('2026-11-08 10:00:00+00:00'));
+        $expired = $this->staffAccount('Expired', 'e@example.org', [Role::Finance], accepted: false);
+        $this->inviteAt($expired, new DateTimeImmutable('2026-10-20 10:00:00+00:00'));
+
+        $statuses = [];
+        foreach ($repository->listStaffRoleHolders()['finance'] as $listing) {
+            $statuses[$listing->name] = $listing->status($now);
+        }
+
+        $this->assertSame([
+            'Active' => AccountStatus::Active,
+            'Deactivated' => AccountStatus::Deactivated,
+            'Expired' => AccountStatus::InvitationExpired,
+            'Pending' => AccountStatus::InvitationPending,
+        ], $statuses);
+    }
+
+    #[Test]
+    public function it_searches_candidates_by_name_or_email_without_holders_or_deactivated_accounts(): void
+    {
+        $repository = $this->repository();
+        $this->staffAccount('Anna Roca', 'roca@example.org');
+        $this->staffAccount('Bernat', 'anna.b@example.org');
+        $this->staffAccount('Anna Holder', 'holder@example.org', [Role::Catalogue]);
+        $this->staffAccount('Anna Gone', 'gone@example.org', deactivated: true);
+        $this->staffAccount('Carla', 'carla@example.org');
+
+        $found = $repository->searchStaffRoleCandidates(Role::Catalogue, 'ANNA', 20);
+
+        $this->assertSame(['Anna Roca', 'Bernat'], $this->names($found));
+        $this->assertSame(['Anna Holder'], $this->names($repository->searchStaffRoleCandidates(Role::Finance, 'holder', 20)));
+    }
+
+    #[Test]
+    public function it_offers_pending_and_expired_invitations_as_candidates(): void
+    {
+        $repository = $this->repository();
+        $pending = $this->staffAccount('Anna Pending', 'p@example.org', accepted: false);
+        $this->inviteAt($pending, new DateTimeImmutable('2026-11-08 10:00:00+00:00'));
+        $expired = $this->staffAccount('Anna Expired', 'e@example.org', accepted: false);
+        $this->inviteAt($expired, new DateTimeImmutable('2026-10-20 10:00:00+00:00'));
+
+        $found = $repository->searchStaffRoleCandidates(Role::Finance, 'anna', 20);
+
+        $this->assertSame(['Anna Expired', 'Anna Pending'], $this->names($found));
+    }
+
+    #[Test]
+    public function it_limits_orders_and_escapes_the_candidate_search(): void
+    {
+        $repository = $this->repository();
+        foreach (['Anna C', 'Anna A', 'Anna B'] as $index => $name) {
+            $this->staffAccount($name, "anna{$index}@example.org");
+        }
+        $this->staffAccount('Pau 100%', 'percent@example.org');
+
+        $this->assertSame(['Anna A', 'Anna B'], $this->names($repository->searchStaffRoleCandidates(Role::Receiver, 'anna ', 2)));
+        $this->assertSame(['Pau 100%'], $this->names($repository->searchStaffRoleCandidates(Role::Receiver, '%', 20)));
+        $this->assertSame([], $repository->searchStaffRoleCandidates(Role::Receiver, '', 20));
+        $this->assertSame([], $repository->searchStaffRoleCandidates(Role::Receiver, '   ', 20));
     }
 }

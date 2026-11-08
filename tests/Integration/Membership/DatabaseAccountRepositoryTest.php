@@ -2,15 +2,18 @@
 
 namespace Tests\Integration\Membership;
 
+use DateTimeImmutable;
 use Guixa\Catalog\Domain\Producer;
 use Guixa\Catalog\Domain\ValueObject\CutoffRule;
 use Guixa\Catalog\Infrastructure\Persistence\EloquentProducerRepository;
 use Guixa\Membership\Domain\Account;
 use Guixa\Membership\Domain\AccountRepository;
 use Guixa\Membership\Domain\Household;
+use Guixa\Membership\Domain\Invitation;
 use Guixa\Membership\Domain\ValueObject\Email;
 use Guixa\Membership\Infrastructure\Persistence\DatabaseAccountRepository;
 use Guixa\Membership\Infrastructure\Persistence\DatabaseHouseholdRepository;
+use Guixa\Membership\Infrastructure\Persistence\DatabaseInvitationRepository;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Tests\Support\Contracts\AccountRepositoryContract;
@@ -28,6 +31,11 @@ final class DatabaseAccountRepositoryTest extends TestCase
     protected function repository(): AccountRepository
     {
         return new DatabaseAccountRepository;
+    }
+
+    protected function inviteAt(Account $account, DateTimeImmutable $sentAt): void
+    {
+        (new DatabaseInvitationRepository)->save(Invitation::issue($account->id, 'token-'.$account->id, $sentAt));
     }
 
     protected function producerId(): string
@@ -80,7 +88,7 @@ final class DatabaseAccountRepositoryTest extends TestCase
             $this->householdId(),
         );
         $repository->save($account);
-        $account->acceptInvitation(new \DateTimeImmutable('2026-10-22 10:00:00+00:00'));
+        $account->acceptInvitation(new DateTimeImmutable('2026-10-22 10:00:00+00:00'));
         $repository->save($account);
 
         DB::table('users')->where('id', $account->id)->update(['email_verified_at' => null]);
@@ -99,7 +107,7 @@ final class DatabaseAccountRepositoryTest extends TestCase
             $this->householdId(),
         );
         $repository->save($account);
-        $account->acceptInvitation(new \DateTimeImmutable('2026-10-22 12:00:00+02:00'));
+        $account->acceptInvitation(new DateTimeImmutable('2026-10-22 12:00:00+02:00'));
 
         $repository->save($account);
 

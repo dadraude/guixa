@@ -37,6 +37,8 @@ use App\Http\Controllers\Manage\ReceptionProductController;
 use App\Http\Controllers\Manage\ReceptionReceivedController;
 use App\Http\Controllers\Manage\ReceptionValidationController;
 use App\Http\Controllers\Manage\ReturnItemController;
+use App\Http\Controllers\Manage\RoleController;
+use App\Http\Controllers\Manage\RoleHolderController;
 use App\Http\Controllers\Manage\SettingsController;
 use App\Http\Controllers\Manage\StockMovementController;
 use App\Http\Controllers\Manage\StockProductController;
@@ -209,6 +211,10 @@ Route::middleware(['auth', 'verified', 'role:manager'])->prefix('manage')->name(
     Route::delete('producers/{producer}/deactivation', [ProducerController::class, 'reactivate'])
         ->whereUuid('producer')
         ->name('producers.deactivation.destroy');
+
+    Route::get('roles', [RoleController::class, 'index'])->name('roles.index');
+    Route::post('roles/{staffRole}/holders', [RoleHolderController::class, 'store'])
+        ->name('roles.holders.store');
 
     Route::get('accounts', [AccountController::class, 'index'])->name('accounts.index');
     Route::put('accounts/{account}/household', [AccountHouseholdController::class, 'update'])

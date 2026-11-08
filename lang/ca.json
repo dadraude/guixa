@@ -681,5 +681,17 @@
     "Page :page": "Pàgina :page",
     "Pages": "Pàgines",
     "Available quantities and movement history": "Quantitats disponibles i historial de moviments",
-    "No movements on this page.": "Aquesta pàgina no té moviments."
+    "No movements on this page.": "Aquesta pàgina no té moviments.",
+    "Roles": "Rols",
+    "Grant staff roles and see who holds them": "Atorga rols de gestió i consulta qui els té",
+    "Catalogue": "Catàleg",
+    "Receiver": "Receptor/a",
+    "Invitation expired": "Invitació caducada",
+    "Nobody holds this role yet.": "Encara no hi ha ningú amb aquest rol.",
+    "Find an account to grant :role": "Cerca un compte per atorgar-li el rol de :role",
+    "Name or email": "Nom o adreça electrònica",
+    "Type a name or email to find an account.": "Escriu un nom o una adreça electrònica per cercar un compte.",
+    "No account matches “:query”.": "Cap compte coincideix amb «:query».",
+    "Grant :role to :name": "Atorga el rol de :role a :name",
+    "Grant": "Atorga"
 }

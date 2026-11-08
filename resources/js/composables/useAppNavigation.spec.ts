@@ -51,7 +51,7 @@ describe('shared app navigation', () => {
             ['Orders', 'My baskets', 'Stock catalogue', 'Wallet'],
             ['Cycles', 'Households', 'Baskets'],
             ['Producers', 'Stock', 'Return items'],
-            ['Accounts', 'Settings'],
+            ['Accounts', 'Roles', 'Settings'],
             ['Products', 'Default cutoff'],
         ]);
         const titles = navigationItemsFor([
@@ -59,7 +59,7 @@ describe('shared app navigation', () => {
             { role: 'manager' },
             { role: 'producer' },
         ]).map((item) => item.title);
-        expect(titles).toHaveLength(15);
+        expect(titles).toHaveLength(16);
         expect(new Set(titles).size).toBe(titles.length);
     });
 

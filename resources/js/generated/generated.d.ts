@@ -418,9 +418,38 @@ export type WalletStatementRow = {
 readonly balance: string,
 readonly movements: App.Http.WalletMovementRow[],
 };
+namespace Controllers {
+namespace Manage {
+export type RoleCandidateRow = {
+readonly accountId: string,
+readonly name: string,
+readonly email: string,
+readonly status: Guixa.Membership.Domain.AccountStatus,
+};
+export type RoleGroupRow = {
+readonly role: Guixa.Shared.Domain.Role,
+readonly holders: App.Http.Controllers.Manage.RoleHolderRow[],
+};
+export type RoleHolderRow = {
+readonly accountId: string,
+readonly name: string,
+readonly email: string,
+readonly status: Guixa.Membership.Domain.AccountStatus,
+readonly isSelf: boolean,
+readonly canRemove: boolean,
+readonly removeBlockedReason: string | null,
+};
+}
+}
 }
 }
 declare namespace Guixa {
+namespace Membership {
+namespace Domain {
+export type AccountStatus = 'active' | 'invitation_pending' | 'invitation_expired' | 'deactivated';
+export type RoleChange = 'granted' | 'removed';
+}
+}
 namespace Sales {
 namespace Domain {
 export type BasketKind = 'stock' | 'weekly';
@@ -430,7 +459,7 @@ export type BasketState = 'draft' | 'validated' | 'collected' | 'cancelled' | 'n
 }
 namespace Shared {
 namespace Domain {
-export type Role = 'manager' | 'finance' | 'member' | 'producer';
+export type Role = 'manager' | 'finance' | 'catalogue' | 'receiver' | 'member' | 'producer';
 }
 }
 namespace Stock {

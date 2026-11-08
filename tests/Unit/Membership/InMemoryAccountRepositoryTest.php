@@ -2,18 +2,34 @@
 
 namespace Tests\Unit\Membership;
 
+use DateTimeImmutable;
+use Guixa\Membership\Domain\Account;
 use Guixa\Membership\Domain\AccountRepository;
+use Guixa\Membership\Domain\Invitation;
 use PHPUnit\Framework\TestCase;
 use Tests\Support\Contracts\AccountRepositoryContract;
 use Tests\Support\InMemory\InMemoryAccountRepository;
+use Tests\Support\InMemory\InMemoryInvitationRepository;
 
 final class InMemoryAccountRepositoryTest extends TestCase
 {
     use AccountRepositoryContract;
 
+    private ?InMemoryAccountRepository $repository = null;
+
+    private ?InMemoryInvitationRepository $invitations = null;
+
     protected function repository(): AccountRepository
     {
-        return new InMemoryAccountRepository;
+        $this->invitations ??= new InMemoryInvitationRepository;
+
+        return $this->repository ??= new InMemoryAccountRepository($this->invitations);
+    }
+
+    protected function inviteAt(Account $account, DateTimeImmutable $sentAt): void
+    {
+        $this->repository();
+        $this->invitations->save(Invitation::issue($account->id, 'token-'.$account->id, $sentAt));
     }
 
     protected function householdId(): string
