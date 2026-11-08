@@ -10,12 +10,12 @@ final readonly class BasketAdjustmentRow
 {
     /** @param list<BasketAdjustmentLineRow> $lines */
     public function __construct(public string $id, public int $amountCents, public string $reason,
-        public string $recordedBy, public string $occurredAt, public array $lines) {}
+        public string $authorName, public string $occurredAt, public array $lines) {}
 
     public static function from(BasketAdjustmentData $adjustment): self
     {
         return new self($adjustment->id, $adjustment->amountCents, $adjustment->reason,
-            $adjustment->recordedBy, $adjustment->occurredAt->format(DATE_ATOM),
+            $adjustment->authorName, $adjustment->occurredAt->format(DATE_ATOM),
             array_map(BasketAdjustmentLineRow::from(...), $adjustment->lines));
     }
 }

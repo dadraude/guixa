@@ -7,6 +7,7 @@ use Guixa\Sales\Domain\BasketState;
 use Guixa\Sales\Domain\Error\BasketNotFound;
 use Guixa\Shared\Application\Actor;
 use Illuminate\Auth\Access\AuthorizationException;
+use Tests\Support\InMemory\Sales\FakeAccountNames;
 use Tests\Support\InMemory\Sales\InMemoryBasketRepository;
 
 it('lists and reads only the actor current household from the public Sales queries (R19a, R35)', function () {
@@ -19,8 +20,8 @@ it('lists and reads only the actor current household from the public Sales queri
 
     $actor = Actor::memberOf('member', 'mine');
     expect(array_map(fn ($row) => $row->id, (new ListMemberBaskets($repository))($actor)))->toBe(['own'])
-        ->and((new GetMemberBasket($repository))($actor, 'own')->id)->toBe('own');
-    expect(fn () => (new GetMemberBasket($repository))($actor, 'other'))->toThrow(BasketNotFound::class);
-    expect(fn () => (new GetMemberBasket($repository))(Actor::memberOf('member', 'new-home'), 'own'))->toThrow(BasketNotFound::class);
+        ->and((new GetMemberBasket($repository, new FakeAccountNames))($actor, 'own')->id)->toBe('own');
+    expect(fn () => (new GetMemberBasket($repository, new FakeAccountNames))($actor, 'other'))->toThrow(BasketNotFound::class);
+    expect(fn () => (new GetMemberBasket($repository, new FakeAccountNames))(Actor::memberOf('member', 'new-home'), 'own'))->toThrow(BasketNotFound::class);
     expect(fn () => (new ListMemberBaskets($repository))(Actor::producer('producer', 'farm')))->toThrow(AuthorizationException::class);
 });

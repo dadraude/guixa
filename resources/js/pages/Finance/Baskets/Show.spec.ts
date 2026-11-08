@@ -117,7 +117,7 @@ describe('Finance basket detail', () => {
                             {
                                 id: 'event-1',
                                 type: 'collected',
-                                recordedBy: 'manager',
+                                authorName: 'manager',
                                 occurredAt: '2026-10-30T10:00:00+00:00',
                                 reason: null,
                             },
@@ -269,7 +269,7 @@ describe('Finance basket detail', () => {
                                 id: 'correction-1',
                                 amountCents: 200,
                                 reason: 'Corrected price',
-                                recordedBy: 'manager',
+                                authorName: 'manager',
                                 occurredAt: '2026-10-30T11:00:00+00:00',
                                 lines: [],
                             },

@@ -118,10 +118,11 @@ defineExpose({ reset });
                         {{ lineName(line.stockProductId)?.unit ?? '' }}
                     </li>
                 </ul>
-                <span class="text-sm wrap-anywhere text-muted-foreground"
-                    >{{ adjustment.recordedBy }} ·
-                    {{ adjustment.occurredAt }}</span
-                >
+                <span class="text-sm wrap-anywhere text-muted-foreground">{{
+                    [adjustment.authorName, adjustment.occurredAt]
+                        .filter(Boolean)
+                        .join(' · ')
+                }}</span>
             </li>
         </ol>
         <form

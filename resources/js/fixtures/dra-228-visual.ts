@@ -73,7 +73,7 @@ const basket = financeBasketRow(
                       amountCents: reversed ? 4100 : 1200,
                       reason:
                           state === 'long' ? longText : 'Una ampolla ha tornat',
-                      recordedBy: 'Finances',
+                      authorName: 'Finances',
                       occurredAt: '2026-11-02T11:00:00+00:00',
                       lines: adjustmentLines,
                   },

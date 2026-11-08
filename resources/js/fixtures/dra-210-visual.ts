@@ -123,7 +123,7 @@ const wallet = {
                       cycleId: null,
                       basketId,
                       sourceMovementId: null,
-                      recordedBy: null,
+                      authorName: '',
                   },
                   ...(state === 'long'
                       ? [
@@ -137,7 +137,7 @@ const wallet = {
                                 basketId:
                                     '0198f0a0-0000-7000-8000-000000000024',
                                 sourceMovementId: null,
-                                recordedBy: null,
+                                authorName: '',
                             },
                         ]
                       : []),

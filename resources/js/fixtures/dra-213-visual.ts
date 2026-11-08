@@ -55,7 +55,7 @@ const basket = withServerFlags(
                       id: correctionId,
                       amountCents: 200,
                       reason: state === 'long' ? longText : 'Preu corregit',
-                      recordedBy: 'Finances',
+                      authorName: 'Finances',
                       occurredAt: '2026-11-01T11:00:00+00:00',
                       lines: [],
                   },

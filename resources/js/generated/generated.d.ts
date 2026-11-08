@@ -26,14 +26,14 @@ export type BasketAdjustmentRow = {
 readonly id: string,
 readonly amountCents: number,
 readonly reason: string,
-readonly recordedBy: string,
+readonly authorName: string,
 readonly occurredAt: string,
 readonly lines: App.Http.BasketAdjustmentLineRow[],
 };
 export type BasketCollectionEventRow = {
 readonly id: string,
 readonly type: string,
-readonly recordedBy: string,
+readonly authorName: string,
 readonly occurredAt: string,
 readonly reason: string | null,
 };
@@ -412,7 +412,7 @@ readonly note: string | null,
 readonly cycleId: string | null,
 readonly basketId: string | null,
 readonly sourceMovementId: string | null,
-readonly recordedBy: string | null,
+readonly authorName: string,
 };
 export type WalletStatementRow = {
 readonly balance: string,

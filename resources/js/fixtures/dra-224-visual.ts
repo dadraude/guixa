@@ -46,7 +46,7 @@ const movement = (
     sourceMovementId,
     basketId,
     cycleId: null,
-    recordedBy: accountId,
+    authorName: 'Anna Soler',
 });
 const movements =
     state === 'empty' || state === 'disabled'

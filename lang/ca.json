@@ -380,7 +380,7 @@
     ":amount · :date · :note": ":amount · :date · :note",
     "Correction of receipt :amount": "Correcció de l’ingrés de :amount",
     "Correction of receipt :id": "Correcció de l’ingrés :id",
-    "Recorded by :id": "Registrat per :id",
+    "Recorded by :name": "Registrat per :name",
     "Receipt recorded.": "Ingrés registrat.",
     "Correction recorded.": "Correcció registrada.",
     "Amount (EUR, negative to subtract)": "Import (EUR, negatiu per restar)",

@@ -116,7 +116,7 @@ describe('confirmed receipt forms and linked correction text', () => {
                     cycleId: null,
                     basketId: null,
                     sourceMovementId: receiptId,
-                    recordedBy: 'finance',
+                    authorName: 'finance',
                 },
                 {
                     id: receiptId,
@@ -127,7 +127,7 @@ describe('confirmed receipt forms and linked correction text', () => {
                     cycleId: null,
                     basketId: null,
                     sourceMovementId: null,
-                    recordedBy: 'finance',
+                    authorName: 'finance',
                 },
             ],
         };
@@ -161,6 +161,38 @@ describe('confirmed receipt forms and linked correction text', () => {
         expect(memberHtml).toContain('Correcció de l’ingrés de 50,00');
         expect(memberHtml).not.toContain('data-test="record-top-up"');
         expect(memberHtml).not.toContain('data-test="record-correction"');
+    });
+});
+
+describe('statement author names', () => {
+    const movement = (id: string, authorName: string) => ({
+        id,
+        type: 'top_up',
+        amount: '50.00',
+        occurredAt: '2026-10-24 12:00',
+        note: null,
+        cycleId: null,
+        basketId: null,
+        sourceMovementId: null,
+        authorName,
+    });
+
+    it('shows who recorded a movement and hides the line when the name is empty', async () => {
+        const app = createSSRApp(Statement, {
+            household: null,
+            wallet: {
+                balance: '100.00',
+                movements: [
+                    movement('named', 'Maria Soler'),
+                    movement('unnamed', ''),
+                ],
+            },
+            canManageReceipts: false,
+        });
+        installTranslations(app);
+        const html = await renderToString(app);
+        expect(html).toContain('Registrat per Maria Soler');
+        expect(html.match(/Registrat per/g)).toHaveLength(1);
     });
 });
 

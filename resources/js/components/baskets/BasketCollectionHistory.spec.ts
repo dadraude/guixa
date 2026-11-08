@@ -9,20 +9,34 @@ const events = [
     {
         id: 'first',
         type: 'collected',
-        recordedBy: 'manager',
+        authorName: 'manager',
         occurredAt: '2026-11-01T10:00:00+00:00',
         reason: null,
     },
     {
         id: 'correction',
         type: 'corrected',
-        recordedBy: 'finance',
+        authorName: 'finance',
         occurredAt: '2026-11-01T11:00:00+00:00',
         reason: 'Marked by mistake',
     },
 ];
 
 describe('basket collection history', () => {
+    it('shows no dangling separator when the author name is empty', () => {
+        const wrapper = mount(BasketCollectionHistory, {
+            props: {
+                collected: true,
+                events: [{ ...events[0], authorName: '' }],
+                editable: false,
+            },
+            global: { plugins: [{ install: installTranslations }] },
+        });
+        expect(wrapper.get('[data-test="original-collection"]').text()).toBe(
+            '2026-11-01T10:00:00+00:00',
+        );
+    });
+
     it('shows original and effective pending states without a correction action after correction', () => {
         const wrapper = mount(BasketCollectionHistory, {
             props: { collected: false, events, editable: false },
