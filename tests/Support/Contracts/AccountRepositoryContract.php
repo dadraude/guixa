@@ -110,7 +110,7 @@ trait AccountRepositoryContract
         $account = Account::inviteMember($repository->nextId(), 'Anna', Email::from('anna@example.org'), $this->householdId());
         $repository->save($account);
 
-        $account->grantManager();
+        $account->grantRole(Role::Manager);
         $account->deactivate(new DateTimeImmutable('2026-10-22 10:00:00+00:00'));
         $repository->save($account);
         $repository->saveHouseholdLink($account);
@@ -120,7 +120,7 @@ trait AccountRepositoryContract
         $this->assertNull($found->householdId);
         $this->assertEquals(new DateTimeImmutable('2026-10-22 10:00:00+00:00'), $found->deactivatedAt);
 
-        $found->removeManager();
+        $found->removeRole(Role::Manager);
         $found->reactivate();
         $repository->save($found);
 
@@ -140,7 +140,7 @@ trait AccountRepositoryContract
         $linked->unlink();
         $repository->saveHouseholdLink($linked);
 
-        $stale->grantManager();
+        $stale->grantRole(Role::Manager);
         $repository->save($stale);
 
         $stored = $repository->get($account->id);
@@ -176,13 +176,18 @@ trait AccountRepositoryContract
     public function it_tells_whether_an_active_manager_other_than_the_account_exists(): void
     {
         $repository = $this->repository();
+        $accepted = new DateTimeImmutable('2026-10-01 10:00:00+00:00');
         $active = Account::inviteMember($repository->nextId(), 'Anna', Email::from('anna@example.org'), $this->householdId());
-        $active->grantManager();
+        $active->grantRole(Role::Manager);
+        $active->acceptInvitation($accepted);
         $deactivated = Account::inviteMember($repository->nextId(), 'Biel', Email::from('biel@example.org'), $this->householdId());
-        $deactivated->grantManager();
+        $deactivated->grantRole(Role::Manager);
+        $deactivated->acceptInvitation($accepted);
         $deactivated->deactivate(new DateTimeImmutable('2026-10-22 10:00:00+00:00'));
+        $pending = Account::inviteMember($repository->nextId(), 'Eva', Email::from('eva@example.org'), $this->householdId());
+        $pending->grantRole(Role::Manager);
         $member = Account::inviteMember($repository->nextId(), 'Carla', Email::from('carla@example.org'), $this->householdId());
-        foreach ([$active, $deactivated, $member] as $account) {
+        foreach ([$active, $deactivated, $pending, $member] as $account) {
             $repository->save($account);
         }
 
@@ -191,9 +196,11 @@ trait AccountRepositoryContract
         $this->assertFalse($repository->hasOtherActiveManager($active->id));
         $this->assertTrue($repository->hasOtherActiveManager($deactivated->id));
         $this->assertTrue($repository->hasOtherActiveManager($member->id));
+        $this->assertTrue($repository->hasOtherActiveManager($pending->id));
 
         $second = Account::inviteMember($repository->nextId(), 'Dan', Email::from('dan@example.org'), $this->householdId());
-        $second->grantManager();
+        $second->grantRole(Role::Manager);
+        $second->acceptInvitation($accepted);
         $repository->save($second);
 
         $this->assertTrue($repository->hasOtherActiveManager($active->id));

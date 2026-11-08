@@ -20,11 +20,9 @@ use App\Http\Controllers\Manage\CycleController;
 use App\Http\Controllers\Manage\CycleCutoffController;
 use App\Http\Controllers\Manage\CycleParticipantController;
 use App\Http\Controllers\Manage\CycleProducerOrderController;
-use App\Http\Controllers\Manage\FinanceRoleController;
 use App\Http\Controllers\Manage\HouseholdController;
 use App\Http\Controllers\Manage\HouseholdMemberController;
 use App\Http\Controllers\Manage\InvitationController;
-use App\Http\Controllers\Manage\ManagerRoleController;
 use App\Http\Controllers\Manage\PickupController;
 use App\Http\Controllers\Manage\ProducerAccountController;
 use App\Http\Controllers\Manage\ProducerController;
@@ -215,6 +213,9 @@ Route::middleware(['auth', 'verified', 'role:manager'])->prefix('manage')->name(
     Route::get('roles', [RoleController::class, 'index'])->name('roles.index');
     Route::post('roles/{staffRole}/holders', [RoleHolderController::class, 'store'])
         ->name('roles.holders.store');
+    Route::delete('roles/{staffRole}/holders/{account}', [RoleHolderController::class, 'destroy'])
+        ->whereUuid('account')
+        ->name('roles.holders.destroy');
 
     Route::get('accounts', [AccountController::class, 'index'])->name('accounts.index');
     Route::put('accounts/{account}/household', [AccountHouseholdController::class, 'update'])
@@ -223,16 +224,6 @@ Route::middleware(['auth', 'verified', 'role:manager'])->prefix('manage')->name(
     Route::delete('accounts/{account}/household', [AccountHouseholdController::class, 'destroy'])
         ->whereUuid('account')
         ->name('accounts.household.destroy');
-    Route::put('accounts/{account}/manager-role', [ManagerRoleController::class, 'update'])
-        ->whereUuid('account')
-        ->name('accounts.manager-role.update');
-    Route::delete('accounts/{account}/manager-role', [ManagerRoleController::class, 'destroy'])
-        ->whereUuid('account')
-        ->name('accounts.manager-role.destroy');
-    Route::put('accounts/{account}/finance-role', [FinanceRoleController::class, 'update'])
-        ->whereUuid('account')->name('accounts.finance-role.update');
-    Route::delete('accounts/{account}/finance-role', [FinanceRoleController::class, 'destroy'])
-        ->whereUuid('account')->name('accounts.finance-role.destroy');
     Route::post('accounts/{account}/deactivation', [AccountDeactivationController::class, 'store'])
         ->whereUuid('account')
         ->name('accounts.deactivation.store');

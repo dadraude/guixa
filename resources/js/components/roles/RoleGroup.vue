@@ -2,6 +2,7 @@
 import { trans } from 'laravel-vue-i18n';
 import { computed } from 'vue';
 import RoleCandidateSearch from '@/components/roles/RoleCandidateSearch.vue';
+import RoleHolderRemove from '@/components/roles/RoleHolderRemove.vue';
 import RoleHolderRow from '@/components/roles/RoleHolderRow.vue';
 
 const props = defineProps<{
@@ -13,6 +14,7 @@ const props = defineProps<{
 }>();
 
 defineEmits<{
+    remove: [role: Guixa.Shared.Domain.Role, accountId: string];
     search: [role: Guixa.Shared.Domain.Role, query: string];
     grant: [role: Guixa.Shared.Domain.Role, accountId: string];
 }>();
@@ -48,7 +50,17 @@ const label = computed(() => trans(roleLabels[props.group.role] ?? ''));
                 :name="holder.name"
                 :email="holder.email"
                 :status="holder.status"
-            />
+            >
+                <RoleHolderRemove
+                    :holder="holder"
+                    :role="group.role"
+                    :role-label="label"
+                    :processing="processing"
+                    @remove="
+                        (accountId) => $emit('remove', group.role, accountId)
+                    "
+                />
+            </RoleHolderRow>
         </ul>
 
         <RoleCandidateSearch

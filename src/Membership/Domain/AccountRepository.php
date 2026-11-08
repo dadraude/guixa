@@ -41,7 +41,7 @@ interface AccountRepository
     /** @return list<Account> */
     public function membersOf(string $householdId): array;
 
-    /** Whether an account other than this one holds the manager role and is not deactivated. Call it after `lockManagers()`. */
+    /** Whether an account other than this one holds the manager role, accepted its invitation and is not deactivated. Call it after `lockManagers()`. */
     public function hasOtherActiveManager(string $accountId): bool;
 
     /**

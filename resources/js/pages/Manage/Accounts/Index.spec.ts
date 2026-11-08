@@ -7,6 +7,17 @@ import { installTranslations } from '@/lib/i18n';
 
 vi.mock('@inertiajs/vue3', () => ({
     Head: () => null,
+    Link: defineComponent({
+        props: ['href'],
+        setup:
+            (props, { slots }) =>
+            () =>
+                h(
+                    'a',
+                    { href: props.href?.url ?? props.href },
+                    slots.default?.(),
+                ),
+    }),
     Form: defineComponent({
         setup:
             (_, { attrs, slots }) =>
@@ -108,5 +119,39 @@ describe('account management', () => {
         );
         expect(badges).toEqual(['Membre', 'Gestor', 'Productor']);
         expect(account.roles).toEqual(['member', 'manager', 'producer']);
+    });
+
+    it('shows Catalogue and Receiver badges, no role forms, and links to the roles screen', async () => {
+        const app = createSSRApp(AccountsIndex, {
+            accounts: [
+                {
+                    accountId: 'one',
+                    name: 'Anna',
+                    email: 'anna@example.test',
+                    roles: ['manager', 'catalogue', 'receiver'],
+                    householdId: null,
+                    householdName: null,
+                    active: true,
+                    invitationPending: false,
+                },
+            ],
+            households: [],
+        });
+        installTranslations(app);
+        const root = document.createElement('div');
+        root.innerHTML = await renderToString(app);
+
+        const badges = [...root.querySelectorAll('[data-slot="badge"]')].map(
+            (badge) => badge.textContent?.trim(),
+        );
+        expect(badges).toEqual(['Gestor', 'Catàleg', 'Receptor/a']);
+        expect(
+            root.querySelectorAll(
+                'form[action*="manager-role"], form[action*="finance-role"]',
+            ),
+        ).toHaveLength(0);
+        expect(root.querySelector('a')?.getAttribute('href')).toBe(
+            '/manage/roles',
+        );
     });
 });

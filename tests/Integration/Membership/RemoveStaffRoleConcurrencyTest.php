@@ -2,7 +2,8 @@
 
 namespace Tests\Integration\Membership;
 
-use Guixa\Membership\Application\RemoveManagerRole;
+use App\Models\User;
+use Guixa\Membership\Application\RemoveStaffRole;
 use Guixa\Membership\Domain\Account;
 use Guixa\Membership\Domain\AccountRepository;
 use Guixa\Membership\Domain\ValueObject\Email;
@@ -14,7 +15,7 @@ use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 /** The two removals run in two processes, so the rows must be committed: no wrapping transaction. */
-final class ManagerRoleConcurrencyTest extends TestCase
+final class RemoveStaffRoleConcurrencyTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -32,20 +33,22 @@ final class ManagerRoleConcurrencyTest extends TestCase
     }
 
     #[Test]
-    public function two_removals_on_the_last_two_managers_leave_one_manager(): void
+    public function two_removals_on_the_last_two_accepted_managers_leave_one_manager(): void
     {
         $accounts = app(AccountRepository::class);
         $first = $this->manager($accounts, 'Carla', 'carla@example.org');
         $second = $this->manager($accounts, 'Dan', 'dan@example.org');
-        $removeManagerRole = app(RemoveManagerRole::class);
-        $actor = Actor::manager('00000000-0000-7000-8000-00000000000a');
+        $removeStaffRole = app(RemoveStaffRole::class);
+        // The change log keeps the actor as a user, so the removals need a real one.
+        $actorId = User::factory()->create()->id;
+        $actor = Actor::manager($actorId);
 
         // This transaction removes the first manager's role and commits only after the other process started
         // its own removal. Without the lock, that process would still see two managers.
         DB::beginTransaction();
-        $removeManagerRole($actor, $first->id);
+        $removeStaffRole($actor, $first->id, 'manager');
         $other = proc_open(
-            [PHP_BINARY, dirname(__DIR__, 2).'/Support/Scripts/remove_manager_role.php', $second->id],
+            [PHP_BINARY, dirname(__DIR__, 2).'/Support/Scripts/remove_staff_role.php', $actorId, $second->id, 'manager'],
             [1 => ['pipe', 'w'], 2 => ['pipe', 'w']],
             $pipes,
             null,
@@ -62,6 +65,7 @@ final class ManagerRoleConcurrencyTest extends TestCase
         $this->assertSame('LastManager', $result);
         $this->assertSame([], $accounts->get($first->id)->roles);
         $this->assertSame([Role::Manager], $accounts->get($second->id)->roles);
+        $this->assertSame(1, DB::table('role_changes')->count());
     }
 
     /** Proves the other process reached the lock, however slowly it booted: committing earlier would prove nothing. */

@@ -20,14 +20,14 @@ it('grants Finance on an existing account for the next real basket request and p
     DB::table('households')->insert(['id' => $household, 'name' => 'Household H', 'created_at' => now(), 'updated_at' => now()]);
     $basket = app(CreateStockBasket::class)(Actor::manager($manager->id), $household);
 
-    $this->actingAs($manager)->put(route('manage.accounts.finance-role.update', $finance->id))->assertRedirect();
+    $this->actingAs($manager)->post('/manage/roles/finance/holders', ['account_id' => $finance->id])->assertRedirect();
     $this->actingAs($finance)->get("/finance/baskets/{$basket}")
         ->assertOk()->assertInertia(fn (Assert $page) => $page->component('Finance/Baskets/Show')->where('basket.id', $basket));
     $actor = app(ActorResolver::class)->forAccount($finance->id);
     expect($actor->hasRole(Role::Finance))->toBeTrue();
     expect(app(GetBasket::class)($actor, $basket)->id)->toBe($basket);
 
-    $this->actingAs($manager)->delete(route('manage.accounts.finance-role.destroy', $finance->id))->assertRedirect();
+    $this->actingAs($manager)->delete("/manage/roles/finance/holders/{$finance->id}")->assertRedirect();
     $this->actingAs($finance)->get("/finance/baskets/{$basket}")->assertForbidden();
 });
 
@@ -128,7 +128,7 @@ it('keeps Finance out of account, catalogue, cycle, reception, stock administrat
     $this->get('/manage/cycles')->assertForbidden();
     $this->get('/manage/producers')->assertForbidden();
     $this->get('/manage/return-items')->assertForbidden();
-    $this->put('/manage/accounts/'.$finance->id.'/finance-role')->assertForbidden();
+    $this->post('/manage/roles/finance/holders', ['account_id' => $finance->id])->assertForbidden();
     $this->post('/manage/households', ['name' => 'X'])->assertForbidden();
     $this->get('/dashboard')->assertInertia(fn (Assert $page) => $page
         ->where('auth.roles', ['finance'])->has('roleAreas', 1)->where('roleAreas.0.role', 'finance'));
@@ -151,14 +151,14 @@ it('preserves member household privacy and combined Manager access (R31, R36a, S
 it('lets an activated Finance-only account sign in after grant and denies sign-in after revocation (R36c, S84)', function () {
     $manager = accountWith(Role::Manager);
     $finance = accountWith();
-    $this->actingAs($manager)->put(route('manage.accounts.finance-role.update', $finance->id))->assertRedirect();
+    $this->actingAs($manager)->post('/manage/roles/finance/holders', ['account_id' => $finance->id])->assertRedirect();
     auth()->logout();
 
     $this->post(route('login.store'), ['email' => $finance->email, 'password' => 'password']);
     $this->assertAuthenticatedAs($finance);
     auth()->logout();
 
-    $this->actingAs($manager)->delete(route('manage.accounts.finance-role.destroy', $finance->id))->assertRedirect();
+    $this->actingAs($manager)->delete("/manage/roles/finance/holders/{$finance->id}")->assertRedirect();
     auth()->logout();
     $this->post(route('login.store'), ['email' => $finance->email, 'password' => 'password'])->assertSessionHasErrors();
     $this->assertGuest();
@@ -169,10 +169,10 @@ it('shows the granted and revoked Finance state on the existing Manager account 
     $manager->forceFill(['name' => 'Alpha Manager'])->save();
     $finance = accountWith();
     $finance->forceFill(['name' => 'Zulu Finance'])->save();
-    $this->actingAs($manager)->put(route('manage.accounts.finance-role.update', $finance->id))->assertRedirect();
+    $this->actingAs($manager)->post('/manage/roles/finance/holders', ['account_id' => $finance->id])->assertRedirect();
     $this->get(route('manage.accounts.index'))->assertInertia(fn (Assert $page) => $page
         ->component('Manage/Accounts/Index')->where('accounts.1.roles', ['finance']));
-    $this->delete(route('manage.accounts.finance-role.destroy', $finance->id))->assertRedirect();
+    $this->delete("/manage/roles/finance/holders/{$finance->id}")->assertRedirect();
     $this->get(route('manage.accounts.index'))->assertInertia(fn (Assert $page) => $page
         ->where('accounts.1.roles', []));
 });

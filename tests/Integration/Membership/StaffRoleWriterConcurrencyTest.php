@@ -5,8 +5,8 @@ namespace Tests\Integration\Membership;
 use App\Models\User;
 use DateTimeImmutable;
 use Guixa\Catalog\Infrastructure\Persistence\ProducerModel;
-use Guixa\Membership\Application\GrantFinanceRole;
-use Guixa\Membership\Application\RemoveFinanceRole;
+use Guixa\Membership\Application\GrantStaffRole;
+use Guixa\Membership\Application\RemoveStaffRole;
 use Guixa\Membership\Domain\Account;
 use Guixa\Membership\Domain\AccountRepository;
 use Guixa\Membership\Domain\Invitation;
@@ -21,8 +21,8 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
-/** Two real PostgreSQL sessions expose stale Account snapshots after Finance changes. */
-final class FinanceRoleConcurrencyTest extends TestCase
+/** Two real PostgreSQL sessions expose stale Account snapshots after a Finance grant or removal (001 R36c); each change records one role_changes row. */
+final class StaffRoleWriterConcurrencyTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -85,14 +85,15 @@ final class FinanceRoleConcurrencyTest extends TestCase
 
         DB::beginTransaction();
         try {
-            $actor = Actor::manager('00000000-0000-7000-8000-00000000000a');
+            // The change log keeps the actor as a user, so the manager must exist.
+            $actor = Actor::manager(User::factory()->create()->id);
             if ($financeAction === 'grant') {
-                app(GrantFinanceRole::class)($actor, $account->id);
+                app(GrantStaffRole::class)($actor, $account->id, Role::Finance->value);
             } else {
-                app(RemoveFinanceRole::class)($actor, $account->id);
+                app(RemoveStaffRole::class)($actor, $account->id, Role::Finance->value);
             }
             $this->child = proc_open(
-                [PHP_BINARY, '-r', self::childCode(), $writer, $account->id, $producerId ?? ''],
+                [PHP_BINARY, '-r', self::childCode(), $writer, $account->id, $producerId ?? '', $actor->accountId],
                 [1 => ['pipe', 'w'], 2 => ['pipe', 'w']],
                 $pipes,
                 base_path(),
@@ -117,6 +118,7 @@ final class FinanceRoleConcurrencyTest extends TestCase
         $stored = $accounts->get($account->id);
         $this->assertSame($expectedFinance, in_array(Role::Finance, $stored->roles, true));
         $this->assertSame($expectedProducer, in_array(Role::Producer, $stored->roles, true));
+        $this->assertSame(1, DB::table('role_changes')->where('user_id', $account->id)->count());
         $resolved = app(ActorResolver::class)->forAccount($account->id);
         $this->assertSame($expectedFinance, $resolved->hasRole(Role::Finance));
         // Simulate the next request from an already verified session; the role gate is under test.
@@ -150,7 +152,7 @@ try {
         'suspend' => $app->make(Guixa\Membership\Application\SuspendProducerRole::class)($argv[3]),
         'restore' => $app->make(Guixa\Membership\Application\RestoreProducerRole::class)($argv[3]),
         'accept' => $app->make(Guixa\Membership\Application\AcceptInvitation::class)('concurrency-token', 'new-password'),
-        'email' => $app->make(Guixa\Membership\Application\ChangeInvitationEmail::class)(Guixa\Shared\Application\Actor::manager('00000000-0000-7000-8000-00000000000a'), $argv[2], 'changed@example.org'),
+        'email' => $app->make(Guixa\Membership\Application\ChangeInvitationEmail::class)(Guixa\Shared\Application\Actor::manager($argv[4]), $argv[2], 'changed@example.org'),
     };
     echo 'done';
 } catch (Throwable $error) {

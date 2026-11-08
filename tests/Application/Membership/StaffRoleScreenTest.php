@@ -56,14 +56,14 @@ it('lists the four staff groups in order, each with its holders and their status
     expect($groups[3]->holders[0]->status)->toBe(AccountStatus::Deactivated);
 });
 
-it('marks the manager itself and keeps removal off until T02 (R11 prerequisite)', function () {
+it('marks the manager itself and blocks removing the last active manager (R1, R11)', function () {
     $world = staffRoleWorld();
 
     $maria = ($world->list)($world->manager)[0]->holders[0];
 
     expect($maria->isSelf)->toBeTrue();
     expect($maria->canRemove)->toBeFalse();
-    expect($maria->removeBlockedReason)->toBeNull();
+    expect($maria->removeBlockedReason)->toBe(__('It is the last active manager: another account must hold the Manager role and have accepted its invitation first.'));
 });
 
 it('offers Bernat as pending and Dora as expired for Finance, never Carla (R10, S2)', function () {
