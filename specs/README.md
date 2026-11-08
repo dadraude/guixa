@@ -108,7 +108,7 @@ design principles and the gap analysis there.
 | --- | ------------------------------- | ------ |
 | 001 | [Weekly orders](001-weekly-orders/spec.md) | Spec + plan amended and accepted (2026-10-28): products, Sales baskets and Finance · [split task breakdown accepted](001-weekly-orders/tasks.md) · implementation status in Linear (Coop) |
 | 002 | [Actionable dashboard](002-actionable-dashboard/spec.md) | **Retired (2026-10-29)** · T01–T04 and DRA-201–DRA-204 canceled; historical request and discovery retained · no dashboard-content work authorized. A new spec needs completion of 001 and a new user decision. The independently shipped login destination (002 T05/R11) and 001 T61 basic dashboard summary remain in force. |
-| 003 | [Role management](003-role-management/spec.md) | Spec accepted (2026-11-08), OQ1–OQ6 resolved: Catalogue and Receiver roles, Finance runs receptions, role management screen · supersedes Commissions |
+| 003 | [Role management](003-role-management/spec.md) | Spec accepted (2026-11-08), OQ1–OQ6 resolved: Catalogue and Receiver roles, Finance runs receptions, role management screen · [plan](003-role-management/plan.md) proposed (2026-11-08) · supersedes Commissions |
 
 ## Roadmap
 
