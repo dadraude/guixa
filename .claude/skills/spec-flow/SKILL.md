@@ -7,6 +7,24 @@ The rules live in `specs/README.md`: the three routes under "Spec flow or direct
 log entry kinds (**Request**, **Q&A**, **Change**, **Deviation**). Read it first; this skill is the
 order of work.
 
+## Delegation
+
+Keep this session's context to routes, decisions and the user's answers. Send the reading and
+drafting below to workers using the profile's Model routing (`Agent` with its `model` set every time),
+following [role-scoped context](../../../skills/agent-workflow/core/handoff.md) and the
+spec-side table in the profile. A worker returns a short digest, writes no `spec.md` or area file and never delegates.
+
+| Step                                | Worker (role)                                                                                      | Returns                                                                                                   |
+| ----------------------------------- | -------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| 1 Route: overlap and glossary check | Discovery                                                                                          | Roadmap/feature rows, decision records and glossary terms that collide with the request, with `path:line` |
+| 2 Log: read history                 | Discovery                                                                                          | The entries relevant to the request (R#, Request, Q&A, Change, Deviation), or "no original Request found" |
+| 2a Gap check                        | Preparation, or a fresh Reviewer for a finished spec                                               | The coverage table of [spec-gaps](../spec-gaps/SKILL.md#delegation)                                       |
+| 3 Plan and break down               | Discovery for readiness and implementation paths; Preparation for the `plan.md` / `tasks.md` draft | Evidence list; a draft in the working tree for this session to present                                    |
+| 4 Close a task                      | Discovery for code-vs-plan evidence per `R#` and scenario                                          | Matches, mismatches and remainders with owners                                                            |
+
+Do inline only what costs less than a brief: a single-file lookup, the route line, a history `add`.
+This session still decides the route, asks the user, edits the documents and creates the history entries.
+
 ## 1. Route
 
 For a bug or change request, pick one route (direct fix, spec flow, plan only) and tell the user which
