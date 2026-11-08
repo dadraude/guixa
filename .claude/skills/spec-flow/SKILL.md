@@ -15,6 +15,11 @@ waiting for the user's OK.
 
 Done when the user has seen the route.
 
+Before grilling or writing a new spec, read the Roadmap and Features tables in `specs/README.md` and any
+decision record they link. If the request overlaps or contradicts an entry, put that decision to the user
+first. Check every new role, term or name against the glossary in `spec.md`; a collision is settled before
+the first question that uses it.
+
 ## 2. Log
 
 Every edit to a feature's documents and every answered question creates a separate entry in
@@ -50,6 +55,13 @@ Why: <reason, or the OQ / conversation that decided it>.
 Commit each printed path with its change. Never edit an existing entry or shared index; record a
 correction in a new file linking the original. Pass exact entry paths to implementers and reviewers.
 Done when every document edit in the diff has its entry.
+
+## 2a. Gap check before the PR
+
+Before committing a new or amended spec, walk the gap families in `.claude/skills/spec-gaps/SKILL.md`
+and fix or record each gap as an open question. Open the PR only after that, and say in it that the check ran.
+
+Done when no gap family is unchecked.
 
 ## 3. Plan and break down accepted scope
 
