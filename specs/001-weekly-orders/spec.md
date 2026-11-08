@@ -42,7 +42,7 @@ is recorded manually as a separate credit to the household's global wallet.
 | Validated basket | Cistella validada | Basket whose actual contents and total have been confirmed, with its charge and stock sale recorded. Original records remain immutable. |
 | Reception | Recepció | Check of one producer's delivery in one cycle: received vs ordered, and allocation to households. |
 | Allocation | Assignació | Quantity of a product a household will take in a cycle. Starts equal to the ordered quantity. |
-| Validated reception | Recepció validada | A reception whose received totals a manager has checked against what arrived. Distinct from basket validation. |
+| Validated reception | Recepció validada | A reception whose received totals Finance or a manager has checked against what arrived ([003](../003-role-management/spec.md) R7). Distinct from basket validation. |
 | Distributed | Distribuïda | A producer order whose reception is finished and balanced. |
 | Settled | Liquidat | A cycle whose every participating producer is distributed. Weekly base basket drafts are created. |
 | Stock product | Producte d'estoc | Product marked for sale from tracked stock in baskets, during or outside weekly pickups. Excluded from weekly ordering and reception. |
@@ -83,7 +83,7 @@ An account with no household and no other role cannot log in until it is linked.
 
 [003 — Role management](../003-role-management/spec.md) adds the Catalogue and Receiver roles, lets Finance
 run receptions and lets Catalogue and the manager edit any producer's weekly products. Where it differs
-from R1, R1b, R1c, R2, R14–R18, R20a, R25, R36a or R36c, 003 applies.
+from R1, R1b, R1c, R2, R3c, R14–R18, R20a, R25, R25b, R28a, R36a or R36c, 003 applies.
 
 ## Areas
 
