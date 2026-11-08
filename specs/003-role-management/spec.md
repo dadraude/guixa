@@ -1,6 +1,6 @@
 # 003 — Role management
 
-**Status: Draft (2026-11-08); OQ1–OQ6 resolved (2026-11-08).** Supersedes the *Commissions* roadmap entry and its
+**Status: Accepted (2026-11-08); OQ1–OQ6 resolved (2026-11-08).** Supersedes the *Commissions* roadmap entry and its
 [decisions](../../docs/commissions/2026-10-25-commission-decisions.md): staff powers stay fixed roles, like Finance.
 
 A manager needs one place to see who holds each staff role and to grant or remove it. Today roles are toggled
