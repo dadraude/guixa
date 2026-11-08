@@ -1,6 +1,6 @@
 # 003 — Role management · Plan
 
-Status: Proposed (2026-11-08), awaiting the user's OK · Spec: [spec.md](spec.md) (R1–R16, S1–S13, accepted
+Status: Accepted (2026-11-08; PR #352 merged) · Spec: [spec.md](spec.md) (R1–R16, S1–S13, accepted
 2026-11-08) · Rules: [constitution](../constitution.md) · Design reference: [001 plan](../001-weekly-orders/plan.md)
 
 This plan changes who may call existing use cases, adds the role management screen and two areas, and
