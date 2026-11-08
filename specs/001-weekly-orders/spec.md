@@ -24,10 +24,10 @@ is recorded manually as a separate credit to the household's global wallet.
 | --- | --- | --- |
 | Household | Unitat de convivència | Ordering and paying unit. Has members; inactive once it leaves or loses its last member. |
 | Member | Soci/sòcia | Person who belongs to at most one household; only with a household can they order. |
-| Manager | Gestor/a | Runs the cooperative and retains all Finance powers, alongside cycle, reception, catalogue, inventory and account administration. |
-| Finance | Econòmiques | Staff who prepare and validate baskets, record receipts and make justified corrections. |
+| Manager | Gestor/a | Runs the cooperative and retains all Finance and Catalogue powers, alongside cycle, reception, catalogue, inventory and account administration. |
+| Finance | Econòmiques | Staff who prepare and validate baskets, record receipts, make justified corrections and run receptions ([003](../003-role-management/spec.md) R7). |
 | Producer | Productor/a | Grows, gathers or makes the products it supplies. Manages its weekly products and can consult its stock products. Has at most one account. |
-| Account | Compte | One login (unique email) with the manager, finance and producer roles it holds, and a household link that makes it a member. |
+| Account | Compte | One login (unique email) with the manager, finance, catalogue, receiver and producer roles it holds, and a household link that makes it a member. |
 | Product | Producte | Belongs to exactly one producer for its lifetime, with a unit (kg, unit, bunch…) and a unit price (≥ 0). Either a weekly product or a stock product. |
 | Weekly product | Producte de comanda setmanal | Product offered through weekly ordering and received and allocated in a cycle. Not a stock product. |
 | Variable product | Producte de pes variable | Quantity can be fractional (weight); delivered quantity may differ from ordered. |
@@ -80,6 +80,10 @@ An account with no household and no other role cannot log in until it is linked.
 - **Manager**: retains all Finance powers and the existing cycle, reception, stock/return catalogue,
   inventory, product-classification, household and account powers. A manager never edits a household's
   ordered quantities. Only a manager grants or revokes Finance.
+
+[003 — Role management](../003-role-management/spec.md) adds the Catalogue and Receiver roles, lets Finance
+run receptions and lets Catalogue and the manager edit any producer's weekly products. Where it differs
+from R1, R1b, R1c, R2, R14–R18, R20a, R25, R36a or R36c, 003 applies.
 
 ## Areas
 

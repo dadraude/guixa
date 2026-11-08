@@ -1,5 +1,7 @@
 # Commissions: decisions (2026-10-25)
 
+**Superseded (2026-11-08)** by [003 — Role management](../../specs/003-role-management/spec.md): staff powers are fixed roles (Catalogue, Receiver) instead of commissions.
+
 Decisions taken while grilling the request below, for the Commissions spec to start from. It is not a spec:
 requirements, scenarios and open questions are written when that spec starts (see the
 [roadmap](../../specs/README.md#roadmap)).
