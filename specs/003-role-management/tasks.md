@@ -1,6 +1,6 @@
 # 003 — Role management · Tasks
 
-Status: Proposed (2026-11-08), awaiting the user's OK. Implementation and Linear publication are separate
+Status: Accepted (2026-11-08). Implementation and Linear publication are separate
 scopes. Source: [spec](spec.md) (R1–R16, S1–S13) · [plan](plan.md) (accepted 2026-11-08, D1–D9) ·
 [constitution](../constitution.md).
 
