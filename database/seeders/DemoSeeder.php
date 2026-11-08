@@ -38,7 +38,7 @@ final class DemoSeeder extends Seeder
 
     private const string MANAGER_EMAIL = 'gestora@demo.guixa.test';
 
-    private const string PASSWORD = 'demo-password';
+    private const string PASSWORD = 'password';
 
     private const array HOUSEHOLDS = [
         ['Can Roca', 'Anna Roca', 'anna@demo.guixa.test', 10000],

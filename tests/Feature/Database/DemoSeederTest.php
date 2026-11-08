@@ -37,7 +37,7 @@ it('lets every demo role log in and open its main screens', function (string $em
     $this->seed(DemoSeeder::class);
     $this->withoutVite();
 
-    $this->post('/login', ['email' => $email, 'password' => 'demo-password'])->assertRedirect();
+    $this->post('/login', ['email' => $email, 'password' => 'password'])->assertRedirect();
     $this->assertAuthenticatedAs(User::query()->where('email', $email)->firstOrFail());
 
     foreach ($paths as $path) {
