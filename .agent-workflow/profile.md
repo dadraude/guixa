@@ -78,6 +78,20 @@ Codex pins each tier in `.codex/agents/agent-workflow-<tier>.toml` (efforts: low
 | Standard | Implementer, Preparation                             | `sonnet`    | `gpt-6-sol`   |
 | Strong   | Reviewer                                             | `opus`      | `gpt-6-astra` |
 
+The spec-side skills (`spec-flow`, `spec-gaps`) and ticket drafting reuse these roles, so no step runs
+on a model above its tier. The session model only coordinates: routing, every question to the user,
+phase gates and the final write of anything that needs a decision.
+
+| Spec-side work                                                                                     | Role        |
+| -------------------------------------------------------------------------------------------------- | ----------- |
+| Read history, roadmap/feature tables, glossary and decision records; find collisions and prior art | Discovery   |
+| Gather code-vs-plan evidence for a task close; read back and diff published tickets                | Discovery   |
+| Walk gap families over new or changed requirements; draft `plan.md`, `tasks.md` and ticket bodies  | Preparation |
+| Review a spec that claims to be complete (fresh worker, not the author)                            | Reviewer    |
+
+A worker returns a digest with `path:line` references (at most 40 lines), never file dumps. It does not
+edit a spec document, ask the user or delegate; the coordinator applies and logs every edit.
+
 ## Tracker constraints
 
 Linear rules the ticket gates rely on:
