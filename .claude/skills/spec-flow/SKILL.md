@@ -58,6 +58,10 @@ Done when every document edit in the diff has its entry.
 
 ## 2a. Gap check before the PR
 
+First `git fetch origin` and check that the spec's PR is still open and that `origin/main` has no newer
+version of it with open questions already answered; work on a branch from the current `origin/main`, never
+on an old local copy of a PR branch.
+
 Before committing a new or amended spec, walk the gap families in `.claude/skills/spec-gaps/SKILL.md`
 and fix or record each gap as an open question. Open the PR only after that, and say in it that the check ran.
 
