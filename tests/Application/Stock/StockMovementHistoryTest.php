@@ -122,6 +122,15 @@ it('shows Catalogue the quantities and balances of any product without a basket 
         ->and(collect((new ListStock($this->products, $this->movements))($catalogue))->firstWhere('id', $this->honeyId)->available)->toBe('7.000');
 });
 
+it('limits a producer holding Catalogue to its own products when reading as a producer (R25b, R28a)', function () {
+    $both = new Actor('beekeeper-account', [Role::Producer, Role::Catalogue], producerId: 'beekeeper');
+    $oilMaker = new Actor('oil-account', [Role::Producer, Role::Catalogue], producerId: 'oil');
+
+    expect(($this->history)($both, $this->honeyId, asProducer: true)->total)->toBe(4)
+        ->and(($this->history)($oilMaker, $this->honeyId)->total)->toBe(4)
+        ->and(fn () => ($this->history)($oilMaker, $this->honeyId, asProducer: true))->toThrow(AuthorizationException::class);
+});
+
 it('lets the producer see the same lines of their own product without any basket (S93, R25b, R28a)', function () {
     $lines = ($this->history)($this->beekeeper, $this->honeyId)->lines;
 

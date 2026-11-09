@@ -26,11 +26,12 @@ final class ListStockMovements
         private readonly CyclePickupDates $pickupDates,
     ) {}
 
-    public function __invoke(Actor $actor, string $productId, int $page = 1): StockMovementPage
+    /** @param bool $asProducer the Producer area: only the producer's own products, whatever other roles the actor holds (R25b) */
+    public function __invoke(Actor $actor, string $productId, int $page = 1, bool $asProducer = false): StockMovementPage
     {
         $product = $this->products->get($productId) ?? throw StockProductNotFound::withId($productId);
 
-        $seesBaskets = $this->authorize($actor, $product);
+        $seesBaskets = $this->authorize($actor, $product, $asProducer);
 
         $newestFirst = array_reverse($this->withBalances($this->movements->forProduct($productId)));
         $pageMovements = $this->pageOf($newestFirst, max($page, 1));
@@ -68,10 +69,10 @@ final class ListStockMovements
     }
 
     /** @return bool whether the actor may see the baskets behind sales and corrections: only Manager and Finance (D5) */
-    private function authorize(Actor $actor, StockProduct $product): bool
+    private function authorize(Actor $actor, StockProduct $product, bool $asProducer): bool
     {
         $gate = Gate::forUser($actor);
-        if (! $gate->allows('view-stock')) {
+        if ($asProducer || ! $gate->allows('view-stock')) {
             $gate->authorize('owns', ['producer', $product->producerId]);
         }
 

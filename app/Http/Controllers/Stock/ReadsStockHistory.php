@@ -12,10 +12,10 @@ use Illuminate\Http\Request;
 /** Shared by the three pages that show a stock product's history (R28a). */
 trait ReadsStockHistory
 {
-    private function history(Request $request, Actor $actor, ListStockMovements $list, string $stockProduct): StockMovementPage
+    private function history(Request $request, Actor $actor, ListStockMovements $list, string $stockProduct, bool $asProducer = false): StockMovementPage
     {
         try {
-            return $list($actor, $stockProduct, max(1, $request->integer('page', 1)));
+            return $list($actor, $stockProduct, max(1, $request->integer('page', 1)), $asProducer);
         } catch (StockProductNotFound) {
             abort(404);
         }
