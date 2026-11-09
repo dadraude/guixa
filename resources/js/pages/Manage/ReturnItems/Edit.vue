@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { trans } from 'laravel-vue-i18n';
 import { Form, Head } from '@inertiajs/vue3';
-import ReturnItemController from '@/actions/App/Http/Controllers/Manage/ReturnItemController';
+import ReturnItemController from '@/actions/App/Http/Controllers/Catalogue/ReturnItemController';
 import Heading from '@/components/Heading.vue';
 import ReturnItemFields from '@/components/ReturnItemFields.vue';
 import { Button } from '@/components/ui/button';

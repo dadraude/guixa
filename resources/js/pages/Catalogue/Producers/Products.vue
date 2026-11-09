@@ -2,20 +2,23 @@
 import { Form, Head, Link, router } from '@inertiajs/vue3';
 import { trans } from 'laravel-vue-i18n';
 import { shallowRef } from 'vue';
-import ProductClassificationController from '@/actions/App/Http/Controllers/Manage/ProductClassificationController';
+import ProductClassificationController from '@/actions/App/Http/Controllers/Catalogue/ProductClassificationController';
 import ProducerController from '@/actions/App/Http/Controllers/Catalogue/ProducerController';
 import ProducerProductController from '@/actions/App/Http/Controllers/Catalogue/ProducerProductController';
 import WeeklyProductController from '@/actions/App/Http/Controllers/Catalogue/WeeklyProductController';
-import StockProductController from '@/actions/App/Http/Controllers/Manage/StockProductController';
+import StockMovementController from '@/actions/App/Http/Controllers/Catalogue/StockMovementController';
+import StockProductController from '@/actions/App/Http/Controllers/Catalogue/StockProductController';
 import ActiveSwitch from '@/components/ActiveSwitch.vue';
 import Heading from '@/components/Heading.vue';
 import InputError from '@/components/InputError.vue';
 import ProductAdministrationActions from '@/components/ProductAdministrationActions.vue';
 import { Button } from '@/components/ui/button';
 import { formatEuroAmount } from '@/lib/formatEuroAmount';
+import { formatQuantity } from '@/lib/locale';
 
 type AdministrableProduct = App.Http.ProducerProductRow & {
     can: { edit: boolean; changeClassification: boolean; delete: boolean };
+    available: string | null;
 };
 
 const props = defineProps<{
@@ -108,6 +111,25 @@ defineOptions({
                             }}
                             · {{ product.unit }} ·
                             {{ formatEuroAmount(product.price) }}
+                        </p>
+                        <p
+                            v-if="product.available !== null"
+                            class="text-sm text-muted-foreground"
+                            data-test="stock-available"
+                        >
+                            {{
+                                trans(':quantity :unit available', {
+                                    quantity: formatQuantity(product.available),
+                                    unit: product.unit,
+                                })
+                            }}
+                            ·
+                            <Link
+                                class="underline"
+                                :href="StockMovementController.show(product.id)"
+                                :aria-label="`${trans('Movements')}: ${product.name}`"
+                                >{{ trans('Movements') }}</Link
+                            >
                         </p>
                     </div>
                     <div class="flex flex-wrap items-center gap-2">

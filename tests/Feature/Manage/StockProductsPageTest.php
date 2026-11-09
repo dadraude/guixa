@@ -20,14 +20,19 @@ function honey(array $overrides = []): ProductModel
     ]);
 }
 
-function stockCreatePath(): string
+function stockCreatePath(ProducerModel $producer): string
 {
-    return '/manage/producers/'.stockProducer()->id.'/products';
+    return "/catalogue/producers/{$producer->id}/products/stock";
+}
+
+function stockProductsPage(ProducerModel|ProductModel $of): string
+{
+    return '/catalogue/producers/'.($of instanceof ProductModel ? $of->producer_id : $of->id).'/products';
 }
 
 function stockProductPath(ProductModel $product): string
 {
-    return "/manage/producers/{$product->producer_id}/products/{$product->id}";
+    return "/catalogue/producers/{$product->producer_id}/products/stock/{$product->id}";
 }
 
 it('records inventory against the same Catalog product created for a producer (R1a, R26, S71)', function () {
@@ -63,13 +68,13 @@ it('creates stock from the producer record and shows that Catalog ID in stock ad
     $other = ProducerModel::query()->create(['name' => 'Oil producer', 'active' => true, 'cutoff_days_before' => 3, 'cutoff_time' => '20:00']);
     $manager = accountWith(Role::Manager);
 
-    $this->actingAs($manager)->get("/manage/producers/{$producer->id}/products/create")
+    $this->actingAs($manager)->get("/catalogue/producers/{$producer->id}/products/stock/create")
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page->component('Manage/Stock/Create')
             ->where('producer.id', $producer->id)->where('producer.name', 'Beekeeper'));
-    $this->actingAs($manager)->post("/manage/producers/{$producer->id}/products", [
+    $this->actingAs($manager)->post("/catalogue/producers/{$producer->id}/products/stock", [
         'producer_id' => $other->id, 'name' => 'Honey', 'unit' => 'jar', 'price' => '6.50', 'variable' => false,
-    ])->assertRedirect('/manage/stock');
+    ])->assertRedirect(stockProductsPage($producer));
 
     $product = ProductModel::query()->where('name', 'Honey')->firstOrFail();
     expect($product->producer_id)->toBe($producer->id)->and($product->stock)->toBeTrue();
@@ -81,8 +86,8 @@ it('edits stock only through its supplying producer context (R1a, S65, S71)', fu
     $product = honey();
     $other = stockProducer();
     $manager = accountWith(Role::Manager);
-    $own = "/manage/producers/{$product->producer_id}/products/{$product->id}";
-    $wrong = "/manage/producers/{$other->id}/products/{$product->id}";
+    $own = "/catalogue/producers/{$product->producer_id}/products/stock/{$product->id}";
+    $wrong = "/catalogue/producers/{$other->id}/products/stock/{$product->id}";
 
     $this->actingAs($manager)->get($own.'/edit')->assertOk();
     $this->actingAs($manager)->get($wrong.'/edit')->assertNotFound();
@@ -102,13 +107,13 @@ it('keeps the stock pages to managers', function (string $method, string $uri) {
     $this->actingAs(accountWith(Role::Member, Role::Producer))->{$method}($uri)->assertForbidden();
 })->with([
     ['get', '/manage/stock'],
-    ['get', '/manage/producers/{producer}/products/create'],
-    ['post', '/manage/producers/{producer}/products'],
-    ['get', '/manage/producers/{producer}/products/{id}/edit'],
-    ['put', '/manage/producers/{producer}/products/{id}'],
-    ['delete', '/manage/producers/{producer}/products/{id}'],
+    ['get', '/catalogue/producers/{producer}/products/stock/create'],
+    ['post', '/catalogue/producers/{producer}/products/stock'],
+    ['get', '/catalogue/producers/{producer}/products/stock/{id}/edit'],
+    ['put', '/catalogue/producers/{producer}/products/stock/{id}'],
+    ['delete', '/catalogue/producers/{producer}/products/stock/{id}'],
     ['put', '/manage/stock/{id}/available'],
-    ['put', '/manage/producers/{producer}/products/{id}/reactivation'],
+    ['put', '/catalogue/producers/{producer}/products/stock/{id}/reactivation'],
 ]);
 
 it('lists the stock products with their price as a decimal string (R25)', function () {
@@ -125,11 +130,12 @@ it('lists the stock products with their price as a decimal string (R25)', functi
 });
 
 it('creates a stock product from euros and redirects to the list (R25)', function () {
+    $producer = stockProducer();
     $this->actingAs(accountWith(Role::Manager))
-        ->post(stockCreatePath(), [
+        ->post(stockCreatePath($producer), [
             'name' => 'Honey', 'unit' => 'jar', 'price' => '6.50', 'variable' => false, 'containers_per_unit' => '2',
         ])
-        ->assertRedirect('/manage/stock');
+        ->assertRedirect(stockProductsPage($producer));
 
     $product = ProductModel::query()->firstOrFail();
     expect($product->price_cents)->toBe(650)
@@ -138,18 +144,20 @@ it('creates a stock product from euros and redirects to the list (R25)', functio
 });
 
 it('accepts a comma as the decimal separator and a free price', function () {
+    $producer = stockProducer();
     $this->actingAs(accountWith(Role::Manager))
-        ->post(stockCreatePath(), ['name' => 'Sample', 'unit' => 'piece', 'price' => '0', 'variable' => true])
-        ->assertRedirect('/manage/stock');
+        ->post(stockCreatePath($producer), ['name' => 'Sample', 'unit' => 'piece', 'price' => '0', 'variable' => true])
+        ->assertRedirect(stockProductsPage($producer));
     $this->actingAs(accountWith(Role::Manager))
-        ->post(stockCreatePath(), ['name' => 'Oil', 'unit' => 'l', 'price' => '9,5', 'variable' => true])
-        ->assertRedirect('/manage/stock');
+        ->post(stockCreatePath($producer), ['name' => 'Oil', 'unit' => 'l', 'price' => '9,5', 'variable' => true])
+        ->assertRedirect(stockProductsPage($producer));
 
     expect(ProductModel::query()->orderBy('name')->pluck('price_cents')->all())->toBe([950, 0]);
 });
 
 it('shows the domain error when the price is negative (R25)', function () {
-    $createPath = stockCreatePath();
+    $producer = stockProducer();
+    $createPath = stockCreatePath($producer);
     $this->actingAs(accountWith(Role::Manager))
         ->from($createPath.'/create')
         ->post($createPath, ['name' => 'Honey', 'unit' => 'jar', 'price' => '-1.00', 'variable' => false])
@@ -160,7 +168,8 @@ it('shows the domain error when the price is negative (R25)', function () {
 });
 
 it('rejects a malformed price before reaching the use case', function () {
-    $createPath = stockCreatePath();
+    $producer = stockProducer();
+    $createPath = stockCreatePath($producer);
     $this->actingAs(accountWith(Role::Manager))
         ->from($createPath.'/create')
         ->post($createPath, ['name' => 'Honey', 'unit' => 'jar', 'price' => 'abc', 'variable' => false])
@@ -190,7 +199,7 @@ it('updates a stock product (R25)', function () {
         ->put(stockProductPath($product), [
             'name' => 'Wild honey', 'unit' => 'kg', 'price' => '12', 'variable' => true, 'containers_per_unit' => null,
         ])
-        ->assertRedirect('/manage/stock');
+        ->assertRedirect(stockProductsPage($product));
 
     $product->refresh();
     expect($product->name)->toBe('Wild honey')
@@ -202,7 +211,7 @@ it('updates a stock product (R25)', function () {
 it('deactivates a stock product (R25)', function () {
     $product = honey();
 
-    $this->actingAs(accountWith(Role::Manager))->delete(stockProductPath($product))->assertRedirect('/manage/stock');
+    $this->actingAs(accountWith(Role::Manager))->delete(stockProductPath($product))->assertRedirect(stockProductsPage($product));
 
     expect($product->refresh()->active)->toBeFalse();
 });
@@ -212,7 +221,7 @@ it('reactivates a stock product from the manager list', function () {
 
     $this->actingAs(accountWith(Role::Manager))
         ->put(stockProductPath($product).'/reactivation')
-        ->assertRedirect('/manage/stock');
+        ->assertRedirect(stockProductsPage($product));
 
     expect($product->refresh()->active)->toBeTrue();
 });
@@ -264,25 +273,27 @@ it('answers 404 to a stock product id that is not a UUID', function (string $met
         'name' => 'Honey', 'unit' => 'jar', 'price' => '1', 'variable' => false,
     ])->assertNotFound();
 })->with([
-    ['get', '/manage/producers/{producer}/products/not-a-uuid/edit'],
-    ['put', '/manage/producers/{producer}/products/not-a-uuid'],
-    ['delete', '/manage/producers/{producer}/products/not-a-uuid'],
+    ['get', '/catalogue/producers/{producer}/products/stock/not-a-uuid/edit'],
+    ['put', '/catalogue/producers/{producer}/products/stock/not-a-uuid'],
+    ['delete', '/catalogue/producers/{producer}/products/stock/not-a-uuid'],
     ['put', '/manage/stock/not-a-uuid/available'],
-    ['put', '/manage/producers/{producer}/products/not-a-uuid/reactivation'],
+    ['put', '/catalogue/producers/{producer}/products/stock/not-a-uuid/reactivation'],
 ]);
 
 it('accepts a comma as the decimal separator of containers per unit', function () {
+    $producer = stockProducer();
     $this->actingAs(accountWith(Role::Manager))
-        ->post(stockCreatePath(), [
+        ->post(stockCreatePath($producer), [
             'name' => 'Honey', 'unit' => 'jar', 'price' => '1', 'variable' => false, 'containers_per_unit' => '2,5',
         ])
-        ->assertRedirect('/manage/stock');
+        ->assertRedirect(stockProductsPage($producer));
 
     expect(ProductModel::query()->firstOrFail()->containers_per_unit)->toBe('2.500');
 });
 
 it('shows a malformed containers per unit under its field', function () {
-    $createPath = stockCreatePath();
+    $producer = stockProducer();
+    $createPath = stockCreatePath($producer);
     $this->actingAs(accountWith(Role::Manager))
         ->from($createPath.'/create')
         ->post($createPath, [
@@ -422,7 +433,7 @@ it('shows permanent stock unit protection after a movement and still accepts met
     expect($product->refresh()->unit)->toBe('jar');
     $this->actingAs($manager)->put(stockProductPath($product), [
         'name' => 'Raw honey', 'unit' => 'jar', 'price' => '7.00', 'variable' => false, 'containers_per_unit' => '3',
-    ])->assertRedirect('/manage/stock');
+    ])->assertRedirect(stockProductsPage($product));
     expect($product->refresh()->name)->toBe('Raw honey')
         ->and($product->price_cents)->toBe(700)
         ->and($product->containers_per_unit)->toBe('3.000');

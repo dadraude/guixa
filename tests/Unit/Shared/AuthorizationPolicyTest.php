@@ -21,6 +21,20 @@ it('keeps broad permissions tied to the exact role combinations', function () {
     }
 });
 
+it('lets the manager, Finance and Catalogue read stock and return items, and nobody else (R4, R5)', function () {
+    $readers = [Actor::manager('manager'), new Actor('finance', [Role::Finance]), new Actor('catalogue', [Role::Catalogue])];
+    $others = [Actor::memberOf('member', 'h1'), Actor::producer('producer', 'p1'), new Actor('receiver', [Role::Receiver])];
+
+    foreach ($readers as $actor) {
+        expect(Gate::forUser($actor)->allows('view-stock'))->toBeTrue()
+            ->and(Gate::forUser($actor)->allows('view-return-items'))->toBeTrue();
+    }
+    foreach ($others as $actor) {
+        expect(Gate::forUser($actor)->allows('view-stock'))->toBeFalse()
+            ->and(Gate::forUser($actor)->allows('view-return-items'))->toBeFalse();
+    }
+});
+
 it('requires a real household link for membership and preserves collection overrides', function () {
     $member = Actor::memberOf('member', 'h1');
     $manager = Actor::manager('manager');
@@ -48,7 +62,7 @@ it('requires the producer role and matching ID even for combined or malformed ac
         ->and(Gate::forUser($owner)->allows('producer'))->toBeTrue();
 });
 
-it('lets a weekly product be edited by its producer, Catalogue or the manager, and stock only be deleted by the manager', function () {
+it('lets a weekly product be edited by its producer, Catalogue or the manager, and stock be deleted by the manager or Catalogue', function () {
     $weekly = Product::create('weekly', 'p1', 'Bread', 'unit', Money::ofCents(100), false, null);
     $stock = Product::create('stock', 'p1', 'Bread', 'unit', Money::ofCents(100), false, null, true);
     $owner = Actor::producer('owner', 'p1');
@@ -69,7 +83,8 @@ it('lets a weekly product be edited by its producer, Catalogue or the manager, a
         ->and(Gate::forUser($manager)->allows('delete', $weekly))->toBeTrue()
         ->and(Gate::forUser($catalogue)->allows('delete', $weekly))->toBeTrue()
         ->and(Gate::forUser($owner)->allows('delete', $stock))->toBeFalse()
-        ->and(Gate::forUser($catalogue)->allows('delete', $stock))->toBeFalse()
+        ->and(Gate::forUser($catalogue)->allows('delete', $stock))->toBeTrue()
+        ->and(Gate::forUser($ownerWithCatalogue)->allows('delete', $stock))->toBeTrue()
         ->and(Gate::forUser($manager)->allows('delete', $stock))->toBeTrue()
         ->and(fn () => Gate::forUser($other)->authorize('delete', $weekly))->toThrow(AuthorizationException::class);
 

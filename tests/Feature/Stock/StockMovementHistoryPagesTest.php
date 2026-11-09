@@ -129,6 +129,17 @@ it('forbids the producer another producer\'s stock history and shows a weekly pr
     $this->get('/producer/stock/'.Str::uuid7().'/movements')->assertNotFound();
 });
 
+it('keeps a producer holding Catalogue to its own products on the producer route and gives it every product under /catalogue (R25b, R28a)', function () {
+    $both = historyProducerAccount($this->oilMaker);
+    DB::table('account_roles')->insert(['user_id' => $both->id, 'role' => Role::Catalogue->value]);
+
+    $this->actingAs($both)->get("/producer/stock/{$this->honey->id}/movements")->assertForbidden();
+    $this->get("/producer/stock/{$this->oil->id}/movements")->assertOk();
+    $this->get("/catalogue/stock/{$this->honey->id}/movements")->assertOk()
+        ->assertInertia(fn (Assert $page) => $page->component('Catalogue/Stock/Movements')->where('history.total', 4)->where('history.lines.0.basketId', null));
+    $this->get("/catalogue/stock/{$this->oil->id}/movements")->assertOk();
+});
+
 it('forbids members, producers and Finance outside their area (S93)', function () {
     $this->actingAs(accountWith(Role::Member))->get("/finance/stock/{$this->honey->id}/movements")->assertForbidden();
     $this->get('/finance/stock')->assertForbidden();

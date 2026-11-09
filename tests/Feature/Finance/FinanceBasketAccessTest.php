@@ -91,7 +91,7 @@ it('lets Finance-only add, remove and validate return contents without catalogue
         ->and(DB::table('wallet_movements')->where('basket_id', $basket)->value('type'))->toBe('credit')
         ->and((int) DB::table('wallet_movements')->where('basket_id', $basket)->value('amount_cents'))->toBe(150)
         ->and(DB::table('basket_lines')->where('basket_id', $basket)->count())->toBe(2);
-    $this->get('/manage/return-items')->assertForbidden();
+    $this->get('/catalogue/return-items')->assertForbidden();
 });
 
 it('returns a domain error for an over-limit return request without changing the Finance draft or ledgers (R20a)', function () {
@@ -127,7 +127,7 @@ it('keeps Finance out of account, catalogue, cycle, reception, stock administrat
     $this->get('/manage/stock')->assertForbidden();
     $this->get('/manage/cycles')->assertForbidden();
     $this->get('/manage/producers')->assertForbidden();
-    $this->get('/manage/return-items')->assertForbidden();
+    $this->get('/catalogue/return-items')->assertForbidden();
     $this->post('/manage/roles/finance/holders', ['account_id' => $finance->id])->assertForbidden();
     $this->post('/manage/households', ['name' => 'X'])->assertForbidden();
     $this->get('/dashboard')->assertInertia(fn (Assert $page) => $page

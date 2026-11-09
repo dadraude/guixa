@@ -21,7 +21,7 @@ final class ProductPolicy
     public function delete(Actor $actor, Product $product): bool
     {
         return $product->isStock()
-            ? $actor->hasRole(Role::Manager)
+            ? Gate::forUser($actor)->allows('administer-catalogue')
             : $this->update($actor, $product);
     }
 

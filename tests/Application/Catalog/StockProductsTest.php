@@ -15,6 +15,8 @@ use Guixa\Catalog\Domain\Error\ProducerNotFound;
 use Guixa\Catalog\Domain\Error\ProductHasStockUse;
 use Guixa\Catalog\Domain\Error\ProductNotFound;
 use Guixa\Catalog\Domain\Error\ProductUsed;
+use Guixa\Shared\Application\Actor;
+use Guixa\Shared\Domain\Role;
 use Illuminate\Auth\Access\AuthorizationException;
 use Tests\Support\Catalog\CatalogWorld;
 
@@ -143,6 +145,18 @@ it('lets only a manager reclassify an unused product and transfers administratio
     expect($world->products->get($weeklyId)->isStock())->toBeFalse();
 });
 
+it('lets Catalogue reclassify an unused product, as the manager does, and refuses a Finance account (R4, 001 R1b, S6)', function () {
+    $world = new CatalogWorld;
+    $producerId = ($world->createProducer)($world->manager, 'Beekeeper', 3, '20:00');
+    $weeklyId = ($world->createProduct)($world->producerActor($producerId), $producerId, 'Honey', 'jar', 500, false, null);
+    $change = new ChangeProductClassification($world->products, $world->usage, $world->transactions);
+
+    $change($world->catalogueActor(), $weeklyId, true);
+
+    expect($world->products->get($weeklyId)->isStock())->toBeTrue()
+        ->and(fn () => $change(new Actor('00000000-0000-7000-8000-0000000000ff', [Role::Finance]), $weeklyId, false))->toThrow(AuthorizationException::class);
+});
+
 it('deletes only unused products through their current administrator (R1c, S70)', function () {
     $world = new CatalogWorld;
     $producerId = ($world->createProducer)($world->manager, 'Beekeeper', 3, '20:00');
@@ -152,10 +166,10 @@ it('deletes only unused products through their current administrator (R1c, S70)'
     $delete = new DeleteUnusedProduct($world->products, $world->usage, $world->transactions);
 
     expect(fn () => $delete($world->producerActor('another-producer'), $weeklyId))->toThrow(AuthorizationException::class)
-        ->and(fn () => $delete($world->catalogueActor(), $stockId))->toThrow(AuthorizationException::class)
+        ->and(fn () => $delete(new Actor('00000000-0000-7000-8000-0000000000ff', [Role::Finance]), $stockId))->toThrow(AuthorizationException::class)
         ->and(fn () => $delete($producer, $stockId))->toThrow(AuthorizationException::class);
     $delete($producer, $weeklyId);
-    $delete($world->manager, $stockId);
+    $delete($world->catalogueActor(), $stockId);
     expect($world->products->get($weeklyId))->toBeNull()
         ->and($world->products->get($stockId))->toBeNull();
 });
@@ -213,4 +227,50 @@ it('answers whether a product has any retained use for administration controls (
     expect($query($id))->toBeFalse();
     $world->usage->any[$id] = true;
     expect($query($id))->toBeTrue();
+});
+
+it('lets Catalogue, and a producer account holding it, administer stock products of any producer (R4, R25b, S6)', function (Actor $actor) {
+    $world = new CatalogWorld;
+    $producerId = ($world->createProducer)($world->manager, 'Beekeeper', 3, '20:00');
+    $create = new CreateStockProduct($world->products, $world->producers);
+    $update = new UpdateStockProduct($world->products, $world->usage, $world->transactions);
+
+    $stockId = $create($actor, $producerId, 'Honey', 'jar', 650, false, null);
+    $update($actor, $producerId, $stockId, 'Raw honey', 'jar', 700, false, null);
+    (new DeactivateStockProduct($world->products, $world->transactions))($actor, $producerId, $stockId);
+    expect($world->products->get($stockId)->isActive())->toBeFalse();
+    (new ReactivateStockProduct($world->products, $world->transactions))($actor, $producerId, $stockId);
+
+    expect($world->products->get($stockId)->isActive())->toBeTrue()
+        ->and($world->products->get($stockId)->name())->toBe('Raw honey');
+})->with([
+    'catalogue' => fn () => (new CatalogWorld)->catalogueActor(),
+    'producer with catalogue' => fn () => new Actor('00000000-0000-7000-8000-0000000000dd', [Role::Producer, Role::Catalogue], producerId: 'any-producer'),
+]);
+
+it('refuses stock administration to a producer account without Catalogue, Finance and receivers (R4, 001 R25b)', function (Actor $actor) {
+    $world = new CatalogWorld;
+    $producerId = ($world->createProducer)($world->manager, 'Beekeeper', 3, '20:00');
+    $stockId = (new CreateStockProduct($world->products, $world->producers))($world->manager, $producerId, 'Honey', 'jar', 650, false, null);
+
+    expect(fn () => (new CreateStockProduct($world->products, $world->producers))($actor, $producerId, 'Jam', 'jar', 300, false, null))->toThrow(AuthorizationException::class)
+        ->and(fn () => (new UpdateStockProduct($world->products, $world->usage, $world->transactions))($actor, $producerId, $stockId, 'Honey', 'jar', 650, false, null))->toThrow(AuthorizationException::class)
+        ->and(fn () => (new DeactivateStockProduct($world->products, $world->transactions))($actor, $producerId, $stockId))->toThrow(AuthorizationException::class)
+        ->and(fn () => (new ReactivateStockProduct($world->products, $world->transactions))($actor, $producerId, $stockId))->toThrow(AuthorizationException::class);
+})->with([
+    'own producer' => fn () => Actor::producer('00000000-0000-7000-8000-0000000000aa', 'any-producer'),
+    'finance' => fn () => new Actor('00000000-0000-7000-8000-0000000000ff', [Role::Finance]),
+    'receiver' => fn () => new Actor('00000000-0000-7000-8000-0000000000ee', [Role::Receiver]),
+]);
+
+it('shows Catalogue the stock classification and edit flags on a producer\'s products (R4, S6)', function () {
+    $world = new CatalogWorld;
+    $producerId = ($world->createProducer)($world->manager, 'Beekeeper', 3, '20:00');
+    $stockId = (new CreateStockProduct($world->products, $world->producers))($world->manager, $producerId, 'Honey', 'jar', 650, false, null);
+
+    $row = collect((new ListProductsOfProducer($world->products, $world->usage))($world->catalogueActor(), $producerId))->firstWhere('id', $stockId);
+
+    expect($row->canEdit)->toBeTrue()
+        ->and($row->canChangeClassification)->toBeTrue()
+        ->and($row->canDelete)->toBeTrue();
 });

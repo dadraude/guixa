@@ -24,7 +24,7 @@ final class ListStock
      */
     public function __invoke(Actor $actor, bool $includeInactive = false): array
     {
-        Gate::forUser($actor)->authorize('manage-sales');
+        Gate::forUser($actor)->authorize('view-stock');
 
         $available = $this->movements->availableByProduct();
 

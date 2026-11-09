@@ -35,7 +35,7 @@ it('shows both product modes from the Manager producer record with weekly edit r
 it('reclassifies an unused product only as Manager and transfers its administrator (S67)', function () {
     $producer = catalogueSupplier();
     $product = catalogueRecord($producer);
-    $path = "/manage/products/{$product->id}/classification";
+    $path = "/catalogue/products/{$product->id}/classification";
     $this->actingAs(accountWith(Role::Manager))->put($path, ['stock' => true])
         ->assertRedirect("/catalogue/producers/{$producer->id}/products");
     expect($product->refresh()->stock)->toBeTrue();
@@ -43,12 +43,12 @@ it('reclassifies an unused product only as Manager and transfers its administrat
     DB::table('account_roles')->insert(['user_id' => $producerAccount->id, 'role' => Role::Producer->value]);
     $this->actingAs($producerAccount)->get("/producer/products/{$product->id}/edit")->assertNotFound();
     $this->actingAs($producerAccount)->put($path, ['stock' => false])->assertForbidden();
-    $this->actingAs(accountWith(Role::Manager))->get("/manage/producers/{$producer->id}/products/{$product->id}/edit")->assertOk();
+    $this->actingAs(accountWith(Role::Manager))->get("/catalogue/producers/{$producer->id}/products/stock/{$product->id}/edit")->assertOk();
     $this->actingAs(accountWith(Role::Manager))->put($path, ['stock' => false])
         ->assertRedirect("/catalogue/producers/{$producer->id}/products");
     expect($product->refresh()->stock)->toBeFalse();
     $this->actingAs($producerAccount)->get("/producer/products/{$product->id}/edit")->assertOk();
-    $this->actingAs(accountWith(Role::Manager))->get("/manage/producers/{$producer->id}/products/{$product->id}/edit")->assertNotFound();
+    $this->actingAs(accountWith(Role::Manager))->get("/catalogue/producers/{$producer->id}/products/stock/{$product->id}/edit")->assertNotFound();
 });
 
 it('keeps Manager catalogue access separate from producer administration including mixed-role accounts (S67, S70)', function () {

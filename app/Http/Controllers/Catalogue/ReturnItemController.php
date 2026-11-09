@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Manage;
+namespace App\Http\Controllers\Catalogue;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Manage\ReturnItemRequest;
@@ -33,7 +33,7 @@ class ReturnItemController extends Controller
     {
         $create($actor, $request->string('name')->toString(), $request->amountCents());
 
-        return to_route('manage.return-items.index');
+        return to_route('catalogue.return-items.index');
     }
 
     public function edit(string $returnItem, Actor $actor, ListReturnItems $list): Response
@@ -48,20 +48,20 @@ class ReturnItemController extends Controller
     {
         $update($actor, $returnItem, $request->string('name')->toString(), $request->amountCents());
 
-        return to_route('manage.return-items.index');
+        return to_route('catalogue.return-items.index');
     }
 
     public function destroy(string $returnItem, Actor $actor, DeactivateReturnItem $deactivate): RedirectResponse
     {
         $deactivate($actor, $returnItem);
 
-        return to_route('manage.return-items.index');
+        return to_route('catalogue.return-items.index');
     }
 
     public function reactivate(string $returnItem, Actor $actor, ReactivateReturnItem $reactivate): RedirectResponse
     {
         $reactivate($actor, $returnItem);
 
-        return to_route('manage.return-items.index');
+        return to_route('catalogue.return-items.index');
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Manage;
+namespace App\Http\Controllers\Catalogue;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Manage\ProductClassificationRequest;

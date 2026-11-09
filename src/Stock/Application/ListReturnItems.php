@@ -13,7 +13,7 @@ final class ListReturnItems
     /** @return list<ReturnItemData> */
     public function __invoke(Actor $actor): array
     {
-        Gate::forUser($actor)->authorize('manage-sales');
+        Gate::forUser($actor)->authorize('view-return-items');
 
         return array_map(
             fn ($item) => new ReturnItemData($item->id, $item->name(), $item->amount()->cents, $item->isActive()),

@@ -83,7 +83,7 @@ it('sends guests to the login page and moves the producer products page out of /
     $producer = areaProducer();
 
     $this->get('/catalogue/producers')->assertRedirect(route('login'));
-    $this->actingAs(accountWith(Role::Manager))->get("/manage/producers/{$producer->id}/products")->assertMethodNotAllowed();
+    $this->actingAs(accountWith(Role::Manager))->get("/manage/producers/{$producer->id}/products")->assertNotFound();
 });
 
 // R2, R15, S1 — a Catalogue-only account with no household
@@ -133,38 +133,123 @@ it('keeps producer administration routes closed to Catalogue (R5)', function (st
     ['post', '/manage/producers/{producer}/account'],
     ['post', '/manage/producers/{producer}/deactivation'],
     ['delete', '/manage/producers/{producer}/deactivation'],
-    ['get', '/manage/producers/{producer}/products/create'],
 ]);
 
 // R3 — the producer's products page with can flags
 
-it('shows both modes with can flags: Catalogue edits weekly products only, Manager keeps stock (R3, R5)', function () {
+it('shows both modes with can flags and the available quantity of stock products to Catalogue and Manager (R3, R4, R5)', function (Role $role) {
     $producer = areaProducer();
     $weekly = areaProduct($producer, ['name' => 'Bread']);
     $stock = areaProduct($producer, ['name' => 'Honey', 'stock' => true]);
+    DB::table('stock_movements')->insert([
+        'id' => (string) Str::uuid7(), 'product_id' => $stock->id, 'type' => 'entry', 'quantity' => '12.500',
+        'occurred_at' => now(), 'recorded_by' => accountWith(Role::Manager)->id,
+    ]);
 
-    $this->actingAs(accountWith(Role::Catalogue))->get("/catalogue/producers/{$producer->id}/products")
+    $this->actingAs(accountWith($role))->get("/catalogue/producers/{$producer->id}/products")
         ->assertInertia(fn (Assert $page) => $page->component('Catalogue/Producers/Products')
-            ->where('canCreateStock', false)
+            ->where('canCreateStock', true)
             ->where('products.0.id', $weekly->id)
-            ->where('products.0.can', ['edit' => true, 'changeClassification' => false, 'delete' => true])
+            ->where('products.0.available', null)
+            ->where('products.0.can', ['edit' => true, 'changeClassification' => true, 'delete' => true])
             ->where('products.1.id', $stock->id)
-            ->where('products.1.can', ['edit' => false, 'changeClassification' => false, 'delete' => false]));
+            ->where('products.1.available', '12.500')
+            ->where('products.1.can', ['edit' => true, 'changeClassification' => true, 'delete' => true]));
+})->with([Role::Catalogue, Role::Manager]);
 
-    $this->actingAs(accountWith(Role::Manager))->get("/catalogue/producers/{$producer->id}/products")
-        ->assertInertia(fn (Assert $page) => $page->where('canCreateStock', true)
-            ->where('products.0.can.edit', true)->where('products.1.can', ['edit' => true, 'changeClassification' => true, 'delete' => true]));
+it('lets Catalogue administer a stock product through the Catàleg routes and changes its stock flag (R4, S6)', function () {
+    $producer = areaProducer();
+    $catalogue = accountWith(Role::Catalogue);
+    $products = "/catalogue/producers/{$producer->id}/products";
+
+    $this->actingAs($catalogue)->get("{$products}/stock/create")->assertInertia(fn (Assert $page) => $page->component('Manage/Stock/Create')->where('producer.id', $producer->id));
+    $this->actingAs($catalogue)->post("{$products}/stock", ['name' => 'Honey', 'unit' => 'jar', 'price' => '6.50', 'variable' => false])->assertRedirect($products);
+    $stock = ProductModel::query()->where('producer_id', $producer->id)->firstOrFail();
+    expect($stock->stock)->toBeTrue();
+
+    $this->actingAs($catalogue)->get("{$products}/stock/{$stock->id}/edit")->assertInertia(fn (Assert $page) => $page->component('Manage/Stock/Edit')->where('product.id', $stock->id));
+    $this->actingAs($catalogue)->put("{$products}/stock/{$stock->id}", ['name' => 'Raw honey', 'unit' => 'jar', 'price' => '7.00', 'variable' => false])->assertRedirect($products);
+    expect($stock->refresh()->name)->toBe('Raw honey');
+
+    $this->actingAs($catalogue)->from($products)->delete("{$products}/stock/{$stock->id}")->assertRedirect($products);
+    expect($stock->refresh()->active)->toBeFalse();
+    $this->actingAs($catalogue)->from($products)->put("{$products}/stock/{$stock->id}/reactivation")->assertRedirect($products);
+    expect($stock->refresh()->active)->toBeTrue();
+
+    $this->actingAs($catalogue)->put("/catalogue/products/{$stock->id}/classification", ['stock' => false])->assertRedirect($products);
+    expect($stock->refresh()->stock)->toBeFalse();
+
+    $this->actingAs($catalogue)->put("/catalogue/products/{$stock->id}/classification", ['stock' => true]);
+    $this->actingAs($catalogue)->delete("{$products}/stock/{$stock->id}/unused")->assertRedirect($products);
+    expect(ProductModel::query()->whereKey($stock->id)->exists())->toBeFalse();
 });
 
-it('keeps stock actions on the Manager-only routes until Catalogue administers stock (R3)', function () {
-    $producer = areaProducer();
-    $stock = areaProduct($producer, ['stock' => true]);
-    $catalogue = accountWith(Role::Catalogue);
+it('refuses Catalogue the manager-only stock routes and closes the old /manage stock URLs (R4, S6, R14)', function (string $method, string $uri) {
+    $stock = areaProduct(areaProducer(), ['stock' => true]);
+    $uri = str_replace('{id}', $stock->id, $uri);
 
-    $this->actingAs($catalogue)->get("/manage/producers/{$producer->id}/products/create")->assertForbidden();
-    $this->actingAs($catalogue)->put("/manage/products/{$stock->id}/classification", ['stock' => false])->assertForbidden();
-    $this->actingAs(accountWith(Role::Manager))->put("/manage/products/{$stock->id}/classification", ['stock' => false])
-        ->assertRedirect("/catalogue/producers/{$producer->id}/products");
+    $this->actingAs(accountWith(Role::Catalogue))->{$method}($uri)->assertForbidden();
+})->with([
+    ['get', '/manage/stock'],
+    ['get', '/manage/stock/{id}/movements'],
+    ['post', '/manage/stock/{id}/entries'],
+    ['post', '/manage/stock/{id}/adjustments'],
+    ['put', '/manage/stock/{id}/available'],
+    ['get', '/manage/cycles'],
+    ['post', '/manage/cycles'],
+]);
+
+it('answers 404 on the old Manager stock, classification and return-item URLs (R4, R5)', function (string $method, string $uri) {
+    $stock = areaProduct(areaProducer(), ['stock' => true]);
+
+    $this->actingAs(accountWith(Role::Manager))->{$method}(str_replace('{id}', $stock->id, $uri))->assertNotFound();
+})->with([
+    ['put', '/manage/products/{id}/classification'],
+    ['get', '/manage/return-items'],
+    ['get', '/manage/producers/{id}/products/create'],
+]);
+
+it('lets a producer account holding Catalogue edit its own stock product through the Catàleg and not from its Producer area (R4, 001 R25b)', function () {
+    $producer = areaProducer();
+    $stock = areaProduct($producer, ['name' => 'Honey', 'stock' => true]);
+    $both = areaProducerAccount($producer, Role::Catalogue);
+    $products = "/catalogue/producers/{$producer->id}/products";
+
+    $this->actingAs($both)->get('/producer/products')->assertInertia(fn (Assert $page) => $page->has('products', 0));
+    $this->actingAs($both)->get("/producer/products/{$stock->id}/edit")->assertNotFound();
+    $this->actingAs($both)->put("/producer/products/{$stock->id}", weeklyForm(['price' => '1.00']))->assertForbidden();
+    expect($stock->refresh()->price_cents)->toBe(300);
+
+    $this->actingAs($both)->put("{$products}/stock/{$stock->id}", ['name' => 'Honey', 'unit' => 'kg', 'price' => '1.00', 'variable' => false])->assertRedirect($products);
+    expect($stock->refresh()->price_cents)->toBe(100);
+});
+
+it('shows Catalogue the stock history with quantities and no basket, while Manager and Finance keep their links (R4, D5)', function () {
+    $producer = areaProducer();
+    $honey = areaProduct($producer, ['name' => 'Honey', 'stock' => true]);
+    $author = accountWith(Role::Manager);
+    $basket = (string) Str::uuid7();
+    $household = (string) Str::uuid7();
+    DB::table('households')->insert(['id' => $household, 'name' => 'Household A', 'created_at' => now(), 'updated_at' => now()]);
+    DB::table('baskets')->insert(['id' => $basket, 'household_id' => $household, 'household_name' => 'Household A', 'kind' => 'stock', 'state' => 'draft', 'created_by' => $author->id, 'created_at' => now()]);
+    foreach ([['entry', '10.000', null], ['sale', '-3.000', $basket]] as $i => [$type, $quantity, $basketId]) {
+        DB::table('stock_movements')->insert([
+            'id' => (string) Str::uuid7(), 'product_id' => $honey->id, 'type' => $type, 'quantity' => $quantity,
+            'occurred_at' => "2026-10-20 09:0{$i}:00+00", 'recorded_by' => $author->id, 'basket_id' => $basketId,
+        ]);
+    }
+    $history = "/catalogue/stock/{$honey->id}/movements";
+
+    $this->actingAs(accountWith(Role::Catalogue))->get($history)->assertOk()
+        ->assertInertia(fn (Assert $page) => $page->component('Catalogue/Stock/Movements')
+            ->where('product.available', '7.000')
+            ->where('history.lines.0.type', 'sale')->where('history.lines.0.quantity', '-3.000')->where('history.lines.0.basketId', null));
+    $this->actingAs(accountWith(Role::Manager))->get($history)
+        ->assertInertia(fn (Assert $page) => $page->where('history.lines.0.basketId', $basket));
+    $this->actingAs(accountWith(Role::Finance))->get("/finance/stock/{$honey->id}/movements")
+        ->assertInertia(fn (Assert $page) => $page->where('history.lines.0.basketId', $basket));
+    $this->actingAs(accountWith(Role::Finance))->get($history)->assertForbidden();
+    $this->actingAs(accountWith(Role::Catalogue))->get('/catalogue/stock/'.Str::uuid7().'/movements')->assertNotFound();
 });
 
 it('creates, edits, deactivates, reactivates and deletes a weekly product of any producer (R3)', function (Role $role) {

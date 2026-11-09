@@ -15,7 +15,7 @@ final class CreateReturnItem
     /** @return string the new return item's id */
     public function __invoke(Actor $actor, string $name, int $amountCents): string
     {
-        Gate::forUser($actor)->authorize('manage');
+        Gate::forUser($actor)->authorize('administer-catalogue');
 
         $item = ReturnItem::create($this->items->nextId(), $name, Money::ofCents($amountCents));
         $this->items->add($item);

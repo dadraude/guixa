@@ -79,7 +79,7 @@ it('fails on an unknown return item', function () {
     expect(fn () => ($this->reactivate)($this->manager, 'missing'))->toThrow(ReturnItemNotFound::class);
 });
 
-it('only lets a manager manage return items (R25, R36a)', function (Role $role) {
+it('only lets the manager and Catalogue manage return items (R25, R36a)', function (Role $role) {
     $actor = new Actor('other-account', [$role], $role === Role::Member ? 'h1' : null);
     $id = ($this->create)($this->manager, 'Glass jar', 50);
 
@@ -88,7 +88,22 @@ it('only lets a manager manage return items (R25, R36a)', function (Role $role) 
     expect(fn () => ($this->deactivate)($actor, $id))->toThrow(AuthorizationException::class);
     expect(fn () => ($this->reactivate)($actor, $id))->toThrow(AuthorizationException::class);
     expect(fn () => ($this->list)($actor))->toThrow(AuthorizationException::class);
-})->with([Role::Member, Role::Producer]);
+})->with([Role::Member, Role::Producer, Role::Receiver]);
+
+it('lets Catalogue administer and list the return-item catalogue (R5, 001 R20a, S6)', function () {
+    $catalogue = new Actor('catalogue-account', [Role::Catalogue]);
+
+    $id = ($this->create)($catalogue, 'Glass jar', 50);
+    ($this->update)($catalogue, $id, 'Big jar', 80);
+    ($this->deactivate)($catalogue, $id);
+    expect(($this->list)($catalogue)[0]->active)->toBeFalse();
+    ($this->reactivate)($catalogue, $id);
+
+    $item = ($this->list)($catalogue)[0];
+    expect($item->name)->toBe('Big jar')
+        ->and($item->amountCents)->toBe(80)
+        ->and($item->active)->toBeTrue();
+});
 
 it('lets Finance read return choices for basket sales without editing the catalogue (R20a, R25)', function () {
     $id = ($this->create)($this->manager, 'Glass jar', 50);

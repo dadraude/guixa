@@ -15,6 +15,7 @@ const pilotPages = new Set([
     'Producer/Stock/Movements',
     'Finance/Stock/Index',
     'Finance/Stock/Movements',
+    'Catalogue/Stock/Movements',
     'Manage/Accounts/Index',
     'Manage/Households/Index',
     'Manage/Households/Show',

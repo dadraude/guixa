@@ -30,7 +30,7 @@ import HouseholdController from '@/actions/App/Http/Controllers/Manage/Household
 import ProducerController from '@/actions/App/Http/Controllers/Manage/ProducerController';
 import StockProductController from '@/actions/App/Http/Controllers/Manage/StockProductController';
 import AccountController from '@/actions/App/Http/Controllers/Manage/AccountController';
-import ReturnItemController from '@/actions/App/Http/Controllers/Manage/ReturnItemController';
+import ReturnItemController from '@/actions/App/Http/Controllers/Catalogue/ReturnItemController';
 import SettingsController from '@/actions/App/Http/Controllers/Manage/SettingsController';
 import ProductController from '@/actions/App/Http/Controllers/Producer/ProductController';
 import CutoffController from '@/actions/App/Http/Controllers/Producer/CutoffController';

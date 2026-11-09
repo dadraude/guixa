@@ -26,7 +26,6 @@ final class ListProductsOfProducer
         );
     }
 
-    /** Stock products and their classification stay with the Manager until Catalogue administers stock. */
     private function row(Actor $actor, Product $product): ProductAdministrationData
     {
         $gate = Gate::forUser($actor);
@@ -34,8 +33,8 @@ final class ListProductsOfProducer
         return ProductAdministrationData::of(
             $product,
             $this->usage->hasAny($product->id),
-            canEdit: $product->isStock() ? $gate->allows('manage') : $gate->allows('update', $product),
-            canChangeClassification: $gate->allows('manage'),
+            canEdit: $product->isStock() ? $gate->allows('administer-catalogue') : $gate->allows('update', $product),
+            canChangeClassification: $gate->allows('administer-catalogue'),
             canDelete: $gate->allows('delete', $product),
         );
     }

@@ -16,7 +16,7 @@ final class StockMovementController extends Controller
 
     public function show(string $stockProduct, Request $request, Actor $actor, ListStockMovements $list): Response
     {
-        $page = $this->history($request, $actor, $list, $stockProduct);
+        $page = $this->history($request, $actor, $list, $stockProduct, asProducer: true);
 
         return Inertia::render('Producer/Stock/Movements', [
             'product' => ['name' => $page->productName, 'unit' => $page->unit, 'available' => $page->available],

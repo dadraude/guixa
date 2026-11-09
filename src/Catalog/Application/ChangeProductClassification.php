@@ -20,7 +20,7 @@ final class ChangeProductClassification
 
     public function __invoke(Actor $actor, string $id, bool $stock): void
     {
-        Gate::forUser($actor)->authorize('manage');
+        Gate::forUser($actor)->authorize('administer-catalogue');
 
         $this->transactions->run(function () use ($id, $stock): void {
             $product = $this->products->getForUpdate($id) ?? throw ProductNotFound::withId($id);
