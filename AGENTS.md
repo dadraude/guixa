@@ -12,6 +12,13 @@ main checkout stays on `main` and is for reading only.
 
 Done when `git -C <worktree> status` shows the change and the main checkout's `git status` shows none.
 
+## Demo seeder
+
+When a change adds or alters data a user sees (roles, entities, states, new screens), check
+`database/seeders/DemoSeeder.php` and update it so the demo shows the change. Extend
+`tests/Feature/Database/DemoSeederTest.php` to cover what you add. If the seeder needs no change, say so
+in the handoff.
+
 ## Versioned history
 
 Record each new Request, Q&A, Change or Deviation in its own file under
