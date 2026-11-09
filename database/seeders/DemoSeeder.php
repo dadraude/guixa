@@ -8,6 +8,7 @@ use Guixa\Catalog\Application\CreateProducer;
 use Guixa\Catalog\Application\CreateProduct;
 use Guixa\Catalog\Application\CreateStockProduct;
 use Guixa\Membership\Application\CreateHousehold;
+use Guixa\Membership\Application\GrantStaffRole;
 use Guixa\Membership\Domain\Account;
 use Guixa\Membership\Domain\AccountPasswords;
 use Guixa\Membership\Domain\AccountRepository;
@@ -26,6 +27,7 @@ use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Application\ActorResolver;
 use Guixa\Shared\Domain\Clock;
 use Guixa\Shared\Domain\Quantity;
+use Guixa\Shared\Domain\Role;
 use Guixa\Stock\Application\RecordStockEntry;
 use Guixa\Wallet\Application\RecordTopUp;
 use Illuminate\Database\Seeder;
@@ -45,6 +47,12 @@ final class DemoSeeder extends Seeder
         ['La Plaça', 'Biel Soler', 'biel@demo.guixa.test', 7500],
         ['Els Pins', 'Carla Pons', 'carla@demo.guixa.test', 5000],
         ['La Font', 'David Font', 'david@demo.guixa.test', 2500],
+    ];
+
+    /** Staff roles granted to the households' accounts, by household index, so the role screen has holders. */
+    private const array STAFF_ROLES = [
+        0 => [Role::Finance],
+        1 => [Role::Catalogue, Role::Receiver],
     ];
 
     private const array PRODUCERS = [
@@ -91,6 +99,7 @@ final class DemoSeeder extends Seeder
             self::MANAGER_ID, 'Gestora Demo', Email::from(self::MANAGER_EMAIL),
         ));
         $members = $this->createHouseholds($manager);
+        $this->grantStaffRoles($manager, $members);
         $catalog = $this->createCatalog($manager);
         $this->createStock($manager, $catalog['producers'][0]);
         $dates = $this->pickupDates();
@@ -151,6 +160,16 @@ final class DemoSeeder extends Seeder
         }
 
         return $members;
+    }
+
+    /** @param list<array{actor: Actor, householdId: string}> $members */
+    private function grantStaffRoles(Actor $manager, array $members): void
+    {
+        foreach (self::STAFF_ROLES as $memberIndex => $roles) {
+            foreach ($roles as $role) {
+                app(GrantStaffRole::class)($manager, $members[$memberIndex]['actor']->accountId, $role->value);
+            }
+        }
     }
 
     /** @return array{producers: list<string>, products: list<array{id: string, producerId: string}>} */
