@@ -58,6 +58,7 @@ Checked on `origin/main` (`7162f52b`):
 | `manage` | Manager | unchanged: cycles, households, accounts, producers' administration, stock entries/adjustments |
 | `manage-roles` *(planned)* | Manager | grant, remove, list holders, search candidates (R1, R9–R11) |
 | `administer-catalogue` *(planned)* | Manager, Catalogue | any producer's weekly and stock products, classification, per-cycle availability, return items (R3–R5) |
+| `set-availability` | the producer itself, Manager, Catalogue | `SetProductAvailability`, `ListProducerUnsentCycles`, `GetProducerCycleAvailability` (R3, S13); takes the producer id |
 | `view-producers` *(planned)* | Manager, Catalogue | `ListProducers` read (R5) |
 | `view-stock` *(planned)* | Manager, Finance, Catalogue | `ListStock`, `ListStockMovements` read-only (R4, 001 R28a) |
 | `receive` *(planned)* | Manager, Finance, Receiver | `ListReceptionCycles`, `GetReception`, `AddUnorderedProduct`, `SetReceivedTotal`, `SetAllocation` (R6–R8) |
@@ -156,11 +157,13 @@ No new aggregates or rules: R3–R5 reuse the 001 rules under a wider gate.
 - **Per-cycle availability (R3, S13).** `SetProductAvailability` authorizes `owns` or `administer-catalogue`;
   its cycle share lock and sent guard are unchanged. Two narrow Ordering queries feed the Catàleg page
   without exposing cycle totals or administration (R14):
-  - `ListProducerUnsentCycles(actor, producerId)` *(planned)*: cycles in which the producer participates and
+  - `ListProducerUnsentCycles(actor, producerId)`: cycles in which the producer participates and
     its order is not sent, pickup date ascending.
-  - `GetProducerCycleAvailability(actor, cycleId, producerId)` *(planned)*: the producer's active weekly
+  - `GetProducerCycleAvailability(actor, cycleId, producerId)`: the producer's active weekly
     products with `available` and `canChange` (false once sent).
-  Both authorize `owns` or `administer-catalogue`. The Producer area keeps `GetProducerCycleSummary`.
+  Both, and `SetProductAvailability`, authorize `owns` or `administer-catalogue` through
+  the gate `set-availability`. The page lists unsent cycles only, so `canChange` false guards an order sent
+  between the list and the detail read. The Producer area keeps `GetProducerCycleSummary`.
 
 ## Ordering: reception for Receiver and Finance
 
@@ -230,7 +233,7 @@ New `/catalogue` prefix *(planned)*, `role:manager,catalogue`. The manager reach
 | `…/products/weekly/create`, `POST …/products/weekly`, `…/weekly/{product}/edit`, `PUT`, deactivation, reactivation, unused delete | Weekly product CRUD for any producer, reusing the fields and submit button extracted from `Producer/Products/{Create,Edit}.vue` into `components/WeeklyProductFields.vue`; each page keeps its own Inertia `<Form>` (A9). |
 | `…/products/stock/...` | Stock product CRUD moved from `/manage/producers/{producer}/products/...` (`StockProductController`). |
 | `PUT /catalogue/products/{product}/classification` | Moved from `/manage/products/{product}/classification`. |
-| `GET /catalogue/producers/{producer}/availability` and `PUT …/cycles/{cycle}/products/{product}/availability` | `Catalogue/Producers/Availability` *(planned)*: unsent cycles and per-product toggles (S13). |
+| `GET /catalogue/producers/{producer}/availability` and `PUT …/cycles/{cycle}/products/{product}/availability` | `Catalogue/Producers/Availability`: unsent cycles and per-product toggles (S13). |
 | `GET /catalogue/stock/{product}/movements` | Read-only history with `components/stock/MovementHistory.vue` (001 D26); basket links only for Manager/Finance. |
 | `/catalogue/return-items` and its commands | Moved from `/manage/return-items`. |
 

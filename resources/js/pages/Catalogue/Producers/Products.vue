@@ -3,6 +3,7 @@ import { Form, Head, Link, router } from '@inertiajs/vue3';
 import { trans } from 'laravel-vue-i18n';
 import { shallowRef } from 'vue';
 import ProductClassificationController from '@/actions/App/Http/Controllers/Catalogue/ProductClassificationController';
+import ProducerAvailabilityController from '@/actions/App/Http/Controllers/Catalogue/ProducerAvailabilityController';
 import ProducerController from '@/actions/App/Http/Controllers/Catalogue/ProducerController';
 import ProducerProductController from '@/actions/App/Http/Controllers/Catalogue/ProducerProductController';
 import WeeklyProductController from '@/actions/App/Http/Controllers/Catalogue/WeeklyProductController';
@@ -69,6 +70,16 @@ defineOptions({
                 "
             />
             <div class="flex flex-wrap gap-2">
+                <Button
+                    as-child
+                    variant="outline"
+                    class="h-auto min-h-11 max-w-full min-w-0 py-2 text-center break-words whitespace-normal"
+                >
+                    <Link
+                        :href="ProducerAvailabilityController.show(producer.id)"
+                        >{{ trans('Availability by cycle') }}</Link
+                    >
+                </Button>
                 <Button
                     as-child
                     class="h-auto min-h-11 max-w-full min-w-0 scroll-mt-24 py-2 text-center break-words whitespace-normal"

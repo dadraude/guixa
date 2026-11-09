@@ -707,5 +707,11 @@
     "Distributed": "Repartit",
     "Check what each producer delivered and share it out.": "Comprova què ha entregat cada productor i reparteix-ho.",
     "No producer order has been sent yet.": "Encara no s’ha enviat cap comanda a cap productor.",
-    "Open reception of :producer": "Obre la recepció de :producer"
+    "Open reception of :producer": "Obre la recepció de :producer",
+    "Availability of :name": "Disponibilitat de :name",
+    "Availability by cycle": "Disponibilitat per cicle",
+    "Mark a product unavailable in a cycle until the producer order is sent": "Marca un producte com a no disponible en un cicle fins que s’enviï la comanda al productor",
+    "A deactivated producer cannot be ordered from.": "No es pot fer comanda a un productor desactivat.",
+    "No cycles are open for this producer.": "Cap cicle obert per a aquest productor.",
+    "This producer has no active weekly products.": "Aquest productor no té productes setmanals actius."
 }

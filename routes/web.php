@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AcceptInvitationController;
+use App\Http\Controllers\Catalogue\ProducerAvailabilityController;
 use App\Http\Controllers\Catalogue\ProducerController as CatalogueProducerController;
 use App\Http\Controllers\Catalogue\ProducerProductController;
 use App\Http\Controllers\Catalogue\ProductClassificationController;
@@ -116,6 +117,10 @@ Route::middleware('guest')->group(function () {
 Route::middleware(['auth', 'verified', 'role:manager,catalogue'])->prefix('catalogue')->name('catalogue.')->whereUuid(['producer', 'product'])->group(function () {
     Route::get('producers', [CatalogueProducerController::class, 'index'])->name('producers.index');
     Route::get('producers/{producer}/products', [ProducerProductController::class, 'index'])->name('producers.products.index');
+    Route::get('producers/{producer}/availability', [ProducerAvailabilityController::class, 'show'])->name('producers.availability.show');
+    Route::put('producers/{producer}/cycles/{cycle}/products/{product}/availability', [ProducerAvailabilityController::class, 'update'])
+        ->whereUuid('cycle')
+        ->name('producers.availability.update');
 
     Route::prefix('producers/{producer}/products/weekly')->name('weekly.')->group(function () {
         Route::get('create', [WeeklyProductController::class, 'create'])->name('create');

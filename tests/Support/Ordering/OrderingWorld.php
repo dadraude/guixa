@@ -12,11 +12,13 @@ use Guixa\Ordering\Application\GetContainerCount;
 use Guixa\Ordering\Application\GetCycleSummary;
 use Guixa\Ordering\Application\GetHouseholdOrder;
 use Guixa\Ordering\Application\GetPickupWeekday;
+use Guixa\Ordering\Application\GetProducerCycleAvailability;
 use Guixa\Ordering\Application\GetProducerCycleSummary;
 use Guixa\Ordering\Application\GetReception;
 use Guixa\Ordering\Application\HasUnsettledLines;
 use Guixa\Ordering\Application\ListCycles;
 use Guixa\Ordering\Application\ListMemberCycles;
+use Guixa\Ordering\Application\ListProducerUnsentCycles;
 use Guixa\Ordering\Application\OpenCycle;
 use Guixa\Ordering\Application\ParticipateAgain;
 use Guixa\Ordering\Application\RemoveMarkedLine;
@@ -122,6 +124,10 @@ final class OrderingWorld
 
     public readonly GetProducerCycleSummary $getProducerCycleSummary;
 
+    public readonly ListProducerUnsentCycles $listProducerUnsentCycles;
+
+    public readonly GetProducerCycleAvailability $getProducerCycleAvailability;
+
     public readonly GetReception $getReception;
 
     public readonly AddUnorderedProduct $addUnorderedProduct;
@@ -175,6 +181,8 @@ final class OrderingWorld
         $this->getCycleSummary = new GetCycleSummary($this->cycles, $this->orders, $this->households);
         $this->getContainerCount = new GetContainerCount($this->cycles, $this->orders, $this->households, $this->catalog, $this->availability, $this->baskets);
         $this->getProducerCycleSummary = new GetProducerCycleSummary($this->cycles, $this->orders, $this->catalog, $this->availability);
+        $this->listProducerUnsentCycles = new ListProducerUnsentCycles($this->cycles);
+        $this->getProducerCycleAvailability = new GetProducerCycleAvailability($this->cycles, $this->catalog, $this->availability);
         $receptions = new ReceptionLoader($this->orders, $this->catalog, $this->availability, $this->receivedTotals, $this->baskets);
         $this->getReception = new GetReception($this->cycles, $receptions, $this->households);
         $this->addUnorderedProduct = new AddUnorderedProduct($this->cycles, $receptions, $this->receivedTotals, $transactions);
