@@ -30,6 +30,7 @@
     <php>
         <ini name="memory_limit" value="512M"/>
         <ini name="pcov.directory" value="."/>
+        <ini name="pcov.exclude" value="~/(vendor|tests|node_modules|storage|bootstrap)/~"/>
         <env name="APP_ENV" value="testing"/>
         <env name="APP_MAINTENANCE_DRIVER" value="file"/>
         <env name="BCRYPT_ROUNDS" value="4"/>
