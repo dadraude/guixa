@@ -16,6 +16,6 @@ class ProductClassificationController extends Controller
         $producerId = $producer($product);
         $change($actor, $product, $request->boolean('stock'));
 
-        return to_route('manage.producer-products.index', ['producer' => $producerId]);
+        return to_route('catalogue.producers.products.index', ['producer' => $producerId]);
     }
 }

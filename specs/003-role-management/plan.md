@@ -147,7 +147,8 @@ No new aggregates or rules: R3–R5 reuse the 001 rules under a wider gate.
   `RecordStockAdjustment` and `SetStockAvailable` stay `manage` (001 R26, R27).
 - **Producers (R5, S6, S13).** `ListProducers` authorizes `view-producers`; it already lists deactivated
   producers with their active flag. `ListProductsOfProducer` authorizes `administer-catalogue` and adds
-  `canCreate`, `canEdit`, `canChangeClassification` and `canDelete` per product (A13). Producer creation,
+  `canEdit`, `canChangeClassification` and `canDelete` per product (A13); the page-level create-stock flag is
+  `canCreateStock` (`manage`) until T04. Producer creation,
   deactivation, reactivation and account invitation stay `manage`. A deactivated producer's products are
   administrable; ordering them is still refused by `GetOrderableProduct` (001 R3).
 - **Return items (R5).** The four return-item commands move to `administer-catalogue`; `ListReturnItems`
@@ -226,7 +227,7 @@ New `/catalogue` prefix *(planned)*, `role:manager,catalogue`. The manager reach
 | --- | --- |
 | `GET /catalogue/producers` | `Catalogue/Producers/Index` *(planned)*: `ListProducers`, deactivated marked; no administration actions. |
 | `GET /catalogue/producers/{producer}/products` | Moved from `/manage/producers/{producer}/products` (`Manage/Producers/Products.vue` → `Catalogue/Producers/Products.vue`): both modes with available quantity for stock, actions from `can` flags. |
-| `…/products/weekly/create`, `POST …/products/weekly`, `…/weekly/{product}/edit`, `PUT`, deactivation, reactivation, unused delete | Weekly product CRUD for any producer, reusing the field component extracted from `Producer/Products/{Create,Edit}.vue` *(planned: `components/WeeklyProductFields.vue`)*. |
+| `…/products/weekly/create`, `POST …/products/weekly`, `…/weekly/{product}/edit`, `PUT`, deactivation, reactivation, unused delete | Weekly product CRUD for any producer, reusing the fields and submit button extracted from `Producer/Products/{Create,Edit}.vue` into `components/WeeklyProductFields.vue`; each page keeps its own Inertia `<Form>` (A9). |
 | `…/products/stock/...` | Stock product CRUD moved from `/manage/producers/{producer}/products/...` (`StockProductController`). |
 | `PUT /catalogue/products/{product}/classification` | Moved from `/manage/products/{product}/classification`. |
 | `GET /catalogue/producers/{producer}/availability` and `PUT …/cycles/{cycle}/products/{product}/availability` | `Catalogue/Producers/Availability` *(planned)*: unsent cycles and per-product toggles (S13). |

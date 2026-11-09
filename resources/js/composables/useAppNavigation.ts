@@ -19,6 +19,7 @@ import {
 } from '@lucide/vue';
 import type { LucideIcon } from '@lucide/vue';
 import { computed } from 'vue';
+import CatalogueProducerController from '@/actions/App/Http/Controllers/Catalogue/ProducerController';
 import OrderController from '@/actions/App/Http/Controllers/OrderController';
 import StockController from '@/actions/App/Http/Controllers/StockController';
 import AccountController from '@/actions/App/Http/Controllers/Manage/AccountController';
@@ -104,6 +105,21 @@ export function navigationSectionsFor(
                   },
               ]
             : []),
+        ...(roles.has('catalogue') && !roles.has('manager')
+            ? [
+                  {
+                      title: 'Catalogue',
+                      icon: Boxes,
+                      items: [
+                          {
+                              title: 'Producers',
+                              href: CatalogueProducerController.index(),
+                              icon: Wheat,
+                          },
+                      ],
+                  },
+              ]
+            : []),
         ...(roles.has('manager')
             ? [
                   {
@@ -136,6 +152,7 @@ export function navigationSectionsFor(
                               title: 'Producers',
                               href: ProducerController.index(),
                               icon: Wheat,
+                              alsoActiveOn: ['/catalogue'],
                           },
                           {
                               title: 'Stock',

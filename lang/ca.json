@@ -696,5 +696,10 @@
     "You are removing your own Manager role. You will lose access to the management screens right away.": "Estàs retirant el teu propi rol de gestor. Perdràs l’accés a la gestió de seguida.",
     "Link members to households and manage account status": "Vincula membres a unitats de convivència i gestiona l’estat dels comptes",
     "Grant or remove roles on the roles screen": "Atorga o retira rols a la pantalla de rols",
-    "Grant": "Atorga"
+    "Grant": "Atorga",
+    "Your areas": "Les teves àrees",
+    "Add weekly product": "Afegeix un producte setmanal",
+    "Weekly product of :name": "Producte setmanal de :name",
+    "Back to products": "Torna als productes",
+    "Choose a producer to administer its products": "Tria un productor per administrar-ne els productes"
 }

@@ -437,7 +437,7 @@ it('deletes an unused stock record but keeps one with a movement (R1c, S68, S70)
     $this->actingAs($manager)->from(stockProductPath($used).'/edit')
         ->delete(stockProductPath($used).'/unused')->assertSessionHasErrors('domain');
     $this->actingAs($manager)->delete(stockProductPath($unused).'/unused')
-        ->assertRedirect("/manage/producers/{$unused->producer_id}/products");
+        ->assertRedirect("/catalogue/producers/{$unused->producer_id}/products");
     expect(ProductModel::query()->whereKey($used->id)->exists())->toBeTrue()
         ->and(ProductModel::query()->whereKey($unused->id)->exists())->toBeFalse();
 });

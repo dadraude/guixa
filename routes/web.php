@@ -1,6 +1,9 @@
 <?php
 
 use App\Http\Controllers\AcceptInvitationController;
+use App\Http\Controllers\Catalogue\ProducerController as CatalogueProducerController;
+use App\Http\Controllers\Catalogue\ProducerProductController;
+use App\Http\Controllers\Catalogue\WeeklyProductController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Finance\BasketCollectionController;
 use App\Http\Controllers\Finance\BasketCollectionCorrectionController;
@@ -26,7 +29,6 @@ use App\Http\Controllers\Manage\InvitationController;
 use App\Http\Controllers\Manage\PickupController;
 use App\Http\Controllers\Manage\ProducerAccountController;
 use App\Http\Controllers\Manage\ProducerController;
-use App\Http\Controllers\Manage\ProducerProductController;
 use App\Http\Controllers\Manage\ProductClassificationController;
 use App\Http\Controllers\Manage\ReceptionAllocationController;
 use App\Http\Controllers\Manage\ReceptionController;
@@ -108,9 +110,22 @@ Route::middleware('guest')->group(function () {
         ->name('invitation.accept');
 });
 
+Route::middleware(['auth', 'verified', 'role:manager,catalogue'])->prefix('catalogue')->name('catalogue.')->whereUuid(['producer', 'product'])->group(function () {
+    Route::get('producers', [CatalogueProducerController::class, 'index'])->name('producers.index');
+    Route::get('producers/{producer}/products', [ProducerProductController::class, 'index'])->name('producers.products.index');
+
+    Route::prefix('producers/{producer}/products/weekly')->name('weekly.')->group(function () {
+        Route::get('create', [WeeklyProductController::class, 'create'])->name('create');
+        Route::post('/', [WeeklyProductController::class, 'store'])->name('store');
+        Route::get('{product}/edit', [WeeklyProductController::class, 'edit'])->name('edit');
+        Route::put('{product}', [WeeklyProductController::class, 'update'])->name('update');
+        Route::delete('{product}', [WeeklyProductController::class, 'destroy'])->name('destroy');
+        Route::delete('{product}/unused', [WeeklyProductController::class, 'deleteUnused'])->name('unused.destroy');
+        Route::put('{product}/reactivation', [WeeklyProductController::class, 'reactivate'])->name('reactivate');
+    });
+});
+
 Route::middleware(['auth', 'verified', 'role:manager'])->prefix('manage')->name('manage.')->group(function () {
-    Route::get('producers/{producer}/products', [ProducerProductController::class, 'index'])
-        ->whereUuid('producer')->name('producer-products.index');
     Route::put('products/{product}/classification', [ProductClassificationController::class, 'update'])
         ->whereUuid('product')->name('products.classification.update');
     Route::get('producers/{producer}/products/create', [StockProductController::class, 'create'])

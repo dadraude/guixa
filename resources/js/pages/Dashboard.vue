@@ -63,6 +63,7 @@ const props = defineProps<{
     pendingPickups: PendingPickup[];
     staffPendingCollections?: { count: number } | null;
     managerSummary: ManagerSummary | null;
+    areaShortcuts?: App.Http.RoleArea[];
 }>();
 
 const page = usePage();
@@ -157,6 +158,20 @@ const isProducer = computed(() => props.roles.includes('producer'));
             <p class="text-sm text-muted-foreground">
                 {{ userName }}
             </p>
+            <nav
+                v-if="areaShortcuts?.length"
+                class="flex flex-wrap gap-2"
+                :aria-label="trans('Your areas')"
+            >
+                <Link
+                    v-for="area in areaShortcuts"
+                    :key="area.role"
+                    :href="area.href"
+                    class="manager-button inline-flex min-h-11 items-center rounded-xl bg-[var(--secondary)] px-4 text-sm font-medium text-[var(--secondary-foreground)] transition-colors hover:bg-[var(--accent)]"
+                    :data-test="`area-shortcut-${area.role}`"
+                    >{{ trans(area.label) }}</Link
+                >
+            </nav>
         </header>
 
         <section

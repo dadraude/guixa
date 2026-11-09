@@ -90,7 +90,7 @@ class StockProductController extends Controller
         abort_if($product === null || $product->producerId !== $producer, 404);
         $delete($actor, $stockProduct);
 
-        return to_route('manage.producer-products.index', ['producer' => $producer]);
+        return to_route('catalogue.producers.products.index', ['producer' => $producer]);
     }
 
     public function reactivate(string $producer, string $stockProduct, Actor $actor, ReactivateStockProduct $reactivate): RedirectResponse

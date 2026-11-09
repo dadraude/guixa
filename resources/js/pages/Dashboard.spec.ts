@@ -59,6 +59,33 @@ vi.mock('@/actions/App/Http/Controllers/Producer/CutoffController', () => ({
 }));
 
 describe('dashboard presentation', () => {
+    it('links the Catalogue area from the header without adding a card (R15)', async () => {
+        const app = createSSRApp(Dashboard, {
+            roles: ['catalogue'],
+            isManager: false,
+            isMember: false,
+            nextPickup: null,
+            openCycles: 0,
+            balance: null,
+            pendingPickups: [],
+            managerSummary: null,
+            areaShortcuts: [
+                {
+                    role: 'catalogue',
+                    label: 'Catalogue',
+                    href: '/catalogue/producers',
+                },
+            ],
+        });
+        installTranslations(app);
+        const html = await renderToString(app);
+
+        expect(html).toContain('aria-label="Les teves àrees"');
+        expect(html).toContain('Catàleg');
+        expect(html).not.toContain('<article');
+        expect(html).not.toContain('manager actions');
+    });
+
     it('groups four-digit member and manager counts without changing summary values', async () => {
         const app = createSSRApp(Dashboard, {
             roles: ['member', 'manager'],

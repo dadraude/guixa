@@ -6,8 +6,7 @@ import ProductAdministrationActions from '@/components/ProductAdministrationActi
 import InputError from '@/components/InputError.vue';
 import ProductController from '@/actions/App/Http/Controllers/Producer/ProductController';
 import Heading from '@/components/Heading.vue';
-import StockProductFields from '@/components/StockProductFields.vue';
-import { Button } from '@/components/ui/button';
+import WeeklyProductFields from '@/components/WeeklyProductFields.vue';
 
 defineOptions({
     layout: {
@@ -52,15 +51,12 @@ function deleteUnused(product: App.Http.ProductRow) {
             class="pilot-layout-panel pilot-layout-form max-w-xl"
             v-slot="{ errors, processing }"
         >
-            <StockProductFields :product="product" :errors="errors" />
-
-            <Button
-                type="submit"
-                :disabled="processing"
-                data-test="save-product"
-            >
-                {{ trans('Save') }}
-            </Button>
+            <WeeklyProductFields
+                :product="product"
+                :errors="errors"
+                :processing="processing"
+                :submit-label="trans('Save')"
+            />
         </Form>
         <div class="pilot-layout-panel mt-4 max-w-xl">
             <InputError :message="actionError" role="alert" />
