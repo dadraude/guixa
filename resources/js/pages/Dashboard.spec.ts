@@ -45,9 +45,12 @@ vi.mock('@/actions/App/Http/Controllers/Manage/StockProductController', () => ({
 vi.mock('@/actions/App/Http/Controllers/Manage/AccountController', () => ({
     default: { index: () => '/manage/accounts' },
 }));
-vi.mock('@/actions/App/Http/Controllers/Manage/ReturnItemController', () => ({
-    default: { index: () => '/manage/return-items' },
-}));
+vi.mock(
+    '@/actions/App/Http/Controllers/Catalogue/ReturnItemController',
+    () => ({
+        default: { index: () => '/catalogue/return-items' },
+    }),
+);
 vi.mock('@/actions/App/Http/Controllers/Manage/SettingsController', () => ({
     default: { show: () => '/manage/settings' },
 }));

@@ -34,18 +34,24 @@ const weekly = {
     stock: false,
     used: false,
     can: { edit: true, changeClassification: true, delete: true },
+    available: null as string | null,
 };
-const stock = { ...weekly, id: 'stock-1', name: 'Honey', stock: true };
-const catalogueWeekly = {
+const stock = {
     ...weekly,
-    can: { edit: true, changeClassification: false, delete: true },
+    id: 'stock-1',
+    name: 'Honey',
+    stock: true,
+    available: '12.000',
 };
-const catalogueStock = {
+const readOnlyStock = {
     ...stock,
     can: { edit: false, changeClassification: false, delete: false },
 };
 
-async function render(products: (typeof weekly)[], canCreateStock = true) {
+async function render(
+    products: (typeof weekly | typeof stock)[],
+    canCreateStock = true,
+) {
     const app = createSSRApp(Products, { producer, products, canCreateStock });
     installTranslations(app);
     return renderToString(app);
@@ -65,16 +71,19 @@ describe('Producer products in the Catàleg area', () => {
         ).toHaveLength(2);
     });
 
-    it('lets Catalogue edit and switch weekly products only, with no stock or classification actions (R3, R4)', async () => {
-        const html = await render([catalogueWeekly, catalogueStock], false);
-        expect(html).toContain('aria-label="Edita: Bread"');
-        expect(html).toContain('data-test="deactivate-weekly-1"');
+    it('shows the available quantity of stock products with a movements link, and none for weekly ones (R4)', async () => {
+        const html = await render([weekly, stock]);
+        expect(html.match(/data-test="stock-available"/g)).toHaveLength(1);
+        expect(html).toContain('12,000 loaf disponibles');
+        expect(html).toContain('aria-label="Moviments: Honey"');
+    });
+
+    it('hides the stock edit, classification and create actions when the can flags are off (R14)', async () => {
+        const html = await render([readOnlyStock], false);
         expect(html).not.toContain('Edita: Honey');
-        expect(html).not.toContain('data-test="deactivate-stock-1"');
-        expect(html).not.toContain('estoc</a>');
-        expect(html).toContain('Afegeix un producte setmanal');
-        expect(html).not.toContain('Afegeix un producte d');
         expect(html).not.toContain('data-test="change-product-classification"');
+        expect(html).not.toContain('Afegeix un producte d');
+        expect(html).toContain('data-test="stock-available"');
     });
 
     it('shows used records without classification actions', async () => {

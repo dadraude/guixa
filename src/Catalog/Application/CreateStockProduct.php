@@ -26,7 +26,7 @@ final class CreateStockProduct
         bool $variable,
         ?string $containersPerUnit,
     ): string {
-        Gate::forUser($actor)->authorize('manage');
+        Gate::forUser($actor)->authorize('administer-catalogue');
 
         if ($this->producers->get($producerId) === null) {
             throw ProducerNotFound::withId($producerId);

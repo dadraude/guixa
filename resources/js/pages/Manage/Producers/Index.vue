@@ -3,7 +3,7 @@ import { Form, Head, Link } from '@inertiajs/vue3';
 import { trans } from 'laravel-vue-i18n';
 import ProducerAccountController from '@/actions/App/Http/Controllers/Manage/ProducerAccountController';
 import ProducerController from '@/actions/App/Http/Controllers/Manage/ProducerController';
-import StockProductController from '@/actions/App/Http/Controllers/Manage/StockProductController';
+import StockProductController from '@/actions/App/Http/Controllers/Catalogue/StockProductController';
 import ProducerProductController from '@/actions/App/Http/Controllers/Catalogue/ProducerProductController';
 import Heading from '@/components/Heading.vue';
 import InputError from '@/components/InputError.vue';

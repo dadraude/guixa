@@ -17,7 +17,7 @@ final class DeactivateStockProduct
 
     public function __invoke(Actor $actor, string $producerId, string $id): void
     {
-        Gate::forUser($actor)->authorize('manage');
+        Gate::forUser($actor)->authorize('administer-catalogue');
         $this->transactions->run(function () use ($producerId, $id): void {
             $product = $this->products->getForUpdate($id);
             if ($product === null || ! $product->isStock() || $product->producerId !== $producerId) {

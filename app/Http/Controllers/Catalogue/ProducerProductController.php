@@ -8,29 +8,33 @@ use Guixa\Catalog\Application\GetProducer;
 use Guixa\Catalog\Application\ListProductsOfProducer;
 use Guixa\Catalog\Application\ProductAdministrationData;
 use Guixa\Shared\Application\Actor;
+use Guixa\Stock\Application\ListStock;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class ProducerProductController extends Controller
 {
-    public function index(string $producer, Actor $actor, GetProducer $getProducer, ListProductsOfProducer $list): Response
+    public function index(string $producer, Actor $actor, GetProducer $getProducer, ListProductsOfProducer $list, ListStock $listStock): Response
     {
         $record = $getProducer($producer);
         abort_if($record === null, 404);
 
+        $available = collect($listStock($actor, includeInactive: true))->pluck('available', 'id');
+
         return Inertia::render('Catalogue/Producers/Products', [
             'producer' => ['id' => $record->id, 'name' => $record->name],
-            'products' => array_map($this->row(...), $list($actor, $producer)),
-            'canCreateStock' => Gate::forUser($actor)->allows('manage'),
+            'products' => array_map(fn (ProductAdministrationData $product) => $this->row($product, $available->get($product->id)), $list($actor, $producer)),
+            'canCreateStock' => Gate::forUser($actor)->allows('administer-catalogue'),
         ]);
     }
 
     /** @return array<string, mixed> */
-    private function row(ProductAdministrationData $product): array
+    private function row(ProductAdministrationData $product, ?string $available): array
     {
         return [
             ...get_object_vars(ProducerProductRow::from($product)),
+            'available' => $product->stock ? $available : null,
             'can' => [
                 'edit' => $product->canEdit,
                 'changeClassification' => $product->canChangeClassification,

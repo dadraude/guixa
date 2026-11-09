@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Form, Head, Link } from '@inertiajs/vue3';
 import { Pencil, Plus } from '@lucide/vue';
-import ReturnItemController from '@/actions/App/Http/Controllers/Manage/ReturnItemController';
+import ReturnItemController from '@/actions/App/Http/Controllers/Catalogue/ReturnItemController';
 import Heading from '@/components/Heading.vue';
 import ActiveSwitch from '@/components/ActiveSwitch.vue';
 import { Button } from '@/components/ui/button';

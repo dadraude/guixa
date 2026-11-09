@@ -3,6 +3,10 @@
 use App\Http\Controllers\AcceptInvitationController;
 use App\Http\Controllers\Catalogue\ProducerController as CatalogueProducerController;
 use App\Http\Controllers\Catalogue\ProducerProductController;
+use App\Http\Controllers\Catalogue\ProductClassificationController;
+use App\Http\Controllers\Catalogue\ReturnItemController;
+use App\Http\Controllers\Catalogue\StockMovementController as CatalogueStockMovementController;
+use App\Http\Controllers\Catalogue\StockProductController as CatalogueStockProductController;
 use App\Http\Controllers\Catalogue\WeeklyProductController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Finance\BasketCollectionController;
@@ -29,14 +33,12 @@ use App\Http\Controllers\Manage\InvitationController;
 use App\Http\Controllers\Manage\PickupController;
 use App\Http\Controllers\Manage\ProducerAccountController;
 use App\Http\Controllers\Manage\ProducerController;
-use App\Http\Controllers\Manage\ProductClassificationController;
 use App\Http\Controllers\Manage\ReceptionAllocationController;
 use App\Http\Controllers\Manage\ReceptionController;
 use App\Http\Controllers\Manage\ReceptionDistributionController;
 use App\Http\Controllers\Manage\ReceptionProductController;
 use App\Http\Controllers\Manage\ReceptionReceivedController;
 use App\Http\Controllers\Manage\ReceptionValidationController;
-use App\Http\Controllers\Manage\ReturnItemController;
 use App\Http\Controllers\Manage\RoleController;
 use App\Http\Controllers\Manage\RoleHolderController;
 use App\Http\Controllers\Manage\SettingsController;
@@ -123,26 +125,32 @@ Route::middleware(['auth', 'verified', 'role:manager,catalogue'])->prefix('catal
         Route::delete('{product}/unused', [WeeklyProductController::class, 'deleteUnused'])->name('unused.destroy');
         Route::put('{product}/reactivation', [WeeklyProductController::class, 'reactivate'])->name('reactivate');
     });
+
+    Route::put('products/{product}/classification', [ProductClassificationController::class, 'update'])->name('products.classification.update');
+
+    Route::prefix('producers/{producer}/products/stock')->name('stock.')->group(function () {
+        Route::get('create', [CatalogueStockProductController::class, 'create'])->name('create');
+        Route::post('/', [CatalogueStockProductController::class, 'store'])->name('store');
+        Route::get('{stockProduct}/edit', [CatalogueStockProductController::class, 'edit'])->whereUuid('stockProduct')->name('edit');
+        Route::put('{stockProduct}', [CatalogueStockProductController::class, 'update'])->whereUuid('stockProduct')->name('update');
+        Route::delete('{stockProduct}', [CatalogueStockProductController::class, 'destroy'])->whereUuid('stockProduct')->name('destroy');
+        Route::delete('{stockProduct}/unused', [CatalogueStockProductController::class, 'deleteUnused'])->whereUuid('stockProduct')->name('unused.destroy');
+        Route::put('{stockProduct}/reactivation', [CatalogueStockProductController::class, 'reactivate'])->whereUuid('stockProduct')->name('reactivate');
+    });
+    Route::get('stock/{stockProduct}/movements', [CatalogueStockMovementController::class, 'show'])->whereUuid('stockProduct')->name('stock.movements.show');
+
+    Route::resource('return-items', ReturnItemController::class)
+        ->parameters(['return-items' => 'returnItem'])
+        ->except(['show'])
+        ->whereUuid('returnItem')
+        ->names('return-items');
+    Route::put('return-items/{returnItem}/reactivation', [ReturnItemController::class, 'reactivate'])
+        ->whereUuid('returnItem')
+        ->name('return-items.reactivate');
 });
 
 Route::middleware(['auth', 'verified', 'role:manager'])->prefix('manage')->name('manage.')->group(function () {
-    Route::put('products/{product}/classification', [ProductClassificationController::class, 'update'])
-        ->whereUuid('product')->name('products.classification.update');
-    Route::get('producers/{producer}/products/create', [StockProductController::class, 'create'])
-        ->whereUuid('producer')->name('stock.create');
-    Route::post('producers/{producer}/products', [StockProductController::class, 'store'])
-        ->whereUuid('producer')->name('stock.store');
     Route::get('stock', [StockProductController::class, 'index'])->name('stock.index');
-    Route::get('producers/{producer}/products/{stockProduct}/edit', [StockProductController::class, 'edit'])
-        ->whereUuid(['producer', 'stockProduct'])->name('stock.edit');
-    Route::put('producers/{producer}/products/{stockProduct}', [StockProductController::class, 'update'])
-        ->whereUuid(['producer', 'stockProduct'])->name('stock.update');
-    Route::delete('producers/{producer}/products/{stockProduct}', [StockProductController::class, 'destroy'])
-        ->whereUuid(['producer', 'stockProduct'])->name('stock.destroy');
-    Route::delete('producers/{producer}/products/{stockProduct}/unused', [StockProductController::class, 'deleteUnused'])
-        ->whereUuid(['producer', 'stockProduct'])->name('stock.unused.destroy');
-    Route::put('producers/{producer}/products/{stockProduct}/reactivation', [StockProductController::class, 'reactivate'])
-        ->whereUuid(['producer', 'stockProduct'])->name('stock.reactivate');
     Route::get('stock/{stockProduct}/movements', [StockMovementController::class, 'show'])
         ->whereUuid('stockProduct')
         ->name('stock.movements.show');
@@ -155,15 +163,6 @@ Route::middleware(['auth', 'verified', 'role:manager'])->prefix('manage')->name(
     Route::put('stock/{stockProduct}/available', [StockMovementController::class, 'setAvailable'])
         ->whereUuid('stockProduct')
         ->name('stock.available.update');
-    Route::resource('return-items', ReturnItemController::class)
-        ->parameters(['return-items' => 'returnItem'])
-        ->except(['show'])
-        ->whereUuid('returnItem')
-        ->names('return-items');
-    Route::put('return-items/{returnItem}/reactivation', [ReturnItemController::class, 'reactivate'])
-        ->whereUuid('returnItem')
-        ->name('return-items.reactivate');
-
     Route::get('cycles', [CycleController::class, 'index'])->name('cycles.index');
     Route::post('cycles', [CycleController::class, 'store'])->name('cycles.store');
     Route::get('cycles/{cycle}', [CycleController::class, 'show'])->whereUuid('cycle')->name('cycles.show');

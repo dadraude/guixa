@@ -67,16 +67,15 @@ final class ListStockMovements
         return array_slice($newestFirst, ($page - 1) * self::PER_PAGE, self::PER_PAGE);
     }
 
-    /** @return bool whether the actor may see the baskets behind sales and corrections: a producer alone may not */
+    /** @return bool whether the actor may see the baskets behind sales and corrections: only Manager and Finance (D5) */
     private function authorize(Actor $actor, StockProduct $product): bool
     {
-        if (Gate::forUser($actor)->allows('manage-sales')) {
-            return true;
+        $gate = Gate::forUser($actor);
+        if (! $gate->allows('view-stock')) {
+            $gate->authorize('owns', ['producer', $product->producerId]);
         }
 
-        Gate::forUser($actor)->authorize('owns', ['producer', $product->producerId]);
-
-        return false;
+        return $gate->allows('manage-sales');
     }
 
     /**

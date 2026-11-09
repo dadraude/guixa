@@ -26,7 +26,7 @@ import AccountController from '@/actions/App/Http/Controllers/Manage/AccountCont
 import CycleController from '@/actions/App/Http/Controllers/Manage/CycleController';
 import HouseholdController from '@/actions/App/Http/Controllers/Manage/HouseholdController';
 import ProducerController from '@/actions/App/Http/Controllers/Manage/ProducerController';
-import ReturnItemController from '@/actions/App/Http/Controllers/Manage/ReturnItemController';
+import ReturnItemController from '@/actions/App/Http/Controllers/Catalogue/ReturnItemController';
 import RoleController from '@/actions/App/Http/Controllers/Manage/RoleController';
 import SettingsController from '@/actions/App/Http/Controllers/Manage/SettingsController';
 import StockProductController from '@/actions/App/Http/Controllers/Manage/StockProductController';
@@ -115,6 +115,11 @@ export function navigationSectionsFor(
                               title: 'Producers',
                               href: CatalogueProducerController.index(),
                               icon: Wheat,
+                          },
+                          {
+                              title: 'Return items',
+                              href: ReturnItemController.index(),
+                              icon: Undo2,
                           },
                       ],
                   },

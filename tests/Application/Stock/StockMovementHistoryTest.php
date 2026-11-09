@@ -112,6 +112,16 @@ it('links sale and correction lines to their basket for Manager and Finance (S93
     'finance' => [new Actor('finance-account', [Role::Finance])],
 ]);
 
+it('shows Catalogue the quantities and balances of any product without a basket (R4, D5)', function () {
+    $catalogue = new Actor('catalogue-account', [Role::Catalogue]);
+
+    $lines = ($this->history)($catalogue, $this->honeyId)->lines;
+
+    expect(array_map(fn ($line) => $line->balanceAfter, $lines))->toBe(['7.000', '6.000', '9.000', '10.000'])
+        ->and(array_map(fn ($line) => $line->basketId, $lines))->toBe([null, null, null, null])
+        ->and(collect((new ListStock($this->products, $this->movements))($catalogue))->firstWhere('id', $this->honeyId)->available)->toBe('7.000');
+});
+
 it('lets the producer see the same lines of their own product without any basket (S93, R25b, R28a)', function () {
     $lines = ($this->history)($this->beekeeper, $this->honeyId)->lines;
 

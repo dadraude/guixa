@@ -125,7 +125,7 @@ describe('shared app navigation', () => {
             ]),
         ).toEqual([
             ['Overview', ['Dashboard']],
-            ['Catalogue', ['Producers']],
+            ['Catalogue', ['Producers', 'Return items']],
         ]);
         expect(
             navigationSectionsFor([
@@ -145,5 +145,11 @@ describe('shared app navigation', () => {
                 '/catalogue/producers/12345678-1234-1234-1234-123456789abc/products',
             )?.title,
         ).toBe('Producers');
+        expect(
+            currentNavigationItem(
+                navigationItemsFor([{ role: 'manager' }]),
+                '/catalogue/return-items',
+            )?.title,
+        ).toBe('Return items');
     });
 });
