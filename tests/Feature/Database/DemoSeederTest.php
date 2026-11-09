@@ -33,6 +33,21 @@ it('seeds a usable cooperative with accounts, orders, reception and pickups', fu
     Mail::assertNothingSent();
 });
 
+it('seeds staff role holders besides the manager', function () {
+    $this->seed(DemoSeeder::class);
+
+    $holders = DB::table('account_roles')->join('users', 'users.id', '=', 'account_roles.user_id')
+        ->whereIn('role', ['finance', 'catalogue', 'receiver'])
+        ->orderBy('role')->pluck('users.email', 'role')->all();
+
+    expect($holders)->toBe([
+        'catalogue' => 'biel@demo.guixa.test',
+        'finance' => 'anna@demo.guixa.test',
+        'receiver' => 'biel@demo.guixa.test',
+    ]);
+    expect(DB::table('role_changes')->count())->toBe(3);
+});
+
 it('lets every demo role log in and open its main screens', function (string $email, array $paths) {
     $this->seed(DemoSeeder::class);
     $this->withoutVite();
