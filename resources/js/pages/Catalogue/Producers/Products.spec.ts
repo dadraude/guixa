@@ -58,6 +58,11 @@ async function render(
 }
 
 describe('Producer products in the Catàleg area', () => {
+    it('offers the availability page of the producer as a link (R3, S13)', async () => {
+        const html = await render([weekly]);
+        expect(html).toMatch(/<a [^>]*>Disponibilitat per cicle<\/a>/);
+    });
+
     it('shows the Manager both modes with edit, classification and both create actions', async () => {
         const html = await render([weekly, stock]);
         expect(html).toContain('Producte setmanal');

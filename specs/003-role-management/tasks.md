@@ -221,9 +221,11 @@ Frontier at proposal time: **T01**. After T01 merges: T02, T03 and T06 are ready
 
 - **Outcome.** From a producer's Catàleg page, Catalogue and the manager mark a weekly product unavailable or
   available again in a cycle whose producer order is not sent; deactivated producers stay administrable.
-- **Scope and path.** `SetProductAvailability` authorizes `owns` or `administer-catalogue`. Ordering queries
-  `ListProducerUnsentCycles`, `GetProducerCycleAvailability` (D9) with a Catalog-facing read through the
-  existing ports. Page `Catalogue/Producers/Availability.vue`, routes
+- **Scope and path.** `SetProductAvailability` authorizes `owns` or `administer-catalogue` (the gate `set-availability`, shared by the
+  two queries). Ordering queries
+  `ListProducerUnsentCycles`, `GetProducerCycleAvailability` (D9) reading Catalog through the existing
+  `ProductCatalog` port; the page lists only unsent cycles, so `canChange` false is the guard for an order sent
+  between the list and the detail read. Page `Catalogue/Producers/Availability.vue`, routes
   `GET /catalogue/producers/{producer}/availability` and
   `PUT /catalogue/producers/{producer}/cycles/{cycle}/products/{product}/availability`.
 - **Requirements.** R3 "marks them unavailable or available again in a cycle while their producer order is not

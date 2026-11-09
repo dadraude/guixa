@@ -5,6 +5,7 @@ use Guixa\Ordering\Domain\Error\CycleNotFound;
 use Guixa\Ordering\Domain\Error\LineNotMarked;
 use Guixa\Ordering\Domain\Error\NoHousehold;
 use Guixa\Ordering\Domain\Error\ProducerClosed;
+use Guixa\Ordering\Domain\Error\ProducerOrderSent;
 use Guixa\Ordering\Domain\Error\ProductNotOrderable;
 use Guixa\Ordering\Domain\ProducerOrder;
 use Guixa\Shared\Application\Actor;
@@ -106,6 +107,28 @@ it('lets only the producer of the product mark it (R3c, R2)', function () {
     expect(fn () => ($this->world->setProductAvailability)($other, $this->cycleA, $this->jam, false))->toThrow(AuthorizationException::class);
     expect(fn () => ($this->world->setProductAvailability)($this->anna, $this->cycleA, $this->jam, false))->toThrow(AuthorizationException::class);
     expect(($this->world->getHouseholdOrder)($this->anna, $this->cycleA)->producers[0]->products)->toHaveCount(1);
+});
+
+it('lets a Catalogue account and the manager mark another producer\'s product, which a member then cannot newly order (R3, S13)', function (Actor $actor) {
+    expect(fn () => ($this->world->setProductAvailability)(new Actor('00000000-0000-7000-8000-0000000000c1', [Role::Finance]), $this->cycleA, $this->jam, false))
+        ->toThrow(AuthorizationException::class);
+
+    ($this->world->setProductAvailability)($actor, $this->cycleA, $this->jam, false);
+
+    expect($this->world->availability->unavailableIn($this->cycleA))->toBe([$this->jam])
+        ->and(fn () => ($this->world->setOrderLine)($this->anna, $this->cycleA, $this->jam, '1'))->toThrow(ProductNotOrderable::class);
+})->with([
+    'catalogue' => fn () => new Actor('00000000-0000-7000-8000-0000000000c0', [Role::Catalogue]),
+    'manager' => fn () => Actor::manager('00000000-0000-7000-8000-00000000000a'),
+]);
+
+it('refuses a Catalogue account once the producer order is sent (R3c, S13)', function () {
+    $catalogue = new Actor('00000000-0000-7000-8000-0000000000c0', [Role::Catalogue]);
+    ($this->world->closeProducerNow)($this->world->manager, $this->cycleA, OrderingWorld::BAKER);
+    ($this->world->sendProducerOrder)($this->world->manager, $this->cycleA, OrderingWorld::BAKER);
+
+    expect(fn () => ($this->world->setProductAvailability)($catalogue, $this->cycleA, $this->jam, false))->toThrow(ProducerOrderSent::class)
+        ->and($this->world->availability->unavailableIn($this->cycleA))->toBe([]);
 });
 
 it('rejects an unknown cycle and an unknown or deactivated product (R3c)', function () {
