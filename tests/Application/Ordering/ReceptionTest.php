@@ -18,6 +18,7 @@ use Guixa\Ordering\Domain\Error\ProducerOrderNotSent;
 use Guixa\Ordering\Domain\Error\ProductAlreadyOrdered;
 use Guixa\Ordering\Domain\Error\ProductNotInReception;
 use Guixa\Ordering\Domain\Error\ProductNotOrderable;
+use Guixa\Ordering\Domain\Error\RedistributionBlockedByValidatedBasket;
 use Guixa\Ordering\Domain\NotDeliveredMarks;
 use Guixa\Ordering\Domain\ReceptionLoader;
 use Guixa\Shared\Application\Actor;
@@ -575,14 +576,69 @@ it('lets Finance receive through the same use cases (R7)', function () {
         ->and(($this->product)($this->bread)->received)->toBe('10.000');
 });
 
-it('refuses a Receiver the validation, the distribution and the reopening, which stay with the manager (R6, S7)', function () {
+it('refuses a Receiver the validation, the distribution and the reopening, which stay with Finance and the manager (R6, S7)', function () {
     ($this->orderBreadLikeS10)();
     ($this->validateReception)($this->world->manager, $this->cycleId, OrderingWorld::BAKER);
 
     expect(fn () => ($this->validateReception)($this->receiver, $this->cycleId, OrderingWorld::BAKER))->toThrow(AuthorizationException::class)
         ->and(fn () => ($this->markDistributed)($this->receiver, $this->cycleId, OrderingWorld::BAKER))->toThrow(AuthorizationException::class)
-        ->and(fn () => ($this->reopenProducerOrder)($this->receiver, $this->cycleId, OrderingWorld::BAKER))->toThrow(AuthorizationException::class)
-        ->and(fn () => ($this->validateReception)($this->finance, $this->cycleId, OrderingWorld::BAKER))->toThrow(AuthorizationException::class);
+        ->and(fn () => ($this->reopenProducerOrder)($this->receiver, $this->cycleId, OrderingWorld::BAKER))->toThrow(AuthorizationException::class);
+});
+
+// T07 — Finance validates, distributes and reopens (R6, R7, S8, S12)
+
+it('lets Finance validate and distribute what a Receiver recorded once allocations balance (R7, S8)', function () {
+    ($this->orderBreadLikeS10)();
+    ($this->world->setReceivedTotal)($this->receiver, $this->cycleId, OrderingWorld::BAKER, $this->bread, '20');
+
+    ($this->validateReception)($this->finance, $this->cycleId, OrderingWorld::BAKER);
+    expect(($this->reception)()->validated)->toBeTrue();
+
+    ($this->markDistributed)($this->finance, $this->cycleId, OrderingWorld::BAKER);
+    expect(($this->reception)()->distributed)->toBeTrue();
+});
+
+it('lets a Receiver give a late arrival to the weekly basket drafts of a reception Finance reopened (R6, R7, S12)', function () {
+    ($this->world->stopParticipating)($this->world->manager, $this->cycleId, OrderingWorld::GROWER);
+    ($this->order)('A', $this->bread, '4');
+    ($this->order)('A', $this->rye, '1');
+    ($this->order)('B', $this->rye, '1');
+    ($this->order)('C', $this->bread, '10');
+    ($this->send)();
+    ($this->setReceived)($this->rye, '0');
+    ($this->validateReception)($this->finance, $this->cycleId, OrderingWorld::BAKER);
+    ($this->markDistributed)($this->finance, $this->cycleId, OrderingWorld::BAKER);
+    $this->world->baskets->validate($this->world->orders->ofHousehold($this->cycleId, RECEPTION_A)->id);
+
+    ($this->reopenProducerOrder)($this->finance, $this->cycleId, OrderingWorld::BAKER);
+    ($this->world->setReceivedTotal)($this->receiver, $this->cycleId, OrderingWorld::BAKER, $this->rye, '2');
+
+    $snapshot = $this->world->baskets->snapshot($this->cycleId);
+    expect(collect($this->world->baskets->latesOfHousehold($this->cycleId, RECEPTION_A))->map(fn (array $late) => [$late['state'], $late['effective']])->all())
+        ->toBe([['draft', [$this->rye => 1000]]])
+        ->and($snapshot->effective(RECEPTION_A, $this->rye))->toBe(1000)
+        ->and($this->world->baskets->stateOfHousehold($this->cycleId, RECEPTION_B))->toBe('draft')
+        ->and($snapshot->effective(RECEPTION_B, $this->rye))->toBe(1000)
+        ->and(($this->reception)($this->receiver)->canEdit)->toBeTrue()
+        ->and(($this->reception)($this->receiver)->canValidate)->toBeFalse();
+});
+
+it('still refuses a Receiver to redistribute a product of a validated basket in a reopened reception (R6, D12)', function () {
+    ($this->world->stopParticipating)($this->world->manager, $this->cycleId, OrderingWorld::GROWER);
+    ($this->order)('A', $this->bread, '4');
+    ($this->order)('A', $this->rye, '1');
+    ($this->order)('B', $this->rye, '1');
+    ($this->order)('C', $this->bread, '10');
+    ($this->send)();
+    ($this->setReceived)($this->rye, '0');
+    ($this->validateReception)($this->finance, $this->cycleId, OrderingWorld::BAKER);
+    ($this->markDistributed)($this->finance, $this->cycleId, OrderingWorld::BAKER);
+    $this->world->baskets->validate($this->world->orders->ofHousehold($this->cycleId, RECEPTION_A)->id);
+    ($this->reopenProducerOrder)($this->finance, $this->cycleId, OrderingWorld::BAKER);
+    ($this->world->setReceivedTotal)($this->receiver, $this->cycleId, OrderingWorld::BAKER, $this->rye, '2');
+
+    expect(fn () => ($this->world->setReceivedTotal)($this->receiver, $this->cycleId, OrderingWorld::BAKER, $this->rye, '3'))
+        ->toThrow(RedistributionBlockedByValidatedBasket::class);
 });
 
 it('clears the validation when a Receiver changes a received total (R6)', function () {
@@ -614,14 +670,16 @@ it('reports the actions each role is allowed on a reception (A13)', function () 
     $flags = fn (Actor $actor) => [($this->reception)($actor)->canEdit, ($this->reception)($actor)->canValidate, ($this->reception)($actor)->canDistribute, ($this->reception)($actor)->canReopen];
 
     expect($flags($this->receiver))->toBe([true, false, false, false])
-        ->and($flags($this->finance))->toBe([true, false, false, false])
+        ->and($flags($this->finance))->toBe([true, true, false, false])
         ->and($flags($this->world->manager))->toBe([true, true, false, false]);
 
     ($this->validateReception)($this->world->manager, $this->cycleId, OrderingWorld::BAKER);
-    expect($flags($this->world->manager))->toBe([true, false, true, false]);
+    expect($flags($this->world->manager))->toBe([true, false, true, false])
+        ->and($flags($this->finance))->toBe([true, false, true, false]);
 
     ($this->markDistributed)($this->world->manager, $this->cycleId, OrderingWorld::BAKER);
     expect($flags($this->world->manager))->toBe([false, false, false, true])
+        ->and($flags($this->finance))->toBe([false, false, false, true])
         ->and($flags($this->receiver))->toBe([false, false, false, false]);
 });
 

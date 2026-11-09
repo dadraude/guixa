@@ -296,18 +296,29 @@ it('clears the validation when a Receiver changes a received total (R6)', functi
     expect(validatedAt($cycleId, $producerId))->toBeNull();
 });
 
-it('lets Finance receive through the same pages but not settle (R7)', function () {
+it('lets Finance receive and run every reception step, seeing the actions Receiver does not (R7)', function () {
     [$cycleId, $producerId, $loaf] = receptionFixture();
     $finance = accountWith(Role::Finance);
     $reception = "/receptions/{$cycleId}/{$producerId}";
 
     $this->actingAs($finance)->get('/receptions')->assertOk();
     $this->actingAs($finance)->get($reception)->assertOk()->assertInertia(fn (Assert $page) => $page
-        ->where('can', ['edit' => true, 'validate' => false, 'distribute' => false, 'reopen' => false]));
+        ->where('can', ['edit' => true, 'validate' => true, 'distribute' => false, 'reopen' => false]));
     $this->actingAs($finance)->put("{$reception}/products/{$loaf}/received", ['received' => '8'])->assertRedirect();
-    $this->actingAs($finance)->post("{$reception}/validate")->assertForbidden();
-
     expect(DB::table('received_totals')->where('product_id', $loaf)->value('received_quantity'))->toBe('8.000');
+
+    $this->actingAs($finance)->post("{$reception}/validate")->assertRedirect();
+    expect(validatedAt($cycleId, $producerId))->not->toBeNull();
+    $this->actingAs($finance)->get($reception)->assertInertia(fn (Assert $page) => $page
+        ->where('can', ['edit' => true, 'validate' => false, 'distribute' => true, 'reopen' => false]));
+
+    $this->actingAs($finance)->post("{$reception}/distribution")->assertRedirect();
+    $this->actingAs($finance)->get($reception)->assertInertia(fn (Assert $page) => $page
+        ->where('can', ['edit' => false, 'validate' => false, 'distribute' => false, 'reopen' => true]));
+
+    $this->actingAs($finance)->delete("{$reception}/distribution")->assertRedirect();
+    $this->actingAs($finance)->get($reception)->assertInertia(fn (Assert $page) => $page
+        ->where('can', ['edit' => true, 'validate' => false, 'distribute' => true, 'reopen' => false]));
 });
 
 it('lists only cycles with a sent order, closed ones included, newest pickup first, and reads a distributed reception only (R8)', function () {

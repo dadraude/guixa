@@ -187,7 +187,7 @@ class AppServiceProvider extends ServiceProvider
     {
         Gate::define('manage', fn (Actor $actor): bool => $actor->hasRole(Role::Manager));
         Gate::define('receive', fn (Actor $actor): bool => $actor->hasAnyRole(Role::Manager->value, Role::Finance->value, Role::Receiver->value));
-        Gate::define('settle-reception', fn (Actor $actor): bool => $actor->hasRole(Role::Manager));
+        Gate::define('settle-reception', fn (Actor $actor): bool => $actor->hasAnyRole(Role::Manager->value, Role::Finance->value));
         Gate::define('manage-roles', fn (Actor $actor): bool => $actor->hasRole(Role::Manager));
         Gate::define('administer-catalogue', fn (Actor $actor): bool => $actor->hasAnyRole(Role::Manager->value, Role::Catalogue->value));
         Gate::define('set-availability', fn (Actor $actor, string $producerId): bool => Gate::forUser($actor)->allows('owns', ['producer', $producerId]) || Gate::forUser($actor)->allows('administer-catalogue'));
