@@ -34,7 +34,6 @@ use App\Http\Controllers\Manage\PickupController;
 use App\Http\Controllers\Manage\ProducerAccountController;
 use App\Http\Controllers\Manage\ProducerController;
 use App\Http\Controllers\Manage\ReceptionAllocationController;
-use App\Http\Controllers\Manage\ReceptionController;
 use App\Http\Controllers\Manage\ReceptionDistributionController;
 use App\Http\Controllers\Manage\ReceptionProductController;
 use App\Http\Controllers\Manage\ReceptionReceivedController;
@@ -52,6 +51,8 @@ use App\Http\Controllers\Producer\CycleController as ProducerCycleController;
 use App\Http\Controllers\Producer\ProductAvailabilityController;
 use App\Http\Controllers\Producer\ProductController;
 use App\Http\Controllers\Producer\StockMovementController as ProducerStockMovementController;
+use App\Http\Controllers\Receptions\ReceptionController;
+use App\Http\Controllers\Receptions\ReceptionCycleController;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\WalletController;
 use Illuminate\Support\Facades\Route;
@@ -185,15 +186,7 @@ Route::middleware(['auth', 'verified', 'role:manager'])->prefix('manage')->name(
         Route::delete('/', [CycleCutoffController::class, 'destroy'])->name('cycles.producers.cutoff.destroy');
     });
 
-    Route::prefix('cycles/{cycle}/receptions/{producer}')->whereUuid(['cycle', 'producer', 'product', 'household'])->group(function () {
-        Route::get('/', [ReceptionController::class, 'show'])->name('cycles.receptions.show');
-        Route::post('products', [ReceptionProductController::class, 'store'])->name('cycles.receptions.products.store');
-        Route::put('products/{product}/received', [ReceptionReceivedController::class, 'update'])->name('cycles.receptions.received.update');
-        Route::put('products/{product}/allocations/{household}', [ReceptionAllocationController::class, 'update'])->name('cycles.receptions.allocations.update');
-        Route::post('validate', [ReceptionValidationController::class, 'store'])->name('cycles.receptions.validate');
-        Route::post('distribution', [ReceptionDistributionController::class, 'store'])->name('cycles.receptions.distribution.store');
-        Route::delete('distribution', [ReceptionDistributionController::class, 'destroy'])->name('cycles.receptions.distribution.destroy');
-    });
+    Route::redirect('cycles/{cycle}/receptions/{producer}', '/receptions/{cycle}/{producer}', 301)->whereUuid(['cycle', 'producer']);
 
     Route::prefix('cycles/{cycle}/pickups')->whereUuid(['cycle', 'household'])->group(function () {
         Route::get('{household}', [PickupController::class, 'show'])->name('cycles.pickups.show');
@@ -251,6 +244,20 @@ Route::middleware(['auth', 'verified', 'role:manager'])->prefix('manage')->name(
     Route::put('accounts/{account}/invitation', [InvitationController::class, 'changeEmail'])
         ->whereUuid('account')
         ->name('accounts.invitation.email');
+});
+
+Route::middleware(['auth', 'verified', 'role:manager,finance,receiver'])->prefix('receptions')->name('receptions.')->group(function () {
+    Route::get('/', [ReceptionCycleController::class, 'index'])->name('index');
+
+    Route::prefix('{cycle}/{producer}')->whereUuid(['cycle', 'producer', 'product', 'household'])->group(function () {
+        Route::get('/', [ReceptionController::class, 'show'])->name('show');
+        Route::post('products', [ReceptionProductController::class, 'store'])->name('products.store');
+        Route::put('products/{product}/received', [ReceptionReceivedController::class, 'update'])->name('received.update');
+        Route::put('products/{product}/allocations/{household}', [ReceptionAllocationController::class, 'update'])->name('allocations.update');
+        Route::post('validate', [ReceptionValidationController::class, 'store'])->name('validate');
+        Route::post('distribution', [ReceptionDistributionController::class, 'store'])->name('distribution.store');
+        Route::delete('distribution', [ReceptionDistributionController::class, 'destroy'])->name('distribution.destroy');
+    });
 });
 
 Route::middleware(['auth', 'verified', 'role:producer'])->prefix('producer')->name('producer.')->group(function () {

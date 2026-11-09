@@ -252,7 +252,7 @@ Frontier at proposal time: **T01**. After T01 merges: T02, T03 and T06 are ready
   `canReopen` from `GetReception`; `Manage/Reception/Show.vue` moved to `Receptions/Show.vue` and reading only
   those flags. `ListReceptionCycles` with a read-repository method and reception state enum; page
   `Receptions/Index.vue`. Routes under `/receptions` (`role:manager,finance,receiver`) replacing
-  `/manage/cycles/{cycle}/receptions/{producer}`; old GET redirects; manager cycle page links updated.
+  `/manage/cycles/{cycle}/receptions/{producer}`; old GET redirects (the manager cycle page has no reception link to update; the *Receptions* sidebar item is the entry).
   `RoleAreas` `receiver`; sidebar *Reception* section, *Receptions* items for Finance and Manager; dashboard
   shortcut for Receiver.
 - **Requirements.** R6 "Receiver opens the reception of any sent producer order, adds unordered weekly products

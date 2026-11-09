@@ -5,6 +5,7 @@ import {
     Home,
     LayoutGrid,
     Package,
+    PackageCheck,
     Settings,
     Settings2,
     ShieldCheck,
@@ -21,6 +22,7 @@ import type { LucideIcon } from '@lucide/vue';
 import { computed } from 'vue';
 import CatalogueProducerController from '@/actions/App/Http/Controllers/Catalogue/ProducerController';
 import OrderController from '@/actions/App/Http/Controllers/OrderController';
+import ReceptionCycleController from '@/actions/App/Http/Controllers/Receptions/ReceptionCycleController';
 import StockController from '@/actions/App/Http/Controllers/StockController';
 import AccountController from '@/actions/App/Http/Controllers/Manage/AccountController';
 import CycleController from '@/actions/App/Http/Controllers/Manage/CycleController';
@@ -50,6 +52,12 @@ const producerItems: NavItem[] = [
     { title: 'Products', href: ProductController.index(), icon: Package },
     { title: 'Default cutoff', href: CutoffController.show(), icon: Timer },
 ];
+
+const receptionsItem: NavItem = {
+    title: 'Receptions',
+    href: ReceptionCycleController.index(),
+    icon: PackageCheck,
+};
 
 const memberItems: NavItem[] = [
     { title: 'Orders', href: OrderController.index(), icon: CalendarDays },
@@ -101,7 +109,19 @@ export function navigationSectionsFor(
                               icon: Package,
                               alsoActiveOn: ['/finance/stock'],
                           },
+                          receptionsItem,
                       ],
+                  },
+              ]
+            : []),
+        ...(roles.has('receiver') &&
+        !roles.has('manager') &&
+        !roles.has('finance')
+            ? [
+                  {
+                      title: 'Reception',
+                      icon: PackageCheck,
+                      items: [receptionsItem],
                   },
               ]
             : []),
@@ -136,6 +156,7 @@ export function navigationSectionsFor(
                               href: CycleController.index(),
                               icon: CalendarDays,
                           },
+                          receptionsItem,
                           {
                               title: 'Households',
                               href: HouseholdController.index(),

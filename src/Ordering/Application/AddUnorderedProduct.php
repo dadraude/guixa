@@ -31,7 +31,7 @@ final class AddUnorderedProduct
     /** @param  string  $received  at most 3 decimals; whole units for a non-variable product */
     public function __invoke(Actor $actor, string $cycleId, string $producerId, string $productId, string $received = '0'): void
     {
-        Gate::forUser($actor)->authorize('manage');
+        Gate::forUser($actor)->authorize('receive');
 
         $total = Quantity::fromString($received);
 

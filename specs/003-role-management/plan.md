@@ -250,7 +250,12 @@ New `/receptions` prefix *(planned)*, `role:manager,finance,receiver`, replacing
 | `POST …/products`, `PUT …/products/{product}/received`, `PUT …/products/{product}/allocations/{household}` | Unchanged controllers, new prefix; `receive`. |
 | `POST …/validate`, `POST`/`DELETE …/distribution` | Unchanged controllers, new prefix; `settle-reception`. |
 
-The manager's cycle page links to `/receptions/{cycle}/{producer}`; the old GET path redirects there.
+The old GET path `/manage/cycles/{cycle}/receptions/{producer}` redirects (301) to `/receptions/{cycle}/{producer}`.
+The manager's cycle page has no link to a reception today, so the *Receptions* sidebar item is the manager's entry.
+`ReceptionController` and `ReceptionCycleController` (namespace `Receptions`) cannot use `ListProducers`
+(`view-producers`) or `ListActiveHouseholds` (`manage`), which refuse Receiver and Finance. Households come from
+`ListReceptionHouseholds` (`receive`; active ones by name, behind the `ReceptionHouseholds` port over Membership's exported `ReadActiveHouseholds`), so
+inactive households never reach the page. Producer names come from one batched, actor-less Catalog read (`ReadProducerNames`, exported to Ordering) behind the `ReceptionProducerNames` port. The mutation controllers stay in `Manage`.
 
 ### Role switch, sidebar and dashboard (R14, R15)
 

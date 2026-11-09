@@ -47,11 +47,15 @@ use Guixa\Ordering\Domain\ProducerNotifier;
 use Guixa\Ordering\Domain\ProductAvailabilityRepository;
 use Guixa\Ordering\Domain\ProductCatalog;
 use Guixa\Ordering\Domain\ReceivedTotalRepository;
+use Guixa\Ordering\Domain\ReceptionHouseholds;
+use Guixa\Ordering\Domain\ReceptionProducerNames;
 use Guixa\Ordering\Domain\WeeklyBasketView;
 use Guixa\Ordering\Infrastructure\Catalog\CatalogProducerCutoffRules;
 use Guixa\Ordering\Infrastructure\Catalog\CatalogProductCatalog;
+use Guixa\Ordering\Infrastructure\Catalog\CatalogReceptionProducerNames;
 use Guixa\Ordering\Infrastructure\Membership\MembershipHouseholds;
 use Guixa\Ordering\Infrastructure\Membership\MembershipProducerNotifier;
+use Guixa\Ordering\Infrastructure\Membership\MembershipReceptionHouseholds;
 use Guixa\Ordering\Infrastructure\Persistence\EloquentCooperativeSettings;
 use Guixa\Ordering\Infrastructure\Persistence\EloquentCycleRepository;
 use Guixa\Ordering\Infrastructure\Persistence\EloquentOrderRepository;
@@ -171,6 +175,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(ProductAvailabilityRepository::class, EloquentProductAvailabilityRepository::class);
         $this->app->bind(ReceivedTotalRepository::class, EloquentReceivedTotalRepository::class);
         $this->app->bind(Households::class, MembershipHouseholds::class);
+        $this->app->bind(ReceptionHouseholds::class, MembershipReceptionHouseholds::class);
+        $this->app->bind(ReceptionProducerNames::class, CatalogReceptionProducerNames::class);
         $this->app->bind(ProducerNotifier::class, MembershipProducerNotifier::class);
     }
 
@@ -180,6 +186,8 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Gate::define('manage', fn (Actor $actor): bool => $actor->hasRole(Role::Manager));
+        Gate::define('receive', fn (Actor $actor): bool => $actor->hasAnyRole(Role::Manager->value, Role::Finance->value, Role::Receiver->value));
+        Gate::define('settle-reception', fn (Actor $actor): bool => $actor->hasRole(Role::Manager));
         Gate::define('manage-roles', fn (Actor $actor): bool => $actor->hasRole(Role::Manager));
         Gate::define('administer-catalogue', fn (Actor $actor): bool => $actor->hasAnyRole(Role::Manager->value, Role::Catalogue->value));
         Gate::define('view-producers', fn (Actor $actor): bool => $actor->hasAnyRole(Role::Manager->value, Role::Catalogue->value));

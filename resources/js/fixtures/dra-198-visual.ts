@@ -292,8 +292,9 @@ const pageProps: Record<string, Record<string, unknown>> = {
         deactivationWarning: settlement,
     },
     'Manage/Producers/Index': { producers: [producer] },
-    'Manage/Reception/Show': {
+    'Receptions/Show': {
         reception,
+        can: { edit: true, validate: true, distribute: false, reopen: false },
         distribution: {
             validated: false,
             distributed: false,

@@ -36,7 +36,7 @@ final class SetAllocation
     /** @param  string  $quantity  at most 3 decimals, zero or more; whole units for a non-variable product */
     public function __invoke(Actor $actor, string $cycleId, string $producerId, string $productId, string $householdId, string $quantity): void
     {
-        Gate::forUser($actor)->authorize('manage');
+        Gate::forUser($actor)->authorize('receive');
 
         $allocated = Quantity::fromString($quantity);
         $now = $this->clock->now()->setTimezone($this->clock->timezone());

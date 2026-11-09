@@ -41,7 +41,7 @@ function validationState(string $cycle): array
 
 it('keeps a stock line through a reception sync and charges weekly plus stock once, leaving 3 jars (R20, R22, R28, S16)', function () {
     ['week' => $week, 'honey' => $honey] = weeklyWithHoney();
-    $reception = "/manage/cycles/{$week['cycle']}/receptions/{$week['producer']}";
+    $reception = "/receptions/{$week['cycle']}/{$week['producer']}";
 
     $this->delete("{$reception}/distribution")->assertRedirect();
     $this->put("{$reception}/products/{$week['loaf']}/received", ['received' => '5'])->assertRedirect();

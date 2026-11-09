@@ -1488,7 +1488,7 @@
             "id": "manage-reception-show",
             "path": "/resources/visual/dra-205.html",
             "query": {
-                "page": "Manage/Reception/Show"
+                "page": "Receptions/Show"
             },
             "root": ".reference-style",
             "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",

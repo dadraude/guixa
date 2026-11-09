@@ -18,7 +18,7 @@ final class ReopenProducerOrder
 
     public function __invoke(Actor $actor, string $cycleId, string $producerId): void
     {
-        Gate::forUser($actor)->authorize('manage');
+        Gate::forUser($actor)->authorize('settle-reception');
 
         $this->transactions->run(function () use ($cycleId, $producerId) {
             $cycle = $this->cycles->getForUpdate($cycleId) ?? throw CycleNotFound::withId($cycleId);

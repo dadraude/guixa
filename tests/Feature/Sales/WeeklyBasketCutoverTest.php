@@ -24,7 +24,7 @@ function settledWeeklyFixture(): array
     DB::table('cycle_producers')->where('cycle_id', $cycleId)->update(['closes_at' => now()->subHour(), 'sent_at' => now()]);
 
     $manager = accountWith(Role::Manager);
-    $reception = "/manage/cycles/{$cycleId}/receptions/{$baker->id}";
+    $reception = "/receptions/{$cycleId}/{$baker->id}";
     test()->actingAs($manager)->put("{$reception}/products/{$loaf}/received", ['received' => '4'])->assertRedirect();
     test()->post("{$reception}/validate")->assertRedirect();
     test()->post("{$reception}/distribution")->assertRedirect();
@@ -95,7 +95,7 @@ it('reports the weekly source not ready until the last producer is distributed, 
     DB::table('cycle_producers')->where('cycle_id', $cycleId)->update(['closes_at' => now()->subHour(), 'sent_at' => now()]);
     $manager = accountWith(Role::Manager);
     $distribute = function (string $producerId, string $product, string $received) use ($cycleId, $manager) {
-        $reception = "/manage/cycles/{$cycleId}/receptions/{$producerId}";
+        $reception = "/receptions/{$cycleId}/{$producerId}";
         $this->actingAs($manager)->put("{$reception}/products/{$product}/received", ['received' => $received])->assertRedirect();
         $this->post("{$reception}/validate")->assertRedirect();
         $this->post("{$reception}/distribution")->assertRedirect();

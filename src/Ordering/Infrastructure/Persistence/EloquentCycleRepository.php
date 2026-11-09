@@ -75,6 +75,20 @@ final class EloquentCycleRepository implements CycleRepository
         return array_values($cycles);
     }
 
+    public function listWithSentOrders(): array
+    {
+        $cycles = CycleModel::query()
+            ->with('producers')
+            ->whereHas('producers', fn ($producers) => $producers->whereNotNull('sent_at'))
+            ->orderByDesc('pickup_date')
+            ->orderByDesc('id')
+            ->get()
+            ->map(fn (CycleModel $model) => $this->toDomain($model))
+            ->all();
+
+        return array_values($cycles);
+    }
+
     public function existsOnPickupDate(DateTimeInterface $pickupDate): bool
     {
         return CycleModel::query()

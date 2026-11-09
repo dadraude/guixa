@@ -86,6 +86,18 @@ const reception = {
 };
 
 const open = { validated: false, distributed: false, settled: false };
+const managerCan = {
+    edit: true,
+    validate: true,
+    distribute: false,
+    reopen: false,
+};
+const receiverCan = {
+    edit: true,
+    validate: false,
+    distribute: false,
+    reopen: false,
+};
 
 describe('reception page', () => {
     it('shows each product with its totals and flags the unbalanced ones', async () => {
@@ -93,6 +105,7 @@ describe('reception page', () => {
             createSSRApp(Show, {
                 reception,
                 distribution: open,
+                can: managerCan,
                 households: [{ id: 'd', name: 'Household D' }],
             }),
         );
@@ -127,6 +140,7 @@ describe('reception page', () => {
                     distributed: false,
                     settled: false,
                 },
+                can: { ...managerCan, validate: false, distribute: true },
                 households: [],
             }),
         );
@@ -141,6 +155,7 @@ describe('reception page', () => {
             createSSRApp(Show, {
                 reception,
                 distribution: open,
+                can: managerCan,
                 households: [],
             }),
         );
@@ -155,6 +170,7 @@ describe('reception page', () => {
             createSSRApp(Show, {
                 reception,
                 distribution: open,
+                can: managerCan,
                 households: [],
             }),
         );
@@ -176,6 +192,12 @@ describe('reception page', () => {
                         settled: true,
                         closed,
                     },
+                    can: {
+                        edit: false,
+                        validate: false,
+                        distribute: false,
+                        reopen: !closed,
+                    },
                     households: [{ id: 'd', name: 'Household D' }],
                 }),
             );
@@ -191,5 +213,23 @@ describe('reception page', () => {
         expect(html).not.toContain('Household D');
         expect(html).toContain('data-test="allocated-value"');
         expect(await render(true)).not.toContain('data-test="reopen-form"');
+    });
+
+    it('shows a receiver the editing controls but no validate, distribute or reopen action', async () => {
+        const html = await renderToString(
+            createSSRApp(Show, {
+                reception,
+                distribution: open,
+                can: receiverCan,
+                households: [{ id: 'd', name: 'Household D' }],
+            }),
+        );
+
+        expect(html).toContain('data-test="received-form-bread"');
+        expect(html).toContain('Another household…');
+        expect(html).not.toContain('data-test="validate-form"');
+        expect(html).not.toContain('data-test="distribute-form"');
+        expect(html).not.toContain('data-test="distribute-hint"');
+        expect(html).not.toContain('data-test="reopen-form"');
     });
 });

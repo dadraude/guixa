@@ -49,7 +49,7 @@ describe('shared app navigation', () => {
         ).toEqual([
             ['Dashboard'],
             ['Orders', 'My baskets', 'Stock catalogue', 'Wallet'],
-            ['Cycles', 'Households', 'Baskets'],
+            ['Cycles', 'Receptions', 'Households', 'Baskets'],
             ['Producers', 'Stock', 'Return items'],
             ['Accounts', 'Roles', 'Settings'],
             ['Products', 'Default cutoff'],
@@ -59,7 +59,7 @@ describe('shared app navigation', () => {
             { role: 'manager' },
             { role: 'producer' },
         ]).map((item) => item.title);
-        expect(titles).toHaveLength(16);
+        expect(titles).toHaveLength(17);
         expect(new Set(titles).size).toBe(titles.length);
     });
 
@@ -93,6 +93,7 @@ describe('shared app navigation', () => {
             'Dashboard',
             'Baskets',
             'Stock',
+            'Receptions',
         ]);
         expect(currentNavigationItem(finance, history)?.title).toBe('Stock');
     });
@@ -151,5 +152,33 @@ describe('shared app navigation', () => {
                 '/catalogue/return-items',
             )?.title,
         ).toBe('Return items');
+    });
+
+    it('gives a Receiver-only account a Reception section and Finance or Manager the Receptions item once', () => {
+        const receiver = navigationSectionsFor([{ role: 'receiver' }]);
+
+        expect(receiver.map((section) => section.title)).toEqual([
+            'Overview',
+            'Reception',
+        ]);
+        expect(
+            navigationItemsFor([{ role: 'finance' }, { role: 'receiver' }])
+                .map((item) => item.title)
+                .filter((title) => title === 'Receptions'),
+        ).toHaveLength(1);
+    });
+
+    it('gives a Receiver-only account a Reception section and Finance or Manager the Receptions item once', () => {
+        const receiver = navigationSectionsFor([{ role: 'receiver' }]);
+
+        expect(receiver.map((section) => section.title)).toEqual([
+            'Overview',
+            'Reception',
+        ]);
+        expect(
+            navigationItemsFor([{ role: 'finance' }, { role: 'receiver' }])
+                .map((item) => item.title)
+                .filter((title) => title === 'Receptions'),
+        ).toHaveLength(1);
     });
 });
