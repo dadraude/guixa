@@ -83,9 +83,9 @@ it('denies receipt writes to members and immediately after Finance revocation (S
     $receiptUrl = "/finance/households/{$household}/wallet/top-ups";
 
     $this->actingAs($member)->post($receiptUrl, ['amount' => '5'])->assertForbidden();
-    $this->actingAs($manager)->put(route('manage.accounts.finance-role.update', $finance->id))->assertRedirect();
+    $this->actingAs($manager)->post('/manage/roles/finance/holders', ['account_id' => $finance->id])->assertRedirect();
     $this->actingAs($finance)->post($receiptUrl, ['amount' => '5'])->assertRedirect();
-    $this->actingAs($manager)->delete(route('manage.accounts.finance-role.destroy', $finance->id))->assertRedirect();
+    $this->actingAs($manager)->delete("/manage/roles/finance/holders/{$finance->id}")->assertRedirect();
     $this->actingAs($finance)->post($receiptUrl, ['amount' => '5'])->assertForbidden();
     expect(DB::table('wallet_movements')->where('household_id', $household)->where('type', 'top_up')->count())->toBe(1);
 });

@@ -20,7 +20,7 @@ const accounts: App.Http.AccountRow[] = empty
                   ? 'Administrador de la cooperativa amb un nom extraordinàriament llarg'
                   : 'Admin',
               email: 'admin@draude.cat',
-              roles: ['manager'],
+              roles: ['manager', 'finance', 'catalogue'],
               householdId: null,
               householdName: null,
               active: true,
@@ -42,7 +42,7 @@ const accounts: App.Http.AccountRow[] = empty
               accountId: 'producer',
               name: 'Productor 1',
               email: 'productor@draude.cat',
-              roles: ['producer'],
+              roles: ['producer', 'receiver'],
               householdId: null,
               householdName: null,
               active: false,

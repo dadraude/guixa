@@ -7,6 +7,7 @@ use Guixa\Membership\Domain\Error\AccountDeactivated;
 use Guixa\Membership\Domain\Error\InvitationAlreadyAccepted;
 use Guixa\Membership\Domain\Error\NotAStaffRole;
 use Guixa\Membership\Domain\Error\RoleAlreadyHeld;
+use Guixa\Membership\Domain\Error\RoleNotHeld;
 use Guixa\Membership\Domain\ValueObject\Email;
 use Guixa\Shared\Domain\Role;
 
@@ -87,9 +88,10 @@ final class Account
         return $this->deactivatedAt === null;
     }
 
+    /** Only a manager who accepted the invitation counts: a pending one cannot act yet (R1). */
     public function isActiveManager(): bool
     {
-        return $this->isManager() && $this->isActive();
+        return $this->isManager() && $this->hasAcceptedInvitation() && $this->isActive();
     }
 
     /** Moving relinks the same account; linking an unlinked one works the same way (R35). */
@@ -125,37 +127,18 @@ final class Account
         $this->roles = [...$this->roles, $role];
     }
 
-    public function grantManager(): void
+    /** A deactivated account keeps its roles and can lose them (R2). */
+    public function removeRole(Role $role): void
     {
-        if ($this->isManager()) {
-            return;
+        if (! $role->isStaff()) {
+            throw NotAStaffRole::named($role->value);
         }
 
-        $this->roles = [...$this->roles, Role::Manager];
-    }
-
-    /** The caller checks that another active manager remains (R36a). */
-    public function removeManager(): void
-    {
-        $this->roles = array_values(array_filter($this->roles, fn (Role $role) => $role !== Role::Manager));
-    }
-
-    public function grantFinance(): void
-    {
-        if (! $this->isActive()) {
-            throw AccountDeactivated::for($this->id);
+        if (! in_array($role, $this->roles, true)) {
+            throw RoleNotHeld::for($this->id, $role);
         }
 
-        if (in_array(Role::Finance, $this->roles, true)) {
-            return;
-        }
-
-        $this->roles = [...$this->roles, Role::Finance];
-    }
-
-    public function removeFinance(): void
-    {
-        $this->roles = array_values(array_filter($this->roles, fn (Role $role) => $role !== Role::Finance));
+        $this->roles = array_values(array_filter($this->roles, fn (Role $held) => $held !== $role));
     }
 
     /** The producer is deactivated: the account keeps its other roles (R3a). */

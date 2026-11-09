@@ -91,8 +91,9 @@ The roles in 001 change as follows; R# below are this feature's.
 - **R12** The accounts page shows each account's roles but no longer grants or removes them; it links to
   the role management screen. Household, deactivation and invitation actions stay there.
 - **R13** A grant or removal shows its result at once. If the state changed meanwhile (the role was already
-  granted or removed, the account was deactivated, or it became the last active manager), the action is
-  rejected with the reason and the screen shows the current holders.
+  granted or removed, the account was deactivated before a grant, or it became the last active manager), the
+  action is rejected with the reason and the screen shows the current holders. Removing a role from a
+  deactivated account is allowed (R2, S2).
 
 ### Areas and access
 

@@ -97,7 +97,7 @@ final class DatabaseAccountRepository implements AccountRepository
 
     public function hasOtherActiveManager(string $accountId): bool
     {
-        return $this->managerRows()->whereNull('deactivated_at')->where('id', '<>', $accountId)->exists();
+        return $this->managerRows()->whereNotNull('activated_at')->whereNull('deactivated_at')->where('id', '<>', $accountId)->exists();
     }
 
     public function lockManagers(): void

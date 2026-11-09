@@ -38,7 +38,7 @@ return [
     'InvitationExpired' => 'Aquesta invitació ha caducat. Demana’n una de nova a un gestor.',
     'InvitationNotValid' => 'Aquest enllaç d’invitació no és vàlid. Demana’n un de nou a un gestor.',
     'LastActiveManager' => 'No es pot desactivar el darrer gestor actiu.',
-    'LastManager' => 'No es pot eliminar el rol del darrer gestor actiu.',
+    'LastManager' => 'No es pot retirar el rol del darrer gestor actiu.',
     'LineMarkedNotDelivered' => 'Aquest producte està marcat com a no lliurable i no es pot assignar.',
     'ManagerAlreadyExists' => 'Ja hi ha un gestor.',
     'ManualAllocationsWouldBeLost' => 'Aquest canvi eliminaria les assignacions manuals.',
@@ -88,5 +88,6 @@ return [
     'ProductNotOrderable' => 'Aquest producte no està disponible per demanar.',
     'ReturnItemNotFound' => 'No s’ha trobat aquest article retornable.',
     'RoleAlreadyHeld' => 'Aquest compte ja té aquest rol.',
+    'RoleNotHeld' => 'Aquest compte ja no té aquest rol.',
     'StockProductNotFound' => 'No s’ha trobat aquest producte d’estoc.',
 ];

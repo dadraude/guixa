@@ -15,7 +15,7 @@ use Guixa\Membership\Application\GetAccountNames;
 use Guixa\Membership\Application\GetHousehold;
 use Guixa\Membership\Application\GetHouseholdDeactivationWarning;
 use Guixa\Membership\Application\GetHouseholds;
-use Guixa\Membership\Application\GrantManagerRole;
+use Guixa\Membership\Application\GrantStaffRole;
 use Guixa\Membership\Application\InviteProducerAccount;
 use Guixa\Membership\Application\ListAccounts;
 use Guixa\Membership\Application\ListHouseholds;
@@ -24,7 +24,7 @@ use Guixa\Membership\Application\ListProducerAccounts;
 use Guixa\Membership\Application\MoveMember;
 use Guixa\Membership\Application\ReactivateAccount;
 use Guixa\Membership\Application\ReactivateHousehold;
-use Guixa\Membership\Application\RemoveManagerRole;
+use Guixa\Membership\Application\RemoveStaffRole;
 use Guixa\Membership\Application\RenameHousehold;
 use Guixa\Membership\Application\ResendInvitation;
 use Guixa\Membership\Application\RestoreProducerRole;
@@ -43,6 +43,7 @@ use Tests\Support\InMemory\ImmediateTransactionRunner;
 use Tests\Support\InMemory\InMemoryAccountRepository;
 use Tests\Support\InMemory\InMemoryHouseholdRepository;
 use Tests\Support\InMemory\InMemoryInvitationRepository;
+use Tests\Support\InMemory\InMemoryRoleChangeLog;
 use Tests\Support\InMemory\RecordingAccountPasswords;
 use Tests\Support\InMemory\RecordingInvitationSender;
 
@@ -107,9 +108,11 @@ final class MembershipWorld
 
     public readonly UnlinkMember $unlinkMember;
 
-    public readonly GrantManagerRole $grantManagerRole;
+    public readonly GrantStaffRole $grantStaffRole;
 
-    public readonly RemoveManagerRole $removeManagerRole;
+    public readonly RemoveStaffRole $removeStaffRole;
+
+    public readonly InMemoryRoleChangeLog $roleChanges;
 
     public readonly DeactivateAccount $deactivateAccount;
 
@@ -177,8 +180,9 @@ final class MembershipWorld
 
         $this->moveMember = new MoveMember($this->households, $this->accounts, $deactivateEmptyHousehold, $this->transactions);
         $this->unlinkMember = new UnlinkMember($this->accounts, $this->households, $deactivateEmptyHousehold, $this->transactions);
-        $this->grantManagerRole = new GrantManagerRole($this->accounts, $this->households, $this->transactions);
-        $this->removeManagerRole = new RemoveManagerRole($this->accounts, $this->households, $this->transactions);
+        $this->roleChanges = new InMemoryRoleChangeLog;
+        $this->grantStaffRole = new GrantStaffRole($this->accounts, $this->households, $this->roleChanges, $this->transactions, $this->clock);
+        $this->removeStaffRole = new RemoveStaffRole($this->accounts, $this->households, $this->roleChanges, $this->transactions, $this->clock);
         $this->deactivateAccount = new DeactivateAccount($this->accounts, $this->households, $deactivateEmptyHousehold, $this->transactions, $this->clock);
         $this->reactivateAccount = new ReactivateAccount($this->accounts, $this->households, $this->transactions);
         $this->listAccounts = new ListAccounts($this->accounts, $this->households);

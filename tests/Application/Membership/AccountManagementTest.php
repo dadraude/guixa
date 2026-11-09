@@ -1,10 +1,12 @@
 <?php
 
+use Guixa\Membership\Domain\Account;
 use Guixa\Membership\Domain\Error\AccountDeactivated;
 use Guixa\Membership\Domain\Error\AccountNotFound;
 use Guixa\Membership\Domain\Error\HouseholdNotFound;
 use Guixa\Membership\Domain\Error\LastActiveManager;
 use Guixa\Membership\Domain\Error\LastManager;
+use Guixa\Membership\Domain\ValueObject\Email;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Role;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -112,28 +114,19 @@ it('lets only a manager move or unlink members (R33)', function () {
 it('lets a member who is granted the manager role keep both roles (S44)', function () {
     [, $annaId] = householdWithAnnaAndBiel($this->world);
 
-    ($this->world->grantManagerRole)($this->world->manager, $annaId);
+    ($this->world->grantStaffRole)($this->world->manager, $annaId, 'manager');
 
     $account = $this->world->accounts->get($annaId);
     expect($account->roles)->toBe([Role::Manager])
         ->and($account->householdId)->not->toBeNull();
 });
 
-it('granting the manager role twice leaves one manager role', function () {
-    [, $annaId] = householdWithAnnaAndBiel($this->world);
-
-    ($this->world->grantManagerRole)($this->world->manager, $annaId);
-    ($this->world->grantManagerRole)($this->world->manager, $annaId);
-
-    expect($this->world->accounts->get($annaId)->roles)->toBe([Role::Manager]);
-});
-
 it('removes the manager role when another active manager remains (R36a)', function () {
     [, $annaId] = householdWithAnnaAndBiel($this->world);
     $carlaId = $this->world->addManager('Carla', 'carla@example.org');
-    ($this->world->grantManagerRole)($this->world->manager, $annaId);
+    ($this->world->grantStaffRole)($this->world->manager, $annaId, 'manager');
 
-    ($this->world->removeManagerRole)($this->world->manager, $annaId);
+    ($this->world->removeStaffRole)($this->world->manager, $annaId, 'manager');
 
     expect($this->world->accounts->get($annaId)->roles)->toBe([])
         ->and($this->world->accounts->get($annaId)->householdId)->not->toBeNull()
@@ -143,7 +136,7 @@ it('removes the manager role when another active manager remains (R36a)', functi
 it('rejects removing the manager role from the last manager (S44)', function () {
     $carlaId = $this->world->addManager('Carla', 'carla@example.org');
 
-    expect(fn () => ($this->world->removeManagerRole)($this->world->manager, $carlaId))->toThrow(LastManager::class)
+    expect(fn () => ($this->world->removeStaffRole)($this->world->manager, $carlaId, 'manager'))->toThrow(LastManager::class)
         ->and($this->world->accounts->get($carlaId)->roles)->toBe([Role::Manager]);
 });
 
@@ -152,7 +145,7 @@ it('does not count a deactivated manager as a remaining manager (R36a)', functio
     $danId = $this->world->addManager('Dan', 'dan@example.org');
     ($this->world->deactivateAccount)($this->world->manager, $danId);
 
-    expect(fn () => ($this->world->removeManagerRole)($this->world->manager, $carlaId))->toThrow(LastManager::class);
+    expect(fn () => ($this->world->removeStaffRole)($this->world->manager, $carlaId, 'manager'))->toThrow(LastManager::class);
 });
 
 it('lets the manager role be removed from a deactivated manager', function () {
@@ -160,7 +153,7 @@ it('lets the manager role be removed from a deactivated manager', function () {
     $danId = $this->world->addManager('Dan', 'dan@example.org');
     ($this->world->deactivateAccount)($this->world->manager, $danId);
 
-    ($this->world->removeManagerRole)($this->world->manager, $danId);
+    ($this->world->removeStaffRole)($this->world->manager, $danId, 'manager');
 
     expect($this->world->accounts->get($danId)->roles)->toBe([]);
 });
@@ -168,9 +161,9 @@ it('lets the manager role be removed from a deactivated manager', function () {
 it('lets only a manager grant or remove the manager role (R36a)', function () {
     [, $annaId] = householdWithAnnaAndBiel($this->world);
 
-    expect(fn () => ($this->world->grantManagerRole)($this->world->member, $annaId))->toThrow(AuthorizationException::class)
-        ->and(fn () => ($this->world->removeManagerRole)($this->world->member, $annaId))->toThrow(AuthorizationException::class)
-        ->and(fn () => ($this->world->grantManagerRole)($this->world->manager, $this->world->accounts->nextId()))->toThrow(AccountNotFound::class);
+    expect(fn () => ($this->world->grantStaffRole)($this->world->member, $annaId, 'manager'))->toThrow(AuthorizationException::class)
+        ->and(fn () => ($this->world->removeStaffRole)($this->world->member, $annaId, 'manager'))->toThrow(AuthorizationException::class)
+        ->and(fn () => ($this->world->grantStaffRole)($this->world->manager, $this->world->accounts->nextId(), 'manager'))->toThrow(AccountNotFound::class);
 });
 
 // S59 — Deactivating an account (R36b)
@@ -320,4 +313,13 @@ it('lists every account with its roles, household and state', function () {
         ->and($accounts[$carlaId]->active)->toBeTrue()
         ->and(collect($accounts)->firstWhere('name', 'Biel')->householdName)->toBe('Household H');
     expect(fn () => ($this->world->listAccounts)($this->world->member))->toThrow(AuthorizationException::class);
+});
+
+it('does not count a manager with a pending invitation as a remaining manager when deactivating (D2)', function () {
+    $carlaId = $this->world->addManager('Carla', 'carla@example.org');
+    $this->world->accounts->save(Account::restore(
+        $this->world->accounts->nextId(), 'Ernest', Email::from('ernest@example.org'), [Role::Manager], null, null, null, null,
+    ));
+
+    expect(fn () => ($this->world->deactivateAccount)($this->world->manager, $carlaId))->toThrow(LastActiveManager::class);
 });

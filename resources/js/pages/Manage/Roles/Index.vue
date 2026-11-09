@@ -40,10 +40,28 @@ function search(role: Guixa.Shared.Domain.Role, query: string) {
 }
 
 const processing = ref(false);
-const grantError = ref<{
+// One error for the last grant or removal, so a new action never leaves the previous one's message behind.
+const roleError = ref<{
     role: Guixa.Shared.Domain.Role;
     message: string;
 } | null>(null);
+
+function remove(role: Guixa.Shared.Domain.Role, accountId: string) {
+    router.delete(RoleHolderController.destroy.url([role, accountId]), {
+        preserveScroll: true,
+        onStart: () => {
+            processing.value = true;
+            roleError.value = null;
+        },
+        // The page reloads the current holders, so the manager sees the state the rejection is about (R13).
+        onError: (errors) => {
+            roleError.value = { role, message: errors.domain ?? '' };
+        },
+        onFinish: () => {
+            processing.value = false;
+        },
+    });
+}
 
 function grant(role: Guixa.Shared.Domain.Role, accountId: string) {
     router.post(
@@ -53,11 +71,11 @@ function grant(role: Guixa.Shared.Domain.Role, accountId: string) {
             preserveScroll: true,
             onStart: () => {
                 processing.value = true;
-                grantError.value = null;
+                roleError.value = null;
             },
             // The page reloads the current holders, so the manager sees the state the rejection is about (R13).
             onError: (errors) => {
-                grantError.value = {
+                roleError.value = {
                     role,
                     message: errors.domain ?? errors.account_id ?? '',
                 };
@@ -88,7 +106,8 @@ function grant(role: Guixa.Shared.Domain.Role, accountId: string) {
                 searchedRole === group.role ? (candidates ?? null) : null
             "
             :processing="processing"
-            :error="grantError?.role === group.role ? grantError.message : null"
+            :error="roleError?.role === group.role ? roleError.message : null"
+            @remove="remove"
             @search="search"
             @grant="grant"
         />

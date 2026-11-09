@@ -23,6 +23,7 @@ it('keeps the role screen and its grant route to managers (R1, R9)', function (s
 })->with([
     ['get', '/manage/roles'],
     ['post', '/manage/roles/catalogue/holders'],
+    ['delete', '/manage/roles/catalogue/holders/00000000-0000-7000-8000-000000000001'],
 ]);
 
 it('answers 404 when the role to grant is not a staff role (R1)', function (string $role) {
@@ -62,6 +63,7 @@ it('lists the four staff groups in order with their holders (R9, S2)', function 
             ->where('groups.0.holders.0.accountId', $manager->id)
             ->where('groups.0.holders.0.isSelf', true)
             ->where('groups.0.holders.0.canRemove', false)
+            ->where('groups.0.holders.0.removeBlockedReason', 'És el darrer gestor actiu: cal que un altre compte tingui el rol de gestor i hagi acceptat la invitació.')
             ->has('groups.1.holders', 0)
             ->where('groups.3.holders.0.accountId', $carla->id)
             ->where('groups.3.holders.0.status', 'deactivated')
@@ -147,3 +149,78 @@ it('rejects a grant to a deactivated account and an unknown account (R2, R13)', 
 
     expect(DB::table('role_changes')->count())->toBe(0);
 });
+
+it('removes a role, records it and lists the holder no more (S9, R11)', function () {
+    $manager = accountWith(Role::Manager);
+    $anna = accountWith(Role::Finance);
+
+    $this->actingAs($manager)->from('/manage/roles')
+        ->delete("/manage/roles/finance/holders/{$anna->id}")
+        ->assertRedirect('/manage/roles');
+
+    expect(DB::table('account_roles')->where('user_id', $anna->id)->exists())->toBeFalse();
+    $change = DB::table('role_changes')->sole();
+    expect([$change->user_id, $change->role, $change->change, $change->actor_id])
+        ->toBe([$anna->id, 'finance', 'removed', $manager->id]);
+    $this->get('/manage/roles')->assertInertia(fn (Assert $page) => $page->has('groups.1.holders', 0));
+});
+
+it('tells the second removal that the role is no longer held and records nothing more (S9, R13)', function () {
+    $manager = accountWith(Role::Manager);
+    $anna = accountWith(Role::Finance);
+    $this->actingAs($manager)->delete("/manage/roles/finance/holders/{$anna->id}");
+
+    $this->from('/manage/roles')
+        ->delete("/manage/roles/finance/holders/{$anna->id}")
+        ->assertSessionHasErrors(['domain' => 'Aquest compte ja no té aquest rol.']);
+
+    expect(DB::table('role_changes')->count())->toBe(1);
+});
+
+it('removes Receiver from a deactivated account and keeps its other roles on reactivation (S2, R2)', function () {
+    $manager = accountWith(Role::Manager);
+    $carla = holderOf(Role::Receiver, ['deactivated_at' => now()]);
+    DB::table('account_roles')->insert(['user_id' => $carla->id, 'role' => 'finance']);
+
+    $this->actingAs($manager)->delete("/manage/roles/receiver/holders/{$carla->id}")->assertRedirect();
+    $this->delete(route('manage.accounts.deactivation.destroy', $carla->id))->assertRedirect();
+
+    expect(DB::table('account_roles')->where('user_id', $carla->id)->pluck('role')->all())->toBe(['finance']);
+    expect($carla->fresh()->deactivated_at)->toBeNull();
+});
+
+it('rejects removing Manager from the only accepted manager while the other is pending and disables the action (R1, S3)', function () {
+    $dolors = accountWith(Role::Manager);
+    $ernest = holderOf(Role::Manager, ['activated_at' => null]);
+
+    $this->actingAs($dolors)->from('/manage/roles')
+        ->delete("/manage/roles/manager/holders/{$dolors->id}")
+        ->assertSessionHasErrors(['domain' => 'No es pot retirar el rol del darrer gestor actiu.']);
+
+    expect(DB::table('role_changes')->count())->toBe(0);
+    $this->get('/manage/roles')->assertInertia(fn (Assert $page) => $page
+        ->where('groups.0.holders', fn ($holders) => collect($holders)->firstWhere('accountId', $dolors->id)['canRemove'] === false
+            && collect($holders)->firstWhere('accountId', $ernest->id)['canRemove'] === true));
+});
+
+it('redirects a manager who removed their own Manager role to the dashboard, where /manage/roles is 403 (S3)', function () {
+    $dolors = accountWith(Role::Manager);
+    holderOf(Role::Manager);
+
+    $this->actingAs($dolors)->from('/manage/roles')
+        ->delete("/manage/roles/manager/holders/{$dolors->id}")
+        ->assertRedirect(route('dashboard'));
+
+    $this->get('/manage/roles')->assertForbidden();
+    expect(DB::table('role_changes')->count())->toBe(1);
+});
+
+it('answers 404 when the role to remove is not a staff role (R1)', function (string $role) {
+    $anna = accountWith(Role::Producer);
+
+    $this->actingAs(accountWith(Role::Manager))
+        ->delete("/manage/roles/{$role}/holders/{$anna->id}")
+        ->assertNotFound();
+
+    expect(DB::table('role_changes')->count())->toBe(0);
+})->with(['producer', 'member', 'unknown']);

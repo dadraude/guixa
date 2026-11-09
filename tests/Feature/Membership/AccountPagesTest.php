@@ -46,25 +46,44 @@ it('lists the accounts with the households they can be linked to', function () {
             ->has('households', 2));
 });
 
-// S44 — Several roles (R36a)
+// S44, S10 — The accounts page shows roles and leaves granting and removing to the roles screen
 
-it('grants the manager role and rejects removing it from the last manager (S44)', function () {
+it('lists an account with Manager and Catalogue together and answers 404 on the retired role routes (S10)', function () {
     $anna = memberOf($this->householdId);
+    DB::table('account_roles')->insert([
+        ['user_id' => $anna->id, 'role' => 'manager'],
+        ['user_id' => $anna->id, 'role' => 'catalogue'],
+    ]);
 
-    $this->actingAs($this->manager)->put(route('manage.accounts.manager-role.update', $anna->id))->assertRedirect();
-    expect(DB::table('account_roles')->where('user_id', $anna->id)->pluck('role')->all())->toBe(['manager']);
+    $this->actingAs($this->manager)->get(route('manage.accounts.index'))
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('accounts', function ($accounts) use ($anna) {
+                $roles = collect($accounts)->firstWhere('accountId', $anna->id)['roles'];
+                sort($roles);
 
-    $this->actingAs($this->manager)->delete(route('manage.accounts.manager-role.destroy', $anna->id))->assertRedirect();
-    expect(DB::table('account_roles')->where('user_id', $anna->id)->pluck('role')->all())->toBe([]);
+                return $roles === ['catalogue', 'manager'];
+            }));
 
-    $this->actingAs($this->manager)
-        ->from(route('manage.accounts.index'))
-        ->delete(route('manage.accounts.manager-role.destroy', $this->manager->id))
-        ->assertSessionHasErrors('domain');
-    expect(DB::table('account_roles')->where('user_id', $this->manager->id)->exists())->toBeTrue();
+    foreach (['put', 'delete'] as $method) {
+        foreach (['manager-role', 'finance-role'] as $role) {
+            $this->actingAs($this->manager)->{$method}("/manage/accounts/{$anna->id}/{$role}")->assertNotFound();
+        }
+    }
+    expect(DB::table('account_roles')->where('user_id', $anna->id)->count())->toBe(2);
 });
 
 // S59 — Deactivating an account (R36b)
+
+it('rejects deactivating the only accepted manager while the other manager is pending (D2)', function () {
+    $ernest = accountWith(Role::Manager);
+    $ernest->forceFill(['activated_at' => null])->save();
+
+    $this->actingAs($this->manager)
+        ->from(route('manage.accounts.index'))
+        ->post(route('manage.accounts.deactivation.store', $this->manager->id))
+        ->assertSessionHasErrors('domain');
+    expect($this->manager->fresh()->deactivated_at)->toBeNull();
+});
 
 it('rejects deactivating the only manager and deactivates and reactivates a member (S59)', function () {
     $anna = memberOf($this->householdId);
@@ -120,7 +139,6 @@ it('answers 403 to everyone but managers on the account pages (R33)', function (
 
     $this->actingAs($anna)->get(route('manage.accounts.index'))->assertForbidden();
     $this->actingAs($anna)->post(route('manage.accounts.deactivation.store', $this->manager->id))->assertForbidden();
-    $this->actingAs($anna)->put(route('manage.accounts.manager-role.update', $anna->id))->assertForbidden();
     $this->actingAs($anna)->delete(route('manage.accounts.household.destroy', $this->manager->id))->assertForbidden();
 });
 

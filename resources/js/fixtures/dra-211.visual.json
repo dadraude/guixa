@@ -70,10 +70,6 @@
                             {
                                 "selector": "[data-visual-page-focus-last]",
                                 "count": 1
-                            },
-                            {
-                                "selector": "#main-content form[action*=\"finance-role\"] button",
-                                "minHeight": 44
                             }
                         ]
                     }
@@ -90,15 +86,7 @@
                             "mode": "dark",
                             "text": 100
                         }
-                    ],
-                    "checks": {
-                        "assertions": [
-                            {
-                                "selector": "#main-content form[action*=\"finance-role\"] button",
-                                "minHeight": 44
-                            }
-                        ]
-                    }
+                    ]
                 },
                 {
                     "id": "inactive",

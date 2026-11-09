@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import { trans } from 'laravel-vue-i18n';
-import { Form, Head } from '@inertiajs/vue3';
+import { Form, Head, Link } from '@inertiajs/vue3';
 import { computed } from 'vue';
 import AccountDeactivationController from '@/actions/App/Http/Controllers/Manage/AccountDeactivationController';
 import AccountController from '@/actions/App/Http/Controllers/Manage/AccountController';
 import AccountHouseholdController from '@/actions/App/Http/Controllers/Manage/AccountHouseholdController';
-import ManagerRoleController from '@/actions/App/Http/Controllers/Manage/ManagerRoleController';
-import FinanceRoleController from '@/actions/App/Http/Controllers/Manage/FinanceRoleController';
+import RoleController from '@/actions/App/Http/Controllers/Manage/RoleController';
 import ActiveSwitch from '@/components/ActiveSwitch.vue';
 import FormSelect from '@/components/FormSelect.vue';
 import Heading from '@/components/Heading.vue';
@@ -33,14 +32,12 @@ const householdOptions = computed(() =>
     })),
 );
 
-const isFinance = (account: App.Http.AccountRow) =>
-    account.roles.includes('finance');
-const isManager = (account: App.Http.AccountRow) =>
-    account.roles.includes('manager');
 const roleLabels: Record<string, string> = {
     member: 'Member',
     manager: 'Manager',
     finance: 'Finance',
+    catalogue: 'Catalogue',
+    receiver: 'Receiver',
     producer: 'Producer',
 };
 const displayRole = (role: string) =>
@@ -54,11 +51,18 @@ const displayRole = (role: string) =>
         <Heading
             :title="trans('Accounts')"
             :description="
-                trans(
-                    'Grant roles, link members to households and manage account status',
-                )
+                trans('Link members to households and manage account status')
             "
         />
+
+        <p class="text-sm">
+            <Link
+                :href="RoleController.index()"
+                class="inline-flex min-h-11 items-center underline underline-offset-4"
+            >
+                {{ trans('Grant or remove roles on the roles screen') }}
+            </Link>
+        </p>
 
         <p
             v-if="accounts.length === 0"
@@ -193,79 +197,6 @@ const displayRole = (role: string) =>
                             :disabled="processing"
                         >
                             {{ trans('Unlink') }}
-                        </Button>
-                    </Form>
-
-                    <Form
-                        v-if="isFinance(account)"
-                        v-bind="
-                            FinanceRoleController.destroy.form(
-                                account.accountId,
-                            )
-                        "
-                        v-slot="{ processing }"
-                    >
-                        <Button
-                            type="submit"
-                            variant="outline"
-                            size="sm"
-                            class="min-h-11"
-                            :disabled="processing"
-                        >
-                            {{ trans('Remove Finance role') }}
-                        </Button>
-                    </Form>
-                    <Form
-                        v-else-if="account.active"
-                        v-bind="
-                            FinanceRoleController.update.form(account.accountId)
-                        "
-                        v-slot="{ processing }"
-                    >
-                        <Button
-                            type="submit"
-                            variant="outline"
-                            size="sm"
-                            class="min-h-11"
-                            :disabled="processing"
-                        >
-                            {{ trans('Grant Finance role') }}
-                        </Button>
-                    </Form>
-
-                    <Form
-                        v-if="isManager(account)"
-                        v-bind="
-                            ManagerRoleController.destroy.form(
-                                account.accountId,
-                            )
-                        "
-                        v-slot="{ errors, processing }"
-                    >
-                        <Button
-                            type="submit"
-                            variant="outline"
-                            size="sm"
-                            :disabled="processing"
-                        >
-                            {{ trans('Remove manager role') }}
-                        </Button>
-                        <InputError :message="errors.domain" />
-                    </Form>
-                    <Form
-                        v-else
-                        v-bind="
-                            ManagerRoleController.update.form(account.accountId)
-                        "
-                        v-slot="{ processing }"
-                    >
-                        <Button
-                            type="submit"
-                            variant="outline"
-                            size="sm"
-                            :disabled="processing"
-                        >
-                            {{ trans('Make manager') }}
                         </Button>
                     </Form>
                 </div>

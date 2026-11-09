@@ -2,8 +2,10 @@
 
 namespace Guixa\Membership\Application;
 
+use DateTimeImmutable;
 use Guixa\Membership\Domain\AccountListing;
 use Guixa\Membership\Domain\AccountRepository;
+use Guixa\Membership\Domain\AccountStatus;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Clock;
 use Guixa\Shared\Domain\Role;
@@ -24,21 +26,33 @@ final class ListStaffRoleHolders
         $holders = $this->accounts->listStaffRoleHolders();
         $now = $this->clock->now();
 
+        $activeManagers = count(array_filter(
+            $holders[Role::Manager->value] ?? [],
+            fn (AccountListing $listing) => $listing->status($now) === AccountStatus::Active,
+        ));
+
         return array_map(
             fn (Role $role) => new StaffRoleGroupData($role, array_map(
-                fn (AccountListing $listing) => new StaffRoleHolderData(
-                    $listing->accountId,
-                    $listing->name,
-                    $listing->email,
-                    $listing->status($now),
-                    $listing->accountId === $actor->accountId,
-                    // Removal arrives with T02; until then no row offers it.
-                    false,
-                    null,
-                ),
+                fn (AccountListing $listing) => $this->holderData($actor, $role, $listing, $now, $activeManagers),
                 $holders[$role->value] ?? [],
             )),
             Role::staff(),
+        );
+    }
+
+    private function holderData(Actor $actor, Role $role, AccountListing $listing, DateTimeImmutable $now, int $activeManagers): StaffRoleHolderData
+    {
+        $status = $listing->status($now);
+        $isLastActiveManager = $role === Role::Manager && $status === AccountStatus::Active && $activeManagers === 1;
+
+        return new StaffRoleHolderData(
+            $listing->accountId,
+            $listing->name,
+            $listing->email,
+            $status,
+            $listing->accountId === $actor->accountId,
+            ! $isLastActiveManager,
+            $isLastActiveManager ? RemoveBlockedReason::LastActiveManager : null,
         );
     }
 }
