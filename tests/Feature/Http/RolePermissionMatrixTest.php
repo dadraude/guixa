@@ -8,6 +8,13 @@ use Illuminate\Support\Facades\Route;
 
 const MATRIX_ID = '00000000-0000-7000-8000-00000000abcd';
 
+/** Reception routes the role middleware lets Finance and Receiver reach but whose use case refuses them until T07 (R6, R7). */
+const SETTLE_ONLY_ROUTES = [
+    'POST receptions/{cycle}/{producer}/validate',
+    'POST receptions/{cycle}/{producer}/distribution',
+    'DELETE receptions/{cycle}/{producer}/distribution',
+];
+
 /** @return array<string, list<string>> every role-gated route as "METHOD uri" => the roles its middleware allows */
 function roleGatedRoutes(): array
 {
@@ -46,6 +53,7 @@ it('denies every role-gated route to guests and to each account holding none of 
         'manager' => matrixAccount(Role::Manager),
         'finance' => matrixAccount(Role::Finance),
         'catalogue' => matrixAccount(Role::Catalogue),
+        'receiver' => matrixAccount(Role::Receiver),
         'none' => matrixAccount(null),
     ];
     $leaks = [];
@@ -81,6 +89,7 @@ it('never answers 403 at the role middleware to an account holding one of the al
         'manager' => matrixAccount(Role::Manager),
         'finance' => matrixAccount(Role::Finance),
         'catalogue' => matrixAccount(Role::Catalogue),
+        'receiver' => matrixAccount(Role::Receiver),
     ];
     $refused = [];
 
@@ -88,6 +97,9 @@ it('never answers 403 at the role middleware to an account holding one of the al
         [$method, $uri] = explode(' ', $signature, 2);
         $path = '/'.ltrim(preg_replace('/\{[^}]+\}/', MATRIX_ID, $uri), '/');
         foreach ($allowed as $role) {
+            if ($role !== 'manager' && in_array($signature, SETTLE_ONLY_ROUTES, true)) {
+                continue;
+            }
             $status = test()->actingAs($accounts[$role])->call($method, $path)->status();
             if ($status === 403) {
                 $refused[] = "{$role} {$signature}";
@@ -96,4 +108,23 @@ it('never answers 403 at the role middleware to an account holding one of the al
     }
 
     expect($refused)->toBe([]);
+});
+
+it('lets only the manager settle a reception, whatever the role middleware admits (R6, R7, S7)', function () {
+    $routes = roleGatedRoutes();
+    $refusedTo = [matrixAccount(Role::Finance), matrixAccount(Role::Receiver)];
+
+    foreach (SETTLE_ONLY_ROUTES as $signature) {
+        expect($routes)->toHaveKey($signature);
+        [$method, $uri] = explode(' ', $signature, 2);
+        $path = '/'.ltrim(preg_replace('/\{[^}]+\}/', MATRIX_ID, $uri), '/');
+
+        foreach ($refusedTo as $account) {
+            expect(test()->actingAs($account)->call($method, $path)->status())->toBe(403);
+        }
+    }
+});
+
+it('admits Manager, Finance and Receiver to the reception list and refuses the other roles (R14)', function () {
+    expect(roleGatedRoutes()['GET receptions'])->toBe(['manager', 'finance', 'receiver']);
 });
