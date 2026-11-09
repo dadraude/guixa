@@ -27,7 +27,7 @@ class ReceptionController extends Controller
         }
 
         return Inertia::render('Receptions/Show', [
-            'reception' => ReceptionRow::from($reception, $getProducer($producer)?->name ?? $producer),
+            'reception' => ReceptionRow::from($reception, $getProducer($producer)->name),
             'distribution' => ['validated' => $reception->validated, 'distributed' => $reception->distributed, 'settled' => $reception->settled, 'closed' => $reception->closed],
             'can' => [
                 'edit' => $reception->canEdit,
