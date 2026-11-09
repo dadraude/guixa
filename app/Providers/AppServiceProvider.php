@@ -181,6 +181,8 @@ class AppServiceProvider extends ServiceProvider
     {
         Gate::define('manage', fn (Actor $actor): bool => $actor->hasRole(Role::Manager));
         Gate::define('manage-roles', fn (Actor $actor): bool => $actor->hasRole(Role::Manager));
+        Gate::define('administer-catalogue', fn (Actor $actor): bool => $actor->hasAnyRole(Role::Manager->value, Role::Catalogue->value));
+        Gate::define('view-producers', fn (Actor $actor): bool => $actor->hasAnyRole(Role::Manager->value, Role::Catalogue->value));
         Gate::define('staff-role', fn (Actor $actor, string $role): bool => Role::tryFrom($role)?->isStaff() ?? false);
         Gate::define('manage-sales', fn (Actor $actor): bool => $actor->hasAnyRole(Role::Manager->value, Role::Finance->value));
         Gate::define('manage-wallet', fn (Actor $actor): bool => $actor->hasAnyRole(Role::Manager->value, Role::Finance->value));

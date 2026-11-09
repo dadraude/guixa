@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\RoleAreas;
 use Guixa\Catalog\Application\CountProducers;
 use Guixa\Membership\Application\CountAccounts;
 use Guixa\Membership\Application\CountHouseholds;
@@ -96,6 +97,7 @@ class DashboardController extends Controller
             'pendingPickups' => $pendingPickups,
             'staffPendingCollections' => $staffPendingCollections,
             'managerSummary' => $managerSummary,
+            'areaShortcuts' => RoleAreas::shortcuts($actor),
         ]);
     }
 }

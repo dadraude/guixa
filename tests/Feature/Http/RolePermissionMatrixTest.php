@@ -45,6 +45,7 @@ it('denies every role-gated route to guests and to each account holding none of 
         'producer' => matrixAccount(Role::Producer),
         'manager' => matrixAccount(Role::Manager),
         'finance' => matrixAccount(Role::Finance),
+        'catalogue' => matrixAccount(Role::Catalogue),
         'none' => matrixAccount(null),
     ];
     $leaks = [];
@@ -79,6 +80,7 @@ it('never answers 403 at the role middleware to an account holding one of the al
         'producer' => matrixAccount(Role::Producer),
         'manager' => matrixAccount(Role::Manager),
         'finance' => matrixAccount(Role::Finance),
+        'catalogue' => matrixAccount(Role::Catalogue),
     ];
     $refused = [];
 

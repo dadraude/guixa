@@ -48,19 +48,33 @@ it('requires the producer role and matching ID even for combined or malformed ac
         ->and(Gate::forUser($owner)->allows('producer'))->toBeTrue();
 });
 
-it('limits weekly product edits to their producer and stock deletion to managers', function () {
+it('lets a weekly product be edited by its producer, Catalogue or the manager, and stock only be deleted by the manager', function () {
     $weekly = Product::create('weekly', 'p1', 'Bread', 'unit', Money::ofCents(100), false, null);
     $stock = Product::create('stock', 'p1', 'Bread', 'unit', Money::ofCents(100), false, null, true);
     $owner = Actor::producer('owner', 'p1');
     $other = Actor::producer('other', 'p2');
     $manager = Actor::manager('manager');
+    $catalogue = new Actor('catalogue', [Role::Catalogue]);
+    $ownerWithCatalogue = new Actor('both', [Role::Producer, Role::Catalogue], producerId: 'p2');
 
     expect(Gate::forUser($owner)->allows('update', $weekly))->toBeTrue()
         ->and(Gate::forUser($owner)->allows('update', $stock))->toBeFalse()
         ->and(Gate::forUser($other)->allows('update', $weekly))->toBeFalse()
-        ->and(Gate::forUser($manager)->allows('update', $weekly))->toBeFalse()
+        ->and(Gate::forUser($manager)->allows('update', $weekly))->toBeTrue()
+        ->and(Gate::forUser($catalogue)->allows('update', $weekly))->toBeTrue()
+        ->and(Gate::forUser($ownerWithCatalogue)->allows('update', $weekly))->toBeTrue()
+        ->and(Gate::forUser($manager)->allows('update', $stock))->toBeFalse()
+        ->and(Gate::forUser($catalogue)->allows('update', $stock))->toBeFalse()
         ->and(Gate::forUser($owner)->allows('delete', $weekly))->toBeTrue()
+        ->and(Gate::forUser($manager)->allows('delete', $weekly))->toBeTrue()
+        ->and(Gate::forUser($catalogue)->allows('delete', $weekly))->toBeTrue()
         ->and(Gate::forUser($owner)->allows('delete', $stock))->toBeFalse()
+        ->and(Gate::forUser($catalogue)->allows('delete', $stock))->toBeFalse()
         ->and(Gate::forUser($manager)->allows('delete', $stock))->toBeTrue()
         ->and(fn () => Gate::forUser($other)->authorize('delete', $weekly))->toThrow(AuthorizationException::class);
+
+    foreach ([new Actor('receiver', [Role::Receiver]), new Actor('finance', [Role::Finance]), Actor::memberOf('member', 'h1')] as $refused) {
+        expect(Gate::forUser($refused)->allows('update', $weekly))->toBeFalse()
+            ->and(Gate::forUser($refused)->allows('delete', $weekly))->toBeFalse();
+    }
 });

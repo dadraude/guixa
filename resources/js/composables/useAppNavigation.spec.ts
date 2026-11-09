@@ -114,4 +114,36 @@ describe('shared app navigation', () => {
             ),
         ).toBeUndefined();
     });
+
+    it('gives Catalogue-only users a Catalogue section with Producers, and the Manager keeps Producers selected on the Catàleg pages', () => {
+        const catalogue = navigationSectionsFor([{ role: 'catalogue' }]);
+
+        expect(
+            catalogue.map((section) => [
+                section.title,
+                section.items.map((item) => item.title),
+            ]),
+        ).toEqual([
+            ['Overview', ['Dashboard']],
+            ['Catalogue', ['Producers']],
+        ]);
+        expect(
+            navigationSectionsFor([
+                { role: 'manager' },
+                { role: 'catalogue' },
+            ]).filter((section) => section.title === 'Catalogue'),
+        ).toEqual([]);
+        expect(
+            currentNavigationItem(
+                navigationItemsFor([{ role: 'manager' }]),
+                '/catalogue/producers/12345678-1234-1234-1234-123456789abc/products',
+            )?.title,
+        ).toBe('Producers');
+        expect(
+            currentNavigationItem(
+                navigationItemsFor([{ role: 'catalogue' }]),
+                '/catalogue/producers/12345678-1234-1234-1234-123456789abc/products',
+            )?.title,
+        ).toBe('Producers');
+    });
 });

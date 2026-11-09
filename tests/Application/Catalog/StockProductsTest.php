@@ -151,7 +151,8 @@ it('deletes only unused products through their current administrator (R1c, S70)'
     $stockId = (new CreateStockProduct($world->products, $world->producers))($world->manager, $producerId, 'Honey', 'jar', 650, false, null);
     $delete = new DeleteUnusedProduct($world->products, $world->usage, $world->transactions);
 
-    expect(fn () => $delete($world->manager, $weeklyId))->toThrow(AuthorizationException::class)
+    expect(fn () => $delete($world->producerActor('another-producer'), $weeklyId))->toThrow(AuthorizationException::class)
+        ->and(fn () => $delete($world->catalogueActor(), $stockId))->toThrow(AuthorizationException::class)
         ->and(fn () => $delete($producer, $stockId))->toThrow(AuthorizationException::class);
     $delete($producer, $weeklyId);
     $delete($world->manager, $stockId);

@@ -6,6 +6,7 @@ use Guixa\Catalog\Application\CreateProducer;
 use Guixa\Catalog\Application\CreateProduct;
 use Guixa\Catalog\Application\DeactivateProducer;
 use Guixa\Catalog\Application\DeactivateProduct;
+use Guixa\Catalog\Application\DeleteUnusedProduct;
 use Guixa\Catalog\Application\GetDefaultCutoff;
 use Guixa\Catalog\Application\GetOrderableProduct;
 use Guixa\Catalog\Application\GetProducer;
@@ -14,11 +15,13 @@ use Guixa\Catalog\Application\ListOrderableProducts;
 use Guixa\Catalog\Application\ListProducerProducts;
 use Guixa\Catalog\Application\ListProducerProductsForReception;
 use Guixa\Catalog\Application\ListProducers;
+use Guixa\Catalog\Application\ListProductsOfProducer;
 use Guixa\Catalog\Application\ReactivateProducer;
 use Guixa\Catalog\Application\ReactivateProduct;
 use Guixa\Catalog\Application\SetDefaultCutoff;
 use Guixa\Catalog\Application\UpdateProduct;
 use Guixa\Shared\Application\Actor;
+use Guixa\Shared\Domain\Role;
 use Tests\Support\FrozenClock;
 use Tests\Support\InMemory\FakeProducerAccess;
 use Tests\Support\InMemory\FakeProducerCycles;
@@ -66,6 +69,10 @@ final class CatalogWorld
 
     public readonly ReactivateProduct $reactivateProduct;
 
+    public readonly DeleteUnusedProduct $deleteUnusedProduct;
+
+    public readonly ListProductsOfProducer $listProductsOfProducer;
+
     public readonly ListProducerProducts $listProducerProducts;
 
     public readonly GetOrderableProduct $getOrderableProduct;
@@ -101,6 +108,8 @@ final class CatalogWorld
         $this->updateProduct = new UpdateProduct($this->products, $this->cycles, $transactions);
         $this->deactivateProduct = new DeactivateProduct($this->products, $this->transactions);
         $this->reactivateProduct = new ReactivateProduct($this->products, $this->transactions);
+        $this->deleteUnusedProduct = new DeleteUnusedProduct($this->products, $this->usage, $this->transactions);
+        $this->listProductsOfProducer = new ListProductsOfProducer($this->products, $this->usage);
         $this->listProducerProducts = new ListProducerProducts($this->products);
         $this->getOrderableProduct = new GetOrderableProduct($this->products, $this->producers);
         $this->listOrderableProducts = new ListOrderableProducts($this->products, $this->producers);
@@ -108,6 +117,11 @@ final class CatalogWorld
         $this->getProducerCutoffRule = new GetProducerCutoffRule($this->producers);
 
         $this->manager = Actor::manager('00000000-0000-7000-8000-00000000000a');
+    }
+
+    public function catalogueActor(?string $producerId = null): Actor
+    {
+        return new Actor('00000000-0000-7000-8000-0000000000cc', [Role::Catalogue], producerId: $producerId);
     }
 
     public function producerActor(string $producerId): Actor

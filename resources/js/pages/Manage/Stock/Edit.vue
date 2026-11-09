@@ -3,7 +3,7 @@ import { trans } from 'laravel-vue-i18n';
 import { Form, Head, Link, router } from '@inertiajs/vue3';
 import { shallowRef } from 'vue';
 import ProductClassificationController from '@/actions/App/Http/Controllers/Manage/ProductClassificationController';
-import ProducerProductController from '@/actions/App/Http/Controllers/Manage/ProducerProductController';
+import ProducerProductController from '@/actions/App/Http/Controllers/Catalogue/ProducerProductController';
 import ProductAdministrationActions from '@/components/ProductAdministrationActions.vue';
 import InputError from '@/components/InputError.vue';
 import StockProductController from '@/actions/App/Http/Controllers/Manage/StockProductController';

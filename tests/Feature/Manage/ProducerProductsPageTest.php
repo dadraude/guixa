@@ -17,13 +17,13 @@ function catalogueRecord(ProducerModel $producer, bool $stock = false): ProductM
     return ProductModel::query()->create(['producer_id' => $producer->id, 'name' => 'Honey', 'unit' => 'jar', 'price_cents' => 650, 'variable' => false, 'active' => true, 'stock' => $stock]);
 }
 
-it('shows both product modes from the Manager producer record without weekly edit rights (S67)', function () {
+it('shows both product modes from the Manager producer record with weekly edit rights (S67, R3)', function () {
     $producer = catalogueSupplier();
     $weekly = catalogueRecord($producer);
     $stock = catalogueRecord($producer, true);
 
-    $this->actingAs(accountWith(Role::Manager))->get("/manage/producers/{$producer->id}/products")
-        ->assertInertia(fn (Assert $page) => $page->component('Manage/Producers/Products')
+    $this->actingAs(accountWith(Role::Manager))->get("/catalogue/producers/{$producer->id}/products")
+        ->assertInertia(fn (Assert $page) => $page->component('Catalogue/Producers/Products')
             ->has('products', 2)
             ->where('products.0.id', $weekly->id)
             ->where('products.0.stock', false)
@@ -37,7 +37,7 @@ it('reclassifies an unused product only as Manager and transfers its administrat
     $product = catalogueRecord($producer);
     $path = "/manage/products/{$product->id}/classification";
     $this->actingAs(accountWith(Role::Manager))->put($path, ['stock' => true])
-        ->assertRedirect("/manage/producers/{$producer->id}/products");
+        ->assertRedirect("/catalogue/producers/{$producer->id}/products");
     expect($product->refresh()->stock)->toBeTrue();
     $producerAccount = User::factory()->create(['producer_id' => $producer->id]);
     DB::table('account_roles')->insert(['user_id' => $producerAccount->id, 'role' => Role::Producer->value]);
@@ -45,7 +45,7 @@ it('reclassifies an unused product only as Manager and transfers its administrat
     $this->actingAs($producerAccount)->put($path, ['stock' => false])->assertForbidden();
     $this->actingAs(accountWith(Role::Manager))->get("/manage/producers/{$producer->id}/products/{$product->id}/edit")->assertOk();
     $this->actingAs(accountWith(Role::Manager))->put($path, ['stock' => false])
-        ->assertRedirect("/manage/producers/{$producer->id}/products");
+        ->assertRedirect("/catalogue/producers/{$producer->id}/products");
     expect($product->refresh()->stock)->toBeFalse();
     $this->actingAs($producerAccount)->get("/producer/products/{$product->id}/edit")->assertOk();
     $this->actingAs(accountWith(Role::Manager))->get("/manage/producers/{$producer->id}/products/{$product->id}/edit")->assertNotFound();
@@ -61,7 +61,7 @@ it('keeps Manager catalogue access separate from producer administration includi
         ['user_id' => $mixed->id, 'role' => Role::Manager->value],
         ['user_id' => $mixed->id, 'role' => Role::Producer->value],
     ]);
-    $this->actingAs($mixed)->get("/manage/producers/{$other->id}/products")->assertOk();
+    $this->actingAs($mixed)->get("/catalogue/producers/{$other->id}/products")->assertOk();
     $this->actingAs($mixed)->delete("/producer/products/{$otherWeekly->id}/unused")->assertForbidden();
     $this->actingAs($mixed)->delete("/producer/products/{$ownWeekly->id}/unused")->assertRedirect('/producer/products');
     expect(ProductModel::query()->whereKey($ownWeekly->id)->exists())->toBeFalse()

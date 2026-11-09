@@ -22,7 +22,10 @@ final class CreateProduct
         bool $variable,
         ?string $containersPerUnit,
     ): string {
-        Gate::forUser($actor)->authorize('owns', ['producer', $producerId]);
+        $gate = Gate::forUser($actor);
+        if (! $gate->allows('administer-catalogue')) {
+            $gate->authorize('owns', ['producer', $producerId]);
+        }
 
         $product = Product::create(
             $this->products->nextId(),
