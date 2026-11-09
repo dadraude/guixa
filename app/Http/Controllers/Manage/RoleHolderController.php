@@ -8,7 +8,6 @@ use Guixa\Membership\Application\GrantStaffRole;
 use Guixa\Membership\Application\RemoveStaffRole;
 use Guixa\Membership\Domain\Error\NotAStaffRole;
 use Guixa\Shared\Application\Actor;
-use Guixa\Shared\Domain\Role;
 use Illuminate\Http\RedirectResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -35,7 +34,7 @@ final class RoleHolderController extends Controller
         }
 
         // The manager who removed their own Manager role can no longer open this screen.
-        if ($staffRole === Role::Manager->value && $account === $actor->accountId) {
+        if ($staffRole === 'manager' && $account === $actor->accountId) {
             return redirect()->route('dashboard');
         }
 

@@ -13,6 +13,6 @@ final readonly class StaffRoleHolderData
         public AccountStatus $status,
         public bool $isSelf,
         public bool $canRemove,
-        public ?string $removeBlockedReason,
+        public ?RemoveBlockedReason $removeBlockedReason,
     ) {}
 }

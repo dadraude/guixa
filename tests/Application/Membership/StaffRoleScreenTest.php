@@ -2,6 +2,7 @@
 
 use Guixa\Membership\Application\GrantStaffRole;
 use Guixa\Membership\Application\ListStaffRoleHolders;
+use Guixa\Membership\Application\RemoveBlockedReason;
 use Guixa\Membership\Application\SearchStaffRoleCandidates;
 use Guixa\Membership\Domain\Account;
 use Guixa\Membership\Domain\AccountStatus;
@@ -63,7 +64,7 @@ it('marks the manager itself and blocks removing the last active manager (R1, R1
 
     expect($maria->isSelf)->toBeTrue();
     expect($maria->canRemove)->toBeFalse();
-    expect($maria->removeBlockedReason)->toBe(__('It is the last active manager: another account must hold the Manager role and have accepted its invitation first.'));
+    expect($maria->removeBlockedReason)->toBe(RemoveBlockedReason::LastActiveManager);
 });
 
 it('offers Bernat as pending and Dora as expired for Finance, never Carla (R10, S2)', function () {

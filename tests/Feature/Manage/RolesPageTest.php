@@ -63,6 +63,7 @@ it('lists the four staff groups in order with their holders (R9, S2)', function 
             ->where('groups.0.holders.0.accountId', $manager->id)
             ->where('groups.0.holders.0.isSelf', true)
             ->where('groups.0.holders.0.canRemove', false)
+            ->where('groups.0.holders.0.removeBlockedReason', 'És el darrer gestor actiu: cal que un altre compte tingui el rol de gestor i hagi acceptat la invitació.')
             ->has('groups.1.holders', 0)
             ->where('groups.3.holders.0.accountId', $carla->id)
             ->where('groups.3.holders.0.status', 'deactivated')

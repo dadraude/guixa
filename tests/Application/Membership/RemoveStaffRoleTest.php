@@ -2,6 +2,7 @@
 
 use Guixa\Membership\Application\ListStaffRoleHolders;
 use Guixa\Membership\Application\ReactivateAccount;
+use Guixa\Membership\Application\RemoveBlockedReason;
 use Guixa\Membership\Application\RemoveStaffRole;
 use Guixa\Membership\Domain\Account;
 use Guixa\Membership\Domain\Error\AccountNotFound;
@@ -51,7 +52,7 @@ it('disables her remove action with the reason while the other manager is pendin
     [$dolors, $ernest] = ($world->list)($world->dolors)[0]->holders;
 
     expect($dolors->canRemove)->toBeFalse();
-    expect($dolors->removeBlockedReason)->toBe(__('It is the last active manager: another account must hold the Manager role and have accepted its invitation first.'));
+    expect($dolors->removeBlockedReason)->toBe(RemoveBlockedReason::LastActiveManager);
     expect($ernest->canRemove)->toBeTrue();
     expect($ernest->removeBlockedReason)->toBeNull();
 });

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Manage;
 
 use Guixa\Membership\Application\StaffRoleHolderData;
+use Illuminate\Support\Facades\Lang;
 use Spatie\TypeScriptTransformer\Attributes\LiteralTypeScriptType;
 use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 
@@ -29,7 +30,7 @@ final readonly class RoleHolderRow
             $holder->status->value,
             $holder->isSelf,
             $holder->canRemove,
-            $holder->removeBlockedReason,
+            $holder->removeBlockedReason === null ? null : Lang::string($holder->removeBlockedReason->value),
         );
     }
 }

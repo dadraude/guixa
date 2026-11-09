@@ -52,7 +52,7 @@ final class ListStaffRoleHolders
             $status,
             $listing->accountId === $actor->accountId,
             ! $isLastActiveManager,
-            $isLastActiveManager ? __('It is the last active manager: another account must hold the Manager role and have accepted its invitation first.') : null,
+            $isLastActiveManager ? RemoveBlockedReason::LastActiveManager : null,
         );
     }
 }
