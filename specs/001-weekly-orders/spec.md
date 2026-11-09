@@ -83,7 +83,7 @@ An account with no household and no other role cannot log in until it is linked.
 
 [003 — Role management](../003-role-management/spec.md) adds the Catalogue and Receiver roles, lets Finance
 run receptions and lets Catalogue and the manager edit any producer's weekly products. Where it differs
-from R1, R1b, R1c, R2, R3c, R14–R18, R20a, R25, R25b, R28a, R36a or R36c, 003 applies.
+from R1, R1b, R1c, R2, R3c, R14–R18, R20a, R25, R25b, R28a, R36a, R36b or R36c, 003 applies.
 
 ## Areas
 
