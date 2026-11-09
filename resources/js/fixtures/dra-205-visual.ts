@@ -285,8 +285,9 @@ const pageProps: Record<string, Record<string, unknown>> = {
         deactivationWarning: settlement,
     },
     'Manage/Producers/Index': { producers: [producer] },
-    'Manage/Reception/Show': {
+    'Receptions/Show': {
         reception,
+        can: { edit: true, validate: true, distribute: false, reopen: false },
         distribution: {
             validated: false,
             distributed: false,
@@ -554,8 +555,7 @@ if (state === 'empty') {
         }
     }
     if (pageName === 'Manage/Cycles/Show') visualProps.summary.producers = [];
-    if (pageName === 'Manage/Reception/Show')
-        visualProps.reception.products = [];
+    if (pageName === 'Receptions/Show') visualProps.reception.products = [];
     if (pageName === 'Manage/Stock/Movements') visualProps.cycles = [];
     if (pageName === 'Orders/Edit') {
         visualProps.order.lines = [];
@@ -627,7 +627,7 @@ if (state === 'status') {
         visualProps.auth.user.email_verified_at = null;
     }
 }
-if (pageName === 'Manage/Reception/Show') {
+if (pageName === 'Receptions/Show') {
     if (query.get('receptionBranch') === 'unordered') {
         visualProps.reception.products[0].nobodyOrdered = true;
         visualProps.reception.products[0].ordered = '0';
@@ -644,13 +644,13 @@ if (pageName === 'Manage/Reception/Show') {
         });
     }
 }
-if (query.get('adjusted') === '1' && pageName === 'Manage/Reception/Show')
+if (query.get('adjusted') === '1' && pageName === 'Receptions/Show')
     visualProps.reception.products[0].hasAdjustments = true;
-if (state === 'manual-allocation' && pageName === 'Manage/Reception/Show') {
+if (state === 'manual-allocation' && pageName === 'Receptions/Show') {
     visualProps.reception.products[0].hasManualAllocations = true;
     visualProps.reception.products[0].allocations[0].byHand = true;
 }
-if (pageName === 'Manage/Reception/Show' && state === 'received-overwrite') {
+if (pageName === 'Receptions/Show' && state === 'received-overwrite') {
     visualProps.reception.products[0].name =
         'Arròs integral de la cooperativa de la Vall de les Hortes';
     visualProps.reception.products[0].allocations[0].householdName =
@@ -795,7 +795,7 @@ void createInertiaApp({
     };
     if (
         ['error', 'disabled'].includes(state) &&
-        !['Manage/Reception/Show', 'Orders/Edit'].includes(pageName)
+        !['Receptions/Show', 'Orders/Edit'].includes(pageName)
     ) {
         const forms = [
             ...document.querySelectorAll<HTMLFormElement>(
@@ -895,10 +895,7 @@ void createInertiaApp({
             ).click();
         }
     }
-    if (
-        pageName === 'Manage/Reception/Show' &&
-        state === 'received-overwrite'
-    ) {
+    if (pageName === 'Receptions/Show' && state === 'received-overwrite') {
         const form = (await waitForElement(
             '[data-test="received-form-product-1"]',
         )) as HTMLFormElement;
@@ -975,7 +972,7 @@ void createInertiaApp({
             'Manage/Cycles/Show': 'Nobody has ordered yet.',
             'Manage/Households/Index': 'There are no households yet.',
             'Manage/Producers/Index': 'No producers yet.',
-            'Manage/Reception/Show': 'Nothing was ordered from this producer.',
+            'Receptions/Show': 'Nothing was ordered from this producer.',
             'Manage/ReturnItems/Index': 'No return items yet.',
             'Manage/Stock/Index': 'No stock products yet.',
             'Orders/Edit': 'No producer takes part in this cycle yet.',

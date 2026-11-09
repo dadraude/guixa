@@ -178,7 +178,7 @@ function twoHouseholdWeek(int $loafPriceCents = 350): array
     }
     DB::table('cycle_producers')->where('cycle_id', $cycleId)->update(['closes_at' => now()->subHour(), 'sent_at' => now()]);
     $manager = accountWith(Role::Manager);
-    $reception = "/manage/cycles/{$cycleId}/receptions/{$baker->id}";
+    $reception = "/receptions/{$cycleId}/{$baker->id}";
     test()->actingAs($manager)->put("{$reception}/products/{$loaf}/received", ['received' => '6'])->assertRedirect();
     test()->post("{$reception}/validate")->assertRedirect();
     test()->post("{$reception}/distribution")->assertRedirect();
@@ -224,7 +224,7 @@ function lateArrivalWeek(bool $withSpareDraft = false): array
     }
     DB::table('cycle_producers')->where('cycle_id', $cycleId)->update(['closes_at' => now()->subHour(), 'sent_at' => now()]);
     $manager = accountWith(Role::Manager);
-    $reception = "/manage/cycles/{$cycleId}/receptions/{$baker->id}";
+    $reception = "/receptions/{$cycleId}/{$baker->id}";
     test()->actingAs($manager)->put("{$reception}/products/{$cherries}/received", ['received' => '0'])->assertRedirect();
     test()->put("{$reception}/products/{$eggs}/received", ['received' => '0'])->assertRedirect();
     test()->post("{$reception}/validate")->assertRedirect();

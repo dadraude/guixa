@@ -1,0 +1,274 @@
+{
+    "baseUrl": "http://127.0.0.1:5252",
+    "rootFontPx": 16,
+    "darkSelector": "html.dark",
+    "matrix": {
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark"],
+        "text": [100, 200]
+    },
+    "views": [
+        {
+            "id": "receptions-list",
+            "path": "/resources/js/fixtures/dra-252.html",
+            "root": ".pilot-manager-page",
+            "panels": ".pilot-manager-page > *",
+            "content": "h1,h2,p,label,input:not([type=hidden]),button,a",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["a"],
+            "assertions": [
+                {
+                    "selector": "h1, h2",
+                    "contrast": 4.5
+                },
+                {
+                    "selector": "button, a[href]",
+                    "minHeight": 44
+                }
+            ],
+            "states": [
+                {
+                    "id": "populated",
+                    "query": {
+                        "page": "index",
+                        "role": "receiver",
+                        "state": "populated"
+                    },
+                    "ready": "body[data-visual-ready=\"index-receiver-populated\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "focus": ["a[href*='/receptions/']"]
+                    }
+                },
+                {
+                    "id": "empty",
+                    "query": {
+                        "page": "index",
+                        "role": "receiver",
+                        "state": "empty"
+                    },
+                    "ready": "body[data-visual-ready=\"index-receiver-empty\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "focus": [],
+                        "noFocusReason": "The empty list has no interactive control.",
+                        "assertions": [
+                            {
+                                "selector": "h1, h2",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=no-receptions]",
+                                "count": 1
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "long",
+                    "query": {
+                        "page": "index",
+                        "role": "receiver",
+                        "state": "long"
+                    },
+                    "ready": "body[data-visual-ready=\"index-receiver-long\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "focus": ["a[href*='/receptions/']"]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "reception-receiver",
+            "path": "/resources/js/fixtures/dra-252.html",
+            "root": ".pilot-manager-page",
+            "panels": ".pilot-manager-page > *",
+            "content": "h1,h2,p,label,input:not([type=hidden]),button,a",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["a"],
+            "assertions": [
+                {
+                    "selector": "h1, h2",
+                    "contrast": 4.5
+                },
+                {
+                    "selector": "button, a[href]",
+                    "minHeight": 44
+                }
+            ],
+            "states": [
+                {
+                    "id": "populated",
+                    "query": {
+                        "page": "show",
+                        "role": "receiver",
+                        "state": "populated"
+                    },
+                    "ready": "body[data-visual-ready=\"show-receiver-populated\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "focus": ["input"]
+                    }
+                },
+                {
+                    "id": "long",
+                    "query": {
+                        "page": "show",
+                        "role": "receiver",
+                        "state": "long"
+                    },
+                    "ready": "body[data-visual-ready=\"show-receiver-long\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "focus": ["input"]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "reception-manager",
+            "path": "/resources/js/fixtures/dra-252.html",
+            "root": ".pilot-manager-page",
+            "panels": ".pilot-manager-page > *",
+            "content": "h1,h2,p,label,input:not([type=hidden]),button,a",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["a"],
+            "assertions": [
+                {
+                    "selector": "h1, h2",
+                    "contrast": 4.5
+                },
+                {
+                    "selector": "button, a[href]",
+                    "minHeight": 44
+                }
+            ],
+            "states": [
+                {
+                    "id": "populated",
+                    "query": {
+                        "page": "show",
+                        "role": "manager",
+                        "state": "populated"
+                    },
+                    "ready": "body[data-visual-ready=\"show-manager-populated\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "focus": ["button"]
+                    }
+                },
+                {
+                    "id": "distributed",
+                    "query": {
+                        "page": "show",
+                        "role": "manager",
+                        "state": "distributed"
+                    },
+                    "ready": "body[data-visual-ready=\"show-manager-distributed\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "focus": ["button"]
+                    }
+                }
+            ]
+        }
+    ]
+}

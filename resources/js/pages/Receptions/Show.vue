@@ -3,12 +3,12 @@ import { formatPickupDate, formatQuantity } from '@/lib/locale';
 import { trans } from 'laravel-vue-i18n';
 import { Form, Head, router, usePage } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
-import CycleController from '@/actions/App/Http/Controllers/Manage/CycleController';
 import ReceptionAllocationController from '@/actions/App/Http/Controllers/Manage/ReceptionAllocationController';
 import ReceptionDistributionController from '@/actions/App/Http/Controllers/Manage/ReceptionDistributionController';
 import ReceptionProductController from '@/actions/App/Http/Controllers/Manage/ReceptionProductController';
 import ReceptionReceivedController from '@/actions/App/Http/Controllers/Manage/ReceptionReceivedController';
 import ReceptionValidationController from '@/actions/App/Http/Controllers/Manage/ReceptionValidationController';
+import ReceptionCycleController from '@/actions/App/Http/Controllers/Receptions/ReceptionCycleController';
 import AddAllocationForm from '@/components/reception/AddAllocationForm.vue';
 import AllocationRow from '@/components/reception/AllocationRow.vue';
 import ReceivedTotalForm from '@/components/reception/ReceivedTotalForm.vue';
@@ -27,12 +27,20 @@ const props = defineProps<{
         settled: boolean;
         closed?: boolean;
     };
+    can: {
+        edit: boolean;
+        validate: boolean;
+        distribute: boolean;
+        reopen: boolean;
+    };
     households: App.Http.HouseholdOptionRow[];
 }>();
 
 defineOptions({
     layout: {
-        breadcrumbs: [{ title: 'Cycles', href: CycleController.index() }],
+        breadcrumbs: [
+            { title: 'Receptions', href: ReceptionCycleController.index() },
+        ],
     },
 });
 
@@ -94,9 +102,10 @@ const distribute = computed(() =>
 const reopen = computed(() =>
     ReceptionDistributionController.destroy.form(routeParams.value),
 );
-const canDistribute = computed(
+const settles = computed(() => props.can.validate || props.can.distribute);
+const readyToDistribute = computed(
     () =>
-        props.distribution.validated &&
+        props.can.distribute &&
         props.reception.products.every(
             (product) => product.balancedForDistribution,
         ),
@@ -141,10 +150,15 @@ const addProduct = computed(() =>
 
         <InputError :message="domainError" data-test="domain-error" />
 
-        <div class="flex flex-wrap items-center gap-3" data-test="distribution">
+        <div
+            v-if="distribution.distributed || distribution.validated || settles"
+            class="flex flex-wrap items-center gap-3"
+            data-test="distribution"
+        >
             <Badge
                 v-if="distribution.distributed"
                 variant="secondary"
+                class="max-w-full min-w-0 break-words whitespace-normal"
                 data-test="distributed"
             >
                 {{ trans('Distributed: this reception is read-only') }}
@@ -152,14 +166,15 @@ const addProduct = computed(() =>
             <Badge
                 v-else-if="distribution.validated"
                 variant="secondary"
+                class="max-w-full min-w-0 break-words whitespace-normal"
                 data-test="validated"
             >
                 {{ trans('Validated') }}
             </Badge>
 
-            <template v-if="!distribution.distributed">
+            <template v-if="settles">
                 <Form
-                    v-if="!distribution.validated"
+                    v-if="can.validate"
                     v-bind="validateReception"
                     :options="{ preserveScroll: true }"
                     v-slot="{ processing: validating }"
@@ -181,13 +196,13 @@ const addProduct = computed(() =>
                 >
                     <Button
                         type="submit"
-                        :disabled="distributing || !canDistribute"
+                        :disabled="distributing || !readyToDistribute"
                     >
                         {{ trans('Mark as distributed') }}
                     </Button>
                 </Form>
                 <p
-                    v-if="!canDistribute"
+                    v-if="!readyToDistribute"
                     class="text-sm text-muted-foreground"
                     data-test="distribute-hint"
                 >
@@ -199,7 +214,7 @@ const addProduct = computed(() =>
                 </p>
             </template>
             <Form
-                v-else-if="!distribution.closed"
+                v-else-if="can.reopen"
                 v-bind="reopen"
                 :options="{ preserveScroll: true }"
                 v-slot="{ processing: reopening }"
@@ -302,7 +317,7 @@ const addProduct = computed(() =>
             </dl>
 
             <Form
-                v-if="!distribution.distributed && product.nobodyOrdered"
+                v-if="can.edit && product.nobodyOrdered"
                 v-bind="addProduct"
                 :options="{ preserveScroll: true }"
                 class="flex flex-wrap items-end gap-2"
@@ -343,7 +358,7 @@ const addProduct = computed(() =>
                 </Button>
             </Form>
             <ReceivedTotalForm
-                v-else-if="!distribution.distributed"
+                v-else-if="can.edit"
                 :product="product"
                 :processing="processing"
                 @save="
@@ -364,7 +379,7 @@ const addProduct = computed(() =>
                     :unit="product.unit"
                     :allocation="allocation"
                     :processing="processing"
-                    :readonly="distribution.distributed"
+                    :readonly="!can.edit"
                     @save="
                         (householdId, quantity) =>
                             setAllocation(
@@ -377,7 +392,7 @@ const addProduct = computed(() =>
             </ul>
 
             <AddAllocationForm
-                v-if="!distribution.distributed"
+                v-if="can.edit"
                 :product="product"
                 :households="households"
                 :processing="processing"
@@ -389,10 +404,7 @@ const addProduct = computed(() =>
         </section>
 
         <Form
-            v-if="
-                !distribution.distributed &&
-                reception.unorderedOptions.length > 0
-            "
+            v-if="can.edit && reception.unorderedOptions.length > 0"
             v-bind="addProduct"
             :options="{ preserveScroll: true }"
             class="flex flex-wrap items-end gap-2"

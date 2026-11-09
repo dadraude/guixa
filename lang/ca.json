@@ -701,5 +701,11 @@
     "Add weekly product": "Afegeix un producte setmanal",
     "Weekly product of :name": "Producte setmanal de :name",
     "Back to products": "Torna als productes",
-    "Choose a producer to administer its products": "Tria un productor per administrar-ne els productes"
+    "Choose a producer to administer its products": "Tria un productor per administrar-ne els productes",
+    "Receptions": "Recepcions",
+    "Reception": "Recepció",
+    "Distributed": "Repartit",
+    "Check what each producer delivered and share it out.": "Comprova què ha entregat cada productor i reparteix-ho.",
+    "No producer order has been sent yet.": "Encara no s’ha enviat cap comanda a cap productor.",
+    "Open reception of :producer": "Obre la recepció de :producer"
 }

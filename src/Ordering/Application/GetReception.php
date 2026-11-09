@@ -13,7 +13,7 @@ use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Quantity;
 use Illuminate\Support\Facades\Gate;
 
-/** What a manager sees of a producer's reception: per product the totals, the difference and every household's allocation (R14, R17). */
+/** What a receiver sees of a producer's reception: per product the totals, the difference and every household's allocation (R14, R17). */
 final class GetReception
 {
     public function __construct(
@@ -24,11 +24,15 @@ final class GetReception
 
     public function __invoke(Actor $actor, string $cycleId, string $producerId): ReceptionData
     {
-        Gate::forUser($actor)->authorize('manage');
+        Gate::forUser($actor)->authorize('receive');
 
         $cycle = $this->cycles->get($cycleId) ?? throw CycleNotFound::withId($cycleId);
         $loaded = $this->loader->load($cycle, $producerId);
         $names = $this->householdNames($loaded->reception->products);
+        $validated = $cycle->isValidated($producerId);
+        $distributed = $cycle->isDistributed($producerId);
+        $canReceive = Gate::forUser($actor)->allows('receive');
+        $canSettle = Gate::forUser($actor)->allows('settle-reception');
         $shown = array_flip(array_map(fn (ReceptionProduct $product) => $product->productId, $loaded->reception->products));
 
         return new ReceptionData(
@@ -40,10 +44,14 @@ final class GetReception
                 fn (OrderableProduct $product) => new ReceptionOptionData($product->id, $product->name, $product->unit, $product->variable),
                 array_filter($loaded->catalog, fn (OrderableProduct $product) => ! isset($shown[$product->id])),
             )),
-            $cycle->isValidated($producerId),
-            $cycle->isDistributed($producerId),
+            $validated,
+            $distributed,
             $cycle->isSettled(),
             $cycle->isClosed(),
+            $canReceive && ! $distributed,
+            $canSettle && ! $distributed && ! $validated,
+            $canSettle && ! $distributed && $validated,
+            $canSettle && $distributed && ! $cycle->isClosed(),
         );
     }
 

@@ -206,9 +206,15 @@ const pages: Record<string, { component: string; props: object }> = {
     },
     member: { component: 'Member/Baskets/Show', props: { basket } },
     reception: {
-        component: 'Manage/Reception/Show',
+        component: 'Receptions/Show',
         props: {
             reception,
+            can: {
+                edit: true,
+                validate: true,
+                distribute: false,
+                reopen: false,
+            },
             distribution: {
                 validated: false,
                 distributed: false,

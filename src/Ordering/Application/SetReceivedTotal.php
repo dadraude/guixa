@@ -40,7 +40,7 @@ final class SetReceivedTotal
      */
     public function __invoke(Actor $actor, string $cycleId, string $producerId, string $productId, string $received, bool $overwriteManual = false): void
     {
-        Gate::forUser($actor)->authorize('manage');
+        Gate::forUser($actor)->authorize('receive');
 
         $total = Quantity::fromString($received);
 

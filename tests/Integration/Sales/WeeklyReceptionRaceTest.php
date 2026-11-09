@@ -82,7 +82,7 @@ final class WeeklyReceptionRaceTest extends TestCase
         }
         DB::table('cycle_producers')->where('cycle_id', $cycle)->update(['closes_at' => now()->subHour(), 'sent_at' => now()]);
         $manager = accountWith(Role::Manager);
-        $reception = "/manage/cycles/{$cycle}/receptions/{$baker->id}";
+        $reception = "/receptions/{$cycle}/{$baker->id}";
         $this->actingAs($manager)->put("{$reception}/products/{$loaf}/received", ['received' => '6'])->assertRedirect();
         $this->post("{$reception}/validate")->assertRedirect();
         $this->post("{$reception}/distribution")->assertRedirect();

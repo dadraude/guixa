@@ -8,6 +8,7 @@ return [
             'dependencies' => ['Membership', 'Ordering', 'Sales', 'Shared', 'Stock'],
             'exports' => [
                 'Application\GetProducer' => ['Membership'],
+                'Application\ReadProducerNames' => ['Ordering'],
                 'Application\ProducerData' => ['Membership'],
                 'Application\GetProducerCutoffRule' => ['Ordering'],
                 'Application\ProducerCutoffRuleData' => ['Ordering'],
@@ -34,8 +35,8 @@ return [
                 'Application\GetHouseholds' => ['Ordering'],
                 'Application\HouseholdData' => ['Ordering'],
                 'Application\GetProducerAccountEmail' => ['Ordering'],
-                'Application\ReadActiveHouseholds' => ['Sales'],
-                'Application\ActiveHouseholdData' => ['Sales'],
+                'Application\ReadActiveHouseholds' => ['Sales', 'Ordering'],
+                'Application\ActiveHouseholdData' => ['Sales', 'Ordering'],
             ],
         ],
         'Ordering' => [

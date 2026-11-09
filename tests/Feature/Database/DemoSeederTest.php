@@ -67,11 +67,17 @@ it('lets every demo role log in and open its main screens', function (string $em
     if ($email === 'gestora@demo.guixa.test') {
         $cycle = DB::table('cycles')->whereNotNull('settled_at')->value('id');
         $producer = DB::table('producers')->value('id');
-        $this->get(route('manage.cycles.receptions.show', [$cycle, $producer]))->assertOk();
+        $this->get(route('receptions.show', [$cycle, $producer]))->assertOk();
+    }
+    if ($email === 'biel@demo.guixa.test') {
+        $cycle = DB::table('cycles')->whereNotNull('settled_at')->value('id');
+        $producer = DB::table('producers')->value('id');
+        $this->get(route('receptions.show', [$cycle, $producer]))->assertOk();
     }
 })->with([
     'manager' => ['gestora@demo.guixa.test', ['/dashboard', '/manage/households', '/manage/producers', '/manage/cycles', '/manage/stock']],
     'member' => ['anna@demo.guixa.test', ['/dashboard', '/', '/wallet']],
+    'receiver' => ['biel@demo.guixa.test', ['/dashboard', '/receptions']],
     'producer' => ['hort@demo.guixa.test', ['/dashboard', '/producer/products']],
 ]);
 

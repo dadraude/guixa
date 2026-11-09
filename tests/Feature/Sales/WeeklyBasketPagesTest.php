@@ -89,7 +89,7 @@ it('redirects the old household pickup URL to its basket and retires the cycle p
 
 it('keeps the unvalidated base in step with a reopened reception and refuses validation until it is distributed again (R18, S29, S30)', function () {
     $week = twoHouseholdWeek();
-    $reception = "/manage/cycles/{$week['cycle']}/receptions/{$week['producer']}";
+    $reception = "/receptions/{$week['cycle']}/{$week['producer']}";
     $this->actingAs($week['manager'])->put("/finance/baskets/{$week['baskets']['B']}/weekly-lines/{$week['loaf']}", ['quantity' => '1'])->assertRedirect();
 
     $this->delete("{$reception}/distribution")->assertRedirect();
@@ -111,7 +111,7 @@ it('keeps the unvalidated base in step with a reopened reception and refuses val
 
 it('rejects redistributing a product a validated basket contains and leaves the total, allocations, baskets and Wallet unchanged (R18, R23, S63, S89)', function () {
     $week = twoHouseholdWeek();
-    $reception = "/manage/cycles/{$week['cycle']}/receptions/{$week['producer']}";
+    $reception = "/receptions/{$week['cycle']}/{$week['producer']}";
     $this->actingAs($week['manager'])->post("/finance/baskets/{$week['baskets']['A']}/validation")->assertRedirect();
     $this->delete("{$reception}/distribution")->assertRedirect();
     $observe = fn () => [
@@ -133,7 +133,7 @@ it('rejects redistributing a product a validated basket contains and leaves the 
 
 it('rejects a hand-set allocation of a product a validated basket contains with the Catalan error and changes nothing (R16, R18, R23, S63)', function () {
     $week = twoHouseholdWeek();
-    $reception = "/manage/cycles/{$week['cycle']}/receptions/{$week['producer']}";
+    $reception = "/receptions/{$week['cycle']}/{$week['producer']}";
     $this->actingAs($week['manager'])->post("/finance/baskets/{$week['baskets']['A']}/validation")->assertRedirect();
     $this->delete("{$reception}/distribution")->assertRedirect();
     $before = [DB::table('order_lines')->orderBy('id')->pluck('allocated_quantity', 'id')->all(), DB::table('basket_lines')->orderBy('id')->get()->map(fn ($row) => (array) $row)->all(), DB::table('wallet_movements')->count()];
@@ -146,7 +146,7 @@ it('rejects a hand-set allocation of a product a validated basket contains with 
 
 it('redistributes after an actual-quantity adjustment without repeating any charge or touching the frozen basket (R18, R19a, S61)', function () {
     $week = twoHouseholdWeek();
-    $reception = "/manage/cycles/{$week['cycle']}/receptions/{$week['producer']}";
+    $reception = "/receptions/{$week['cycle']}/{$week['producer']}";
     $this->actingAs($week['manager'])->put("/finance/baskets/{$week['baskets']['A']}/weekly-lines/{$week['loaf']}", ['quantity' => '3'])->assertRedirect();
     $this->post("/finance/baskets/{$week['baskets']['A']}/validation")->assertRedirect();
     $charges = fn () => DB::table('wallet_movements')->orderBy('basket_id')->get()->map(fn ($row) => [$row->basket_id, $row->amount_cents])->all();
