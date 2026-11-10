@@ -1,6 +1,6 @@
 ---
 name: agent-workflow-spec-flow
-description: Route a Guixa bug or change through spec, plan, tasks and immutable history; use when editing feature documents or closing a task.
+description: Route a Guixa bug or change through discovery, selected delivery-slice spec, plan, tasks and immutable history; use for new or multi-outcome features, feature document edits and task closure.
 ---
 
 Follow the [Guixa spec flow](../../../.agent-workflow/references/spec-flow.md) and

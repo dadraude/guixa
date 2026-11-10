@@ -14,6 +14,7 @@ spec-side table in the profile. A worker returns a short digest, writes no `spec
 | Step                                | Worker (role)                                                                                      | Returns                                                                                                   |
 | ----------------------------------- | -------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
 | 1 Route: overlap and glossary check | Discovery                                                                                          | Roadmap/feature rows, decision records and glossary terms that collide with the request, with `path:line` |
+| 1a Discover scope                   | Discovery for existing obligations, users, outcomes and dependencies; Preparation for a draft      | Source-backed discovery evidence and proposed delivery slices, with unresolved decisions                  |
 | 2 Log: read history                 | Discovery                                                                                          | The entries relevant to the request (R#, Request, Q&A, Change, Deviation), or "no original Request found" |
 | 2a Gap check                        | Preparation, or a fresh Reviewer for a finished spec                                               | The coverage table of [spec-gaps](spec-gaps.md#delegation)                                                |
 | 3 Plan and break down               | Discovery for readiness and implementation paths; Preparation for the `plan.md` / `tasks.md` draft | Evidence list; a draft in the working tree for this session to present                                    |
@@ -39,6 +40,63 @@ for the missing decision. Do not repeat a question answered by history, accepted
 in this session. After an answer, record it and advance to the next unresolved case. If the request
 overlaps or contradicts an entry, put that decision to the user first. Check every new role, term or name against the glossary in `spec.md`; a collision is settled before
 the first question that uses it.
+
+### 1a. Discover scope before the selected slice's spec
+
+Use discovery when the request has several independently useful outcomes, distinct users or decision
+owners, or uncertain boundaries/dependencies. Do not use an arbitrary task count as the trigger.
+For a single bounded outcome, discovery may be brief and select one slice. Direct fixes stay on their
+existing route without a feature manifest. A plan-only change starts from its accepted behavior and
+records the design change without reopening settled product decisions. Read existing features,
+roadmap, accepted obligations, history and implementation before deciding what remains to deliver.
+Retired or superseded scope, including 002 dashboard content, remains retired unless the user makes
+a new explicit product decision.
+
+Allocate the `NNN-feature` ID at discovery. Create `discovery.md`, a discovery-only row in the
+Features table, and the first immutable Request entry containing the user's original ask verbatim.
+Log each answered question as Q&A. In `discovery.md`, record source links, intended outcomes and
+users, non-goals, shared constraints/invariants, existing obligations and owners, and the choices that
+must be settled before the first slice versus those safe to decide later. Record each candidate
+delivery slice with a short name, useful observable outcome, boundary, actual dependency reason,
+and observable completion. Recommend the first by value and uncertainty reduced, showing the
+alternatives and trade-offs. Selection and product decisions remain with the user; a discovery-only
+row or artifact is not authorization to implement.
+
+A delivery slice may contain multiple implementation tasks but must leave a useful result a user or
+tester can observe. Keep later slices as this lightweight roadmap; add the selected slice's spec,
+then accepted plan, then tasks. Do not prewrite detailed requirements, technical plans, tickets or
+implementation for later slices. Keep an indivisible business invariant in one slice when a smaller
+cut would be unsafe, and record that reason with bounded checkpoints. Reconcile every existing
+accepted `R#`/`S#` with delivered evidence or an explicit owner; defer only newly proposed scope
+whose decision and dependency allow it. Retain earlier accepted requirements, scenarios, task rows
+and allocations in the cumulative canonical documents. Preserve global `R#`, `S#` and `Tnn` IDs when
+later slices enter them.
+
+After a slice integrates, review its allocated acceptance and regression of shared invariants on the
+integrated base. Select the next slice using current evidence, then repeat the spec → gap review →
+acceptance → plan → acceptance → tasks → acceptance sequence for its scope. Keep the previous slice's
+scope decision, acceptance matrix, evidence, and exact reviewed source revisions/commit in an
+immutable Change history entry. The canonical documents retain accepted earlier scope while the
+manifest points to the currently selected slice's evidence. The first slice's acceptance does not
+imply acceptance of the whole initiative. Run the feature-wide review only after the final in-scope
+slice integrates.
+
+### Evidence gate
+
+Before advancing the selected slice, run the next-stage command in
+[feature evidence validation](feature-validation.md). Repair missing or stale evidence before entering
+the stage. Keep the manifest tied to the selected slice and preserve prior-slice evidence, acceptance
+matrix and exact reviewed source revisions in immutable history. For an existing accepted feature or
+plan-only change, cite actual accepted documents and history for completed stages; preserve approvals
+of unchanged scope. The evidence gate checks recorded sources, not product decisions, so use actual
+decisions and review results.
+
+The manifest follows the selected delivery slice, not an individual `Tnn`. Run the
+`implementation` prerequisite gate before dispatching its first task. Keep delivering and reviewing
+independent vertical tasks through their existing task PR gates. Populate subsequent slice-stage
+evidence cumulatively at the declared slice review and integration milestone, reusing task acceptance
+records and current integrated proof; the validator does not require every task to finish before the
+first task review or merge.
 
 ## 2. Log
 

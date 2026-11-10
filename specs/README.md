@@ -1,23 +1,42 @@
 # Specs
 
-Spec-driven development, by hand. Every feature goes through four documents, in order;
-no code is written before its spec is accepted.
+Spec-driven development, by hand. Discovery precedes the feature's spec, plan and tasks; the
+constitution remains project-wide. No feature code is written before its selected delivery slice's
+spec is accepted.
 
 1. `constitution.md` — project-wide principles, stack and architecture. Changes rarely.
-2. `NNN-feature/spec.md` — what and why: glossary, requirements (`R#`), acceptance scenarios
-   (Given/When/Then), open questions. No technology.
+2. `NNN-feature/discovery.md` — the original outcome, users, non-goals, shared constraints, candidate
+   delivery slices and their dependency reasons. A new `NNN` ID, directory, discovery-only Features
+   row and immutable Request history entry are created when discovery starts. Record answered questions
+   as Q&A entries. Discovery is a scope proposal, not approval to build or change existing obligations.
+3. `NNN-feature/spec.md` — what and why for the **selected delivery slice**, retaining earlier
+   accepted scope: glossary, requirements (`R#`), acceptance scenarios (Given/When/Then), open
+   questions. No technology.
    A long spec is split into one file per area (`ordering.md`, `pickup.md`…) plus `open-questions.md`;
    `spec.md` keeps the glossary, roles and an index of the areas. `R#` and `S#` stay global.
-3. `NNN-feature/plan.md` — how: domain model, use cases, ports/adapters, persistence, UI routes.
-4. `NNN-feature/tasks.md` — the canonical registry of ordered, small tasks, each linked to the `R#`
-   and scenarios it covers. Large task sets may put detail in `tasks/<area>.md` and historical evidence
+4. `NNN-feature/plan.md` — how for accepted scope, retaining earlier accepted design: domain model,
+   use cases, ports/adapters, persistence, UI routes.
+5. `NNN-feature/tasks.md` — the cumulative canonical registry of ordered, small tasks, each linked
+   to the `R#` and scenarios it covers. Large task sets may put detail in `tasks/<area>.md` and historical evidence
    in `tasks/baseline.md`; keep one global Tnn sequence and all task rows/dependencies in `tasks.md`.
-   Tasks are tracer bullets wherever possible: the first task is the thinnest slice that runs end to
+   Tasks are tracer bullets wherever possible: the first task is the thinnest increment that runs end to
    end through every layer it needs (page, use case, domain, persistence, tests) and stops for review;
-   each later task is another vertical slice that reuses and widens that path. A layer-only task
+   each later task is another vertical increment that reuses and widens that path. A layer-only task
    (only the schema, only the tokens) is used only when no vertical slice can be delivered, and its
    row says why. Apply the shared [task-quality and slicing rules](../skills/agent-workflow/references/planning.md#task-quality-invest)
    to every new task breakdown.
+
+A **delivery slice** produces an independently useful, observable outcome. It may need several
+implementation tasks; a task is a bounded change within the selected slice, not another roadmap
+feature. Several outcomes with separate users or decisions, or uncertain boundaries between them,
+trigger discovery before a full spec. Task count alone does not. Select the first slice for value and
+the uncertainty it can resolve. Keep later slices as a short roadmap in `discovery.md` until their
+turn; add their detailed spec, plan and tasks only after the preceding slice's integrated acceptance
+is reviewed. Retain earlier accepted requirements and task rows in the canonical documents, with
+global `R#`, `S#` and `Tnn` identifiers across slices. An indivisible business invariant can justify
+a larger slice: record why a smaller independently useful boundary is unsafe, and use bounded
+implementation checkpoints. Existing accepted obligations remain owned until
+explicitly changed; discovery cannot silently defer them.
 
 ## History
 
@@ -26,7 +45,7 @@ committed with the change. Entries are immutable once committed; corrections and
 get a new entry linking the original. Never append to or rewrite another entry, maintain a shared
 index, or reserve a sequential filename. Each entry is dated and is one of:
 
-- **Request** — the original ask, verbatim. The first entry of every feature.
+- **Request** — the original ask, verbatim. The first entry of every feature, created at discovery.
 - **Q&A** — a question asked while writing a document and the answer given, verbatim.
 - **Change** — what changed in which document (`R#`, `S#`, plan section, task) and why.
 - **Deviation** — something found while coding that the spec or plan did not anticipate, and how it was resolved.
@@ -89,8 +108,8 @@ the G1–G14 review with source identity in a new immutable Change history entry
 - **Direct fix** (test + code, no document changes): the code breaks an existing `R#` or scenario, or
   the change is one no requirement or scenario describes (refactor, tooling, a copy typo). Write a
   failing test that reproduces it first.
-- **Spec flow** (spec → plan → tasks): new behaviour, or a change to what an existing `R#` or
-  scenario says. A "bug" where the spec is wrong or silent is a spec change.
+- **Spec flow** (discovery/scope when needed → spec → plan → tasks): new behaviour, or a change to
+  what an existing `R#` or scenario says. A "bug" where the spec is wrong or silent is a spec change.
 - **Plan only** (plan → tasks, logged as a **Change**): the behaviour stays the same but the design
   changes — a new port, a different persistence model, a moved use case.
 
@@ -101,7 +120,9 @@ or `.agents/skills/agent-workflow-spec-flow/SKILL.md`. The shared guidance lives
 `.agent-workflow/references/spec-flow.md` and gap families in
 `.agent-workflow/references/spec-gaps.md`.
 
-After the final in-scope slice integrates, run a fresh [feature acceptance review](../.agent-workflow/references/feature-acceptance.md)
+After each selected delivery slice integrates, review its acceptance and shared-invariant regression
+before selecting the next slice. After the final in-scope slice integrates, run a fresh
+[feature acceptance review](../.agent-workflow/references/feature-acceptance.md)
 against the integrated base. Record its evidence and verdict separately from task completion or
 grouping-parent tracker status. Only the user accepts the feature; this review does not merge PRs.
 
@@ -121,12 +142,10 @@ design principles and the gap analysis there.
 
 ## Roadmap
 
-Features are built one slice at a time: only the next one gets a full spec, and it starts once the
-previous slice is merged. The rest live here as one line each, so a slice does not close off an option a
-later one needs. Before starting a spec, review this table and check its *Builds on* terms against the
-current glossary.
-
-An entry gets an `NNN` ID and moves to *Features* when its spec starts. The order below is not a priority.
+Features are built one delivery slice at a time. A roadmap entry gets an `NNN` ID and a discovery-only
+Features row when discovery starts. Only its selected slice gets a full spec, plan and task breakdown;
+later slices remain lightweight in `discovery.md`. Before discovery or a subsequent slice, review this
+table and check its *Builds on* terms against the current glossary. The order below is not a priority.
 
 | Feature | For | Builds on |
 | --- | --- | --- |

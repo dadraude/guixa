@@ -84,12 +84,12 @@ The spec-side skills (`spec-flow`, `spec-gaps`) and ticket drafting reuse these 
 on a model above its tier. The session model only coordinates: routing, every question to the user,
 phase gates and the final write of anything that needs a decision.
 
-| Spec-side work                                                                                     | Role        |
-| -------------------------------------------------------------------------------------------------- | ----------- |
-| Read history, roadmap/feature tables, glossary and decision records; find collisions and prior art | Discovery   |
-| Gather code-vs-plan evidence for a task close; read back and diff published tickets                | Discovery   |
-| Walk gap families over new or changed requirements; draft `plan.md`, `tasks.md` and ticket bodies  | Preparation |
-| Review a spec that claims to be complete (fresh worker, not the author)                            | Reviewer    |
+| Spec-side work                                                                                                                                       | Role        |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| Read history, roadmap/feature tables, glossary and decision records; find collisions, prior art, outcomes, users and dependencies for discovery      | Discovery   |
+| Gather code-vs-plan evidence for a task close; read back and diff published tickets                                                                  | Discovery   |
+| Draft delivery-slice boundaries from discovery evidence; walk gap families over selected requirements; draft `plan.md`, `tasks.md` and ticket bodies | Preparation |
+| Review a spec that claims to be complete (fresh worker, not the author)                                                                              | Reviewer    |
 
 A worker returns a digest with `path:line` references (at most 40 lines), never file dumps. It does not
 edit a spec document, ask the user or delegate; the coordinator applies and logs every edit.
@@ -202,15 +202,16 @@ reported, not retried destructively.
 
 ## Project conventions
 
-- Read `specs/README.md`, `specs/constitution.md`, the task row, its phase's Done when, and every linked
+- Read `specs/README.md`, `specs/constitution.md`, the feature's `discovery.md` when present, the task row, its phase's Done when, and every linked
   `R#` and scenario. The feature's `plan.md` records design; history uses immutable files in `history/`.
   Consult legacy `log.md` plus all relevant new entries with the history helper before changing a feature.
 - At task close, retain a slice acceptance record in the task handoff/PR: each allocated `R#`/`S#`,
   task row, observable scenario, test assertion and result, reviewed code/commit, verdict and named
   remainder owner. Partial slices say what is still pending; a passing test is evidence only for its
   assertions. Use this mapping for the feature-wide review after integration.
-- After all in-scope slices integrate, follow [feature acceptance](references/feature-acceptance.md)
-  on the current base and report its verdict separately from grouping-parent status. Retired 002
+- After each delivery slice integrates, review its allocated acceptance and shared-invariant regression;
+  after all in-scope slices integrate, follow [feature acceptance](references/feature-acceptance.md)
+  on the current base and report the feature verdict separately from grouping-parent status. Retired 002
   dashboard content is excluded; do not revive it through a generic feature gate.
 - At task close, reconcile code/tests with those documents. Record authorized design mismatches in
   the affected document and a new Deviation file; preserve existing entries and legacy logs byte-for-byte. Missing
