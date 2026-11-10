@@ -67,7 +67,7 @@ base: <sha>
 commit: <sha, or none>
 changed_paths: <actual paths including generated files and docs>
 scope_request: <additional paths and reason, or none>
-covered: <each requirement/scenario -> test>
+covered: <each allocated requirement/scenario -> task, observable outcome, test assertion/result, verdict and named remainder owner>
 deviations: <each logged deviation, or none>
 checks: <commands and observed results>
 component_plan: <patterns -> reused/extended component paths; alternatives and gap for new components, or not applicable>

@@ -34,6 +34,8 @@ yarn-error.log
 !/.agents/skills/agent-workflow-implement-session/
 !/.agents/skills/agent-workflow-implement-task/
 !/.agents/skills/agent-workflow-to-tickets/
+!/.agents/skills/agent-workflow-spec-flow/
+!/.agents/skills/agent-workflow-spec-gaps/
 /.agents/skills/agent-workflow-*/*
 !/.agents/skills/agent-workflow-*/SKILL.md
 !/.agents/skills/agent-workflow-*/agents/
