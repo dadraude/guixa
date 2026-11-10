@@ -16,6 +16,7 @@ Pre-authorized:
 - Read the project's issues, relations, PRs, checks and CI runs.
 - Dispatch every admitted task (dependency-ready, compatible, within Limits).
 - Set an admitted issue `In Progress`; on Stop, comment the blocker and return it to `Todo`.
+- Set a grouping parent `Done` once every child is `Done` and nothing else remains open under it.
 - Create and clean up task worktrees, branches and `guixa_test_draNN*` databases.
 - Push the task branch, open its PR against `main`, and push new commits for CI fixes and
   merges of `main` when the PR conflicts.
@@ -51,6 +52,7 @@ Ask first:
 | Requirements documents                    | The feature's `specs/NNN-feature/spec.md` and its area files; `plan.md`/`tasks.md` deviations stay in the task PR                                                                                                                   |
 | Spec-sync branch / worktree               | `docs/NNN-tnn-spec-sync` (no `DRA-NN`: Linear would move the issue on merge) / `<worktree-root>/dra-NN-spec-sync`                                                                                                                   |
 | Implementation owner record               | `<worktree>/.agent-workflow/implementation-owner.json` (ignored runtime state; retain until integration)                                                                                                                            |
+| Task handoff                              | `<worktree>/.agent-workflow/handoff-tnn.md` (ignored runtime state; retain until integration)                                                                                                                                       |
 | Test database                             | `guixa_test_draNN`; parallel workers may add `_test_N`                                                                                                                                                                              |
 | Limits                                    | 3 pipelines; 3 substantive reviews; 2 mechanical follow-up reviews; 2 consecutive product failures per stage; 2 unsuccessful corrections per stable mechanism (`recovery`); 8 total correction attempts per stage (`recoveryTotal`) |
 
@@ -121,7 +123,7 @@ shared `guixa_test` are not task databases. If isolated database configuration c
 
 | Operation                 | Command in the task worktree                                                                                                                                                                                             |
 | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Setup                     | `composer install && pnpm install --frozen-lockfile`; build only for a focused-test prerequisite or build reproduction                                                                                                   |
+| Setup                     | `composer install && pnpm install --frozen-lockfile`; build only for a focused-test prerequisite or build reproduction; documents/tooling only: `pnpm install --frozen-lockfile`                                         |
 | Focused test              | `php artisan test --filter=<test>` (run serially initially)                                                                                                                                                              |
 | Focused checks            | Tests for affected behavior and every changed test file; select frontend files/tests using the installed runner's supported selectors; format all changed supported code/docs; type checks when needed                   |
 | Full validation (CI only) | `.github/workflows/tests.yml`: selected `frontend`, `backend` and `tooling` jobs plus the always-on `docs` lint/format check; `ci` aggregates their results; resolve commands from the workflow and dependency manifests |
@@ -181,9 +183,9 @@ and run relevant structural checks. Never report an omitted check as passed.
 
 The current CI triggers on PRs and pushes to `main`, not a feature-branch push alone. Resolve expected
 checks from the current workflow (currently `ci` in `tests`) plus branch requirements before accepting
-results. The `tooling` job covers workflow-skill structural and helper tests for agent-tooling changes. Run
-the focused offline checks in `skills/agent-workflow/tests` and `.agent-workflow/tests` locally when
-these instruction documents change; CI also runs them when `.github/` changes.
+results. The `tooling` job covers workflow-skill structural and helper tests for agent-tooling changes. When
+these instruction documents change, run its checks locally: `python3 .github/scripts/test_commands.py`
+with `selection`, `contracts` and `helpers` (`helpers` needs `CHROME_BIN`). CI also runs them when `.github/` changes.
 
 The prefix's `PGTZ=UTC` matches CI; a local Europe/Madrid database session can hide timestamp failures.
 Discover affected generators from the repository scripts before regenerating; do not invent a command.

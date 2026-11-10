@@ -12,6 +12,11 @@ main checkout stays on `main` and is for reading only.
 
 Done when `git -C <worktree> status` shows the change and the main checkout's `git status` shows none.
 
+## Workflow rules
+
+Standing rules on how the workflow operates (statuses, authorizations, cleanup) go in
+`.agent-workflow/profile.md` or `skills/agent-workflow/core/` through a worktree PR, not in agent memory.
+
 ## Demo seeder
 
 When a change adds or alters data a user sees (roles, entities, states, new screens), check

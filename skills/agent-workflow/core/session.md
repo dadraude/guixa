@@ -1,7 +1,7 @@
 # Coordinate compatible tasks
 
 Use the selected runtime adapter and [project profile](../../../.agent-workflow/profile.md). Read [scheduling](scheduling.md)
-before selecting work. These rules are shared by every runtime; one coordinator owns a feature across
+once discovery returns a dependency-ready candidate; cleanup and discovery need only this file. These rules are shared by every runtime; one coordinator owns a feature across
 all sessions and runtimes. An in-session table is not a cross-process lock.
 
 ## Discover and admit
@@ -25,12 +25,16 @@ the remote branch on merge; never delete it from here. If the task has an open s
 configured base and keep its worktree until that PR integrates too. Keep and report a dirty worktree,
 an unverifiable PR, or a closed-unmerged PR until the user confirms it is abandoned.
 
+Then close finished grouping parents: when every child of an open grouping parent has the profile's
+completion status and the parent holds no other open work, set the parent to that status and read it
+back. Leave any other parent untouched.
+
 ## Report the batch
 
 Show the compatible batch and queued tasks with reasons, then dispatch the batch without waiting. Ask
 one question only when a needed operation falls outside the profile's standing authorization.
 
-Only admitted executable tasks change status. Keep grouping parents untouched.
+Only admitted executable tasks and finished grouping parents change status.
 
 ## Run and report
 
