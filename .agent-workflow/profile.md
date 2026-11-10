@@ -16,6 +16,7 @@ Pre-authorized:
 - Read the project's issues, relations, PRs, checks and CI runs.
 - Dispatch every admitted task (dependency-ready, compatible, within Limits).
 - Set an admitted issue `In Progress`; on Stop, comment the blocker and return it to `Todo`.
+- Set a grouping parent `Done` once every child is `Done` and nothing else remains open under it.
 - Create and clean up task worktrees, branches and `guixa_test_draNN*` databases.
 - Push the task branch, open its PR against `main`, and push new commits for CI fixes and
   merges of `main` when the PR conflicts.
