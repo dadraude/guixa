@@ -93,7 +93,7 @@ function fixture(status = 'Accepted') {
     };
 }
 
-test('a later-stage claim cannot skip a required earlier artifact', () => {
+void test('a later-stage claim cannot skip a required earlier artifact', () => {
     const f = fixture();
     try {
         delete f.manifest.stages.spec.gapReview;
@@ -110,7 +110,7 @@ test('a later-stage claim cannot skip a required earlier artifact', () => {
     }
 });
 
-test('changed evidence bytes make a prior stage stale', () => {
+void test('changed evidence bytes make a prior stage stale', () => {
     const f = fixture();
     try {
         f.write(`specs/${f.feature}/plan.md`, 'changed\n');
@@ -127,7 +127,7 @@ test('changed evidence bytes make a prior stage stale', () => {
     }
 });
 
-test('retired feature cannot progress even with otherwise complete evidence', () => {
+void test('retired feature cannot progress even with otherwise complete evidence', () => {
     const f = fixture('Retired');
     try {
         const result = validateFeature(f.root, f.feature, 'complete');
@@ -140,7 +140,7 @@ test('retired feature cannot progress even with otherwise complete evidence', ()
     }
 });
 
-test('selected first slice can advance while future refs remain deferred', () => {
+void test('selected first slice can advance while future refs remain deferred', () => {
     const f = fixture();
     try {
         assert.equal(
@@ -156,7 +156,7 @@ test('selected first slice can advance while future refs remain deferred', () =>
     }
 });
 
-test('discovery starts with a request but does not require finished discovery', () => {
+void test('discovery starts with a request but does not require finished discovery', () => {
     const f = fixture();
     try {
         delete f.manifest.stages.discovery.discovery;
@@ -174,7 +174,7 @@ test('discovery starts with a request but does not require finished discovery', 
     }
 });
 
-test('outside-root and malformed evidence are rejected', () => {
+void test('outside-root and malformed evidence are rejected', () => {
     const f = fixture();
     try {
         f.manifest.stages.scope.slices.path = '../outside.md';
@@ -189,7 +189,7 @@ test('outside-root and malformed evidence are rejected', () => {
     }
 });
 
-test('malformed CLI arguments fail with actionable usage', () => {
+void test('malformed CLI arguments fail with actionable usage', () => {
     const result = spawnSync(
         process.execPath,
         [script, '004-example', 'unknown-stage'],
@@ -199,7 +199,7 @@ test('malformed CLI arguments fail with actionable usage', () => {
     assert.match(result.stderr, /Usage:.*validate-feature/);
 });
 
-test('new discovery works before spec.md exists', () => {
+void test('new discovery works before spec.md exists', () => {
     const f = fixture();
     try {
         rmSync(join(f.root, 'specs', f.feature, 'spec.md'));
@@ -218,7 +218,7 @@ test('new discovery works before spec.md exists', () => {
     }
 });
 
-test('additional split-spec source hash is checked', () => {
+void test('additional split-spec source hash is checked', () => {
     const f = fixture();
     try {
         f.manifest.stages.spec.sources = [
@@ -240,7 +240,7 @@ test('additional split-spec source hash is checked', () => {
     }
 });
 
-test('evidence from another slice cannot satisfy the gate', () => {
+void test('evidence from another slice cannot satisfy the gate', () => {
     const f = fixture();
     try {
         f.manifest.stages.implementation.sliceId = 'other';
@@ -257,7 +257,7 @@ test('evidence from another slice cannot satisfy the gate', () => {
     }
 });
 
-test('malformed manifest fails closed', () => {
+void test('malformed manifest fails closed', () => {
     const f = fixture();
     try {
         f.write(`specs/${f.feature}/workflow.json`, '{broken');
@@ -270,7 +270,7 @@ test('malformed manifest fails closed', () => {
     }
 });
 
-test('complete requires the final acceptance evidence', () => {
+void test('complete requires the final acceptance evidence', () => {
     const f = fixture();
     try {
         delete f.manifest.stages.acceptance.userAcceptance;
@@ -291,7 +291,7 @@ test('complete requires the final acceptance evidence', () => {
     }
 });
 
-test('superseded feature status blocks progression', () => {
+void test('superseded feature status blocks progression', () => {
     const f = fixture('Superseded');
     try {
         const result = validateFeature(f.root, f.feature, 'plan');
@@ -304,7 +304,7 @@ test('superseded feature status blocks progression', () => {
     }
 });
 
-test('symlinked evidence outside the repository is rejected', () => {
+void test('symlinked evidence outside the repository is rejected', () => {
     const f = fixture();
     const outside = mkdtempSync(join(tmpdir(), 'feature-outside-'));
     try {
