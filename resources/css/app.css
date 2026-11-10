@@ -2040,3 +2040,16 @@ html.dark:has(.reference-style) [data-sidebar='sidebar'][data-mobile='true'] {
         height: 2rem;
     }
 }
+
+@keyframes welcome-enter {
+    from {
+        opacity: 0;
+        transform: translateY(0.5rem);
+    }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .reference-style-welcome .welcome-enter {
+        animation: welcome-enter 240ms ease-out;
+    }
+}

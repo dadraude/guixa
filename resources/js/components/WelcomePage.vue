@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { useMediaQuery } from '@vueuse/core';
+import { CalendarCheck, Clock, ShoppingBasket } from '@lucide/vue';
+import { computed } from 'vue';
 import { trans } from 'laravel-vue-i18n';
 import AppLogoIcon from '@/components/AppLogoIcon.vue';
 import { Button } from '@/components/ui/button';
@@ -9,8 +10,23 @@ defineProps<{
     actionHref: string;
 }>();
 
-const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
-const compact = useMediaQuery('(max-width: 639px)');
+const steps = computed(() => [
+    {
+        icon: ShoppingBasket,
+        label: trans('Order'),
+        line: trans('Choose what your household needs.'),
+    },
+    {
+        icon: Clock,
+        label: trans('Cutoff'),
+        line: trans('Orders close and are sent to the producers.'),
+    },
+    {
+        icon: CalendarCheck,
+        label: trans('Pickup'),
+        line: trans('Collect your order on pickup day.'),
+    },
+]);
 </script>
 
 <template>
@@ -31,23 +47,26 @@ const compact = useMediaQuery('(max-width: 639px)');
             </header>
 
             <main
-                class="grid flex-1 items-center gap-10 py-12 sm:py-16 xl:grid-cols-[minmax(0,1fr)_minmax(18rem,0.8fr)] xl:gap-16"
+                class="welcome-enter flex flex-1 flex-col justify-center gap-12 py-10 sm:py-14"
             >
                 <section class="min-w-0">
                     <p class="text-sm font-semibold tracking-wide text-primary">
                         {{ trans('For your cooperative') }}
                     </p>
                     <h1
-                        class="mt-4 max-w-2xl text-4xl font-semibold tracking-tight text-balance sm:text-5xl"
+                        class="mt-4 max-w-4xl text-[clamp(min(2.5rem,11vw),7vw,4.75rem)] leading-[1.05] font-extrabold tracking-tighter text-balance break-words"
                     >
-                        {{ trans('A clearer way to work together.') }}
+                        {{ trans("This week's order,") }}
+                        <span class="text-primary">{{
+                            trans('in one place.')
+                        }}</span>
                     </h1>
                     <p
                         class="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground"
                     >
                         {{
                             trans(
-                                'Plan orders, coordinate pickups and keep households connected in one place.',
+                                'Order, pick up and follow your household wallet.',
                             )
                         }}
                     </p>
@@ -62,47 +81,24 @@ const compact = useMediaQuery('(max-width: 639px)');
                     </Button>
                 </section>
 
-                <figure class="min-w-0" data-visual-panel>
-                    <!-- Filmed from the stageshow demo; the poster is its final frame, shown under reduced motion -->
-                    <picture v-if="reducedMotion">
-                        <source
-                            media="(max-width: 639px)"
-                            srcset="/images/welcome/order-hero-compact.png"
+                <ol class="grid gap-4 sm:grid-cols-3">
+                    <li
+                        v-for="step in steps"
+                        :key="step.label"
+                        class="min-w-0 bg-card p-5"
+                        data-visual-panel
+                    >
+                        <component
+                            :is="step.icon"
+                            class="size-6 text-primary"
+                            aria-hidden="true"
                         />
-                        <img
-                            src="/images/welcome/order-hero.png"
-                            :alt="
-                                trans(
-                                    'A member updates their order and the total follows.',
-                                )
-                            "
-                            class="h-auto w-full"
-                        />
-                    </picture>
-                    <video
-                        v-else
-                        class="h-auto w-full"
-                        autoplay
-                        loop
-                        muted
-                        playsinline
-                        :aria-label="
-                            trans(
-                                'A member updates their order and the total follows.',
-                            )
-                        "
-                        :poster="
-                            compact
-                                ? '/images/welcome/order-hero-compact.png'
-                                : '/images/welcome/order-hero.png'
-                        "
-                        :src="
-                            compact
-                                ? '/images/welcome/order-hero-compact.webm'
-                                : '/images/welcome/order-hero.webm'
-                        "
-                    />
-                </figure>
+                        <p class="mt-3 font-bold">{{ step.label }}</p>
+                        <p class="mt-1 text-sm text-muted-foreground">
+                            {{ step.line }}
+                        </p>
+                    </li>
+                </ol>
             </main>
         </div>
     </div>
