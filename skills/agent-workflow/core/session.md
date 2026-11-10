@@ -1,7 +1,7 @@
 # Coordinate compatible tasks
 
 Use the selected runtime adapter and [project profile](../../../.agent-workflow/profile.md). Read [scheduling](scheduling.md)
-before selecting work. These rules are shared by every runtime; one coordinator owns a feature across
+once discovery returns a dependency-ready candidate; cleanup and discovery need only this file. These rules are shared by every runtime; one coordinator owns a feature across
 all sessions and runtimes. An in-session table is not a cross-process lock.
 
 ## Discover and admit
