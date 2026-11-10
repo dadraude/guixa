@@ -73,14 +73,16 @@ claiming the history is current, and disclose any pending task branches that mat
 
 Rules:
 
-- Each acceptance scenario becomes at least one test. A task is done when its scenarios pass.
+- Each acceptance scenario becomes at least one test. A task is done when its allocated scenarios
+  pass and its slice acceptance record maps requirements, task, test evidence, verdict and remainder.
 - A requirement change edits the spec first, then the plan and tasks it affects, and logs a **Change**.
 - A task is not done until any deviation found while coding is written back to the spec or plan it
   affects and logged as a **Deviation**. Code never silently disagrees with its documents.
 - When a task PR makes `spec.md` or an area file stale, the agent opens a stacked spec-sync PR on the
   task branch with the edits and a **Change** entry; merging it accepts the change.
 - Open questions block only the requirements that depend on them. When resolved, the answer is logged as a **Q&A**.
-- Before a spec is accepted, walk the gap families in `.claude/skills/spec-gaps/SKILL.md`.
+- Before a spec is accepted, walk the gap families in `.agent-workflow/references/spec-gaps.md`; record
+the G1–G14 review with source identity in a new immutable Change history entry.
 
 ## Spec flow or direct fix?
 
@@ -94,7 +96,14 @@ Rules:
 
 When in doubt, ask: "would a reader of `spec.md` notice?" If yes, use the spec flow.
 
-Agents follow these rules through `.claude/skills/spec-flow/SKILL.md`.
+Agents follow these rules through the Guixa spec flow: `.claude/skills/spec-flow/SKILL.md`
+or `.agents/skills/agent-workflow-spec-flow/SKILL.md`. The shared guidance lives in
+`.agent-workflow/references/spec-flow.md` and gap families in
+`.agent-workflow/references/spec-gaps.md`.
+
+After the final in-scope slice integrates, run a fresh [feature acceptance review](../.agent-workflow/references/feature-acceptance.md)
+against the integrated base. Record its evidence and verdict separately from task completion or
+grouping-parent tracker status. Only the user accepts the feature; this review does not merge PRs.
 
 ## Research
 

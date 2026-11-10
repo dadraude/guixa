@@ -6,7 +6,8 @@ You must be a fresh independent reviewer. Load this brief, the fixed diff and su
 not the coordinator's adapter, setup commands or whole profile. Missing source/test evidence is a blocker,
 not a clean result. Request missing inputs; do not infer remote or execution authority.
 
-Read the task/phase acceptance, linked requirements/scenarios, affected design, project standards and
+Read the task/phase acceptance, linked requirements/scenarios, any supplied per-slice
+scenario/task/test-evidence/verdict/remainder mapping, affected design, project standards and
 new deviation history files at the exact paths in the handoff. Consult the project's combined legacy
 and new history when checking earlier decisions. Verify existing entries/archives are unchanged and
 corrections use new files linking their originals.

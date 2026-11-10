@@ -27,7 +27,9 @@ an unverifiable PR, or a closed-unmerged PR until the user confirms it is abando
 
 Then close finished grouping parents: when every child of an open grouping parent has the profile's
 completion status and the parent holds no other open work, set the parent to that status and read it
-back. Leave any other parent untouched.
+back. Leave any other parent untouched. Grouping-parent closure is a tracker operation. If the profile
+defines a feature acceptance gate, run it when all in-scope slices are integrated and report its
+verdict separately; do not infer product acceptance from parent status.
 
 ## Report the batch
 

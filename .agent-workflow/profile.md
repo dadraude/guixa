@@ -16,7 +16,7 @@ Pre-authorized:
 - Read the project's issues, relations, PRs, checks and CI runs.
 - Dispatch every admitted task (dependency-ready, compatible, within Limits).
 - Set an admitted issue `In Progress`; on Stop, comment the blocker and return it to `Todo`.
-- Set a grouping parent `Done` once every child is `Done` and nothing else remains open under it.
+- Set a grouping parent `Done` once every child is `Done` and nothing else remains open under it; this is tracker closure, not product acceptance.
 - Create and clean up task worktrees, branches and `guixa_test_draNN*` databases.
 - Push the task branch, open its PR against `main`, and push new commits for CI fixes and
   merges of `main` when the PR conflicts.
@@ -44,7 +44,7 @@ Ask first:
 | Executable task                           | `Tnn` title prefix matching a row in `specs/*/tasks.md`; title format `Tnn — Title`                                                                                                                                                 |
 | Ready label                               | `ready-for-agent`, executable mapped leaves only                                                                                                                                                                                    |
 | Relation fields                           | `parentId`, `blockedBy`/`blocks`, `relatedTo` on `save_issue`, where exposed                                                                                                                                                        |
-| Codex entrypoint prefix                   | `agent-workflow` (`$agent-workflow-implement-session`, `$agent-workflow-implement-task DRA-NN`, `$agent-workflow-to-tickets`)                                                                                                       |
+| Codex entrypoint prefix                   | `agent-workflow` (`$agent-workflow-implement-session`, `$agent-workflow-implement-task DRA-NN`, `$agent-workflow-to-tickets`, `$agent-workflow-spec-flow`, `$agent-workflow-spec-gaps`)                                             |
 | Remote / base                             | `origin` / `main`                                                                                                                                                                                                                   |
 | Task branch                               | `feature/dra-NN-<3-6 title words>`; `chore/` for tooling, test support or CI; `docs/` for documents only                                                                                                                            |
 | Worktree root                             | Sibling of the selected repository: `<repo-parent>/<repo-name>-worktrees`                                                                                                                                                           |
@@ -205,6 +205,13 @@ reported, not retried destructively.
 - Read `specs/README.md`, `specs/constitution.md`, the task row, its phase's Done when, and every linked
   `R#` and scenario. The feature's `plan.md` records design; history uses immutable files in `history/`.
   Consult legacy `log.md` plus all relevant new entries with the history helper before changing a feature.
+- At task close, retain a slice acceptance record in the task handoff/PR: each allocated `R#`/`S#`,
+  task row, observable scenario, test assertion and result, reviewed code/commit, verdict and named
+  remainder owner. Partial slices say what is still pending; a passing test is evidence only for its
+  assertions. Use this mapping for the feature-wide review after integration.
+- After all in-scope slices integrate, follow [feature acceptance](references/feature-acceptance.md)
+  on the current base and report its verdict separately from grouping-parent status. Retired 002
+  dashboard content is excluded; do not revive it through a generic feature gate.
 - At task close, reconcile code/tests with those documents. Record authorized design mismatches in
   the affected document and a new Deviation file; preserve existing entries and legacy logs byte-for-byte. Missing
   original Request or a behavior change needs the user's decision, not an invented requirement/log.
