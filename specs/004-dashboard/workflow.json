@@ -1,0 +1,76 @@
+{
+    "schemaVersion": 1,
+    "slice": {
+        "id": "attention-and-opportunities",
+        "scopeRefs": [],
+        "deferredRefs": []
+    },
+    "stages": {
+        "discovery": {
+            "request": {
+                "path": "specs/004-dashboard/history/2026-11-10T17-57-45.277Z-no-task-d280baf7-0213-496f-9449-59b28cdcd2a9.md",
+                "sha256": "b483b91ffa6d2cd003ef99f363c3db740c3ceb25a81e265e31f95fbd08ba403f"
+            },
+            "discovery": {
+                "path": "specs/004-dashboard/discovery.md",
+                "sha256": "bb45fc0cd730c30239c954290d02236b7c8d749709c29b7eec6ffd4955c47077"
+            }
+        },
+        "scope": {
+            "sliceId": "attention-and-opportunities",
+            "slices": {
+                "path": "specs/004-dashboard/discovery.md",
+                "sha256": "bb45fc0cd730c30239c954290d02236b7c8d749709c29b7eec6ffd4955c47077"
+            },
+            "selectionDecision": {
+                "path": "specs/004-dashboard/history/2026-11-10T23-11-32.497Z-no-task-17a0d258-5bdf-4b53-b1cd-64f71ead1444.md",
+                "sha256": "7fd183ddacd586f4c33acea5a88abc9202af20ed638d0d4d58a59a663462653c"
+            }
+        },
+        "spec": {
+            "sliceId": "attention-and-opportunities",
+            "specification": {
+                "path": "specs/004-dashboard/spec.md",
+                "sha256": "2bb702003ac266bd87a952f802148e70a9696a3a719884ad814f2b9ac3a60a1d"
+            },
+            "gapReview": {
+                "path": "specs/004-dashboard/history/2026-11-10T23-42-39.298Z-no-task-526708dc-2a6e-45bb-a892-0e10230e5465.md",
+                "sha256": "1b07bd9b7ab2da5cbdd51ce6b265e41fc371a62a806e6078319b67c9afadb717"
+            },
+            "sources": [
+                {
+                    "path": "specs/004-dashboard/discovery.md",
+                    "sha256": "bb45fc0cd730c30239c954290d02236b7c8d749709c29b7eec6ffd4955c47077"
+                },
+                {
+                    "path": "specs/constitution.md",
+                    "sha256": "9f1c5e4cc45e5f64f23dd2707cc7f3b64d12d30ef2489c730daab29c13dad5f2"
+                },
+                {
+                    "path": "specs/001-weekly-orders/spec.md",
+                    "sha256": "7ff4639a8061793101ec97b24991a45d3a26ded8e15112107cdc05d39a413b94"
+                },
+                {
+                    "path": "specs/001-weekly-orders/ordering.md",
+                    "sha256": "c599975af55222d7474a3f1ffb5f4a38ceb0de2d3e81c52940bb0dbc4e9894d4"
+                },
+                {
+                    "path": "specs/001-weekly-orders/reception.md",
+                    "sha256": "670203b391488f6fcaeb9e71b23bc90af6ae9abca55447f82850435140e1476c"
+                },
+                {
+                    "path": "specs/001-weekly-orders/pickup.md",
+                    "sha256": "510f6678b61c23b129fb1ef6e11f5649a31487fbada03b78dc4202c8bb848798"
+                },
+                {
+                    "path": "specs/001-weekly-orders/stock-wallet.md",
+                    "sha256": "4a3194d4abd0941a0edb8a3478715e9f42600a051518ca37a8765f34e5928ff0"
+                },
+                {
+                    "path": "specs/003-role-management/spec.md",
+                    "sha256": "200be7dc4f719ed7589e33a55f2ca0bbc52cac01de7a032c626a3a7bfa4b4ae5"
+                }
+            ]
+        }
+    }
+}
