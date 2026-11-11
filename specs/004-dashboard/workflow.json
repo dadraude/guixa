@@ -109,6 +109,95 @@
                 "path": "specs/004-dashboard/history/2026-11-11T07-11-59.614Z-no-task-6315fdbb-5a99-46a5-bd29-a8b293fda762.md",
                 "sha256": "af0ca0f48d6c8343e1bf217f38247cf95e932759f47598853353f42b45d7ec47"
             }
+        },
+        "plan": {
+            "sliceId": "attention-and-opportunities",
+            "plan": {
+                "path": "specs/004-dashboard/plan.md",
+                "sha256": "7e26298272086212363e4fff80cb6d77feaee370ed435f350b67f4b495c3cd9d"
+            },
+            "preparation": {
+                "path": "specs/004-dashboard/history/2026-11-11T07-19-31.442Z-no-task-b0231324-4a4f-4288-b0ef-cc8e6debb49e.md",
+                "sha256": "c32072ef91bd1788bf15789cc8115c392fd775ee223141116ff4786823ae554f"
+            },
+            "sources": [
+                {
+                    "path": "specs/004-dashboard/spec.md",
+                    "sha256": "edfd447c2c1c5802783784b5fd2e62834616485f33d4b84062459560e1584494"
+                },
+                {
+                    "path": "specs/004-dashboard/discovery.md",
+                    "sha256": "47315731b5a20673e327ef2b4302ad7515b23434926e3e7939b69245cd10ee32"
+                },
+                {
+                    "path": "specs/constitution.md",
+                    "sha256": "9f1c5e4cc45e5f64f23dd2707cc7f3b64d12d30ef2489c730daab29c13dad5f2"
+                },
+                {
+                    "path": "architecture/modules.php",
+                    "sha256": "44831c9dc945b393dc42ce6ae2584fc476f4e31a462c152b266bd441b567fc50"
+                },
+                {
+                    "path": "routes/web.php",
+                    "sha256": "d372cb4b1702034c96152e1dbcf991414c5ae771534cb1d4da9e3b28631aaf8a"
+                },
+                {
+                    "path": "app/Http/Controllers/DashboardController.php",
+                    "sha256": "b071893921c7582e6e6fa6277d5878ec0957c32626ddeb5cab21df9f5fc76b89"
+                },
+                {
+                    "path": "resources/js/pages/Dashboard.vue",
+                    "sha256": "83e2f7448068c8726e266c9e3c94298c4bf97fddbec76dc6057e4dbbf6284faf"
+                },
+                {
+                    "path": "src/Ordering/Application/ListCycles.php",
+                    "sha256": "25435fac20df658756f638b6f766fb4b9501b2f19607dc86a309debf890dc68f"
+                },
+                {
+                    "path": "src/Ordering/Application/ListReceptionCycles.php",
+                    "sha256": "510398e64525c8e6e517052c600536e7842f399b6b8f624aab4a4ba42dc733d4"
+                },
+                {
+                    "path": "src/Ordering/Domain/ReceptionLoader.php",
+                    "sha256": "91a96b481c88a8da0923381fd43d84f6c5e895b8567ff3e315fed5c66de88b30"
+                },
+                {
+                    "path": "src/Sales/Application/ListBaskets.php",
+                    "sha256": "5e5e1d0509129ce518ed5aa93b72232d576c62be3d647fa8cff369ffe4bf34d6"
+                },
+                {
+                    "path": "src/Sales/Application/ListPendingCollections.php",
+                    "sha256": "5e995280c76601d8961a21270b6635a6b7d8014a5ebc275c2cfd622e9783a548"
+                },
+                {
+                    "path": "src/Sales/Application/ListMemberPendingCollections.php",
+                    "sha256": "0d4b5ff31feb86487b9a639603a351cebbca58c497352ba5b8cb75d8e189937c"
+                },
+                {
+                    "path": "resources/js/pages/Manage/Roles/Index.vue",
+                    "sha256": "8bfa75100748052cc1dcb633dc2c89b48101dad8911e7f06fa93f224f2b1969a"
+                },
+                {
+                    "path": "tests/Feature/DashboardTest.php",
+                    "sha256": "061458ae8ceef5ac6e06f06f81bd6edba4f442345ac5f875ae5b178f09136f04"
+                },
+                {
+                    "path": "resources/js/pages/Dashboard.spec.ts",
+                    "sha256": "6a03b13feb06785a19c1894cd343c711e38e5a163d6c0b5e925e8aa4bda09b5f"
+                },
+                {
+                    "path": "tests/Feature/Sales/PendingCollectionVisibilityTest.php",
+                    "sha256": "516733544a331d48be5eccb35a2902a35c6bdbed6d52cfcf110a4b2a7591c598"
+                },
+                {
+                    "path": "database/seeders/DemoSeeder.php",
+                    "sha256": "61d1d62e8e3bf51028e10f5ea3bd4cfec97443e69a780ae5b914ca97fe5948ab"
+                },
+                {
+                    "path": "tests/Feature/Database/DemoSeederTest.php",
+                    "sha256": "c45ca309c8bff3cbf18bb1d984bb5c957c0f9c68106511e09877f14b1d604a8f"
+                }
+            ]
         }
     }
 }
