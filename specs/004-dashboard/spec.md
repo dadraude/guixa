@@ -72,10 +72,11 @@ domain entity.
   has the single review group in R5, not a separate validation group. A received-total change that clears
   validation updates the next dashboard read accordingly. The dashboard adds no receipt-confirmed state.
 - **R7 — Basket preparation and validation.** Finance and Manager see existing, non-cancelled basket drafts
-  that they can prepare or validate under 001 R19a/R22. The item names preparation when the draft is not yet
-  eligible for validation and validation when the existing rules allow it. Validated, cancelled and
-  nothing-to-collect cases are excluded from draft work. A zero-price or net-zero basket with effective goods
-  or returns may still require validation; amount alone cannot remove it.
+  with at least one active line, the condition under which 001 R19a/R22 accepts validation. Every such draft
+  is validation work, named as validation. Preparation remains a defined action name, but no draft reaches it
+  today: a draft is either validatable or has no active line. Validated, cancelled, nothing-to-collect and
+  drafts with no active line are excluded from draft work. A zero-price or net-zero basket with effective
+  goods or returns still requires validation; amount alone cannot remove it.
 - **R8 — Staff collection.** Finance and Manager see every validated basket still pending collection that they
   can record, including closed-cycle, late and cycleless baskets (a supplemental basket is independent, has
   no cycle and takes the no-cycle context) and those of inactive households. Collection remains independent of wallet balance. An effective full contents reversal
@@ -175,9 +176,9 @@ basket actuals alone does not create this distribution blocker.
 
 **S7 — Baskets and closure (R7, R10).** Given a settled cycle with a draft basket containing effective goods,
 another draft with no contents, and a validated basket pending physical collection, when Finance opens the
-dashboard, then it sees only the eligible preparation/validation and collection work; zero money due does not
-by itself remove a goods basket; no “close cycle” action appears. When the final weekly basket is validated or
-needs no collection, closure follows 001 R24b without a dashboard command.
+dashboard, then it sees only the draft as validation work and the collection work, and the empty draft is
+absent; zero money due does not by itself remove a goods basket; no “close cycle” action appears. When the
+final weekly basket is validated or needs no collection, closure follows 001 R24b without a dashboard command.
 
 **S8 — Eligible send and scheduler exclusion (R9, R12).** Given one non-empty participating order closed for
 ordering with a producer account, one still open, one empty and one already sent, when Manager opens the
