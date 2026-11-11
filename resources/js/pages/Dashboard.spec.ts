@@ -1,13 +1,20 @@
 import { describe, expect, it, vi } from 'vite-plus/test';
-import { createSSRApp } from 'vue';
+import { createSSRApp, h } from 'vue';
 import { renderToString } from 'vue/server-renderer';
 import { installTranslations } from '@/lib/i18n';
 import Dashboard from './Dashboard.vue';
 
+let renderLinkNames = false;
+
 vi.mock('@inertiajs/vue3', () => ({
     Head: () => null,
-    Link: (_props: unknown, { slots }: { slots: { default?: () => string } }) =>
-        slots.default?.() ?? '',
+    Link: (
+        props: Record<string, unknown>,
+        { slots }: { slots: { default?: () => string } },
+    ) =>
+        renderLinkNames
+            ? h('a', props, slots.default?.() ?? '')
+            : (slots.default?.() ?? ''),
     usePage: () => ({
         props: {
             auth: { user: { name: 'Test User' } },
@@ -348,5 +355,159 @@ describe('dashboard presentation', () => {
         expect(html).not.toContain('<form');
         expect(html).not.toContain('<button type="submit"');
         expect(html.toLowerCase()).not.toContain('endarrerida');
+    });
+
+    it('lists opportunities below the attention list, as available ordering with cutoffs and never as unfinished work (R11, R12, S3)', async () => {
+        const app = createSSRApp(Dashboard, {
+            roles: ['member'],
+            isManager: false,
+            isMember: true,
+            nextPickup: null,
+            openCycles: 1,
+            balance: null,
+            managerSummary: null,
+            attention: [
+                {
+                    key: 'collect_basket:cycle:c0',
+                    action: 'collect_basket',
+                    cycleId: 'c0',
+                    scheduledDate: '2026-10-31',
+                    count: 1,
+                    href: '/baskets?pending=1',
+                    producerName: null,
+                    allocationDifferenceCount: 0,
+                },
+            ],
+            opportunities: [
+                {
+                    key: 'member_order:cycle:c1',
+                    kind: 'member_order',
+                    scheduledDate: '2026-11-07',
+                    href: '/cycles/c1/order',
+                    cutoffs: [
+                        {
+                            producerName: 'Forn de la Vila',
+                            closesAt: '2026-11-04 20:00',
+                        },
+                    ],
+                },
+            ],
+        });
+        installTranslations(app);
+        const html = await renderToString(app);
+        expect(html.match(/data-test="opportunity"/g)).toHaveLength(1);
+        expect(html.indexOf('data-test="attention-list"')).toBeLessThan(
+            html.indexOf('data-test="opportunity-list"'),
+        );
+        expect(html).toContain('Es pot fer la comanda');
+        expect(html).toContain('Forn de la Vila tanca el');
+        expect(html).toContain('a les 20:00');
+        expect(html).toContain('Obre la comanda');
+        expect(html.toLowerCase()).not.toContain('sense enviar');
+        expect(html.toLowerCase()).not.toContain('pendent de');
+    });
+
+    it('lists the producer review and Catalogue maintenance opportunities with no count or pending claim (R11, S10)', async () => {
+        const app = createSSRApp(Dashboard, {
+            roles: ['catalogue'],
+            isManager: false,
+            isMember: false,
+            nextPickup: null,
+            openCycles: 0,
+            balance: null,
+            managerSummary: null,
+            attention: [],
+            opportunities: [
+                {
+                    key: 'producer_summary:cycle:c1',
+                    kind: 'producer_summary',
+                    scheduledDate: '2026-11-07',
+                    href: '/producer/cycles/c1',
+                    cutoffs: [],
+                },
+                {
+                    key: 'catalogue_maintenance',
+                    kind: 'catalogue_maintenance',
+                    scheduledDate: null,
+                    href: '/catalogue/producers',
+                    cutoffs: [],
+                },
+            ],
+        });
+        installTranslations(app);
+        const html = await renderToString(app);
+        expect(html).not.toContain('data-test="attention-list"');
+        expect(html.match(/data-test="opportunity"/g)).toHaveLength(2);
+        expect(html).toContain('Revisa la comanda enviada');
+        expect(html).toContain('Manté productes i disponibilitat');
+        expect(html).not.toContain('data-test="attention-count"');
+    });
+
+    it('gives repeated opportunity rows distinct accessible link names by pickup date (R11, R16)', async () => {
+        const row = (cycle: string, date: string) => ({
+            key: `producer_summary:cycle:${cycle}`,
+            kind: 'producer_summary',
+            scheduledDate: date,
+            href: `/producer/cycles/${cycle}`,
+            cutoffs: [],
+        });
+        const app = createSSRApp(Dashboard, {
+            roles: ['producer'],
+            isManager: false,
+            isMember: false,
+            nextPickup: null,
+            openCycles: 0,
+            balance: null,
+            managerSummary: null,
+            attention: [],
+            opportunities: [row('c1', '2026-11-07'), row('c2', '2026-11-14')],
+        });
+        installTranslations(app);
+        renderLinkNames = true;
+        const html = await renderToString(app).finally(() => {
+            renderLinkNames = false;
+        });
+        const labels = [
+            ...html.matchAll(/aria-label="(Obre el resum[^"]*)"/g),
+        ].map((match) => match[1]);
+        expect(labels).toHaveLength(2);
+        expect(new Set(labels).size).toBe(2);
+        expect(labels[0]).toContain('Recollida del');
+    });
+
+    it('shows one cutoff row per open producer even when two share a name (R12)', async () => {
+        const app = createSSRApp(Dashboard, {
+            roles: ['member'],
+            isManager: false,
+            isMember: true,
+            nextPickup: null,
+            openCycles: 1,
+            balance: null,
+            managerSummary: null,
+            attention: [],
+            opportunities: [
+                {
+                    key: 'member_order:cycle:c1',
+                    kind: 'member_order',
+                    scheduledDate: '2026-11-07',
+                    href: '/cycles/c1/order',
+                    cutoffs: [
+                        {
+                            producerName: 'Cal Pere',
+                            closesAt: '2026-11-04 20:00',
+                        },
+                        {
+                            producerName: 'Cal Pere',
+                            closesAt: '2026-11-05 12:00',
+                        },
+                    ],
+                },
+            ],
+        });
+        installTranslations(app);
+        const html = await renderToString(app);
+        expect(html.match(/data-test="opportunity-cutoff"/g)).toHaveLength(2);
+        expect(html).toContain('a les 20:00');
+        expect(html).toContain('a les 12:00');
     });
 });

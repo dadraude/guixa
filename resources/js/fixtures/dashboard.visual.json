@@ -17,7 +17,7 @@
             },
             "root": ".reference-style",
             "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, [data-sidebar=\"sidebar\"]",
-            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content a,#main-content [data-test=\"attention-count\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content a,#main-content [data-test=\"attention-count\"],#main-content [data-test=\"opportunity-cutoff\"]",
             "fonts": ["16px Nunito Variable"],
             "focus": [
                 "button[data-sidebar=\"trigger\"]",
@@ -130,6 +130,72 @@
                         ],
                         "focus": [],
                         "noFocusReason": "A member with no collection work has no attention links; the shortcuts and summary are unchanged 001 content."
+                    }
+                },
+                {
+                    "id": "opportunities",
+                    "query": {
+                        "state": "opportunities"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"opportunities\"]",
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"opportunity\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"opportunity\"] a",
+                                "count": 1,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"opportunity-cutoff\"]",
+                                "count": 2
+                            },
+                            {
+                                "selector": "[data-test=\"attention-group\"]",
+                                "count": 2
+                            }
+                        ],
+                        "focus": [
+                            "button[data-sidebar=\"trigger\"]",
+                            "[data-test=\"attention-group\"] a",
+                            "[data-test=\"opportunity\"] a"
+                        ]
                     }
                 }
             ]
@@ -558,6 +624,207 @@
                         ]
                     },
                     "ready": "body[data-visual-ready=\"manual-send\"]"
+                }
+            ]
+        },
+        {
+            "id": "dashboard-producer-opportunity",
+            "path": "/resources/visual/dra-205.html",
+            "query": {
+                "page": "Dashboard",
+                "role": "producer"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content a,#main-content [data-test=\"attention-count\"],#main-content [data-test=\"opportunity-cutoff\"]",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "button[data-sidebar=\"trigger\"]",
+                "[data-test=\"opportunity\"] a"
+            ],
+            "states": [
+                {
+                    "id": "opportunities",
+                    "query": {
+                        "state": "opportunities"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"opportunities\"]",
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"opportunity\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"opportunity\"] a",
+                                "count": 1,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"opportunity-cutoff\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"attention-list\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"attention-count\"]",
+                                "count": 0
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "two-summaries",
+                    "query": {
+                        "state": "opportunities-repeated"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"opportunities-repeated\"]",
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"opportunity\"]",
+                                "count": 2
+                            },
+                            {
+                                "selector": "[data-test=\"opportunity\"] a",
+                                "count": 2,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"opportunity-cutoff\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"attention-list\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"attention-count\"]",
+                                "count": 0
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "dashboard-catalogue-opportunity",
+            "path": "/resources/visual/dra-205.html",
+            "query": {
+                "page": "Dashboard",
+                "role": "catalogue"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content a,#main-content [data-test=\"attention-count\"],#main-content [data-test=\"opportunity-cutoff\"]",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "button[data-sidebar=\"trigger\"]",
+                "[data-test=\"opportunity\"] a"
+            ],
+            "states": [
+                {
+                    "id": "opportunities",
+                    "query": {
+                        "state": "opportunities"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"opportunities\"]",
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"opportunity\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"opportunity\"] a",
+                                "count": 1,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"opportunity-cutoff\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"attention-list\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"attention-count\"]",
+                                "count": 0
+                            }
+                        ]
+                    }
                 }
             ]
         }

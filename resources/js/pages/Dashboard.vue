@@ -52,6 +52,7 @@ const props = defineProps<{
     openCycles: number;
     balance: number | null;
     attention?: App.Http.AttentionGroupRow[];
+    opportunities?: App.Http.OpportunityRow[];
     managerSummary: ManagerSummary | null;
     areaShortcuts?: App.Http.RoleArea[];
 }>();
@@ -107,6 +108,38 @@ const contextLabel = (group: App.Http.AttentionGroupRow) =>
     group.producerName
         ? `${group.producerName} · ${dateContext(group)}`
         : dateContext(group);
+
+const opportunityLabels: Record<
+    Guixa.Dashboard.Domain.OpportunityKind,
+    string
+> = {
+    member_order: trans('Ordering is open'),
+    producer_summary: trans('Review your sent order'),
+    catalogue_maintenance: trans('Maintain products and availability'),
+};
+
+const opportunityLinkLabels: Record<
+    Guixa.Dashboard.Domain.OpportunityKind,
+    string
+> = {
+    member_order: trans('Open the order'),
+    producer_summary: trans('Open the summary'),
+    catalogue_maintenance: trans('Open producers'),
+};
+
+const opportunityContext = (opportunity: App.Http.OpportunityRow) =>
+    opportunity.scheduledDate
+        ? `${opportunityLabels[opportunity.kind]} · ${trans('Pickup :date', { date: formattedDate(opportunity.scheduledDate) })}`
+        : opportunityLabels[opportunity.kind];
+
+const cutoffLabel = (cutoff: { producerName: string; closesAt: string }) => {
+    const [date, time] = cutoff.closesAt.split(' ');
+    return trans(':producer closes :date at :time', {
+        producer: cutoff.producerName,
+        date: formattedDate(date),
+        time,
+    });
+};
 
 const memberLinks: QuickLink[] = [
     {
@@ -322,6 +355,57 @@ const isProducer = computed(() => props.roles.includes('producer'));
                             >{{ linkLabels[group.action] }}</Link
                         >
                     </div>
+                </li>
+            </ul>
+        </section>
+
+        <section
+            v-if="opportunities?.length"
+            class="pilot-layout-panel"
+            :aria-label="trans('opportunities')"
+            data-test="opportunity-list"
+        >
+            <div class="pilot-layout-panel-header">
+                <h2 class="text-lg font-semibold">
+                    {{ trans('Opportunities') }}
+                </h2>
+            </div>
+            <ul class="pilot-list">
+                <li
+                    v-for="opportunity in opportunities"
+                    :key="opportunity.key"
+                    class="pilot-list-row"
+                    data-test="opportunity"
+                >
+                    <div class="pilot-list-row-body">
+                        <span class="font-medium">{{
+                            opportunityLabels[opportunity.kind]
+                        }}</span>
+                        <span
+                            v-if="opportunity.scheduledDate"
+                            class="text-sm text-muted-foreground"
+                            >{{
+                                trans('Pickup :date', {
+                                    date: formattedDate(
+                                        opportunity.scheduledDate,
+                                    ),
+                                })
+                            }}</span
+                        >
+                        <span
+                            v-for="(cutoff, index) in opportunity.cutoffs"
+                            :key="`${index}:${cutoff.producerName}`"
+                            class="text-sm"
+                            data-test="opportunity-cutoff"
+                            >{{ cutoffLabel(cutoff) }}</span
+                        >
+                    </div>
+                    <Link
+                        :href="opportunity.href"
+                        :aria-label="`${opportunityLinkLabels[opportunity.kind]}: ${opportunityContext(opportunity)}`"
+                        class="inline-flex min-h-11 items-center text-sm underline"
+                        >{{ opportunityLinkLabels[opportunity.kind] }}</Link
+                    >
                 </li>
             </ul>
         </section>

@@ -3,9 +3,11 @@
 use Guixa\Dashboard\Application\DestinationArea;
 use Guixa\Dashboard\Application\ListDashboard;
 use Guixa\Dashboard\Domain\ActionKind;
+use Guixa\Dashboard\Infrastructure\Ordering\OrderingOrderOpportunities;
 use Guixa\Dashboard\Infrastructure\Ordering\OrderingReceptionWork;
 use Guixa\Dashboard\Infrastructure\Ordering\OrderingSendWork;
 use Guixa\Dashboard\Infrastructure\Sales\SalesBasketWork;
+use Guixa\Ordering\Application\ReadDashboardOrderOpportunities;
 use Guixa\Ordering\Application\ReadDashboardOrderWork;
 use Guixa\Ordering\Application\SendableTotals;
 use Guixa\Ordering\Domain\ReceptionLoader;
@@ -67,7 +69,7 @@ beforeEach(function () {
             $this->world->notifier,
         );
 
-        return (new ListDashboard($sales, new OrderingReceptionWork($read), new OrderingSendWork($read)))($actor);
+        return (new ListDashboard($sales, new OrderingReceptionWork($read), new OrderingSendWork($read), new OrderingOrderOpportunities(new ReadDashboardOrderOpportunities($this->world->cycles, $names, $this->world->clock))))($actor);
     };
 });
 

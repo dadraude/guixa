@@ -3,10 +3,12 @@
 use Guixa\Dashboard\Application\ListDashboard;
 use Guixa\Dashboard\Domain\ActionKind;
 use Guixa\Dashboard\Domain\SendWorkRepository;
+use Guixa\Dashboard\Infrastructure\Ordering\OrderingOrderOpportunities;
 use Guixa\Dashboard\Infrastructure\Ordering\OrderingReceptionWork;
 use Guixa\Dashboard\Infrastructure\Sales\SalesBasketWork;
 use Guixa\Ordering\Application\CycleSettlement;
 use Guixa\Ordering\Application\MarkProducerDistributed;
+use Guixa\Ordering\Application\ReadDashboardOrderOpportunities;
 use Guixa\Ordering\Application\ReadDashboardOrderWork;
 use Guixa\Ordering\Application\ReopenProducerOrder;
 use Guixa\Ordering\Application\SendableTotals;
@@ -72,7 +74,7 @@ beforeEach(function () {
             {
                 return [];
             }
-        }))($actor);
+        }, new OrderingOrderOpportunities(new ReadDashboardOrderOpportunities($this->world->cycles, $names, $this->world->clock))))($actor);
     };
     $this->groups = fn (Actor $actor) => array_map(fn ($group) => [$group->action, $group->count, $group->producerName, $group->allocationDifferenceCount], ($this->dashboard)($actor)->attention);
     $this->receiver = new Actor('receiver', [Role::Receiver]);
