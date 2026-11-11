@@ -1,6 +1,6 @@
 # 004 — Dashboard discovery
 
-**Status:** Discovery recorded; [first-slice spec](spec.md) proposed for review, not accepted. Q1–Q13 are accepted product direction. Q14 selects unified attention and opportunities across all agreed audiences as the first delivery slice; detailed requirements, plan and implementation remain unaccepted. The retired 002 dashboard content is not revived. Feature 001 completion is a prerequisite to starting a new dashboard spec. Read-only Linear checks indicate 001 closure and 003 tasks Done; the canonical closure-record mismatch is noted below. These tracker observations are not a fresh feature acceptance verdict.
+**Status:** Discovery recorded; [first-slice spec](spec.md) accepted in Q22 (2026-11-11). Q1–Q13 are accepted product direction. Q14 selects unified attention and opportunities across all agreed audiences as the first delivery slice; Q22 accepts the detailed first-slice requirements and authorizes a proposed plan; plan acceptance and implementation remain pending. The retired 002 dashboard content is not revived. Feature 001 completion is a prerequisite to starting a new dashboard spec. Read-only Linear checks indicate 001 closure and 003 tasks Done; the canonical closure-record mismatch is noted below. These tracker observations are not a fresh feature acceptance verdict.
 
 ## Problem and outcome
 

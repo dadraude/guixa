@@ -1,8 +1,8 @@
 # 004 — Dashboard: attention and opportunities
 
-**Status: Proposed first-slice specification; not accepted.** Q14 selected this delivery boundary. Q1–Q21 in
-[history](history/) establish the product direction; this text proposes exact requirements and scenarios for
-review. Feature 002 remains retired. The independently shipped login destination (002 T05/R11) and interim
+**Status: First-slice specification accepted (Q22, 2026-11-11).** Q14 selected this delivery boundary. Q1–Q21 in
+[history](history/) establish the product direction; Q22 accepts the exact requirements and scenarios below.
+Feature 002 remains retired. The independently shipped login destination (002 T05/R11) and interim
 dashboard summary (001 T61) retain their ownership; this slice replaces the interim page content when accepted
 and delivered. Feature 001 completion and 003 delivery readiness must be confirmed before implementation.
 
@@ -222,6 +222,5 @@ under 002 T05/R11 and 003 R15.
 
 ## Open questions
 
-No unresolved product decision is required by the proposed requirements. The exact opportunity set and
-action-group identity in R2/R11 are proposed specifications for explicit user review, not previously accepted
-Q&A. A fresh independent whole-spec gap review must be recorded in history before user acceptance.
+No unresolved product decision remains for this slice. Q22 accepts R1–R16 and S1–S13, including the
+opportunity set and action-group identity in R2/R11, following the recorded independent whole-spec review.
