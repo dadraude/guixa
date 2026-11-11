@@ -125,7 +125,10 @@ final class DemoSeeder extends Seeder
         $this->validateBasketAwaitingCollection($manager, $cycles[0], $members[1]['householdId']);
 
         $this->prepareReception($cycles[1], $catalog['producers']);
-        $this->receiveProducts($manager, $cycles[1], array_slice($catalog['products'], 0, 2));
+        // The next cycle shows every reception state the dashboard lists: the first producer is validated and balanced
+        // (awaiting distribution), the third has default totals recorded but is unvalidated, the second was never opened.
+        $this->receiveProducts($manager, $cycles[1], array_slice($catalog['products'], 0, 2, true) + array_slice($catalog['products'], 4, 2, true));
+        app(ValidateReception::class)($manager, $cycles[1], $catalog['producers'][0]);
     }
 
     /** Settlement created one draft base basket per household; the first household's is validated and collected. */

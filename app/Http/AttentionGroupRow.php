@@ -16,5 +16,7 @@ final readonly class AttentionGroupRow
         public ?string $scheduledDate,
         public int $count,
         public string $href,
+        public ?string $producerName = null,
+        public int $allocationDifferenceCount = 0,
     ) {}
 }

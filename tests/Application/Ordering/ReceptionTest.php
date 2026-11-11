@@ -730,3 +730,40 @@ it('names the producers of the reception list with one read (R8)', function () {
         ->and($cycles[1]->producers[0]->producerName)->toBe('Baker')
         ->and($this->producerNames->reads)->toBe(1);
 });
+
+it('loads several producers\' receptions of a cycle exactly as loading each one alone (R14, R17)', function () {
+    ($this->world->setOrderLine)($this->households['A'], $this->cycleId, $this->bread, '4');
+    ($this->world->setOrderLine)($this->households['B'], $this->cycleId, $this->bread, '6');
+    ($this->world->setOrderLine)($this->households['A'], $this->cycleId, $this->apples, '2.5');
+    ($this->world->setOrderLine)($this->households['B'], $this->cycleId, $this->jam, '1');
+    ($this->world->setProductAvailability)(Actor::producer('00000000-0000-7000-8000-0000000000aa', OrderingWorld::BAKER), $this->cycleId, $this->jam, false);
+    foreach ([OrderingWorld::BAKER, OrderingWorld::GROWER] as $producerId) {
+        ($this->world->closeProducerNow)($this->world->manager, $this->cycleId, $producerId);
+        ($this->world->sendProducerOrder)($this->world->manager, $this->cycleId, $producerId);
+    }
+    ($this->setReceived)($this->bread, '8');
+    $loader = new ReceptionLoader($this->world->orders, $this->world->catalog, $this->world->availability, $this->world->receivedTotals, $this->world->baskets);
+    $cycle = $this->world->cycles->get($this->cycleId);
+
+    $batch = $loader->loadAll($cycle, [OrderingWorld::BAKER, OrderingWorld::GROWER]);
+
+    expect(array_keys($batch))->toBe([OrderingWorld::BAKER, OrderingWorld::GROWER])
+        ->and($batch[OrderingWorld::BAKER])->toEqual($loader->load($cycle, OrderingWorld::BAKER))
+        ->and($batch[OrderingWorld::GROWER])->toEqual($loader->load($cycle, OrderingWorld::GROWER))
+        ->and($batch[OrderingWorld::BAKER]->reception->products)->not->toBe([]);
+});
+
+it('shows the same marks before sending as the ones send derives to store (R3b, R6c, D9)', function () {
+    foreach ([$this->bread, $this->jam, $this->rye] as $productId) {
+        ($this->world->setOrderLine)($this->households['A'], $this->cycleId, $productId, '1');
+    }
+    ($this->world->setProductAvailability)(Actor::producer('00000000-0000-7000-8000-0000000000aa', OrderingWorld::BAKER), $this->cycleId, $this->jam, false);
+    $this->world->catalog->deactivate($this->rye);
+    $marks = new NotDeliveredMarks($this->world->catalog, $this->world->availability, $this->world->orders);
+    $cycle = $this->world->cycles->get($this->cycleId);
+    $order = $this->world->orders->ofHousehold($this->cycleId, RECEPTION_A);
+
+    expect($marks->of($cycle, $order))->toBe($marks->derivedOf($cycle, $order))
+        ->and(array_keys($marks->of($cycle, $order)))->toEqualCanonicalizing([$this->jam, $this->rye])
+        ->and($marks->ofAll($cycle, [$order]))->toBe($marks->derivedOfAll($cycle, [$order]));
+});

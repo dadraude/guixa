@@ -6,6 +6,7 @@ use App\Http\AttentionGroupRow;
 use App\Http\RoleAreas;
 use Guixa\Catalog\Application\CountProducers;
 use Guixa\Dashboard\Application\AttentionGroupData;
+use Guixa\Dashboard\Application\DestinationArea;
 use Guixa\Dashboard\Application\ListDashboard;
 use Guixa\Membership\Application\CountAccounts;
 use Guixa\Membership\Application\CountHouseholds;
@@ -83,11 +84,17 @@ class DashboardController extends Controller
 
     private function attentionRow(AttentionGroupData $group): AttentionGroupRow
     {
-        return new AttentionGroupRow($group->key, $group->action, $group->cycleId, $group->scheduledDate, $group->count, $this->destinationUrl($group));
+        return new AttentionGroupRow($group->key, $group->action, $group->cycleId, $group->scheduledDate, $group->count, $this->destinationUrl($group), $group->producerName, $group->allocationDifferenceCount);
     }
 
     private function destinationUrl(AttentionGroupData $group): string
     {
+        if ($group->destination->area === DestinationArea::Receptions) {
+            $producerId = $group->destination->producerId;
+
+            return $producerId === null ? route('receptions.index', [], false) : route('receptions.show', [$group->cycleId, $producerId], false);
+        }
+
         $basketId = $group->destination->basketId;
         if ($group->destination->staffWide) {
             if ($basketId !== null) {

@@ -218,4 +218,51 @@ describe('dashboard presentation', () => {
             expect(emptyHtml).not.toContain('<ul class="pilot-list"');
         }
     });
+
+    it('lists reception groups with the producer, blocker and a receptions link, without any command control (R5, R6, S5, S6)', async () => {
+        const app = createSSRApp(Dashboard, {
+            roles: ['finance'],
+            isManager: false,
+            isMember: false,
+            nextPickup: null,
+            openCycles: 0,
+            balance: null,
+            managerSummary: null,
+            attention: [
+                {
+                    key: 'check_delivery_and_allocations:cycle:c1',
+                    action: 'check_delivery_and_allocations',
+                    cycleId: 'c1',
+                    scheduledDate: '2026-11-07',
+                    count: 1,
+                    href: '/receptions/c1/p1',
+                    producerName: 'Forn de la Vila',
+                    allocationDifferenceCount: 1,
+                },
+                {
+                    key: 'mark_distributed:cycle:c1',
+                    action: 'mark_distributed',
+                    cycleId: 'c1',
+                    scheduledDate: '2026-11-07',
+                    count: 2,
+                    href: '/receptions',
+                    producerName: null,
+                    allocationDifferenceCount: 0,
+                },
+            ],
+        });
+        installTranslations(app);
+        const html = await renderToString(app);
+        expect(html.match(/data-test="attention-group"/g)).toHaveLength(2);
+        expect(html).toContain('Revisa l’entrega i els repartiments');
+        expect(html).toContain('Forn de la Vila ·');
+        expect(html).toContain(
+            'El repartiment no coincideix amb el que s’ha rebut.',
+        );
+        expect(html.match(/data-test="attention-blocker"/g)).toHaveLength(1);
+        expect(html).toContain('Marca com a distribuïda');
+        expect(html.match(/Veure recepcions/g)).toHaveLength(2);
+        expect(html).not.toContain('<form');
+        expect(html).not.toContain('<button type="submit"');
+    });
 });
