@@ -91,6 +91,8 @@ return [
                 'Application\PendingCollectionData' => ['Ordering'],
                 'Application\ReadDashboardBasketWork' => ['Dashboard'],
                 'Application\DashboardBasketWorkData' => ['Dashboard'],
+                'Application\DashboardBasketScope' => ['Dashboard'],
+                'Application\DashboardBasketStage' => ['Dashboard'],
                 'Application\ReadHouseholdContainerBalances' => ['Ordering'],
                 'Application\ReadOpenHouseholdBaskets' => ['Membership'],
                 'Application\OpenBasketData' => ['Membership'],

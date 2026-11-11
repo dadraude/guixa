@@ -145,10 +145,16 @@ final readonly class Basket
             $this->cancelledAt, [...$this->adjustments, $adjustment], $this->collectionEvents, kind: $this->kind, sourceOrderId: $this->sourceOrderId, late: $this->late);
     }
 
+    /** A draft with at least one active line: exactly what validation accepts, whatever its amount (R22). */
+    public function canBeValidated(): bool
+    {
+        return $this->state->isDraft() && $this->activeLines() !== [];
+    }
+
     public function validated(string $actorId, DateTimeImmutable $when): self
     {
         $this->draft();
-        if ($this->activeLines() === []) {
+        if (! $this->canBeValidated()) {
             throw new DomainException('A basket needs contents before validation.');
         }
 

@@ -164,6 +164,14 @@ final class InMemoryBasketRepository implements BasketRepository
             fn (Basket $basket) => in_array($basket->householdId, $householdIds, true) && $basket->state->isSettled()));
     }
 
+    public function drafts(): array
+    {
+        $drafts = array_filter($this->baskets, fn (Basket $basket) => $basket->state->isDraft());
+        usort($drafts, fn (Basket $a, Basket $b) => [$a->createdAt, $a->id] <=> [$b->createdAt, $b->id]);
+
+        return array_values($drafts);
+    }
+
     public function pendingCollections(?string $householdId = null): array
     {
         $pending = array_filter($this->baskets, fn (Basket $basket) => $basket->isPendingCollection()

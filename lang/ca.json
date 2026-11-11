@@ -41,6 +41,8 @@
     "Pending work": "Feina pendent",
     "pending work": "feina pendent",
     "Collect baskets": "Recollir cistelles",
+    "Prepare baskets": "Prepara cistelles",
+    "Validate baskets": "Valida cistelles",
     "{1} :count pending|[2,*] :count pending": "{1} :count pendent|[2,*] :count pendents",
     "View baskets": "Veure cistelles",
     "Check delivery and allocations": "Revisa l’entrega i els repartiments",

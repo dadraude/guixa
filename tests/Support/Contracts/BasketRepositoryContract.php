@@ -428,4 +428,36 @@ trait BasketRepositoryContract
         $this->assertSame([$otherHousehold], $ids($repository->pendingCollections($other)));
         $this->assertSame([], $repository->pendingCollections('00000000-0000-7000-8000-000000000098'));
     }
+
+    #[Test]
+    public function it_reads_only_draft_baskets_by_creation_instant_then_id(): void
+    {
+        [$repository, $manager, $household, $product] = $this->basketWorld();
+        [$orderId] = $this->weeklySource();
+        $draftAt = function (string $at) use ($repository, $manager, $household, $product): string {
+            $id = $repository->nextId();
+            $line = new BasketLine($repository->nextId(), $id, $product, 'Oil', 'bottle', 1200, false, null, Quantity::fromString('1'), new DateTimeImmutable($at));
+            $repository->save(new Basket($id, $household, 'Household K', BasketState::Draft, $manager, new DateTimeImmutable($at), [$line]));
+
+            return $id;
+        };
+        $later = $draftAt('2026-10-30T12:00:00+00:00');
+        $earlier = $draftAt('2026-10-30T09:00:00+00:00');
+        $sameInstantA = $draftAt('2026-10-30T10:00:00+00:00');
+        $sameInstantB = $draftAt('2026-10-30T10:00:00+00:00');
+        $tie = [$sameInstantA, $sameInstantB];
+        sort($tie);
+
+        $validated = $draftAt('2026-10-29T10:00:00+00:00');
+        $repository->save($repository->get($validated)->validated($manager, new DateTimeImmutable('2026-10-31T10:00:00+00:00')));
+        $cancelled = $draftAt('2026-10-29T11:00:00+00:00');
+        $repository->save($repository->get($cancelled)->cancelled($manager, new DateTimeImmutable('2026-10-31T10:00:00+00:00')));
+        $nothing = $repository->nextId();
+        $repository->save(new Basket($nothing, $household, 'Household K', BasketState::NothingToCollect, null, new DateTimeImmutable('2026-10-29T12:00:00+00:00'), [],
+            kind: BasketKind::Weekly, sourceOrderId: $orderId));
+
+        $ids = array_map(fn (Basket $basket) => $basket->id, $repository->drafts());
+
+        $this->assertSame([$earlier, ...$tie, $later], $ids);
+    }
 }

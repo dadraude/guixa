@@ -47,5 +47,12 @@ interface BasketRepository
      */
     public function pendingCollections(?string $householdId = null): array;
 
+    /**
+     * Draft baskets, ordered by creation instant then id; the caller decides which can be validated.
+     *
+     * @return list<Basket>
+     */
+    public function drafts(): array;
+
     public function hasProductHistory(string $productId): bool;
 }

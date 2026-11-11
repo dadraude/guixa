@@ -10,5 +10,7 @@ final readonly class DestinationData
         public ?string $basketId,
         public DestinationArea $area = DestinationArea::Baskets,
         public ?string $producerId = null,
+        /** Whether the staff list is narrowed to pending collections; drafts are in the unfiltered list. */
+        public bool $collectionList = true,
     ) {}
 }

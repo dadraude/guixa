@@ -60,6 +60,19 @@ it('seeds one reception in each state the dashboard lists and reads them without
     expect($receiverActions)->toContain('check_delivery_and_allocations')->not->toContain('mark_distributed');
 });
 
+it('shows Finance the demo cycle\'s drafts as validation work next to the pending collection', function () {
+    $this->seed(DemoSeeder::class);
+    $this->withoutVite();
+    $finance = User::query()->where('email', 'anna@demo.guixa.test')->firstOrFail();
+
+    $actions = collect($this->actingAs($finance)->get('/dashboard')->viewData('page')['props']['attention'])->keyBy('action');
+
+    expect($actions['validate_basket']->count)->toBe(2)
+        ->and($actions['validate_basket']->href)->toBe('/finance/baskets')
+        ->and($actions->has('collect_basket'))->toBeTrue()
+        ->and($actions->has('prepare_basket'))->toBeFalse();
+});
+
 it('seeds staff role holders besides the manager', function () {
     $this->seed(DemoSeeder::class);
 

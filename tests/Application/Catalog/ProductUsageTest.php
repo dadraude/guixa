@@ -73,6 +73,11 @@ it('derives stock use from movements without relying on quantity on hand (R1b, R
             return [];
         }
 
+        public function drafts(): array
+        {
+            return array_values(array_filter($this->list(), fn (Basket $basket) => $basket->state->isDraft()));
+        }
+
         public function pendingCollections(?string $householdId = null): array
         {
             $pending = array_filter($this->list(), fn (Basket $basket) => $basket->isPendingCollection()

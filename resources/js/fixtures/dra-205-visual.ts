@@ -527,6 +527,34 @@ if (pageName === 'Dashboard') {
     visualProps.nextPickup = role === 'member' ? visualProps.nextPickup : null;
     visualProps.openCycles = role === 'member' ? visualProps.openCycles : 0;
     visualProps.balance = role === 'member' ? visualProps.balance : null;
+    if (state === 'baskets') {
+        // The server's order: dated groups first, then undated; validation before collection within a date.
+        const [datedCollection, ...undatedCollection] = visualProps.attention;
+        visualProps.attention = [
+            {
+                key: 'validate_basket:cycle:visual-cycle',
+                action: 'validate_basket',
+                cycleId: 'visual-cycle',
+                scheduledDate: pickupDate,
+                count: 2,
+                href: '/finance/baskets',
+                producerName: null,
+                allocationDifferenceCount: 0,
+            },
+            datedCollection,
+            {
+                key: 'validate_basket:no-cycle',
+                action: 'validate_basket',
+                cycleId: null,
+                scheduledDate: null,
+                count: 1,
+                href: '/finance/baskets/visual-stock-draft',
+                producerName: null,
+                allocationDifferenceCount: 0,
+            },
+            ...undatedCollection,
+        ];
+    }
     if (state === 'reception' || state === 'reception-long-name') {
         const longName = state === 'reception-long-name';
         visualProps.attention = [
@@ -1048,6 +1076,8 @@ void createInertiaApp({
                 return (
                     !!emptyMessage && mainText().includes(trans(emptyMessage))
                 );
+            case 'baskets':
+                return visible('[data-test="attention-group"]');
             case 'reception':
             case 'reception-long-name':
                 return visible('[data-test="attention-blocker"]');
