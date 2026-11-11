@@ -39,7 +39,18 @@ it('renders the eligible send as a group linking to the existing cycle screen (S
         ->where('attention.0.cycleId', $cycle)
         ->where('attention.0.count', 1)
         ->where('attention.0.producerName', 'Baker')
-        ->where('attention.0.href', "/manage/cycles/{$cycle}"));
+        ->where('attention.0.href', '/manage/cycles'));
+});
+
+it('links to the page that offers the send control for that producer (S8)', function () {
+    [$cycle, $producer] = closedBakerOrderWithAccount();
+    $manager = accountWith(Role::Manager);
+    $href = $this->actingAs($manager)->get('/dashboard')->viewData('page')['props']['attention'][0]->href;
+
+    app('auth')->forgetGuards();
+    $this->actingAs($manager)->get($href)->assertInertia(fn (Assert $page) => $page
+        ->component('Manage/Cycles/Index')
+        ->where('cycles', fn ($cycles) => collect(collect($cycles)->firstWhere('id', $cycle)['participants'])->firstWhere('producerId', $producer)['canSendManually'] === true));
 });
 
 it('shows Finance, Receiver and a member no send group (R9)', function () {

@@ -320,7 +320,7 @@ describe('dashboard presentation', () => {
                     cycleId: 'c1',
                     scheduledDate: '2026-11-07',
                     count: 1,
-                    href: '/manage/cycles/c1',
+                    href: '/manage/cycles',
                     producerName: 'Forn de la Vila',
                     allocationDifferenceCount: 0,
                 },

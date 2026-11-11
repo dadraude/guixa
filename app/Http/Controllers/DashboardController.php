@@ -96,7 +96,7 @@ class DashboardController extends Controller
         }
 
         if ($group->destination->area === DestinationArea::Cycles) {
-            return route('manage.cycles.show', $group->cycleId, false);
+            return route('manage.cycles.index', [], false);
         }
 
         $basketId = $group->destination->basketId;

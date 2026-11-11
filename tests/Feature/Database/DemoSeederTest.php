@@ -70,7 +70,7 @@ it('seeds one closed, ordered, unsent producer with an account as the manager\'s
 
     expect($sends)->toHaveCount(1)
         ->and($sends->first()->count)->toBe(1)
-        ->and($sends->first()->href)->toBe("/manage/cycles/{$cycle}");
+        ->and($sends->first()->href)->toBe('/manage/cycles');
 
     foreach (['anna@demo.guixa.test', 'biel@demo.guixa.test'] as $email) {
         app('auth')->forgetGuards();

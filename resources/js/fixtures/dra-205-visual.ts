@@ -566,7 +566,7 @@ if (pageName === 'Dashboard') {
                           cycleId: 'visual-cycle',
                           scheduledDate: pickupDate,
                           count: 1,
-                          href: '/manage/cycles/visual-cycle',
+                          href: '/manage/cycles',
                           producerName: 'Forn del Barri',
                           allocationDifferenceCount: 0,
                       },

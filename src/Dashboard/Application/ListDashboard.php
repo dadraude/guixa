@@ -45,7 +45,7 @@ final class ListDashboard
         return new DashboardData($groups);
     }
 
-    /** @return list<AttentionGroupData> one group per cycle: the manager sends from that cycle's screen */
+    /** @return list<AttentionGroupData> one group per cycle: the manager sends from the cycles list, where the send control lives */
     private function sendGroups(): array
     {
         $byCycle = [];

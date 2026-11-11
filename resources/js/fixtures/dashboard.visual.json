@@ -441,7 +441,7 @@
                                 "count": 3
                             },
                             {
-                                "selector": "[data-test=\"attention-group\"] a[href=\"/manage/cycles/visual-cycle\"]",
+                                "selector": "[data-test=\"attention-group\"] a[href=\"/manage/cycles\"]",
                                 "count": 0
                             }
                         ]
@@ -552,7 +552,7 @@
                                 "count": 4
                             },
                             {
-                                "selector": "[data-test=\"attention-group\"] a[href=\"/manage/cycles/visual-cycle\"]",
+                                "selector": "[data-test=\"attention-group\"] a[href=\"/manage/cycles\"]",
                                 "count": 1
                             }
                         ]
