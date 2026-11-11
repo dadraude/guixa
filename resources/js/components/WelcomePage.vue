@@ -72,8 +72,49 @@ defineProps<{ actionHref: string }>();
     --welcome-hero-surface: #286585;
     --welcome-hero-cream: #faf1dc;
     --welcome-focus: var(--welcome-hero-cream);
+    position: relative;
     color: var(--welcome-hero-cream);
     background: var(--welcome-hero-surface);
+}
+
+.welcome-hero-band::before {
+    position: absolute;
+    inset: 0;
+    background-image: url('../../images/welcome/hero-scratches.svg');
+    background-repeat: repeat;
+    background-size: 30rem 20rem;
+    opacity: 0.08;
+    pointer-events: none;
+    content: '';
+}
+
+.welcome-hero-band::after {
+    position: absolute;
+    inset: 0;
+    background-image: url('../../images/welcome/hero-scratches.svg');
+    background-repeat: repeat;
+    background-size: 30rem 20rem;
+    opacity: 0.22;
+    mask-image:
+        linear-gradient(
+            to right,
+            #000 0 6px,
+            transparent 6px calc(100% - 6px),
+            #000 calc(100% - 6px)
+        ),
+        linear-gradient(
+            to bottom,
+            #000 0 6px,
+            transparent 6px calc(100% - 6px),
+            #000 calc(100% - 6px)
+        );
+    mask-composite: add;
+    pointer-events: none;
+    content: '';
+}
+
+.welcome-hero-band > .welcome-shell {
+    position: relative;
 }
 
 :global(.dark) .welcome-hero-band {
