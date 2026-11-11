@@ -29,7 +29,11 @@ import { Button } from '@/components/ui/button';
             </div>
         </div>
         <div class="welcome-hero-art" aria-hidden="true">
-            <span class="welcome-basket"></span>
+            <img
+                class="welcome-basket"
+                src="../../../images/welcome/cooperative-basket.svg"
+                alt=""
+            />
         </div>
     </section>
 </template>
@@ -124,11 +128,6 @@ import { Button } from '@/components/ui/button';
     display: block;
     width: 100%;
     aspect-ratio: 1;
-    background: var(--welcome-hero-cream);
-    mask-image: url('../../../images/welcome/cooperative-basket.svg');
-    mask-position: center;
-    mask-repeat: no-repeat;
-    mask-size: 125%;
 }
 
 .welcome-hero :is(a:focus-visible) {
