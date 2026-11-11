@@ -12,11 +12,15 @@ defineProps<{ actionHref: string }>();
     <div class="welcome-page pilot-theme min-h-svh" data-visual-root>
         <div class="welcome-shell">
             <LandingHeader :action-href="actionHref" />
-            <main>
+        </div>
+        <main>
+            <div class="welcome-shell">
                 <LandingHero />
                 <LandingStory />
-                <LandingContact />
-            </main>
+            </div>
+            <LandingContact />
+        </main>
+        <div class="welcome-shell">
             <footer class="welcome-footer">
                 <a class="welcome-brand welcome-footer-brand" href="#top">
                     {{ trans('la guixa') }}
@@ -64,7 +68,7 @@ defineProps<{ actionHref: string }>();
     min-height: 2.75rem;
     align-items: center;
     color: var(--welcome-ink);
-    font-size: 1.75rem;
+    font-size: 2.25rem;
     font-weight: 900;
     letter-spacing: -0.07em;
     line-height: 1;
@@ -73,6 +77,7 @@ defineProps<{ actionHref: string }>();
 
 .welcome-footer {
     display: flex;
+    flex-wrap: wrap;
     min-height: 5rem;
     align-items: center;
     gap: 1.25rem;
@@ -80,7 +85,9 @@ defineProps<{ actionHref: string }>();
 }
 
 .welcome-footer-brand {
-    font-size: 1.5rem;
+    flex-shrink: 0;
+    font-size: 1.75rem;
+    white-space: nowrap;
 }
 
 .welcome-footer-divider {

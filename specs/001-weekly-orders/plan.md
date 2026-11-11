@@ -891,13 +891,17 @@ user approved a lighter, content-first public landing for La Guixa. Keep a
 near-white cream canvas, muted blue actions and icons, discreet ochre step
 numbers, and a pale-blue contact area. Use a typographic approximation of the
 `la guixa` wordmark because no vector original is available. The page has a
-header with visible cooperative, process and member-access links; a concise
-hero with a desktop-only line basket icon; three cooperative values; the
+header with cooperative and process links on desktop and member access at every
+width; a compact mobile header with the wordmark and member access side by side
+when space permits; a concise hero with a desktop-only line illustration of a
+vegetable basket; three cooperative values; the
 three-step weekly ordering process; a contact link to
 `laguixamanresa@gmail.com`; Manresa; and a short footer. Do not add an address,
 opening hours, textures, oversized dark panels or unrelated application-wide
-branding changes. Keep mobile content in one column, retain visible navigation,
-make controls at least 44 px tall, and preserve clear focus and contrast in both
+branding changes. Keep mobile content in one column, stack the hero actions, and
+retain the process link in the hero. On desktop, place step numbers above their
+labels; on mobile, beside them. The contact background spans the viewport while
+its text aligns with the main content. Make controls at least 44 px tall, and preserve clear focus and contrast in both
 themes. The `WelcomePage` remains a public composition surface and keeps the
 existing server route and authenticated access destination. See the immutable
 2026-11-11 Change history entry for the complete approved copy and visual source.

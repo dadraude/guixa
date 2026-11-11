@@ -10,34 +10,45 @@ const email = 'laguixamanresa@gmail.com';
         class="welcome-contact"
         aria-labelledby="contact-title"
     >
-        <div>
-            <h2 id="contact-title">
-                {{ trans('Would you like to meet us?') }}
-            </h2>
-            <p>{{ trans('We will listen and tell you how to take part.') }}</p>
-        </div>
-        <div class="welcome-contact-details">
-            <a class="welcome-contact-button" :href="`mailto:${email}`">
-                {{ trans('Let’s talk') }}
-            </a>
-            <a class="welcome-email" :href="`mailto:${email}`">{{ email }}</a>
-            <p>{{ trans('Manresa') }}</p>
+        <div class="welcome-contact-inner">
+            <div>
+                <h2 id="contact-title">
+                    {{ trans('Would you like to meet us?') }}
+                </h2>
+                <p>
+                    {{ trans('We will listen and tell you how to take part.') }}
+                </p>
+            </div>
+            <div class="welcome-contact-details">
+                <a class="welcome-contact-button" :href="`mailto:${email}`">
+                    {{ trans('Let’s talk') }}
+                </a>
+                <a class="welcome-email" :href="`mailto:${email}`">{{
+                    email
+                }}</a>
+                <p>{{ trans('Manresa') }}</p>
+            </div>
         </div>
     </section>
 </template>
 
 <style scoped>
 .welcome-contact {
+    background: var(--welcome-blue-soft);
+}
+
+.welcome-contact-inner {
     display: grid;
     gap: 1.5rem;
-    padding: clamp(1.5rem, 5vw, 3rem);
-    background: var(--welcome-blue-soft);
+    width: min(100% - 2.5rem, 72rem);
+    margin-inline: auto;
+    padding-block: clamp(1.5rem, 4vw, 2rem);
 }
 
 .welcome-contact h2 {
     margin: 0;
-    font-size: clamp(1.5rem, 3.2vw, 2rem);
-    font-weight: 800;
+    font-size: clamp(1.65rem, 3.2vw, 2.25rem);
+    font-weight: 900;
     letter-spacing: -0.035em;
     line-height: 1.2;
 }
@@ -90,10 +101,17 @@ const email = 'laguixamanresa@gmail.com';
 }
 
 @media (min-width: 48rem) {
-    .welcome-contact {
+    .welcome-contact-inner {
         grid-template-columns: minmax(0, 1fr) minmax(16rem, 0.75fr);
         align-items: center;
         gap: 2.5rem;
+        width: min(100% - 4rem, 72rem);
+    }
+}
+
+@media (max-width: 25rem) {
+    .welcome-contact-inner {
+        width: min(100% - 2rem, 72rem);
     }
 }
 </style>
