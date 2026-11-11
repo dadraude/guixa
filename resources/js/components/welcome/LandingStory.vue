@@ -101,6 +101,7 @@ const steps = [
     letter-spacing: -0.035em;
     line-height: 1.2;
     text-wrap: balance;
+    overflow-wrap: anywhere;
 }
 
 .welcome-values,
@@ -118,6 +119,12 @@ const steps = [
     align-items: center;
     gap: 0.875rem;
     min-width: 0;
+}
+
+.welcome-values li > div,
+.welcome-steps li > div {
+    min-width: 0;
+    overflow-wrap: anywhere;
 }
 
 .welcome-value-icon {
@@ -163,7 +170,7 @@ const steps = [
 @media (min-width: 48rem) {
     .welcome-values,
     .welcome-steps {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
         gap: 2rem;
     }
 

@@ -94,6 +94,7 @@ import { Button } from '@/components/ui/button';
     letter-spacing: -0.045em;
     line-height: 1.08;
     text-wrap: balance;
+    overflow-wrap: anywhere;
 }
 
 .welcome-intro {

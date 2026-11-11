@@ -39,15 +39,73 @@
                     "minHeight": 44,
                     "contrast": 4.5
                 },
-                { "selector": ".welcome-step-number", "contrast": 4.5 },
+                {
+                    "selector": ".welcome-step-number",
+                    "contrast": 4.5
+                },
                 {
                     "selector": ".welcome-email",
-                    "attributes": { "href": "mailto:laguixamanresa@gmail.com" }
+                    "attributes": {
+                        "href": "mailto:laguixamanresa@gmail.com"
+                    }
                 }
             ],
             "states": [
                 {
-                    "id": "guest",
+                    "id": "guest-mobile",
+                    "checks": {
+                        "focus": [
+                            ".welcome-brand",
+                            "#welcome-action",
+                            ".welcome-primary-action",
+                            ".welcome-text-action",
+                            ".welcome-contact-button",
+                            ".welcome-email"
+                        ],
+                        "assertions": [
+                            {
+                                "selector": ".welcome-header .welcome-brand",
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": ".welcome-access",
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-primary-action",
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-contact-button",
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-step-number",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-email",
+                                "attributes": {
+                                    "href": "mailto:laguixamanresa@gmail.com"
+                                }
+                            },
+                            {
+                                "selector": ".welcome-nav",
+                                "styles": {
+                                    "display": "none"
+                                }
+                            },
+                            {
+                                "selector": ".welcome-hero-actions",
+                                "styles": {
+                                    "flex-direction": "column"
+                                }
+                            }
+                        ]
+                    },
                     "cases": [
                         {
                             "width": 375,
@@ -60,6 +118,66 @@
                             "text": 100
                         },
                         {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "guest-desktop",
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".welcome-header .welcome-brand",
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": ".welcome-access",
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-primary-action",
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-contact-button",
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-step-number",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-email",
+                                "attributes": {
+                                    "href": "mailto:laguixamanresa@gmail.com"
+                                }
+                            },
+                            {
+                                "selector": ".welcome-nav",
+                                "styles": {
+                                    "display": "flex"
+                                }
+                            },
+                            {
+                                "selector": ".welcome-steps li",
+                                "styles": {
+                                    "display": "block"
+                                }
+                            }
+                        ]
+                    },
+                    "cases": [
+                        {
                             "width": 1280,
                             "mode": "light",
                             "text": 100
@@ -76,16 +194,6 @@
                         },
                         {
                             "width": 1024,
-                            "mode": "dark",
-                            "text": 200
-                        },
-                        {
-                            "width": 375,
-                            "mode": "light",
-                            "text": 200
-                        },
-                        {
-                            "width": 375,
                             "mode": "dark",
                             "text": 200
                         },
@@ -102,9 +210,62 @@
                     ]
                 },
                 {
-                    "id": "authenticated",
+                    "id": "authenticated-mobile",
                     "query": {
                         "authenticated": 1
+                    },
+                    "checks": {
+                        "focus": [
+                            ".welcome-brand",
+                            "#welcome-action",
+                            ".welcome-primary-action",
+                            ".welcome-text-action",
+                            ".welcome-contact-button",
+                            ".welcome-email"
+                        ],
+                        "assertions": [
+                            {
+                                "selector": ".welcome-header .welcome-brand",
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": ".welcome-access",
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-primary-action",
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-contact-button",
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-step-number",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-email",
+                                "attributes": {
+                                    "href": "mailto:laguixamanresa@gmail.com"
+                                }
+                            },
+                            {
+                                "selector": ".welcome-nav",
+                                "styles": {
+                                    "display": "none"
+                                }
+                            },
+                            {
+                                "selector": ".welcome-hero-actions",
+                                "styles": {
+                                    "flex-direction": "column"
+                                }
+                            }
+                        ]
                     },
                     "cases": [
                         {
@@ -116,7 +277,60 @@
                             "width": 375,
                             "mode": "dark",
                             "text": 100
-                        },
+                        }
+                    ]
+                },
+                {
+                    "id": "authenticated-desktop",
+                    "query": {
+                        "authenticated": 1
+                    },
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".welcome-header .welcome-brand",
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": ".welcome-access",
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-primary-action",
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-contact-button",
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-step-number",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-email",
+                                "attributes": {
+                                    "href": "mailto:laguixamanresa@gmail.com"
+                                }
+                            },
+                            {
+                                "selector": ".welcome-nav",
+                                "styles": {
+                                    "display": "flex"
+                                }
+                            },
+                            {
+                                "selector": ".welcome-steps li",
+                                "styles": {
+                                    "display": "block"
+                                }
+                            }
+                        ]
+                    },
+                    "cases": [
                         {
                             "width": 1280,
                             "mode": "light",

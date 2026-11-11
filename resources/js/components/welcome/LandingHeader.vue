@@ -91,7 +91,6 @@ defineProps<{ actionHref: string }>();
 
 @media (min-width: 48rem) {
     .welcome-header {
-        flex-wrap: nowrap;
         min-height: 5.5rem;
         gap: clamp(1.5rem, 4vw, 3.5rem);
     }
@@ -102,6 +101,7 @@ defineProps<{ actionHref: string }>();
 
     .welcome-nav {
         display: flex;
+        flex-wrap: wrap;
     }
 
     .welcome-access {
