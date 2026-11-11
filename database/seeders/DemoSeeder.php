@@ -125,7 +125,11 @@ final class DemoSeeder extends Seeder
         $this->validateBasketAwaitingCollection($manager, $cycles[0], $members[1]['householdId']);
 
         $this->prepareReception($cycles[1], $catalog['producers']);
+        // The next cycle shows every reception state the dashboard lists: the first producer is validated and balanced
+        // (awaiting distribution), the third has default totals recorded but is unvalidated, the second was never opened.
         $this->receiveProducts($manager, $cycles[1], array_slice($catalog['products'], 0, 2));
+        $this->receiveProducts($manager, $cycles[1], array_slice($catalog['products'], 4, 2), firstQuantityColumn: 4);
+        app(ValidateReception::class)($manager, $cycles[1], $catalog['producers'][0]);
     }
 
     /** Settlement created one draft base basket per household; the first household's is validated and collected. */
@@ -257,13 +261,16 @@ final class DemoSeeder extends Seeder
         $cycles->add($cycle);
     }
 
-    /** @param list<array{id: string, producerId: string}> $products */
-    private function receiveProducts(Actor $manager, string $cycleId, array $products): void
+    /**
+     * @param  list<array{id: string, producerId: string}>  $products
+     * @param  int  $firstQuantityColumn  the QUANTITIES column of the first product
+     */
+    private function receiveProducts(Actor $manager, string $cycleId, array $products, int $firstQuantityColumn = 0): void
     {
         foreach ($products as $index => $product) {
             $thousandths = 0;
             foreach (self::QUANTITIES as $quantities) {
-                $thousandths += Quantity::fromString($quantities[$index])->thousandths;
+                $thousandths += Quantity::fromString($quantities[$firstQuantityColumn + $index])->thousandths;
             }
             app(SetReceivedTotal::class)($manager, $cycleId, $product['producerId'], $product['id'], Quantity::ofThousandths($thousandths)->toString());
         }

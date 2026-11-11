@@ -27,7 +27,7 @@ return [
         ],
         'Dashboard' => [
             'owns' => 'The signed-in dashboard read composition: attention groups built from other modules\' exported read queries. It owns no table and runs no command.',
-            'dependencies' => ['Sales', 'Shared'],
+            'dependencies' => ['Ordering', 'Sales', 'Shared'],
             'exports' => [],
         ],
         'Membership' => [
@@ -50,6 +50,10 @@ return [
             'exports' => [
                 'Application\CheckProductUsage' => ['Catalog'],
                 'Application\LockWeeklyBasketSource' => ['Sales'],
+                'Application\ReadDashboardOrderWork' => ['Dashboard'],
+                'Application\DashboardReceptionWorkData' => ['Dashboard'],
+                'Application\DashboardReceptionStage' => ['Dashboard'],
+                'Application\DashboardOrderScope' => ['Dashboard'],
                 'Application\CloseCycleAfterBasketValidation' => ['Sales'],
                 'Application\ReadCyclePickupDates' => ['Sales', 'Stock'],
                 'Application\ReadSourceOrderCycles' => ['Sales'],

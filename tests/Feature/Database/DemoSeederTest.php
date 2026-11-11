@@ -34,6 +34,32 @@ it('seeds a usable cooperative with accounts, orders, reception and pickups', fu
     Mail::assertNothingSent();
 });
 
+it('seeds one reception in each state the dashboard lists and reads them without writing', function () {
+    $this->seed(DemoSeeder::class);
+    $this->withoutVite();
+    $cycle = DB::table('cycles')->whereNull('settled_at')->orderBy('pickup_date')->value('id');
+    $producers = DB::table('producers')->orderBy('name')->pluck('id', 'name');
+    $validated = $producers['Hort de la Vall'];
+    $unopened = $producers['Forn del Barri'];
+    $defaulted = $producers['La Formatgeria'];
+
+    expect(DB::table('cycle_producers')->where('cycle_id', $cycle)->where('producer_id', $validated)->value('validated_at'))->not->toBeNull()
+        ->and(DB::table('cycle_producers')->where('cycle_id', $cycle)->where('producer_id', $defaulted)->value('validated_at'))->toBeNull()
+        ->and(DB::table('received_totals')->where('cycle_id', $cycle)->where('producer_id', $defaulted)->count())->toBeGreaterThan(0)
+        ->and(DB::table('received_totals')->where('cycle_id', $cycle)->where('producer_id', $unopened)->count())->toBe(0);
+
+    $totals = DB::table('received_totals')->count();
+    $manager = User::query()->where('email', 'gestora@demo.guixa.test')->firstOrFail();
+    $actions = collect($this->actingAs($manager)->get('/dashboard')->viewData('page')['props']['attention'])->keyBy('action');
+    expect($actions['mark_distributed']->href)->toBe("/receptions/{$cycle}/{$validated}")
+        ->and($actions['check_delivery_and_allocations']->count)->toBe(2)
+        ->and(DB::table('received_totals')->count())->toBe($totals);
+
+    $receiver = User::query()->where('email', 'biel@demo.guixa.test')->firstOrFail();
+    $receiverActions = collect($this->actingAs($receiver)->get('/dashboard')->viewData('page')['props']['attention'])->pluck('action')->all();
+    expect($receiverActions)->toContain('check_delivery_and_allocations')->not->toContain('mark_distributed');
+});
+
 it('seeds staff role holders besides the manager', function () {
     $this->seed(DemoSeeder::class);
 

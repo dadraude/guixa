@@ -4,14 +4,19 @@ namespace Guixa\Dashboard\Application;
 
 use Guixa\Dashboard\Domain\ActionKind;
 use Guixa\Dashboard\Domain\BasketWorkRepository;
+use Guixa\Dashboard\Domain\ReceptionWorkRepository;
 use Guixa\Dashboard\Domain\ValueObject\BasketWork;
+use Guixa\Dashboard\Domain\ValueObject\ReceptionWork;
 use Guixa\Shared\Application\Actor;
 use Illuminate\Support\Facades\Gate;
 
 /** The signed-in account's pending work, read from current persisted data; it changes nothing (R1, R3). */
 final class ListDashboard
 {
-    public function __construct(private readonly BasketWorkRepository $basketWork) {}
+    public function __construct(
+        private readonly BasketWorkRepository $basketWork,
+        private readonly ReceptionWorkRepository $receptionWork,
+    ) {}
 
     public function __invoke(Actor $actor): DashboardData
     {
@@ -25,7 +30,55 @@ final class ListDashboard
             ...($isStaff ? $this->basketWork->staffCollection() : []),
         ];
 
-        return new DashboardData($this->collectionGroups($records, $isStaff));
+        $groups = [
+            ...$this->collectionGroups($records, $isStaff),
+            ...$this->receptionGroups($gate->allows('receive'), $gate->allows('settle-reception')),
+        ];
+        usort($groups, fn (AttentionGroupData $a, AttentionGroupData $b) => [$a->scheduledDate === null, $a->scheduledDate, ActionKind::from($a->action)->rank(), $a->key]
+            <=> [$b->scheduledDate === null, $b->scheduledDate, ActionKind::from($b->action)->rank(), $b->key]);
+
+        return new DashboardData($groups);
+    }
+
+    /** @return list<AttentionGroupData> */
+    private function receptionGroups(bool $canReceive, bool $canSettle): array
+    {
+        if (! $canReceive) {
+            return [];
+        }
+
+        $byGroup = [];
+        foreach ($this->receptionWork->pending() as $work) {
+            if ($work->action === ActionKind::MarkDistributed && ! $canSettle) {
+                continue;
+            }
+            $byGroup[$this->receptionGroupKey($work)][$work->recordKey()] = $work;
+        }
+
+        return array_map(fn (array $members, string $key) => $this->receptionGroup($key, $members), $byGroup, array_keys($byGroup));
+    }
+
+    /** @param  non-empty-array<string, ReceptionWork>  $members */
+    private function receptionGroup(string $key, array $members): AttentionGroupData
+    {
+        $first = reset($members);
+        $single = count($members) === 1;
+
+        return new AttentionGroupData(
+            $key,
+            $first->action->value,
+            $first->cycleId,
+            $first->scheduledDate,
+            count($members),
+            new DestinationData(false, null, DestinationArea::Receptions, $single ? $first->producerId : null),
+            $single ? $first->producerName : null,
+            count(array_filter($members, fn (ReceptionWork $work) => $work->allocationDifference)),
+        );
+    }
+
+    private function receptionGroupKey(ReceptionWork $work): string
+    {
+        return "{$work->action->value}:cycle:{$work->cycleId}";
     }
 
     /**
@@ -51,9 +104,6 @@ final class ListDashboard
                 new DestinationData($staffWide, count($members) === 1 ? $first->basketId : null),
             );
         }, $byGroup, array_keys($byGroup));
-
-        usort($groups, fn (AttentionGroupData $a, AttentionGroupData $b) => [$a->scheduledDate === null, $a->scheduledDate, $a->key]
-            <=> [$b->scheduledDate === null, $b->scheduledDate, $b->key]);
 
         return $groups;
     }

@@ -188,6 +188,8 @@ const pageProps: Record<string, Record<string, unknown>> = {
                 scheduledDate: pickupDate,
                 count: 3,
                 href: '/finance/baskets?pending=1',
+                producerName: null,
+                allocationDifferenceCount: 0,
             },
             {
                 key: 'collect_basket:no-cycle',
@@ -196,6 +198,8 @@ const pageProps: Record<string, Record<string, unknown>> = {
                 scheduledDate: null,
                 count: 1,
                 href: '/baskets/visual-stock-basket',
+                producerName: null,
+                allocationDifferenceCount: 0,
             },
         ],
         managerSummary: {
@@ -523,6 +527,34 @@ if (pageName === 'Dashboard') {
     visualProps.nextPickup = role === 'member' ? visualProps.nextPickup : null;
     visualProps.openCycles = role === 'member' ? visualProps.openCycles : 0;
     visualProps.balance = role === 'member' ? visualProps.balance : null;
+    if (state === 'reception' || state === 'reception-long-name') {
+        const longName = state === 'reception-long-name';
+        visualProps.attention = [
+            {
+                key: 'check_delivery_and_allocations:cycle:visual-cycle',
+                action: 'check_delivery_and_allocations',
+                cycleId: 'visual-cycle',
+                scheduledDate: pickupDate,
+                count: 1,
+                href: '/receptions/visual-cycle/visual-producer',
+                producerName: longName
+                    ? 'Cooperativa Agrícola i Ramadera de la Figuera del barri de la Vall'
+                    : 'Forn del Barri',
+                allocationDifferenceCount: 1,
+            },
+            {
+                key: 'mark_distributed:cycle:visual-cycle',
+                action: 'mark_distributed',
+                cycleId: 'visual-cycle',
+                scheduledDate: pickupDate,
+                count: 2,
+                href: '/receptions',
+                producerName: null,
+                allocationDifferenceCount: 0,
+            },
+            ...visualProps.attention,
+        ];
+    }
 }
 if (pageName === 'Wallet/Statement') {
     visualProps.household = role === 'manager' ? household : null;
@@ -1016,6 +1048,9 @@ void createInertiaApp({
                 return (
                     !!emptyMessage && mainText().includes(trans(emptyMessage))
                 );
+            case 'reception':
+            case 'reception-long-name':
+                return visible('[data-test="attention-blocker"]');
             case 'long-content':
                 return pageName === 'Orders/Index'
                     ? document.querySelectorAll('#main-content li').length >= 6

@@ -2,6 +2,7 @@
 
 use Guixa\Dashboard\Application\ListDashboard;
 use Guixa\Dashboard\Domain\ActionKind;
+use Guixa\Dashboard\Domain\ReceptionWorkRepository;
 use Guixa\Dashboard\Infrastructure\Sales\SalesBasketWork;
 use Guixa\Sales\Application\ReadDashboardBasketWork;
 use Guixa\Sales\Application\ReadPendingCollections;
@@ -28,7 +29,16 @@ function dashboardWith(InMemoryBasketRepository $repository, InMemoryWeeklyBaske
         }
     };
 
-    return new ListDashboard(new SalesBasketWork(new ReadDashboardBasketWork(new ReadPendingCollections($repository, $source), $pickups)));
+    return new ListDashboard(
+        new SalesBasketWork(new ReadDashboardBasketWork(new ReadPendingCollections($repository, $source), $pickups)),
+        new class implements ReceptionWorkRepository
+        {
+            public function pending(): array
+            {
+                return [];
+            }
+        },
+    );
 }
 
 function validatedBasket(InMemoryBasketRepository $repository, InMemoryWeeklyBasketSource $source, string $id, string $household, ?string $cycle = null, bool $late = false): void

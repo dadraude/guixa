@@ -17,6 +17,8 @@ readonly cycleId: string | null,
 readonly scheduledDate: string | null,
 readonly count: number,
 readonly href: string,
+readonly producerName: string | null,
+readonly allocationDifferenceCount: number,
 };
 export type BasketActionsRow = {
 readonly edit: boolean,
@@ -454,7 +456,7 @@ readonly removeBlockedReason: string | null,
 declare namespace Guixa {
 namespace Dashboard {
 namespace Domain {
-export type ActionKind = 'collect_basket';
+export type ActionKind = 'check_delivery_and_allocations' | 'resolve_allocations' | 'mark_distributed' | 'collect_basket';
 }
 }
 namespace Membership {
@@ -467,6 +469,9 @@ export type RoleChange = 'granted' | 'removed';
 }
 }
 namespace Ordering {
+namespace Application {
+export type DashboardReceptionStage = 'check' | 'resolve_allocations' | 'distribute';
+}
 namespace Domain {
 export type ReceptionState = 'sent' | 'validated' | 'distributed';
 }

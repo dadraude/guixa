@@ -75,10 +75,20 @@ const formattedDate = (iso: string) =>
 type QuickLink = { title: string; href: NavItem['href']; icon: LucideIcon };
 
 const actionLabels: Record<Guixa.Dashboard.Domain.ActionKind, string> = {
+    check_delivery_and_allocations: trans('Check delivery and allocations'),
+    resolve_allocations: trans('Resolve allocations'),
+    mark_distributed: trans('Mark distributed'),
     collect_basket: trans('Collect baskets'),
 };
 
-const contextLabel = (group: App.Http.AttentionGroupRow) => {
+const linkLabels: Record<Guixa.Dashboard.Domain.ActionKind, string> = {
+    check_delivery_and_allocations: trans('View receptions'),
+    resolve_allocations: trans('View receptions'),
+    mark_distributed: trans('View receptions'),
+    collect_basket: trans('View baskets'),
+};
+
+const dateContext = (group: App.Http.AttentionGroupRow) => {
     if (group.scheduledDate) {
         return trans('Pickup :date', {
             date: formattedDate(group.scheduledDate),
@@ -86,6 +96,11 @@ const contextLabel = (group: App.Http.AttentionGroupRow) => {
     }
     return group.cycleId ? trans('Cycle') : trans('No cycle');
 };
+
+const contextLabel = (group: App.Http.AttentionGroupRow) =>
+    group.producerName
+        ? `${group.producerName} · ${dateContext(group)}`
+        : dateContext(group);
 
 const memberLinks: QuickLink[] = [
     {
@@ -267,6 +282,16 @@ const isProducer = computed(() => props.roles.includes('producer'));
                         <span class="text-sm text-muted-foreground">{{
                             contextLabel(group)
                         }}</span>
+                        <span
+                            v-if="group.allocationDifferenceCount > 0"
+                            class="text-sm"
+                            data-test="attention-blocker"
+                            >{{
+                                trans(
+                                    'Allocation differs from what was received.',
+                                )
+                            }}</span
+                        >
                     </div>
                     <div class="flex flex-wrap items-center gap-x-4">
                         <span
@@ -286,9 +311,9 @@ const isProducer = computed(() => props.roles.includes('producer'));
                         >
                         <Link
                             :href="group.href"
-                            :aria-label="`${trans('View baskets')}: ${contextLabel(group)}`"
+                            :aria-label="`${linkLabels[group.action]}: ${contextLabel(group)}`"
                             class="inline-flex min-h-11 items-center text-sm underline"
-                            >{{ trans('View baskets') }}</Link
+                            >{{ linkLabels[group.action] }}</Link
                         >
                     </div>
                 </li>

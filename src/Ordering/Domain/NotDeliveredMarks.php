@@ -22,19 +22,44 @@ final class NotDeliveredMarks
      */
     public function of(Cycle $cycle, Order $order): array
     {
-        $stored = array_flip($this->orders->notDeliveredProductIds($order->id));
-        $derived = $this->derivedOf($cycle, $order);
-        $marked = [];
+        return $this->ofAll($cycle, [$order])[$order->id];
+    }
 
-        foreach ($order->lines() as $line) {
-            $isMarked = $cycle->isSent($line->producerId) ? isset($stored[$line->productId]) : isset($derived[$line->productId]);
+    /**
+     * The marks to show for every given order of the cycle, reading what they share once: the cycle's unavailable
+     * products and each product's catalog entry. `of` is this for one order, so both always agree.
+     *
+     * @param  list<Order>  $orders
+     * @return array<string, array<string, true>> marked product ids per order id
+     */
+    public function ofAll(Cycle $cycle, array $orders): array
+    {
+        $unavailable = null;
+        $orderable = [];
+        $marksByOrder = [];
 
-            if ($isMarked) {
-                $marked[$line->productId] = true;
+        foreach ($orders as $order) {
+            $stored = null;
+            $marked = [];
+
+            foreach ($order->lines() as $line) {
+                if ($cycle->isSent($line->producerId)) {
+                    $stored ??= array_flip($this->orders->notDeliveredProductIds($order->id));
+                    $isMarked = isset($stored[$line->productId]);
+                } else {
+                    $unavailable ??= array_flip($this->availability->unavailableIn($cycle->id));
+                    $isMarked = $this->isMarked($line, $cycle, $unavailable, $orderable);
+                }
+
+                if ($isMarked) {
+                    $marked[$line->productId] = true;
+                }
             }
+
+            $marksByOrder[$order->id] = $marked;
         }
 
-        return $marked;
+        return $marksByOrder;
     }
 
     /**
@@ -46,10 +71,11 @@ final class NotDeliveredMarks
     public function derivedOf(Cycle $cycle, Order $order): array
     {
         $unavailable = array_flip($this->availability->unavailableIn($cycle->id));
+        $orderable = [];
         $marked = [];
 
         foreach ($order->lines() as $line) {
-            if ($this->isMarked($line, $cycle, $unavailable)) {
+            if ($this->isMarked($line, $cycle, $unavailable, $orderable)) {
                 $marked[$line->productId] = true;
             }
         }
@@ -74,11 +100,18 @@ final class NotDeliveredMarks
         return $marked;
     }
 
-    /** @param  array<string, int>  $unavailable  product ids unavailable in the cycle, as keys */
-    private function isMarked(OrderLine $line, Cycle $cycle, array $unavailable): bool
+    /**
+     * The one derivation rule (R3b, R6c): shown before sending and stored by `send`.
+     *
+     * @param  array<string, int>  $unavailable  product ids unavailable in the cycle, as keys
+     * @param  array<string, bool>  $orderable  whether Catalog still offers a product, by product id; filled as it is looked up
+     */
+    private function isMarked(OrderLine $line, Cycle $cycle, array $unavailable, array &$orderable): bool
     {
+        $orderable[$line->productId] ??= $this->catalog->orderable($line->productId) !== null;
+
         return ! $cycle->isParticipating($line->producerId)
             || isset($unavailable[$line->productId])
-            || $this->catalog->orderable($line->productId) === null;
+            || ! $orderable[$line->productId];
     }
 }
