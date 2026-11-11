@@ -1,0 +1,268 @@
+{
+    "schemaVersion": 1,
+    "slice": {
+        "id": "attention-and-opportunities",
+        "scopeRefs": [
+            "R1",
+            "R2",
+            "R3",
+            "R4",
+            "R5",
+            "R6",
+            "R7",
+            "R8",
+            "R9",
+            "R10",
+            "R11",
+            "R12",
+            "R13",
+            "R14",
+            "R15",
+            "R16",
+            "S1",
+            "S2",
+            "S3",
+            "S4",
+            "S5",
+            "S6",
+            "S7",
+            "S8",
+            "S9",
+            "S10",
+            "S11",
+            "S12",
+            "S13"
+        ],
+        "deferredRefs": []
+    },
+    "stages": {
+        "discovery": {
+            "request": {
+                "path": "specs/004-dashboard/history/2026-11-10T17-57-45.277Z-no-task-d280baf7-0213-496f-9449-59b28cdcd2a9.md",
+                "sha256": "b483b91ffa6d2cd003ef99f363c3db740c3ceb25a81e265e31f95fbd08ba403f"
+            },
+            "discovery": {
+                "path": "specs/004-dashboard/discovery.md",
+                "sha256": "e94bf3a0f11b89a8f9c11c7e23231cf731a7dfc2001f9dcd1a212de0c3696486"
+            }
+        },
+        "scope": {
+            "sliceId": "attention-and-opportunities",
+            "slices": {
+                "path": "specs/004-dashboard/discovery.md",
+                "sha256": "e94bf3a0f11b89a8f9c11c7e23231cf731a7dfc2001f9dcd1a212de0c3696486"
+            },
+            "selectionDecision": {
+                "path": "specs/004-dashboard/history/2026-11-10T23-11-32.497Z-no-task-17a0d258-5bdf-4b53-b1cd-64f71ead1444.md",
+                "sha256": "7fd183ddacd586f4c33acea5a88abc9202af20ed638d0d4d58a59a663462653c"
+            }
+        },
+        "spec": {
+            "sliceId": "attention-and-opportunities",
+            "specification": {
+                "path": "specs/004-dashboard/spec.md",
+                "sha256": "edfd447c2c1c5802783784b5fd2e62834616485f33d4b84062459560e1584494"
+            },
+            "gapReview": {
+                "path": "specs/004-dashboard/history/2026-11-10T23-42-39.298Z-no-task-526708dc-2a6e-45bb-a892-0e10230e5465.md",
+                "sha256": "1b07bd9b7ab2da5cbdd51ce6b265e41fc371a62a806e6078319b67c9afadb717"
+            },
+            "sources": [
+                {
+                    "path": "specs/004-dashboard/discovery.md",
+                    "sha256": "e94bf3a0f11b89a8f9c11c7e23231cf731a7dfc2001f9dcd1a212de0c3696486"
+                },
+                {
+                    "path": "specs/constitution.md",
+                    "sha256": "9f1c5e4cc45e5f64f23dd2707cc7f3b64d12d30ef2489c730daab29c13dad5f2"
+                },
+                {
+                    "path": "specs/001-weekly-orders/spec.md",
+                    "sha256": "7ff4639a8061793101ec97b24991a45d3a26ded8e15112107cdc05d39a413b94"
+                },
+                {
+                    "path": "specs/001-weekly-orders/ordering.md",
+                    "sha256": "c599975af55222d7474a3f1ffb5f4a38ceb0de2d3e81c52940bb0dbc4e9894d4"
+                },
+                {
+                    "path": "specs/001-weekly-orders/reception.md",
+                    "sha256": "670203b391488f6fcaeb9e71b23bc90af6ae9abca55447f82850435140e1476c"
+                },
+                {
+                    "path": "specs/001-weekly-orders/pickup.md",
+                    "sha256": "510f6678b61c23b129fb1ef6e11f5649a31487fbada03b78dc4202c8bb848798"
+                },
+                {
+                    "path": "specs/001-weekly-orders/stock-wallet.md",
+                    "sha256": "4a3194d4abd0941a0edb8a3478715e9f42600a051518ca37a8765f34e5928ff0"
+                },
+                {
+                    "path": "specs/003-role-management/spec.md",
+                    "sha256": "200be7dc4f719ed7589e33a55f2ca0bbc52cac01de7a032c626a3a7bfa4b4ae5"
+                }
+            ],
+            "acceptance": {
+                "path": "specs/004-dashboard/history/2026-11-11T07-11-59.560Z-no-task-9d1099a8-f84f-4960-8440-d1d9aef9ff30.md",
+                "sha256": "c2bf1eb1ccbb526786e104bc2a9f693b3e5ac55cc3168c348ac115ddb735c5d8"
+            },
+            "gapReviewStatusUpdate": {
+                "path": "specs/004-dashboard/history/2026-11-11T07-11-59.614Z-no-task-6315fdbb-5a99-46a5-bd29-a8b293fda762.md",
+                "sha256": "af0ca0f48d6c8343e1bf217f38247cf95e932759f47598853353f42b45d7ec47"
+            }
+        },
+        "plan": {
+            "sliceId": "attention-and-opportunities",
+            "plan": {
+                "path": "specs/004-dashboard/plan.md",
+                "sha256": "926b4a809d683d4395c6d8f5c1a82a26ae5bb27f126c2e390773f706ccf83fcb"
+            },
+            "preparation": {
+                "path": "specs/004-dashboard/history/2026-11-11T07-19-31.442Z-no-task-b0231324-4a4f-4288-b0ef-cc8e6debb49e.md",
+                "sha256": "c32072ef91bd1788bf15789cc8115c392fd775ee223141116ff4786823ae554f"
+            },
+            "sources": [
+                {
+                    "path": "specs/004-dashboard/spec.md",
+                    "sha256": "edfd447c2c1c5802783784b5fd2e62834616485f33d4b84062459560e1584494"
+                },
+                {
+                    "path": "specs/004-dashboard/discovery.md",
+                    "sha256": "e94bf3a0f11b89a8f9c11c7e23231cf731a7dfc2001f9dcd1a212de0c3696486"
+                },
+                {
+                    "path": "specs/constitution.md",
+                    "sha256": "9f1c5e4cc45e5f64f23dd2707cc7f3b64d12d30ef2489c730daab29c13dad5f2"
+                },
+                {
+                    "path": "architecture/modules.php",
+                    "sha256": "44831c9dc945b393dc42ce6ae2584fc476f4e31a462c152b266bd441b567fc50"
+                },
+                {
+                    "path": "routes/web.php",
+                    "sha256": "d372cb4b1702034c96152e1dbcf991414c5ae771534cb1d4da9e3b28631aaf8a"
+                },
+                {
+                    "path": "app/Http/Controllers/DashboardController.php",
+                    "sha256": "b071893921c7582e6e6fa6277d5878ec0957c32626ddeb5cab21df9f5fc76b89"
+                },
+                {
+                    "path": "resources/js/pages/Dashboard.vue",
+                    "sha256": "83e2f7448068c8726e266c9e3c94298c4bf97fddbec76dc6057e4dbbf6284faf"
+                },
+                {
+                    "path": "src/Ordering/Application/ListCycles.php",
+                    "sha256": "25435fac20df658756f638b6f766fb4b9501b2f19607dc86a309debf890dc68f"
+                },
+                {
+                    "path": "src/Ordering/Application/ListReceptionCycles.php",
+                    "sha256": "510398e64525c8e6e517052c600536e7842f399b6b8f624aab4a4ba42dc733d4"
+                },
+                {
+                    "path": "src/Ordering/Domain/ReceptionLoader.php",
+                    "sha256": "91a96b481c88a8da0923381fd43d84f6c5e895b8567ff3e315fed5c66de88b30"
+                },
+                {
+                    "path": "src/Sales/Application/ListBaskets.php",
+                    "sha256": "5e5e1d0509129ce518ed5aa93b72232d576c62be3d647fa8cff369ffe4bf34d6"
+                },
+                {
+                    "path": "src/Sales/Application/ListPendingCollections.php",
+                    "sha256": "5e995280c76601d8961a21270b6635a6b7d8014a5ebc275c2cfd622e9783a548"
+                },
+                {
+                    "path": "src/Sales/Application/ListMemberPendingCollections.php",
+                    "sha256": "0d4b5ff31feb86487b9a639603a351cebbca58c497352ba5b8cb75d8e189937c"
+                },
+                {
+                    "path": "resources/js/pages/Manage/Roles/Index.vue",
+                    "sha256": "8bfa75100748052cc1dcb633dc2c89b48101dad8911e7f06fa93f224f2b1969a"
+                },
+                {
+                    "path": "tests/Feature/DashboardTest.php",
+                    "sha256": "061458ae8ceef5ac6e06f06f81bd6edba4f442345ac5f875ae5b178f09136f04"
+                },
+                {
+                    "path": "resources/js/pages/Dashboard.spec.ts",
+                    "sha256": "6a03b13feb06785a19c1894cd343c711e38e5a163d6c0b5e925e8aa4bda09b5f"
+                },
+                {
+                    "path": "tests/Feature/Sales/PendingCollectionVisibilityTest.php",
+                    "sha256": "516733544a331d48be5eccb35a2902a35c6bdbed6d52cfcf110a4b2a7591c598"
+                },
+                {
+                    "path": "database/seeders/DemoSeeder.php",
+                    "sha256": "61d1d62e8e3bf51028e10f5ea3bd4cfec97443e69a780ae5b914ca97fe5948ab"
+                },
+                {
+                    "path": "tests/Feature/Database/DemoSeederTest.php",
+                    "sha256": "c45ca309c8bff3cbf18bb1d984bb5c957c0f9c68106511e09877f14b1d604a8f"
+                }
+            ],
+            "acceptance": {
+                "path": "specs/004-dashboard/history/2026-11-11T07-24-15.984Z-no-task-71db3acf-e1cc-4039-a061-1824e2e0ada7.md",
+                "sha256": "15b176d2407ed622c0818c6dd15207cfc5c822a0bed03f06bd32b5649efe738c"
+            },
+            "acceptanceStatusUpdate": {
+                "path": "specs/004-dashboard/history/2026-11-11T07-24-16.047Z-no-task-8759e0a7-e67c-489d-85ce-2b39b96667c5.md",
+                "sha256": "5e7f204405c2cd28230196b875ef5f5641ff285742d7bc5878b083ca7ae47903"
+            }
+        },
+        "tasks": {
+            "sliceId": "attention-and-opportunities",
+            "tasks": {
+                "path": "specs/004-dashboard/tasks.md",
+                "sha256": "bb197156fb2e73b2d682c462242897f19c7ccdae373498f1021f0e331b5fcc81"
+            },
+            "preparation": {
+                "path": "specs/004-dashboard/history/2026-11-11T07-32-03.022Z-no-task-54736f2d-7d33-4b71-b165-0685064a5d28.md",
+                "sha256": "2e6388656b90d9e65c788ad93d6fc46a053f6280a510f150e0c866d53dbcd3eb"
+            },
+            "sources": [
+                {
+                    "path": "specs/004-dashboard/spec.md",
+                    "sha256": "edfd447c2c1c5802783784b5fd2e62834616485f33d4b84062459560e1584494"
+                },
+                {
+                    "path": "specs/004-dashboard/plan.md",
+                    "sha256": "926b4a809d683d4395c6d8f5c1a82a26ae5bb27f126c2e390773f706ccf83fcb"
+                },
+                {
+                    "path": "specs/constitution.md",
+                    "sha256": "9f1c5e4cc45e5f64f23dd2707cc7f3b64d12d30ef2489c730daab29c13dad5f2"
+                },
+                {
+                    "path": "skills/agent-workflow/references/planning.md",
+                    "sha256": "71d076cc964de47a164d8b32f4512e21c06a4ad6578012f6c17df0dc80c0dfd2"
+                }
+            ],
+            "acceptance": {
+                "path": "specs/004-dashboard/history/2026-11-11T07-35-59.334Z-no-task-16fd9a03-17ac-43c3-94de-91fdb2e376bc.md",
+                "sha256": "393de88683e5eb9dead1eff478d52d5cf3157419a4cc65a17e9a301b67e34698"
+            },
+            "acceptanceStatusUpdate": {
+                "path": "specs/004-dashboard/history/2026-11-11T07-35-59.401Z-no-task-0f55014d-7038-47b3-a168-147f3ca6876c.md",
+                "sha256": "0750c483792310ce4fafb5cc30a888c789c43750f86be68e64b4d8138c4de5a9"
+            },
+            "ticketDrafts": {
+                "path": "specs/004-dashboard/ticket-drafts.md",
+                "sha256": "fffa12b5cdcf0ec3acd24290ad96aec3c12a21c8049642c402dfd442b70c20ec"
+            },
+            "ticketDraftPreparation": {
+                "path": "specs/004-dashboard/history/2026-11-11T07-40-43.605Z-no-task-4338a807-6618-496f-aece-ce32d85cf0f5.md",
+                "sha256": "0184180f5bdda98b9859f4369ec2a41108ab3deea536d4fbb7a7def6479fa782"
+            },
+            "ticketPublicationApproval": {
+                "path": "specs/004-dashboard/history/2026-11-11T07-52-53.734Z-no-task-284e0d2a-564a-4f20-9e62-5530ce5591c6.md",
+                "sha256": "3117353aa1cb3d28ea33320c1ada1c68fbbf4c81222c0b96bf66ce45be3efaa5"
+            },
+            "ticketPublication": {
+                "path": "specs/004-dashboard/linear-publication.md",
+                "sha256": "4a6e527b91ef2ad25cf576e9a6c3bea500a6603d90ff4d07bfc457b2f688ba4c"
+            },
+            "ticketPublicationRecord": {
+                "path": "specs/004-dashboard/history/2026-11-11T07-58-14.727Z-no-task-b65835c1-cbde-4226-bc95-6e67ec9b8ac3.md",
+                "sha256": "d45230a9babcc753794fca585b3f212d4ee78aad1eab346ae9b8e0cef00ed2ba"
+            }
+        }
+    }
+}
