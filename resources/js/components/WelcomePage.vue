@@ -12,11 +12,19 @@ defineProps<{ actionHref: string }>();
     <div class="welcome-page pilot-theme min-h-svh" data-visual-root>
         <div class="welcome-shell">
             <LandingHeader :action-href="actionHref" />
-            <main>
-                <LandingHero />
+        </div>
+        <main>
+            <div class="welcome-hero-band">
+                <div class="welcome-shell">
+                    <LandingHero />
+                </div>
+            </div>
+            <div class="welcome-shell welcome-story-shell">
                 <LandingStory />
-                <LandingContact />
-            </main>
+            </div>
+            <LandingContact />
+        </main>
+        <div class="welcome-shell">
             <footer class="welcome-footer">
                 <a class="welcome-brand welcome-footer-brand" href="#top">
                     {{ trans('la guixa') }}
@@ -57,6 +65,43 @@ defineProps<{ actionHref: string }>();
 .welcome-shell {
     width: min(100% - 2.5rem, 72rem);
     margin-inline: auto;
+    container-type: inline-size;
+}
+
+.welcome-hero-band {
+    --welcome-hero-surface: #286585;
+    --welcome-hero-cream: #faf1dc;
+    --welcome-focus: var(--welcome-hero-cream);
+    position: relative;
+    color: var(--welcome-hero-cream);
+    background: var(--welcome-hero-surface);
+}
+
+.welcome-hero-band::before {
+    position: absolute;
+    inset: 0;
+    background: var(--welcome-hero-cream);
+    opacity: 0.8;
+    mask-image: url('../../images/welcome/hero-wear-mask.png');
+    mask-mode: luminance;
+    mask-position: center;
+    mask-repeat: no-repeat;
+    mask-size: 100% 100%;
+    pointer-events: none;
+    content: '';
+}
+
+.welcome-hero-band > .welcome-shell {
+    position: relative;
+    z-index: 1;
+}
+
+:global(.dark) .welcome-hero-band {
+    --welcome-hero-surface: #23485c;
+}
+
+.welcome-story-shell {
+    padding-top: clamp(3rem, 6vw, 4.5rem);
 }
 
 .welcome-brand {
@@ -64,7 +109,7 @@ defineProps<{ actionHref: string }>();
     min-height: 2.75rem;
     align-items: center;
     color: var(--welcome-ink);
-    font-size: 1.75rem;
+    font-size: 2.25rem;
     font-weight: 900;
     letter-spacing: -0.07em;
     line-height: 1;
@@ -73,6 +118,7 @@ defineProps<{ actionHref: string }>();
 
 .welcome-footer {
     display: flex;
+    flex-wrap: wrap;
     min-height: 5rem;
     align-items: center;
     gap: 1.25rem;
@@ -80,7 +126,9 @@ defineProps<{ actionHref: string }>();
 }
 
 .welcome-footer-brand {
-    font-size: 1.5rem;
+    flex-shrink: 0;
+    font-size: 1.75rem;
+    white-space: nowrap;
 }
 
 .welcome-footer-divider {

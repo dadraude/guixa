@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ShoppingBasket } from '@lucide/vue';
 import { trans } from 'laravel-vue-i18n';
 import { Button } from '@/components/ui/button';
 </script>
@@ -30,7 +29,7 @@ import { Button } from '@/components/ui/button';
             </div>
         </div>
         <div class="welcome-hero-art" aria-hidden="true">
-            <ShoppingBasket :size="150" :stroke-width="1.15" />
+            <span class="welcome-basket"></span>
         </div>
     </section>
 </template>
@@ -40,31 +39,35 @@ import { Button } from '@/components/ui/button';
     display: grid;
     align-items: center;
     gap: 1.5rem;
-    padding-block: clamp(2.5rem, 8vw, 5rem) clamp(3.5rem, 8vw, 5.75rem);
+    padding-block: clamp(3.5rem, 8vw, 6rem);
 }
 
 .welcome-hero-copy {
     min-width: 0;
+    background: var(--welcome-hero-surface);
+    box-shadow: 0 0 0.75rem 0.5rem var(--welcome-hero-surface);
 }
 
 .welcome-eyebrow {
     margin: 0 0 0.75rem;
-    color: var(--welcome-blue);
+    color: var(--welcome-hero-cream);
     font-size: 0.8125rem;
     font-weight: 800;
     letter-spacing: 0.08em;
     line-height: 1.5;
     text-transform: uppercase;
+    overflow-wrap: anywhere;
 }
 
 .welcome-hero h1 {
-    max-width: 15ch;
+    max-width: 16ch;
     margin: 0;
-    font-size: clamp(2.125rem, 6.5vw, 3.75rem);
-    font-weight: 850;
+    font-size: clamp(2.5rem, 6.5vw, 4.25rem);
+    font-weight: 900;
     letter-spacing: -0.045em;
     line-height: 1.08;
     text-wrap: balance;
+    overflow-wrap: anywhere;
 }
 
 .welcome-intro {
@@ -84,48 +87,58 @@ import { Button } from '@/components/ui/button';
 
 .welcome-primary-action {
     min-height: 2.75rem;
+    height: auto;
     border: 0;
     border-radius: 0.4rem;
-    background: var(--welcome-blue);
+    background: var(--welcome-hero-cream);
     padding-inline: 1.25rem;
-    color: #fff;
+    color: #173e53;
     font-weight: 750;
     text-decoration: none;
+    white-space: normal;
 }
 
 .welcome-primary-action:hover {
-    background: var(--welcome-blue-hover);
-}
-
-:global(.dark) .welcome-primary-action {
-    color: #15232a;
+    background: #fff9eb;
 }
 
 .welcome-text-action {
     display: inline-flex;
     min-height: 2.75rem;
     align-items: center;
-    color: var(--welcome-blue);
+    color: var(--welcome-hero-cream);
     font-weight: 700;
     text-underline-offset: 0.25em;
 }
 
 .welcome-text-action:hover {
-    color: var(--welcome-blue-hover);
+    color: #fff9eb;
 }
 
 .welcome-hero-art {
     display: none;
     justify-self: end;
-    color: var(--welcome-blue);
+    width: min(100%, 22rem);
+    color: var(--welcome-hero-cream);
+}
+
+.welcome-basket {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1;
+    background: var(--welcome-hero-cream);
+    mask-image: url('../../../images/welcome/cooperative-basket.png');
+    mask-position: center;
+    mask-repeat: no-repeat;
+    mask-size: 125%;
 }
 
 .welcome-hero :is(a:focus-visible) {
-    outline: 3px solid var(--welcome-focus);
+    outline: 3px solid var(--welcome-hero-cream);
     outline-offset: 3px;
 }
 
-@media (min-width: 48rem) {
+@container (min-width: 48rem) {
     .welcome-hero {
         grid-template-columns: minmax(0, 1.35fr) minmax(12rem, 0.65fr);
         gap: 2rem;
@@ -134,6 +147,18 @@ import { Button } from '@/components/ui/button';
     .welcome-hero-art {
         display: block;
         padding: 1rem;
+    }
+}
+
+@media (max-width: 47.999rem) {
+    .welcome-hero-actions {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+    }
+
+    .welcome-text-action {
+        align-self: start;
     }
 }
 </style>

@@ -21,21 +21,20 @@ defineProps<{ actionHref: string }>();
 
 <style scoped>
 .welcome-header {
-    display: grid;
-    grid-template-areas:
-        'brand'
-        'nav'
-        'access';
-    grid-template-columns: minmax(0, 1fr);
-    align-items: start;
-    gap: 0.5rem;
-    padding-block: 1.25rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding-block: 1rem;
 }
 
 .welcome-brand {
-    grid-area: brand;
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
     color: var(--welcome-ink);
-    font-size: 1.75rem;
+    font-size: clamp(2rem, 5vw, 2.25rem);
     font-weight: 900;
     letter-spacing: -0.07em;
     line-height: 1;
@@ -43,8 +42,7 @@ defineProps<{ actionHref: string }>();
 }
 
 .welcome-nav {
-    grid-area: nav;
-    display: flex;
+    display: none;
     align-items: center;
     gap: clamp(0.75rem, 2.5vw, 2rem);
 }
@@ -66,15 +64,14 @@ defineProps<{ actionHref: string }>();
 }
 
 .welcome-access {
-    grid-area: access;
-    justify-self: start;
+    flex-shrink: 0;
     display: inline-flex;
     min-height: 2.75rem;
     align-items: center;
     justify-content: center;
     border: 1px solid var(--welcome-blue);
     border-radius: 0.35rem;
-    padding: 0.5rem 0.8rem;
+    padding: 0.5rem 0.7rem;
     color: var(--welcome-blue);
     font-size: 0.8125rem;
     font-weight: 700;
@@ -87,17 +84,6 @@ defineProps<{ actionHref: string }>();
     background: var(--welcome-blue-soft);
 }
 
-.welcome-nav {
-    grid-column: 1 / -1;
-    justify-content: space-between;
-    border-top: 1px solid var(--welcome-border);
-    margin-top: 0.375rem;
-}
-
-.welcome-nav a {
-    font-size: 0.875rem;
-}
-
 .welcome-header :is(a:focus-visible) {
     outline: 3px solid var(--welcome-focus);
     outline-offset: 3px;
@@ -105,7 +91,6 @@ defineProps<{ actionHref: string }>();
 
 @media (min-width: 48rem) {
     .welcome-header {
-        display: flex;
         min-height: 5.5rem;
         gap: clamp(1.5rem, 4vw, 3.5rem);
     }
@@ -115,9 +100,8 @@ defineProps<{ actionHref: string }>();
     }
 
     .welcome-nav {
-        justify-content: initial;
-        border: 0;
-        margin: 0;
+        display: flex;
+        flex-wrap: wrap;
     }
 
     .welcome-access {

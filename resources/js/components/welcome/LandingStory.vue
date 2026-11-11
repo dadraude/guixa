@@ -90,17 +90,18 @@ const steps = [
 <style scoped>
 .welcome-story {
     display: grid;
-    gap: clamp(3.5rem, 8vw, 5.5rem);
-    padding-bottom: clamp(3.5rem, 8vw, 5.5rem);
+    gap: clamp(2.75rem, 6vw, 4rem);
+    padding-bottom: clamp(3rem, 6vw, 4.5rem);
 }
 
 .welcome-section h2 {
     margin: 0;
-    font-size: clamp(1.5rem, 3.2vw, 2rem);
-    font-weight: 800;
+    font-size: clamp(1.65rem, 3.2vw, 2.25rem);
+    font-weight: 900;
     letter-spacing: -0.035em;
     line-height: 1.2;
     text-wrap: balance;
+    overflow-wrap: anywhere;
 }
 
 .welcome-values,
@@ -120,6 +121,12 @@ const steps = [
     min-width: 0;
 }
 
+.welcome-values li > div,
+.welcome-steps li > div {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
 .welcome-value-icon {
     width: 2.5rem;
     height: 2.5rem;
@@ -130,8 +137,8 @@ const steps = [
 .welcome-values h3,
 .welcome-steps h3 {
     margin: 0;
-    font-size: 1.125rem;
-    font-weight: 800;
+    font-size: 1.25rem;
+    font-weight: 850;
     line-height: 1.3;
 }
 
@@ -163,13 +170,22 @@ const steps = [
 @media (min-width: 48rem) {
     .welcome-values,
     .welcome-steps {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
         gap: 2rem;
     }
 
     .welcome-values li {
         grid-template-columns: 3rem minmax(0, 1fr);
         gap: 1rem;
+    }
+
+    .welcome-steps li {
+        display: block;
+    }
+
+    .welcome-step-number {
+        display: block;
+        margin-bottom: 0.125rem;
     }
 }
 </style>
