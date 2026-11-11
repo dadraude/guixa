@@ -89,24 +89,27 @@ defineProps<{ actionHref: string }>();
 }
 
 .welcome-hero-band::after {
+    --welcome-wear-edge: clamp(8px, 2vw, 24px);
     position: absolute;
     inset: 0;
     background-image: url('../../images/welcome/hero-scratches.svg');
     background-repeat: repeat;
     background-size: 30rem 20rem;
-    opacity: 0.22;
+    opacity: 0.5;
     mask-image:
         linear-gradient(
             to right,
-            #000 0 6px,
-            transparent 6px calc(100% - 6px),
-            #000 calc(100% - 6px)
+            #000 0 var(--welcome-wear-edge),
+            transparent var(--welcome-wear-edge)
+                calc(100% - var(--welcome-wear-edge)),
+            #000 calc(100% - var(--welcome-wear-edge))
         ),
         linear-gradient(
             to bottom,
-            #000 0 6px,
-            transparent 6px calc(100% - 6px),
-            #000 calc(100% - 6px)
+            #000 0 var(--welcome-wear-edge),
+            transparent var(--welcome-wear-edge)
+                calc(100% - var(--welcome-wear-edge)),
+            #000 calc(100% - var(--welcome-wear-edge))
         );
     mask-composite: add;
     pointer-events: none;
