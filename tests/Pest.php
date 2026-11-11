@@ -104,6 +104,12 @@ function architectureClasses(string $namespace, bool $concreteOnly = true): arra
     return $classes;
 }
 
+/** A valid weekly-product form payload. */
+function weeklyForm(array $overrides = []): array
+{
+    return ['name' => 'Tomàquet', 'unit' => 'kg', 'price' => '3.00', 'variable' => false, 'containers_per_unit' => null, ...$overrides];
+}
+
 /** An account holding exactly the given roles. */
 function accountWith(Role ...$roles): User
 {
