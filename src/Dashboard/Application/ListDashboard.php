@@ -5,8 +5,10 @@ namespace Guixa\Dashboard\Application;
 use Guixa\Dashboard\Domain\ActionKind;
 use Guixa\Dashboard\Domain\BasketWorkRepository;
 use Guixa\Dashboard\Domain\ReceptionWorkRepository;
+use Guixa\Dashboard\Domain\SendWorkRepository;
 use Guixa\Dashboard\Domain\ValueObject\BasketWork;
 use Guixa\Dashboard\Domain\ValueObject\ReceptionWork;
+use Guixa\Dashboard\Domain\ValueObject\SendWork;
 use Guixa\Shared\Application\Actor;
 use Illuminate\Support\Facades\Gate;
 
@@ -16,6 +18,7 @@ final class ListDashboard
     public function __construct(
         private readonly BasketWorkRepository $basketWork,
         private readonly ReceptionWorkRepository $receptionWork,
+        private readonly SendWorkRepository $sendWork,
     ) {}
 
     public function __invoke(Actor $actor): DashboardData
@@ -33,12 +36,37 @@ final class ListDashboard
 
         $groups = [
             ...$this->basketGroups($records, $isStaff),
+            ...($gate->allows('manage') ? $this->sendGroups() : []),
             ...$this->receptionGroups($gate->allows('receive'), $gate->allows('settle-reception')),
         ];
         usort($groups, fn (AttentionGroupData $a, AttentionGroupData $b) => [$a->scheduledDate === null, $a->scheduledDate, ActionKind::from($a->action)->rank(), $a->key]
             <=> [$b->scheduledDate === null, $b->scheduledDate, ActionKind::from($b->action)->rank(), $b->key]);
 
         return new DashboardData($groups);
+    }
+
+    /** @return list<AttentionGroupData> one group per cycle: the manager sends from that cycle's screen */
+    private function sendGroups(): array
+    {
+        $byCycle = [];
+        foreach ($this->sendWork->pending() as $work) {
+            $byCycle[$work->cycleId]["{$work->cycleId}|{$work->producerId}"] = $work;
+        }
+
+        return array_map(function (array $members, string $cycleId) {
+            /** @var SendWork $first */
+            $first = reset($members);
+
+            return new AttentionGroupData(
+                ActionKind::SendOrder->value.":cycle:{$cycleId}",
+                ActionKind::SendOrder->value,
+                $cycleId,
+                $first->scheduledDate,
+                count($members),
+                new DestinationData(false, null, DestinationArea::Cycles),
+                count($members) === 1 ? $first->producerName : null,
+            );
+        }, $byCycle, array_keys($byCycle));
     }
 
     /** @return list<AttentionGroupData> */

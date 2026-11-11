@@ -13,6 +13,7 @@ use Guixa\Membership\Domain\Account;
 use Guixa\Membership\Domain\AccountPasswords;
 use Guixa\Membership\Domain\AccountRepository;
 use Guixa\Membership\Domain\ValueObject\Email;
+use Guixa\Ordering\Application\CloseProducerNow;
 use Guixa\Ordering\Application\MarkProducerDistributed;
 use Guixa\Ordering\Application\OpenCycle;
 use Guixa\Ordering\Application\SetOrderLine;
@@ -130,6 +131,9 @@ final class DemoSeeder extends Seeder
         $this->receiveProducts($manager, $cycles[1], array_slice($catalog['products'], 0, 2));
         $this->receiveProducts($manager, $cycles[1], array_slice($catalog['products'], 4, 2), firstQuantityColumn: 4);
         app(ValidateReception::class)($manager, $cycles[1], $catalog['producers'][0]);
+
+        // A closed, ordered, unsent producer with an account is the one send the dashboard offers the manager (R9).
+        app(CloseProducerNow::class)($manager, $cycles[2], $catalog['producers'][2]);
     }
 
     /** Settlement created one draft base basket per household; the first household's is validated and collected. */

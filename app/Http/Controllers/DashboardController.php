@@ -95,6 +95,10 @@ class DashboardController extends Controller
             return $producerId === null ? route('receptions.index', [], false) : route('receptions.show', [$group->cycleId, $producerId], false);
         }
 
+        if ($group->destination->area === DestinationArea::Cycles) {
+            return route('manage.cycles.show', $group->cycleId, false);
+        }
+
         $basketId = $group->destination->basketId;
         if ($group->destination->staffWide) {
             if ($basketId !== null) {

@@ -54,6 +54,7 @@ return [
                 'Application\DashboardReceptionWorkData' => ['Dashboard'],
                 'Application\DashboardReceptionStage' => ['Dashboard'],
                 'Application\DashboardOrderScope' => ['Dashboard'],
+                'Application\DashboardSendWorkData' => ['Dashboard'],
                 'Application\CloseCycleAfterBasketValidation' => ['Sales'],
                 'Application\ReadCyclePickupDates' => ['Sales', 'Stock'],
                 'Application\ReadSourceOrderCycles' => ['Sales'],

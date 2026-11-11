@@ -45,6 +45,8 @@
     "Validate baskets": "Valida cistelles",
     "{1} :count pending|[2,*] :count pending": "{1} :count pendent|[2,*] :count pendents",
     "View baskets": "Veure cistelles",
+    "Send producer orders": "Envia les comandes als productors",
+    "View cycle": "Veure cicle",
     "Check delivery and allocations": "Revisa l’entrega i els repartiments",
     "Resolve allocations": "Resol els repartiments",
     "Mark distributed": "Marca com a distribuïda",

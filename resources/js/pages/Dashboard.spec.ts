@@ -303,4 +303,50 @@ describe('dashboard presentation', () => {
         expect(html).not.toContain('<form');
         expect(html).not.toContain('<button type="submit"');
     });
+
+    it('lists a send group before reception work, labelled as a cycle link with no send control and no overdue wording (R9, R12, S8)', async () => {
+        const app = createSSRApp(Dashboard, {
+            roles: ['manager'],
+            isManager: true,
+            isMember: false,
+            nextPickup: null,
+            openCycles: 0,
+            balance: null,
+            managerSummary: null,
+            attention: [
+                {
+                    key: 'send_order:cycle:c1',
+                    action: 'send_order',
+                    cycleId: 'c1',
+                    scheduledDate: '2026-11-07',
+                    count: 1,
+                    href: '/manage/cycles/c1',
+                    producerName: 'Forn de la Vila',
+                    allocationDifferenceCount: 0,
+                },
+                {
+                    key: 'check_delivery_and_allocations:cycle:c1',
+                    action: 'check_delivery_and_allocations',
+                    cycleId: 'c1',
+                    scheduledDate: '2026-11-07',
+                    count: 1,
+                    href: '/receptions/c1/p2',
+                    producerName: 'Hort',
+                    allocationDifferenceCount: 0,
+                },
+            ],
+        });
+        installTranslations(app);
+        const html = await renderToString(app);
+        expect(html.match(/data-test="attention-group"/g)).toHaveLength(2);
+        expect(html.indexOf('Envia les comandes als productors')).toBeLessThan(
+            html.indexOf('Revisa l’entrega i els repartiments'),
+        );
+        expect(html).toContain('Forn de la Vila ·');
+
+        expect(html).toContain('Veure cicle');
+        expect(html).not.toContain('<form');
+        expect(html).not.toContain('<button type="submit"');
+        expect(html.toLowerCase()).not.toContain('endarrerida');
+    });
 });

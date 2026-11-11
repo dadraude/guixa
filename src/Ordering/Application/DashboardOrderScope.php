@@ -6,4 +6,5 @@ namespace Guixa\Ordering\Application;
 enum DashboardOrderScope
 {
     case Reception;
+    case ManualSend;
 }

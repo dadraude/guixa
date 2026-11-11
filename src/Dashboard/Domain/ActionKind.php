@@ -4,6 +4,7 @@ namespace Guixa\Dashboard\Domain;
 
 enum ActionKind: string
 {
+    case SendOrder = 'send_order';
     case CheckDeliveryAndAllocations = 'check_delivery_and_allocations';
     case ResolveAllocations = 'resolve_allocations';
     case MarkDistributed = 'mark_distributed';
@@ -11,10 +12,11 @@ enum ActionKind: string
     case ValidateBasket = 'validate_basket';
     case CollectBasket = 'collect_basket';
 
-    /** Stage order among groups with the same date: reception before basket work (R13). */
+    /** Stage order among groups with the same date: sending, reception, basket work, collection (R13). */
     public function rank(): int
     {
         return match ($this) {
+            self::SendOrder => 10,
             self::CheckDeliveryAndAllocations => 20,
             self::ResolveAllocations => 21,
             self::MarkDistributed => 22,

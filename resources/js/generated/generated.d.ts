@@ -456,7 +456,7 @@ readonly removeBlockedReason: string | null,
 declare namespace Guixa {
 namespace Dashboard {
 namespace Domain {
-export type ActionKind = 'check_delivery_and_allocations' | 'resolve_allocations' | 'mark_distributed' | 'prepare_basket' | 'validate_basket' | 'collect_basket';
+export type ActionKind = 'send_order' | 'check_delivery_and_allocations' | 'resolve_allocations' | 'mark_distributed' | 'prepare_basket' | 'validate_basket' | 'collect_basket';
 }
 }
 namespace Membership {

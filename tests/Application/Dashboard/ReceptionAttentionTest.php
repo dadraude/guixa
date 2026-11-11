@@ -2,12 +2,14 @@
 
 use Guixa\Dashboard\Application\ListDashboard;
 use Guixa\Dashboard\Domain\ActionKind;
+use Guixa\Dashboard\Domain\SendWorkRepository;
 use Guixa\Dashboard\Infrastructure\Ordering\OrderingReceptionWork;
 use Guixa\Dashboard\Infrastructure\Sales\SalesBasketWork;
 use Guixa\Ordering\Application\CycleSettlement;
 use Guixa\Ordering\Application\MarkProducerDistributed;
 use Guixa\Ordering\Application\ReadDashboardOrderWork;
 use Guixa\Ordering\Application\ReopenProducerOrder;
+use Guixa\Ordering\Application\SendableTotals;
 use Guixa\Ordering\Application\ValidateReception;
 use Guixa\Ordering\Domain\NotDeliveredMarks;
 use Guixa\Ordering\Domain\ReceptionLoader;
@@ -64,7 +66,13 @@ beforeEach(function () {
         };
         $sales = new SalesBasketWork(new ReadDashboardBasketWork(new ReadPendingCollections($baskets = new InMemoryBasketRepository, $source = new InMemoryWeeklyBasketSource), $pickups, $baskets, $source));
 
-        return (new ListDashboard($sales, new OrderingReceptionWork(new ReadDashboardOrderWork($this->world->cycles, $loader, $names))))($actor);
+        return (new ListDashboard($sales, new OrderingReceptionWork(new ReadDashboardOrderWork($this->world->cycles, $loader, $names, $this->world->clock, new SendableTotals($this->world->orders, $this->world->catalog, $this->world->availability), $this->world->notifier)), new class implements SendWorkRepository
+        {
+            public function pending(): array
+            {
+                return [];
+            }
+        }))($actor);
     };
     $this->groups = fn (Actor $actor) => array_map(fn ($group) => [$group->action, $group->count, $group->producerName, $group->allocationDifferenceCount], ($this->dashboard)($actor)->attention);
     $this->receiver = new Actor('receiver', [Role::Receiver]);

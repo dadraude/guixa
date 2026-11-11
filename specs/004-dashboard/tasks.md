@@ -214,7 +214,7 @@ Later 004 insight slices are outside this verdict.
   the same attention list, with a link to the cycle send screen.
 - **Scope and path.** Add the `manualSend` scope to planned
   `src/Ordering/Application/ReadDashboardOrderWork.php` using `Cycle::producersReadyToSend` and
-  `SendableTotals`/notifyable-account rule already used by `ListCycles`. Ordering adapter projects `(cycle
+  `SendableTotals` already used by `ListCycles`, plus the `canNotify` account rule `SendProducerOrder` enforces (Deviation `history/2026-11-11T21-32-32.759Z-DRA-260-645d434b-c504-4031-97fc-cd4ca2cb9823.md`). Ordering adapter projects `(cycle
   UUID,producer UUID)` and scheduled date; reconcile the shared class/adapter with T02 if it integrates first.
   `ListDashboard` inserts send groups into its existing attention list with stable stage order and route to
   `/manage/cycles…`. Add planned source/Dashboard Application tests, existing
