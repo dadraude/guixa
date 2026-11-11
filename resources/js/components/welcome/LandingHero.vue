@@ -127,7 +127,7 @@ import { Button } from '@/components/ui/button';
     width: 100%;
     aspect-ratio: 1;
     background: var(--welcome-hero-cream);
-    mask-image: url('../../../images/welcome/vegetable-basket.png');
+    mask-image: url('../../../images/welcome/cooperative-basket.png');
     mask-position: center;
     mask-repeat: no-repeat;
     mask-size: 125%;
