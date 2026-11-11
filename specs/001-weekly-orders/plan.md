@@ -1123,6 +1123,193 @@ Welcome coverage gates. Backlog on those new tickets does not mean the rollout m
 This annotation updates delivery evidence only; current spec 001 and T52–T63 retain ownership
 of superseding product behavior.
 
+## Llenguatge visual de la portada a tota l'aplicació — proposta de pla
+
+**Estat: pla acceptat (2026-11-11); desglossament T84 acceptat (2026-11-11). Ruta: plan-only, 001.** La portada integrada a
+PR #385 és la referència visual real. Aquesta esmena defineix com traslladar-ne el llenguatge a l'aplicació
+sencera; no canvia encara codi, tiquets ni el comportament. L’usuari n’ha aprovat la direcció i ha demanat
+el desglossament començant pel pilot d’Estoc de gestió. Substitueix la direcció cromàtica i el tractament
+de marca de «Reference style refresh» (verd de Common Ground) per a la futura implementació; el codi
+integrat continua sent la base fins que s’executi cada lliurament autoritzat. Es conserven els contractes funcionals i
+de revisió: rutes, rols, permisos, props d'Inertia, validacions, traduccions, estats, navegació accessible i
+les obligacions de les especificacions 003 i 004. El desplegament T47–T51 ja integrat és el punt de partida
+tècnic; no es repeteix com si fos feina pendent. La proposta 002 de dashboard està retirada i no és una
+dependència.
+
+### Referència i regles de trasllat
+
+La font visual és `resources/js/components/WelcomePage.vue` i les seves peces, amb el tractament real de PR
+#385; no els esbossos anteriors. En mode clar: paper `#faf1dc`, tinta `#2c2c2b`, blau principal `#286585`
+(hover `#1d526f`), blau suau `#e7f0f3`, ocre `#a05a10`, contorn `#d8d7d1` i focus `#a85f12`. En mode fosc:
+fons `#1c201f`, tinta `#f2f0e9`, blau principal `#8fc5df` (hover `#b2d9e8`), blau suau `#27363d`, ocre
+`#e5a650`, contorn `#4f5a5d` i focus `#f1bd6e`. En aparença fosca, el bloc principal de portada combina blau
+fosc `#23485c` i crema `#faf1dc`. Aquests valors fixen la direcció; cada parella de superfície, text, acció,
+estat i focus s'ha de verificar en el seu context. El càlcul sobre colors font dóna 5,68:1 per crema `#faf1dc`
+sobre blau `#286585`, 12,43:1 per tinta sobre crema i 8,79:1 per tinta `#1c201f` sobre blau `#8fc5df`. No és
+evidència de contrast en execució. Els contorns de portada només donen 1,28:1 en clar i 2,31:1 en fosc contra
+els fons respectius: són decoratius; els camps i altres límits essencials requereixen un token propi d'almenys
+3:1.
+
+Tipografia: `Nunito Variable` per al cos i els títols, `JetBrains Mono` només per a codi o identificadors
+tècnics. La portada usa un títol expressiu (`clamp(2.5rem, 6.5vw, 4.25rem)`, pes 900); les pantalles
+operatives conserven una jerarquia compacta, amb títols, subtítols, xifres i etiquetes fàcils d'escanejar.
+Conservar l'alineació i el format tabular de quantitats, imports i dates. Les CTA de portada tenen radi
+`.4rem`; les superfícies de l'aplicació poden mantenir `.625rem` si la jerarquia i la consistència ho
+justifiquen. No cal copiar la geometria del hero a formularis, taules o diàlegs.
+
+La textura de PR #385 només apareix com a desgast discret a les franges superior i inferior de 48 px en mòbil.
+Mai se situa darrere de text, controls, dades o accions. El tractament `pigment-wash` del cistell SVG és propi
+de la il·lustració: no s'aplica com a filtre global ni es repeteix en icones o superfícies de treball. Els
+elements comuns han de transmetre la mateixa calidesa amb color, tipografia, espai i contorns, sense
+perjudicar la densitat d'informació.
+
+### Inventari i base compartida
+
+Abans d'editar cap pantalla, inventariar les rutes realment servides i les seves variants per rol, els estats
+visibles i els components compartits; contrastar-ho amb els manifests històrics, que no acredita per si sol la
+cobertura actual. Incloure autenticació, dashboard, comandes, catàleg, productors, estoc, finances, recepció,
+recollida, configuració, compte, Welcome i estats buits, errors i overlays. Documentar per a cada família la
+pàgina, el contenidor, els patrons reutilitzables i la mostra de dades de revisió. Els canvis en rutes noves o
+moviments de components exigeixen actualitzar aquest inventari abans de retirar cap límit de desplegament.
+
+La paleta d'execució viu a `public/theme-colors.css`, carregat després de `@vite` per
+`resources/views/app.blade.php`; el verd `#246b57` és encara el valor principal actual. Definir-hi tokens
+semàntics de superfície, tinta, acció i text sobre acció, hover, focus, camp, contorn, estats i gràfics per
+als dos modes. El blau fosc/clar necessita parelles `primary`/`primary-foreground` diferents segons el mode;
+comprovar-les en botons, enllaços i navegació. Reconciliar `resources/css/app.css` amb aquests tokens,
+mantenint-hi la geometria i els patrons `.pilot-*` compartits. Evitar valors dispersos per pàgina i preservar
+colors semàntics de perill, èxit i avís quan el seu significat requereix distingir-los de la marca.
+
+`resources/js/layouts/AppLayout.vue` i `resources/js/lib/pilotTheme.ts` delimiten avui l'opt-in del tema.
+Revisar aquesta llista contra l'inventari de rutes abans d'ampliar-la o eliminar-la. `usePilotTheme` dóna
+context als portals: revisar conjuntament `ui/dialog`, `ui/sheet`, `ui/dropdown-menu`, `ui/tooltip`,
+`ui/sonner` i `ui/select/SelectContent.vue`, que actualment no consumeix aquest context. El criteri és que un
+overlay hereti el tema, el focus i els colors de la pàgina que l'obre, també quan es renderitza fora del seu
+arbre DOM. Reutilitzar `AppSidebarLayout.vue`, `AppSidebarHeader.vue`, `AppSidebar.vue`, `Breadcrumbs.vue`,
+`NavMain.vue` i els patrons de `components/ui/`; conservar breadcrumb a la capçalera, H1 en el contingut, skip
+link, control d'aparença i navegació mòbil.
+
+### Mapa de superfícies i components
+
+Inventari de famílies observades a `resources/js/pages/` sobre el commit `cfda8e70`; els noms següents són
+camins de pàgina, no noves rutes. Cada lliurament concretarà les variants de rol/estat contra les rutes
+vigents.
+
+| Família | Pàgines existents i abast |
+| --- | --- |
+| Públic i accés | `Welcome.vue`, `auth/{Login,AcceptInvitation,ConfirmPassword,ForgotPassword,ResetPassword,TwoFactorChallenge,VerifyEmail}.vue`; conservar destinació segons sessió |
+| Membre | `Orders/{Index,Edit}.vue`, `Member/Baskets/{Index,Show}.vue`, `Wallet/Statement.vue`, `Stock/Index.vue` |
+| Productor | `Producer/Products/{Index,Create,Edit}.vue`, `Producer/{Cutoff,CycleSummary}.vue`, `Producer/Stock/Movements.vue` |
+| Catàleg | `Catalogue/Producers/{Index,Products,Availability}.vue`, `Catalogue/Producers/WeeklyProduct/{Create,Edit}.vue`, `Catalogue/Stock/Movements.vue`; comprovar també pantalles compartides servides pels controladors de catàleg |
+| Administració | `Manage/Accounts/Index.vue`, `Manage/Roles/Index.vue`, `Manage/Households/{Index,Show}.vue`, `Manage/Producers/Index.vue`, `Manage/Cycles/{Index,Show}.vue`, `Manage/Settings.vue` |
+| Estoc i envasos | `Manage/Stock/{Index,Create,Edit,Movements}.vue`, `Manage/ReturnItems/{Index,Create,Edit}.vue`; conservar diàlegs interns |
+| Finances i recepció | `Finance/Baskets/{Index,Create,Show}.vue`, `Finance/Stock/{Index,Movements}.vue`, `Receptions/{Index,Show}.vue`; provar finances, recepció i administració segons permisos actuals |
+| Compartit | `Dashboard.vue`, `settings/{Profile,Appearance,Security}.vue`; dashboard segons la versió integrada de 004, sense avançar funcionalitat pendent |
+
+| Patró | Reutilització i canvi proposat |
+| --- | --- |
+| Navegació i marca | `components/{AppSidebar,AppSidebarHeader,NavMain,Breadcrumbs}.vue`: blau sòlid/crema, selecció amb indicador i text; adaptar el tractament tipogràfic del nom existent, conservar la icona compacta en col·lapsar. Sense textura sota enllaços |
+| Taules i llistes | `resources/css/app.css`: `.pilot-data-table`, `.pilot-list`, `.pilot-amount` i container queries existents; superfícies planes, separadors llegibles, xifres tabulars, mateixa informació en reflow mòbil |
+| Formularis | `components/FormSelect.vue`, `components/ui/input/Input.vue`, `components/InputError.vue`: camps amb superfície neta, contorn propi, etiqueta persistent i error associat; no substituir la validació existent |
+| Botons | `components/ui/button/index.ts` i `.manager-button` a CSS: principal blau, secundari neutre/blau suau, perill vermell. Preservar busy/disabled, nom accessible i jerarquia |
+| Diàlegs | `components/manager/NativeDialog.vue`, `components/ui/dialog/DialogContent.vue` i `pages/Manage/Stock/StockEditDialog.vue`: mateixa superfície i focus; conservar Escape, atrapament i retorn del focus |
+| Missatges i estats | `components/{StatusIndicator,AlertError,InputError}.vue`, `components/ui/sonner/Sonner.vue`: semàntica independent del blau i l'ocre; text/icona a més del color |
+| Decoració | `components/welcome/LandingHero.vue`, `resources/images/welcome/cooperative-basket.svg`: aquarel·la només en il·lustracions de capçalera o estats buits apropiats, petita i prescindible; vores orgàniques als extrems decoratius, geometria regular als controls |
+
+Els camins abreujats de components i pàgines parteixen de `resources/js/`. No afegir el cistell a cada
+pantalla: una taula, un error o una confirmació destructiva no necessiten il·lustració. No convertir l'ocre en
+avís ni els colors de les verdures en estats de negoci.
+
+L’aprovació literal consta a [l’entrada d’acceptació](history/2026-11-11T16-58-01.938Z-no-task-af456e57-d88a-4d3a-b411-52e529785370.md).
+El [desglossament del pilot](tasks/landing-style-pilot.md) ha estat acceptat per separat; ni aquest pla
+ni la preparació de tasques autoritzen implementar o publicar tiquets.
+
+### Seqüència d'implementació futura
+
+Aquestes són fases proposades, sense IDs de tasca ni estimació de dies. Cada família posterior es divideix en
+lliuraments petits quan s'accepti el seu detall; no és una única PR de tota l'app.
+
+1. **Pilot d'estoc i base compartida.** `Manage/Stock/Index.vue` + `StockEditDialog.vue`, shell i els seus overlays. Resultat demostrable: cercar un producte, obrir l'edició, llegir/modificar quantitat i tancar retornant el focus, amb la nova identitat. La taula d'escriptori, llista mòbil i formulari real redueixen més incertesa visual que començar per la landing o una pàgina simple. Sortida: mesures, regressió de les accions i aprovació visual del pilot.
+2. **Comandes del membre.** `Orders/{Index,Edit}.vue`, `components/orders/{CycleCard,OrderPageHeader,OrderProductRow}.vue`. Depèn dels tokens i shell validats al pilot. Sortida: escollir cicle, editar quantitats i llegir totals amb la mateixa petició explícita de desament i la mateixa previsualització del servidor; incloure obert/tancat/cancel·lat, línia marcada i enllaç a cistella quan pertoqui.
+3. **Catàleg i productor.** Primer `Catalogue/Producers/Products.vue` i formularis `WeeklyProduct/{Create,Edit}.vue`; després la família `Producer/` en lliuraments separats. Depèn de la jerarquia de camps/accions del pilot, no de canvis funcionals en comandes. Sortida per lliurament: mateix contingut i accions autoritzades, amb noms llargs, errors i controls desactivats llegibles.
+4. **Finances, recepció i administració.** Lliuraments separats per cistelles/cartera, recepcions, cicles/llars i comptes/rols/configuració; incloure estoc/envasos i vistes de membre pendents. Depenen dels patrons aprovats que consumeixen. Sortida per família: revisar imports, totals, estats i accions sensibles sense canviar càlculs, permisos ni destinacions. La família de rols conserva les decisions de 003.
+5. **Accés, preferències i tancament transversal.** Aplicar el sistema a `AuthLayout.vue`/`auth/AuthSimpleLayout.vue`, `settings/Layout.vue` i les seves pàgines; reconciliar `Dashboard.vue` amb 004. Aquestes famílies poden avançar després del pilot si no comparteixen fitxers en edició; només el tancament depèn de totes les anteriors. Verificar també Welcome i les transicions públic→accés→app. Sortida final: inventari complet sense rutes/portals amb tema antic, preferència clar/fosc/sistema preservada i revisió de totes les famílies.
+
+**Contenció del pilot:** no canviar directament els mappings globals de `:root` de `public/theme-colors.css` a
+la fase 1: restilarien totes les pantalles. Definir una sola família de valors de marca i aplicar-ne el
+mapping semàntic només al pilot mitjançant una variant explícita del context de tema existent; `.pilot-theme`
+ja cobreix moltes pàgines i no identifica per si sola aquest nou pilot. Estendre `AppLayout.vue`,
+`lib/pilotTheme.ts` i `usePilotTheme.ts` per transmetre aquesta variant també als portals; mantenir el
+comportament del flag actual durant la migració. És una extensió del sistema existent, sense duplicar paletes
+per pantalla. El mapping global només es promou quan tots els consumidors s'han revisat; després es retira la
+frontera temporal amb proves de navegació. La landing consumirà els mateixos valors de marca conservant els
+seus rols hero/paper i la seva composició. Durant el pilot ha de mantenir el resultat integrat de #385.
+
+Cada fase futura comença amb una fitxa de rutes/estats/components i acaba amb una revisió de patrons i
+evidència reproduïble. No crear una nova pantalla ni un nou component si un patró existent cobreix la
+necessitat. No modificar dades de negoci, regles d'autorització, contractes de rutes, props, validacions ni
+còpia traduïda fora de correccions estrictament visuals.
+
+### Criteris d'acceptació i evidència
+
+Per cada ruta afectada i cada rol que en canvia el contingut, comprovar 375 i 1280 px en clar i fosc; per cada
+patró de composició diferent, 1024 px amb text al 200% en tots dos modes. Incloure estats plens, buits,
+llargs, invàlids i desactivats, així com menú, selector, diàleg, full i toast oberts quan correspongui.
+Mesurar primer `getComputedStyle` i `getBoundingClientRect` o `measureLayout`/`measureFocus`, llegir
+estructura i text, i executar el visual runner en mode de mesures. Una previsualització petita es reserva per
+una direcció nova, una fallada inexplicada o una petició explícita. Verificar contrast mínim 4,5:1 en text
+normal i 3:1 en contorns significatius i focus, text gran d’almenys 3:1, objectius tàctils de 44 × 44 px,
+ordre de tabulació, focus visible, Escape i retorn del focus en overlays, absència de retall i desbordament,
+preferència de sistema, moviment reduït i font de reserva. Registrar els valors mesurats i les excepcions
+corregides abans de donar una família per acabada.
+
+La validació funcional futura usa les proves de Vue/PHP existents per confirmar que els fluxos, rols i
+permisos continuen iguals; afegir només comprovacions necessàries per riscos nous del tema o dels portals.
+Aquesta esmena documental es valida ara per enllaços, identificadors, coherència amb el pla i registre
+d'història; no exigeix proves d'aplicació. `database/seeders/DemoSeeder.php` no necessita cap canvi per una
+proposta de pla; ja conté actors de tots els rols. En una implementació futura, revisar-lo i ampliar
+`tests/Feature/Database/DemoSeederTest.php` només si calen dades o estats visibles nous per mostrar el
+resultat.
+
+**Preparació:** el comportament és fora d'abast i les obligacions 003/004 continuen vigents; la direcció
+visual i les fases d’aquest pla estan acceptades; el desglossament es presenta per separat. Els camins de referència i els patrons pilots
+s'han comprovat en el codi actual; l'inventari complet de rutes, la validació en execució i l'aprovació visual
+de cada fase corresponen a la implementació posterior. No hi ha cap dependència externa pendent per decidir
+sobre aquest pla.
+
+### Riscos i proves de regressió
+
+- **Propagació global accidental:** els tokens públics, `.reference-style`, estils natius i portals tenen abasts diferents. Mesurar una ruta pilot i una encara no migrada després d’una navegació Inertia, amb menú mòbil obert; conservar una sortida reversible per variant fins al tancament.
+- **Pèrdua de densitat o clipping:** no copiar els espais ni el títol gegant del hero. Conservar les container queries, seccions i imports; comprovar text al 200% també a 375 px en el formulari/diàleg més arriscat i a 1024 px en cada patró. Cap scroll horitzontal de pàgina, dades ocultes o control fora d’abast.
+- **Colors funcionals amb contrast insuficient:** comprovar hover, focus, invalid i disabled de cada parella; vores decoratives i filtres SVG no constitueixen una prova de contrast. Els camps mantenen contorn essencial ≥3:1 i errors recognoscibles sense color.
+- **Canvis de negoci accidentals:** retenir proves de `pages/Manage/Stock/Index.spec.ts`, `pages/Manage/Stock/Edit.spec.ts`, `components/manager/NativeDialog.spec.ts`, `pages/Orders/{Index,Edit}.spec.ts`, `composables/useAppNavigation.spec.ts`, `composables/usePilotTheme.spec.ts` i `lib/pilotTheme.spec.ts`; seleccionar les de cada família i les proves HTTP d’autorització afectades, sense donar per cobertes rutes noves pels tests de Welcome.
+- **Marca i rendiment:** Nunito local i fallback, espai reservat a la il·lustració; no repetir filtres d’aquarel·la en files. Confirmar menús amb fletxes/Enter i formularis amb teclat, no només el seu estat tancat. Les fixtures amb transport simulat no acrediten persistència ni permisos.
+
+A cada lliurament: manifest de casos lligat al commit/base, dades deterministes, mesures de
+font/color/mida/overflow i interaccions; comprovacions locals enfocades, tipus i format segons el diff, i CI
+del projecte. L’aprovació estètica del nou pilot és un punt explícit abans d’estendre la direcció; les mesures
+no la substitueixen. En aquesta sessió no s’han executat navegació, proves d’aplicació ni auditoria
+d’accessibilitat: s’ha preparat el pla i verificat fonts i contrast de parelles planes.
+
+### Fonts i límits de la descoberta
+
+Base inspeccionada: `origin/main` al commit `cfda8e70c4a5a0c56c5f8f52ca07c91905b0351f`, amb [PR #385
+fusionada](https://github.com/dadraude/guixa/pull/385) el 2026-11-11. Historial combinat de 001, 003 i 004
+llegit amb `history.mjs read`; les decisions acceptades de «Reference style refresh» i les posteriors
+refinacions de la landing es conserven com a historial; aquesta aprovació substitueix només la direcció visual descrita.
+
+Descoberta Verify: projecte de graf `guixa`, generació `2026-11-01T14:55:31Z`, índex fast anterior a la base
+actual. Les cerques, traça de `useAppNavigation` en les dues direccions i controls `check_index_coverage`
+mostren fonts canviades, pàgines noves no registrades, CSS parcial i exclusions de `public/`, fixtures i
+proves. Per això s’han contrastat els fitxers actuals directament, incloent paleta, layouts, navegació,
+directoris de pàgines, portals, demo i rangs CSS afectats. No s’infereix absència de consumidors de la traça
+ni cobertura funcional completa del graf.
+
+S’ha aplicat `ui-ux-pro-max` amb cerca de sistema visual i una reformulació per a gestió densa, més consulta
+Vue. Les paletes/fonts genèriques retornades no són adequades com a referència de marca i no s’han adoptat;
+només se’n retenen criteris de densitat i accessibilitat compatibles amb el projecte. S’ha consultat
+`vue-best-practices` per mantenir les fronteres dels components existents.
+
 ## Translations
 
 Constitution, UI (*Translatable*). `ca` is the default and fallback locale and the only one shipped.
