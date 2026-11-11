@@ -3,6 +3,7 @@
 use Guixa\Dashboard\Application\ListDashboard;
 use Guixa\Dashboard\Domain\ActionKind;
 use Guixa\Dashboard\Domain\ReceptionWorkRepository;
+use Guixa\Dashboard\Domain\SendWorkRepository;
 use Guixa\Dashboard\Infrastructure\Sales\SalesBasketWork;
 use Guixa\Sales\Application\ReadDashboardBasketWork;
 use Guixa\Sales\Application\ReadPendingCollections;
@@ -33,6 +34,13 @@ function dashboardWith(InMemoryBasketRepository $repository, InMemoryWeeklyBaske
     return new ListDashboard(
         new SalesBasketWork(new ReadDashboardBasketWork(new ReadPendingCollections($repository, $source), $pickups, $repository, $source)),
         new class implements ReceptionWorkRepository
+        {
+            public function pending(): array
+            {
+                return [];
+            }
+        },
+        new class implements SendWorkRepository
         {
             public function pending(): array
             {

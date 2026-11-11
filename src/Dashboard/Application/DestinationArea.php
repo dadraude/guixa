@@ -6,4 +6,5 @@ enum DestinationArea
 {
     case Baskets;
     case Receptions;
+    case Cycles;
 }

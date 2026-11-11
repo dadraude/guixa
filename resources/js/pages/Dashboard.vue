@@ -75,6 +75,7 @@ const formattedDate = (iso: string) =>
 type QuickLink = { title: string; href: NavItem['href']; icon: LucideIcon };
 
 const actionLabels: Record<Guixa.Dashboard.Domain.ActionKind, string> = {
+    send_order: trans('Send producer orders'),
     check_delivery_and_allocations: trans('Check delivery and allocations'),
     resolve_allocations: trans('Resolve allocations'),
     mark_distributed: trans('Mark distributed'),
@@ -84,6 +85,7 @@ const actionLabels: Record<Guixa.Dashboard.Domain.ActionKind, string> = {
 };
 
 const linkLabels: Record<Guixa.Dashboard.Domain.ActionKind, string> = {
+    send_order: trans('View cycles'),
     check_delivery_and_allocations: trans('View receptions'),
     resolve_allocations: trans('View receptions'),
     mark_distributed: trans('View receptions'),

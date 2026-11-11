@@ -60,6 +60,25 @@ it('seeds one reception in each state the dashboard lists and reads them without
     expect($receiverActions)->toContain('check_delivery_and_allocations')->not->toContain('mark_distributed');
 });
 
+it('seeds one closed, ordered, unsent producer with an account as the manager\'s only manual send, and shows it to no other role (R9, S8)', function () {
+    $this->seed(DemoSeeder::class);
+    $this->withoutVite();
+    $cycle = DB::table('cycles')->orderByDesc('pickup_date')->value('id');
+    $manager = User::query()->where('email', 'gestora@demo.guixa.test')->firstOrFail();
+
+    $sends = collect($this->actingAs($manager)->get('/dashboard')->viewData('page')['props']['attention'])->where('action', 'send_order');
+
+    expect($sends)->toHaveCount(1)
+        ->and($sends->first()->count)->toBe(1)
+        ->and($sends->first()->href)->toBe('/manage/cycles');
+
+    foreach (['anna@demo.guixa.test', 'biel@demo.guixa.test'] as $email) {
+        app('auth')->forgetGuards();
+        $user = User::query()->where('email', $email)->firstOrFail();
+        expect(collect($this->actingAs($user)->get('/dashboard')->viewData('page')['props']['attention'])->pluck('action'))->not->toContain('send_order');
+    }
+});
+
 it('shows Finance the demo cycle\'s drafts as validation work next to the pending collection', function () {
     $this->seed(DemoSeeder::class);
     $this->withoutVite();

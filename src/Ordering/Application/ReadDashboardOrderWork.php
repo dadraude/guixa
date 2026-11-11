@@ -4,9 +4,11 @@ namespace Guixa\Ordering\Application;
 
 use Guixa\Ordering\Domain\Cycle;
 use Guixa\Ordering\Domain\CycleRepository;
+use Guixa\Ordering\Domain\ProducerNotifier;
 use Guixa\Ordering\Domain\ProducerOrder;
 use Guixa\Ordering\Domain\ReceptionLoader;
 use Guixa\Ordering\Domain\ReceptionProducerNames;
+use Guixa\Shared\Domain\Clock;
 
 /** Internal query for the dashboard, which authorises its own scopes; it takes no actor. It only reads: an unopened reception is calculated, never persisted. */
 final class ReadDashboardOrderWork
@@ -15,14 +17,50 @@ final class ReadDashboardOrderWork
         private readonly CycleRepository $cycles,
         private readonly ReceptionLoader $loader,
         private readonly ReceptionProducerNames $producerNames,
+        private readonly Clock $clock,
+        private readonly SendableTotals $sendableTotals,
+        private readonly ProducerNotifier $notifier,
     ) {}
 
-    /** @return list<DashboardReceptionWorkData> the reception scope: every sent producer order whose reception is not distributed yet, closed cycles included */
+    /**
+     * Reception: every sent producer order whose reception is not distributed yet, closed cycles included.
+     * ManualSend: the orders 001 R12a lets a manager send now, by the rule `ListCycles` uses plus the producer's account.
+     *
+     * @return ($scope is DashboardOrderScope::Reception ? list<DashboardReceptionWorkData> : list<DashboardSendWorkData>)
+     */
     public function __invoke(DashboardOrderScope $scope): array
     {
         return match ($scope) {
             DashboardOrderScope::Reception => $this->reception(),
+            DashboardOrderScope::ManualSend => $this->manualSend(),
         };
+    }
+
+    /** @return list<DashboardSendWorkData> */
+    private function manualSend(): array
+    {
+        $now = $this->clock->now()->setTimezone($this->clock->timezone());
+
+        $sendable = [];
+        foreach ($this->cycles->list() as $cycle) {
+            $producerIds = array_values(array_filter(
+                ($this->sendableTotals)($cycle, $cycle->producersReadyToSend($now)),
+                fn (string $producerId) => $this->notifier->canNotify($producerId),
+            ));
+            if ($producerIds !== []) {
+                $sendable[] = [$cycle, $producerIds];
+            }
+        }
+
+        $names = $this->producerNames->of($this->producerIds($sendable));
+        $work = [];
+        foreach ($sendable as [$cycle, $producerIds]) {
+            foreach ($producerIds as $producerId) {
+                $work[] = new DashboardSendWorkData($cycle->id, $producerId, $names[$producerId] ?? $producerId, $cycle->pickupDate()->format('Y-m-d'));
+            }
+        }
+
+        return $work;
     }
 
     /** @return list<DashboardReceptionWorkData> */

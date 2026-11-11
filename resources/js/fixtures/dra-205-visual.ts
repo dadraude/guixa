@@ -555,6 +555,36 @@ if (pageName === 'Dashboard') {
             ...undatedCollection,
         ];
     }
+    if (state === 'manual-send') {
+        // The server's order for one pickup date: sending, then reception, then the baskets already listed. Only a manager is offered the send.
+        visualProps.attention = [
+            ...(role === 'manager'
+                ? [
+                      {
+                          key: 'send_order:cycle:visual-cycle',
+                          action: 'send_order',
+                          cycleId: 'visual-cycle',
+                          scheduledDate: pickupDate,
+                          count: 1,
+                          href: '/manage/cycles',
+                          producerName: 'Forn del Barri',
+                          allocationDifferenceCount: 0,
+                      },
+                  ]
+                : []),
+            {
+                key: 'check_delivery_and_allocations:cycle:visual-cycle',
+                action: 'check_delivery_and_allocations',
+                cycleId: 'visual-cycle',
+                scheduledDate: pickupDate,
+                count: 1,
+                href: '/receptions/visual-cycle/visual-producer',
+                producerName: 'Hort de la Vall',
+                allocationDifferenceCount: 0,
+            },
+            ...visualProps.attention,
+        ];
+    }
     if (state === 'reception' || state === 'reception-long-name') {
         const longName = state === 'reception-long-name';
         visualProps.attention = [
@@ -1077,6 +1107,7 @@ void createInertiaApp({
                     !!emptyMessage && mainText().includes(trans(emptyMessage))
                 );
             case 'baskets':
+            case 'manual-send':
                 return visible('[data-test="attention-group"]');
             case 'reception':
             case 'reception-long-name':
