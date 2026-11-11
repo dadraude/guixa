@@ -44,8 +44,6 @@ import { Button } from '@/components/ui/button';
 
 .welcome-hero-copy {
     min-width: 0;
-    background: var(--welcome-hero-surface);
-    box-shadow: 0 0 0.75rem 0.5rem var(--welcome-hero-surface);
 }
 
 .welcome-eyebrow {

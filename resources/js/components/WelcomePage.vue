@@ -38,12 +38,12 @@ defineProps<{ actionHref: string }>();
 
 <style scoped>
 .welcome-page {
-    --welcome-paper: #faf9f6;
+    --welcome-paper: #faf1dc;
     --welcome-ink: #2c2c2b;
     --welcome-blue: #286585;
     --welcome-blue-hover: #1d526f;
     --welcome-blue-soft: #e7f0f3;
-    --welcome-ochre: #a85f12;
+    --welcome-ochre: #a05a10;
     --welcome-border: #d8d7d1;
     --welcome-focus: #a85f12;
     color: var(--welcome-ink);
@@ -80,9 +80,9 @@ defineProps<{ actionHref: string }>();
 .welcome-hero-band::before {
     position: absolute;
     inset: 0;
-    background: var(--welcome-hero-cream);
-    opacity: 0.8;
-    mask-image: url('../../images/welcome/hero-wear-mask.png');
+    background: var(--welcome-paper);
+    opacity: 1;
+    mask-image: url('../../images/welcome/hero-wear-subtle-mask.png');
     mask-mode: luminance;
     mask-position: center;
     mask-repeat: no-repeat;
@@ -157,6 +157,13 @@ defineProps<{ actionHref: string }>();
 @media (max-width: 25rem) {
     .welcome-shell {
         width: min(100% - 2rem, 72rem);
+    }
+}
+
+@media (max-width: 47.999rem) {
+    .welcome-hero-band::before {
+        mask-position: left center;
+        mask-size: 200% 100%;
     }
 }
 </style>
