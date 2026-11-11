@@ -114,9 +114,9 @@ import { Button } from '@/components/ui/button';
 }
 
 .welcome-hero-art {
-    display: none;
-    justify-self: end;
-    width: min(100%, 22rem);
+    display: block;
+    justify-self: center;
+    width: min(100%, 18rem);
     color: var(--welcome-hero-cream);
 }
 
@@ -125,7 +125,7 @@ import { Button } from '@/components/ui/button';
     width: 100%;
     aspect-ratio: 1;
     background: var(--welcome-hero-cream);
-    mask-image: url('../../../images/welcome/cooperative-basket.png');
+    mask-image: url('../../../images/welcome/cooperative-basket.svg');
     mask-position: center;
     mask-repeat: no-repeat;
     mask-size: 125%;
@@ -144,6 +144,8 @@ import { Button } from '@/components/ui/button';
 
     .welcome-hero-art {
         display: block;
+        justify-self: end;
+        width: min(100%, 22rem);
         padding: 1rem;
     }
 }
