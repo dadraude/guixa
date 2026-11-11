@@ -80,44 +80,20 @@ defineProps<{ actionHref: string }>();
 .welcome-hero-band::before {
     position: absolute;
     inset: 0;
-    background-image: url('../../images/welcome/hero-scratches.svg');
-    background-repeat: repeat;
-    background-size: 30rem 20rem;
-    opacity: 0.08;
-    pointer-events: none;
-    content: '';
-}
-
-.welcome-hero-band::after {
-    --welcome-wear-edge: clamp(8px, 2vw, 24px);
-    position: absolute;
-    inset: 0;
-    background-image: url('../../images/welcome/hero-scratches.svg');
-    background-repeat: repeat;
-    background-size: 30rem 20rem;
-    opacity: 0.5;
-    mask-image:
-        linear-gradient(
-            to right,
-            #000 0 var(--welcome-wear-edge),
-            transparent var(--welcome-wear-edge)
-                calc(100% - var(--welcome-wear-edge)),
-            #000 calc(100% - var(--welcome-wear-edge))
-        ),
-        linear-gradient(
-            to bottom,
-            #000 0 var(--welcome-wear-edge),
-            transparent var(--welcome-wear-edge)
-                calc(100% - var(--welcome-wear-edge)),
-            #000 calc(100% - var(--welcome-wear-edge))
-        );
-    mask-composite: add;
+    background: var(--welcome-hero-cream);
+    opacity: 0.8;
+    mask-image: url('../../images/welcome/hero-wear-mask.png');
+    mask-mode: luminance;
+    mask-position: center;
+    mask-repeat: no-repeat;
+    mask-size: 100% 100%;
     pointer-events: none;
     content: '';
 }
 
 .welcome-hero-band > .welcome-shell {
     position: relative;
+    z-index: 1;
 }
 
 :global(.dark) .welcome-hero-band {

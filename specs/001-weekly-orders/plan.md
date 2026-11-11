@@ -914,9 +914,10 @@ above only; the cooperative values, steps and pale-blue contact remain light and
 spacious. Preserve dark appearance contrast and text-zoom reflow. In the subsequent
 modern/rustic refinement, replace the provisional hand-coded basket with a
 clean, proportionate illustration based on the second approved mockup. Add
-restrained scratched/screenprint texture only to the blue hero, with stronger
-edge wear and very low intensity behind text; retain clean lower sections and
-readable text/control contrast.
+screenprinted ink wear matching the explicitly selected original rustic mockup
+only to the blue hero: irregular cream paper chips and weathered edges. Keep
+solid blue behind copy/actions to preserve contrast under the stronger texture;
+retain the new basket and clean lower sections.
 
 T40 extends the same reactive opt-in to Dashboard, Wallet/Statement and the five existing producer
 pages. Their current page components retain their props, actions and form contracts. Shared page,
