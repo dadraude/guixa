@@ -9,6 +9,10 @@ are reconciled below and T64–T68 are accepted additions; existing issue identi
 T64–T68 map to DRA-224–DRA-228. The [review and publication delta](tasks/reslicing-review.md) separates the current tracker snapshot
 from the accepted graph. Product requirements and plan decisions are unchanged. Implementation status belongs to Linear, not this table.
 
+**2026-11-11 — Identitat de la landing:** pla acceptat per l’usuari; **T84 proposada, pendent d’acceptació**.
+Només es detalla el pilot d’Estoc de gestió. La resta del desplegament conserva el full de ruta del pla
+fins a la revisió del pilot. No hi ha autorització d’implementació ni de publicació de tiquets.
+
 Source: [spec](spec.md) and areas · [plan](plan.md) · [coverage allocation](tasks/coverage.md).
 
 ## File map
@@ -24,6 +28,7 @@ Source: [spec](spec.md) and areas · [plan](plan.md) · [coverage allocation](ta
 | [tasks/audit-2026-11-05.md](tasks/audit-2026-11-05.md) | T69–T76: follow-up tasks from the 2026-11-05 SDD↔code audit (documents, bugfixes, refactors, tests, send button, movement history) |
 | [tasks/recorder-names.md](tasks/recorder-names.md) | T82: recorder names instead of account ids in the wallet statement and basket histories |
 | [tasks/landing.md](tasks/landing.md) | T83: approved light cooperative public landing |
+| [tasks/landing-style-pilot.md](tasks/landing-style-pilot.md) | T84: pilot d’Estoc de gestió amb la identitat de la landing; proposta, preparació i cobertura parcial |
 | [tasks/baseline.md](tasks/baseline.md) | Historical T01–T51 scopes, approval gates and dated evidence; superseded behavior is explicitly historical |
 
 IDs are feature-global. Detail files do not start separate numbering or redefine dependencies.
@@ -155,6 +160,7 @@ preserves; implement changed behavior through T52–T68; T69–T76 are the 2026-
 | T76 | <a id="t76"></a>[Stock movement history](tasks/audit-2026-11-05.md#t76) | R25b, R28a, R36c; S93 | T69 |
 | T82 | <a id="t82"></a>[Show recorder names instead of account ids](tasks/recorder-names.md#t82) | R23a, R31 (recorder names) | T76 |
 | T83 | <a id="t83"></a>[Implement approved light cooperative landing](tasks/landing.md#t83) | Plan: Public Welcome landing direction | — |
+| T84 | <a id="t84"></a>[Aplicar la identitat de la landing al pilot d’Estoc de gestió](tasks/landing-style-pilot.md#t84) | Pla: llenguatge visual de la portada; regressió parcial 001 R25/R27/R28/R28a, S23/S71/S93; permisos 003 R4 | — (base integrada; proposta no admesa a execució) |
 
 ## Linear mapping — 2026-11-05 audit tasks
 

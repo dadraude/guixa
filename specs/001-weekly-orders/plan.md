@@ -1125,11 +1125,12 @@ of superseding product behavior.
 
 ## Llenguatge visual de la portada a tota l'aplicació — proposta de pla
 
-**Estat: proposta pendent d'acceptació (2026-11-11). Ruta: només esmena del pla 001.** La portada integrada a
+**Estat: pla acceptat (2026-11-11); desglossament pendent d’acceptació. Ruta: plan-only, 001.** La portada integrada a
 PR #385 és la referència visual real. Aquesta esmena defineix com traslladar-ne el llenguatge a l'aplicació
-sencera; no canvia encara codi, tasques, tiquets ni el comportament. Si s'accepta, substituirà la direcció
-cromàtica i el tractament de marca de la secció «Reference style refresh» (verd de la referència Common
-Ground). Fins aleshores, aquella decisió acceptada continua vigent. Es conserven els contractes funcionals i
+sencera; no canvia encara codi, tiquets ni el comportament. L’usuari n’ha aprovat la direcció i ha demanat
+el desglossament començant pel pilot d’Estoc de gestió. Substitueix la direcció cromàtica i el tractament
+de marca de «Reference style refresh» (verd de Common Ground) per a la futura implementació; el codi
+integrat continua sent la base fins que s’executi cada lliurament autoritzat. Es conserven els contractes funcionals i
 de revisió: rutes, rols, permisos, props d'Inertia, validacions, traduccions, estats, navegació accessible i
 les obligacions de les especificacions 003 i 004. El desplegament T47–T51 ja integrat és el punt de partida
 tècnic; no es repeteix com si fos feina pendent. La proposta 002 de dashboard està retirada i no és una
@@ -1219,6 +1220,10 @@ Els camins abreujats de components i pàgines parteixen de `resources/js/`. No a
 pantalla: una taula, un error o una confirmació destructiva no necessiten il·lustració. No convertir l'ocre en
 avís ni els colors de les verdures en estats de negoci.
 
+L’aprovació literal consta a [l’entrada d’acceptació](history/2026-11-11T16-58-01.938Z-no-task-af456e57-d88a-4d3a-b411-52e529785370.md).
+El [desglossament del pilot](tasks/landing-style-pilot.md) és una proposta separada; ni aquest pla
+ni la preparació de tasques autoritzen implementar o publicar tiquets.
+
 ### Seqüència d'implementació futura
 
 Aquestes són fases proposades, sense IDs de tasca ni estimació de dies. Cada família posterior es divideix en
@@ -1267,7 +1272,7 @@ proposta de pla; ja conté actors de tots els rols. En una implementació futura
 resultat.
 
 **Preparació:** el comportament és fora d'abast i les obligacions 003/004 continuen vigents; la direcció
-visual i les fases d'aquest pla són una proposta per acceptar. Els camins de referència i els patrons pilots
+visual i les fases d’aquest pla estan acceptades; el desglossament es presenta per separat. Els camins de referència i els patrons pilots
 s'han comprovat en el codi actual; l'inventari complet de rutes, la validació en execució i l'aprovació visual
 de cada fase corresponen a la implementació posterior. No hi ha cap dependència externa pendent per decidir
 sobre aquest pla.
@@ -1291,7 +1296,7 @@ d’accessibilitat: s’ha preparat el pla i verificat fonts i contrast de parel
 Base inspeccionada: `origin/main` al commit `cfda8e70c4a5a0c56c5f8f52ca07c91905b0351f`, amb [PR #385
 fusionada](https://github.com/dadraude/guixa/pull/385) el 2026-11-11. Historial combinat de 001, 003 i 004
 llegit amb `history.mjs read`; les decisions acceptades de «Reference style refresh» i les posteriors
-refinacions de la landing es preserven fins que aquesta proposta s’accepti.
+refinacions de la landing es conserven com a historial; aquesta aprovació substitueix només la direcció visual descrita.
 
 Descoberta Verify: projecte de graf `guixa`, generació `2026-11-01T14:55:31Z`, índex fast anterior a la base
 actual. Les cerques, traça de `useAppNavigation` en les dues direccions i controls `check_index_coverage`
