@@ -62,7 +62,7 @@ beforeEach(function () {
                 return [];
             }
         };
-        $sales = new SalesBasketWork(new ReadDashboardBasketWork(new ReadPendingCollections(new InMemoryBasketRepository, new InMemoryWeeklyBasketSource), $pickups));
+        $sales = new SalesBasketWork(new ReadDashboardBasketWork(new ReadPendingCollections($baskets = new InMemoryBasketRepository, $source = new InMemoryWeeklyBasketSource), $pickups, $baskets, $source));
 
         return (new ListDashboard($sales, new OrderingReceptionWork(new ReadDashboardOrderWork($this->world->cycles, $loader, $names))))($actor);
     };

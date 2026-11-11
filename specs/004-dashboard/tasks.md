@@ -191,16 +191,18 @@ Later 004 insight slices are outside this verdict.
   attention list and Catalan copy; grouping by action kind keeps preparation and validation distinct. Planned
   source/Dashboard Application tests, existing `tests/Feature/DashboardTest.php`,
   `tests/Feature/Sales/PendingCollectionVisibilityTest.php` and seeder tests cover effective goods/returns,
-  zero/net-zero money, cancelled/empty drafts and automatic closure regression.
+  zero/net-zero money, cancelled/empty drafts and automatic closure regression. Delivered rule (Deviation
+  `history/2026-11-11T21-10-37.278Z-DRA-259-7a081a1b-4086-460a-be3a-94358cd86276.md`): `Basket::canBeValidated()`, the condition `validated()` enforces, makes any draft with
+  an active line `validate_basket`; `prepare_basket` stays in the contract but no state reaches it today.
 - **Requirements.** R7/R10, S7; 001 R19a/R22/R24b. T01's collection remains.
 - **Dependencies.** T01 gives the Sales adapter, grouping contract and collection path to extend.
-- **Done when.** Given a settled cycle with one effective draft ready for validation, one draft needing
-  preparation, an empty retained draft and a validated basket still to collect, when Finance opens the
-  dashboard, then it sees the first two with different action names, excludes the empty draft, and retains the
-  collection group (S7). Zero price/net-zero goods or returns still counts when effective content exists.
+- **Done when.** Given a settled cycle with one effective draft ready for validation, an empty retained draft and
+  a validated basket still to collect, when Finance opens the dashboard, then it sees the draft as validation
+  work, excludes the empty draft, and retains the collection group (S7). The "draft needing preparation"
+  case cannot be built under 001 R19a/R22 (Deviation `history/2026-11-11T21-10-37.278Z-DRA-259-7a081a1b-4086-460a-be3a-94358cd86276.md`). Zero price/net-zero goods or returns still counts when effective content exists.
   Given final weekly basket validation/no-collection-due, the existing 001 closure path operates without any
   dashboard close command. Receiver/Catalogue/member get no staff draft work.
-- **First checkpoint.** Failing Application test for a zero-price effective draft that can validate; make the
+- **First checkpoint.** Failing Application test for a zero-price effective draft that can validate (done); make the
   Sales read and Dashboard group pass without inspecting `totalCents` for eligibility.
 - **Size/rollout.** Roughly 230–380 authored lines (medium confidence); no new persistence or command. No
   global caught-up claim.

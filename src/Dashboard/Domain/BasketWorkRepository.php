@@ -12,4 +12,7 @@ interface BasketWorkRepository
 
     /** @return list<BasketWork> every household's, inactive ones included */
     public function staffCollection(): array;
+
+    /** @return list<BasketWork> every household's draft staff can prepare or validate */
+    public function staffDrafts(): array;
 }

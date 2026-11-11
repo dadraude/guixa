@@ -73,8 +73,9 @@ governed by its current role mapping, including 003 R15.
   and no validate/distribute claim. A received-total edit that clears validation reclassifies on next read.
   Compare allocation totals with received totals using the existing R18 gate, not variance against basket
   actuals (R5–R6/S5–S6).
-- Draft basket with effective goods/returns and `canValidate` → `validate_basket`; otherwise an actionable
-  draft → `prepare_basket`. Exclude validated, cancelled, effectively empty/no-collection cases according to
+- Draft basket with at least one active line (`Basket::canBeValidated()`, the condition `validated()`
+  enforces) → `validate_basket`. `prepare_basket` stays in the contract but is unreachable under 001
+  R19a/R22 (Deviation `history/2026-11-11T21-10-37.278Z-DRA-259-7a081a1b-4086-460a-be3a-94358cd86276.md`). Exclude validated, cancelled, effectively empty/no-collection cases according to
   existing Sales rules. Monetary zero is not an exclusion. Validated, effective, uncollected basket →
   `collect_basket` for member or Finance/Manager. Include late, closed-cycle, inactive-household staff
   and cycleless (including independent stock) baskets. Wallet balance never gates collection

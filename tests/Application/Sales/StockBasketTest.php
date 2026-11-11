@@ -107,6 +107,11 @@ beforeEach(function () {
             return [];
         }
 
+        public function drafts(): array
+        {
+            return array_values(array_filter($this->list(), fn (Basket $basket) => $basket->state->isDraft()));
+        }
+
         public function pendingCollections(?string $householdId = null): array
         {
             $pending = array_filter($this->list(), fn (Basket $basket) => $basket->isPendingCollection()

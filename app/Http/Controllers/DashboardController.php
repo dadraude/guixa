@@ -101,6 +101,10 @@ class DashboardController extends Controller
                 return route('finance.baskets.show', $basketId, false);
             }
 
+            if (! $group->destination->collectionList) {
+                return route('finance.baskets.index', [], false);
+            }
+
             return route('finance.baskets.index', $group->cycleId === null ? ['pending' => 1] : ['pending' => 1, 'cycle' => $group->cycleId], false);
         }
 

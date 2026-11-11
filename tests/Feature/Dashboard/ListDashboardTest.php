@@ -24,17 +24,27 @@ function closedWeek(object $test): array
 /** A validated independent stock basket of the household holding `quantity` bottles; returns [basket id, product id]. */
 function validatedStockBasketOf(object $test, string $household, string $quantity = '3'): array
 {
+    [$basket, $product] = draftStockBasketOf($test, $household, $quantity, validate: true);
+
+    return [$basket, $product];
+}
+
+/** An independent stock basket draft holding `quantity` bottles priced `priceCents`; returns [basket id, product id]. */
+function draftStockBasketOf(object $test, string $household, string $quantity = '3', int $priceCents = 1200, bool $validate = false): array
+{
     $manager = accountWith(Role::Manager);
     $producer = ProducerModel::query()->create(['name' => 'Maker', 'active' => true, 'cutoff_days_before' => 3, 'cutoff_time' => '20:00']);
     $product = (string) Str::uuid7();
     DB::table('products')->insert(['id' => $product, 'producer_id' => $producer->id, 'stock' => true,
-        'name' => 'Oil', 'unit' => 'bottle', 'price_cents' => 1200, 'variable' => false, 'active' => true]);
+        'name' => 'Oil', 'unit' => 'bottle', 'price_cents' => $priceCents, 'variable' => false, 'active' => true]);
     DB::table('stock_movements')->insert(['id' => (string) Str::uuid7(), 'product_id' => $product,
         'type' => 'entry', 'quantity' => '10', 'occurred_at' => now(), 'recorded_by' => $manager->id]);
     $test->actingAs($manager)->post('/finance/baskets', ['household_id' => $household])->assertRedirect();
     $basket = (string) DB::table('baskets')->where('household_id', $household)->where('kind', 'stock')->latest('id')->value('id');
     $test->post("/finance/baskets/{$basket}/stock-lines", ['stock_product_id' => $product, 'stock_quantity' => $quantity])->assertRedirect();
-    $test->post("/finance/baskets/{$basket}/validation")->assertRedirect();
+    if ($validate) {
+        $test->post("/finance/baskets/{$basket}/validation")->assertRedirect();
+    }
     app('auth')->forgetGuards();
 
     return [$basket, $product];
@@ -139,4 +149,60 @@ it('keeps an inactive household\'s validated, uncollected basket in the staff-wi
         ->has('baskets', 2)
         ->where('baskets', fn ($rows) => collect($rows)->pluck('id')->sort()->values()->all()
             === collect([$week['baskets']['A'], $week['baskets']['B']])->sort()->values()->all()));
+});
+
+it('shows Finance a persisted zero-price draft with goods as validation work linking to that basket, and a member none (R7, S7)', function () {
+    $week = closedWeek($this);
+    [$free] = draftStockBasketOf($this, $week['households']['A'], priceCents: 0);
+
+    expect(DB::table('baskets')->where('id', $free)->value('state'))->toBe('draft');
+    $groups = attentionOf($this, accountWith(Role::Finance));
+    expect(collect($groups)->pluck('action')->all())->toContain('validate_basket');
+    $draft = collect($groups)->firstWhere('action', 'validate_basket');
+    expect($draft['count'])->toBe(1)
+        ->and($draft['cycleId'])->toBeNull()
+        ->and($draft['href'])->toBe("/finance/baskets/{$free}");
+
+    expect(collect(attentionOf($this, memberOf($week['households']['A'])))->pluck('action')->all())->not->toContain('validate_basket');
+});
+
+it('shows Finance the settled cycle\'s draft to validate, drops an emptied draft, keeps collection, and lets validation close the cycle without a dashboard command (R7, R10, S7)', function () {
+    $week = lateArrivalWeek();
+    [$emptied] = draftStockBasketOf($this, $week['households']['A']);
+    DB::table('basket_lines')->where('basket_id', $emptied)->update(['removed_at' => now()]);
+    $finance = accountWith(Role::Finance);
+
+    $groups = collect(attentionOf($this, $finance))->keyBy('action');
+    expect($groups->keys()->sort()->values()->all())->toBe(['collect_basket', 'validate_basket'])
+        ->and($groups['validate_basket']['count'])->toBe(1)
+        ->and($groups['validate_basket']['cycleId'])->toBe($week['cycle'])
+        ->and($groups['validate_basket']['href'])->toBe("/finance/baskets/{$week['baskets']['B']}")
+        ->and($groups['collect_basket']['count'])->toBe(1);
+
+    $this->actingAs($finance)->post("/finance/baskets/{$week['baskets']['B']}/validation")->assertRedirect();
+    app('auth')->forgetGuards();
+
+    expect(DB::table('cycles')->where('id', $week['cycle'])->value('closed_at'))->not->toBeNull();
+    $after = collect(attentionOf($this, $finance));
+    expect($after->pluck('action')->all())->toBe(['collect_basket'])
+        ->and($after[0]['count'])->toBe(2);
+    $this->actingAs($finance)->get('/dashboard')->assertOk();
+    expect(DB::table('cycles')->where('id', $week['cycle'])->value('closed_at'))->not->toBeNull();
+});
+
+it('gives Receiver, Catalogue and a plain member no draft work (R7)', function () {
+    $week = lateArrivalWeek();
+
+    foreach ([accountWith(Role::Receiver), accountWith(Role::Catalogue), memberOf($week['households']['B'])] as $account) {
+        expect(collect(attentionOf($this, $account))->pluck('action')->all())->not->toContain('validate_basket', 'prepare_basket');
+    }
+});
+
+it('links several drafts to the unfiltered staff basket list (R7)', function () {
+    $week = lateArrivalWeek();
+    draftStockBasketOf($this, $week['households']['A']);
+    draftStockBasketOf($this, $week['households']['B']);
+
+    $noCycle = collect(attentionOf($this, accountWith(Role::Finance)))->where('action', 'validate_basket')->firstWhere('cycleId', null);
+    expect($noCycle['href'])->toBe('/finance/baskets')->and($noCycle['count'])->toBe(2);
 });

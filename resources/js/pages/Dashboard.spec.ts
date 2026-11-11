@@ -219,6 +219,44 @@ describe('dashboard presentation', () => {
         }
     });
 
+    it('lists validation and collection groups as distinct actions with server links and no command control (R7, S7)', async () => {
+        const app = createSSRApp(Dashboard, {
+            roles: ['finance'],
+            isManager: false,
+            isMember: false,
+            nextPickup: null,
+            openCycles: 0,
+            balance: null,
+            managerSummary: null,
+            attention: [
+                {
+                    key: 'validate_basket:cycle:c1',
+                    action: 'validate_basket',
+                    cycleId: 'c1',
+                    scheduledDate: '2026-11-07',
+                    count: 2,
+                    href: '/finance/baskets',
+                },
+                {
+                    key: 'collect_basket:cycle:c1',
+                    action: 'collect_basket',
+                    cycleId: 'c1',
+                    scheduledDate: '2026-11-07',
+                    count: 1,
+                    href: '/finance/baskets?pending=1&cycle=c1',
+                },
+            ],
+        });
+        installTranslations(app);
+        const html = await renderToString(app);
+        expect(html.match(/data-test="attention-group"/g)).toHaveLength(2);
+        expect(html).toContain('Valida cistelles');
+        expect(html).toContain('Recollir cistelles');
+        expect(html.match(/Veure cistelles/g)).toHaveLength(2);
+        expect(html).not.toContain('<button');
+        expect(html).not.toContain('Tanca el cicle');
+    });
+
     it('lists reception groups with the producer, blocker and a receptions link, without any command control (R5, R6, S5, S6)', async () => {
         const app = createSSRApp(Dashboard, {
             roles: ['finance'],

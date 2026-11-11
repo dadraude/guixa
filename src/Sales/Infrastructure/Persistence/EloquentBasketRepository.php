@@ -298,6 +298,13 @@ final class EloquentBasketRepository implements BasketRepository
             ->filter(fn (Basket $basket) => $basket->isPendingCollection())->all());
     }
 
+    public function drafts(): array
+    {
+        return array_values(BasketModel::query()->where('state', BasketState::Draft->value)
+            ->with(['lines', 'adjustments.lines', 'collectionEvents'])->orderBy('created_at')->orderBy('id')->get()
+            ->map(fn (BasketModel $model) => $this->toDomain($model))->all());
+    }
+
     public function hasProductHistory(string $productId): bool
     {
         return BasketLineModel::query()->where('product_id', $productId)->exists();

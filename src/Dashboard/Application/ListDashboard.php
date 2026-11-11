@@ -28,10 +28,11 @@ final class ListDashboard
         $records = [
             ...($isMember ? $this->basketWork->memberCollection($actor->householdId) : []),
             ...($isStaff ? $this->basketWork->staffCollection() : []),
+            ...($isStaff ? $this->basketWork->staffDrafts() : []),
         ];
 
         $groups = [
-            ...$this->collectionGroups($records, $isStaff),
+            ...$this->basketGroups($records, $isStaff),
             ...$this->receptionGroups($gate->allows('receive'), $gate->allows('settle-reception')),
         ];
         usort($groups, fn (AttentionGroupData $a, AttentionGroupData $b) => [$a->scheduledDate === null, $a->scheduledDate, ActionKind::from($a->action)->rank(), $a->key]
@@ -85,11 +86,11 @@ final class ListDashboard
      * @param  list<BasketWork>  $records
      * @return list<AttentionGroupData>
      */
-    private function collectionGroups(array $records, bool $staffWide): array
+    private function basketGroups(array $records, bool $staffWide): array
     {
         $byGroup = [];
         foreach ($records as $record) {
-            $byGroup[$this->groupKey($record)][$record->basketId] = $record;
+            $byGroup[$this->groupKey($record)][$record->action->value.':'.$record->basketId] = $record;
         }
 
         $groups = array_map(function (array $members, string $key) use ($staffWide) {
@@ -97,11 +98,11 @@ final class ListDashboard
 
             return new AttentionGroupData(
                 $key,
-                ActionKind::CollectBasket->value,
+                $first->action->value,
                 $first->cycleId,
                 $first->scheduledDate,
                 count($members),
-                new DestinationData($staffWide, count($members) === 1 ? $first->basketId : null),
+                new DestinationData($staffWide, count($members) === 1 ? $first->basketId : null, collectionList: $first->action === ActionKind::CollectBasket),
             );
         }, $byGroup, array_keys($byGroup));
 
@@ -110,6 +111,6 @@ final class ListDashboard
 
     private function groupKey(BasketWork $record): string
     {
-        return ActionKind::CollectBasket->value.':'.($record->cycleId === null ? 'no-cycle' : "cycle:{$record->cycleId}");
+        return $record->action->value.':'.($record->cycleId === null ? 'no-cycle' : "cycle:{$record->cycleId}");
     }
 }

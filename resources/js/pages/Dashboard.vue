@@ -78,6 +78,8 @@ const actionLabels: Record<Guixa.Dashboard.Domain.ActionKind, string> = {
     check_delivery_and_allocations: trans('Check delivery and allocations'),
     resolve_allocations: trans('Resolve allocations'),
     mark_distributed: trans('Mark distributed'),
+    prepare_basket: trans('Prepare baskets'),
+    validate_basket: trans('Validate baskets'),
     collect_basket: trans('Collect baskets'),
 };
 
@@ -85,6 +87,8 @@ const linkLabels: Record<Guixa.Dashboard.Domain.ActionKind, string> = {
     check_delivery_and_allocations: trans('View receptions'),
     resolve_allocations: trans('View receptions'),
     mark_distributed: trans('View receptions'),
+    prepare_basket: trans('View baskets'),
+    validate_basket: trans('View baskets'),
     collect_basket: trans('View baskets'),
 };
 
