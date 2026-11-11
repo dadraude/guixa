@@ -211,7 +211,7 @@
             "sliceId": "attention-and-opportunities",
             "tasks": {
                 "path": "specs/004-dashboard/tasks.md",
-                "sha256": "cff8271bf80d9068c298836a336a76ef10e345fee6e5db25cec5faaa4f048c63"
+                "sha256": "13e4575c2dc720c5c6c5042f8ff680b06b5278a5f262e7dbf87f84c946043b29"
             },
             "preparation": {
                 "path": "specs/004-dashboard/history/2026-11-11T07-32-03.022Z-no-task-54736f2d-7d33-4b71-b165-0685064a5d28.md",
@@ -234,7 +234,15 @@
                     "path": "skills/agent-workflow/references/planning.md",
                     "sha256": "71d076cc964de47a164d8b32f4512e21c06a4ad6578012f6c17df0dc80c0dfd2"
                 }
-            ]
+            ],
+            "acceptance": {
+                "path": "specs/004-dashboard/history/2026-11-11T07-35-59.334Z-no-task-16fd9a03-17ac-43c3-94de-91fdb2e376bc.md",
+                "sha256": "393de88683e5eb9dead1eff478d52d5cf3157419a4cc65a17e9a301b67e34698"
+            },
+            "acceptanceStatusUpdate": {
+                "path": "specs/004-dashboard/history/2026-11-11T07-35-59.401Z-no-task-0f55014d-7038-47b3-a168-147f3ca6876c.md",
+                "sha256": "0750c483792310ce4fafb5cc30a888c789c43750f86be68e64b4d8138c4de5a9"
+            }
         }
     }
 }

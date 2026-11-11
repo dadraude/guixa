@@ -1,6 +1,6 @@
-# 004 — Dashboard: attention and opportunities · Proposed tasks
+# 004 — Dashboard: attention and opportunities · Tasks
 
-**Status: Proposed for task-breakdown review (2026-11-11).** Source: [accepted spec](spec.md) R1–R16/S1–S13;
+**Status: Accepted in Q24 (2026-11-11).** Source: [accepted spec](spec.md) R1–R16/S1–S13;
 [accepted plan](plan.md); [constitution](../constitution.md). These IDs are local to 004, starting at T01.
 This document does not authorize implementation, ticket publication, or a feature verdict. Before admission,
 confirm 001 feature closure and delivered 003 behavior on the implementation base; current read-only tracker
@@ -61,7 +61,7 @@ architecture declarations and docs together. Planned paths are marked below; all
 | T06 | <a id="t06"></a>[Refresh on return and expose read failures](#t06-refresh-on-return-and-expose-read-failures) | R15 generic contract, R1 current access after change, R16 refresh states; S11/S12 generic portions | T01: Dashboard read/list contract |
 | T07 | <a id="t07"></a>[Complete attention priority and caught-up dashboard](#t07-complete-attention-priority-and-caught-up-dashboard) | R1–R3 union/final links, R8 dedup, R10 absence, R12–R15 full family behavior, R16 final; S1/S2/S3/S7/S9–S13 complete | T02–T06: all families and failure contract |
 
-Technical frontier at proposal time: **T01**, subject to external readiness/admission above. After T01
+Current dependency frontier: **T01**, subject to external readiness/admission above. After T01
 integrates, **T02–T06** are technical frontier leaves: each extends the established list or read contract
 without consuming another's behavior. T07 needs every family and the failure contract to make global caught-up
 truthful. Shared Dashboard/Ordering files require scheduling and reconciliation of edits, not dependency
