@@ -14,8 +14,12 @@ defineProps<{ actionHref: string }>();
             <LandingHeader :action-href="actionHref" />
         </div>
         <main>
-            <div class="welcome-shell">
-                <LandingHero />
+            <div class="welcome-hero-band">
+                <div class="welcome-shell">
+                    <LandingHero />
+                </div>
+            </div>
+            <div class="welcome-shell welcome-story-shell">
                 <LandingStory />
             </div>
             <LandingContact />
@@ -62,6 +66,22 @@ defineProps<{ actionHref: string }>();
     width: min(100% - 2.5rem, 72rem);
     margin-inline: auto;
     container-type: inline-size;
+}
+
+.welcome-hero-band {
+    --welcome-hero-surface: #286585;
+    --welcome-hero-cream: #faf1dc;
+    --welcome-focus: var(--welcome-hero-cream);
+    color: var(--welcome-hero-cream);
+    background: var(--welcome-hero-surface);
+}
+
+:global(.dark) .welcome-hero-band {
+    --welcome-hero-surface: #23485c;
+}
+
+.welcome-story-shell {
+    padding-top: clamp(3rem, 6vw, 4.5rem);
 }
 
 .welcome-brand {

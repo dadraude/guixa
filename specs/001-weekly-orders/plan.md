@@ -906,6 +906,14 @@ themes. The `WelcomePage` remains a public composition surface and keeps the
 existing server route and authenticated access destination. See the immutable
 2026-11-11 Change history entry for the complete approved copy and visual source.
 
+The subsequent 2026-11-11 user refinement gives the hero more of the first proposal's
+character: a full-width muted-blue hero with cream heading/body, a cream primary
+button, and a more prominent headline and desktop basket. The navigation remains
+on the cream canvas in light appearance. This supersedes the cream-hero treatment
+above only; the cooperative values, steps and pale-blue contact remain light and
+spacious. Preserve dark appearance contrast and text-zoom reflow, with no distressed
+textures or additional decoration.
+
 T40 extends the same reactive opt-in to Dashboard, Wallet/Statement and the five existing producer
 pages. Their current page components retain their props, actions and form contracts. Shared page,
 panel, empty-state and mobile table presentation classes live under the pilot theme, so the two

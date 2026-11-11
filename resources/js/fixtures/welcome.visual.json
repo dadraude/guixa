@@ -48,6 +48,22 @@
                     "attributes": {
                         "href": "mailto:laguixamanresa@gmail.com"
                     }
+                },
+                {
+                    "selector": ".welcome-eyebrow",
+                    "contrast": 4.5
+                },
+                {
+                    "selector": ".welcome-hero h1",
+                    "contrast": 4.5
+                },
+                {
+                    "selector": ".welcome-intro",
+                    "contrast": 4.5
+                },
+                {
+                    "selector": ".welcome-text-action",
+                    "contrast": 4.5
                 }
             ],
             "states": [
@@ -103,6 +119,22 @@
                                 "styles": {
                                     "flex-direction": "column"
                                 }
+                            },
+                            {
+                                "selector": ".welcome-eyebrow",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-hero h1",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-intro",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-text-action",
+                                "contrast": 4.5
                             }
                         ]
                     },
@@ -173,6 +205,22 @@
                                 "styles": {
                                     "display": "block"
                                 }
+                            },
+                            {
+                                "selector": ".welcome-eyebrow",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-hero h1",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-intro",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-text-action",
+                                "contrast": 4.5
                             }
                         ]
                     },
@@ -274,6 +322,22 @@
                                 "styles": {
                                     "flex-direction": "column"
                                 }
+                            },
+                            {
+                                "selector": ".welcome-eyebrow",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-hero h1",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-intro",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-text-action",
+                                "contrast": 4.5
                             }
                         ]
                     },
@@ -337,6 +401,22 @@
                                 "styles": {
                                     "display": "block"
                                 }
+                            },
+                            {
+                                "selector": ".welcome-eyebrow",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-hero h1",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-intro",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-text-action",
+                                "contrast": 4.5
                             }
                         ]
                     },
