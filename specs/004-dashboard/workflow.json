@@ -43,14 +43,14 @@
             },
             "discovery": {
                 "path": "specs/004-dashboard/discovery.md",
-                "sha256": "47315731b5a20673e327ef2b4302ad7515b23434926e3e7939b69245cd10ee32"
+                "sha256": "e94bf3a0f11b89a8f9c11c7e23231cf731a7dfc2001f9dcd1a212de0c3696486"
             }
         },
         "scope": {
             "sliceId": "attention-and-opportunities",
             "slices": {
                 "path": "specs/004-dashboard/discovery.md",
-                "sha256": "47315731b5a20673e327ef2b4302ad7515b23434926e3e7939b69245cd10ee32"
+                "sha256": "e94bf3a0f11b89a8f9c11c7e23231cf731a7dfc2001f9dcd1a212de0c3696486"
             },
             "selectionDecision": {
                 "path": "specs/004-dashboard/history/2026-11-10T23-11-32.497Z-no-task-17a0d258-5bdf-4b53-b1cd-64f71ead1444.md",
@@ -70,7 +70,7 @@
             "sources": [
                 {
                     "path": "specs/004-dashboard/discovery.md",
-                    "sha256": "47315731b5a20673e327ef2b4302ad7515b23434926e3e7939b69245cd10ee32"
+                    "sha256": "e94bf3a0f11b89a8f9c11c7e23231cf731a7dfc2001f9dcd1a212de0c3696486"
                 },
                 {
                     "path": "specs/constitution.md",
@@ -114,7 +114,7 @@
             "sliceId": "attention-and-opportunities",
             "plan": {
                 "path": "specs/004-dashboard/plan.md",
-                "sha256": "7e26298272086212363e4fff80cb6d77feaee370ed435f350b67f4b495c3cd9d"
+                "sha256": "926b4a809d683d4395c6d8f5c1a82a26ae5bb27f126c2e390773f706ccf83fcb"
             },
             "preparation": {
                 "path": "specs/004-dashboard/history/2026-11-11T07-19-31.442Z-no-task-b0231324-4a4f-4288-b0ef-cc8e6debb49e.md",
@@ -127,7 +127,7 @@
                 },
                 {
                     "path": "specs/004-dashboard/discovery.md",
-                    "sha256": "47315731b5a20673e327ef2b4302ad7515b23434926e3e7939b69245cd10ee32"
+                    "sha256": "e94bf3a0f11b89a8f9c11c7e23231cf731a7dfc2001f9dcd1a212de0c3696486"
                 },
                 {
                     "path": "specs/constitution.md",
@@ -197,7 +197,15 @@
                     "path": "tests/Feature/Database/DemoSeederTest.php",
                     "sha256": "c45ca309c8bff3cbf18bb1d984bb5c957c0f9c68106511e09877f14b1d604a8f"
                 }
-            ]
+            ],
+            "acceptance": {
+                "path": "specs/004-dashboard/history/2026-11-11T07-24-15.984Z-no-task-71db3acf-e1cc-4039-a061-1824e2e0ada7.md",
+                "sha256": "15b176d2407ed622c0818c6dd15207cfc5c822a0bed03f06bd32b5649efe738c"
+            },
+            "acceptanceStatusUpdate": {
+                "path": "specs/004-dashboard/history/2026-11-11T07-24-16.047Z-no-task-8759e0a7-e67c-489d-85ce-2b39b96667c5.md",
+                "sha256": "5e7f204405c2cd28230196b875ef5f5641ff285742d7bc5878b083ca7ae47903"
+            }
         }
     }
 }

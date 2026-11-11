@@ -1,7 +1,7 @@
-# 004 — Dashboard: attention and opportunities · Proposed plan
+# 004 — Dashboard: attention and opportunities · Plan
 
-**Status: Proposed for design acceptance (2026-11-11).** [Spec](spec.md) R1–R16/S1–S13 was accepted in Q22.
-This plan is a proposed design only; implementation and task breakdown are separate decisions. It replaces the
+**Status: Accepted in Q23 (2026-11-11).** [Spec](spec.md) R1–R16/S1–S13 was accepted in Q22.
+Q23 accepts this design; implementation and task breakdown remain separate decisions. It replaces the
 interim content owned by 001 T61 when delivered. Retired 002 T01–T04 remain retired; shipped 002 T05/R11 login
 routing remains its own work.
 
@@ -11,7 +11,7 @@ routing remains its own work.
 | --- | --- | --- |
 | Behavior | Ready | 004 spec Q22 accepts R1–R16/S1–S13 and states no open product question. 001 glossary/workflow and 003 powers govern eligibility and access. |
 | Decisions | Ready | Q14 selects this first slice; Q20 excludes manual closure, Q21 refines reception stages, Q22 accepts exact first-slice rules. No additional product decision is proposed here. |
-| Design | Ready once this proposal is accepted | Contracts, state flow, navigation, failure behavior and verification are below. UI reuses the existing dashboard shell, role navigation and component/tokens. |
+| Design | Accepted in Q23 | Contracts, state flow, navigation, failure behavior and verification are below. UI reuses the existing dashboard shell, role navigation and component/tokens. |
 | External prerequisites | Readiness check before implementation | Source inspection confirms the existing 001/003 routes and role readers. Read-only Linear status on 2026-11-11 showed 001 DRA-183/DRA-206 and 003 DRA-248–255 Done; status alone is not feature acceptance. Confirm 001 feature closure and 003 delivered behavior on the implementation base. No new external service, package or credential. |
 | Paths | Proposed and source-backed | Existing entry/destinations and candidate readers are named below from worktree source; new Dashboard module and narrow read queries are planned. A fresh implementation-base check is needed before work starts. |
 | Verification | Planned | Application scenarios, HTTP/Inertia/authorization, frontend interaction, seeder fixture and measured responsive/accessibility checks below. No implementation check is claimed to have passed. |
@@ -170,8 +170,7 @@ visual-design approval gate.
 ## Limits and acceptance boundary
 
 This plan covers only accepted 004 R1–R16/S1–S13. Later insight/reporting slices, reminders, payments,
-invoices, assignments, analytics and new workflow state remain outside it. Design acceptance would settle
-these read contracts and UI states; executable task allocation, implementation authorization and feature
+invoices, assignments, analytics and new workflow state remain outside it. Q23 settles these read contracts and UI states; executable task allocation, implementation authorization and feature
 acceptance remain separate workflow gates. The principal implementation risks to check early are source
 read-only behavior for unopened receptions, exact Sales draft eligibility, current actor changes on return,
 and no cross-module/table ownership violation. No unresolved product question is identified.
