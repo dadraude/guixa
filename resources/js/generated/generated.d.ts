@@ -10,6 +10,14 @@ readonly householdName: string | null,
 readonly active: boolean,
 readonly invitationPending: boolean,
 };
+export type AttentionGroupRow = {
+readonly key: string,
+readonly action: Guixa.Dashboard.Domain.ActionKind,
+readonly cycleId: string | null,
+readonly scheduledDate: string | null,
+readonly count: number,
+readonly href: string,
+};
 export type BasketActionsRow = {
 readonly edit: boolean,
 readonly validate: boolean,
@@ -444,10 +452,23 @@ readonly removeBlockedReason: string | null,
 }
 }
 declare namespace Guixa {
+namespace Dashboard {
+namespace Domain {
+export type ActionKind = 'collect_basket';
+}
+}
 namespace Membership {
+namespace Application {
+export type RemoveBlockedReason = 'It is the last active manager: another account must hold the Manager role and have accepted its invitation first.';
+}
 namespace Domain {
 export type AccountStatus = 'active' | 'invitation_pending' | 'invitation_expired' | 'deactivated';
 export type RoleChange = 'granted' | 'removed';
+}
+}
+namespace Ordering {
+namespace Domain {
+export type ReceptionState = 'sent' | 'validated' | 'distributed';
 }
 }
 namespace Sales {

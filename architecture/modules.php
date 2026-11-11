@@ -25,6 +25,11 @@ return [
                 'Application\StockOfferProductData' => ['Sales'],
             ],
         ],
+        'Dashboard' => [
+            'owns' => 'The signed-in dashboard read composition: attention groups built from other modules\' exported read queries. It owns no table and runs no command.',
+            'dependencies' => ['Sales', 'Shared'],
+            'exports' => [],
+        ],
         'Membership' => [
             'owns' => 'Accounts, households, roles, invitations and household lifecycle.',
             'dependencies' => ['Catalog', 'Sales', 'Shared', 'Wallet'],
@@ -57,7 +62,7 @@ return [
             'owns' => 'Shared values, actor contracts, clock and transaction abstractions.',
             'dependencies' => [],
             'exports' => [
-                'Application\Actor' => ['Catalog', 'Membership', 'Ordering', 'Sales', 'Stock', 'Wallet'],
+                'Application\Actor' => ['Catalog', 'Dashboard', 'Membership', 'Ordering', 'Sales', 'Stock', 'Wallet'],
                 'Application\ActorResolver' => ['Catalog', 'Membership', 'Ordering', 'Stock', 'Wallet'],
                 'Application\TransactionRunner' => ['Catalog', 'Membership', 'Ordering', 'Sales', 'Stock', 'Wallet'],
                 'Domain\Clock' => ['Catalog', 'Membership', 'Ordering', 'Sales', 'Stock', 'Wallet'],
@@ -80,6 +85,8 @@ return [
                 'Application\ReadWeeklyBasketStates' => ['Ordering'],
                 'Application\ReadPendingCollections' => ['Ordering'],
                 'Application\PendingCollectionData' => ['Ordering'],
+                'Application\ReadDashboardBasketWork' => ['Dashboard'],
+                'Application\DashboardBasketWorkData' => ['Dashboard'],
                 'Application\ReadHouseholdContainerBalances' => ['Ordering'],
                 'Application\ReadOpenHouseholdBaskets' => ['Membership'],
                 'Application\OpenBasketData' => ['Membership'],

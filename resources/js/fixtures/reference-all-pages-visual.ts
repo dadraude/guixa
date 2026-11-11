@@ -175,14 +175,6 @@ const pageProps: Record<string, Record<string, unknown>> = {
         nextPickup: pickupDate,
         openCycles: 1,
         balance: 2000,
-        pendingPickups: [
-            {
-                basketId: 'visual-basket',
-                validatedAt: pickupDate,
-                weekly: true,
-                late: false,
-            },
-        ],
         managerSummary: {
             cycles: 1,
             activeCycles: 1,

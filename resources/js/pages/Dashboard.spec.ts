@@ -15,15 +15,6 @@ vi.mock('@inertiajs/vue3', () => ({
     }),
 }));
 
-vi.mock('@/actions/App/Http/Controllers/Member/BasketController', () => ({
-    default: {
-        index: { url: () => '/baskets?pending=1' },
-        show: { url: () => '/baskets/basket' },
-    },
-}));
-vi.mock('@/actions/App/Http/Controllers/Finance/BasketController', () => ({
-    default: { index: { url: () => '/finance/baskets?pending=1' } },
-}));
 vi.mock('@/actions/App/Http/Controllers/OrderController', () => ({
     default: { index: () => '/' },
 }));
@@ -70,7 +61,6 @@ describe('dashboard presentation', () => {
             nextPickup: null,
             openCycles: 0,
             balance: null,
-            pendingPickups: [],
             managerSummary: null,
             areaShortcuts: [
                 {
@@ -97,7 +87,6 @@ describe('dashboard presentation', () => {
             nextPickup: null,
             openCycles: 1234,
             balance: null,
-            pendingPickups: [],
             managerSummary: {
                 cycles: 2345,
                 activeCycles: 1,
@@ -124,7 +113,6 @@ describe('dashboard presentation', () => {
             nextPickup: '2026-11-05',
             openCycles: 1,
             balance: 5000,
-            pendingPickups: [],
             managerSummary: null,
         });
         installTranslations(app);
@@ -141,7 +129,6 @@ describe('dashboard presentation', () => {
             nextPickup: '2026-11-05',
             openCycles: 2,
             balance: 5000,
-            pendingPickups: [],
             managerSummary: null,
         });
         installTranslations(app);
@@ -160,7 +147,6 @@ describe('dashboard presentation', () => {
             nextPickup: null,
             openCycles: 0,
             balance: null,
-            pendingPickups: [],
             managerSummary: {
                 cycles: 3,
                 activeCycles: 1,
@@ -181,7 +167,7 @@ describe('dashboard presentation', () => {
         expect(html.match(/text-lg font-semibold/g)).toHaveLength(2);
     });
 
-    it('lists pending collections from validated baskets, late and cycleless included, and links to all of them (R24, S42)', async () => {
+    it('lists collection groups with context, visible counts and server links, and claims nothing when there are none (R2, R4, R14, S4)', async () => {
         const base = {
             roles: ['member'],
             isManager: false,
@@ -193,65 +179,43 @@ describe('dashboard presentation', () => {
         };
         const populated = createSSRApp(Dashboard, {
             ...base,
-            pendingPickups: [
+            attention: [
                 {
-                    basketId: 'closed',
-                    validatedAt: '2026-11-03',
-                    weekly: true,
-                    late: false,
+                    key: 'collect_basket:cycle:c1',
+                    action: 'collect_basket',
+                    cycleId: 'c1',
+                    scheduledDate: '2026-10-28',
+                    count: 2,
+                    href: '/finance/baskets?pending=1',
                 },
                 {
-                    basketId: 'late',
-                    validatedAt: '2026-11-04',
-                    weekly: true,
-                    late: true,
-                },
-                {
-                    basketId: 'stock',
-                    validatedAt: '2026-11-05',
-                    weekly: false,
-                    late: false,
+                    key: 'collect_basket:no-cycle',
+                    action: 'collect_basket',
+                    cycleId: null,
+                    scheduledDate: null,
+                    count: 1,
+                    href: '/baskets/stock',
                 },
             ],
         });
         installTranslations(populated);
         const html = await renderToString(populated);
-        expect(html.match(/<li class="pilot-list-row"/g)).toHaveLength(3);
-        expect(html).toContain('Cistella tardana');
-        expect(html).toContain('Totes les recollides pendents');
+        expect(html.match(/data-test="attention-group"/g)).toHaveLength(2);
+        expect(html).toContain('Feina pendent');
+        expect(html).toContain('Recollir cistelles');
+        expect(html).toContain('2 pendents');
+        expect(html).toContain('1 pendent<');
+        expect(html).not.toContain('1 pendents');
+        expect(html).toContain('Cap cicle');
+        expect(html.match(/Veure cistelles/g)).toHaveLength(2);
 
-        const empty = createSSRApp(Dashboard, { ...base, pendingPickups: [] });
-        installTranslations(empty);
-        expect(await renderToString(empty)).not.toContain(
-            'data-test="pending-pickups"',
-        );
-    });
-
-    it('shows Finance and Manager the exact total of pending collections only when there are some', async () => {
-        const props = {
-            roles: ['finance'],
-            isManager: false,
-            isMember: false,
-            nextPickup: null,
-            openCycles: 0,
-            balance: null,
-            pendingPickups: [],
-            managerSummary: null,
-        };
-        const some = createSSRApp(Dashboard, {
-            ...props,
-            staffPendingCollections: { count: 4 },
-        });
-        installTranslations(some);
-        expect(await renderToString(some)).toContain('Recollides pendents: 4');
-
-        const none = createSSRApp(Dashboard, {
-            ...props,
-            staffPendingCollections: { count: 0 },
-        });
-        installTranslations(none);
-        expect(await renderToString(none)).not.toContain(
-            'data-test="staff-pending-collections"',
-        );
+        for (const attention of [[], undefined]) {
+            const empty = createSSRApp(Dashboard, { ...base, attention });
+            installTranslations(empty);
+            const emptyHtml = await renderToString(empty);
+            expect(emptyHtml).not.toContain('attention-list');
+            expect(emptyHtml).not.toContain('Feina pendent');
+            expect(emptyHtml).not.toContain('<ul class="pilot-list"');
+        }
     });
 });

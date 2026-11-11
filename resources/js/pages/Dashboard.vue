@@ -16,13 +16,11 @@ import {
     Settings,
 } from '@lucide/vue';
 import type { LucideIcon } from '@lucide/vue';
-import { trans } from 'laravel-vue-i18n';
+import { trans, transChoice } from 'laravel-vue-i18n';
 import { computed } from 'vue';
 import { formatEuroAmount } from '@/lib/formatEuroAmount';
 import { formatQuantity } from '@/lib/locale';
 import type { NavItem } from '@/types';
-import MemberBasketController from '@/actions/App/Http/Controllers/Member/BasketController';
-import FinanceBasketController from '@/actions/App/Http/Controllers/Finance/BasketController';
 import OrderController from '@/actions/App/Http/Controllers/OrderController';
 import WalletController from '@/actions/App/Http/Controllers/WalletController';
 import CycleController from '@/actions/App/Http/Controllers/Manage/CycleController';
@@ -34,13 +32,6 @@ import ReturnItemController from '@/actions/App/Http/Controllers/Catalogue/Retur
 import SettingsController from '@/actions/App/Http/Controllers/Manage/SettingsController';
 import ProductController from '@/actions/App/Http/Controllers/Producer/ProductController';
 import CutoffController from '@/actions/App/Http/Controllers/Producer/CutoffController';
-
-type PendingPickup = {
-    basketId: string;
-    validatedAt: string | null;
-    weekly: boolean;
-    late: boolean;
-};
 
 type ManagerSummary = {
     cycles: number;
@@ -60,8 +51,7 @@ const props = defineProps<{
     nextPickup: string | null;
     openCycles: number;
     balance: number | null;
-    pendingPickups: PendingPickup[];
-    staffPendingCollections?: { count: number } | null;
+    attention?: App.Http.AttentionGroupRow[];
     managerSummary: ManagerSummary | null;
     areaShortcuts?: App.Http.RoleArea[];
 }>();
@@ -83,6 +73,19 @@ const formattedDate = (iso: string) =>
     }).format(new Date(iso));
 
 type QuickLink = { title: string; href: NavItem['href']; icon: LucideIcon };
+
+const actionLabels: Record<Guixa.Dashboard.Domain.ActionKind, string> = {
+    collect_basket: trans('Collect baskets'),
+};
+
+const contextLabel = (group: App.Http.AttentionGroupRow) => {
+    if (group.scheduledDate) {
+        return trans('Pickup :date', {
+            date: formattedDate(group.scheduledDate),
+        });
+    }
+    return group.cycleId ? trans('Cycle') : trans('No cycle');
+};
 
 const memberLinks: QuickLink[] = [
     {
@@ -189,7 +192,7 @@ const isProducer = computed(() => props.roles.includes('producer'));
                         <p class="text-xs text-muted-foreground">
                             {{ trans('Next pickup') }}
                         </p>
-                        <p class="truncate text-lg font-semibold">
+                        <p class="text-lg font-semibold break-words">
                             {{
                                 nextPickup
                                     ? formattedDate(nextPickup)
@@ -211,7 +214,9 @@ const isProducer = computed(() => props.roles.includes('producer'));
                         <p class="text-xs text-muted-foreground">
                             {{ trans('Balance') }}
                         </p>
-                        <p class="truncate text-lg font-semibold tabular-nums">
+                        <p
+                            class="text-lg font-semibold break-words tabular-nums"
+                        >
                             {{ balanceLabel ?? '—' }}
                         </p>
                     </div>
@@ -229,7 +234,7 @@ const isProducer = computed(() => props.roles.includes('producer'));
                         <p class="text-xs text-muted-foreground">
                             {{ trans('Open') }}
                         </p>
-                        <p class="truncate text-lg font-semibold">
+                        <p class="text-lg font-semibold break-words">
                             {{ formatQuantity(String(openCycles)) }}
                         </p>
                     </div>
@@ -238,73 +243,56 @@ const isProducer = computed(() => props.roles.includes('producer'));
         </section>
 
         <section
-            v-if="pendingPickups.length > 0"
+            v-if="attention?.length"
             class="pilot-layout-panel"
-            :aria-label="trans('pending pickups')"
+            :aria-label="trans('pending work')"
+            data-test="attention-list"
         >
             <div class="pilot-layout-panel-header">
                 <h2 class="text-lg font-semibold">
-                    {{ trans('Pending pickups') }}
+                    {{ trans('Pending work') }}
                 </h2>
             </div>
-            <ul class="pilot-list" data-test="pending-pickups">
+            <ul class="pilot-list">
                 <li
-                    v-for="p in pendingPickups"
-                    :key="p.basketId"
+                    v-for="group in attention"
+                    :key="group.key"
                     class="pilot-list-row"
+                    data-test="attention-group"
                 >
-                    <Link
-                        :href="
-                            MemberBasketController.show.url({
-                                basket: p.basketId,
-                            })
-                        "
-                        class="inline-flex min-h-11 items-center text-sm underline"
-                        >{{
-                            p.validatedAt
-                                ? formattedDate(p.validatedAt)
-                                : trans('Pending collection')
-                        }}</Link
-                    >
-                    <span v-if="p.late" class="text-xs text-muted-foreground">{{
-                        trans('Late basket')
-                    }}</span>
+                    <div class="pilot-list-row-body">
+                        <span class="font-medium">{{
+                            actionLabels[group.action]
+                        }}</span>
+                        <span class="text-sm text-muted-foreground">{{
+                            contextLabel(group)
+                        }}</span>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-x-4">
+                        <span
+                            class="text-sm tabular-nums"
+                            data-test="attention-count"
+                            >{{
+                                transChoice(
+                                    '{1} :count pending|[2,*] :count pending',
+                                    group.count,
+                                    {
+                                        count: formatQuantity(
+                                            String(group.count),
+                                        ),
+                                    },
+                                )
+                            }}</span
+                        >
+                        <Link
+                            :href="group.href"
+                            :aria-label="`${trans('View baskets')}: ${contextLabel(group)}`"
+                            class="inline-flex min-h-11 items-center text-sm underline"
+                            >{{ trans('View baskets') }}</Link
+                        >
+                    </div>
                 </li>
             </ul>
-            <Link
-                :href="
-                    MemberBasketController.index.url({ query: { pending: 1 } })
-                "
-                class="inline-flex min-h-11 items-center text-sm underline"
-                data-test="pending-pickups-all"
-                >{{ trans('All pending collections') }}</Link
-            >
-        </section>
-
-        <section
-            v-if="staffPendingCollections && staffPendingCollections.count > 0"
-            class="pilot-layout-panel"
-            :aria-label="trans('pending collections')"
-        >
-            <div class="pilot-layout-panel-header">
-                <h2 class="text-lg font-semibold">
-                    {{ trans('Pending collections') }}
-                </h2>
-            </div>
-            <Link
-                :href="
-                    FinanceBasketController.index.url({
-                        query: { pending: 1 },
-                    })
-                "
-                class="inline-flex min-h-11 items-center text-sm underline"
-                data-test="staff-pending-collections"
-                >{{
-                    trans('Pending collections: :count', {
-                        count: String(staffPendingCollections.count),
-                    })
-                }}</Link
-            >
         </section>
 
         <section

@@ -19,6 +19,8 @@ use Guixa\Catalog\Infrastructure\Ordering\RetainedProductUsage;
 use Guixa\Catalog\Infrastructure\Persistence\EloquentProducerRepository;
 use Guixa\Catalog\Infrastructure\Persistence\EloquentProductRepository;
 use Guixa\Catalog\Infrastructure\Stock\StockAvailabilityAdapter;
+use Guixa\Dashboard\Domain\BasketWorkRepository;
+use Guixa\Dashboard\Infrastructure\Sales\SalesBasketWork;
 use Guixa\Membership\Domain\AccountPasswords;
 use Guixa\Membership\Domain\AccountRepository;
 use Guixa\Membership\Domain\HouseholdBalances;
@@ -138,6 +140,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(StockOfferCatalog::class, CatalogStockOfferCatalog::class);
         $this->app->bind(StockQuantities::class, StockQuantitiesAdapter::class);
         $this->app->bind(BasketRepository::class, EloquentBasketRepository::class);
+        $this->app->bind(BasketWorkRepository::class, SalesBasketWork::class);
         $this->app->bind(ReturnItems::class, StockModuleReturnItems::class);
         $this->app->bind(HouseholdDirectory::class, MembershipHouseholdDirectory::class);
         $this->app->bind(StockProducts::class, CatalogStockProducts::class);

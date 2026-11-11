@@ -122,6 +122,7 @@ final class DemoSeeder extends Seeder
             app(MarkProducerDistributed::class)($manager, $cycles[0], $producerId);
         }
         $this->collectFirstBasket($manager, $cycles[0], $members[0]['householdId']);
+        $this->validateBasketAwaitingCollection($manager, $cycles[0], $members[1]['householdId']);
 
         $this->prepareReception($cycles[1], $catalog['producers']);
         $this->receiveProducts($manager, $cycles[1], array_slice($catalog['products'], 0, 2));
@@ -133,6 +134,13 @@ final class DemoSeeder extends Seeder
         $basket = app(FindWeeklyBaseBasket::class)($manager, $cycleId, $householdId);
         app(ValidateBasket::class)($manager, $basket->id);
         app(MarkBasketCollected::class)($manager, $basket->id);
+    }
+
+    /** A validated, uncollected basket gives the dashboard a pending collection to show. */
+    private function validateBasketAwaitingCollection(Actor $manager, string $cycleId, string $householdId): void
+    {
+        $basket = app(FindWeeklyBaseBasket::class)($manager, $cycleId, $householdId);
+        app(ValidateBasket::class)($manager, $basket->id);
     }
 
     private function createAccount(Account $account): Actor

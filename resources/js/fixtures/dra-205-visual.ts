@@ -180,21 +180,24 @@ const pageProps: Record<string, Record<string, unknown>> = {
         nextPickup: pickupDate,
         openCycles: 1,
         balance: 2000,
-        pendingPickups: [
+        attention: [
             {
-                basketId: 'visual-basket',
-                validatedAt: pickupDate,
-                weekly: true,
-                late: false,
+                key: 'collect_basket:cycle:visual-cycle',
+                action: 'collect_basket',
+                cycleId: 'visual-cycle',
+                scheduledDate: pickupDate,
+                count: 3,
+                href: '/finance/baskets?pending=1',
             },
             {
-                basketId: 'visual-late-basket',
-                validatedAt: pickupDate,
-                weekly: true,
-                late: true,
+                key: 'collect_basket:no-cycle',
+                action: 'collect_basket',
+                cycleId: null,
+                scheduledDate: null,
+                count: 1,
+                href: '/baskets/visual-stock-basket',
             },
         ],
-        staffPendingCollections: { count: 3 },
         managerSummary: {
             cycles: 1,
             activeCycles: 1,
@@ -507,12 +510,16 @@ if (pageName === 'Dashboard') {
     visualProps.isMember = role === 'member';
     visualProps.managerSummary =
         role === 'manager' ? visualProps.managerSummary : null;
-    visualProps.pendingPickups =
-        role === 'member' ? visualProps.pendingPickups : [];
-    visualProps.staffPendingCollections =
-        role === 'manager' || role === 'finance'
-            ? visualProps.staffPendingCollections
-            : null;
+    visualProps.attention =
+        role === 'member'
+            ? visualProps.attention.map((group: Record<string, unknown>) => ({
+                  ...group,
+                  count: 1,
+                  href: '/baskets/visual-basket',
+              }))
+            : role === 'manager' || role === 'finance'
+              ? visualProps.attention
+              : [];
     visualProps.nextPickup = role === 'member' ? visualProps.nextPickup : null;
     visualProps.openCycles = role === 'member' ? visualProps.openCycles : 0;
     visualProps.balance = role === 'member' ? visualProps.balance : null;
@@ -539,8 +546,7 @@ if (state === 'empty') {
     if (pageName === 'Dashboard') {
         visualProps.nextPickup = null;
         visualProps.openCycles = 0;
-        visualProps.pendingPickups = [];
-        visualProps.staffPendingCollections = { count: 0 };
+        visualProps.attention = [];
         if (role === 'manager') {
             visualProps.managerSummary = {
                 cycles: 0,
@@ -1001,7 +1007,7 @@ void createInertiaApp({
                 if (pageName === 'Dashboard' && role === 'finance')
                     return (
                         mainText().length > 0 &&
-                        !visible('[data-test="staff-pending-collections"]')
+                        !visible('[data-test="attention-list"]')
                     );
                 if (pageName === 'Dashboard')
                     return role === 'manager'
