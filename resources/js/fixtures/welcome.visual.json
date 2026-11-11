@@ -188,6 +188,16 @@
                             "text": 100
                         },
                         {
+                            "width": 768,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 768,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
                             "width": 1024,
                             "mode": "light",
                             "text": 200
@@ -347,7 +357,7 @@
         }
     ],
     "matrix": {
-        "widths": [375, 1024, 1280],
+        "widths": [375, 768, 1024, 1280],
         "modes": ["light", "dark"],
         "text": [100, 200]
     }

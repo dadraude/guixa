@@ -102,7 +102,7 @@ const email = 'laguixamanresa@gmail.com';
 
 @media (min-width: 48rem) {
     .welcome-contact-inner {
-        grid-template-columns: minmax(0, 1fr) minmax(16rem, 0.75fr);
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
         align-items: center;
         gap: 2.5rem;
         width: min(100% - 4rem, 72rem);
