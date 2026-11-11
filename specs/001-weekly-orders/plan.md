@@ -883,6 +883,25 @@ visual fixture on identical markup. Check the guest and signed-in variants at
 375 and 1280 px in both themes and the guest page at 1024 px with 200% root
 text. Reuse the existing manager/shared-control manifest for action hierarchy.
 
+#### 2026-11-11 Cooperative landing direction
+
+For the public Welcome page, this supersedes the landing-specific styling in the
+2026-10-27 rollout; the rest of that app-wide direction remains in force. The
+user approved a lighter, content-first public landing for La Guixa. Keep a
+near-white cream canvas, muted blue actions and icons, discreet ochre step
+numbers, and a pale-blue contact area. Use a typographic approximation of the
+`la guixa` wordmark because no vector original is available. The page has a
+header with visible cooperative, process and member-access links; a concise
+hero with a desktop-only line basket icon; three cooperative values; the
+three-step weekly ordering process; a contact link to
+`laguixamanresa@gmail.com`; Manresa; and a short footer. Do not add an address,
+opening hours, textures, oversized dark panels or unrelated application-wide
+branding changes. Keep mobile content in one column, retain visible navigation,
+make controls at least 44 px tall, and preserve clear focus and contrast in both
+themes. The `WelcomePage` remains a public composition surface and keeps the
+existing server route and authenticated access destination. See the immutable
+2026-11-11 Change history entry for the complete approved copy and visual source.
+
 T40 extends the same reactive opt-in to Dashboard, Wallet/Statement and the five existing producer
 pages. Their current page components retain their props, actions and form contracts. Shared page,
 panel, empty-state and mobile table presentation classes live under the pilot theme, so the two
