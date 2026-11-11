@@ -1,9 +1,9 @@
-# 001 — Desglossament proposat: pilot visual d'estoc (2026-11-11)
+# 001 — Desglossament acceptat: pilot visual d'estoc (2026-11-11)
 
 Part del [registre canònic](../tasks.md), amb una única definició de dependències al registre. Font de
 disseny: secció «Llenguatge visual de la portada a tota l'aplicació» del [pla
 001](../plan.md#llenguatge-visual-de-la-portada-a-tota-laplicació--proposta-de-pla), ara acceptada per
-l'usuari. Aquest document proposa tasques; no autoritza implementació ni publicació de tiquets.
+l'usuari. Aquest desglossament està acceptat; no autoritza implementació ni publicació de tiquets.
 
 Aprovació del pla: [decisió
 literal](../history/2026-11-11T16-58-01.938Z-no-task-af456e57-d88a-4d3a-b411-52e529785370.md).
@@ -29,9 +29,8 @@ aplicable; no hi ha servei o contracte nou. Camins: els fitxers esmentats existe
 fixtures és un fitxer nou previst. Verificació: possible amb ruta real, fixture determinista, mesures de DOM i
 proves actuals; les fixtures visuals simulades no acrediten persistència o autorització. La cobertura actual
 del graf és antiga/parcial, per tant l'implementador ha de confirmar els consumidors i rutes vigents al codi
-de la seva base abans d'editar. `specs/001-weekly-orders/workflow.json` encara no existeix: el validador de
-tasques que el requereix queda com a buit d'evidència del llegat, sense declarar aquesta proposta acceptada ni
-executable per aquesta via.
+de la seva base abans d’editar. El registre de fonts del pilot és `specs/001-weekly-orders/workflow.json`;
+la seva comprovació només acredita prerequisits documentals, no autorització d’executar.
 
 **Tall.** Una sola tasca executable T84. Separar tokens, shell, taula i diàleg en tasques independents
 deixaria resultats parcials sense un recorregut d'usuari complet, i multiplicaria la frontera temporal del
@@ -49,7 +48,7 @@ epic o tiquet en aquesta passada documental.
 
 ## T84
 
-**Aplicar la identitat de la landing al pilot d’Estoc de gestió. Estat: proposada; no admesa a execució.**
+**Aplicar la identitat de la landing al pilot d’Estoc de gestió. Estat: acceptada; sense autorització d’execució.**
 
 **Resultat.** Un gestor pot entrar a l'índex d'estoc, cercar un producte, llegir-ne preu i quantitat, obrir
 l'edició, desar una quantitat vàlida o rebre'n l'error, consultar moviments, canviar l’estat directament a la llista o amb confirmació dins del diàleg i
@@ -183,15 +182,17 @@ StockEditDialog com a canviats, de manera que es llegeixen les fonts actuals. El
 inventari exhaustiu de consumidors. Abans de l’execució, repetir la comprovació sobre la base candidata, en
 particular per als wrappers de portals que canviïn.
 
-`node .agent-workflow/scripts/validate-feature.mjs 001-weekly-orders tasks` retorna `evidenceReady: false`:
-manca `specs/001-weekly-orders/workflow.json`. És una mancança documental prèvia de la feature establerta, no
-una decisió de producte pendent ni un motiu per inventar discovery, revisions o acceptacions. Es lliura el
-desglossament com a proposta, sense promocionar l’etapa ni crear un manifest amb aprovacions fictícies. El
-coordinador haurà de reconciliar el registre d’evidències a partir de fonts reals abans de donar la porta per
-passada o admetre execució; no cal alterar cap script ni reobrir el comportament acceptat per preparar aquesta
-proposta.
+La mancança inicial de `workflow.json` queda reconciliada amb fonts actuals i decisions reals. El manifest
+selecciona només `landing-style-stock-pilot` (T84). La descoberta es documenta ara com a reconstrucció
+d’abast de les decisions ja acceptades; la revisió de gaps és nova i limitada al pilot, no una auditoria
+retrospectiva de tota 001. Els requisits de negoci es mantenen sense canvis.
 
-**Frontera tècnica:** T84 no té dependències de codi pendents. **Admissió:** no llesta; pendent d’acceptació
-d’aquest desglossament, reconciliació de la porta d’evidència i autorització explícita d’implementar. La
-revisió estètica del pilot és una porta posterior a la seva implementació i anterior a la propagació. No s’ha
-executat cap test d’app ni comprovació visual en aquesta preparació documental.
+[Acceptació literal de T84](../history/2026-11-11T17-11-48.918Z-no-task-f1d25139-bd9e-455b-8b11-b1728e63688a.md). El coordinador valida els prerequisits documentals amb
+`node .agent-workflow/scripts/validate-feature.mjs 001-weekly-orders implementation` després de reconciliar
+els hashes. El resultat es registra a l’historial; no omplir implementation/review/integration/acceptance
+amb proves o aprovacions que encara no existeixen.
+
+**Frontera tècnica:** T84 no té dependències de codi pendents. **Autorització:** l’usuari ha acceptat pla i
+desglossament però ha exclòs expressament implementar i publicar tiquets. La revisió estètica del pilot
+continua posterior a la seva implementació i anterior a la propagació. No s’ha executat cap test d’app ni
+comprovació visual en aquesta reconciliació documental.

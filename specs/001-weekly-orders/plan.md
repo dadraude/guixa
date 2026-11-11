@@ -1125,7 +1125,7 @@ of superseding product behavior.
 
 ## Llenguatge visual de la portada a tota l'aplicació — proposta de pla
 
-**Estat: pla acceptat (2026-11-11); desglossament pendent d’acceptació. Ruta: plan-only, 001.** La portada integrada a
+**Estat: pla acceptat (2026-11-11); desglossament T84 acceptat (2026-11-11). Ruta: plan-only, 001.** La portada integrada a
 PR #385 és la referència visual real. Aquesta esmena defineix com traslladar-ne el llenguatge a l'aplicació
 sencera; no canvia encara codi, tiquets ni el comportament. L’usuari n’ha aprovat la direcció i ha demanat
 el desglossament començant pel pilot d’Estoc de gestió. Substitueix la direcció cromàtica i el tractament
@@ -1221,7 +1221,7 @@ pantalla: una taula, un error o una confirmació destructiva no necessiten il·l
 avís ni els colors de les verdures en estats de negoci.
 
 L’aprovació literal consta a [l’entrada d’acceptació](history/2026-11-11T16-58-01.938Z-no-task-af456e57-d88a-4d3a-b411-52e529785370.md).
-El [desglossament del pilot](tasks/landing-style-pilot.md) és una proposta separada; ni aquest pla
+El [desglossament del pilot](tasks/landing-style-pilot.md) ha estat acceptat per separat; ni aquest pla
 ni la preparació de tasques autoritzen implementar o publicar tiquets.
 
 ### Seqüència d'implementació futura
