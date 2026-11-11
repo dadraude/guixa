@@ -84,6 +84,7 @@ import { Button } from '@/components/ui/button';
     letter-spacing: 0.08em;
     line-height: 1.5;
     text-transform: uppercase;
+    overflow-wrap: anywhere;
 }
 
 .welcome-hero h1 {
@@ -161,7 +162,7 @@ import { Button } from '@/components/ui/button';
     outline-offset: 3px;
 }
 
-@media (min-width: 48rem) {
+@container (min-width: 48rem) {
     .welcome-hero {
         grid-template-columns: minmax(0, 1.35fr) minmax(12rem, 0.65fr);
         gap: 2rem;

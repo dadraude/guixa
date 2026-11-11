@@ -61,6 +61,7 @@ defineProps<{ actionHref: string }>();
 .welcome-shell {
     width: min(100% - 2.5rem, 72rem);
     margin-inline: auto;
+    container-type: inline-size;
 }
 
 .welcome-brand {
