@@ -55,7 +55,7 @@ final class ListDashboard
             $byGroup[$this->receptionGroupKey($work)][$work->recordKey()] = $work;
         }
 
-        return array_values(array_map(fn (array $members, string $key) => $this->receptionGroup($key, $members), $byGroup, array_keys($byGroup)));
+        return array_map(fn (array $members, string $key) => $this->receptionGroup($key, $members), $byGroup, array_keys($byGroup));
     }
 
     /** @param  non-empty-array<string, ReceptionWork>  $members */
