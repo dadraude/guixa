@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\AttentionGroupRow;
 use App\Http\RoleAreas;
 use Guixa\Catalog\Application\CountProducers;
+use Guixa\Dashboard\Application\AttentionGroupData;
+use Guixa\Dashboard\Application\ListDashboard;
 use Guixa\Membership\Application\CountAccounts;
 use Guixa\Membership\Application\CountHouseholds;
 use Guixa\Ordering\Application\CountCycles;
 use Guixa\Ordering\Application\CountOpenMemberCycles;
 use Guixa\Ordering\Application\ListMemberCycles;
-use Guixa\Sales\Application\BasketData;
-use Guixa\Sales\Application\ListMemberPendingCollections;
-use Guixa\Sales\Application\ListPendingCollections;
 use Guixa\Shared\Application\Actor;
 use Guixa\Wallet\Application\ReadHouseholdBalance;
 use Inertia\Inertia;
@@ -28,8 +28,7 @@ class DashboardController extends Controller
         CountAccounts $countAccounts,
         CountProducers $countProducers,
         ReadHouseholdBalance $readHouseholdBalance,
-        ListMemberPendingCollections $memberPending,
-        ListPendingCollections $staffPending,
+        ListDashboard $listDashboard,
     ): Response {
         $roles = $actor->roleNames();
         $isManager = in_array('manager', $roles, true);
@@ -48,24 +47,6 @@ class DashboardController extends Controller
         $balance = null;
         if ($hasHousehold) {
             $balance = $readHouseholdBalance($actor->householdId);
-        }
-
-        $pendingPickups = [];
-        if ($hasHousehold) {
-            $pendingPickups = array_map(
-                fn (BasketData $basket) => [
-                    'basketId' => $basket->id,
-                    'validatedAt' => $basket->validatedAt?->setTimezone(new \DateTimeZone(config('guixa.timezone')))->format('Y-m-d'),
-                    'weekly' => $basket->weekly,
-                    'late' => $basket->late,
-                ],
-                $memberPending($actor),
-            );
-        }
-
-        $staffPendingCollections = null;
-        if (array_intersect(['manager', 'finance'], $roles) !== []) {
-            $staffPendingCollections = ['count' => count($staffPending($actor))];
         }
 
         $managerSummary = null;
@@ -94,10 +75,28 @@ class DashboardController extends Controller
             'nextPickup' => $nextPickup,
             'openCycles' => $hasHousehold ? $countOpenMemberCycles($actor) : 0,
             'balance' => $balance,
-            'pendingPickups' => $pendingPickups,
-            'staffPendingCollections' => $staffPendingCollections,
+            'attention' => array_map($this->attentionRow(...), $listDashboard($actor)->attention),
             'managerSummary' => $managerSummary,
             'areaShortcuts' => RoleAreas::shortcuts($actor),
         ]);
+    }
+
+    private function attentionRow(AttentionGroupData $group): AttentionGroupRow
+    {
+        return new AttentionGroupRow($group->key, $group->action, $group->cycleId, $group->scheduledDate, $group->count, $this->destinationUrl($group));
+    }
+
+    private function destinationUrl(AttentionGroupData $group): string
+    {
+        $basketId = $group->destination->basketId;
+        if ($group->destination->staffWide) {
+            if ($basketId !== null) {
+                return route('finance.baskets.show', $basketId, false);
+            }
+
+            return route('finance.baskets.index', $group->cycleId === null ? ['pending' => 1] : ['pending' => 1, 'cycle' => $group->cycleId], false);
+        }
+
+        return $basketId === null ? route('baskets.index', ['pending' => 1], false) : route('baskets.show', $basketId, false);
     }
 }

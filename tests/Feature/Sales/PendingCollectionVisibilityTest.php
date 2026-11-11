@@ -61,7 +61,7 @@ it('shows pending collections by validation order to the right audience: drafts 
             ->has('baskets', 3)->where('pending', true)
             ->where('baskets', fn ($rows) => collect($rows)->pluck('id')->all() === $ids)
             ->where('baskets', fn ($rows) => collect($rows)->pluck('validatedAt')->all() === array_map($validatedAt, $ids)));
-        $this->get('/dashboard')->assertInertia(fn (Assert $page) => $page->where('staffPendingCollections.count', 3));
+        $this->get('/dashboard')->assertInertia(fn (Assert $page) => $page->where('attention', fn ($groups) => collect($groups)->sum('count') === 3));
     }
     // The cycle badge counts weekly baskets only; the cycleless stock basket is not in it.
     $this->actingAs(accountWith(Role::Manager))->get("/manage/cycles/{$week['cycle']}")
@@ -73,12 +73,12 @@ it('shows pending collections by validation order to the right audience: drafts 
             === collect([$stock, $week['baskets']['A']])->sort()->values()->all())
         ->where('baskets', fn ($rows) => collect($rows)->every(fn ($row) => $row['validatedAt'] === $validatedAt($row['id']))));
     $this->get('/dashboard')->assertInertia(fn (Assert $page) => $page
-        ->has('pendingPickups', 2)->where('staffPendingCollections', null));
+        ->where('attention', fn ($groups) => collect($groups)->sum('count') === 2 && collect($groups)->every(fn ($group) => str_starts_with($group['href'], '/baskets'))));
     $this->actingAs(memberOf($week['households']['B'], 'Berta'))->get('/baskets?pending=1')->assertInertia(fn (Assert $page) => $page
         ->has('baskets', 1)->where('baskets.0.id', $draftOnly));
     $this->actingAs(memberOf($week['households']['K'], 'Kira'))->get('/baskets?pending=1')->assertInertia(fn (Assert $page) => $page
         ->has('baskets', 0))->assertOk();
-    $this->get('/dashboard')->assertInertia(fn (Assert $page) => $page->has('pendingPickups', 0));
+    $this->get('/dashboard')->assertInertia(fn (Assert $page) => $page->has('attention', 0));
     $this->actingAs(accountWith(Role::Producer))->get('/baskets?pending=1')->assertForbidden();
     $this->get('/finance/baskets?pending=1')->assertForbidden();
 

@@ -52,7 +52,7 @@ Eloquent in Application, or business logic in a controller/DTO/Vue.
 | --- | --- | --- |
 | Ordering `src/Ordering/Application/ReadDashboardOrderWork.php` *(planned internal, no actor)* | A scoped read for Manager manual-send work and Receiver/Finance/Manager reception work: producer/cycle identifiers, names, scheduled date, sent-order identity, current reception stage and allocation-balance fact. Scope names are explicit, e.g. `manualSend` or `reception`, chosen only after Dashboard's entry-point gate check. | R5–R6/R9/R12–R14. Manual send requires a participating, non-empty, **unsent** order, producer ordering closed and a notifyable account under the *same* 001 R12a rule. Reuse `Cycle::producersReadyToSend` plus `SendableTotals` path used by `ListCycles` (`src/Ordering/Application/ListCycles.php:12–38`), not a cutoff heuristic. For receptions, reuse `ReceptionLoader::load` as a read-only calculation or a batch equivalent; it constructs a snapshot without persisting (`src/Ordering/Domain/ReceptionLoader.php`). `ListReceptionCycles` has sent/validated/distributed state but no blocker flag. Never call a command or persist/open a reception on read; defaults and received-vs-basket variance do not prove allocation balance. |
 | Ordering `src/Ordering/Application/ReadDashboardOrderOpportunities.php` *(planned internal, no actor)* | Member scope takes the current household ID and returns open ordering windows with applicable cutoffs and destination cycle IDs; producer scope takes only the current producer ID and returns its sent summary destinations. | R1/R11/R12/S2–S3/S10. Reuse `ListMemberCycles` rules and existing cutoff/producer order rules inside Ordering, without invoking its actor-gated UI query as a forged actor. Do not infer submission obligation from a saved order. No household names in producer output. |
-| Sales `src/Sales/Application/ReadDashboardBasketWork.php` *(planned internal, no actor)* | `memberCollection(householdId)` returns only that household's pending collections; `staffWork` returns all-household pending collections and eligible draft preparation/validation. Each includes basket UUID, source/cycle or optional pickup context, household display label where allowed, domain-derived action stage and destination ID. | R4/R7–R8/R14. Existing `ListMemberPendingCollections` and `ListPendingCollections` establish collection behavior and include closed/cycleless baskets (`src/Sales/Application/…`); the internal query reuses their repository/domain rule without forging an actor. The narrow projection uses owning Basket's effective-content and eligibility rules, not amount, `totalCents`, cancelled-cycle attribution or active-household filtering. `ListBaskets` is broad detail, not a dashboard contract. |
+| Sales `src/Sales/Application/ReadDashboardBasketWork.php` *(planned internal, no actor)* | `__invoke(householdId)` returns only that household's pending collections and `__invoke()` all households' (T01; draft preparation/validation joins in T03 through its own query, see the T01 Deviation). Each includes basket UUID, source/cycle or optional pickup context, household display label where allowed, domain-derived action stage and destination ID. | R4/R7–R8/R14. Existing `ListMemberPendingCollections` and `ListPendingCollections` establish collection behavior and include closed/cycleless baskets (`src/Sales/Application/…`); the internal query reuses their repository/domain rule without forging an actor. The narrow projection uses owning Basket's effective-content and eligibility rules, not amount, `totalCents`, cycle state or active-household filtering. `ListBaskets` is broad detail, not a dashboard contract. |
 | Dashboard `ListDashboard(actor)` | `attention[]`, `opportunities[]`, permitted shortcuts or existing shortcut prop, `lastUpdatedAt` instant and server-provided visibility flags; each attention group contains action code, context label/date, distinct-record count, accessible text, permitted destination and stable IDs. | R1–R3/R11–R16. The time is from `Clock` only after all source reads succeed. A role with no context gets explanatory no-context copy, not fabricated zero metrics. |
 
 The entry-point Dashboard query authorizes the explicit `Actor` and may call an internal reader only with a
@@ -76,18 +76,18 @@ governed by its current role mapping, including 003 R15.
 - Draft basket with effective goods/returns and `canValidate` → `validate_basket`; otherwise an actionable
   draft → `prepare_basket`. Exclude validated, cancelled, effectively empty/no-collection cases according to
   existing Sales rules. Monetary zero is not an exclusion. Validated, effective, uncollected basket →
-  `collect_basket` for member or Finance/Manager. Include late, closed-cycle, inactive-household staff,
-  attributed independent stock and cycleless baskets. Wallet balance never gates collection
+  `collect_basket` for member or Finance/Manager. Include late, closed-cycle, inactive-household staff
+  and cycleless (including independent stock) baskets. Wallet balance never gates collection
   (R4/R7–R8/R14/S4/S7).
 - Canonical dedup key is `(action code, owning record type, stable record key)`, before grouping. Use basket
   UUID for basket actions and `(cycle UUID, producer UUID)` for producer sending and reception actions; an
   unopened reception has no persisted reception UUID to rely on. A combined member/Finance account's basket
   collection therefore appears once even if both scoped reads emit it. Distinct actions on the same record
   retain separate keys. Group key is `(action code, cycle UUID)` when a cycle context exists, otherwise
-  `(action code, scheduled date or explicit no-cycle context)`; independent stock basket attribution to a
-  cancelled cycle is context only and never an eligibility filter. Count distinct stable record keys, never
-  sum staff and member counts. Show a permitted compact cycle/date and producer or household context with
-  count; use the existing authorized task list for multiple records, and detail for one. Do not expand an
+  `(action code, scheduled date or explicit no-cycle context)`; an independent stock basket has no cycle
+  attribution and takes the no-cycle context, and no cycle's state is an eligibility filter. Count distinct
+  stable record keys, never sum staff and member counts. Show a permitted compact cycle/date and producer or
+  household context with count; use the existing authorized task list for multiple records, and detail for one. Do not expand an
   unbounded list of names into a row. A group destination is selected from the actor's permitted view (staff
   list for mixed staff collection). If a list lacks an exact filter, it still exposes the records for
   inspection; no new action route is needed (R2–R3/R14/S1/S4).
@@ -141,7 +141,7 @@ visual-design approval gate.
 
 - Test-first Application scenarios S1–S12 through the public Dashboard query and owning source projections:
   mixed-role union/collection dedup; current household move and producer privacy; member open ordering plus
-  validated collection; closed/late/cycleless/cancelled-attributed basket; unopened and default reception read
+  validated collection; closed/late/cycleless basket; unopened and default reception read
   without persistence; blocking allocation vs basket variance, validated distribution and Receiver exclusion;
   effective draft vs zero amount, cancellation and automatic closure absence; manual-send exact eligibility
   and scheduler exclusion; cross-cycle/date/stage/tie ordering; no-work opportunities; refresh/role changes.

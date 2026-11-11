@@ -13,12 +13,13 @@ checked by architecture tests.
 ## Ownership and allowed dependencies
 
 Dependencies name the targets a module may call through declared exports. They do not grant access
-to a target's entire Application namespace. Shared is a kernel; the other six entries are business
+to a target's entire Application namespace. Shared is a kernel; the other seven entries are business
 modules. `Platform` below names framework persistence ownership, not a `src/Platform` module.
 
 | Module     | Owns today                                                                                                                   | Allowed dependencies                                 |
 | ---------- | ---------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
 | Catalog    | Producers; all product identity, metadata, classification and administration                                                 | Membership, Ordering, Sales, Stock, Shared           |
+| Dashboard  | Read-only dashboard composition of other modules' exported reads; no table, no command                                       | Sales, Shared                                        |
 | Membership | Accounts, households, roles, invitations and household lifecycle                                                             | Catalog, Sales, Wallet, Shared                       |
 | Ordering   | Weekly demand, cycles, cutoffs, producer orders, reception and allocation; settlement hands orders to Sales                  | Catalog, Membership, Sales, Shared                   |
 | Sales      | Stock offers, weekly base baskets and independent stock/return baskets: actuals, validation, late weekly baskets, collection | Catalog, Membership, Ordering, Stock, Wallet, Shared |
@@ -57,6 +58,7 @@ else in a module is private to that module for integration purposes, even when P
 | Ordering → Stock         | ReadCyclePickupDates                                                                                                                      | —                                                                                |
 | Ordering → Sales         | LockWeeklyBasketSource, CloseCycleAfterBasketValidation, ReadCyclePickupDates, ReadSourceOrderCycles, ReadCycleSourceOrders               | —                                                                                |
 | Sales → Catalog          | HasProductHistory                                                                                                                         | —                                                                                |
+| Sales → Dashboard        | ReadDashboardBasketWork                                                                                                                   | DashboardBasketWorkData                                                          |
 | Sales → Membership       | ReadOpenHouseholdBaskets                                                                                                                  | OpenBasketData                                                                   |
 | Sales → Ordering         | CreateWeeklyBasket, SyncWeeklyBasket, AddLateWeeklyLines, ReadWeeklyBasketStates, ReadPendingCollections, ReadHouseholdContainerBalances  | WeeklyBaseData, WeeklyBaseLineData, WeeklyBasketStateData, PendingCollectionData |
 | Stock → Catalog          | CheckProductUsage, GetAvailableQuantities                                                                                                 | —                                                                                |
@@ -65,7 +67,7 @@ else in a module is private to that module for integration purposes, even when P
 | Wallet → Membership      | ReadHouseholdBalance                                                                                                                      | —                                                                                |
 | Wallet → Sales           | ChargeForBasket, GetBalance, RecordCorrection                                                                                             | —                                                                                |
 
-Shared explicitly exports `Application\Actor`, `ActorResolver`, `TransactionRunner`, and
+Shared explicitly exports `Application\Actor` (also to Dashboard), `ActorResolver`, `TransactionRunner`, and
 `Domain\Money`, `Quantity`, `Clock`, `LocalTime`, `Role`, plus `InvalidLocalTime` and `InvalidQuantity`
 in `Domain\Error`. Business modules may use these according to A1/A2. Application authorization uses Laravel gates
 and policies against the explicit `Actor`; denials throw Laravel's `AuthorizationException`.

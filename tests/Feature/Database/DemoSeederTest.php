@@ -25,7 +25,8 @@ it('seeds a usable cooperative with accounts, orders, reception and pickups', fu
     $this->assertDatabaseCount('orders', 12);
     expect(DB::table('order_lines')->count())->toBeGreaterThan(60);
     expect(DB::table('cycles')->whereNotNull('settled_at')->count())->toBe(1);
-    expect(DB::table('baskets')->where('kind', 'weekly')->where('state', 'draft')->count())->toBe(3);
+    expect(DB::table('baskets')->where('kind', 'weekly')->where('state', 'draft')->count())->toBe(2);
+    expect(DB::table('baskets')->where('kind', 'weekly')->where('state', 'validated')->count())->toBe(1);
     expect(DB::table('baskets')->where('kind', 'weekly')->where('state', 'collected')->count())->toBe(1);
     expect(DB::table('received_totals')->count())->toBeGreaterThan(0);
     expect(DB::table('stock_movements')->count())->toBe(2);

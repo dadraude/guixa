@@ -21,8 +21,8 @@
             "fonts": ["16px \"Nunito Variable\""],
             "focus": [
                 "button[data-sidebar=\"trigger\"]",
-                "section[aria-label=\"member actions\"] .pilot-action-row a:first-of-type",
-                "section[aria-label=\"member actions\"] .pilot-action-row a:last-of-type"
+                "section[aria-label=\"accions dels membres\"] .pilot-action-row a:first-of-type",
+                "section[aria-label=\"accions dels membres\"] .pilot-action-row a:last-of-type"
             ],
             "states": [
                 {
@@ -90,8 +90,8 @@
             "fonts": ["16px \"Nunito Variable\""],
             "focus": [
                 "button[data-sidebar=\"trigger\"]",
-                "section[aria-label=\"producer actions\"] .pilot-action-row a:first-of-type",
-                "section[aria-label=\"producer actions\"] .pilot-action-row a:last-of-type"
+                "section[aria-label=\"accions dels productors\"] .pilot-action-row a:first-of-type",
+                "section[aria-label=\"accions dels productors\"] .pilot-action-row a:last-of-type"
             ],
             "states": [
                 {
@@ -159,8 +159,8 @@
             "fonts": ["16px \"Nunito Variable\""],
             "focus": [
                 "button[data-sidebar=\"trigger\"]",
-                "section[aria-label=\"manager actions\"] .pilot-action-row a:first-of-type",
-                "section[aria-label=\"manager actions\"] .pilot-action-row a:last-of-type"
+                "section[aria-label=\"accions de gestió\"] .pilot-action-row a:first-of-type",
+                "section[aria-label=\"accions de gestió\"] .pilot-action-row a:last-of-type"
             ],
             "states": [
                 {

@@ -6,6 +6,7 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import AuthLayout from '@/layouts/AuthLayout.vue';
 import SettingsLayout from '@/layouts/settings/Layout.vue';
 import { installTranslations } from '@/lib/i18n';
+import { trans } from 'laravel-vue-i18n';
 
 const query = new URLSearchParams(window.location.search);
 const fixtureUrl = window.location.href;
@@ -177,12 +178,14 @@ const pageProps: Record<string, Record<string, unknown>> = {
         nextPickup: pickupDate,
         openCycles: 1,
         balance: 2000,
-        pendingPickups: [
+        attention: [
             {
-                basketId: 'visual-basket',
-                validatedAt: pickupDate,
-                weekly: true,
-                late: false,
+                key: 'collect_basket:cycle:visual-cycle',
+                action: 'collect_basket',
+                cycleId: 'visual-cycle',
+                scheduledDate: pickupDate,
+                count: 1,
+                href: '/baskets/visual-basket',
             },
         ],
         managerSummary: {
@@ -440,15 +443,14 @@ if (pageName === 'Dashboard') {
     visualProps.isMember = role === 'member';
     visualProps.managerSummary =
         role === 'manager' ? visualProps.managerSummary : null;
-    visualProps.pendingPickups =
-        role === 'member' ? visualProps.pendingPickups : [];
+    visualProps.attention = role === 'member' ? visualProps.attention : [];
     visualProps.nextPickup = role === 'member' ? visualProps.nextPickup : null;
     visualProps.openCycles = role === 'member' ? visualProps.openCycles : 0;
     visualProps.balance = role === 'member' ? visualProps.balance : null;
     if (state === 'empty' || state === 'no-cycle' || state === 'no-data') {
         visualProps.nextPickup = null;
         visualProps.openCycles = 0;
-        visualProps.pendingPickups = [];
+        visualProps.attention = [];
         if (role === 'manager') {
             visualProps.managerSummary = {
                 cycles: 0,
@@ -567,13 +569,13 @@ void createInertiaApp({
             '#main-content .pilot-t44-page',
         );
         const present = (name: string) =>
-            !!root?.querySelector(`section[aria-label="${name}"]`);
+            !!root?.querySelector(`section[aria-label="${trans(name)}"]`);
         const valid =
             present('member actions') === (role === 'member') &&
             present('producer actions') === (role === 'producer') &&
             present('manager actions') === (role === 'manager') &&
             present('cooperative summary') === (role === 'manager') &&
-            present('pending pickups') ===
+            present('pending work') ===
                 (role === 'member' && state !== 'empty');
         if (root) root.dataset.visualRoleValid = String(valid);
     }

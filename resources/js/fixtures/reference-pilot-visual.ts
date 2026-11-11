@@ -117,9 +117,7 @@ const catalogueProps: Record<string, Record<string, unknown>> = {
         nextPickup: null,
         openCycles: 0,
         balance: null,
-        pendingPickups: [],
         managerSummary: null,
-        staffPendingCollections: null,
         areaShortcuts: [
             {
                 role: 'catalogue',
