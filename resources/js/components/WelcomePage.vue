@@ -91,16 +91,6 @@ defineProps<{ actionHref: string }>();
     content: '';
 }
 
-.welcome-hero-band::after {
-    position: absolute;
-    inset: 0;
-    background-image:
-        linear-gradient(to bottom, var(--welcome-paper), transparent 18px),
-        linear-gradient(to top, var(--welcome-paper), transparent 18px);
-    pointer-events: none;
-    content: '';
-}
-
 .welcome-hero-band > .welcome-shell {
     position: relative;
     z-index: 1;
