@@ -250,6 +250,10 @@
             "ticketDraftPreparation": {
                 "path": "specs/004-dashboard/history/2026-11-11T07-40-43.605Z-no-task-4338a807-6618-496f-aece-ce32d85cf0f5.md",
                 "sha256": "0184180f5bdda98b9859f4369ec2a41108ab3deea536d4fbb7a7def6479fa782"
+            },
+            "ticketPublicationApproval": {
+                "path": "specs/004-dashboard/history/2026-11-11T07-52-53.734Z-no-task-284e0d2a-564a-4f20-9e62-5530ce5591c6.md",
+                "sha256": "3117353aa1cb3d28ea33320c1ada1c68fbbf4c81222c0b96bf66ce45be3efaa5"
             }
         }
     }
