@@ -34,21 +34,22 @@ jobs:
 
   # Keep the existing docs check on every PR, including mixed code/docs changes.
   docs:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Windows]
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
-
+      # Node first: pnpm's installer needs npm, which the runner lacks. The pnpm
+      # store persists on the self-hosted runner, so no setup-node cache.
       - name: Setup Node
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: '22'
-          cache: pnpm
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -84,7 +85,7 @@ jobs:
   frontend:
     needs: changes
     if: needs.changes.outputs.frontend == 'true'
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Windows]
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -99,22 +100,28 @@ jobs:
           tools: composer:v2
           coverage: none
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
-
+      # Node first: pnpm's installer needs npm, which the runner lacks. The pnpm
+      # store persists on the self-hosted runner, so no setup-node cache.
       - name: Setup Node
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: '22'
-          cache: pnpm
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
 
       # Wayfinder generates routes while building; PHP is needed, services are not.
-      - name: Prepare application for frontend build
+      # One command per step: PowerShell only fails a step on its last exit code.
+      - name: Install PHP dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Prepare environment
         run: |
-          composer install --no-interaction --prefer-dist
-          cp .env.example .env
+          Copy-Item .env.example .env
           php artisan key:generate
-          pnpm install --frozen-lockfile
+
+      - name: Install frontend dependencies
+        run: pnpm install --frozen-lockfile
 
       - name: Build frontend and generate routes
         run: pnpm run build
@@ -128,43 +135,45 @@ jobs:
   backend:
     needs: changes
     if: needs.changes.outputs.backend == 'true'
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Windows]
 
-    services:
-      postgres:
-        image: postgres:17
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: guixa_test
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-      redis:
-        image: redis:7
-        ports:
-          - 6379:6379
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
+    # Job services need a Linux runner, so Postgres and Redis run through
+    # `docker run` on non-default ports to stay clear of local instances.
     env:
+      PG_CONTAINER: guixa-ci-pg-${{ github.run_id }}-${{ github.run_attempt }}
+      REDIS_CONTAINER: guixa-ci-redis-${{ github.run_id }}-${{ github.run_attempt }}
       DB_CONNECTION: pgsql
       DB_HOST: 127.0.0.1
-      DB_PORT: 5432
+      DB_PORT: 55432
       DB_DATABASE: guixa_test
       DB_USERNAME: postgres
       DB_PASSWORD: postgres
       REDIS_HOST: 127.0.0.1
-      REDIS_PORT: 6379
+      REDIS_PORT: 56379
 
     steps:
+      - name: Start Postgres and Redis
+        run: |
+          docker run -d --name $env:PG_CONTAINER `
+            -e POSTGRES_USER=postgres `
+            -e POSTGRES_PASSWORD=postgres `
+            -e POSTGRES_DB=guixa_test `
+            -p "${env:DB_PORT}:5432" `
+            postgres:17
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          docker run -d --name $env:REDIS_CONTAINER `
+            -p "${env:REDIS_PORT}:6379" `
+            redis:7
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          for ($i = 0; $i -lt 30; $i++) {
+            docker exec $env:PG_CONTAINER pg_isready -h 127.0.0.1 -U postgres
+            $pg = $LASTEXITCODE
+            docker exec $env:REDIS_CONTAINER redis-cli ping
+            if ($pg -eq 0 -and $LASTEXITCODE -eq 0) { exit 0 }
+            Start-Sleep -Seconds 2
+          }
+          exit 1
+
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -180,14 +189,15 @@ jobs:
           # pcov ignores app/ unless told; ini_set from phpunit.xml is refused, so set it at startup.
           ini-values: pcov.directory=${{ github.workspace }}, pcov.exclude="~/(vendor|tests|node_modules|storage|bootstrap)/~"
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
-
+      # Node first: pnpm's installer needs npm, which the runner lacks. The pnpm
+      # store persists on the self-hosted runner, so no setup-node cache.
       - name: Setup Node
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: '22'
-          cache: pnpm
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
 
       - name: Setup Application
         run: composer setup
@@ -195,6 +205,11 @@ jobs:
       - name: Run PHP checks and tests
         run: composer test:coverage
 
+      - name: Stop Postgres and Redis
+        if: always()
+        run: docker rm -f $env:PG_CONTAINER $env:REDIS_CONTAINER
+
+  # Stays on Linux: it needs python3 and Chrome at /usr/bin.
   tooling:
     needs: changes
     if: needs.changes.outputs.tooling == 'true'
