@@ -162,8 +162,26 @@ defineProps<{ actionHref: string }>();
 
 @media (max-width: 47.999rem) {
     .welcome-hero-band::before {
-        mask-position: left center;
-        mask-size: 200% 100%;
+        bottom: auto;
+        height: 48px;
+        mask-position: left top;
+        mask-size: 200% 250px;
+    }
+
+    .welcome-hero-band::after {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        height: 48px;
+        background: var(--welcome-paper);
+        mask-image: url('../../images/welcome/hero-wear-subtle-mask.png');
+        mask-mode: luminance;
+        mask-position: left bottom;
+        mask-repeat: no-repeat;
+        mask-size: 200% 250px;
+        pointer-events: none;
+        content: '';
     }
 }
 </style>
