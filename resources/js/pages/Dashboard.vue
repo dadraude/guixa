@@ -85,7 +85,7 @@ const actionLabels: Record<Guixa.Dashboard.Domain.ActionKind, string> = {
 };
 
 const linkLabels: Record<Guixa.Dashboard.Domain.ActionKind, string> = {
-    send_order: trans('View cycle'),
+    send_order: trans('View cycles'),
     check_delivery_and_allocations: trans('View receptions'),
     resolve_allocations: trans('View receptions'),
     mark_distributed: trans('View receptions'),

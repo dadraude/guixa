@@ -344,7 +344,7 @@ describe('dashboard presentation', () => {
         );
         expect(html).toContain('Forn de la Vila ·');
 
-        expect(html).toContain('Veure cicle');
+        expect(html).toContain('Veure cicles');
         expect(html).not.toContain('<form');
         expect(html).not.toContain('<button type="submit"');
         expect(html.toLowerCase()).not.toContain('endarrerida');
