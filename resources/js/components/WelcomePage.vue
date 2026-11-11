@@ -82,7 +82,7 @@ defineProps<{ actionHref: string }>();
     inset: 0;
     background: var(--welcome-paper);
     opacity: 1;
-    mask-image: url('../../images/welcome/hero-wear-mask.png');
+    mask-image: url('../../images/welcome/hero-wear-horizontal-mask.png');
     mask-mode: luminance;
     mask-position: center;
     mask-repeat: no-repeat;
