@@ -10,7 +10,37 @@
             "panels": "[data-visual-panel]",
             "content": "h1,h2,p,a,li",
             "fonts": ["16px Nunito Variable"],
-            "focus": ["#welcome-action"],
+            "focus": [
+                ".welcome-brand",
+                ".welcome-nav a",
+                "#welcome-action",
+                ".welcome-primary-action",
+                ".welcome-text-action",
+                ".welcome-contact-button",
+                ".welcome-email"
+            ],
+            "assertions": [
+                {
+                    "selector": ".welcome-access",
+                    "minHeight": 44,
+                    "contrast": 4.5
+                },
+                {
+                    "selector": ".welcome-primary-action",
+                    "minHeight": 44,
+                    "contrast": 4.5
+                },
+                {
+                    "selector": ".welcome-contact-button",
+                    "minHeight": 44,
+                    "contrast": 4.5
+                },
+                { "selector": ".welcome-step-number", "contrast": 4.5 },
+                {
+                    "selector": ".welcome-email",
+                    "attributes": { "href": "mailto:laguixamanresa@gmail.com" }
+                }
+            ],
             "states": [
                 {
                     "id": "guest",

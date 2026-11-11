@@ -23,6 +23,7 @@ Source: [spec](spec.md) and areas · [plan](plan.md) · [coverage allocation](ta
 | [tasks/traceability.md](tasks/traceability.md) | T33 audit: assertion-level evidence and verdict for every requirement and scenario, closure prerequisites and gaps filled |
 | [tasks/audit-2026-11-05.md](tasks/audit-2026-11-05.md) | T69–T76: follow-up tasks from the 2026-11-05 SDD↔code audit (documents, bugfixes, refactors, tests, send button, movement history) |
 | [tasks/recorder-names.md](tasks/recorder-names.md) | T82: recorder names instead of account ids in the wallet statement and basket histories |
+| [tasks/landing.md](tasks/landing.md) | T83: approved light cooperative public landing |
 | [tasks/baseline.md](tasks/baseline.md) | Historical T01–T51 scopes, approval gates and dated evidence; superseded behavior is explicitly historical |
 
 IDs are feature-global. Detail files do not start separate numbering or redefine dependencies.
@@ -153,6 +154,7 @@ preserves; implement changed behavior through T52–T68; T69–T76 are the 2026-
 | T75 | <a id="t75"></a>[Manager send button for producer orders](tasks/audit-2026-11-05.md#t75) | R12a; S36 | T69 |
 | T76 | <a id="t76"></a>[Stock movement history](tasks/audit-2026-11-05.md#t76) | R25b, R28a, R36c; S93 | T69 |
 | T82 | <a id="t82"></a>[Show recorder names instead of account ids](tasks/recorder-names.md#t82) | R23a, R31 (recorder names) | T76 |
+| T83 | <a id="t83"></a>[Implement approved light cooperative landing](tasks/landing.md#t83) | Plan: Public Welcome landing direction | — |
 
 ## Linear mapping — 2026-11-05 audit tasks
 
@@ -264,6 +266,15 @@ coverage checks. They are not relabelled as current-HEAD browser verification. T
 and producer views omit the role query and default to member navigation; Welcome is guest-only.
 See the linked record for exact routes, candidates/bases, tests, approvals and bounded follow-up.
 These evidence gaps do not authorize repeating the redesign.
+
+## Linear mapping — T83 landing
+
+T83 is a standalone Coop task for the approved static public landing. It does not change the weekly
+ordering requirements or scenarios and has no prerequisite task.
+
+| Task | Linear issue | After |
+| --- | --- | --- |
+| [T83](#t83) | [DRA-264](https://linear.app/draude/issue/DRA-264/t83-implement-approved-light-cooperative-landing) | — |
 
 Descriptions record the reconciliation; only T47 changes status. Fields and native relations
 outside that authorized tracking update remain intact. T33 stays Todo with all 18 blockers;
