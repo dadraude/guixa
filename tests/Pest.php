@@ -122,12 +122,6 @@ function accountWith(Role ...$roles): User
     return $user;
 }
 
-/** Valid default payload for weekly catalogue product forms. */
-function weeklyForm(array $overrides = []): array
-{
-    return ['name' => 'Tomàquet', 'unit' => 'kg', 'price' => '3.00', 'variable' => false, 'containers_per_unit' => null, ...$overrides];
-}
-
 /** A member is an account linked to a household (R35); this links it to a new one. */
 function linkToNewHousehold(User $user): string
 {
