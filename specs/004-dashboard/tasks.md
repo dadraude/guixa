@@ -127,9 +127,9 @@ Later 004 insight slices are outside this verdict.
 - **Requirements.** R1–R4/R8/R14 collection subset; S4 and S1's H-basket collection assertion; 001
   R23a/R23b/R24/R24a. Current page summary for unrelated areas remains from 001 T61.
 - **Dependencies.** None; uses already delivered Sales and the existing dashboard route.
-- **Done when.** Given H has a validated late basket, a closed-cycle basket, a stock basket attributed to a
-  cancelled cycle and a cycleless stock basket, when H's current member opens the dashboard, then four
-  distinct pending records appear in their cycle/no-cycle groups with authorized `/baskets` links; a member of
+- **Done when.** Given H has a validated late basket, a closed-cycle basket and a cycleless stock basket,
+  when H's current member opens the dashboard, then three distinct pending records appear in their
+  cycle/no-cycle groups with authorized `/baskets` links; a member of
   J sees none of H's records (S4). Given Finance also belongs to H, the H basket counts once in the staff-wide
   collection group and a second household's basket is visible to Finance; a member-only actor sees no
   staff-wide group (S1 portion). Given a collected or effectively fully reversed basket, it is absent;
@@ -325,7 +325,7 @@ Later 004 insight slices are outside this verdict.
   (S3/S10). Given zero eligible pending records after a complete successful read, `can.showCaughtUp` is true
   with opportunities/shortcuts retained; known failure from T06 keeps it false, and a no-context actor sees
   explanation rather than fabricated zero. Cancelled weekly work and close-cycle action are absent;
-  independent stock basket attribution to cancelled cycle remains. A direct stale link cannot bypass
+  the cycleless stock basket remains. A direct stale link cannot bypass
   authorization. Given a reception distributed elsewhere or a removed Receiver role, refresh/return drops its
   item/link; failed refresh retains the last successful snapshot visibly stale (S11/S12). At 375 px/200% text,
   light/dark and keyboard, final populated/caught-up/busy/error states preserve names, counts, dates, links,

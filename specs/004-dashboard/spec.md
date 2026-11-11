@@ -77,8 +77,8 @@ domain entity.
   nothing-to-collect cases are excluded from draft work. A zero-price or net-zero basket with effective goods
   or returns may still require validation; amount alone cannot remove it.
 - **R8 — Staff collection.** Finance and Manager see every validated basket still pending collection that they
-  can record, including closed-cycle, late, attributed supplemental and cycleless baskets and those of
-  inactive households. Collection remains independent of wallet balance. An effective full contents reversal
+  can record, including closed-cycle, late and cycleless baskets (a supplemental basket is independent, has
+  no cycle and takes the no-cycle context) and those of inactive households. Collection remains independent of wallet balance. An effective full contents reversal
   or a corrected collection mark changes eligibility under 001 R23/R24 on the next read. A member/Finance or
   member/Manager account does not get a second copy of its own basket collection action.
 - **R9 — Manual sending.** Manager sees a participating producer's non-empty, unsent order only when the
@@ -118,8 +118,8 @@ domain entity.
   When the account has no pending work, say it is caught up and keep its permitted opportunities and area
   shortcuts available. When it has no role-specific context, explain the absence rather than displaying a
   fabricated zero or trend. Cancelled weekly work and retained cancelled drafts do not become live work.
-  An independent stock basket merely attributed to a cancelled cycle remains eligible under its own state
-  and permissions, as required by 001 R4b; the cancelled cycle reference alone cannot hide it.
+  An independent stock basket has no cycle attribution, so it shows in the explicit no-cycle context and
+  remains eligible under its own state and permissions, as required by 001 R4b; no cycle's state can hide it.
 
 ### Freshness and presentation
 
@@ -153,12 +153,11 @@ window, a saved order and a validated basket awaiting collection, when the membe
 collection is pending work before ordering opportunity; the order is not called unsubmitted; relevant cutoffs
 are shown without making the collection overdue solely from its pickup date.
 
-**S4 — Closed, cancelled-attribution and cycleless collection (R4, R8, R14).** Given a closed-cycle basket, a
-late basket, an independent stock basket attributed to a cancelled cycle and a cycleless stock basket remain
-effectively pending collection, when a current household member and Finance open their dashboards, then each
-sees only the baskets its permissions allow; all remain actionable despite date, cycle closure or the
-independent basket’s cancelled-cycle attribution. Cancelled weekly orders do not become work, and a cycleless
-basket has an explicit no-cycle context.
+**S4 — Closed, late and cycleless collection (R4, R8, R14).** Given a closed-cycle basket, a late basket and a
+cycleless independent stock basket remain effectively pending collection, when a current household member and
+Finance open their dashboards, then each sees only the baskets its permissions allow; all remain actionable
+despite date or cycle closure. Cancelled weekly orders do not become work, and a cycleless basket has an
+explicit no-cycle context.
 
 **S5 — Reception defaults and permissions (R5, R6).** Given a sent producer order whose reception has not yet
 been opened, and another sent reception whose received totals and allocations still equal the ordered defaults
