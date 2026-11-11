@@ -1,7 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Generator: visioncortex VTracer 0.6.12 -->
 <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="125.4 125.4 1003.2 1003.2">
-<g transform="scale(2.508)">
+<defs>
+  <filter id="pigment-wash" x="-3%" y="-3%" width="106%" height="106%" color-interpolation-filters="sRGB">
+    <feTurbulence type="fractalNoise" baseFrequency=".013" numOctaves="2" seed="7" result="cloud"/>
+    <feDisplacementMap in="SourceGraphic" in2="cloud" scale="1.4" xChannelSelector="R" yChannelSelector="G" result="organic"/>
+    <feColorMatrix in="cloud" type="matrix" values="0 0 0 0 1  0 0 0 0 .95  0 0 0 0 .82  1.9 0 0 0 -.72" result="paper"/>
+    <feComposite in="paper" in2="organic" operator="in" result="wash"/>
+    <feComposite in="wash" in2="organic" operator="over" result="painted"/>
+    <feTurbulence type="fractalNoise" baseFrequency=".12" numOctaves="2" seed="13" result="fine-grain"/>
+    <feColorMatrix in="fine-grain" type="matrix" values="0 0 0 0 .42  0 0 0 0 .31  0 0 0 0 .22  .22 0 0 0 -.085" result="pigment"/>
+    <feComposite in="pigment" in2="organic" operator="in" result="granulation"/>
+    <feComposite in="granulation" in2="painted" operator="over"/>
+  </filter>
+</defs>
+<g transform="scale(2.508)" filter="url(#pigment-wash)">
   <path fill="#c58c55" d="M86 300 Q248 328 414 299 L390 365 Q379 422 344 430 Q251 444 151 430 Q114 423 99 376 Z"/>
   <path fill="#e0b177" d="M78 285 Q86 269 116 276 Q255 309 393 275 Q421 279 412 299 Q398 320 350 321 Q247 339 144 318 Q94 313 78 294 Z"/>
   <path fill="#dcad73" d="M145 192 Q159 111 198 87 Q219 79 240 81 Q312 82 349 157 Q356 171 358 190 L345 194 Q326 109 266 95 Q213 82 181 129 Q164 153 157 195 Z"/>
