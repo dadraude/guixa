@@ -211,7 +211,7 @@
             "sliceId": "attention-and-opportunities",
             "tasks": {
                 "path": "specs/004-dashboard/tasks.md",
-                "sha256": "13e4575c2dc720c5c6c5042f8ff680b06b5278a5f262e7dbf87f84c946043b29"
+                "sha256": "bb197156fb2e73b2d682c462242897f19c7ccdae373498f1021f0e331b5fcc81"
             },
             "preparation": {
                 "path": "specs/004-dashboard/history/2026-11-11T07-32-03.022Z-no-task-54736f2d-7d33-4b71-b165-0685064a5d28.md",
@@ -245,7 +245,7 @@
             },
             "ticketDrafts": {
                 "path": "specs/004-dashboard/ticket-drafts.md",
-                "sha256": "d212d3736fd237e0032716f71b2c7a8b6d893adc4587aef0d69c904553bb3008"
+                "sha256": "fffa12b5cdcf0ec3acd24290ad96aec3c12a21c8049642c402dfd442b70c20ec"
             },
             "ticketDraftPreparation": {
                 "path": "specs/004-dashboard/history/2026-11-11T07-40-43.605Z-no-task-4338a807-6618-496f-aece-ce32d85cf0f5.md",
@@ -254,6 +254,14 @@
             "ticketPublicationApproval": {
                 "path": "specs/004-dashboard/history/2026-11-11T07-52-53.734Z-no-task-284e0d2a-564a-4f20-9e62-5530ce5591c6.md",
                 "sha256": "3117353aa1cb3d28ea33320c1ada1c68fbbf4c81222c0b96bf66ce45be3efaa5"
+            },
+            "ticketPublication": {
+                "path": "specs/004-dashboard/linear-publication.md",
+                "sha256": "4a6e527b91ef2ad25cf576e9a6c3bea500a6603d90ff4d07bfc457b2f688ba4c"
+            },
+            "ticketPublicationRecord": {
+                "path": "specs/004-dashboard/history/2026-11-11T07-58-14.727Z-no-task-b65835c1-cbde-4226-bc95-6e67ec9b8ac3.md",
+                "sha256": "d45230a9babcc753794fca585b3f212d4ee78aad1eab346ae9b8e0cef00ed2ba"
             }
         }
     }

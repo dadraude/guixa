@@ -51,15 +51,17 @@ architecture declarations and docs together. Planned paths are marked below; all
 
 ## Canonical task registry
 
-| ID | Task | Acceptance owner | After |
-| --- | --- | --- | --- |
-| T01 | <a id="t01"></a>[Show grouped pending basket collections](#t01-show-grouped-pending-basket-collections) | R1/R2/R3 collection subset, R4, R8 collection subset, R14 collection persistence; S4, S1 collection portion | — |
-| T02 | <a id="t02"></a>[Add read-only reception groups to attention](#t02-add-read-only-reception-groups-to-attention) | R5/R6, R10 distribution visibility, R1/R3 reception subset; S5/S6 | T01: Dashboard composition/list contract |
-| T03 | <a id="t03"></a>[Add basket preparation and validation groups](#t03-add-basket-preparation-and-validation-groups) | R7, R10 basket visibility; S7 (with T01 collection) | T01: Dashboard composition/list contract |
-| T04 | <a id="t04"></a>[Add eligible manual-send groups](#t04-add-eligible-manual-send-groups) | R9, R10 no manual closure, R12 send language; S8 | T01: Dashboard composition/list contract |
-| T05 | <a id="t05"></a>[Show scoped ordering, producer and Catalogue opportunities](#t05-show-scoped-ordering-producer-and-catalogue-opportunities) | R11, R1 opportunity privacy; S2/S3 opportunity portions | T01: Dashboard composition/list contract |
-| T06 | <a id="t06"></a>[Refresh on return and expose read failures](#t06-refresh-on-return-and-expose-read-failures) | R15 generic contract, R1 current access after change, R16 refresh states; S11/S12 generic portions | T01: Dashboard read/list contract |
-| T07 | <a id="t07"></a>[Complete attention priority and caught-up dashboard](#t07-complete-attention-priority-and-caught-up-dashboard) | R1–R3 union/final links, R8 dedup, R10 absence, R12–R15 full family behavior, R16 final; S1/S2/S3/S7/S9–S13 complete | T02–T06: all families and failure contract |
+Published under [DRA-256](https://linear.app/draude/issue/DRA-256/dashboard-attention-and-opportunities-first-slice); see the [publication record](linear-publication.md).
+
+| ID | Linear | Task | Acceptance owner | After |
+| --- | --- | --- | --- | --- |
+| T01 | [DRA-257](https://linear.app/draude/issue/DRA-257/t01-show-grouped-pending-basket-collections) | <a id="t01"></a>[Show grouped pending basket collections](#t01-show-grouped-pending-basket-collections) | R1/R2/R3 collection subset, R4, R8 collection subset, R14 collection persistence; S4, S1 collection portion | — |
+| T02 | [DRA-258](https://linear.app/draude/issue/DRA-258/t02-add-read-only-reception-groups-to-attention) | <a id="t02"></a>[Add read-only reception groups to attention](#t02-add-read-only-reception-groups-to-attention) | R5/R6, R10 distribution visibility, R1/R3 reception subset; S5/S6 | T01: Dashboard composition/list contract |
+| T03 | [DRA-259](https://linear.app/draude/issue/DRA-259/t03-add-basket-preparation-and-validation-groups) | <a id="t03"></a>[Add basket preparation and validation groups](#t03-add-basket-preparation-and-validation-groups) | R7, R10 basket visibility; S7 (with T01 collection) | T01: Dashboard composition/list contract |
+| T04 | [DRA-260](https://linear.app/draude/issue/DRA-260/t04-add-eligible-manual-send-groups) | <a id="t04"></a>[Add eligible manual-send groups](#t04-add-eligible-manual-send-groups) | R9, R10 no manual closure, R12 send language; S8 | T01: Dashboard composition/list contract |
+| T05 | [DRA-261](https://linear.app/draude/issue/DRA-261/t05-show-scoped-ordering-producer-and-catalogue-opportunities) | <a id="t05"></a>[Show scoped ordering, producer and Catalogue opportunities](#t05-show-scoped-ordering-producer-and-catalogue-opportunities) | R11, R1 opportunity privacy; S2/S3 opportunity portions | T01: Dashboard composition/list contract |
+| T06 | [DRA-262](https://linear.app/draude/issue/DRA-262/t06-refresh-on-return-and-expose-read-failures) | <a id="t06"></a>[Refresh on return and expose read failures](#t06-refresh-on-return-and-expose-read-failures) | R15 generic contract, R1 current access after change, R16 refresh states; S11/S12 generic portions | T01: Dashboard read/list contract |
+| T07 | [DRA-263](https://linear.app/draude/issue/DRA-263/t07-complete-attention-priority-and-caught-up-dashboard) | <a id="t07"></a>[Complete attention priority and caught-up dashboard](#t07-complete-attention-priority-and-caught-up-dashboard) | R1–R3 union/final links, R8 dedup, R10 absence, R12–R15 full family behavior, R16 final; S1/S2/S3/S7/S9–S13 complete | T02–T06: all families and failure contract |
 
 Current dependency frontier: **T01**, subject to external readiness/admission above. After T01
 integrates, **T02–T06** are technical frontier leaves: each extends the established list or read contract
