@@ -16,7 +16,7 @@ describe('public cooperative landing', () => {
     it('shows the approved Catalan sections and their in-page links', async () => {
         const html = await render('/login');
 
-        expect(html).toContain('El que mengem també transforma.');
+        expect(html).toContain('Alimentem el canvi.');
         expect(html).toContain('Consumim amb sentit.');
         expect(html).toContain('De la comanda a la cistella.');
         expect(html).toContain('Ens vols conèixer?');
