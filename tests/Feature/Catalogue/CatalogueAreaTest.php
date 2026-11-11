@@ -46,11 +46,6 @@ function areaUnsettledLine(ProducerModel $producer, ProductModel $product): void
     ]);
 }
 
-function weeklyForm(array $overrides = []): array
-{
-    return ['name' => 'Tomàquet', 'unit' => 'kg', 'price' => '3.00', 'variable' => false, 'containers_per_unit' => null, ...$overrides];
-}
-
 // R14 — the Catàleg area is closed to every other role
 
 it('closes every Catàleg route to accounts without Manager or Catalogue (R14)', function (string $method, string $uri, ?Role $role) {
