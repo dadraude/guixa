@@ -34,7 +34,9 @@ const email = 'laguixamanresa@gmail.com';
 
 <style scoped>
 .welcome-contact {
-    background: var(--welcome-blue-soft);
+    --welcome-focus: var(--welcome-feature-cream);
+    color: var(--welcome-feature-cream);
+    background: var(--welcome-feature-surface);
 }
 
 .welcome-contact-inner {
@@ -70,19 +72,15 @@ const email = 'laguixamanresa@gmail.com';
     align-items: center;
     justify-content: center;
     border-radius: 0.4rem;
-    background: var(--welcome-blue);
+    background: var(--welcome-feature-cream);
     padding: 0.625rem 1.25rem;
-    color: #fff;
+    color: #173e53;
     font-weight: 750;
     text-decoration: none;
 }
 
 .welcome-contact-button:hover {
-    background: var(--welcome-blue-hover);
-}
-
-:global(.dark) .welcome-contact-button {
-    color: #15232a;
+    background: #fff9eb;
 }
 
 .welcome-email {
@@ -91,7 +89,7 @@ const email = 'laguixamanresa@gmail.com';
     align-items: center;
     max-width: 100%;
     overflow-wrap: anywhere;
-    color: var(--welcome-ink);
+    color: var(--welcome-feature-cream);
     text-underline-offset: 0.2em;
 }
 

@@ -143,6 +143,18 @@
                             {
                                 "selector": ".welcome-basket",
                                 "count": 1
+                            },
+                            {
+                                "selector": ".welcome-contact h2",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-contact p",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-email",
+                                "contrast": 4.5
                             }
                         ]
                     },
@@ -233,6 +245,18 @@
                             {
                                 "selector": ".welcome-basket",
                                 "count": 1
+                            },
+                            {
+                                "selector": ".welcome-contact h2",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-contact p",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-email",
+                                "contrast": 4.5
                             }
                         ]
                     },
@@ -354,6 +378,18 @@
                             {
                                 "selector": ".welcome-basket",
                                 "count": 1
+                            },
+                            {
+                                "selector": ".welcome-contact h2",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-contact p",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-email",
+                                "contrast": 4.5
                             }
                         ]
                     },
@@ -437,6 +473,18 @@
                             {
                                 "selector": ".welcome-basket",
                                 "count": 1
+                            },
+                            {
+                                "selector": ".welcome-contact h2",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-contact p",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-email",
+                                "contrast": 4.5
                             }
                         ]
                     },
@@ -448,6 +496,116 @@
                         },
                         {
                             "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "palette-light",
+                    "checks": {
+                        "focus": [
+                            ".welcome-brand",
+                            "#welcome-action",
+                            ".welcome-primary-action",
+                            ".welcome-text-action",
+                            ".welcome-contact-button",
+                            ".welcome-email"
+                        ],
+                        "assertions": [
+                            {
+                                "selector": ".welcome-hero-band",
+                                "styles": {
+                                    "background-color": "rgb(40, 101, 133)"
+                                }
+                            },
+                            {
+                                "selector": ".welcome-contact",
+                                "styles": {
+                                    "background-color": "rgb(40, 101, 133)",
+                                    "color": "rgb(250, 241, 220)"
+                                }
+                            },
+                            {
+                                "selector": ".welcome-contact-button",
+                                "styles": {
+                                    "background-color": "rgb(250, 241, 220)",
+                                    "color": "rgb(23, 62, 83)"
+                                },
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": ".welcome-email",
+                                "styles": {
+                                    "color": "rgb(250, 241, 220)"
+                                }
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "styles": {
+                                    "background-color": "rgb(250, 241, 220)"
+                                }
+                            }
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "palette-dark",
+                    "checks": {
+                        "focus": [
+                            ".welcome-brand",
+                            "#welcome-action",
+                            ".welcome-primary-action",
+                            ".welcome-text-action",
+                            ".welcome-contact-button",
+                            ".welcome-email"
+                        ],
+                        "assertions": [
+                            {
+                                "selector": ".welcome-hero-band",
+                                "styles": {
+                                    "background-color": "rgb(35, 72, 92)"
+                                }
+                            },
+                            {
+                                "selector": ".welcome-contact",
+                                "styles": {
+                                    "background-color": "rgb(35, 72, 92)",
+                                    "color": "rgb(250, 241, 220)"
+                                }
+                            },
+                            {
+                                "selector": ".welcome-contact-button",
+                                "styles": {
+                                    "background-color": "rgb(250, 241, 220)",
+                                    "color": "rgb(23, 62, 83)"
+                                },
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": ".welcome-email",
+                                "styles": {
+                                    "color": "rgb(250, 241, 220)"
+                                }
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "styles": {
+                                    "background-color": "rgb(28, 32, 31)"
+                                }
+                            }
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
                             "mode": "dark",
                             "text": 100
                         }
