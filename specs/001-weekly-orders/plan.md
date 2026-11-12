@@ -889,7 +889,7 @@ For the public Welcome page, this supersedes the landing-specific styling in the
 2026-10-27 rollout; the rest of that app-wide direction remains in force. The
 user approved a lighter, content-first public landing for La Guixa. Keep a
 near-white cream canvas, muted blue actions and icons, discreet ochre step
-numbers, and a pale-blue contact area. Use a typographic approximation of the
+numbers, and a deep-blue contact area with cream text and button. Use a typographic approximation of the
 `la guixa` wordmark because no vector original is available. The page has a
 header with cooperative and process links on desktop and member access at every
 width; a compact mobile header with the wordmark and member access side by side
@@ -910,8 +910,11 @@ The subsequent 2026-11-11 user refinement gives the hero more of the first propo
 character: a full-width muted-blue hero with cream heading/body, a cream primary
 button, and a more prominent headline and desktop basket. The navigation remains
 on the cream canvas in light appearance. This supersedes the cream-hero treatment
-above only; the cooperative values, steps and pale-blue contact remain light and
-spacious. Preserve dark appearance contrast and text-zoom reflow. In the subsequent
+above only; the cooperative values and steps remain light and
+spacious. The later contact refinement gives the contact area the hero's
+deep-blue surface and cream text and button, while the small footer stays on
+the cream canvas in light appearance. Preserve dark appearance contrast and
+text-zoom reflow. In the subsequent
 modern/rustic refinement, replace the provisional hand-coded basket with a
 clean, proportionate illustration based on the second approved mockup. Add
 screenprinted ink wear matching the explicitly selected original rustic mockup

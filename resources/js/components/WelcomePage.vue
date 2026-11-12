@@ -43,6 +43,8 @@ defineProps<{ actionHref: string }>();
     --welcome-blue: #286585;
     --welcome-blue-hover: #1d526f;
     --welcome-blue-soft: #e7f0f3;
+    --welcome-feature-surface: #286585;
+    --welcome-feature-cream: #faf1dc;
     --welcome-ochre: #a05a10;
     --welcome-border: #d8d7d1;
     --welcome-focus: #a85f12;
@@ -51,12 +53,13 @@ defineProps<{ actionHref: string }>();
     font-family: var(--font-body);
 }
 
-:global(.dark) .welcome-page {
+:global(.dark .welcome-page) {
     --welcome-paper: #1c201f;
     --welcome-ink: #f2f0e9;
     --welcome-blue: #8fc5df;
     --welcome-blue-hover: #b2d9e8;
     --welcome-blue-soft: #27363d;
+    --welcome-feature-surface: #23485c;
     --welcome-ochre: #e5a650;
     --welcome-border: #4f5a5d;
     --welcome-focus: #f1bd6e;
@@ -69,12 +72,11 @@ defineProps<{ actionHref: string }>();
 }
 
 .welcome-hero-band {
-    --welcome-hero-surface: #286585;
-    --welcome-hero-cream: #faf1dc;
-    --welcome-focus: var(--welcome-hero-cream);
+    --welcome-hero-cream: var(--welcome-feature-cream);
+    --welcome-focus: var(--welcome-feature-cream);
     position: relative;
-    color: var(--welcome-hero-cream);
-    background: var(--welcome-hero-surface);
+    color: var(--welcome-feature-cream);
+    background: var(--welcome-feature-surface);
 }
 
 .welcome-hero-band::before {
@@ -94,10 +96,6 @@ defineProps<{ actionHref: string }>();
 .welcome-hero-band > .welcome-shell {
     position: relative;
     z-index: 1;
-}
-
-:global(.dark) .welcome-hero-band {
-    --welcome-hero-surface: #23485c;
 }
 
 .welcome-story-shell {
