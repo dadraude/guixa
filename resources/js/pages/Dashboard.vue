@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Head, Link, usePage } from '@inertiajs/vue3';
+import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import {
     CalendarDays,
     Package,
@@ -14,10 +14,14 @@ import {
     Timer,
     Undo2,
     Settings,
+    RefreshCw,
+    AlertCircle,
 } from '@lucide/vue';
 import type { LucideIcon } from '@lucide/vue';
 import { trans, transChoice } from 'laravel-vue-i18n';
-import { computed } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
 import { formatEuroAmount } from '@/lib/formatEuroAmount';
 import { formatQuantity } from '@/lib/locale';
 import type { NavItem } from '@/types';
@@ -51,11 +55,107 @@ const props = defineProps<{
     nextPickup: string | null;
     openCycles: number;
     balance: number | null;
-    attention?: App.Http.AttentionGroupRow[];
-    opportunities?: App.Http.OpportunityRow[];
+    attention?: App.Http.AttentionGroupRow[] | null;
+    opportunities?: App.Http.OpportunityRow[] | null;
+    lastUpdatedAt?: string | null;
+    readFailed?: boolean;
     managerSummary: ManagerSummary | null;
     areaShortcuts?: App.Http.RoleArea[];
 }>();
+
+type Snapshot = {
+    attention: App.Http.AttentionGroupRow[] | null;
+    opportunities: App.Http.OpportunityRow[] | null;
+    lastUpdatedAt: string | null;
+};
+
+// The last successful read: a failed read sends null sections, which must never replace it or read as "nothing pending" (R15).
+const lastSuccess = ref<Snapshot | null>(null);
+const saveSuccess = () => {
+    if (props.readFailed || !props.lastUpdatedAt) return;
+    lastSuccess.value = {
+        attention: props.attention ?? null,
+        opportunities: props.opportunities ?? null,
+        lastUpdatedAt: props.lastUpdatedAt,
+    };
+};
+watch(
+    () => [
+        props.readFailed,
+        props.lastUpdatedAt,
+        props.attention,
+        props.opportunities,
+    ],
+    saveSuccess,
+    { immediate: true },
+);
+
+const requestFailed = ref(false);
+const busy = ref(false);
+const shown = computed<Snapshot>(() =>
+    props.readFailed
+        ? (lastSuccess.value ?? {
+              attention: null,
+              opportunities: null,
+              lastUpdatedAt: null,
+          })
+        : {
+              attention: props.attention ?? null,
+              opportunities: props.opportunities ?? null,
+              lastUpdatedAt: props.lastUpdatedAt ?? null,
+          },
+);
+const failed = computed(() => props.readFailed === true || requestFailed.value);
+const hasFreshness = computed(
+    () => shown.value.lastUpdatedAt !== null || failed.value,
+);
+
+// The source string already carries the cooperative's offset, so its wall time is the local time without a DST guess.
+const readTime = computed(() => {
+    const match = shown.value.lastUpdatedAt?.match(
+        /^\d{4}-(\d{2})-(\d{2})T(\d{2}:\d{2})/,
+    );
+    return match ? `${match[2]}/${match[1]} ${match[3]}` : null;
+});
+
+function refresh() {
+    if (busy.value) return;
+    let succeeded = false;
+    let cancelled = false;
+    router.reload({
+        onStart: () => {
+            busy.value = true;
+            requestFailed.value = false;
+        },
+        onSuccess: () => {
+            succeeded = true;
+        },
+        onCancel: () => {
+            cancelled = true;
+        },
+        onFinish: () => {
+            busy.value = false;
+            requestFailed.value = !succeeded && !cancelled;
+        },
+    });
+}
+
+// Both returns restore old props without asking the server: the browser's back/forward cache (pageshow) and Inertia's in-app history
+// restore (navigate of type "history"). Each reads once (R15). A fresh visit or the initial load already has current props.
+const readOnReturn = (event: PageTransitionEvent) => {
+    if (event.persisted) refresh();
+};
+let stopListening: (() => void) | undefined;
+onMounted(() => {
+    window.addEventListener('pageshow', readOnReturn);
+    stopListening = router.on('navigate', (event) => {
+        if (event.detail.type === 'history') refresh();
+    });
+});
+onBeforeUnmount(() => {
+    window.removeEventListener('pageshow', readOnReturn);
+    stopListening?.();
+});
 
 const page = usePage();
 const userName = computed(() => page.props.auth?.user?.name ?? '');
@@ -232,6 +332,61 @@ const isProducer = computed(() => props.roles.includes('producer'));
         </header>
 
         <section
+            v-if="hasFreshness"
+            class="flex flex-col gap-2"
+            :aria-label="trans('Last update')"
+            data-test="freshness"
+        >
+            <Alert v-if="failed" variant="destructive" data-test="read-error">
+                <AlertCircle class="size-4" aria-hidden="true" />
+                <AlertDescription>{{
+                    shown.lastUpdatedAt
+                        ? trans(
+                              'Pending work could not be updated. The last successful read is shown and may be out of date.',
+                          )
+                        : trans(
+                              'Pending work could not be read. Try again to see it.',
+                          )
+                }}</AlertDescription>
+            </Alert>
+            <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
+                <p
+                    v-if="readTime"
+                    class="text-sm text-muted-foreground"
+                    data-test="freshness-time"
+                >
+                    {{ trans('Last updated :time', { time: readTime }) }}
+                </p>
+                <span
+                    v-if="readTime && failed"
+                    class="text-sm font-medium"
+                    data-test="freshness-stale"
+                    >{{ trans('Out of date') }}</span
+                >
+                <Button
+                    type="button"
+                    variant="outline"
+                    class="min-h-11"
+                    data-test="refresh-button"
+                    :aria-disabled="busy"
+                    @click="refresh"
+                >
+                    <RefreshCw class="size-4" aria-hidden="true" />
+                    {{ failed ? trans('Try again') : trans('Refresh') }}
+                </Button>
+            </div>
+            <p
+                role="status"
+                class="min-h-6 text-sm text-muted-foreground"
+                data-test="refresh-busy"
+            >
+                <template v-if="busy">{{
+                    trans('Updating pending work…')
+                }}</template>
+            </p>
+        </section>
+
+        <section
             class="dashboard-summary grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
             :aria-label="trans('summary')"
         >
@@ -297,7 +452,7 @@ const isProducer = computed(() => props.roles.includes('producer'));
         </section>
 
         <section
-            v-if="attention?.length"
+            v-if="shown.attention?.length"
             class="pilot-layout-panel"
             :aria-label="trans('pending work')"
             data-test="attention-list"
@@ -309,7 +464,7 @@ const isProducer = computed(() => props.roles.includes('producer'));
             </div>
             <ul class="pilot-list">
                 <li
-                    v-for="group in attention"
+                    v-for="group in shown.attention"
                     :key="group.key"
                     class="pilot-list-row"
                     data-test="attention-group"
@@ -360,7 +515,7 @@ const isProducer = computed(() => props.roles.includes('producer'));
         </section>
 
         <section
-            v-if="opportunities?.length"
+            v-if="shown.opportunities?.length"
             class="pilot-layout-panel"
             :aria-label="trans('opportunities')"
             data-test="opportunity-list"
@@ -372,7 +527,7 @@ const isProducer = computed(() => props.roles.includes('producer'));
             </div>
             <ul class="pilot-list">
                 <li
-                    v-for="opportunity in opportunities"
+                    v-for="opportunity in shown.opportunities"
                     :key="opportunity.key"
                     class="pilot-list-row"
                     data-test="opportunity"

@@ -51,7 +51,7 @@ beforeEach(function () {
         };
         $sales = new SalesBasketWork(new ReadDashboardBasketWork(new ReadPendingCollections($baskets = new InMemoryBasketRepository, $source = new InMemoryWeeklyBasketSource), $pickups, $baskets, $source));
 
-        return (new ListDashboard($sales, $empty, $empty, new OrderingOrderOpportunities(new ReadDashboardOrderOpportunities($this->world->cycles, $names, $this->world->clock))))($actor);
+        return (new ListDashboard($sales, $empty, $empty, new OrderingOrderOpportunities(new ReadDashboardOrderOpportunities($this->world->cycles, $names, $this->world->clock)), $this->world->clock))($actor);
     };
     $this->kinds = fn (Actor $actor) => array_map(fn ($opportunity) => $opportunity->kind, ($this->dashboard)($actor)->opportunities);
 });

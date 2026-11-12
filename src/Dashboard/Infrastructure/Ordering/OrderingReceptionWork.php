@@ -5,6 +5,7 @@ namespace Guixa\Dashboard\Infrastructure\Ordering;
 use Guixa\Dashboard\Domain\ActionKind;
 use Guixa\Dashboard\Domain\ReceptionWorkRepository;
 use Guixa\Dashboard\Domain\ValueObject\ReceptionWork;
+use Guixa\Dashboard\Infrastructure\TranslatesReadFailures;
 use Guixa\Ordering\Application\DashboardOrderScope;
 use Guixa\Ordering\Application\DashboardReceptionStage;
 use Guixa\Ordering\Application\DashboardReceptionWorkData;
@@ -12,6 +13,8 @@ use Guixa\Ordering\Application\ReadDashboardOrderWork;
 
 final class OrderingReceptionWork implements ReceptionWorkRepository
 {
+    use TranslatesReadFailures;
+
     public function __construct(private readonly ReadDashboardOrderWork $read) {}
 
     public function pending(): array
@@ -23,7 +26,7 @@ final class OrderingReceptionWork implements ReceptionWorkRepository
             $item->pickupDate,
             $this->action($item->stage),
             $item->allocationDifference,
-        ), ($this->read)(DashboardOrderScope::Reception));
+        ), $this->guarded('reception work', fn () => ($this->read)(DashboardOrderScope::Reception)));
     }
 
     private function action(DashboardReceptionStage $stage): ActionKind

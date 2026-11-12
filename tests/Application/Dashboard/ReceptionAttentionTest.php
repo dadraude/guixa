@@ -74,7 +74,7 @@ beforeEach(function () {
             {
                 return [];
             }
-        }, new OrderingOrderOpportunities(new ReadDashboardOrderOpportunities($this->world->cycles, $names, $this->world->clock))))($actor);
+        }, new OrderingOrderOpportunities(new ReadDashboardOrderOpportunities($this->world->cycles, $names, $this->world->clock)), $this->world->clock))($actor);
     };
     $this->groups = fn (Actor $actor) => array_map(fn ($group) => [$group->action, $group->count, $group->producerName, $group->allocationDifferenceCount], ($this->dashboard)($actor)->attention);
     $this->receiver = new Actor('receiver', [Role::Receiver]);

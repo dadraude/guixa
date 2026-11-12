@@ -267,8 +267,8 @@ Later 004 insight slices are outside this verdict.
 - **Scope and path.** Planned `src/Dashboard/Domain/Error/ReadUnavailable.php` and read-result handling in
   `src/Dashboard/Application/ListDashboard.php`; adapters translate only known source read failures, never
   authorization 403. Existing `app/Http/Controllers/DashboardController.php` supplies sibling `attention`,
-  `opportunities`, `lastUpdatedAt`, `navigation`, `readFailed`, `can` props together; on initial known failure
-  it sends null section data/time and false caught-up/no-context flags. `resources/js/pages/Dashboard.vue`
+  `opportunities`, `lastUpdatedAt`, `readFailed` props together (`navigation` and `can` stay with T07); on
+  initial known failure it sends null section data/time. `resources/js/pages/Dashboard.vue`
   uses the existing `resources/js/pages/Manage/Roles/Index.vue` reload pattern for explicit refresh, fresh
   Inertia navigation and one BFCache/history return read. It retains last successful data/time only on failed
   refresh/transport and marks them stale with retry; no polling. Add Catalan busy/error/time copy, planned

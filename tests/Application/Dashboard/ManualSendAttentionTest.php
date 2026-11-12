@@ -69,7 +69,7 @@ beforeEach(function () {
             $this->world->notifier,
         );
 
-        return (new ListDashboard($sales, new OrderingReceptionWork($read), new OrderingSendWork($read), new OrderingOrderOpportunities(new ReadDashboardOrderOpportunities($this->world->cycles, $names, $this->world->clock))))($actor);
+        return (new ListDashboard($sales, new OrderingReceptionWork($read), new OrderingSendWork($read), new OrderingOrderOpportunities(new ReadDashboardOrderOpportunities($this->world->cycles, $names, $this->world->clock)), $this->world->clock))($actor);
     };
 });
 

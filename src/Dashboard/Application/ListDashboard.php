@@ -12,6 +12,7 @@ use Guixa\Dashboard\Domain\ValueObject\BasketWork;
 use Guixa\Dashboard\Domain\ValueObject\ReceptionWork;
 use Guixa\Dashboard\Domain\ValueObject\SendWork;
 use Guixa\Shared\Application\Actor;
+use Guixa\Shared\Domain\Clock;
 use Illuminate\Support\Facades\Gate;
 
 /** The signed-in account's pending work, read from current persisted data; it changes nothing (R1, R3). */
@@ -22,6 +23,7 @@ final class ListDashboard
         private readonly ReceptionWorkRepository $receptionWork,
         private readonly SendWorkRepository $sendWork,
         private readonly OrderOpportunitiesRepository $opportunities,
+        private readonly Clock $clock,
     ) {}
 
     public function __invoke(Actor $actor): DashboardData
@@ -45,7 +47,10 @@ final class ListDashboard
         usort($groups, fn (AttentionGroupData $a, AttentionGroupData $b) => [$a->scheduledDate === null, $a->scheduledDate, ActionKind::from($a->action)->rank(), $a->key]
             <=> [$b->scheduledDate === null, $b->scheduledDate, ActionKind::from($b->action)->rank(), $b->key]);
 
-        return new DashboardData($groups, $this->opportunities($actor, $isMember));
+        // Read last: the time is stamped only once every source read has succeeded; a failed read raises ReadUnavailable instead (R15).
+        $opportunities = $this->opportunities($actor, $isMember);
+
+        return new DashboardData($groups, $opportunities, $this->clock->now());
     }
 
     /**

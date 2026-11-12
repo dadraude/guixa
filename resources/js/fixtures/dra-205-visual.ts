@@ -685,6 +685,75 @@ if (pageName === 'Dashboard') {
         ];
     }
 }
+if (pageName === 'Dashboard') {
+    // Every dashboard state counts requests, so "no idle request" and "no write request" are measured, not assumed (R15).
+    const freshProps = {
+        readFailed: false,
+        lastUpdatedAt: '2026-11-12T09:30:00+01:00',
+    };
+    Object.assign(visualProps, freshProps);
+    document.body.dataset.visualRequests = '0';
+    document.body.dataset.visualWrites = '0';
+    if (state === 'initial-error') {
+        Object.assign(visualProps, {
+            readFailed: true,
+            lastUpdatedAt: null,
+            attention: null,
+            opportunities: null,
+        });
+    }
+    http.setClient({
+        request: async (config: { method?: string; url?: unknown }) => {
+            const log = ((
+                window as unknown as Record<string, unknown>
+            ).visualRequestLog ??= []) as string[];
+            log.push(`${config.method ?? 'get'} ${String(config.url)}`);
+            const requests = Number(document.body.dataset.visualRequests) + 1;
+            document.body.dataset.visualRequests = String(requests);
+            if ((config.method ?? 'get').toLowerCase() !== 'get')
+                document.body.dataset.visualWrites = String(
+                    Number(document.body.dataset.visualWrites) + 1,
+                );
+            if (state === 'history-probe') {
+                // In-app history probe: a visit to /settings/appearance, and a dashboard read that advances the time.
+                const toAppearance = String(config.url).includes('/finance/');
+                return {
+                    status: 200,
+                    data: JSON.stringify({
+                        ...page,
+                        component: toAppearance
+                            ? 'settings/Appearance'
+                            : 'Dashboard',
+                        url: toAppearance
+                            ? '/settings/appearance'
+                            : window.location.pathname + window.location.search,
+                        props: {
+                            ...page.props,
+                            lastUpdatedAt: '2026-11-12T09:45:00+01:00',
+                        },
+                    }),
+                    headers: { 'x-inertia': 'true' },
+                };
+            }
+            if (state !== 'stale-error') return new Promise(() => {});
+            return {
+                status: 200,
+                data: JSON.stringify({
+                    ...page,
+                    url: window.location.pathname + window.location.search,
+                    props: {
+                        ...page.props,
+                        readFailed: true,
+                        lastUpdatedAt: null,
+                        attention: null,
+                        opportunities: null,
+                    },
+                }),
+                headers: { 'x-inertia': 'true' },
+            };
+        },
+    });
+}
 if (pageName === 'Wallet/Statement') {
     visualProps.household = role === 'manager' ? household : null;
 }
@@ -1177,6 +1246,28 @@ void createInertiaApp({
                 return (
                     !!emptyMessage && mainText().includes(trans(emptyMessage))
                 );
+            case 'history-probe':
+                return document.body.dataset.visualReturnReads !== undefined;
+            case 'refresh-busy':
+                return (
+                    document.body.dataset.visualRequests === '1' &&
+                    visible('[data-test="refresh-busy"]') &&
+                    mainText().includes(trans('Updating pending work…')) &&
+                    document.querySelector(
+                        '[data-test="refresh-button"][aria-disabled="true"]',
+                    ) !== null
+                );
+            case 'stale-error':
+                return (
+                    visible('[data-test="freshness-stale"]') &&
+                    visible('[role="alert"]') &&
+                    visible('[data-test="attention-group"]')
+                );
+            case 'initial-error':
+                return (
+                    visible('[role="alert"]') &&
+                    !visible('[data-test="attention-group"]')
+                );
             case 'opportunities':
             case 'opportunities-repeated':
                 return visible('[data-test="opportunity"]');
@@ -1447,6 +1538,56 @@ void createInertiaApp({
                 cancelable: true,
             }),
         );
+    }
+    if (
+        pageName === 'Dashboard' &&
+        ['refresh-busy', 'stale-error'].includes(state)
+    ) {
+        // The person's own explicit refresh: the only request these states make.
+        for (let attempt = 0; attempt < 100; attempt++) {
+            const refresh = document.querySelector<HTMLElement>(
+                '[data-test="refresh-button"]',
+            );
+            if (refresh) {
+                refresh.click();
+                break;
+            }
+            await new Promise((resolve) => window.setTimeout(resolve, 25));
+        }
+    }
+    if (pageName === 'Dashboard' && state === 'history-probe') {
+        // Drives the real Inertia router: leave through an in-app link, then browser Back. Only the HTTP client is mocked.
+        const wait = async (until: () => boolean) => {
+            for (let attempt = 0; !until() && attempt < 100; attempt++)
+                await new Promise((resolve) => window.setTimeout(resolve, 25));
+        };
+        const dashboardReads = () =>
+            (
+                (window as unknown as Record<string, string[]>)
+                    .visualRequestLog ?? []
+            ).filter((entry) => !entry.includes('/finance/')).length;
+        await wait(
+            () => !!document.querySelector('[data-test="freshness-time"]'),
+        );
+        await new Promise((resolve) => window.setTimeout(resolve, 500));
+        document.body.dataset.visualIdleReads = String(dashboardReads());
+        document
+            .querySelector<HTMLElement>('[data-test="attention-group"] a')
+            ?.click();
+        await wait(() => window.location.pathname === '/settings/appearance');
+        window.history.back();
+        await wait(
+            () =>
+                document
+                    .querySelector('[data-test="freshness-time"]')
+                    ?.textContent?.includes('09:45') === true,
+        );
+        await new Promise((resolve) => window.setTimeout(resolve, 500));
+        document.body.dataset.visualReturnReads = String(dashboardReads());
+        document.body.dataset.visualReturnTime =
+            document
+                .querySelector('[data-test="freshness-time"]')
+                ?.textContent?.trim() ?? '';
     }
     if (state !== 'default') {
         let ready = stateReady();
