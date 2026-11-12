@@ -94,8 +94,10 @@ domain entity.
 ### Opportunities and ordering
 
 - **R11 — Opportunities.** A member with an open ordering window sees the existing household order destination
-  as an opportunity, with applicable producer cutoffs; a saved order is not labelled awaiting submission. A
-  producer sees its own sent-order summary as a review opportunity, not a persistent delivery obligation.
+  as an opportunity, with the cutoffs stored for the producers open in that window (a producer without a stored
+  cutoff is not listed, so no deadline is inferred); a saved order is not labelled awaiting submission. A
+  producer sees its own sent-order summary as a review opportunity, not a persistent delivery obligation, only
+  for its own sent, non-cancelled cycles whose pickup date is today or later in the cooperative calendar.
   Catalogue sees its permitted product/availability maintenance destination as an opportunity; an inactive or
   cycle-unavailable product alone does not make pending work. These do not appear after the account loses the
   relevant household/producer/role access. Existing permitted role-area shortcuts remain available, including
@@ -146,7 +148,7 @@ screen.
 
 **S2 — Current membership and producer privacy (R1, R11, R14).** Given a member moves from H to J and a
 producer account is associated with P, when each opens the dashboard, then the member sees J's permitted order
-and collection context but not H's, while the producer sees only P's sent-order summaries and no household
+and collection context but not H's, while the producer sees only P's sent-order summaries for pickups today or later and no household
 names or Q's order.
 
 **S3 — Member opportunity and collection (R4, R11, R12).** Given a member's household has an open ordering
