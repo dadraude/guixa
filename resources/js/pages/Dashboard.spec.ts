@@ -77,10 +77,6 @@ describe('dashboard presentation', () => {
             roles: ['catalogue'],
             isManager: false,
             isMember: false,
-            nextPickup: null,
-            openCycles: 0,
-            balance: null,
-            managerSummary: null,
             areaShortcuts: [
                 {
                     role: 'catalogue',
@@ -98,41 +94,11 @@ describe('dashboard presentation', () => {
         expect(html).not.toContain('manager actions');
     });
 
-    it('groups four-digit member and manager counts without changing summary values', async () => {
-        const app = createSSRApp(Dashboard, {
-            roles: ['member', 'manager'],
-            isManager: true,
-            isMember: true,
-            nextPickup: null,
-            openCycles: 1234,
-            balance: null,
-            managerSummary: {
-                cycles: 2345,
-                activeCycles: 1,
-                households: 3456,
-                activeHouseholds: 2,
-                accounts: 4567,
-                pendingInvitations: 0,
-                producers: 1,
-                activeProducers: 1,
-            },
-        });
-        installTranslations(app);
-        const html = await renderToString(app);
-
-        for (const count of ['1.234', '2.345', '3.456', '4.567'])
-            expect(html).toContain(count);
-        expect(html).not.toContain('>1234<');
-    });
     it('renders the translated dashboard title', async () => {
         const app = createSSRApp(Dashboard, {
             roles: ['member'],
             isManager: false,
             isMember: true,
-            nextPickup: '2026-11-05',
-            openCycles: 1,
-            balance: 5000,
-            managerSummary: null,
         });
         installTranslations(app);
         const html = await renderToString(app);
@@ -140,50 +106,88 @@ describe('dashboard presentation', () => {
         expect(html).toContain('Inici');
     });
 
-    it('shows member summary cards for a member', async () => {
+    it('renders no summary cards, balance or cooperative totals any more (R2, 001 T61 retired)', async () => {
         const app = createSSRApp(Dashboard, {
-            roles: ['member'],
-            isManager: false,
+            roles: ['member', 'manager'],
+            isManager: true,
             isMember: true,
-            nextPickup: '2026-11-05',
-            openCycles: 2,
-            balance: 5000,
-            managerSummary: null,
+            attention: [],
+            opportunities: [],
+            lastUpdatedAt: '2026-11-12T09:30:00+01:00',
+            readFailed: false,
+            can: { showCaughtUp: true, showNoContext: false },
         });
         installTranslations(app);
         const html = await renderToString(app);
 
-        expect(html).toContain('Saldo');
-        expect(html).toContain('recollida');
-        expect(html).toContain('text-lg font-semibold');
+        expect(html).not.toContain('<article');
+        expect(html).not.toContain('Saldo');
+        expect(html).not.toContain('Propera recollida');
+        expect(html).not.toContain('Cooperativa');
     });
 
-    it('shows manager summary for a manager', async () => {
-        const app = createSSRApp(Dashboard, {
-            roles: ['manager'],
-            isManager: true,
+    it('says the person is caught up only from the server flag, keeping opportunities and shortcuts (R14, S10)', async () => {
+        const props = {
+            roles: ['catalogue'],
+            isManager: false,
             isMember: false,
-            nextPickup: null,
-            openCycles: 0,
-            balance: null,
-            managerSummary: {
-                cycles: 3,
-                activeCycles: 1,
-                households: 5,
-                activeHouseholds: 4,
-                accounts: 10,
-                pendingInvitations: 2,
-                producers: 6,
-                activeProducers: 5,
-            },
+            attention: [],
+            opportunities: [
+                {
+                    key: 'catalogue_maintenance',
+                    kind: 'catalogue_maintenance',
+                    scheduledDate: null,
+                    href: '/catalogue/producers',
+                    cutoffs: [],
+                },
+            ],
+            lastUpdatedAt: '2026-11-12T09:30:00+01:00',
+            readFailed: false,
+            areaShortcuts: [
+                {
+                    role: 'catalogue',
+                    label: 'Catalogue',
+                    href: '/catalogue/producers',
+                },
+            ],
+        };
+        const caughtUp = createSSRApp(Dashboard, {
+            ...props,
+            can: { showCaughtUp: true, showNoContext: false },
+        });
+        installTranslations(caughtUp);
+        const html = await renderToString(caughtUp);
+        expect(html).toContain('data-test="caught-up"');
+        expect(html).toContain('Estàs al dia');
+        expect(html).toContain('data-test="opportunity"');
+        expect(html).toContain('Catàleg');
+
+        const unflagged = createSSRApp(Dashboard, {
+            ...props,
+            can: { showCaughtUp: false, showNoContext: false },
+        });
+        installTranslations(unflagged);
+        expect(await renderToString(unflagged)).not.toContain('caught-up');
+    });
+
+    it('explains an account without context instead of a zero or caught-up claim (R14)', async () => {
+        const app = createSSRApp(Dashboard, {
+            roles: [],
+            isManager: false,
+            isMember: false,
+            attention: [],
+            opportunities: [],
+            lastUpdatedAt: '2026-11-12T09:30:00+01:00',
+            readFailed: false,
+            can: { showCaughtUp: false, showNoContext: true },
         });
         installTranslations(app);
         const html = await renderToString(app);
 
-        expect(html).toContain('Cooperativa');
-        expect(html).toContain('Cicles');
-        expect(html).toContain('Comptes');
-        expect(html.match(/text-lg font-semibold/g)).toHaveLength(2);
+        expect(html).toContain('data-test="no-context"');
+        expect(html).toContain('Aquest compte no té tasques');
+        expect(html).not.toContain('data-test="caught-up"');
+        expect(html).not.toContain('data-test="attention-group"');
     });
 
     it('lists collection groups with context, visible counts and server links, and claims nothing when there are none (R2, R4, R14, S4)', async () => {
@@ -191,10 +195,6 @@ describe('dashboard presentation', () => {
             roles: ['member'],
             isManager: false,
             isMember: true,
-            nextPickup: null,
-            openCycles: 0,
-            balance: 5000,
-            managerSummary: null,
         };
         const populated = createSSRApp(Dashboard, {
             ...base,
@@ -243,10 +243,6 @@ describe('dashboard presentation', () => {
             roles: ['finance'],
             isManager: false,
             isMember: false,
-            nextPickup: null,
-            openCycles: 0,
-            balance: null,
-            managerSummary: null,
             attention: [
                 {
                     key: 'validate_basket:cycle:c1',
@@ -281,10 +277,6 @@ describe('dashboard presentation', () => {
             roles: ['finance'],
             isManager: false,
             isMember: false,
-            nextPickup: null,
-            openCycles: 0,
-            balance: null,
-            managerSummary: null,
             attention: [
                 {
                     key: 'check_delivery_and_allocations:cycle:c1',
@@ -328,10 +320,6 @@ describe('dashboard presentation', () => {
             roles: ['manager'],
             isManager: true,
             isMember: false,
-            nextPickup: null,
-            openCycles: 0,
-            balance: null,
-            managerSummary: null,
             attention: [
                 {
                     key: 'send_order:cycle:c1',
@@ -369,15 +357,63 @@ describe('dashboard presentation', () => {
         expect(html.toLowerCase()).not.toContain('endarrerida');
     });
 
+    it('renders the server order of a same-date send, reception, validation and collection after an older collection (R13, S9)', async () => {
+        const group = (
+            action: string,
+            cycleId: string,
+            scheduledDate: string,
+            producerName: string | null = null,
+        ) => ({
+            key: `${action}:cycle:${cycleId}`,
+            action,
+            cycleId,
+            scheduledDate,
+            count: 1,
+            href: '/x',
+            producerName,
+            allocationDifferenceCount: 0,
+        });
+        const app = createSSRApp(Dashboard, {
+            roles: ['manager'],
+            isManager: true,
+            isMember: false,
+            attention: [
+                group('collect_basket', 'c0', '2026-10-31'),
+                group('send_order', 'c1', '2026-11-07', 'Forn'),
+                group(
+                    'check_delivery_and_allocations',
+                    'c1',
+                    '2026-11-07',
+                    'Forn',
+                ),
+                group('validate_basket', 'c1', '2026-11-07'),
+                group('collect_basket', 'c1', '2026-11-07'),
+            ],
+        });
+        installTranslations(app);
+        const html = await renderToString(app);
+        const labels = [
+            'Recollir cistelles',
+            'Envia les comandes als productors',
+            'Revisa l’entrega i els repartiments',
+            'Valida cistelles',
+        ];
+        expect(html.match(/data-test="attention-group"/g)).toHaveLength(5);
+        const positions = labels.map((label) => html.indexOf(label));
+        expect(positions.every((position) => position >= 0)).toBe(true);
+        expect(positions[0]).toBeLessThan(positions[1]);
+        expect(positions[1]).toBeLessThan(positions[2]);
+        expect(positions[2]).toBeLessThan(positions[3]);
+        expect(html.lastIndexOf('Recollir cistelles')).toBeGreaterThan(
+            positions[3],
+        );
+    });
+
     it('lists opportunities below the attention list, as available ordering with cutoffs and never as unfinished work (R11, R12, S3)', async () => {
         const app = createSSRApp(Dashboard, {
             roles: ['member'],
             isManager: false,
             isMember: true,
-            nextPickup: null,
-            openCycles: 1,
-            balance: null,
-            managerSummary: null,
             attention: [
                 {
                     key: 'collect_basket:cycle:c0',
@@ -424,10 +460,6 @@ describe('dashboard presentation', () => {
             roles: ['catalogue'],
             isManager: false,
             isMember: false,
-            nextPickup: null,
-            openCycles: 0,
-            balance: null,
-            managerSummary: null,
             attention: [],
             opportunities: [
                 {
@@ -467,10 +499,6 @@ describe('dashboard presentation', () => {
             roles: ['producer'],
             isManager: false,
             isMember: false,
-            nextPickup: null,
-            openCycles: 0,
-            balance: null,
-            managerSummary: null,
             attention: [],
             opportunities: [row('c1', '2026-11-07'), row('c2', '2026-11-14')],
         });
@@ -492,10 +520,6 @@ describe('dashboard presentation', () => {
             roles: ['member'],
             isManager: false,
             isMember: true,
-            nextPickup: null,
-            openCycles: 1,
-            balance: null,
-            managerSummary: null,
             attention: [],
             opportunities: [
                 {
@@ -546,10 +570,6 @@ const baseProps = {
     roles: ['member'],
     isManager: false,
     isMember: true,
-    nextPickup: null,
-    openCycles: 0,
-    balance: null,
-    managerSummary: null,
 };
 
 const mounted: { unmount: () => void }[] = [];
@@ -628,6 +648,27 @@ describe('dashboard freshness (R15, R16, S11)', () => {
         expect(
             root.querySelector('[data-test="refresh-button"]')?.textContent,
         ).toContain('Torna-ho a provar');
+    });
+
+    it('drops a stale caught-up claim when a later read fails, so a failure never reads as nothing to do (R15, S11)', async () => {
+        const { state, root } = mountDashboard({
+            attention: [],
+            opportunities: [],
+            readFailed: false,
+            lastUpdatedAt: '2026-11-12T09:30:00+01:00',
+            can: { showCaughtUp: true, showNoContext: false },
+        });
+        expect(root.querySelector('[data-test="caught-up"]')).not.toBeNull();
+
+        state.attention = null;
+        state.opportunities = null;
+        state.lastUpdatedAt = null;
+        state.readFailed = true;
+        state.can = { showCaughtUp: false, showNoContext: false };
+        await nextTick();
+
+        expect(root.querySelector('[data-test="caught-up"]')).toBeNull();
+        expect(root.querySelector('[role="alert"]')).not.toBeNull();
     });
 
     it('keeps the prior data stale with retry when the request does not succeed (transport or non-success response)', async () => {

@@ -1,5 +1,5 @@
 {
-    "baseUrl": "http://127.0.0.1:5257",
+    "baseUrl": "http://127.0.0.1:5263",
     "rootFontPx": 16,
     "darkSelector": "html.dark",
     "matrix": {
@@ -137,10 +137,14 @@
                             {
                                 "selector": "[data-test=\"attention-count\"]",
                                 "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"caught-up\"]",
+                                "count": 1
                             }
                         ],
                         "focus": [],
-                        "noFocusReason": "A member with no collection work has no attention links; the shortcuts and summary are unchanged 001 content."
+                        "noFocusReason": "A member with no collection work has no attention links; the caught-up message, sidebar and shortcuts carry no extra focus target in this fixture."
                     }
                 },
                 {
@@ -207,6 +211,111 @@
                             "[data-test=\"attention-group\"] a",
                             "[data-test=\"opportunity\"] a"
                         ]
+                    }
+                },
+                {
+                    "id": "caught-up",
+                    "query": {
+                        "state": "caught-up"
+                    },
+                    "ready": "body[data-visual-ready=\"caught-up\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"caught-up\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"attention-group\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"no-context\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"opportunity\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"opportunity\"] a",
+                                "count": 1,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            }
+                        ],
+                        "focus": [
+                            "button[data-sidebar=\"trigger\"]",
+                            "[data-test=\"opportunity\"] a"
+                        ]
+                    }
+                },
+                {
+                    "id": "no-context",
+                    "query": {
+                        "state": "no-context"
+                    },
+                    "ready": "body[data-visual-ready=\"no-context\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"no-context\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"caught-up\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"attention-group\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"opportunity\"]",
+                                "count": 0
+                            }
+                        ],
+                        "focus": [],
+                        "noFocusReason": "An account with no context has no links on the page; the explanation is plain text."
                     }
                 }
             ]
@@ -524,6 +633,57 @@
                         ]
                     },
                     "ready": "body[data-visual-ready=\"manual-send\"]"
+                },
+                {
+                    "id": "combined",
+                    "query": {
+                        "state": "combined"
+                    },
+                    "ready": "body[data-visual-ready=\"combined\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"attention-group\"]",
+                                "count": 2
+                            },
+                            {
+                                "selector": "[data-test=\"attention-group\"] a",
+                                "count": 2,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"attention-count\"]",
+                                "count": 2
+                            },
+                            {
+                                "selector": "[data-test=\"caught-up\"]",
+                                "count": 0
+                            }
+                        ]
+                    }
                 }
             ]
         },

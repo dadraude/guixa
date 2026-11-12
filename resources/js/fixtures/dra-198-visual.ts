@@ -175,9 +175,6 @@ const pageProps: Record<string, Record<string, unknown>> = {
         roles: ['manager', 'member', 'producer'],
         isManager: true,
         isMember: true,
-        nextPickup: pickupDate,
-        openCycles: 1,
-        balance: 2000,
         attention: [
             {
                 key: 'collect_basket:cycle:visual-cycle',
@@ -188,16 +185,6 @@ const pageProps: Record<string, Record<string, unknown>> = {
                 href: '/baskets/visual-basket',
             },
         ],
-        managerSummary: {
-            cycles: 1,
-            activeCycles: 1,
-            households: 1,
-            activeHouseholds: 1,
-            accounts: 1,
-            pendingInvitations: 0,
-            producers: 1,
-            activeProducers: 1,
-        },
     },
     'Manage/Accounts/Index': {
         accounts: [
@@ -441,29 +428,14 @@ if (pageName === 'Dashboard') {
     visualProps.roles = [role];
     visualProps.isManager = role === 'manager';
     visualProps.isMember = role === 'member';
-    visualProps.managerSummary =
-        role === 'manager' ? visualProps.managerSummary : null;
     visualProps.attention = role === 'member' ? visualProps.attention : [];
-    visualProps.nextPickup = role === 'member' ? visualProps.nextPickup : null;
-    visualProps.openCycles = role === 'member' ? visualProps.openCycles : 0;
-    visualProps.balance = role === 'member' ? visualProps.balance : null;
-    if (state === 'empty' || state === 'no-cycle' || state === 'no-data') {
-        visualProps.nextPickup = null;
-        visualProps.openCycles = 0;
+    if (state === 'empty' || state === 'no-cycle' || state === 'no-data')
         visualProps.attention = [];
-        if (role === 'manager') {
-            visualProps.managerSummary = {
-                cycles: 0,
-                activeCycles: 0,
-                households: 0,
-                activeHouseholds: 0,
-                accounts: 0,
-                pendingInvitations: 0,
-                producers: 0,
-                activeProducers: 0,
-            };
-        }
-    }
+    // The server's flag: a person with a context and no pending work is caught up (R14).
+    visualProps.can = {
+        showCaughtUp: visualProps.attention.length === 0,
+        showNoContext: false,
+    };
 }
 
 if (pageName === 'Wallet/Statement') {
@@ -574,9 +546,11 @@ void createInertiaApp({
             present('member actions') === (role === 'member') &&
             present('producer actions') === (role === 'producer') &&
             present('manager actions') === (role === 'manager') &&
-            present('cooperative summary') === (role === 'manager') &&
-            present('pending work') ===
-                (role === 'member' && state !== 'empty');
+            !present('cooperative summary') &&
+            !!root?.querySelector('[data-test="attention-list"]') ===
+                (role === 'member' && state !== 'empty') &&
+            !!root?.querySelector('[data-test="caught-up"]') ===
+                !(role === 'member' && state !== 'empty');
         if (root) root.dataset.visualRoleValid = String(valid);
     }
     if (state === 'errors') {

@@ -24,6 +24,9 @@ class DashboardTest extends TestCase
         $this->withoutVite();
 
         $this->get(route('dashboard'))
-            ->assertInertia(fn (Assert $page) => $page->component('Dashboard'));
+            ->assertInertia(fn (Assert $page) => $page->component('Dashboard')
+                ->where('can', ['showCaughtUp' => false, 'showNoContext' => true])
+                ->where('readFailed', false)
+                ->missing('managerSummary')->missing('balance')->missing('nextPickup')->missing('openCycles'));
     }
 }

@@ -48,7 +48,8 @@ it('sends null sections and time with readFailed true when a known source read f
         ->where('readFailed', true)
         ->where('lastUpdatedAt', null)
         ->where('attention', null)
-        ->where('opportunities', null));
+        ->where('opportunities', null)
+        ->where('can', ['showCaughtUp' => false, 'showNoContext' => false]));
 });
 
 it('keeps an authorization failure as 403 instead of reading it as a failed read (R15)', function () {

@@ -12,17 +12,14 @@ enum ActionKind: string
     case ValidateBasket = 'validate_basket';
     case CollectBasket = 'collect_basket';
 
-    /** Stage order among groups with the same date: sending, reception, basket work, collection (R13). */
-    public function rank(): int
+    /** Stage among groups with the same date: sending, reception, basket work, collection (R13). Sub-actions of one stage share it. */
+    public function stage(): int
     {
         return match ($this) {
-            self::SendOrder => 10,
-            self::CheckDeliveryAndAllocations => 20,
-            self::ResolveAllocations => 21,
-            self::MarkDistributed => 22,
-            self::PrepareBasket => 30,
-            self::ValidateBasket => 31,
-            self::CollectBasket => 40,
+            self::SendOrder => 1,
+            self::CheckDeliveryAndAllocations, self::ResolveAllocations, self::MarkDistributed => 2,
+            self::PrepareBasket, self::ValidateBasket => 3,
+            self::CollectBasket => 4,
         };
     }
 }

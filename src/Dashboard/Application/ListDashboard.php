@@ -18,6 +18,19 @@ use Illuminate\Support\Facades\Gate;
 /** The signed-in account's pending work, read from current persisted data; it changes nothing (R1, R3). */
 final class ListDashboard
 {
+    /**
+     * The words the page renders for a group's context, copied from lang/ca.json ("Pickup :date", "Cycle", "No cycle"). Application
+     * cannot use the translator (architecture A2), so ordering by the displayed label keeps its own copy here; the Catalan default is
+     * the only locale, and AttentionPriorityTest fails if lang/ca.json stops matching these words.
+     */
+    private const array CONTEXT_WORDS = ['pickup' => 'recollida del', 'cycle' => 'cicle', 'noCycle' => 'cap cicle'];
+
+    private const array ACCENT_FOLD = [
+        'à' => 'a', 'á' => 'a', 'â' => 'a', 'ä' => 'a', 'è' => 'e', 'é' => 'e', 'ê' => 'e', 'ë' => 'e',
+        'ì' => 'i', 'í' => 'i', 'î' => 'i', 'ï' => 'i', 'ò' => 'o', 'ó' => 'o', 'ô' => 'o', 'ö' => 'o',
+        'ù' => 'u', 'ú' => 'u', 'û' => 'u', 'ü' => 'u', 'ç' => 'c', 'ñ' => 'n', 'l·l' => 'll',
+    ];
+
     public function __construct(
         private readonly BasketWorkRepository $basketWork,
         private readonly ReceptionWorkRepository $receptionWork,
@@ -44,13 +57,52 @@ final class ListDashboard
             ...($gate->allows('manage') ? $this->sendGroups() : []),
             ...$this->receptionGroups($gate->allows('receive'), $gate->allows('settle-reception')),
         ];
-        usort($groups, fn (AttentionGroupData $a, AttentionGroupData $b) => [$a->scheduledDate === null, $a->scheduledDate, ActionKind::from($a->action)->rank(), $a->key]
-            <=> [$b->scheduledDate === null, $b->scheduledDate, ActionKind::from($b->action)->rank(), $b->key]);
+        usort($groups, $this->comparePriority(...));
 
         // Read last: the time is stamped only once every source read has succeeded; a failed read raises ReadUnavailable instead (R15).
         $opportunities = $this->opportunities($actor, $isMember);
 
-        return new DashboardData($groups, $opportunities, $this->clock->now());
+        $hasContext = $this->hasContext($actor, $isMember);
+
+        // Both flags are decided only here, after every read succeeded, so a failed read can never report caught up (R14, R15).
+        return new DashboardData($groups, $opportunities, $this->clock->now(), $hasContext && $groups === [], ! $hasContext);
+    }
+
+    /** Whether the account has any household, producer or staff context to be caught up in (R14). */
+    private function hasContext(Actor $actor, bool $isMember): bool
+    {
+        $gate = Gate::forUser($actor);
+
+        return $isMember
+            || $gate->allows('manage-sales') || $gate->allows('manage') || $gate->allows('receive') || $gate->allows('view-producers')
+            || ($gate->allows('producer') && $gate->allows('owns', ['producer', $actor->producerId]));
+    }
+
+    /**
+     * No pending family carries an actual deadline today, so priority is the scheduled date (undated last), then the four-value
+     * stage, then the displayed context, then the action code, then the stable identifiers, which a rename cannot change (R12, R13).
+     */
+    private function comparePriority(AttentionGroupData $a, AttentionGroupData $b): int
+    {
+        return [$a->scheduledDate === null, $a->scheduledDate, ActionKind::from($a->action)->stage()] <=> [$b->scheduledDate === null, $b->scheduledDate, ActionKind::from($b->action)->stage()]
+            ?: strcmp($this->contextOrderKey($a), $this->contextOrderKey($b))
+            ?: [$a->action, $a->cycleId ?? '', $a->key] <=> [$b->action, $b->cycleId ?? '', $b->key];
+    }
+
+    /**
+     * The label the page shows for the group, in the same shape and with the same Catalan words (see CONTEXT_WORDS): the producer
+     * (when the group is one reception or send) before the pickup date, or the cycle / no-cycle context when it has no date. A group
+     * of several producers shows only the date part. Accents and case are folded so "àlex" sorts with "alex" for Catalan names,
+     * without depending on ext-intl. The date is the ISO date: only same-date groups reach this comparison, so it orders consistently.
+     */
+    private function contextOrderKey(AttentionGroupData $group): string
+    {
+        $context = $group->scheduledDate !== null
+            ? self::CONTEXT_WORDS['pickup'].' '.$group->scheduledDate
+            : self::CONTEXT_WORDS[$group->cycleId === null ? 'noCycle' : 'cycle'];
+        $label = $group->producerName === null ? $context : "{$group->producerName} · {$context}";
+
+        return strtr(mb_strtolower($label), self::ACCENT_FOLD);
     }
 
     /**

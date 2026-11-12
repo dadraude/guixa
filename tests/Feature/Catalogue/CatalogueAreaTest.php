@@ -90,7 +90,7 @@ it('shows a Catalogue-only account its area in the switch and one dashboard shor
         ->where('roleAreas', [['role' => 'catalogue', 'label' => 'Catalogue', 'href' => '/catalogue/producers']])
         ->where('areaShortcuts', [['role' => 'catalogue', 'label' => 'Catalogue', 'href' => '/catalogue/producers']])
         ->where('isMember', false)->where('isManager', false)
-        ->where('managerSummary', null)->has('attention', 0));
+        ->has('attention', 0)->where('can.showCaughtUp', true));
 
     $this->actingAs($account)->get('/catalogue/producers')->assertOk();
 });

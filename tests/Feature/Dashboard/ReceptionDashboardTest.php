@@ -103,3 +103,20 @@ it('is a read-only route: the dashboard accepts only GET and HEAD', function () 
 
     expect($methods)->toBe(['GET', 'HEAD']);
 });
+
+it('drops the reception group on the next read once the Receiver role is removed, and the stale reception link refuses (S12, R1)', function () {
+    [$cycleId, $producerId] = sentBakerOrder();
+    $receiver = accountWith(Role::Receiver);
+    $link = "/receptions/{$cycleId}/{$producerId}";
+
+    $this->actingAs($receiver)->get('/dashboard')->assertInertia(fn (Assert $page) => $page
+        ->has('attention', 1)->where('attention.0.href', $link));
+    $this->get($link)->assertOk();
+
+    DB::table('account_roles')->where('user_id', $receiver->id)->where('role', Role::Receiver->value)->delete();
+    app('auth')->forgetGuards();
+
+    $this->actingAs($receiver->fresh())->get('/dashboard')->assertInertia(fn (Assert $page) => $page
+        ->has('attention', 0)->where('can.showNoContext', true));
+    $this->get($link)->assertForbidden();
+});

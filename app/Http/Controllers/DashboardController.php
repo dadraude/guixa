@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\AttentionGroupRow;
 use App\Http\OpportunityRow;
 use App\Http\RoleAreas;
-use Guixa\Catalog\Application\CountProducers;
 use Guixa\Dashboard\Application\AttentionGroupData;
 use Guixa\Dashboard\Application\DashboardData;
 use Guixa\Dashboard\Application\DestinationArea;
@@ -13,81 +12,26 @@ use Guixa\Dashboard\Application\ListDashboard;
 use Guixa\Dashboard\Application\OpportunityArea;
 use Guixa\Dashboard\Application\OpportunityData;
 use Guixa\Dashboard\Domain\Error\ReadUnavailable;
-use Guixa\Membership\Application\CountAccounts;
-use Guixa\Membership\Application\CountHouseholds;
-use Guixa\Ordering\Application\CountCycles;
-use Guixa\Ordering\Application\CountOpenMemberCycles;
-use Guixa\Ordering\Application\ListMemberCycles;
 use Guixa\Shared\Application\Actor;
-use Guixa\Wallet\Application\ReadHouseholdBalance;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class DashboardController extends Controller
 {
-    public function show(
-        Actor $actor,
-        ListMemberCycles $listMemberCycles,
-        CountOpenMemberCycles $countOpenMemberCycles,
-        CountCycles $countCycles,
-        CountHouseholds $countHouseholds,
-        CountAccounts $countAccounts,
-        CountProducers $countProducers,
-        ReadHouseholdBalance $readHouseholdBalance,
-        ListDashboard $listDashboard,
-    ): Response {
+    public function show(Actor $actor, ListDashboard $listDashboard): Response
+    {
         $dashboard = $this->read($listDashboard, $actor);
-        $roles = $actor->roleNames();
-        $isManager = in_array('manager', $roles, true);
-        $isMember = in_array('member', $roles, true);
-
-        $hasHousehold = $isMember && $actor->householdId !== null;
-        $memberCycles = $hasHousehold ? $listMemberCycles($actor) : [];
-        $nextPickup = null;
-        foreach ($memberCycles as $cycle) {
-            if (! $cycle->cancelled) {
-                $nextPickup = $cycle->pickupDate;
-                break;
-            }
-        }
-
-        $balance = null;
-        if ($hasHousehold) {
-            $balance = $readHouseholdBalance($actor->householdId);
-        }
-
-        $managerSummary = null;
-        if ($isManager) {
-            $cycles = $countCycles($actor);
-            $households = $countHouseholds($actor);
-            $accounts = $countAccounts($actor);
-            $producers = $countProducers($actor);
-
-            $managerSummary = [
-                'cycles' => $cycles->total,
-                'activeCycles' => $cycles->active,
-                'households' => $households->total,
-                'activeHouseholds' => $households->active,
-                'accounts' => $accounts->total,
-                'pendingInvitations' => $accounts->pendingInvitations,
-                'producers' => $producers->total,
-                'activeProducers' => $producers->active,
-            ];
-        }
 
         return Inertia::render('Dashboard', [
-            'roles' => $roles,
-            'isManager' => $isManager,
-            'isMember' => $isMember,
-            'nextPickup' => $nextPickup,
-            'openCycles' => $hasHousehold ? $countOpenMemberCycles($actor) : 0,
-            'balance' => $balance,
+            'roles' => $actor->roleNames(),
+            'isManager' => in_array('manager', $actor->roleNames(), true),
+            'isMember' => in_array('member', $actor->roleNames(), true),
             // A known failed read sends no sections and no time, so the page cannot read it as zero pending work (R15).
             'readFailed' => $dashboard === null,
             'lastUpdatedAt' => $dashboard?->readAt->format(DATE_ATOM),
             'attention' => $dashboard === null ? null : array_map($this->attentionRow(...), $dashboard->attention),
             'opportunities' => $dashboard === null ? null : array_map($this->opportunityRow(...), $dashboard->opportunities),
-            'managerSummary' => $managerSummary,
+            'can' => ['showCaughtUp' => $dashboard?->showCaughtUp ?? false, 'showNoContext' => $dashboard?->showNoContext ?? false],
             'areaShortcuts' => RoleAreas::shortcuts($actor),
         ]);
     }

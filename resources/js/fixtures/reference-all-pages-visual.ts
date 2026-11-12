@@ -172,19 +172,7 @@ const pageProps: Record<string, Record<string, unknown>> = {
         roles: ['manager', 'member', 'producer'],
         isManager: true,
         isMember: true,
-        nextPickup: pickupDate,
-        openCycles: 1,
-        balance: 2000,
-        managerSummary: {
-            cycles: 1,
-            activeCycles: 1,
-            households: 1,
-            activeHouseholds: 1,
-            accounts: 1,
-            pendingInvitations: 0,
-            producers: 1,
-            activeProducers: 1,
-        },
+        can: { showCaughtUp: true, showNoContext: false },
     },
     'Manage/Accounts/Index': {
         accounts: [
