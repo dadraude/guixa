@@ -716,7 +716,7 @@ if (pageName === 'Dashboard') {
                 );
             if (state === 'history-probe') {
                 // In-app history probe: a visit to /settings/appearance, and a dashboard read that advances the time.
-                const toAppearance = !String(config.url).includes('dra-205');
+                const toAppearance = String(config.url).includes('/finance/');
                 return {
                     status: 200,
                     data: JSON.stringify({
@@ -1565,7 +1565,7 @@ void createInertiaApp({
             (
                 (window as unknown as Record<string, string[]>)
                     .visualRequestLog ?? []
-            ).filter((entry) => entry.includes('dra-205')).length;
+            ).filter((entry) => !entry.includes('/finance/')).length;
         await wait(
             () => !!document.querySelector('[data-test="freshness-time"]'),
         );
