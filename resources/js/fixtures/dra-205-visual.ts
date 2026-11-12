@@ -1247,7 +1247,7 @@ void createInertiaApp({
                     !!emptyMessage && mainText().includes(trans(emptyMessage))
                 );
             case 'history-probe':
-                return true;
+                return document.body.dataset.visualReturnReads !== undefined;
             case 'refresh-busy':
                 return (
                     document.body.dataset.visualRequests === '1' &&
@@ -1554,6 +1554,40 @@ void createInertiaApp({
             }
             await new Promise((resolve) => window.setTimeout(resolve, 25));
         }
+    }
+    if (pageName === 'Dashboard' && state === 'history-probe') {
+        // Drives the real Inertia router: leave through an in-app link, then browser Back. Only the HTTP client is mocked.
+        const wait = async (until: () => boolean) => {
+            for (let attempt = 0; !until() && attempt < 100; attempt++)
+                await new Promise((resolve) => window.setTimeout(resolve, 25));
+        };
+        const dashboardReads = () =>
+            (
+                (window as unknown as Record<string, string[]>)
+                    .visualRequestLog ?? []
+            ).filter((entry) => entry.includes('dra-205')).length;
+        await wait(
+            () => !!document.querySelector('[data-test="freshness-time"]'),
+        );
+        await new Promise((resolve) => window.setTimeout(resolve, 500));
+        document.body.dataset.visualIdleReads = String(dashboardReads());
+        document
+            .querySelector<HTMLElement>('[data-test="attention-group"] a')
+            ?.click();
+        await wait(() => window.location.pathname === '/settings/appearance');
+        window.history.back();
+        await wait(
+            () =>
+                document
+                    .querySelector('[data-test="freshness-time"]')
+                    ?.textContent?.includes('09:45') === true,
+        );
+        await new Promise((resolve) => window.setTimeout(resolve, 500));
+        document.body.dataset.visualReturnReads = String(dashboardReads());
+        document.body.dataset.visualReturnTime =
+            document
+                .querySelector('[data-test="freshness-time"]')
+                ?.textContent?.trim() ?? '';
     }
     if (state !== 'default') {
         let ready = stateReady();

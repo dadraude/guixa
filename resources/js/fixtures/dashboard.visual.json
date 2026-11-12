@@ -1059,6 +1059,45 @@
                         "state": "initial-error",
                         "role": "manager"
                     }
+                },
+                {
+                    "id": "history-probe",
+                    "query": {
+                        "state": "history-probe"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"history-probe\"]",
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-visual-idle-reads": "0",
+                                    "data-visual-return-reads": "1",
+                                    "data-visual-return-time": "Actualitzat el 12/11 09:45",
+                                    "data-visual-writes": "0"
+                                }
+                            },
+                            {
+                                "selector": "[data-test=\"freshness-time\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"read-error\"]",
+                                "count": 0
+                            }
+                        ],
+                        "focus": [
+                            "button[data-sidebar=\"trigger\"]",
+                            "[data-test=\"refresh-button\"]"
+                        ]
+                    }
                 }
             ]
         }
