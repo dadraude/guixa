@@ -23,9 +23,6 @@ import { Button } from '@/components/ui/button';
                 <Button as-child size="lg" class="welcome-primary-action">
                     <a href="#contact">{{ trans('Come and meet us') }}</a>
                 </Button>
-                <a class="welcome-text-action" href="#how-it-works">
-                    {{ trans('How it works') }}
-                </a>
             </div>
         </div>
         <div class="welcome-hero-art" aria-hidden="true">
@@ -104,19 +101,6 @@ import { Button } from '@/components/ui/button';
     background: #fff9eb;
 }
 
-.welcome-text-action {
-    display: inline-flex;
-    min-height: 2.75rem;
-    align-items: center;
-    color: var(--welcome-hero-cream);
-    font-weight: 700;
-    text-underline-offset: 0.25em;
-}
-
-.welcome-text-action:hover {
-    color: #fff9eb;
-}
-
 .welcome-hero-art {
     display: block;
     justify-self: center;
@@ -154,10 +138,6 @@ import { Button } from '@/components/ui/button';
         flex-direction: column;
         align-items: stretch;
         gap: 0.5rem;
-    }
-
-    .welcome-text-action {
-        align-self: start;
     }
 }
 </style>
