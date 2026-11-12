@@ -961,7 +961,7 @@
                             },
                             {
                                 "selector": "[data-test=\"attention-group\"]",
-                                "count": 1
+                                "count": 2
                             },
                             {
                                 "selector": "[data-test=\"freshness-time\"]",
@@ -1056,7 +1056,8 @@
                         ]
                     },
                     "query": {
-                        "state": "initial-error"
+                        "state": "initial-error",
+                        "role": "manager"
                     }
                 }
             ]
