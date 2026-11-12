@@ -13,7 +13,7 @@ async function render(actionHref: string) {
 }
 
 describe('public cooperative landing', () => {
-    it('shows the approved Catalan sections and their in-page links', async () => {
+    it('shows the Catalan sections and remaining in-page links', async () => {
         const html = await render('/login');
 
         expect(html).toContain('Alimentem el canvi.');
@@ -21,7 +21,8 @@ describe('public cooperative landing', () => {
         expect(html).toContain('De la comanda a la cistella.');
         expect(html).toContain('Ens vols conèixer?');
         expect(html).toContain('href="#cooperative"');
-        expect(html).toContain('href="#how-it-works"');
+        expect(html).not.toContain('href="#how-it-works"');
+        expect(html).not.toContain('Com funciona');
         expect(html).toContain('href="#contact"');
         expect(html).toContain('href="mailto:laguixamanresa@gmail.com"');
     });

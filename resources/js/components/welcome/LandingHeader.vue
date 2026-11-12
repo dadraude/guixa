@@ -11,7 +11,6 @@ defineProps<{ actionHref: string }>();
         </a>
         <nav class="welcome-nav" :aria-label="trans('Main navigation')">
             <a href="#cooperative">{{ trans('The cooperative') }}</a>
-            <a href="#how-it-works">{{ trans('How it works') }}</a>
         </nav>
         <a id="welcome-action" class="welcome-access" :href="actionHref">
             {{ trans('Member access') }}

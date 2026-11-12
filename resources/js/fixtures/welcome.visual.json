@@ -15,7 +15,6 @@
                 ".welcome-nav a",
                 "#welcome-action",
                 ".welcome-primary-action",
-                ".welcome-text-action",
                 ".welcome-contact-button",
                 ".welcome-email"
             ],
@@ -62,10 +61,6 @@
                     "contrast": 4.5
                 },
                 {
-                    "selector": ".welcome-text-action",
-                    "contrast": 4.5
-                },
-                {
                     "selector": ".welcome-basket",
                     "count": 1
                 }
@@ -78,7 +73,6 @@
                             ".welcome-brand",
                             "#welcome-action",
                             ".welcome-primary-action",
-                            ".welcome-text-action",
                             ".welcome-contact-button",
                             ".welcome-email"
                         ],
@@ -134,10 +128,6 @@
                             },
                             {
                                 "selector": ".welcome-intro",
-                                "contrast": 4.5
-                            },
-                            {
-                                "selector": ".welcome-text-action",
                                 "contrast": 4.5
                             },
                             {
@@ -239,10 +229,6 @@
                                 "contrast": 4.5
                             },
                             {
-                                "selector": ".welcome-text-action",
-                                "contrast": 4.5
-                            },
-                            {
                                 "selector": ".welcome-basket",
                                 "count": 1
                             },
@@ -313,7 +299,6 @@
                             ".welcome-brand",
                             "#welcome-action",
                             ".welcome-primary-action",
-                            ".welcome-text-action",
                             ".welcome-contact-button",
                             ".welcome-email"
                         ],
@@ -369,10 +354,6 @@
                             },
                             {
                                 "selector": ".welcome-intro",
-                                "contrast": 4.5
-                            },
-                            {
-                                "selector": ".welcome-text-action",
                                 "contrast": 4.5
                             },
                             {
@@ -467,10 +448,6 @@
                                 "contrast": 4.5
                             },
                             {
-                                "selector": ".welcome-text-action",
-                                "contrast": 4.5
-                            },
-                            {
                                 "selector": ".welcome-basket",
                                 "count": 1
                             },
@@ -508,7 +485,6 @@
                             ".welcome-brand",
                             "#welcome-action",
                             ".welcome-primary-action",
-                            ".welcome-text-action",
                             ".welcome-contact-button",
                             ".welcome-email"
                         ],
@@ -563,7 +539,6 @@
                             ".welcome-brand",
                             "#welcome-action",
                             ".welcome-primary-action",
-                            ".welcome-text-action",
                             ".welcome-contact-button",
                             ".welcome-email"
                         ],
