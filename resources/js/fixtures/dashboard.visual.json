@@ -976,8 +976,8 @@
                                 "count": 1
                             },
                             {
-                                "selector": "[data-test=\"caught-up\"]",
-                                "count": 0
+                                "selector": "[data-test=\"attention-list\"]",
+                                "count": 1
                             }
                         ],
                         "focus": [
@@ -1046,7 +1046,7 @@
                                 "count": 1
                             },
                             {
-                                "selector": "[data-test=\"caught-up\"]",
+                                "selector": "[data-test=\"attention-list\"]",
                                 "count": 0
                             }
                         ],
