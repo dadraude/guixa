@@ -17,6 +17,7 @@ use Guixa\Sales\Domain\CyclePickupDates;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Quantity;
 use Guixa\Shared\Domain\Role;
+use Tests\Support\FrozenClock;
 use Tests\Support\InMemory\Sales\InMemoryBasketRepository;
 use Tests\Support\InMemory\Sales\InMemoryWeeklyBasketSource;
 
@@ -60,6 +61,7 @@ function dashboardWith(InMemoryBasketRepository $repository, InMemoryWeeklyBaske
                 return [];
             }
         },
+        new FrozenClock('2026-11-12 09:30'),
     );
 }
 

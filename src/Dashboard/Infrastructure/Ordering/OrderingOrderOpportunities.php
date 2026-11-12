@@ -5,6 +5,7 @@ namespace Guixa\Dashboard\Infrastructure\Ordering;
 use Guixa\Dashboard\Domain\OrderOpportunitiesRepository;
 use Guixa\Dashboard\Domain\ValueObject\OrderWindow;
 use Guixa\Dashboard\Domain\ValueObject\SentSummary;
+use Guixa\Dashboard\Infrastructure\TranslatesReadFailures;
 use Guixa\Ordering\Application\DashboardOpportunityCutoffData;
 use Guixa\Ordering\Application\DashboardOpportunityScope;
 use Guixa\Ordering\Application\DashboardOpportunitySummaryData;
@@ -13,6 +14,8 @@ use Guixa\Ordering\Application\ReadDashboardOrderOpportunities;
 
 final class OrderingOrderOpportunities implements OrderOpportunitiesRepository
 {
+    use TranslatesReadFailures;
+
     public function __construct(private readonly ReadDashboardOrderOpportunities $read) {}
 
     public function openWindows(): array
@@ -23,7 +26,7 @@ final class OrderingOrderOpportunities implements OrderOpportunitiesRepository
                 $window->pickupDate,
                 array_map(fn (DashboardOpportunityCutoffData $cutoff) => [$cutoff->producerName, $cutoff->closesAt], $window->cutoffs),
             ),
-            ($this->read)(DashboardOpportunityScope::OpenWindows),
+            $this->guarded('open ordering windows', fn () => ($this->read)(DashboardOpportunityScope::OpenWindows)),
         );
     }
 
@@ -31,7 +34,7 @@ final class OrderingOrderOpportunities implements OrderOpportunitiesRepository
     {
         return array_map(
             fn (DashboardOpportunitySummaryData $summary) => new SentSummary($summary->cycleId, $summary->pickupDate),
-            ($this->read)(DashboardOpportunityScope::SentSummaries, $producerId),
+            $this->guarded('sent summaries', fn () => ($this->read)(DashboardOpportunityScope::SentSummaries, $producerId)),
         );
     }
 }

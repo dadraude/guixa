@@ -7,10 +7,12 @@ use App\Http\OpportunityRow;
 use App\Http\RoleAreas;
 use Guixa\Catalog\Application\CountProducers;
 use Guixa\Dashboard\Application\AttentionGroupData;
+use Guixa\Dashboard\Application\DashboardData;
 use Guixa\Dashboard\Application\DestinationArea;
 use Guixa\Dashboard\Application\ListDashboard;
 use Guixa\Dashboard\Application\OpportunityArea;
 use Guixa\Dashboard\Application\OpportunityData;
+use Guixa\Dashboard\Domain\Error\ReadUnavailable;
 use Guixa\Membership\Application\CountAccounts;
 use Guixa\Membership\Application\CountHouseholds;
 use Guixa\Ordering\Application\CountCycles;
@@ -34,7 +36,7 @@ class DashboardController extends Controller
         ReadHouseholdBalance $readHouseholdBalance,
         ListDashboard $listDashboard,
     ): Response {
-        $dashboard = $listDashboard($actor);
+        $dashboard = $this->read($listDashboard, $actor);
         $roles = $actor->roleNames();
         $isManager = in_array('manager', $roles, true);
         $isMember = in_array('member', $roles, true);
@@ -80,11 +82,23 @@ class DashboardController extends Controller
             'nextPickup' => $nextPickup,
             'openCycles' => $hasHousehold ? $countOpenMemberCycles($actor) : 0,
             'balance' => $balance,
-            'attention' => array_map($this->attentionRow(...), $dashboard->attention),
-            'opportunities' => array_map($this->opportunityRow(...), $dashboard->opportunities),
+            // A known failed read sends no sections and no time, so the page cannot read it as zero pending work (R15).
+            'readFailed' => $dashboard === null,
+            'lastUpdatedAt' => $dashboard?->readAt->format(DATE_ATOM),
+            'attention' => $dashboard === null ? null : array_map($this->attentionRow(...), $dashboard->attention),
+            'opportunities' => $dashboard === null ? null : array_map($this->opportunityRow(...), $dashboard->opportunities),
             'managerSummary' => $managerSummary,
             'areaShortcuts' => RoleAreas::shortcuts($actor),
         ]);
+    }
+
+    private function read(ListDashboard $listDashboard, Actor $actor): ?DashboardData
+    {
+        try {
+            return $listDashboard($actor);
+        } catch (ReadUnavailable) {
+            return null;
+        }
     }
 
     private function attentionRow(AttentionGroupData $group): AttentionGroupRow
