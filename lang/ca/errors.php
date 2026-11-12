@@ -66,6 +66,7 @@ return [
     'ProductHasUnsettledLines' => 'No es poden canviar la unitat ni la condició de preu variable mentre el producte tingui línies en un cicle pendent de liquidació.',
     'ProductNotFound' => 'No s’ha trobat aquest producte.',
     'ProductNotInReception' => 'Aquest producte no és a la recepció perquè no s’ha enviat ni afegit.',
+    'ReadUnavailable' => 'No s’ha pogut llegir la feina pendent. Torna-ho a provar.',
     'ReceptionNotValidated' => 'La recepció d’aquest productor encara no s’ha validat.',
     'ReceptionUnbalanced' => 'La recepció d’aquest productor conté productes sense quadrar.',
     'UnitRequired' => 'Cal indicar una unitat.',

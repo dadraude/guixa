@@ -75,7 +75,7 @@ return [
                 'Application\Actor' => ['Catalog', 'Dashboard', 'Membership', 'Ordering', 'Sales', 'Stock', 'Wallet'],
                 'Application\ActorResolver' => ['Catalog', 'Membership', 'Ordering', 'Stock', 'Wallet'],
                 'Application\TransactionRunner' => ['Catalog', 'Membership', 'Ordering', 'Sales', 'Stock', 'Wallet'],
-                'Domain\Clock' => ['Catalog', 'Membership', 'Ordering', 'Sales', 'Stock', 'Wallet'],
+                'Domain\Clock' => ['Catalog', 'Dashboard', 'Membership', 'Ordering', 'Sales', 'Stock', 'Wallet'],
                 'Domain\Money' => ['Catalog', 'Membership', 'Ordering', 'Sales', 'Stock', 'Wallet'],
                 'Domain\Quantity' => ['Catalog', 'Membership', 'Ordering', 'Sales', 'Stock', 'Wallet'],
                 'Domain\LocalTime' => ['Catalog', 'Membership', 'Ordering', 'Stock', 'Wallet'],

@@ -333,7 +333,7 @@ const isProducer = computed(() => props.roles.includes('producer'));
 
         <section
             v-if="hasFreshness"
-            class="flex flex-col gap-3"
+            class="flex flex-col gap-2"
             :aria-label="trans('Last update')"
             data-test="freshness"
         >
