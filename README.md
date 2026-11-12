@@ -62,6 +62,7 @@ Open <http://localhost:8000> and sign in as `gestora@demo.guixa.test` with passw
 | Manager           | `gestora@demo.guixa.test`                                                                        |
 | Household members | `anna@demo.guixa.test`, `biel@demo.guixa.test`, `carla@demo.guixa.test`, `david@demo.guixa.test` |
 | Producers         | `hort@demo.guixa.test`, `forn@demo.guixa.test`, `formatgeria@demo.guixa.test`                    |
+| Former member     | `eva@demo.guixa.test` (no household or role; shows the dashboard's no-context state)             |
 
 The demo creates four households, three producers, six weekly products, two stock products,
 opening wallet balances and stock entries. Each household has an order in three upcoming cycles:
