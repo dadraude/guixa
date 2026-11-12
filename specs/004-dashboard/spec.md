@@ -3,8 +3,9 @@
 **Status: First-slice specification accepted (Q22, 2026-11-11).** Q14 selected this delivery boundary. Q1–Q21 in
 [history](history/) establish the product direction; Q22 accepts the exact requirements and scenarios below.
 Feature 002 remains retired. The independently shipped login destination (002 T05/R11) and interim
-dashboard summary (001 T61) retain their ownership; this slice replaces the interim page content when accepted
-and delivered. Feature 001 completion and 003 delivery readiness must be confirmed before implementation.
+dashboard summary (001 T61) retain their ownership; this slice replaces the interim summary cards, balance and
+manager totals when accepted and delivered, and keeps the existing role navigation links (R11). Feature 001
+completion and 003 delivery readiness must be confirmed before implementation.
 
 The signed-in dashboard puts permitted pending work first, then opportunities. It helps household members,
 producers, and Manager, Finance, Catalogue and Receiver staff reach their existing task screens. It performs
@@ -101,8 +102,10 @@ domain entity.
   Catalogue sees its permitted product/availability maintenance destination as an opportunity; an inactive or
   cycle-unavailable product alone does not make pending work. These do not appear after the account loses the
   relevant household/producer/role access. Existing permitted role-area shortcuts remain available, including
-  Catalogue and Receiver shortcuts from 003 R15; generic shortcuts do not manufacture additional pending tasks
-  or deadline claims.
+  Catalogue and Receiver shortcuts from 003 R15. The existing role navigation link sections also stay on the
+  dashboard as navigation only, alongside those shortcuts: a member's Orders and Wallet, a producer's Products
+  and Default cutoff, and a Manager's existing management links. Generic shortcuts and navigation links do not
+  manufacture additional pending tasks, counts or deadline claims.
 - **R12 — Priority and time language.** Pending work with an actual existing deadline comes first, then other
   pending work, then opportunities. Use actual existing rules to call an item overdue. A scheduled pickup date
   alone never makes reception, basket preparation or collection overdue; an ordering cutoff is an
@@ -118,9 +121,13 @@ domain entity.
 - **R14 — Cross-cycle and empty state.** Include all permitted pending work across overlapping cycles and
   independent baskets. A scheduled date passing, a cycle closing, or a household becoming inactive does not
   hide an item that an authorized staff actor can still resolve. Label each cycle or no-cycle context clearly.
-  When the account has no pending work, say it is caught up and keep its permitted opportunities and area
-  shortcuts available. When it has no role-specific context, explain the absence rather than displaying a
-  fabricated zero or trend. Cancelled weekly work and retained cancelled drafts do not become live work.
+  When the account has role-specific context and no pending work after a complete, successful read, say it is
+  caught up and keep its permitted opportunities and area shortcuts available. Role-specific context is an
+  active household link, an owned producer, or a Manager, Finance, Receiver or Catalogue role. When the account
+  has none of these, explain the absence rather than displaying a fabricated zero or trend, and never say it is
+  caught up. A failed read never says the account is caught up. A failed first read shows neither message; the
+  no-context explanation shows only from a successful read and stays with its retained snapshot. Cancelled weekly
+  work and retained cancelled drafts do not become live work.
   An independent stock basket has no cycle attribution, so it shows in the explicit no-cycle context and
   remains eligible under its own state and permissions, as required by 001 R4b; no cycle's state can hide it.
 
