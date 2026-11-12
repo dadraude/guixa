@@ -22,7 +22,6 @@ import { trans, transChoice } from 'laravel-vue-i18n';
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { formatEuroAmount } from '@/lib/formatEuroAmount';
 import { formatQuantity } from '@/lib/locale';
 import type { NavItem } from '@/types';
 import OrderController from '@/actions/App/Http/Controllers/OrderController';
@@ -37,29 +36,15 @@ import SettingsController from '@/actions/App/Http/Controllers/Manage/SettingsCo
 import ProductController from '@/actions/App/Http/Controllers/Producer/ProductController';
 import CutoffController from '@/actions/App/Http/Controllers/Producer/CutoffController';
 
-type ManagerSummary = {
-    cycles: number;
-    activeCycles: number;
-    households: number;
-    activeHouseholds: number;
-    accounts: number;
-    pendingInvitations: number;
-    producers: number;
-    activeProducers: number;
-};
-
 const props = defineProps<{
     roles: string[];
     isManager: boolean;
     isMember: boolean;
-    nextPickup: string | null;
-    openCycles: number;
-    balance: number | null;
     attention?: App.Http.AttentionGroupRow[] | null;
     opportunities?: App.Http.OpportunityRow[] | null;
     lastUpdatedAt?: string | null;
     readFailed?: boolean;
-    managerSummary: ManagerSummary | null;
+    can?: { showCaughtUp: boolean; showNoContext: boolean };
     areaShortcuts?: App.Http.RoleArea[];
 }>();
 
@@ -67,9 +52,11 @@ type Snapshot = {
     attention: App.Http.AttentionGroupRow[] | null;
     opportunities: App.Http.OpportunityRow[] | null;
     lastUpdatedAt: string | null;
+    can: { showCaughtUp: boolean; showNoContext: boolean };
 };
 
 // The last successful read: a failed read sends null sections, which must never replace it or read as "nothing pending" (R15).
+const noClaim = { showCaughtUp: false, showNoContext: false };
 const lastSuccess = ref<Snapshot | null>(null);
 const saveSuccess = () => {
     if (props.readFailed || !props.lastUpdatedAt) return;
@@ -77,6 +64,7 @@ const saveSuccess = () => {
         attention: props.attention ?? null,
         opportunities: props.opportunities ?? null,
         lastUpdatedAt: props.lastUpdatedAt,
+        can: props.can ?? noClaim,
     };
 };
 watch(
@@ -98,14 +86,21 @@ const shown = computed<Snapshot>(() =>
               attention: null,
               opportunities: null,
               lastUpdatedAt: null,
+              can: noClaim,
           })
         : {
               attention: props.attention ?? null,
               opportunities: props.opportunities ?? null,
               lastUpdatedAt: props.lastUpdatedAt ?? null,
+              can: props.can ?? noClaim,
           },
 );
 const failed = computed(() => props.readFailed === true || requestFailed.value);
+// A failed read or request never claims there is nothing to do (R15); the explanation is not a freshness claim, so it stays.
+const showCaughtUp = computed(
+    () => !failed.value && shown.value.can.showCaughtUp,
+);
+const showNoContext = computed(() => shown.value.can.showNoContext);
 const hasFreshness = computed(
     () => shown.value.lastUpdatedAt !== null || failed.value,
 );
@@ -159,12 +154,6 @@ onBeforeUnmount(() => {
 
 const page = usePage();
 const userName = computed(() => page.props.auth?.user?.name ?? '');
-
-const balanceLabel = computed(() => {
-    if (props.balance === null) return null;
-    const euros = (props.balance / 100).toFixed(2);
-    return formatEuroAmount(euros);
-});
 
 const formattedDate = (iso: string) =>
     new Intl.DateTimeFormat('ca-ES', {
@@ -387,68 +376,39 @@ const isProducer = computed(() => props.roles.includes('producer'));
         </section>
 
         <section
-            class="dashboard-summary grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
-            :aria-label="trans('summary')"
+            v-if="showCaughtUp"
+            class="pilot-layout-panel"
+            :aria-label="trans('pending work')"
+            data-test="caught-up"
         >
-            <article v-if="isMember" class="pilot-layout-panel">
-                <div class="flex items-center gap-4">
-                    <span
-                        class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-[var(--secondary)] text-[var(--secondary-foreground)]"
-                    >
-                        <CalendarDays class="size-5" aria-hidden="true" />
-                    </span>
-                    <div class="min-w-0">
-                        <p class="text-xs text-muted-foreground">
-                            {{ trans('Next pickup') }}
-                        </p>
-                        <p class="text-lg font-semibold break-words">
-                            {{
-                                nextPickup
-                                    ? formattedDate(nextPickup)
-                                    : trans('None')
-                            }}
-                        </p>
-                    </div>
-                </div>
-            </article>
+            <div class="pilot-layout-panel-header">
+                <h2 class="text-lg font-semibold">
+                    {{ trans('You are all caught up') }}
+                </h2>
+            </div>
+            <p class="text-sm text-muted-foreground">
+                {{ trans('There is no pending work for you right now.') }}
+            </p>
+        </section>
 
-            <article v-if="isMember" class="pilot-layout-panel">
-                <div class="flex items-center gap-4">
-                    <span
-                        class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-[var(--secondary)] text-[var(--secondary-foreground)]"
-                    >
-                        <Wallet class="size-5" aria-hidden="true" />
-                    </span>
-                    <div class="min-w-0">
-                        <p class="text-xs text-muted-foreground">
-                            {{ trans('Balance') }}
-                        </p>
-                        <p
-                            class="text-lg font-semibold break-words tabular-nums"
-                        >
-                            {{ balanceLabel ?? '—' }}
-                        </p>
-                    </div>
-                </div>
-            </article>
-
-            <article v-if="isMember" class="pilot-layout-panel">
-                <div class="flex items-center gap-4">
-                    <span
-                        class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-[var(--secondary)] text-[var(--secondary-foreground)]"
-                    >
-                        <ShoppingBasket class="size-5" aria-hidden="true" />
-                    </span>
-                    <div class="min-w-0">
-                        <p class="text-xs text-muted-foreground">
-                            {{ trans('Open') }}
-                        </p>
-                        <p class="text-lg font-semibold break-words">
-                            {{ formatQuantity(String(openCycles)) }}
-                        </p>
-                    </div>
-                </div>
-            </article>
+        <section
+            v-if="showNoContext"
+            class="pilot-layout-panel"
+            :aria-label="trans('pending work')"
+            data-test="no-context"
+        >
+            <div class="pilot-layout-panel-header">
+                <h2 class="text-lg font-semibold">
+                    {{ trans('No tasks for this account') }}
+                </h2>
+            </div>
+            <p class="text-sm text-muted-foreground">
+                {{
+                    trans(
+                        'This account has no household, producer or staff role yet, so the dashboard has no work to show. Ask a manager to link it.',
+                    )
+                }}
+            </p>
         </section>
 
         <section
@@ -563,44 +523,6 @@ const isProducer = computed(() => props.roles.includes('producer'));
                     >
                 </li>
             </ul>
-        </section>
-
-        <section
-            v-if="managerSummary"
-            class="pilot-layout-panel"
-            :aria-label="trans('cooperative summary')"
-        >
-            <div class="pilot-layout-panel-header">
-                <h2 class="text-lg font-semibold">
-                    {{ trans('Cooperative') }}
-                </h2>
-            </div>
-            <div class="grid gap-4 sm:grid-cols-3">
-                <div>
-                    <p class="text-xs text-muted-foreground">
-                        {{ trans('Cycles') }}
-                    </p>
-                    <p class="text-2xl font-semibold tabular-nums">
-                        {{ formatQuantity(String(managerSummary.cycles)) }}
-                    </p>
-                </div>
-                <div>
-                    <p class="text-xs text-muted-foreground">
-                        {{ trans('Households') }}
-                    </p>
-                    <p class="text-2xl font-semibold tabular-nums">
-                        {{ formatQuantity(String(managerSummary.households)) }}
-                    </p>
-                </div>
-                <div>
-                    <p class="text-xs text-muted-foreground">
-                        {{ trans('Accounts') }}
-                    </p>
-                    <p class="text-2xl font-semibold tabular-nums">
-                        {{ formatQuantity(String(managerSummary.accounts)) }}
-                    </p>
-                </div>
-            </div>
         </section>
 
         <section

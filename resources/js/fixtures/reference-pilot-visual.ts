@@ -114,10 +114,7 @@ const catalogueProps: Record<string, Record<string, unknown>> = {
         roles: ['catalogue'],
         isManager: false,
         isMember: false,
-        nextPickup: null,
-        openCycles: 0,
-        balance: null,
-        managerSummary: null,
+        can: { showCaughtUp: true, showNoContext: false },
         areaShortcuts: [
             {
                 role: 'catalogue',

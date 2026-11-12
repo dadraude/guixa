@@ -206,3 +206,36 @@ it('links several drafts to the unfiltered staff basket list (R7)', function () 
     $noCycle = collect(attentionOf($this, accountWith(Role::Finance)))->where('action', 'validate_basket')->firstWhere('cycleId', null);
     expect($noCycle['href'])->toBe('/finance/baskets')->and($noCycle['count'])->toBe(2);
 });
+
+it('sends the dated collection first, then the undated validation before the undated collection, in the page props (R13, S9)', function () {
+    $week = closedWeek($this);
+    [$collectable] = validatedStockBasketOf($this, $week['households']['A']);
+    draftStockBasketOf($this, $week['households']['A']);
+
+    $this->actingAs(accountWith(Role::Manager))->get('/dashboard')->assertInertia(fn (Assert $page) => $page
+        ->where('attention', fn ($groups) => collect($groups)->pluck('key')->map(fn ($key) => preg_replace('/:cycle:.*/', ':cycle', $key))->all() === [
+            'collect_basket:cycle', 'validate_basket:no-cycle', 'collect_basket:no-cycle',
+        ]));
+});
+
+it('lets a member who is also Finance and Receiver see one collection group, no pending claim of caught up, and no duplicated role rows (S1, R1, R2, R8)', function () {
+    $week = closedWeek($this);
+    $combined = memberOf($week['households']['A']);
+    DB::table('account_roles')->insert([
+        ['user_id' => $combined->id, 'role' => Role::Finance->value],
+        ['user_id' => $combined->id, 'role' => Role::Receiver->value],
+    ]);
+
+    $this->actingAs($combined)->get('/dashboard')->assertInertia(fn (Assert $page) => $page
+        ->has('attention', 1)
+        ->where('attention.0.count', 2)
+        ->where('can', ['showCaughtUp' => false, 'showNoContext' => false]));
+});
+
+it('sets caught up for a Receiver with nothing pending and no-context for an account without any context, never both (R14, S10)', function () {
+    $this->actingAs(accountWith(Role::Receiver))->get('/dashboard')->assertInertia(fn (Assert $page) => $page
+        ->has('attention', 0)->where('can', ['showCaughtUp' => true, 'showNoContext' => false]));
+
+    $this->actingAs(accountWith())->get('/dashboard')->assertInertia(fn (Assert $page) => $page
+        ->has('attention', 0)->where('can', ['showCaughtUp' => false, 'showNoContext' => true]));
+});

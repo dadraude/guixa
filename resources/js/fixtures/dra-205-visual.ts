@@ -177,9 +177,6 @@ const pageProps: Record<string, Record<string, unknown>> = {
         roles: ['manager', 'member', 'producer'],
         isManager: true,
         isMember: true,
-        nextPickup: pickupDate,
-        openCycles: 1,
-        balance: 2000,
         opportunities: [],
         attention: [
             {
@@ -203,16 +200,6 @@ const pageProps: Record<string, Record<string, unknown>> = {
                 allocationDifferenceCount: 0,
             },
         ],
-        managerSummary: {
-            cycles: 1,
-            activeCycles: 1,
-            households: 1,
-            activeHouseholds: 1,
-            accounts: 1,
-            pendingInvitations: 0,
-            producers: 1,
-            activeProducers: 1,
-        },
     },
     'Manage/Accounts/Index': {
         accounts: [
@@ -538,8 +525,6 @@ if (pageName === 'Dashboard') {
     visualProps.roles = [role];
     visualProps.isManager = role === 'manager';
     visualProps.isMember = role === 'member';
-    visualProps.managerSummary =
-        role === 'manager' ? visualProps.managerSummary : null;
     visualProps.attention =
         role === 'member'
             ? visualProps.attention.map((group: Record<string, unknown>) => ({
@@ -550,9 +535,6 @@ if (pageName === 'Dashboard') {
             : role === 'manager' || role === 'finance'
               ? visualProps.attention
               : [];
-    visualProps.nextPickup = role === 'member' ? visualProps.nextPickup : null;
-    visualProps.openCycles = role === 'member' ? visualProps.openCycles : 0;
-    visualProps.balance = role === 'member' ? visualProps.balance : null;
     if (state === 'baskets') {
         // The server's order: dated groups first, then undated; validation before collection within a date.
         const [datedCollection, ...undatedCollection] = visualProps.attention;
@@ -581,7 +563,11 @@ if (pageName === 'Dashboard') {
             ...undatedCollection,
         ];
     }
-    if (state === 'opportunities' || state === 'opportunities-repeated') {
+    if (
+        state === 'opportunities' ||
+        state === 'opportunities-repeated' ||
+        state === 'caught-up'
+    ) {
         // Below the attention list and never counted as pending: ordering with cutoffs, a sent-order review, product maintenance.
         const opportunities: Record<string, Record<string, unknown>> = {
             member: {
@@ -618,6 +604,7 @@ if (pageName === 'Dashboard') {
         visualProps.opportunities = opportunities[role]
             ? [opportunities[role]]
             : [];
+        if (state === 'caught-up') visualProps.attention = [];
         if (state === 'opportunities-repeated')
             visualProps.opportunities.push({
                 ...opportunities[role],
@@ -692,6 +679,38 @@ if (pageName === 'Dashboard') {
         lastUpdatedAt: '2026-11-12T09:30:00+01:00',
     };
     Object.assign(visualProps, freshProps);
+    // The server's flags: caught up only with a context and no pending work; no-context only without any context (R14).
+    if (state === 'combined') {
+        // A member who is also Finance and Receiver: the same basket collection is one staff-wide group, and reception work is not repeated per role.
+        visualProps.roles = ['member', 'finance', 'receiver'];
+        visualProps.isMember = true;
+        visualProps.isManager = false;
+        visualProps.attention = [
+            {
+                key: 'check_delivery_and_allocations:cycle:visual-cycle',
+                action: 'check_delivery_and_allocations',
+                cycleId: 'visual-cycle',
+                scheduledDate: pickupDate,
+                count: 1,
+                href: '/receptions/visual-cycle/visual-producer',
+                producerName: 'Hort de la Vall',
+                allocationDifferenceCount: 0,
+            },
+            visualProps.attention[0],
+        ];
+    }
+    if (state === 'no-context') {
+        visualProps.roles = [];
+        visualProps.isMember = false;
+        visualProps.isManager = false;
+        visualProps.attention = [];
+        visualProps.opportunities = [];
+    }
+    const noPending = visualProps.attention?.length === 0;
+    visualProps.can = {
+        showCaughtUp: noPending && state !== 'no-context',
+        showNoContext: state === 'no-context',
+    };
     document.body.dataset.visualRequests = '0';
     document.body.dataset.visualWrites = '0';
     if (state === 'initial-error') {
@@ -774,21 +793,8 @@ if (state === 'empty') {
     if (collection) visualProps[collection] = [];
     if (pageName === 'Manage/Households/Index') visualProps.toSettle = [];
     if (pageName === 'Dashboard') {
-        visualProps.nextPickup = null;
-        visualProps.openCycles = 0;
         visualProps.attention = [];
-        if (role === 'manager') {
-            visualProps.managerSummary = {
-                cycles: 0,
-                activeCycles: 0,
-                households: 0,
-                activeHouseholds: 0,
-                accounts: 0,
-                pendingInvitations: 0,
-                producers: 0,
-                activeProducers: 0,
-            };
-        }
+        visualProps.can = { showCaughtUp: true, showNoContext: false };
     }
     if (pageName === 'Manage/Cycles/Show') visualProps.summary.producers = [];
     if (pageName === 'Receptions/Show') visualProps.reception.products = [];
@@ -1234,15 +1240,11 @@ void createInertiaApp({
             case 'default':
                 return true;
             case 'empty':
-                if (pageName === 'Dashboard' && role === 'finance')
+                if (pageName === 'Dashboard')
                     return (
-                        mainText().length > 0 &&
+                        visible('[data-test="caught-up"]') &&
                         !visible('[data-test="attention-list"]')
                     );
-                if (pageName === 'Dashboard')
-                    return role === 'manager'
-                        ? mainText().includes('0') && !mainText().includes('1')
-                        : mainText().includes(trans('None'));
                 return (
                     !!emptyMessage && mainText().includes(trans(emptyMessage))
                 );
@@ -1271,6 +1273,21 @@ void createInertiaApp({
             case 'opportunities':
             case 'opportunities-repeated':
                 return visible('[data-test="opportunity"]');
+            case 'caught-up':
+                return (
+                    visible('[data-test="caught-up"]') &&
+                    !visible('[data-test="attention-group"]')
+                );
+            case 'no-context':
+                return (
+                    visible('[data-test="no-context"]') &&
+                    !visible('[data-test="caught-up"]')
+                );
+            case 'combined':
+                return (
+                    document.querySelectorAll('[data-test="attention-group"]')
+                        .length === 2 && !visible('[data-test="caught-up"]')
+                );
             case 'baskets':
             case 'manual-send':
                 return visible('[data-test="attention-group"]');

@@ -43,6 +43,10 @@ final class DemoSeeder extends Seeder
 
     private const string PASSWORD = 'password';
 
+    private const string UNLINKED_NAME = 'Eva Sense Llar';
+
+    private const string UNLINKED_EMAIL = 'eva@demo.guixa.test';
+
     private const array HOUSEHOLDS = [
         ['Can Roca', 'Anna Roca', 'anna@demo.guixa.test', 10000],
         ['La Plaça', 'Biel Soler', 'biel@demo.guixa.test', 7500],
@@ -50,9 +54,12 @@ final class DemoSeeder extends Seeder
         ['La Font', 'David Font', 'david@demo.guixa.test', 2500],
     ];
 
-    /** Staff roles granted to the households' accounts, by household index, so the role screen has holders. */
+    /**
+     * Staff roles granted to the households' accounts, by household index, so the role screen has holders. The first account is
+     * member, Finance and Receiver at once, the combined-role dashboard (one collection group, no duplicated role rows).
+     */
     private const array STAFF_ROLES = [
-        0 => [Role::Finance],
+        0 => [Role::Finance, Role::Receiver],
         1 => [Role::Catalogue, Role::Receiver],
     ];
 
@@ -101,6 +108,7 @@ final class DemoSeeder extends Seeder
         ));
         $members = $this->createHouseholds($manager);
         $this->grantStaffRoles($manager, $members);
+        $this->createUnlinkedAccount($members[0]['householdId']);
         $catalog = $this->createCatalog($manager);
         $this->createStock($manager, $catalog['producers'][0]);
         $dates = $this->pickupDates();
@@ -186,6 +194,15 @@ final class DemoSeeder extends Seeder
                 app(GrantStaffRole::class)($manager, $members[$memberIndex]['actor']->accountId, $role->value);
             }
         }
+    }
+
+    /** A former member whose household link was removed: no household, producer or staff role, so the dashboard explains the absence (R14). */
+    private function createUnlinkedAccount(string $formerHouseholdId): void
+    {
+        $actor = $this->createAccount(Account::inviteMember(
+            app(AccountRepository::class)->nextId(), self::UNLINKED_NAME, Email::from(self::UNLINKED_EMAIL), $formerHouseholdId,
+        ));
+        DB::table('users')->where('id', $actor->accountId)->update(['household_id' => null]);
     }
 
     /** @return array{producers: list<string>, products: list<array{id: string, producerId: string}>} */

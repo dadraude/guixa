@@ -176,13 +176,13 @@ it('drops a distributed reception, and reclassifies a reopened one and one whose
     expect(($this->groups)($this->finance))->toBe([[ActionKind::CheckDeliveryAndAllocations->value, 1, 'Baker', 0]]);
 });
 
-it('orders reception groups by pickup date and then by stage, ahead of baskets of the same date (R13)', function () {
+it('orders reception groups by pickup date, then stage, then producer name, whatever each reception\'s sub-action (R13)', function () {
     ($this->send)(OrderingWorld::BAKER, $this->bread);
     ($this->send)(OrderingWorld::GROWER, $this->apples);
     ($this->validate)(OrderingWorld::BAKER);
 
     expect(array_map(fn ($group) => $group->key, ($this->dashboard)($this->finance)->attention))->toBe([
-        'check_delivery_and_allocations:cycle:'.$this->cycleId,
         'mark_distributed:cycle:'.$this->cycleId,
+        'check_delivery_and_allocations:cycle:'.$this->cycleId,
     ]);
 });

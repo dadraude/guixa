@@ -17,7 +17,7 @@ it('seeds a usable cooperative with accounts, orders, reception and pickups', fu
     Mail::fake();
     $this->seed(DatabaseSeeder::class);
 
-    expect(User::count())->toBe(8);
+    expect(User::count())->toBe(9);
     $this->assertDatabaseCount('households', 4);
     $this->assertDatabaseCount('producers', 3);
     $this->assertDatabaseCount('products', 8);
@@ -114,14 +114,44 @@ it('seeds staff role holders besides the manager', function () {
 
     $holders = DB::table('account_roles')->join('users', 'users.id', '=', 'account_roles.user_id')
         ->whereIn('role', ['finance', 'catalogue', 'receiver'])
-        ->orderBy('role')->pluck('users.email', 'role')->all();
+        ->orderBy('users.email')->get()->groupBy('role')->map(fn ($rows) => $rows->pluck('email')->all())->sortKeys()->all();
 
     expect($holders)->toBe([
-        'catalogue' => 'biel@demo.guixa.test',
-        'finance' => 'anna@demo.guixa.test',
-        'receiver' => 'biel@demo.guixa.test',
+        'catalogue' => ['biel@demo.guixa.test'],
+        'finance' => ['anna@demo.guixa.test'],
+        'receiver' => ['anna@demo.guixa.test', 'biel@demo.guixa.test'],
     ]);
-    expect(DB::table('role_changes')->count())->toBe(3);
+    expect(DB::table('role_changes')->count())->toBe(4);
+});
+
+it('shows the combined member, Finance and Receiver demo account one collection group, the unlinked account an explanation, and caught-up members their opportunity instead (S1, S10, R14)', function () {
+    $this->seed(DemoSeeder::class);
+    $this->withoutVite();
+    $props = function (string $email) {
+        app('auth')->forgetGuards();
+
+        return $this->actingAs(User::query()->where('email', $email)->firstOrFail())->get('/dashboard')->viewData('page')['props'];
+    };
+
+    $combined = $props('anna@demo.guixa.test');
+    $collections = collect($combined['attention'])->where('action', 'collect_basket');
+    expect($collections)->toHaveCount(1)
+        ->and($combined['can']['showCaughtUp'])->toBeFalse()
+        ->and(collect($combined['attention'])->pluck('key')->unique()->count())->toBe(count($combined['attention']));
+
+    $unlinked = $props('eva@demo.guixa.test');
+    expect($unlinked['attention'])->toBe([])
+        ->and($unlinked['opportunities'])->toBe([])
+        ->and($unlinked['can'])->toMatchArray(['showCaughtUp' => false, 'showNoContext' => true])
+        ->and(DB::table('users')->where('email', 'eva@demo.guixa.test')->value('household_id'))->toBeNull()
+        ->and(DB::table('account_roles')->join('users', 'users.id', '=', 'account_roles.user_id')->where('email', 'eva@demo.guixa.test')->count())->toBe(0);
+
+    foreach (['carla@demo.guixa.test', 'david@demo.guixa.test'] as $email) {
+        $caughtUp = $props($email);
+        expect($caughtUp['attention'])->toBe([])
+            ->and($caughtUp['can'])->toMatchArray(['showCaughtUp' => true, 'showNoContext' => false])
+            ->and(collect($caughtUp['opportunities'])->pluck('kind')->all())->toBe(['member_order']);
+    }
 });
 
 it('lets every demo role log in and open its main screens', function (string $email, array $paths) {
