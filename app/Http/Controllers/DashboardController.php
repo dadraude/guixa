@@ -3,11 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Http\AttentionGroupRow;
+use App\Http\OpportunityRow;
 use App\Http\RoleAreas;
 use Guixa\Catalog\Application\CountProducers;
 use Guixa\Dashboard\Application\AttentionGroupData;
 use Guixa\Dashboard\Application\DestinationArea;
 use Guixa\Dashboard\Application\ListDashboard;
+use Guixa\Dashboard\Application\OpportunityArea;
+use Guixa\Dashboard\Application\OpportunityData;
 use Guixa\Membership\Application\CountAccounts;
 use Guixa\Membership\Application\CountHouseholds;
 use Guixa\Ordering\Application\CountCycles;
@@ -31,6 +34,7 @@ class DashboardController extends Controller
         ReadHouseholdBalance $readHouseholdBalance,
         ListDashboard $listDashboard,
     ): Response {
+        $dashboard = $listDashboard($actor);
         $roles = $actor->roleNames();
         $isManager = in_array('manager', $roles, true);
         $isMember = in_array('member', $roles, true);
@@ -76,7 +80,8 @@ class DashboardController extends Controller
             'nextPickup' => $nextPickup,
             'openCycles' => $hasHousehold ? $countOpenMemberCycles($actor) : 0,
             'balance' => $balance,
-            'attention' => array_map($this->attentionRow(...), $listDashboard($actor)->attention),
+            'attention' => array_map($this->attentionRow(...), $dashboard->attention),
+            'opportunities' => array_map($this->opportunityRow(...), $dashboard->opportunities),
             'managerSummary' => $managerSummary,
             'areaShortcuts' => RoleAreas::shortcuts($actor),
         ]);
@@ -85,6 +90,22 @@ class DashboardController extends Controller
     private function attentionRow(AttentionGroupData $group): AttentionGroupRow
     {
         return new AttentionGroupRow($group->key, $group->action, $group->cycleId, $group->scheduledDate, $group->count, $this->destinationUrl($group), $group->producerName, $group->allocationDifferenceCount);
+    }
+
+    private function opportunityRow(OpportunityData $opportunity): OpportunityRow
+    {
+        $cutoffs = array_map(fn (array $cutoff) => ['producerName' => $cutoff[0], 'closesAt' => $cutoff[1]], $opportunity->cutoffs);
+
+        return new OpportunityRow($opportunity->key, $opportunity->kind, $opportunity->scheduledDate, $this->opportunityUrl($opportunity), $cutoffs);
+    }
+
+    private function opportunityUrl(OpportunityData $opportunity): string
+    {
+        return match ($opportunity->area) {
+            OpportunityArea::MemberOrder => route('orders.edit', $opportunity->cycleId, false),
+            OpportunityArea::ProducerCycle => route('producer.cycles.show', $opportunity->cycleId, false),
+            OpportunityArea::CatalogueProducers => route('catalogue.producers.index', [], false),
+        };
     }
 
     private function destinationUrl(AttentionGroupData $group): string

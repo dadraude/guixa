@@ -2,6 +2,7 @@
 
 use Guixa\Dashboard\Application\ListDashboard;
 use Guixa\Dashboard\Domain\ActionKind;
+use Guixa\Dashboard\Domain\OrderOpportunitiesRepository;
 use Guixa\Dashboard\Domain\ReceptionWorkRepository;
 use Guixa\Dashboard\Domain\SendWorkRepository;
 use Guixa\Dashboard\Infrastructure\Sales\SalesBasketWork;
@@ -43,6 +44,18 @@ function dashboardWith(InMemoryBasketRepository $repository, InMemoryWeeklyBaske
         new class implements SendWorkRepository
         {
             public function pending(): array
+            {
+                return [];
+            }
+        },
+        new class implements OrderOpportunitiesRepository
+        {
+            public function openWindows(): array
+            {
+                return [];
+            }
+
+            public function sentSummaries(string $producerId): array
             {
                 return [];
             }

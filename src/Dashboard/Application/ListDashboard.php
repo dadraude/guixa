@@ -4,6 +4,8 @@ namespace Guixa\Dashboard\Application;
 
 use Guixa\Dashboard\Domain\ActionKind;
 use Guixa\Dashboard\Domain\BasketWorkRepository;
+use Guixa\Dashboard\Domain\OpportunityKind;
+use Guixa\Dashboard\Domain\OrderOpportunitiesRepository;
 use Guixa\Dashboard\Domain\ReceptionWorkRepository;
 use Guixa\Dashboard\Domain\SendWorkRepository;
 use Guixa\Dashboard\Domain\ValueObject\BasketWork;
@@ -19,6 +21,7 @@ final class ListDashboard
         private readonly BasketWorkRepository $basketWork,
         private readonly ReceptionWorkRepository $receptionWork,
         private readonly SendWorkRepository $sendWork,
+        private readonly OrderOpportunitiesRepository $opportunities,
     ) {}
 
     public function __invoke(Actor $actor): DashboardData
@@ -42,7 +45,35 @@ final class ListDashboard
         usort($groups, fn (AttentionGroupData $a, AttentionGroupData $b) => [$a->scheduledDate === null, $a->scheduledDate, ActionKind::from($a->action)->rank(), $a->key]
             <=> [$b->scheduledDate === null, $b->scheduledDate, ActionKind::from($b->action)->rank(), $b->key]);
 
-        return new DashboardData($groups);
+        return new DashboardData($groups, $this->opportunities($actor, $isMember));
+    }
+
+    /**
+     * Where the signed-in account can act now without any evidence of unfinished work: gated on the current household, producer and role (R11).
+     *
+     * @return list<OpportunityData>
+     */
+    private function opportunities(Actor $actor, bool $isMember): array
+    {
+        $gate = Gate::forUser($actor);
+        $opportunities = [];
+        if ($isMember) {
+            foreach ($this->opportunities->openWindows() as $window) {
+                $opportunities[] = new OpportunityData(OpportunityKind::MemberOrder->value.":cycle:{$window->cycleId}", OpportunityKind::MemberOrder->value, OpportunityArea::MemberOrder, $window->cycleId, $window->scheduledDate, $window->cutoffs);
+            }
+        }
+        if ($gate->allows('producer') && $gate->allows('owns', ['producer', $actor->producerId])) {
+            foreach ($this->opportunities->sentSummaries($actor->producerId) as $summary) {
+                $opportunities[] = new OpportunityData(OpportunityKind::ProducerSummary->value.":cycle:{$summary->cycleId}", OpportunityKind::ProducerSummary->value, OpportunityArea::ProducerCycle, $summary->cycleId, $summary->scheduledDate);
+            }
+        }
+        if ($gate->allows('view-producers')) {
+            $opportunities[] = new OpportunityData(OpportunityKind::CatalogueMaintenance->value, OpportunityKind::CatalogueMaintenance->value, OpportunityArea::CatalogueProducers, null, null);
+        }
+        usort($opportunities, fn (OpportunityData $a, OpportunityData $b) => [OpportunityKind::from($a->kind)->rank(), $a->scheduledDate === null, $a->scheduledDate, $a->key]
+            <=> [OpportunityKind::from($b->kind)->rank(), $b->scheduledDate === null, $b->scheduledDate, $b->key]);
+
+        return $opportunities;
     }
 
     /** @return list<AttentionGroupData> one group per cycle: the manager sends from the cycles list, where the send control lives */

@@ -92,6 +92,23 @@ it('shows Finance the demo cycle\'s drafts as validation work next to the pendin
         ->and($actions->has('prepare_basket'))->toBeFalse();
 });
 
+it('shows each demo role its own opportunity below no false task: member ordering, producer review, Catalogue maintenance (R11, S3, S10)', function () {
+    $this->seed(DemoSeeder::class);
+    $this->withoutVite();
+    $kinds = function (string $email) {
+        app('auth')->forgetGuards();
+        $user = User::query()->where('email', $email)->firstOrFail();
+
+        return collect($this->actingAs($user)->get('/dashboard')->viewData('page')['props']['opportunities']);
+    };
+
+    $member = $kinds('carla@demo.guixa.test');
+    expect($member->pluck('kind')->all())->toBe(['member_order'])
+        ->and($member->first()->cutoffs)->not->toBeEmpty()
+        ->and($kinds('hort@demo.guixa.test')->pluck('kind')->unique()->all())->toBe(['producer_summary'])
+        ->and($kinds('biel@demo.guixa.test')->pluck('kind')->all())->toContain('catalogue_maintenance');
+});
+
 it('seeds staff role holders besides the manager', function () {
     $this->seed(DemoSeeder::class);
 

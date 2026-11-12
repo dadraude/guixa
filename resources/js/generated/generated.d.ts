@@ -211,6 +211,13 @@ readonly basketId: string,
 readonly status: string,
 readonly date: string,
 };
+export type OpportunityRow = {
+readonly key: string,
+readonly kind: Guixa.Dashboard.Domain.OpportunityKind,
+readonly scheduledDate: string | null,
+readonly href: string,
+readonly cutoffs: Array<{ producerName: string; closesAt: string }>,
+};
 export type OrderLineRow = {
 readonly productId: string,
 readonly producerId: string,
@@ -457,6 +464,7 @@ declare namespace Guixa {
 namespace Dashboard {
 namespace Domain {
 export type ActionKind = 'send_order' | 'check_delivery_and_allocations' | 'resolve_allocations' | 'mark_distributed' | 'prepare_basket' | 'validate_basket' | 'collect_basket';
+export type OpportunityKind = 'member_order' | 'producer_summary' | 'catalogue_maintenance';
 }
 }
 namespace Membership {

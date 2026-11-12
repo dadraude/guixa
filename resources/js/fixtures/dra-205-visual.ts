@@ -180,6 +180,7 @@ const pageProps: Record<string, Record<string, unknown>> = {
         nextPickup: pickupDate,
         openCycles: 1,
         balance: 2000,
+        opportunities: [],
         attention: [
             {
                 key: 'collect_basket:cycle:visual-cycle',
@@ -454,6 +455,11 @@ const page = {
                       },
                       { role: 'member', label: 'Member', href: '/orders' },
                       {
+                          role: 'catalogue',
+                          label: 'Catalogue',
+                          href: '/catalogue/producers',
+                      },
+                      {
                           role: 'producer',
                           label: 'Producer',
                           href: '/producer/products',
@@ -574,6 +580,51 @@ if (pageName === 'Dashboard') {
             },
             ...undatedCollection,
         ];
+    }
+    if (state === 'opportunities' || state === 'opportunities-repeated') {
+        // Below the attention list and never counted as pending: ordering with cutoffs, a sent-order review, product maintenance.
+        const opportunities: Record<string, Record<string, unknown>> = {
+            member: {
+                key: 'member_order:cycle:visual-cycle',
+                kind: 'member_order',
+                scheduledDate: pickupDate,
+                href: '/cycles/visual-cycle/order',
+                cutoffs: [
+                    {
+                        producerName: 'Forn del Barri',
+                        closesAt: '2026-11-02 20:00',
+                    },
+                    {
+                        producerName: 'La Figuera del barri de la Vall',
+                        closesAt: '2026-11-03 12:00',
+                    },
+                ],
+            },
+            producer: {
+                key: 'producer_summary:cycle:visual-cycle',
+                kind: 'producer_summary',
+                scheduledDate: pickupDate,
+                href: '/producer/cycles/visual-cycle',
+                cutoffs: [],
+            },
+            catalogue: {
+                key: 'catalogue_maintenance',
+                kind: 'catalogue_maintenance',
+                scheduledDate: null,
+                href: '/catalogue/producers',
+                cutoffs: [],
+            },
+        };
+        visualProps.opportunities = opportunities[role]
+            ? [opportunities[role]]
+            : [];
+        if (state === 'opportunities-repeated')
+            visualProps.opportunities.push({
+                ...opportunities[role],
+                key: 'producer_summary:cycle:visual-cycle-2',
+                scheduledDate: '2026-11-12',
+                href: '/producer/cycles/visual-cycle-2',
+            });
     }
     if (state === 'manual-send') {
         // The server's order for one pickup date: sending, then reception, then the baskets already listed. Only a manager is offered the send.
@@ -1126,6 +1177,9 @@ void createInertiaApp({
                 return (
                     !!emptyMessage && mainText().includes(trans(emptyMessage))
                 );
+            case 'opportunities':
+            case 'opportunities-repeated':
+                return visible('[data-test="opportunity"]');
             case 'baskets':
             case 'manual-send':
                 return visible('[data-test="attention-group"]');
