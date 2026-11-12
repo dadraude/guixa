@@ -140,18 +140,22 @@ function refresh() {
     });
 }
 
-// A page restored from the browser's back/forward cache holds old props: read once on return (R15).
+// Both returns restore old props without asking the server: the browser's back/forward cache (pageshow) and Inertia's in-app history
+// restore (navigate of type "history"). Each reads once (R15). A fresh visit or the initial load already has current props.
 const readOnReturn = (event: PageTransitionEvent) => {
     if (event.persisted) refresh();
 };
+let stopListening: (() => void) | undefined;
 onMounted(() => {
     window.addEventListener('pageshow', readOnReturn);
-    const entry = performance.getEntriesByType?.('navigation')[0] as
-        | PerformanceNavigationTiming
-        | undefined;
-    if (entry?.type === 'back_forward') refresh();
+    stopListening = router.on('navigate', (event) => {
+        if (event.detail.type === 'history') refresh();
+    });
 });
-onBeforeUnmount(() => window.removeEventListener('pageshow', readOnReturn));
+onBeforeUnmount(() => {
+    window.removeEventListener('pageshow', readOnReturn);
+    stopListening?.();
+});
 
 const page = usePage();
 const userName = computed(() => page.props.auth?.user?.name ?? '');

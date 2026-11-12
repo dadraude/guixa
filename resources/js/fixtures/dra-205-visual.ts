@@ -703,13 +703,38 @@ if (pageName === 'Dashboard') {
         });
     }
     http.setClient({
-        request: async (config: { method?: string }) => {
+        request: async (config: { method?: string; url?: unknown }) => {
+            const log = ((
+                window as unknown as Record<string, unknown>
+            ).visualRequestLog ??= []) as string[];
+            log.push(`${config.method ?? 'get'} ${String(config.url)}`);
             const requests = Number(document.body.dataset.visualRequests) + 1;
             document.body.dataset.visualRequests = String(requests);
             if ((config.method ?? 'get').toLowerCase() !== 'get')
                 document.body.dataset.visualWrites = String(
                     Number(document.body.dataset.visualWrites) + 1,
                 );
+            if (state === 'history-probe') {
+                // In-app history probe: a visit to /settings/appearance, and a dashboard read that advances the time.
+                const toAppearance = !String(config.url).includes('dra-205');
+                return {
+                    status: 200,
+                    data: JSON.stringify({
+                        ...page,
+                        component: toAppearance
+                            ? 'settings/Appearance'
+                            : 'Dashboard',
+                        url: toAppearance
+                            ? '/settings/appearance'
+                            : window.location.pathname + window.location.search,
+                        props: {
+                            ...page.props,
+                            lastUpdatedAt: '2026-11-12T09:45:00+01:00',
+                        },
+                    }),
+                    headers: { 'x-inertia': 'true' },
+                };
+            }
             if (state !== 'stale-error') return new Promise(() => {});
             return {
                 status: 200,
@@ -1221,6 +1246,8 @@ void createInertiaApp({
                 return (
                     !!emptyMessage && mainText().includes(trans(emptyMessage))
                 );
+            case 'history-probe':
+                return true;
             case 'refresh-busy':
                 return (
                     document.body.dataset.visualRequests === '1' &&

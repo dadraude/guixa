@@ -7,6 +7,15 @@ import Dashboard from './Dashboard.vue';
 
 let renderLinkNames = false;
 const reloadMock = vi.hoisted(() => vi.fn());
+const navigateListeners = vi.hoisted(() => [] as ((event: unknown) => void)[]);
+const onMock = vi.hoisted(() =>
+    vi.fn((_event: string, listener: (event: unknown) => void) => {
+        navigateListeners.push(listener);
+        return () => {
+            navigateListeners.splice(navigateListeners.indexOf(listener), 1);
+        };
+    }),
+);
 
 vi.mock('@inertiajs/vue3', () => ({
     Head: () => null,
@@ -22,7 +31,7 @@ vi.mock('@inertiajs/vue3', () => ({
             auth: { user: { name: 'Test User' } },
         },
     }),
-    router: { reload: reloadMock },
+    router: { reload: reloadMock, on: onMock },
 }));
 
 vi.mock('@/actions/App/Http/Controllers/OrderController', () => ({
@@ -562,6 +571,7 @@ describe('dashboard freshness (R15, R16, S11)', () => {
     afterEach(() => {
         mounted.splice(0).forEach((app) => app.unmount());
         reloadMock.mockReset();
+        onMock.mockClear();
         vi.useRealTimers();
         document.body.innerHTML = '';
     });
@@ -713,6 +723,45 @@ describe('dashboard freshness (R15, R16, S11)', () => {
             Object.assign(new Event('pageshow'), { persisted: true }),
         );
         expect(reloadMock).toHaveBeenCalledTimes(1);
+    });
+
+    it('reads once when Inertia restores the page from history, and not for a visit or the initial load', () => {
+        const { app } = mountDashboard({
+            attention: [],
+            opportunities: [],
+            readFailed: false,
+            lastUpdatedAt: '2026-11-12T09:30:00+01:00',
+        });
+        const navigate = (type: string) =>
+            navigateListeners.forEach((listener) =>
+                listener({ detail: { type } }),
+            );
+
+        expect(onMock).toHaveBeenCalledWith('navigate', expect.any(Function));
+        navigate('visit');
+        navigate('initial');
+        expect(reloadMock).not.toHaveBeenCalled();
+
+        navigate('history');
+        expect(reloadMock).toHaveBeenCalledTimes(1);
+
+        app.unmount();
+        expect(navigateListeners).toHaveLength(0);
+    });
+
+    it('does not read on mount just because the document was loaded by back/forward', () => {
+        vi.spyOn(performance, 'getEntriesByType').mockReturnValue([
+            { type: 'back_forward' } as PerformanceNavigationTiming,
+        ]);
+        mountDashboard({
+            attention: [],
+            opportunities: [],
+            readFailed: false,
+            lastUpdatedAt: '2026-11-12T09:30:00+01:00',
+        });
+        vi.restoreAllMocks();
+
+        expect(reloadMock).not.toHaveBeenCalled();
     });
 
     it('never polls while the page stays open', () => {
