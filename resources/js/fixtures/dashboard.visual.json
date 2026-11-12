@@ -68,6 +68,17 @@
                             {
                                 "selector": "[data-test=\"attention-count\"]",
                                 "count": 2
+                            },
+                            {
+                                "selector": "[data-test=\"freshness-time\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-visual-requests": "0",
+                                    "data-visual-writes": "0"
+                                }
                             }
                         ]
                     }
@@ -824,6 +835,228 @@
                                 "count": 0
                             }
                         ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "dashboard-freshness",
+            "path": "/resources/visual/dra-205.html",
+            "query": {
+                "page": "Dashboard",
+                "role": "finance"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content a,#main-content button,#main-content [role=\"alert\"],#main-content [role=\"status\"],#main-content [data-test=\"freshness-time\"],#main-content [data-test=\"freshness-stale\"],#main-content [data-test=\"attention-count\"]",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "button[data-sidebar=\"trigger\"]",
+                "[data-test=\"refresh-button\"]"
+            ],
+            "states": [
+                {
+                    "id": "refresh-busy",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"refresh-busy\"]",
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"refresh-button\"]",
+                                "count": 1,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-visual-writes": "0"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-visual-requests": "1"
+                                }
+                            },
+                            {
+                                "selector": "[data-test=\"refresh-busy\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"read-error\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"refresh-button\"]",
+                                "attributes": {
+                                    "aria-disabled": "true"
+                                }
+                            }
+                        ],
+                        "focus": [
+                            "button[data-sidebar=\"trigger\"]",
+                            "[data-test=\"refresh-button\"]"
+                        ]
+                    },
+                    "query": {
+                        "state": "refresh-busy"
+                    }
+                },
+                {
+                    "id": "stale-error",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"stale-error\"]",
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"refresh-button\"]",
+                                "count": 1,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-visual-writes": "0"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-visual-requests": "1"
+                                }
+                            },
+                            {
+                                "selector": "[data-test=\"attention-group\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"freshness-time\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"freshness-stale\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[role=\"alert\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"caught-up\"]",
+                                "count": 0
+                            }
+                        ],
+                        "focus": [
+                            "button[data-sidebar=\"trigger\"]",
+                            "[data-test=\"refresh-button\"]"
+                        ]
+                    },
+                    "query": {
+                        "state": "stale-error"
+                    }
+                },
+                {
+                    "id": "initial-error",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"initial-error\"]",
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"refresh-button\"]",
+                                "count": 1,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-visual-writes": "0"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-visual-requests": "0"
+                                }
+                            },
+                            {
+                                "selector": "[data-test=\"attention-group\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"attention-list\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"freshness-time\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[role=\"alert\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"caught-up\"]",
+                                "count": 0
+                            }
+                        ],
+                        "focus": [
+                            "button[data-sidebar=\"trigger\"]",
+                            "[data-test=\"refresh-button\"]"
+                        ]
+                    },
+                    "query": {
+                        "state": "initial-error"
                     }
                 }
             ]

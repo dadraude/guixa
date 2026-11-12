@@ -764,5 +764,13 @@
     "Mark a product unavailable in a cycle until the producer order is sent": "Marca un producte com a no disponible en un cicle fins que s’enviï la comanda al productor",
     "A deactivated producer cannot be ordered from.": "No es pot fer comanda a un productor desactivat.",
     "No cycles are open for this producer.": "Cap cicle obert per a aquest productor.",
-    "This producer has no active weekly products.": "Aquest productor no té productes setmanals actius."
+    "This producer has no active weekly products.": "Aquest productor no té productes setmanals actius.",
+    "Last update": "Última actualització",
+    "Pending work could not be updated. The last successful read is shown and may be out of date.": "No s’ha pogut actualitzar la feina pendent. Es mostra l’última lectura correcta, que pot estar desfasada.",
+    "Pending work could not be read. Try again to see it.": "No s’ha pogut llegir la feina pendent. Torna-ho a provar per veure-la.",
+    "Last updated :time": "Actualitzat el :time",
+    "Out of date": "Desfasat",
+    "Try again": "Torna-ho a provar",
+    "Refresh": "Actualitza",
+    "Updating pending work…": "S’està actualitzant la feina pendent…"
 }

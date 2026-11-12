@@ -1,10 +1,12 @@
-import { describe, expect, it, vi } from 'vite-plus/test';
-import { createSSRApp, h } from 'vue';
+// @vitest-environment jsdom
+import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
+import { createApp, createSSRApp, h, nextTick, reactive } from 'vue';
 import { renderToString } from 'vue/server-renderer';
 import { installTranslations } from '@/lib/i18n';
 import Dashboard from './Dashboard.vue';
 
 let renderLinkNames = false;
+const reloadMock = vi.hoisted(() => vi.fn());
 
 vi.mock('@inertiajs/vue3', () => ({
     Head: () => null,
@@ -20,6 +22,7 @@ vi.mock('@inertiajs/vue3', () => ({
             auth: { user: { name: 'Test User' } },
         },
     }),
+    router: { reload: reloadMock },
 }));
 
 vi.mock('@/actions/App/Http/Controllers/OrderController', () => ({
@@ -509,5 +512,220 @@ describe('dashboard presentation', () => {
         expect(html.match(/data-test="opportunity-cutoff"/g)).toHaveLength(2);
         expect(html).toContain('a les 20:00');
         expect(html).toContain('a les 12:00');
+    });
+});
+
+type ReloadOptions = {
+    onStart?: () => void;
+    onSuccess?: () => void;
+    onCancel?: () => void;
+    onFinish?: () => void;
+};
+
+const collection = {
+    key: 'collect_basket:cycle:c1',
+    action: 'collect_basket',
+    cycleId: 'c1',
+    scheduledDate: '2026-11-14',
+    count: 1,
+    href: '/baskets?pending=1',
+    producerName: null,
+    allocationDifferenceCount: 0,
+};
+
+const baseProps = {
+    roles: ['member'],
+    isManager: false,
+    isMember: true,
+    nextPickup: null,
+    openCycles: 0,
+    balance: null,
+    managerSummary: null,
+};
+
+const mounted: { unmount: () => void }[] = [];
+
+function mountDashboard(props: Record<string, unknown>) {
+    const state = reactive<Record<string, unknown>>({ ...baseProps, ...props });
+    const root = document.createElement('div');
+    document.body.appendChild(root);
+    const app = createApp({ render: () => h(Dashboard, state as never) });
+    installTranslations(app);
+    app.mount(root);
+    mounted.push(app);
+    const sent = () => reloadMock.mock.calls.at(-1)?.[0] as ReloadOptions;
+
+    return { state, root, app, sent };
+}
+
+describe('dashboard freshness (R15, R16, S11)', () => {
+    afterEach(() => {
+        mounted.splice(0).forEach((app) => app.unmount());
+        reloadMock.mockReset();
+        vi.useRealTimers();
+        document.body.innerHTML = '';
+    });
+
+    it('shows the last successful read time and refreshes through an explicit reload with a busy message', async () => {
+        const { root, sent } = mountDashboard({
+            attention: [collection],
+            opportunities: [],
+            readFailed: false,
+            lastUpdatedAt: '2026-11-12T09:30:00+01:00',
+        });
+
+        expect(
+            root.querySelector('[data-test="freshness-time"]')?.textContent,
+        ).toContain('09:30');
+        expect(root.querySelector('[data-test="read-error"]')).toBeNull();
+        expect(reloadMock).not.toHaveBeenCalled();
+
+        root.querySelector<HTMLButtonElement>(
+            '[data-test="refresh-button"]',
+        )!.click();
+        expect(reloadMock).toHaveBeenCalledTimes(1);
+
+        sent().onStart?.();
+        await nextTick();
+        expect(root.querySelector('[role="status"]')?.textContent).not.toBe('');
+        sent().onFinish?.();
+    });
+
+    it('keeps the last successful item and time, marked stale with an alert and retry, when a refresh fails to read', async () => {
+        const { state, root } = mountDashboard({
+            attention: [collection],
+            opportunities: [],
+            readFailed: false,
+            lastUpdatedAt: '2026-11-12T09:30:00+01:00',
+        });
+
+        state.attention = null;
+        state.opportunities = null;
+        state.lastUpdatedAt = null;
+        state.readFailed = true;
+        await nextTick();
+
+        expect(
+            root.querySelectorAll('[data-test="attention-group"]'),
+        ).toHaveLength(1);
+        expect(
+            root.querySelector('[data-test="freshness-time"]')?.textContent,
+        ).toContain('09:30');
+        expect(
+            root.querySelector('[data-test="freshness-stale"]'),
+        ).not.toBeNull();
+        expect(root.querySelector('[role="alert"]')).not.toBeNull();
+        expect(
+            root.querySelector('[data-test="refresh-button"]')?.textContent,
+        ).toContain('Torna-ho a provar');
+    });
+
+    it('keeps the prior data stale with retry when the request does not succeed (transport or non-success response)', async () => {
+        const { root, sent } = mountDashboard({
+            attention: [collection],
+            opportunities: [],
+            readFailed: false,
+            lastUpdatedAt: '2026-11-12T09:30:00+01:00',
+        });
+
+        root.querySelector<HTMLButtonElement>(
+            '[data-test="refresh-button"]',
+        )!.click();
+        sent().onStart?.();
+        sent().onFinish?.();
+        await nextTick();
+
+        expect(
+            root.querySelectorAll('[data-test="attention-group"]'),
+        ).toHaveLength(1);
+        expect(
+            root.querySelector('[data-test="freshness-stale"]'),
+        ).not.toBeNull();
+        expect(root.querySelector('[role="alert"]')).not.toBeNull();
+    });
+
+    it('clears the stale state when a later read succeeds with the new time', async () => {
+        const { state, root, sent } = mountDashboard({
+            attention: [collection],
+            opportunities: [],
+            readFailed: false,
+            lastUpdatedAt: '2026-11-12T09:30:00+01:00',
+        });
+        root.querySelector<HTMLButtonElement>(
+            '[data-test="refresh-button"]',
+        )!.click();
+        sent().onStart?.();
+        sent().onFinish?.();
+        await nextTick();
+
+        root.querySelector<HTMLButtonElement>(
+            '[data-test="refresh-button"]',
+        )!.click();
+        sent().onStart?.();
+        state.attention = [];
+        state.lastUpdatedAt = '2026-11-12T09:41:00+01:00';
+        sent().onSuccess?.();
+        sent().onFinish?.();
+        await nextTick();
+
+        expect(
+            root.querySelectorAll('[data-test="attention-group"]'),
+        ).toHaveLength(0);
+        expect(
+            root.querySelector('[data-test="freshness-time"]')?.textContent,
+        ).toContain('09:41');
+        expect(root.querySelector('[data-test="freshness-stale"]')).toBeNull();
+        expect(root.querySelector('[role="alert"]')).toBeNull();
+    });
+
+    it('shows only the error and retry on an initial failed read, never a list, zero or caught-up claim', async () => {
+        const { root } = mountDashboard({
+            attention: null,
+            opportunities: null,
+            readFailed: true,
+            lastUpdatedAt: null,
+        });
+
+        expect(root.querySelector('[role="alert"]')).not.toBeNull();
+        expect(
+            root.querySelector('[data-test="refresh-button"]')?.textContent,
+        ).toContain('Torna-ho a provar');
+        expect(root.querySelector('[data-test="freshness-time"]')).toBeNull();
+        expect(root.querySelector('[data-test="attention-list"]')).toBeNull();
+        expect(root.querySelector('[data-test="opportunity-list"]')).toBeNull();
+        expect(root.querySelector('[data-test="caught-up"]')).toBeNull();
+    });
+
+    it('reads once when the browser restores the page from history, and not for a fresh show', () => {
+        mountDashboard({
+            attention: [],
+            opportunities: [],
+            readFailed: false,
+            lastUpdatedAt: '2026-11-12T09:30:00+01:00',
+        });
+
+        window.dispatchEvent(
+            Object.assign(new Event('pageshow'), { persisted: false }),
+        );
+        expect(reloadMock).not.toHaveBeenCalled();
+
+        window.dispatchEvent(
+            Object.assign(new Event('pageshow'), { persisted: true }),
+        );
+        expect(reloadMock).toHaveBeenCalledTimes(1);
+    });
+
+    it('never polls while the page stays open', () => {
+        vi.useFakeTimers();
+        mountDashboard({
+            attention: [],
+            opportunities: [],
+            readFailed: false,
+            lastUpdatedAt: '2026-11-12T09:30:00+01:00',
+        });
+
+        vi.advanceTimersByTime(30 * 60 * 1000);
+
+        expect(reloadMock).not.toHaveBeenCalled();
     });
 });
