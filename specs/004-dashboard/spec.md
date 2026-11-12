@@ -4,8 +4,8 @@
 [history](history/) establish the product direction; Q22 accepts the exact requirements and scenarios below.
 Feature 002 remains retired. The independently shipped login destination (002 T05/R11) and interim
 dashboard summary (001 T61) retain their ownership; this slice replaces the interim summary cards, balance and
-manager totals when accepted and delivered, and keeps the existing role navigation links (R11). Feature 001
-completion and 003 delivery readiness must be confirmed before implementation.
+manager totals when accepted and delivered, and keeps the existing role navigation links (R11). Delivery is
+complete: T01–T07 are integrated.
 
 The signed-in dashboard puts permitted pending work first, then opportunities. It helps household members,
 producers, and Manager, Finance, Catalogue and Receiver staff reach their existing task screens. It performs
