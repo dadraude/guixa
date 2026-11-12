@@ -252,14 +252,27 @@ const typeLabels: Record<string, string> = {
                                 >
                                 {{ typeLabels[movement.type] ?? movement.type }}
                             </td>
-                            <td class="py-2">
+                            <td
+                                :class="{
+                                    'pilot-wallet-empty-note': !movement.note,
+                                }"
+                                class="py-2"
+                            >
                                 <span
                                     class="pilot-cell-label"
                                     aria-hidden="true"
                                     >{{ trans('Note') }}</span
                                 >{{ movement.note }}
                             </td>
-                            <td class="py-2">
+                            <td
+                                :class="{
+                                    'pilot-wallet-empty-source':
+                                        !movement.basketId &&
+                                        !movement.sourceMovementId &&
+                                        !movement.cycleId,
+                                }"
+                                class="py-2"
+                            >
                                 <span
                                     class="pilot-cell-label"
                                     aria-hidden="true"

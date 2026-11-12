@@ -1287,6 +1287,10 @@ html[data-font-fallback='true'] .pilot-theme {
 @container pilot-wallet (max-width: 52rem) {
     .pilot-theme .pilot-t44-page .pilot-wallet-table tbody tr {
         margin-bottom: 1rem;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        column-gap: 0.75rem;
+        padding: 0.75rem;
     }
 
     .pilot-theme .pilot-t44-page .pilot-wallet-table tbody tr:last-child {
@@ -1294,7 +1298,64 @@ html[data-font-fallback='true'] .pilot-theme {
     }
 
     .pilot-theme .pilot-t44-page .pilot-wallet-table .pilot-cell-label {
-        margin-bottom: 0.5rem;
+        margin-bottom: 0;
+    }
+
+    .pilot-theme .pilot-t44-page .pilot-wallet-table tbody tr td,
+    .pilot-theme
+        .pilot-t44-page
+        .pilot-wallet-table
+        tbody
+        tr:not(:last-child)
+        td {
+        min-width: 0;
+        padding: 0.25rem 0;
+    }
+
+    .pilot-theme .pilot-t44-page .pilot-wallet-table td:first-child,
+    .pilot-theme .pilot-t44-page .pilot-wallet-table td:nth-child(3),
+    .pilot-theme .pilot-t44-page .pilot-wallet-table td:nth-child(4) {
+        grid-column: 1 / -1;
+    }
+
+    .pilot-theme .pilot-t44-page .pilot-wallet-table td.pilot-amount {
+        grid-column: 2;
+        grid-row: 2;
+        white-space: nowrap;
+    }
+
+    .pilot-theme
+        .pilot-t44-page
+        .pilot-wallet-table
+        td:is(.pilot-wallet-empty-note, .pilot-wallet-empty-source) {
+        display: none;
+    }
+
+    .pilot-theme
+        .pilot-t44-page
+        .pilot-wallet-table
+        td:first-child
+        .pilot-cell-label,
+    .pilot-theme
+        .pilot-t44-page
+        .pilot-wallet-table
+        td:nth-child(2)
+        .pilot-cell-label,
+    .pilot-theme
+        .pilot-t44-page
+        .pilot-wallet-table
+        td.pilot-amount
+        .pilot-cell-label {
+        display: none;
+    }
+
+    .pilot-theme
+        .pilot-t44-page
+        .pilot-wallet-table
+        td:is(:nth-child(3), :nth-child(4))
+        .pilot-cell-label {
+        display: inline;
+        margin-right: 0.375rem;
     }
 }
 
