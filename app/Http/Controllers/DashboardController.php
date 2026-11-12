@@ -31,7 +31,7 @@ class DashboardController extends Controller
             'lastUpdatedAt' => $dashboard?->readAt->format(DATE_ATOM),
             'attention' => $dashboard === null ? null : array_map($this->attentionRow(...), $dashboard->attention),
             'opportunities' => $dashboard === null ? null : array_map($this->opportunityRow(...), $dashboard->opportunities),
-            'can' => ['showCaughtUp' => $dashboard?->showCaughtUp ?? false, 'showNoContext' => $dashboard?->showNoContext ?? false],
+            'can' => ['showCaughtUp' => $dashboard !== null && $dashboard->showCaughtUp, 'showNoContext' => $dashboard !== null && $dashboard->showNoContext],
             'areaShortcuts' => RoleAreas::shortcuts($actor),
         ]);
     }
