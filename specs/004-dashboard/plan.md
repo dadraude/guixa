@@ -106,7 +106,7 @@ governed by its current role mapping, including 003 R15.
 ## HTTP, freshness and page states
 
 Keep the dashboard route. Return generated typed sibling props `attention`, `opportunities`, `lastUpdatedAt`,
-`navigation`, `readFailed`, and `can` for the dashboard sections, delivered together on each read. The server
+`areaShortcuts` (from `RoleAreas::shortcuts`; it replaced the planned `navigation` prop), `readFailed`, and `can` for the dashboard sections, delivered together on each read. The server
 sets `can.showCaughtUp` only after a successful empty read and `can.showNoContext` from current permitted
 contexts; Vue does not infer business state. Action and context kinds use backed Domain enums, rendered
 through translation keys rather than Vue state/kind comparisons. A typed

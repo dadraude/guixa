@@ -1,11 +1,13 @@
 <?php
 
 use Guixa\Catalog\Infrastructure\Persistence\ProducerModel;
+use Guixa\Shared\Domain\Clock;
 use Guixa\Shared\Domain\Role;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Inertia\Testing\AssertableInertia as Assert;
+use Tests\Support\FrozenClock;
 
 beforeEach(fn () => $this->withoutVite());
 
@@ -119,4 +121,45 @@ it('drops the reception group on the next read once the Receiver role is removed
     $this->actingAs($receiver->fresh())->get('/dashboard')->assertInertia(fn (Assert $page) => $page
         ->has('attention', 0)->where('can.showNoContext', true));
     $this->get($link)->assertForbidden();
+});
+
+it('shows a member who is also Finance and Receiver one reception group, whose link opens the reception (S1, R2)', function () {
+    [$cycleId, $producerId] = sentBakerOrder();
+    $household = (string) Str::uuid7();
+    DB::table('households')->insert(['id' => $household, 'name' => 'Household C', 'created_at' => now(), 'updated_at' => now()]);
+    $combined = memberOf($household);
+    DB::table('account_roles')->insert([
+        ['user_id' => $combined->id, 'role' => Role::Finance->value],
+        ['user_id' => $combined->id, 'role' => Role::Receiver->value],
+    ]);
+    $link = "/receptions/{$cycleId}/{$producerId}";
+
+    $this->actingAs($combined)->get('/dashboard')->assertInertia(fn (Assert $page) => $page
+        ->has('attention', 1)
+        ->where('attention.0.action', 'check_delivery_and_allocations')
+        ->where('attention.0.href', $link));
+    $this->get($link)->assertOk();
+});
+
+it('keeps a reception distributed elsewhere until the next read, opens its current state, then drops it with a later read time (S11, R15)', function () {
+    [$cycleId, $producerId] = sentBakerOrder();
+    DB::table('cycle_producers')->where('cycle_id', $cycleId)->update(['validated_at' => now()]);
+    $finance = accountWith(Role::Finance);
+    $link = "/receptions/{$cycleId}/{$producerId}";
+    $clock = new FrozenClock(now()->toDateTimeString(), config('guixa.timezone'));
+    $this->app->instance(Clock::class, $clock);
+
+    $firstRead = $clock->now()->format(DATE_ATOM);
+    $this->actingAs($finance)->get('/dashboard')->assertInertia(fn (Assert $page) => $page
+        ->has('attention', 1)->where('attention.0.href', $link)->where('lastUpdatedAt', $firstRead));
+
+    DB::table('cycle_producers')->where('cycle_id', $cycleId)->update(['distributed_at' => now()]);
+    $this->get($link)->assertOk();
+    $this->post("/receptions/{$cycleId}/{$producerId}/distribution")->assertRedirect()->assertSessionHasErrors();
+
+    $clock->travelTo($clock->now()->modify('+5 minutes')->format('Y-m-d H:i:s'));
+    $this->get('/dashboard')->assertInertia(fn (Assert $page) => $page
+        ->has('attention', 0)
+        ->where('lastUpdatedAt', $clock->now()->format(DATE_ATOM)));
+    expect($clock->now()->format(DATE_ATOM))->not->toBe($firstRead);
 });
