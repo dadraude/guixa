@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { describe, expect, it, vi } from 'vite-plus/test';
+import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 import {
     createApp,
     createSSRApp,
@@ -13,6 +13,8 @@ import { renderToString } from 'vue/server-renderer';
 import { installTranslations } from '@/lib/i18n';
 import Edit from './Edit.vue';
 
+const pageErrors = vi.hoisted(() => ({ value: {} as Record<string, string> }));
+
 vi.mock('@inertiajs/vue3', () => ({
     Head: () => null,
     Link: defineComponent({
@@ -21,7 +23,7 @@ vi.mock('@inertiajs/vue3', () => ({
             () =>
                 h('a', attrs, slots.default?.()),
     }),
-    usePage: () => ({ props: { errors: {} } }),
+    usePage: () => ({ props: { errors: pageErrors.value } }),
     router: { put: vi.fn(), delete: vi.fn(), get: vi.fn() },
 }));
 
@@ -56,6 +58,10 @@ async function render(component: Component, props: Record<string, unknown>) {
 }
 
 describe('member order editor presentation', () => {
+    afterEach(() => {
+        pageErrors.value = {};
+    });
+
     it('keeps the explicit Enter save request and its partial reload', async () => {
         const put = vi.spyOn(router, 'put');
         const element = document.createElement('div');
@@ -243,5 +249,80 @@ describe('member order editor presentation', () => {
         const html = await render(Edit, { order, preview });
 
         expect(html).not.toContain('data-test="pickup"');
+    });
+
+    it('sends the existing DELETE when a marked line of a closed producer is removed', async () => {
+        const destroy = vi.spyOn(router, 'delete');
+        const element = document.createElement('div');
+        document.body.append(element);
+        const app = createApp(Edit, {
+            preview,
+            order: {
+                ...order,
+                producers: [
+                    { ...order.producers[0], open: false },
+                    {
+                        ...order.producers[0],
+                        producerId: 'empty',
+                        products: [],
+                    },
+                ],
+                lines: [
+                    {
+                        productId: 'bread',
+                        producerId: 'baker',
+                        producerName: 'Forn de la plaça',
+                        name: 'Pa de pagès',
+                        unit: 'unitat',
+                        price: '3.50',
+                        variable: false,
+                        quantity: '2.000',
+                        notDelivered: true,
+                    },
+                ],
+            },
+        });
+        installTranslations(app);
+        app.mount(element);
+
+        expect(element.textContent).toContain('Tancat');
+        expect(element.textContent).toContain(
+            'Aquest productor no té productes per demanar.',
+        );
+        element
+            .querySelector<HTMLButtonElement>('[data-test="remove-bread"]')!
+            .click();
+
+        expect(destroy).toHaveBeenCalledWith(
+            '/cycles/cycle/order/lines/bread',
+            expect.objectContaining({ only: ['order', 'errors'] }),
+        );
+        app.unmount();
+        element.remove();
+    });
+
+    it('shows a server domain error as an alert and keeps the typed quantity', async () => {
+        pageErrors.value = { domain: 'Aquest productor ja ha tancat.' };
+        const element = document.createElement('div');
+        document.body.append(element);
+        const app = createApp(Edit, { order, preview });
+        installTranslations(app);
+        app.mount(element);
+
+        const quantity =
+            element.querySelector<HTMLInputElement>('#quantity-bread')!;
+        quantity.value = '4';
+        quantity.dispatchEvent(new Event('input', { bubbles: true }));
+        await nextTick();
+        element
+            .querySelector<HTMLButtonElement>('[data-test="save-bread"]')!
+            .click();
+        await nextTick();
+
+        const alert = element.querySelector('[role="alert"]');
+        expect(alert?.textContent).toContain('Aquest productor ja ha tancat.');
+        expect(quantity.value).toBe('4');
+        app.unmount();
+        element.remove();
     });
 });

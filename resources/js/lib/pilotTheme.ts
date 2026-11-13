@@ -48,13 +48,17 @@ const pilotPages = new Set([
     'auth/VerifyEmail',
 ]);
 
-export type PilotVariant = 'landing-stock';
+export type PilotVariant = 'landing';
 
 // Exact page names only: never a prefix such as 'Manage/' and never a role.
-const landingStockPages = new Set(['Manage/Stock/Index']);
+const landingPages = new Set([
+    'Manage/Stock/Index',
+    'Orders/Index',
+    'Orders/Edit',
+]);
 
 export function pilotVariantFor(pageName: string): PilotVariant | null {
-    return landingStockPages.has(pageName) ? 'landing-stock' : null;
+    return landingPages.has(pageName) ? 'landing' : null;
 }
 
 export function isPilotThemePage(pageName: string): boolean {

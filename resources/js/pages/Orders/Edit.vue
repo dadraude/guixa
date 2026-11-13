@@ -177,7 +177,7 @@ function remove(productId: string) {
                         :class="
                             group.open
                                 ? 'bg-primary text-primary-foreground'
-                                : 'bg-background text-muted-foreground'
+                                : 'border-input bg-background text-muted-foreground'
                         "
                     >
                         {{ group.open ? trans('Open') : trans('Closed') }}

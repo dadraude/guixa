@@ -178,9 +178,9 @@ describe('pilot theme page selection', () => {
     });
 });
 
-describe('landing-stock variant admission', () => {
+describe('landing variant admission', () => {
     it.each([
-        ['Manage/Stock/Index', 'landing-stock'],
+        ['Manage/Stock/Index', 'landing'],
         ['Manage/Stock/Create', null],
         ['Manage/Stock/Edit', null],
         ['Manage/Stock/Movements', null],
@@ -191,7 +191,11 @@ describe('landing-stock variant admission', () => {
         ['Manage/Accounts/Index', null],
         ['Stock/Index', null],
         ['Finance/Stock/Index', null],
-        ['Orders/Index', null],
+        ['Orders/Index', 'landing'],
+        ['Orders/Edit', 'landing'],
+        ['Orders/Other', null],
+        ['Orders/Index/Extra', null],
+        ['Orders/', null],
         ['Catalogue/Producers/Index', null],
         ['Welcome', null],
     ])('%s -> %s', (page, expected) => {
@@ -204,7 +208,7 @@ describe('landing-stock variant admission', () => {
         const variant = () =>
             wrapper.get('[data-pilot]').attributes('data-variant');
         for (const component of [
-            'Orders/Index',
+            'Orders/Other',
             'Catalogue/Producers/Index',
             'Manage/Accounts/Index',
             'Manage/Stock/Create',
@@ -216,14 +220,31 @@ describe('landing-stock variant admission', () => {
         }
         page.component = 'Manage/Stock/Index';
         await nextTick();
-        expect(variant()).toBe('landing-stock');
-        page.component = 'Orders/Index';
+        expect(variant()).toBe('landing');
+        page.component = 'Orders/Other';
         await nextTick();
         expect(variant()).toBe('');
         page.component = 'Manage/Stock/Index';
         await nextTick();
-        expect(variant()).toBe('landing-stock');
+        expect(variant()).toBe('landing');
         wrapper.unmount();
-        page.component = 'Orders/Index';
+        page.component = 'Orders/Other';
+    });
+
+    it('carries the variant through AppLayout on both member order pages', async () => {
+        const page = usePage();
+        const wrapper = mount(AppLayout);
+        for (const component of ['Orders/Index', 'Orders/Edit']) {
+            page.component = component;
+            await nextTick();
+            expect(
+                wrapper.get('[data-pilot]').attributes('data-variant'),
+                component,
+            ).toBe('landing');
+        }
+        page.component = 'Orders/Other';
+        await nextTick();
+        expect(wrapper.get('[data-pilot]').attributes('data-variant')).toBe('');
+        wrapper.unmount();
     });
 });

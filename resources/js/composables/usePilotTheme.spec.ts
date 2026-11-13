@@ -227,9 +227,9 @@ describe('pilot theme layout and portal', () => {
         ).toBe(false);
     });
 
-    it('scopes landing-stock to shell, dialog and sheet portals of the exact stock page only', async () => {
+    it('scopes landing to shell, dialog and sheet portals of the exact stock page only', async () => {
         const page = usePage();
-        page.component = 'Orders/Index';
+        page.component = 'Orders/Other';
         const wrapper = mount(AppLayout, {
             slots: { default: () => [h(Portal), h(SheetPortal)] },
         });
@@ -241,29 +241,36 @@ describe('pilot theme layout and portal', () => {
         const sheet = () =>
             document.querySelector('[data-slot="sheet-content"]');
         const landing = (element: Element | null | undefined) =>
-            element?.classList.contains('landing-stock');
+            element?.classList.contains('landing');
 
         for (const component of [
-            'Orders/Index',
+            'Orders/Other',
             'Catalogue/Producers/Index',
             'Manage/Stock/Create',
             'Welcome',
         ]) {
             page.component = component;
             await nextTick();
-            expect(shell.classes()).not.toContain('landing-stock');
+            expect(shell.classes()).not.toContain('landing');
             expect(landing(dialog())).toBe(false);
             expect(landing(sheet())).toBe(false);
         }
         page.component = 'Manage/Stock/Index';
         await nextTick();
-        expect(shell.classes()).toContain('landing-stock');
+        expect(shell.classes()).toContain('landing');
         expect(shell.classes()).toContain('pilot-theme');
         expect(landing(dialog())).toBe(true);
         expect(landing(sheet())).toBe(true);
-        page.component = 'Orders/Index';
+        for (const component of ['Orders/Index', 'Orders/Edit']) {
+            page.component = component;
+            await nextTick();
+            expect(shell.classes(), component).toContain('landing');
+            expect(landing(dialog()), component).toBe(true);
+            expect(landing(sheet()), component).toBe(true);
+        }
+        page.component = 'Orders/Other';
         await nextTick();
-        expect(shell.classes()).not.toContain('landing-stock');
+        expect(shell.classes()).not.toContain('landing');
         expect(landing(dialog())).toBe(false);
         expect(landing(sheet())).toBe(false);
         page.component = 'Manage/Stock/Index';
@@ -271,18 +278,18 @@ describe('pilot theme layout and portal', () => {
         expect(landing(dialog())).toBe(true);
     });
 
-    it('does not apply landing-stock to a portal outside the layout', async () => {
+    it('does not apply landing to a portal outside the layout', async () => {
         const wrapper = mount(Portal);
         mountedWrappers.push(wrapper);
         await nextTick();
         expect(
             document
                 .querySelector('[data-slot="dialog-content"]')
-                ?.classList.contains('landing-stock'),
+                ?.classList.contains('landing'),
         ).toBe(false);
     });
 
-    it('adds and removes landing-stock on dropdown, submenu, tooltip and toaster content', async () => {
+    it('adds and removes landing on dropdown, submenu, tooltip and toaster content', async () => {
         const { Toaster: RealToaster } = await vi.importActual<
             typeof import('@/components/ui/sonner')
         >('@/components/ui/sonner');
@@ -317,7 +324,7 @@ describe('pilot theme layout and portal', () => {
             },
         );
         const page = usePage();
-        page.component = 'Orders/Index';
+        page.component = 'Orders/Other';
         const wrapper = mount(AppLayout, {
             slots: { default: () => h(Overlays) },
         });
@@ -336,15 +343,21 @@ describe('pilot theme layout and portal', () => {
             document.querySelector(selector) ??
             wrapper.element.querySelector(selector);
         const has = (selector: string) =>
-            find(selector)?.classList.contains('landing-stock');
+            find(selector)?.classList.contains('landing');
         for (const selector of Object.values(targets))
             expect(find(selector), selector).not.toBeNull();
 
-        for (const component of ['Orders/Index', 'Manage/Stock/Create']) {
+        for (const component of ['Orders/Other', 'Manage/Stock/Create']) {
             page.component = component;
             await nextTick();
             for (const selector of Object.values(targets))
                 expect(has(selector), `${component} ${selector}`).toBe(false);
+        }
+        for (const component of ['Orders/Index', 'Orders/Edit']) {
+            page.component = component;
+            await nextTick();
+            for (const [name, selector] of Object.entries(targets))
+                expect(has(selector), `${component} ${name}`).toBe(true);
         }
         page.component = 'Manage/Stock/Index';
         await nextTick();
@@ -355,7 +368,7 @@ describe('pilot theme layout and portal', () => {
                 name,
             ).toBe(true);
         }
-        page.component = 'Orders/Index';
+        page.component = 'Orders/Other';
         await nextTick();
         for (const [name, selector] of Object.entries(targets))
             expect(has(selector), name).toBe(false);
