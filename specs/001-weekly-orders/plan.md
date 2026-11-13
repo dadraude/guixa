@@ -1234,9 +1234,11 @@ ni la preparació de tasques autoritzen implementar o publicar tiquets.
 (`0074d383`; substitueix la fotografia `cfda8e70` del mapa anterior) d'allò que cada fase de la seqüència següent ha de cobrir. Fa servir el mateix inventari que
 exigeix «Inventari i base compartida»: pàgines servides, components compartits i superfícies fora d'Inertia.
 
-**Punt de partida.** El tema de la landing (blau/crema) només és a `Welcome`. `lib/pilotTheme.ts` és
-l'opt-in del tema verd anterior i **no** marca res com a migrat a la landing; la variant `landing-stock` de
-T84 encara no existeix al codi. Per tant, tot el que figura més avall està pendent.
+**Punt de partida (actualitzat 2026-11-13).** Quan es va redactar aquest inventari, el tema de la landing
+(blau/crema) només era a `Welcome`. T84 està integrada (PR #408, aprovació visual a PR #409): la variant
+`landing-stock` s'admet per coincidència exacta a `Manage/Stock/Index` (`lib/pilotTheme.ts`). La resta de
+l'inventari està pendent. `isPilotThemePage` continua sent l'opt-in del tema verd anterior i **no** marca res
+com a migrat a la landing.
 
 **Pàgines (52 rutes, 56 fitxers a `resources/js/pages/`; la resta són components fills, vegeu «Fora del mapa»).**
 «Tema verd» indica si la pàgina és a la llista de `pilotTheme.ts`; el que no hi és s'ha de revisar a la
