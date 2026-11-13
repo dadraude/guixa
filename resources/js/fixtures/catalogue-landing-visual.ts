@@ -223,6 +223,17 @@ const productsState =
 const productRows = (
     productsByState[productsState] ?? productsByState.default
 ).map((product) => ({ ...product }));
+// --- T05 (DRA-277): the product the weekly edit form is prefilled with; long-name stresses the title and the Name input.
+const weeklyProduct = {
+    id: 'product-1',
+    name: state === 'long-name' ? longName : 'Pa de pagès',
+    unit: 'unitat',
+    price: '3.50',
+    variable: false,
+    containersPerUnit: null,
+    active: true,
+};
+// --- end T05
 const pageProps: Record<string, Record<string, unknown>> = {
     'Catalogue/Producers/Index': {
         producers: producersByState[state] ?? producersByState.default,
@@ -240,7 +251,21 @@ const pageProps: Record<string, Record<string, unknown>> = {
         },
         cycles: availability.cycles,
     },
+    // --- T05 (DRA-277): weekly product forms ---
+    'Catalogue/Producers/WeeklyProduct/Create': {
+        producer: { id: 'producer-1', name: 'Hort de la Vall' },
+    },
+    'Catalogue/Producers/WeeklyProduct/Edit': {
+        producer: { id: 'producer-1', name: 'Hort de la Vall' },
+        product: weeklyProduct,
+        used: state === 'used',
+        canDelete: state !== 'used' && state !== 'read-only',
+    },
+    // --- end T05 ---
     // Unmigrated consumers of the shared dialog, for the leakage probe.
+    // --- T05 (DRA-277): shared-consumer probe, WeeklyProductFields consumer left unmigrated
+    'Producer/Products/Create': {},
+    // --- end T05
     'Producer/Products/Edit': {
         product: {
             id: 'product-1',
@@ -272,6 +297,13 @@ const urls: Record<string, string> = {
     'Catalogue/Producers/Products': '/catalogue/producers/producer-1/products',
     'Catalogue/Producers/Availability':
         '/catalogue/producers/producer-1/availability',
+    // --- T05 (DRA-277)
+    'Catalogue/Producers/WeeklyProduct/Create':
+        '/catalogue/producers/producer-1/products/weekly/create',
+    'Catalogue/Producers/WeeklyProduct/Edit':
+        '/catalogue/producers/producer-1/products/weekly/product-1/edit',
+    'Producer/Products/Create': '/producer/products/create',
+    // --- end T05
     'Producer/Products/Edit': '/producer/products/product-1/edit',
     'Manage/Cycles/Index': '/manage/cycles',
     'Manage/Accounts/Index': '/manage/accounts',
@@ -312,6 +344,9 @@ const page = {
 // Request spy: navigation states count every request the real router sends.
 const requestLog: string[] = [];
 const availabilityRequests: string[] = [];
+// --- T05 (DRA-277)
+const weeklyRequests: string[] = [];
+// --- end T05
 const pagesByPath: Record<string, string> = {
     '/catalogue/producers/producer-1/availability':
         'Catalogue/Producers/Availability',
@@ -359,6 +394,27 @@ http.setClient({
                 props: { ...page.props, cycles: availability.cycles },
             });
         }
+        // --- T05 (DRA-277): the weekly forms post to /products/weekly. busy never answers; invalid and server-error
+        // answer with the errors the real controller would return, through the real router.
+        if (path.includes('/products/weekly') && method !== 'get') {
+            weeklyRequests.push(`${method} ${path}`);
+            if (state === 'busy') return new Promise(() => {});
+            const errors =
+                {
+                    invalid: {
+                        name: 'Ja existeix un producte setmanal amb aquest nom.',
+                    },
+                    'invalid-long': {
+                        name: `Ja existeix un producte setmanal amb aquest nom: ${longName}.`,
+                        price: 'El preu ha de ser un import positiu.',
+                    },
+                    'server-error': {
+                        domain: 'No s’ha pogut desar el producte.',
+                    },
+                }[state] ?? {};
+            return reply({ ...page, props: { ...page.props, errors } });
+        }
+        // --- end T05
         // Busy state: the request never answers, so the page stays in `processing`.
         if (method === 'put' && state === 'busy') return new Promise(() => {});
         if (method === 'put' && state === 'error')
@@ -828,6 +884,75 @@ const recordControlContrast = (scope: string, prefix: string) => {
     );
 };
 
+// --- T05 (DRA-277): weekly product forms ---------------------------------------------------------
+const weeklyForms = [
+    'Catalogue/Producers/WeeklyProduct/Create',
+    'Catalogue/Producers/WeeklyProduct/Edit',
+];
+// Fills the Name, Unit and Price inputs the way a person would (events included), then submits.
+const submitWeeklyForm = async () => {
+    const form = await waitFor(() =>
+        document.querySelector<HTMLFormElement>('#main-content form'),
+    );
+    const type = (name: string, value: string) => {
+        const input = form.querySelector<HTMLInputElement>(
+            `input[name="${name}"]`,
+        )!;
+        input.focus();
+        input.value = value;
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+    };
+    type(
+        'name',
+        pageName.endsWith('/Edit') ? weeklyProduct.name : 'Pa de pagès',
+    );
+    type('unit', 'unitat');
+    type('price', '3.50');
+    form.requestSubmit();
+    const outcome =
+        state === 'busy'
+            ? '[data-test="save-product"][disabled]'
+            : '#main-content form [class*="text-destructive"]:not(:empty)';
+    await waitFor(() => document.querySelector(outcome));
+    await sleep(300);
+};
+// R5: the border of every text field against the page behind it and against its own fill (3:1), and
+// the error text against the page. In dark the field is `dark:bg-input/30` over the page, so the fill
+// is composited like the browser does. A class with no nodes records "false".
+const recordFieldContrast = () => {
+    const fields = [
+        ...document.querySelectorAll<HTMLInputElement>(
+            '#main-content form input:not([type="hidden"]):not([type="checkbox"])',
+        ),
+    ];
+    const against = (colour: string, backdrop: Rgba) =>
+        ratio(over(toRgba(colour), backdrop), backdrop);
+    const ratios = fields.flatMap((field) => {
+        const style = getComputedStyle(field);
+        const page = backdropOf(field);
+        const fill = over(toRgba(style.backgroundColor), page);
+        return [
+            against(style.borderTopColor, page),
+            against(style.borderTopColor, fill),
+        ];
+    });
+    const weakest = ratios.length ? Math.min(...ratios) : 0;
+    const set = (name: string, value: string) =>
+        document.body.setAttribute(`data-ev-field-${name}`, value);
+    set('count', String(fields.length));
+    set('border-ratio', weakest.toFixed(2));
+    set('border-ok', String(ratios.length > 0 && weakest >= 3));
+    const first = fields[0];
+    if (first) {
+        const style = getComputedStyle(first);
+        set('first-border', style.borderTopColor);
+        set('first-border-width', style.borderTopWidth);
+        set('first-bg', style.backgroundColor);
+        set('first-height', String(first.getBoundingClientRect().height));
+    }
+};
+// --- end T05 ---------------------------------------------------------------------------------------
+
 void createInertiaApp({
     resolve: (name) => components[`../pages/${name}.vue`].default,
     layout: (name) => {
@@ -974,6 +1099,32 @@ void createInertiaApp({
             '[data-test="delete-unused-product"]',
             'delete-unused-product',
         );
+    // --- T05: the delete dialog of WeeklyProduct/Edit closed by Escape (requestClose) or Cancel ---
+    if (dialogParam === 'delete-escape' || dialogParam === 'delete-cancel') {
+        await openFrom(
+            '[data-test="delete-unused-product"]',
+            'delete-unused-product',
+        );
+        recordDialog();
+        if (dialogParam === 'delete-escape') dialogElement()?.requestClose();
+        else
+            dialogElement()
+                ?.querySelector<HTMLElement>(
+                    '[data-test="cancel-product-action"]',
+                )
+                ?.click();
+        await waitFor(() => (dialogElement()?.open ? null : document.body));
+        await sleep(150);
+        document.body.setAttribute(
+            'data-ev-t05-close-requests',
+            String(requestLog.length),
+        );
+        document.body.setAttribute(
+            'data-ev-t05-close-focus',
+            dataTest(document.activeElement),
+        );
+    }
+    // --- end T05 ---
     if (dialogParam === 'escape') {
         // requestClose() is the close request Escape sends: cancel, then close, then the focus return.
         dialogElement()?.requestClose();
@@ -1016,6 +1167,19 @@ void createInertiaApp({
             dataTest(document.activeElement),
         );
     }
+    // --- T05 ---
+    if (
+        weeklyForms.includes(pageName) &&
+        ['invalid', 'invalid-long', 'server-error', 'busy'].includes(state)
+    )
+        await submitWeeklyForm();
+    if (weeklyForms.includes(pageName) && !dialogParam) recordFieldContrast();
+    if (weeklyForms.includes(pageName))
+        document.body.setAttribute(
+            'data-ev-weekly-requests',
+            weeklyRequests.join(' ; '),
+        );
+    // --- end T05 ---
     recordDialog();
     await snapshot('now');
     if (
