@@ -13,8 +13,8 @@ from the accepted graph. Product requirements and plan decisions are unchanged. 
 Només es detalla el pilot d’Estoc de gestió. La resta del desplegament conserva el full de ruta del pla
 fins a la revisió del pilot. No hi ha autorització d’implementació ni de publicació de tiquets.
 
-**2026-11-13 — Fase 2, comandes del membre:** T85 proposada (pendent d’acceptació); sense autorització
-d’execució ni de publicació de tiquets.
+**2026-11-13 — Fase 2, comandes del membre:** T85 acceptada per l’usuari; autoritzada la publicació del tiquet, sense
+autorització d’execució.
 
 Source: [spec](spec.md) and areas · [plan](plan.md) · [coverage allocation](tasks/coverage.md).
 
@@ -32,7 +32,7 @@ Source: [spec](spec.md) and areas · [plan](plan.md) · [coverage allocation](ta
 | [tasks/recorder-names.md](tasks/recorder-names.md) | T82: recorder names instead of account ids in the wallet statement and basket histories |
 | [tasks/landing.md](tasks/landing.md) | T83: approved light cooperative public landing |
 | [tasks/landing-style-pilot.md](tasks/landing-style-pilot.md) | T84: pilot d’Estoc de gestió amb la identitat de la landing; acceptada, preparació i cobertura parcial |
-| [tasks/landing-orders.md](tasks/landing-orders.md) | T85: fase 2, comandes del membre amb la identitat de la landing; proposta pendent d’acceptació |
+| [tasks/landing-orders.md](tasks/landing-orders.md) | T85: fase 2, comandes del membre amb la identitat de la landing; acceptada; sense autorització d’execució |
 | [tasks/baseline.md](tasks/baseline.md) | Historical T01–T51 scopes, approval gates and dated evidence; superseded behavior is explicitly historical |
 
 IDs are feature-global. Detail files do not start separate numbering or redefine dependencies.
