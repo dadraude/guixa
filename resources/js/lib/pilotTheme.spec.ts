@@ -196,7 +196,9 @@ describe('landing variant admission', () => {
         ['Orders/Other', null],
         ['Orders/Index/Extra', null],
         ['Orders/', null],
-        ['Catalogue/Producers/Index', null],
+        ['Catalogue/Producers/Index', 'landing'],
+        ['Catalogue/Producers/Index/Extra', null],
+        ['Catalogue/Producers', null],
         ['Welcome', null],
     ])('%s -> %s', (page, expected) => {
         expect(pilotVariantFor(page)).toBe(expected);
@@ -209,7 +211,9 @@ describe('landing variant admission', () => {
             wrapper.get('[data-pilot]').attributes('data-variant');
         for (const component of [
             'Orders/Other',
-            'Catalogue/Producers/Index',
+            'Catalogue/Producers/Index/Extra',
+            'Catalogue/Producers',
+            'Manage/Stock/Movements',
             'Manage/Accounts/Index',
             'Manage/Stock/Create',
             'Welcome',
@@ -218,6 +222,9 @@ describe('landing variant admission', () => {
             await nextTick();
             expect(variant()).toBe('');
         }
+        page.component = 'Catalogue/Producers/Index';
+        await nextTick();
+        expect(variant()).toBe('landing');
         page.component = 'Manage/Stock/Index';
         await nextTick();
         expect(variant()).toBe('landing');

@@ -49,15 +49,6 @@ const products = Array.from({ length: 20 }, (_, index) => ({
     available: '9.000',
     active: index !== 0,
 }));
-const producer = {
-    id: 'producer-1',
-    name: 'Hort de la Vall',
-    active: true,
-    cutoffDaysBefore: 3,
-    cutoffTime: '20:00',
-    accountEmail: null,
-    accountInvitationPending: false,
-};
 const pageProps: Record<string, Record<string, unknown>> = {
     'Manage/Stock/Index': { products: state === 'empty' ? [] : products },
     'Orders/Index': {
@@ -111,7 +102,7 @@ const pageProps: Record<string, Record<string, unknown>> = {
         },
         preview: { totalCents: 0, amountCents: {} },
     },
-    'Catalogue/Producers/Index': { producers: [producer] },
+    'Manage/Accounts/Index': { accounts: [], households: [] },
     Welcome: {},
 };
 const areas = [
@@ -123,7 +114,7 @@ const urls: Record<string, string> = {
     'Manage/Stock/Index': '/manage/stock',
     'Orders/Index': '/',
     'Orders/Edit': '/cycles/cycle-1/order',
-    'Catalogue/Producers/Index': '/catalogue/producers',
+    'Manage/Accounts/Index': '/manage/accounts',
     Welcome: '/',
 };
 const page = {
@@ -182,7 +173,7 @@ const requestLog: string[] = [];
 const pagesByPath: Record<string, string> = {
     '/': 'Orders/Index',
     '/cycles/cycle-1/order': 'Orders/Edit',
-    '/catalogue/producers': 'Catalogue/Producers/Index',
+    '/manage/accounts': 'Manage/Accounts/Index',
     '/manage/stock': 'Manage/Stock/Index',
 };
 if (
@@ -477,7 +468,7 @@ void createInertiaApp({
         const open = state === 'nav-sheet' ? openSheet : openMenu;
         await open();
         await snapshot('s1');
-        await visit('/catalogue/producers', 'Productors');
+        await visit('/manage/accounts', 'Comptes');
         await open();
         await snapshot('s2');
         await visit('/manage/stock', 'Estoc');

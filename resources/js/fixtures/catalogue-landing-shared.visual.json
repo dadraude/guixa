@@ -1,0 +1,1468 @@
+{
+    "baseUrl": "http://127.0.0.1:5271",
+    "rootFontPx": 16,
+    "darkSelector": "html.dark",
+    "matrix": {
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark", "system-light", "system-dark"],
+        "text": [100, 200]
+    },
+    "views": [
+        {
+            "id": "producers-index",
+            "path": "/resources/js/fixtures/catalogue-landing.html",
+            "query": {
+                "page": "Catalogue/Producers/Index",
+                "role": "catalogue"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content p,#main-content a,#main-content .material-status,#main-content li",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["#main-content .pilot-list a"],
+            "states": [
+                {
+                    "id": "default",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-page > header p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-list",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content .pilot-list > li",
+                                "count": 3,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-list .material-status",
+                                "count": 3,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-list a",
+                                "count": 3,
+                                "contrast": 4.5,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "#main-content .pilot-list .material-status-dot",
+                                "count": 3
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-border-count": "3",
+                                    "data-ev-border-ok": "true",
+                                    "data-ev-dot-count": "3",
+                                    "data-ev-dot-ok": "true",
+                                    "data-ev-focus-count": "3",
+                                    "data-ev-focus-ok": "true"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-list > li .material-status",
+                                "count": 3
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "deactivated",
+                    "query": {
+                        "state": "deactivated"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-page > header p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-list",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content .pilot-list > li",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-list .material-status",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-list a",
+                                "count": 2,
+                                "contrast": 4.5,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "#main-content .pilot-list .material-status-dot",
+                                "count": 2
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-border-count": "2",
+                                    "data-ev-border-ok": "true",
+                                    "data-ev-dot-count": "2",
+                                    "data-ev-dot-ok": "true",
+                                    "data-ev-focus-count": "2",
+                                    "data-ev-focus-ok": "true"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-list > li:first-child .material-status",
+                                "count": 1,
+                                "text": "Desactivat"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "long-name",
+                    "query": {
+                        "state": "long-name"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-page > header p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-list",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content .pilot-list > li",
+                                "count": 3,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-list .material-status",
+                                "count": 3,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-list a",
+                                "count": 3,
+                                "contrast": 4.5,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "#main-content .pilot-list .material-status-dot",
+                                "count": 3
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-border-count": "3",
+                                    "data-ev-border-ok": "true",
+                                    "data-ev-dot-count": "3",
+                                    "data-ev-dot-ok": "true",
+                                    "data-ev-focus-count": "3",
+                                    "data-ev-focus-ok": "true"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "producers-empty",
+            "path": "/resources/js/fixtures/catalogue-landing.html",
+            "query": {
+                "page": "Catalogue/Producers/Index",
+                "role": "catalogue",
+                "state": "empty"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content p,#main-content a,#main-content .material-status,#main-content li",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Empty state has no interactive control in the content area.",
+            "states": [
+                {
+                    "id": "empty",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-page > header p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-list",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content .pilot-page > p",
+                                "count": 1,
+                                "text": "Encara no hi ha productors.",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-page a",
+                                "count": 0
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "producers-checkpoint",
+            "path": "/resources/js/fixtures/catalogue-landing.html",
+            "query": {
+                "page": "Catalogue/Producers/Index",
+                "role": "catalogue",
+                "state": "deactivated"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content p,#main-content a,#main-content .material-status,#main-content li",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["#main-content .pilot-list a"],
+            "states": [
+                {
+                    "id": "light",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-page > header p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-list",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content .pilot-list > li",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-list .material-status",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-list a",
+                                "count": 2,
+                                "contrast": 4.5,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "#main-content .pilot-list .material-status-dot",
+                                "count": 2
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-border-count": "2",
+                                    "data-ev-border-ok": "true",
+                                    "data-ev-dot-count": "2",
+                                    "data-ev-dot-ok": "true",
+                                    "data-ev-focus-count": "2",
+                                    "data-ev-focus-ok": "true"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(40, 101, 133)",
+                                    "data-now-shell-bg": "rgb(250, 241, 220)"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-page > header p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-list",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content .pilot-list > li",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-list .material-status",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-list a",
+                                "count": 2,
+                                "contrast": 4.5,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "#main-content .pilot-list .material-status-dot",
+                                "count": 2
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-border-count": "2",
+                                    "data-ev-border-ok": "true",
+                                    "data-ev-dot-count": "2",
+                                    "data-ev-dot-ok": "true",
+                                    "data-ev-focus-count": "2",
+                                    "data-ev-focus-ok": "true"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(143, 197, 223)",
+                                    "data-now-shell-bg": "rgb(28, 32, 31)"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "producers-manager",
+            "path": "/resources/js/fixtures/catalogue-landing.html",
+            "query": {
+                "page": "Catalogue/Producers/Index",
+                "role": "manager",
+                "state": "deactivated"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content p,#main-content a,#main-content .material-status,#main-content li",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["#main-content .pilot-list a"],
+            "states": [
+                {
+                    "id": "light",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-page > header p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-list",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content .pilot-list > li",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-list .material-status",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-list a",
+                                "count": 2,
+                                "contrast": 4.5,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "#main-content .pilot-list .material-status-dot",
+                                "count": 2
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-border-count": "2",
+                                    "data-ev-border-ok": "true",
+                                    "data-ev-dot-count": "2",
+                                    "data-ev-dot-ok": "true",
+                                    "data-ev-focus-count": "2",
+                                    "data-ev-focus-ok": "true"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(40, 101, 133)",
+                                    "data-now-shell-bg": "rgb(250, 241, 220)"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-page > header p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-list",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content .pilot-list > li",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-list .material-status",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-list a",
+                                "count": 2,
+                                "contrast": 4.5,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "#main-content .pilot-list .material-status-dot",
+                                "count": 2
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-border-count": "2",
+                                    "data-ev-border-ok": "true",
+                                    "data-ev-dot-count": "2",
+                                    "data-ev-dot-ok": "true",
+                                    "data-ev-focus-count": "2",
+                                    "data-ev-focus-ok": "true"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(143, 197, 223)",
+                                    "data-now-shell-bg": "rgb(28, 32, 31)"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "accounts-unmigrated",
+            "path": "/resources/js/fixtures/catalogue-landing.html",
+            "query": {
+                "page": "Manage/Accounts/Index",
+                "role": "manager"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content p,#main-content a,#main-content .material-status,#main-content li",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Unmigrated Manager-only route; only the absence of landing is checked.",
+            "states": [
+                {
+                    "id": "light",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(36, 107, 87)",
+                                    "data-now-shell-bg": "rgb(248, 247, 244)"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(167, 215, 193)",
+                                    "data-now-shell-bg": "rgb(27, 30, 28)"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "producers-variant-off",
+            "path": "/resources/js/fixtures/catalogue-landing.html",
+            "query": {
+                "page": "Catalogue/Producers/Index",
+                "role": "catalogue",
+                "state": "variant-off"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content p,#main-content a,#main-content .material-status,#main-content li",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Reversion fixture; only the exact pre-slice colours are checked.",
+            "states": [
+                {
+                    "id": "light",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(36, 107, 87)",
+                                    "data-now-shell-bg": "rgb(248, 247, 244)"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(167, 215, 193)",
+                                    "data-now-shell-bg": "rgb(27, 30, 28)"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "producers-navigation",
+            "path": "/resources/js/fixtures/catalogue-landing.html",
+            "query": {
+                "page": "Catalogue/Producers/Index",
+                "role": "manager"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content p,#main-content a,#main-content .material-status,#main-content li",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Navigation probe: focus order is covered by producers-index.",
+            "states": [
+                {
+                    "id": "nav-sheet-light",
+                    "query": {
+                        "state": "nav-sheet"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-s1-shell-primary": "rgb(40, 101, 133)",
+                                    "data-s1-shell-bg": "rgb(250, 241, 220)",
+                                    "data-s1-sheet-primary": "rgb(40, 101, 133)",
+                                    "data-s2-shell-primary": "rgb(36, 107, 87)",
+                                    "data-s2-shell-bg": "rgb(248, 247, 244)",
+                                    "data-s3-shell-primary": "rgb(40, 101, 133)",
+                                    "data-s3-shell-bg": "rgb(250, 241, 220)",
+                                    "data-s3-sheet-primary": "rgb(40, 101, 133)",
+                                    "data-nav-requests": "get /manage/accounts,get /catalogue/producers"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "nav-sheet-dark",
+                    "query": {
+                        "state": "nav-sheet"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-s1-shell-primary": "rgb(143, 197, 223)",
+                                    "data-s1-shell-bg": "rgb(28, 32, 31)",
+                                    "data-s1-sheet-primary": "rgb(143, 197, 223)",
+                                    "data-s2-shell-primary": "rgb(167, 215, 193)",
+                                    "data-s2-shell-bg": "rgb(27, 30, 28)",
+                                    "data-s3-shell-primary": "rgb(143, 197, 223)",
+                                    "data-s3-shell-bg": "rgb(28, 32, 31)",
+                                    "data-s3-sheet-primary": "rgb(143, 197, 223)",
+                                    "data-nav-requests": "get /manage/accounts,get /catalogue/producers"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "nav-menu-light",
+                    "query": {
+                        "state": "nav-menu"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-s1-shell-primary": "rgb(40, 101, 133)",
+                                    "data-s1-shell-bg": "rgb(250, 241, 220)",
+                                    "data-s1-menu-primary": "rgb(40, 101, 133)",
+                                    "data-s2-shell-primary": "rgb(36, 107, 87)",
+                                    "data-s2-shell-bg": "rgb(248, 247, 244)",
+                                    "data-s3-shell-primary": "rgb(40, 101, 133)",
+                                    "data-s3-shell-bg": "rgb(250, 241, 220)",
+                                    "data-s3-menu-primary": "rgb(40, 101, 133)",
+                                    "data-nav-requests": "get /manage/accounts,get /catalogue/producers"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "nav-menu-dark",
+                    "query": {
+                        "state": "nav-menu"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-s1-shell-primary": "rgb(143, 197, 223)",
+                                    "data-s1-shell-bg": "rgb(28, 32, 31)",
+                                    "data-s1-menu-primary": "rgb(143, 197, 223)",
+                                    "data-s2-shell-primary": "rgb(167, 215, 193)",
+                                    "data-s2-shell-bg": "rgb(27, 30, 28)",
+                                    "data-s3-shell-primary": "rgb(143, 197, 223)",
+                                    "data-s3-shell-bg": "rgb(28, 32, 31)",
+                                    "data-s3-menu-primary": "rgb(143, 197, 223)",
+                                    "data-nav-requests": "get /manage/accounts,get /catalogue/producers"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "producers-overlays",
+            "path": "/resources/js/fixtures/catalogue-landing.html",
+            "query": {
+                "page": "Catalogue/Producers/Index",
+                "role": "catalogue"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content p,#main-content a,#main-content .material-status,#main-content li",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Overlay and appearance probes; focus order is the unchanged shell model.",
+            "states": [
+                {
+                    "id": "drawer-light",
+                    "query": {
+                        "drawer": "1"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-sidebar=\"sidebar\"][data-mobile=\"true\"].landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(40, 101, 133)",
+                                    "data-now-shell-bg": "rgb(250, 241, 220)"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "drawer-dark",
+                    "query": {
+                        "drawer": "1"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-sidebar=\"sidebar\"][data-mobile=\"true\"].landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(143, 197, 223)",
+                                    "data-now-shell-bg": "rgb(28, 32, 31)"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "menu-light",
+                    "query": {
+                        "state": "account-menu"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-slot=\"dropdown-menu-content\"].landing",
+                                "count": 1
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "menu-dark",
+                    "query": {
+                        "state": "account-menu"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-slot=\"dropdown-menu-content\"].landing",
+                                "count": 1
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "system-dark",
+                    "query": {
+                        "drawer": "1"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "system-dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "html.dark",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-sidebar=\"sidebar\"][data-mobile=\"true\"].landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(143, 197, 223)",
+                                    "data-now-shell-bg": "rgb(28, 32, 31)"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "system-light",
+                    "query": {
+                        "drawer": "1"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "system-light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "html.dark",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-sidebar=\"sidebar\"][data-mobile=\"true\"].landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(40, 101, 133)",
+                                    "data-now-shell-bg": "rgb(250, 241, 220)"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "drawer-reduced-motion",
+                    "query": {
+                        "drawer": "1"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "reducedMotion": true,
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-sidebar=\"sidebar\"][data-mobile=\"true\"].landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(40, 101, 133)",
+                                    "data-now-shell-bg": "rgb(250, 241, 220)"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "menu-reduced-motion",
+                    "query": {
+                        "state": "account-menu"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "reducedMotion": true,
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-slot=\"dropdown-menu-content\"].landing",
+                                "count": 1
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "producers-fallback-font",
+            "path": "/resources/js/fixtures/catalogue-landing.html",
+            "query": {
+                "page": "Catalogue/Producers/Index",
+                "role": "catalogue",
+                "fallback": "1",
+                "state": "long-name"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content p,#main-content a,#main-content .material-status,#main-content li",
+            "fonts": ["16px sans-serif"],
+            "focus": ["#main-content .pilot-list a"],
+            "states": [
+                {
+                    "id": "fallback",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "html[data-font-fallback=\"true\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-page > header p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-list",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content .pilot-list > li",
+                                "count": 3,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-list .material-status",
+                                "count": 3,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-list a",
+                                "count": 3,
+                                "contrast": 4.5,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "#main-content .pilot-list .material-status-dot",
+                                "count": 3
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-border-count": "3",
+                                    "data-ev-border-ok": "true",
+                                    "data-ev-dot-count": "3",
+                                    "data-ev-dot-ok": "true",
+                                    "data-ev-focus-count": "3",
+                                    "data-ev-focus-ok": "true"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ],
+            "systemFonts": true
+        }
+    ]
+}
