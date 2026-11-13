@@ -1,6 +1,6 @@
 # 005 — Landing identity rollout: Catalogue role complete · Plan
 
-**Status: Draft awaiting acceptance.** Covers delivery slice 1 only ([spec](spec.md) R1–R13, S1–S12).
+**Status: Accepted (2026-11-13, PR #417; D1–D5 confirmed by the merge).** Covers delivery slice 1 only ([spec](spec.md) R1–R13, S1–S12).
 It authorizes no tasks, tickets or implementation. Slices 2–7 stay in [discovery](discovery.md). The visual direction
 is the accepted 001 plan, "Llenguatge visual de la portada a tota l'aplicació" (`specs/001-weekly-orders/plan.md:1130`);
 the landing (`resources/js/components/WelcomePage.vue`) wins if the two differ. Paths are relative to the repository
