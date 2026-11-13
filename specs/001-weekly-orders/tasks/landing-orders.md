@@ -1,9 +1,9 @@
-# 001 — Desglossament proposat: fase 2, comandes del membre (2026-11-13)
+# 001 — Desglossament acceptat: fase 2, comandes del membre (2026-11-13)
 
 Part del [registre canònic](../tasks.md), amb una única definició de dependències al registre. Font de
 disseny: [«Llenguatge visual de la portada a tota l'aplicació»](../plan.md#llenguatge-visual-de-la-portada-a-tota-laplicació--proposta-de-pla),
-seqüència d'implementació futura, punt 2, i «Inventari de desplegament». Aquest desglossament **és una
-proposta pendent d'acceptació**: no autoritza implementació ni publicació de tiquets.
+seqüència d'implementació futura, punt 2, i «Inventari de desplegament». Aquest desglossament **està acceptat** (2026-11-13, [decisió
+literal](../history/2026-11-13T10-40-21.781Z-no-task-e89110b6-19ce-472c-9144-10e2bdee47ff.md)); autoritza publicar el tiquet, no implementar-lo.
 
 Desbloqueig: l'aprovació visual del pilot (T84) consta a l'[entrada
 Q&A](../history/2026-11-13T09-22-04.247Z-DRA-265-e23507b9-941a-4aaf-b2d7-fb4fd0385aad.md); només desbloqueja
@@ -58,7 +58,7 @@ la fase 5. Les fases 3–5 no depenen de T85: el pla fa dependre la fase 3 de la
 
 ## T85
 
-**Aplicar la identitat de la landing a les comandes del membre. Estat: proposta pendent d'acceptació; sense autorització d'execució.**
+**Aplicar la identitat de la landing a les comandes del membre. Estat: acceptada; sense autorització d'execució.**
 
 **Resultat.** Un membre pot entrar a `/`, veure els cicles agrupats, obrir-ne un, canviar quantitats, desar-les
 amb la petició explícita, veure el total que calcula el servidor, treure una línia marcada «No es lliurarà» i,
