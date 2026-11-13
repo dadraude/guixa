@@ -377,3 +377,19 @@ global promotion and Dashboard restyle are outside.
    contrast, seeder table names (`return_items`, `producer_cycle_availability`), runner path with no command run, and
    the ~150–170 case estimate (`run.mjs plan` decides). Pest test names and filters not run.
 5. No Linear publication, branch/worktree or implementation authorization is implied; no tracker column exists yet.
+
+## Linear mapping — slice 1
+
+Published 2026-11-13 ([record](linear-publication.md)). Parent: DRA-270 (no task ID, no label).
+
+| Task | Issue |
+| --- | --- |
+| T01 | DRA-271 |
+| T02 | DRA-272 |
+| T03 | DRA-273 |
+| T04 | DRA-274 |
+| T05 | DRA-277 |
+| T06 | DRA-278 |
+| T07 | DRA-275 |
+| T08 | DRA-276 |
+| T09 | DRA-279 |

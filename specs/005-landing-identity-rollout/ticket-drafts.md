@@ -1,6 +1,6 @@
 # 005 Landing identity rollout, slice 1 (Catalogue role) — proposed Linear ticket batch
 
-**Draft for review, nothing written to Linear.** Publishing needs your separate approval of this exact batch (profile: new tickets are ask-first).
+**Published 2026-11-13; see the [publication record](linear-publication.md).** The proposal below is retained as publication evidence.
 
 **Source.** Merge commit `fa428042c7f51eae34cf48314a399cb9cb8734bc` on `origin/main` (verified contained in `origin/main`) of `https://github.com/dadraude/guixa`. Source links below use `SRC` = `https://github.com/dadraude/guixa/blob/fa428042c7f51eae34cf48314a399cb9cb8734bc/specs/005-landing-identity-rollout`. Files: `SRC/spec.md` (accepted, PR #416), `SRC/plan.md` (accepted, PR #417), `SRC/tasks.md` (PR #418).
 
