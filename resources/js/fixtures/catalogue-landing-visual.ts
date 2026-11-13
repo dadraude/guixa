@@ -2,6 +2,7 @@ import '@/../css/app.css';
 import '../../../public/theme-colors.css';
 import { createInertiaApp, http, router } from '@inertiajs/vue3';
 import { defineComponent, h, type DefineComponent } from 'vue';
+import ProducerAvailabilityController from '@/actions/App/Http/Controllers/Catalogue/ProducerAvailabilityController';
 import AppLayout from '@/layouts/AppLayout.vue';
 import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
 import { initializeTheme } from '@/composables/useAppearance';
@@ -137,6 +138,84 @@ const productsByState: Record<string, ReturnType<typeof makeProduct>[]> = {
         makeProduct('product-1', 'Pa de pagès', readOnly),
     ],
 };
+// Availability (spec 005 T04). Cycle A can still be changed, cycle B is already sent (canChange false).
+const makeCycle = (
+    id: string,
+    pickupDate: string,
+    canChange: boolean,
+    products: { productId: string; name: string; available: boolean }[],
+) => ({
+    cycleId: id,
+    pickupDate,
+    canChange,
+    products: products.map((product) => ({ unit: 'unitat', ...product })),
+});
+const toggleable = [
+    { productId: 'p-1', name: 'Tomàquet de pera', available: true },
+    { productId: 'p-2', name: 'Bròquil', available: false },
+    { productId: 'p-3', name: 'Pebrots del piquillo', available: true },
+];
+const sentCycle = makeCycle('cycle-2', '2026-11-21', false, [
+    { productId: 'p-1', name: 'Tomàquet de pera', available: true },
+    { productId: 'p-2', name: 'Bròquil', available: false },
+]);
+const openCycle = (products = toggleable) =>
+    makeCycle('cycle-1', '2026-11-14', true, products);
+const longProducts = [
+    { productId: 'p-1', name: longName, available: true },
+    { productId: 'p-2', name: longName, available: false },
+];
+const availabilityByState: Record<
+    string,
+    { producerActive: boolean; producerName: string; cycles: unknown[] }
+> = {
+    default: {
+        producerActive: true,
+        producerName: 'Hort de la Vall',
+        cycles: [openCycle(), sentCycle],
+    },
+    // The deactivated producer: danger indicator and notice are text, not only colour.
+    deactivated: {
+        producerActive: false,
+        producerName: 'Forn de Sant Joan',
+        cycles: [openCycle(), sentCycle],
+    },
+    // Unavailable product first: the first checkpoint measures this state.
+    checkpoint: {
+        producerActive: true,
+        producerName: 'Hort de la Vall',
+        cycles: [openCycle([toggleable[1], toggleable[0]])],
+    },
+    'read-only': {
+        producerActive: true,
+        producerName: 'Hort de la Vall',
+        cycles: [sentCycle],
+    },
+    empty: {
+        producerActive: true,
+        producerName: 'Hort de la Vall',
+        cycles: [],
+    },
+    'no-products': {
+        producerActive: true,
+        producerName: 'Hort de la Vall',
+        cycles: [openCycle([]), sentCycle],
+    },
+    'long-name': {
+        producerActive: false,
+        producerName: longName,
+        cycles: [
+            openCycle(longProducts),
+            makeCycle('cycle-2', '2026-11-21', false, longProducts),
+        ],
+    },
+};
+const availabilityState = state.replace(
+    /^(?:variant-off|migration-off|nav-.*|toggle)$/,
+    'default',
+);
+const availability =
+    availabilityByState[availabilityState] ?? availabilityByState.default;
 // Error and busy states reuse the checkpoint products; navigation and reversion states the default ones.
 const productsState =
     { error: 'checkpoint', busy: 'checkpoint' }[state] ??
@@ -152,6 +231,14 @@ const pageProps: Record<string, Record<string, unknown>> = {
         producer: { id: 'producer-1', name: 'Hort de la Vall' },
         products: productRows,
         canCreateStock: state !== 'read-only',
+    },
+    'Catalogue/Producers/Availability': {
+        producer: {
+            id: 'producer-1',
+            name: availability.producerName,
+            active: availability.producerActive,
+        },
+        cycles: availability.cycles,
     },
     // Unmigrated consumers of the shared dialog, for the leakage probe.
     'Producer/Products/Edit': {
@@ -183,6 +270,8 @@ const areas = [
 const urls: Record<string, string> = {
     'Catalogue/Producers/Index': '/catalogue/producers',
     'Catalogue/Producers/Products': '/catalogue/producers/producer-1/products',
+    'Catalogue/Producers/Availability':
+        '/catalogue/producers/producer-1/availability',
     'Producer/Products/Edit': '/producer/products/product-1/edit',
     'Manage/Cycles/Index': '/manage/cycles',
     'Manage/Accounts/Index': '/manage/accounts',
@@ -222,15 +311,23 @@ const page = {
 
 // Request spy: navigation states count every request the real router sends.
 const requestLog: string[] = [];
+const availabilityRequests: string[] = [];
 const pagesByPath: Record<string, string> = {
+    '/catalogue/producers/producer-1/availability':
+        'Catalogue/Producers/Availability',
     '/catalogue/producers/producer-1/products': 'Catalogue/Producers/Products',
     '/catalogue/producers': 'Catalogue/Producers/Index',
     '/manage/accounts': 'Manage/Accounts/Index',
 };
 const flashMessage = 'Classificació del producte actualitzada.';
 http.setClient({
-    request: async (config: { url: string; method?: string }) => {
-        const path = new URL(config.url, window.location.origin).pathname;
+    request: async (config: {
+        url: string;
+        method?: string;
+        data?: unknown;
+    }) => {
+        const url = new URL(config.url, window.location.origin);
+        const path = url.pathname;
         const method = (config.method ?? 'get').toLowerCase();
         requestLog.push(`${method} ${path}`);
         const reply = (body: Record<string, unknown>) => ({
@@ -238,6 +335,30 @@ http.setClient({
             data: JSON.stringify(body),
             headers: { 'x-inertia': 'true' },
         });
+        // Availability toggle: the Form of the page posts the wayfinder action; the product flips.
+        if (path.endsWith('/availability') && method !== 'get') {
+            const body =
+                config.data instanceof FormData
+                    ? Object.fromEntries(config.data.entries())
+                    : ((config.data ?? {}) as Record<string, unknown>);
+            availabilityRequests.push(
+                `${method} ${path}${url.search} available=${String(body.available)}`,
+            );
+            const productId = path.split('/').at(-2);
+            for (const cycle of availability.cycles as ReturnType<
+                typeof makeCycle
+            >[])
+                for (const product of cycle.products)
+                    if (
+                        path.includes(`/cycles/${cycle.cycleId}/`) &&
+                        product.productId === productId
+                    )
+                        product.available = String(body.available) === '1';
+            return reply({
+                ...page,
+                props: { ...page.props, cycles: availability.cycles },
+            });
+        }
         // Busy state: the request never answers, so the page stays in `processing`.
         if (method === 'put' && state === 'busy') return new Promise(() => {});
         if (method === 'put' && state === 'error')
@@ -280,6 +401,19 @@ const RevertedLayout = defineComponent({
             h(
                 AppSidebarLayout,
                 { ...attrs, pilotTheme: true, managerTheme: true },
+                slots,
+            ),
+});
+
+// Pre-slice fixture for Availability: it was in neither list, so no pilot theme and no variant.
+const UnmigratedLayout = defineComponent({
+    inheritAttrs: false,
+    setup:
+        (_, { attrs, slots }) =>
+        () =>
+            h(
+                AppSidebarLayout,
+                { ...attrs, pilotTheme: false, managerTheme: false },
                 slots,
             ),
 });
@@ -341,6 +475,34 @@ const snapshot = async (label: string) => {
         document.body.setAttribute(
             `data-${label}-${name}-bg`,
             getComputedStyle(element).backgroundColor,
+        );
+    }
+};
+// Own look of the page in view: heading ink and font, and the first panel's surface and border.
+const snapshotPage = async (label: string) => {
+    await snapshot(label);
+    const title = document.querySelector('#main-content h1:not(.sr-only)');
+    if (title) {
+        document.body.setAttribute(
+            `data-${label}-h1-ink`,
+            getComputedStyle(title).color,
+        );
+        document.body.setAttribute(
+            `data-${label}-h1-font`,
+            getComputedStyle(title).fontFamily.split(',')[0],
+        );
+    }
+    const panel = document.querySelector(
+        '#main-content .pilot-layout-panel, #main-content .pilot-list',
+    );
+    if (panel) {
+        document.body.setAttribute(
+            `data-${label}-panel-bg`,
+            getComputedStyle(panel).backgroundColor,
+        );
+        document.body.setAttribute(
+            `data-${label}-panel-border`,
+            getComputedStyle(panel).borderTopColor,
         );
     }
 };
@@ -617,6 +779,13 @@ const recordControlContrast = (scope: string, prefix: string) => {
             against(getComputedStyle(button).borderTopColor, button),
         ),
     );
+    // The status dot of a StatusIndicator (deactivated producer on Availability).
+    report(
+        'dot',
+        nodes('.material-status-dot').map((dot) =>
+            against(getComputedStyle(dot).backgroundColor, dot),
+        ),
+    );
     const toggles = nodes('input[type="checkbox"]');
     report(
         'switch',
@@ -663,7 +832,8 @@ void createInertiaApp({
     resolve: (name) => components[`../pages/${name}.vue`].default,
     layout: (name) => {
         if (name === 'Welcome') return null;
-        return state === 'variant-off' ? RevertedLayout : AppLayout;
+        if (state === 'variant-off') return RevertedLayout;
+        return state === 'migration-off' ? UnmigratedLayout : AppLayout;
     },
     withApp: (app, { page }) => {
         installTranslations(app, page.props.locale);
@@ -682,6 +852,89 @@ void createInertiaApp({
         await open();
         await snapshot('s3');
         document.body.dataset.navRequests = requestLog.join(',');
+    }
+    if (state === 'nav-neighbours') {
+        // R2: the neighbours of Availability keep their own look. Availability (landing) -> Producers
+        // (landing, previous page) -> Products (landing, next page) -> Accounts (unmigrated) -> Availability.
+        await snapshotPage('s1');
+        await visit('/catalogue/producers', 'Productors');
+        await snapshotPage('s2');
+        await visit(
+            '/catalogue/producers/producer-1/products',
+            'Productes de Hort de la Vall',
+        );
+        await snapshotPage('s3');
+        await visit('/manage/accounts', 'Comptes');
+        await snapshotPage('s4');
+        await visit(
+            '/catalogue/producers/producer-1/availability',
+            'Disponibilitat de Hort de la Vall',
+        );
+        await snapshotPage('s5');
+        document.body.dataset.navRequests = requestLog.join(',');
+    }
+    if (state === 'toggle') {
+        // S5: marking a product unavailable and available again through the real router.
+        const row = (id: string) =>
+            `[data-test="product-${id}"] [data-test="availability"]`;
+        const text = (selector: string) =>
+            document.querySelector(selector)?.textContent?.trim() ?? 'none';
+        const toggle = await waitFor(() =>
+            document.querySelector<HTMLElement>('[data-test="toggle-p-1"]'),
+        );
+        document.body.setAttribute('data-ev-toggle-before', text(row('p-1')));
+        toggle.focus();
+        toggle.click();
+        await waitFor(() =>
+            text(row('p-1')) === 'No disponible' ? document.body : null,
+        );
+        await sleep(150);
+        document.body.setAttribute('data-ev-toggle-after', text(row('p-1')));
+        document.body.setAttribute(
+            'data-ev-toggle-label',
+            document
+                .querySelector('[data-test="toggle-p-1"]')
+                ?.textContent?.trim() ?? 'none',
+        );
+        document
+            .querySelector<HTMLElement>('[data-test="toggle-p-1"]')
+            ?.click();
+        await waitFor(() =>
+            text(row('p-1')) === 'Disponible' ? document.body : null,
+        );
+        await sleep(150);
+        document.body.setAttribute('data-ev-toggle-back', text(row('p-1')));
+        document.body.setAttribute(
+            'data-ev-toggle-requests',
+            availabilityRequests.join(' ; '),
+        );
+        // The same request as before: the unchanged Form posts what the wayfinder action defines.
+        const expected = ProducerAvailabilityController.update.form({
+            producer: 'producer-1',
+            cycle: 'cycle-1',
+            product: 'p-1',
+        });
+        const target = new URL(expected.action, window.location.origin);
+        document.body.setAttribute(
+            'data-ev-toggle-expected',
+            [0, 1]
+                .map(
+                    (value) =>
+                        `${expected.method} ${target.pathname}${target.search} available=${value}`,
+                )
+                .join(' ; '),
+        );
+        document.body.setAttribute(
+            'data-ev-toggle-match',
+            String(
+                document.body.getAttribute('data-ev-toggle-requests') ===
+                    document.body.getAttribute('data-ev-toggle-expected'),
+            ),
+        );
+        document.body.setAttribute(
+            'data-ev-toggle-focus',
+            dataTest(document.activeElement),
+        );
     }
     if (state === 'account-menu') await openMenu();
     if (query.get('tooltip') === '1') {
@@ -772,6 +1025,12 @@ void createInertiaApp({
     )
         recordGraphicContrast();
     if (pageName === 'Catalogue/Producers/Products' && !dialogParam)
+        recordControlContrast('#main-content .pilot-page', 'page');
+    if (
+        pageName === 'Catalogue/Producers/Availability' &&
+        !document.querySelector(measured.sheet) &&
+        !document.querySelector(measured.menu)
+    )
         recordControlContrast('#main-content .pilot-page', 'page');
     if (dialogElement()?.open) recordControlContrast('dialog[open]', 'dialog');
     document.body.dataset.requests = String(requestLog.length);

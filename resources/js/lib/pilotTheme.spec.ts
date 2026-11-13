@@ -139,6 +139,7 @@ describe('pilot theme page selection', () => {
         ['Manage/Producers/Index', true],
         ['Catalogue/Producers/Index', true],
         ['Catalogue/Producers/Products', true],
+        ['Catalogue/Producers/Availability', true],
         ['Catalogue/Producers/WeeklyProduct/Create', true],
         ['Catalogue/Producers/WeeklyProduct/Edit', true],
         ['Manage/Cycles/Index', true],
@@ -202,6 +203,8 @@ describe('landing variant admission', () => {
         ['Catalogue/Producers/Products', 'landing'],
         ['Catalogue/Producers/Products/Extra', null],
         ['Catalogue/Producers/Product', null],
+        ['Catalogue/Producers/Availability', 'landing'],
+        ['Catalogue/Producers/Availability/Extra', null],
         ['Welcome', null],
     ])('%s -> %s', (page, expected) => {
         expect(pilotVariantFor(page)).toBe(expected);
@@ -218,6 +221,7 @@ describe('landing variant admission', () => {
             'Catalogue/Producers',
             'Catalogue/Producers/Products/Extra',
             'Catalogue/Producers/Product',
+            'Catalogue/Producers/Availability/Extra',
             'Manage/Stock/Movements',
             'Manage/Accounts/Index',
             'Manage/Stock/Create',
@@ -231,6 +235,9 @@ describe('landing variant admission', () => {
         await nextTick();
         expect(variant()).toBe('landing');
         page.component = 'Catalogue/Producers/Products';
+        await nextTick();
+        expect(variant()).toBe('landing');
+        page.component = 'Catalogue/Producers/Availability';
         await nextTick();
         expect(variant()).toBe('landing');
         page.component = 'Manage/Stock/Index';
