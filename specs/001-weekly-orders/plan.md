@@ -1230,6 +1230,8 @@ ni la preparació de tasques autoritzen implementar o publicar tiquets.
 
 ### Inventari de desplegament — esborrany (2026-11-13)
 
+**Traspàs (2026-11-13):** les fases 3–5 d'aquesta seqüència passen a l'especificació [005](../005-landing-identity-rollout/discovery.md). Aquesta feature manté el pilot (T83–T85) i la direcció visual d'aquest pla; l'inventari següent és la font per al descobriment de 005.
+
 **Estat: esborrany pendent d'acceptació; no autoritza implementació.** Fotografia sobre `origin/main`
 (`0074d383`; substitueix la fotografia `cfda8e70` del mapa anterior) d'allò que cada fase de la seqüència següent ha de cobrir. Fa servir el mateix inventari que
 exigeix «Inventari i base compartida»: pàgines servides, components compartits i superfícies fora d'Inertia.
