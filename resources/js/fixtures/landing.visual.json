@@ -10,7 +10,7 @@
     "views": [
         {
             "id": "stock-index",
-            "path": "/resources/js/fixtures/landing-stock.html",
+            "path": "/resources/js/fixtures/landing.html",
             "query": {
                 "page": "Manage/Stock/Index"
             },
@@ -55,7 +55,7 @@
                                 "contrast": 4.5
                             },
                             {
-                                "selector": ".reference-style.landing-stock",
+                                "selector": ".reference-style.landing",
                                 "count": 1
                             },
                             {
@@ -99,7 +99,7 @@
                                 "contrast": 4.5
                             },
                             {
-                                "selector": ".reference-style.landing-stock",
+                                "selector": ".reference-style.landing",
                                 "count": 1
                             },
                             {
@@ -230,7 +230,7 @@
                                 "contrast": 4.5
                             },
                             {
-                                "selector": ".reference-style.landing-stock",
+                                "selector": ".reference-style.landing",
                                 "count": 1
                             }
                         ]
@@ -272,7 +272,7 @@
                                 "contrast": 4.5
                             },
                             {
-                                "selector": ".reference-style.landing-stock",
+                                "selector": ".reference-style.landing",
                                 "count": 1
                             }
                         ]
@@ -282,7 +282,7 @@
         },
         {
             "id": "stock-dialog",
-            "path": "/resources/js/fixtures/landing-stock.html",
+            "path": "/resources/js/fixtures/landing.html",
             "query": {
                 "page": "Manage/Stock/Index"
             },
@@ -440,7 +440,7 @@
         },
         {
             "id": "stock-drawer",
-            "path": "/resources/js/fixtures/landing-stock.html",
+            "path": "/resources/js/fixtures/landing.html",
             "query": {
                 "page": "Manage/Stock/Index",
                 "drawer": "1"
@@ -471,7 +471,7 @@
         },
         {
             "id": "stock-account-menu",
-            "path": "/resources/js/fixtures/landing-stock.html",
+            "path": "/resources/js/fixtures/landing.html",
             "query": {
                 "page": "Manage/Stock/Index",
                 "state": "account-menu"
@@ -501,74 +501,8 @@
             ]
         },
         {
-            "id": "orders-unmigrated",
-            "path": "/resources/js/fixtures/landing-stock.html",
-            "query": {
-                "page": "Orders/Index",
-                "role": "member"
-            },
-            "root": ".reference-style",
-            "panels": "#main-content, [data-sidebar=\"sidebar\"]",
-            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]),#main-content td,#main-content th",
-            "fonts": ["16px Nunito Variable"],
-            "focus": [],
-            "noFocusReason": "Unmigrated route; only the absence of landing-stock is checked.",
-            "states": [
-                {
-                    "id": "light",
-                    "cases": [
-                        {
-                            "width": 375,
-                            "mode": "light",
-                            "text": 100
-                        }
-                    ],
-                    "checks": {
-                        "assertions": [
-                            {
-                                "selector": ".landing-stock",
-                                "count": 0
-                            },
-                            {
-                                "selector": "body",
-                                "attributes": {
-                                    "data-now-shell-primary": "rgb(36, 107, 87)",
-                                    "data-now-shell-bg": "rgb(248, 247, 244)"
-                                }
-                            }
-                        ]
-                    }
-                },
-                {
-                    "id": "dark",
-                    "cases": [
-                        {
-                            "width": 1280,
-                            "mode": "dark",
-                            "text": 100
-                        }
-                    ],
-                    "checks": {
-                        "assertions": [
-                            {
-                                "selector": ".landing-stock",
-                                "count": 0
-                            },
-                            {
-                                "selector": "body",
-                                "attributes": {
-                                    "data-now-shell-primary": "rgb(167, 215, 193)",
-                                    "data-now-shell-bg": "rgb(27, 30, 28)"
-                                }
-                            }
-                        ]
-                    }
-                }
-            ]
-        },
-        {
             "id": "catalogue-unmigrated",
-            "path": "/resources/js/fixtures/landing-stock.html",
+            "path": "/resources/js/fixtures/landing.html",
             "query": {
                 "page": "Catalogue/Producers/Index",
                 "role": "catalogue"
@@ -578,7 +512,7 @@
             "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]),#main-content td,#main-content th",
             "fonts": ["16px Nunito Variable"],
             "focus": [],
-            "noFocusReason": "Unmigrated route; only the absence of landing-stock is checked.",
+            "noFocusReason": "Unmigrated route; only the absence of landing is checked.",
             "states": [
                 {
                     "id": "light",
@@ -592,7 +526,7 @@
                     "checks": {
                         "assertions": [
                             {
-                                "selector": ".landing-stock",
+                                "selector": ".landing",
                                 "count": 0
                             },
                             {
@@ -617,7 +551,7 @@
                     "checks": {
                         "assertions": [
                             {
-                                "selector": ".landing-stock",
+                                "selector": ".landing",
                                 "count": 0
                             },
                             {
@@ -634,7 +568,7 @@
         },
         {
             "id": "stock-variant-off",
-            "path": "/resources/js/fixtures/landing-stock.html",
+            "path": "/resources/js/fixtures/landing.html",
             "query": {
                 "page": "Manage/Stock/Index",
                 "state": "variant-off"
@@ -658,7 +592,7 @@
                     "checks": {
                         "assertions": [
                             {
-                                "selector": ".landing-stock",
+                                "selector": ".landing",
                                 "count": 0
                             },
                             {
@@ -683,7 +617,7 @@
                     "checks": {
                         "assertions": [
                             {
-                                "selector": ".landing-stock",
+                                "selector": ".landing",
                                 "count": 0
                             },
                             {
@@ -700,7 +634,7 @@
         },
         {
             "id": "welcome-unchanged",
-            "path": "/resources/js/fixtures/landing-stock.html",
+            "path": "/resources/js/fixtures/landing.html",
             "query": {
                 "page": "Welcome"
             },
@@ -709,7 +643,7 @@
             "content": "main h1",
             "fonts": ["16px Nunito Variable"],
             "focus": [],
-            "noFocusReason": "Welcome is untouched; only its resolved tokens and the absence of landing-stock are checked.",
+            "noFocusReason": "Welcome is untouched; only its resolved tokens and the absence of landing are checked.",
             "states": [
                 {
                     "id": "light",
@@ -723,7 +657,7 @@
                     "checks": {
                         "assertions": [
                             {
-                                "selector": ".landing-stock",
+                                "selector": ".landing",
                                 "count": 0
                             },
                             {
@@ -754,7 +688,7 @@
                     "checks": {
                         "assertions": [
                             {
-                                "selector": ".landing-stock",
+                                "selector": ".landing",
                                 "count": 0
                             },
                             {
@@ -777,12 +711,12 @@
         },
         {
             "id": "stock-navigation",
-            "path": "/resources/js/fixtures/landing-stock.html",
+            "path": "/resources/js/fixtures/landing.html",
             "query": {
                 "page": "Manage/Stock/Index"
             },
             "root": ".reference-style",
-            "panels": "#main-content .pilot-manager-page",
+            "panels": "#main-content",
             "content": "#main-content h1:not(.sr-only)",
             "fonts": ["16px Nunito Variable"],
             "focus": [],
@@ -819,7 +753,16 @@
                                     "data-s3-shell-bg": "rgb(250, 241, 220)",
                                     "data-s3-sheet-primary": "rgb(40, 101, 133)",
                                     "data-s3-sheet-bg": "rgb(40, 101, 133)",
-                                    "data-nav-requests": "get /orders,get /manage/stock"
+                                    "data-nav-requests": "get /catalogue/producers,get /manage/stock,get /,get /",
+                                    "data-s4-shell-primary": "rgb(40, 101, 133)",
+                                    "data-s4-shell-bg": "rgb(250, 241, 220)",
+                                    "data-s4-sheet-primary": "rgb(40, 101, 133)",
+                                    "data-s4-sheet-bg": "rgb(40, 101, 133)",
+                                    "data-w-landing": "0",
+                                    "data-w-sheet": "0",
+                                    "data-w-menu": "0",
+                                    "data-w-paper": "#faf1dc",
+                                    "data-w-blue": "#286585"
                                 }
                             }
                         ]
@@ -856,7 +799,16 @@
                                     "data-s3-shell-bg": "rgb(28, 32, 31)",
                                     "data-s3-sheet-primary": "rgb(143, 197, 223)",
                                     "data-s3-sheet-bg": "rgb(35, 72, 92)",
-                                    "data-nav-requests": "get /orders,get /manage/stock"
+                                    "data-nav-requests": "get /catalogue/producers,get /manage/stock,get /,get /",
+                                    "data-s4-shell-primary": "rgb(143, 197, 223)",
+                                    "data-s4-shell-bg": "rgb(28, 32, 31)",
+                                    "data-s4-sheet-primary": "rgb(143, 197, 223)",
+                                    "data-s4-sheet-bg": "rgb(35, 72, 92)",
+                                    "data-w-landing": "0",
+                                    "data-w-sheet": "0",
+                                    "data-w-menu": "0",
+                                    "data-w-paper": "#1c201f",
+                                    "data-w-blue": "#8fc5df"
                                 }
                             }
                         ]
@@ -893,7 +845,16 @@
                                     "data-s3-shell-bg": "rgb(250, 241, 220)",
                                     "data-s3-menu-primary": "rgb(40, 101, 133)",
                                     "data-s3-menu-bg": "rgb(255, 250, 240)",
-                                    "data-nav-requests": "get /orders,get /manage/stock"
+                                    "data-nav-requests": "get /catalogue/producers,get /manage/stock,get /,get /",
+                                    "data-s4-shell-primary": "rgb(40, 101, 133)",
+                                    "data-s4-shell-bg": "rgb(250, 241, 220)",
+                                    "data-s4-menu-primary": "rgb(40, 101, 133)",
+                                    "data-s4-menu-bg": "rgb(255, 250, 240)",
+                                    "data-w-landing": "0",
+                                    "data-w-sheet": "0",
+                                    "data-w-menu": "0",
+                                    "data-w-paper": "#faf1dc",
+                                    "data-w-blue": "#286585"
                                 }
                             }
                         ]
@@ -930,7 +891,16 @@
                                     "data-s3-shell-bg": "rgb(28, 32, 31)",
                                     "data-s3-menu-primary": "rgb(143, 197, 223)",
                                     "data-s3-menu-bg": "rgb(36, 42, 41)",
-                                    "data-nav-requests": "get /orders,get /manage/stock"
+                                    "data-nav-requests": "get /catalogue/producers,get /manage/stock,get /,get /",
+                                    "data-s4-shell-primary": "rgb(143, 197, 223)",
+                                    "data-s4-shell-bg": "rgb(28, 32, 31)",
+                                    "data-s4-menu-primary": "rgb(143, 197, 223)",
+                                    "data-s4-menu-bg": "rgb(36, 42, 41)",
+                                    "data-w-landing": "0",
+                                    "data-w-sheet": "0",
+                                    "data-w-menu": "0",
+                                    "data-w-paper": "#1c201f",
+                                    "data-w-blue": "#8fc5df"
                                 }
                             }
                         ]
@@ -940,7 +910,7 @@
         },
         {
             "id": "stock-system",
-            "path": "/resources/js/fixtures/landing-stock.html",
+            "path": "/resources/js/fixtures/landing.html",
             "query": {
                 "page": "Manage/Stock/Index",
                 "drawer": "1"
@@ -969,11 +939,11 @@
                                 "count": 1
                             },
                             {
-                                "selector": ".reference-style.landing-stock",
+                                "selector": ".reference-style.landing",
                                 "count": 1
                             },
                             {
-                                "selector": "[data-sidebar=\"sidebar\"][data-mobile=\"true\"].landing-stock",
+                                "selector": "[data-sidebar=\"sidebar\"][data-mobile=\"true\"].landing",
                                 "count": 1
                             },
                             {
@@ -1005,11 +975,11 @@
                                 "count": 0
                             },
                             {
-                                "selector": ".reference-style.landing-stock",
+                                "selector": ".reference-style.landing",
                                 "count": 1
                             },
                             {
-                                "selector": "[data-sidebar=\"sidebar\"][data-mobile=\"true\"].landing-stock",
+                                "selector": "[data-sidebar=\"sidebar\"][data-mobile=\"true\"].landing",
                                 "count": 1
                             },
                             {
@@ -1028,7 +998,7 @@
         },
         {
             "id": "stock-fallback-font",
-            "path": "/resources/js/fixtures/landing-stock.html",
+            "path": "/resources/js/fixtures/landing.html",
             "query": {
                 "page": "Manage/Stock/Index",
                 "fallback": "1"
@@ -1078,7 +1048,7 @@
         },
         {
             "id": "stock-interactions",
-            "path": "/resources/js/fixtures/landing-stock.html",
+            "path": "/resources/js/fixtures/landing.html",
             "query": {
                 "page": "Manage/Stock/Index"
             },
@@ -1163,6 +1133,498 @@
                                     "data-requests": "0",
                                     "data-dialog-open": "false",
                                     "data-active": "Edita Producte 1"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "orders-index-navigation",
+            "path": "/resources/js/fixtures/landing.html",
+            "query": {
+                "page": "Orders/Index",
+                "role": "member"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only)",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Navigation probe: focus order is covered by stock-index and stock-dialog.",
+            "states": [
+                {
+                    "id": "nav-sheet-light",
+                    "query": {
+                        "state": "nav-sheet"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-s1-shell-primary": "rgb(40, 101, 133)",
+                                    "data-s1-shell-bg": "rgb(250, 241, 220)",
+                                    "data-s1-sheet-primary": "rgb(40, 101, 133)",
+                                    "data-s1-sheet-bg": "rgb(40, 101, 133)",
+                                    "data-s2-shell-primary": "rgb(36, 107, 87)",
+                                    "data-s2-shell-bg": "rgb(248, 247, 244)",
+                                    "data-s2-sheet-primary": "rgb(36, 107, 87)",
+                                    "data-s2-sheet-bg": "rgb(36, 107, 87)",
+                                    "data-s3-shell-primary": "rgb(40, 101, 133)",
+                                    "data-s3-shell-bg": "rgb(250, 241, 220)",
+                                    "data-s3-sheet-primary": "rgb(40, 101, 133)",
+                                    "data-s3-sheet-bg": "rgb(40, 101, 133)",
+                                    "data-nav-requests": "get /catalogue/producers,get /manage/stock,get /,get /",
+                                    "data-s4-shell-primary": "rgb(40, 101, 133)",
+                                    "data-s4-shell-bg": "rgb(250, 241, 220)",
+                                    "data-s4-sheet-primary": "rgb(40, 101, 133)",
+                                    "data-s4-sheet-bg": "rgb(40, 101, 133)",
+                                    "data-w-landing": "0",
+                                    "data-w-sheet": "0",
+                                    "data-w-menu": "0",
+                                    "data-w-paper": "#faf1dc",
+                                    "data-w-blue": "#286585"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "nav-sheet-dark",
+                    "query": {
+                        "state": "nav-sheet"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-s1-shell-primary": "rgb(143, 197, 223)",
+                                    "data-s1-shell-bg": "rgb(28, 32, 31)",
+                                    "data-s1-sheet-primary": "rgb(143, 197, 223)",
+                                    "data-s1-sheet-bg": "rgb(35, 72, 92)",
+                                    "data-s2-shell-primary": "rgb(167, 215, 193)",
+                                    "data-s2-shell-bg": "rgb(27, 30, 28)",
+                                    "data-s2-sheet-primary": "rgb(167, 215, 193)",
+                                    "data-s2-sheet-bg": "rgb(32, 37, 33)",
+                                    "data-s3-shell-primary": "rgb(143, 197, 223)",
+                                    "data-s3-shell-bg": "rgb(28, 32, 31)",
+                                    "data-s3-sheet-primary": "rgb(143, 197, 223)",
+                                    "data-s3-sheet-bg": "rgb(35, 72, 92)",
+                                    "data-nav-requests": "get /catalogue/producers,get /manage/stock,get /,get /",
+                                    "data-s4-shell-primary": "rgb(143, 197, 223)",
+                                    "data-s4-shell-bg": "rgb(28, 32, 31)",
+                                    "data-s4-sheet-primary": "rgb(143, 197, 223)",
+                                    "data-s4-sheet-bg": "rgb(35, 72, 92)",
+                                    "data-w-landing": "0",
+                                    "data-w-sheet": "0",
+                                    "data-w-menu": "0",
+                                    "data-w-paper": "#1c201f",
+                                    "data-w-blue": "#8fc5df"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "nav-menu-light",
+                    "query": {
+                        "state": "nav-menu"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-s1-shell-primary": "rgb(40, 101, 133)",
+                                    "data-s1-shell-bg": "rgb(250, 241, 220)",
+                                    "data-s1-menu-primary": "rgb(40, 101, 133)",
+                                    "data-s1-menu-bg": "rgb(255, 250, 240)",
+                                    "data-s2-shell-primary": "rgb(36, 107, 87)",
+                                    "data-s2-shell-bg": "rgb(248, 247, 244)",
+                                    "data-s2-menu-primary": "rgb(36, 107, 87)",
+                                    "data-s2-menu-bg": "rgb(255, 255, 255)",
+                                    "data-s3-shell-primary": "rgb(40, 101, 133)",
+                                    "data-s3-shell-bg": "rgb(250, 241, 220)",
+                                    "data-s3-menu-primary": "rgb(40, 101, 133)",
+                                    "data-s3-menu-bg": "rgb(255, 250, 240)",
+                                    "data-nav-requests": "get /catalogue/producers,get /manage/stock,get /,get /",
+                                    "data-s4-shell-primary": "rgb(40, 101, 133)",
+                                    "data-s4-shell-bg": "rgb(250, 241, 220)",
+                                    "data-s4-menu-primary": "rgb(40, 101, 133)",
+                                    "data-s4-menu-bg": "rgb(255, 250, 240)",
+                                    "data-w-landing": "0",
+                                    "data-w-sheet": "0",
+                                    "data-w-menu": "0",
+                                    "data-w-paper": "#faf1dc",
+                                    "data-w-blue": "#286585"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "nav-menu-dark",
+                    "query": {
+                        "state": "nav-menu"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-s1-shell-primary": "rgb(143, 197, 223)",
+                                    "data-s1-shell-bg": "rgb(28, 32, 31)",
+                                    "data-s1-menu-primary": "rgb(143, 197, 223)",
+                                    "data-s1-menu-bg": "rgb(36, 42, 41)",
+                                    "data-s2-shell-primary": "rgb(167, 215, 193)",
+                                    "data-s2-shell-bg": "rgb(27, 30, 28)",
+                                    "data-s2-menu-primary": "rgb(167, 215, 193)",
+                                    "data-s2-menu-bg": "rgb(37, 42, 39)",
+                                    "data-s3-shell-primary": "rgb(143, 197, 223)",
+                                    "data-s3-shell-bg": "rgb(28, 32, 31)",
+                                    "data-s3-menu-primary": "rgb(143, 197, 223)",
+                                    "data-s3-menu-bg": "rgb(36, 42, 41)",
+                                    "data-nav-requests": "get /catalogue/producers,get /manage/stock,get /,get /",
+                                    "data-s4-shell-primary": "rgb(143, 197, 223)",
+                                    "data-s4-shell-bg": "rgb(28, 32, 31)",
+                                    "data-s4-menu-primary": "rgb(143, 197, 223)",
+                                    "data-s4-menu-bg": "rgb(36, 42, 41)",
+                                    "data-w-landing": "0",
+                                    "data-w-sheet": "0",
+                                    "data-w-menu": "0",
+                                    "data-w-paper": "#1c201f",
+                                    "data-w-blue": "#8fc5df"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "orders-edit-navigation",
+            "path": "/resources/js/fixtures/landing.html",
+            "query": {
+                "page": "Orders/Edit",
+                "role": "member"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only)",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Navigation probe: focus order is covered by stock-index and stock-dialog.",
+            "states": [
+                {
+                    "id": "nav-sheet-light",
+                    "query": {
+                        "state": "nav-sheet"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-s1-shell-primary": "rgb(40, 101, 133)",
+                                    "data-s1-shell-bg": "rgb(250, 241, 220)",
+                                    "data-s1-sheet-primary": "rgb(40, 101, 133)",
+                                    "data-s1-sheet-bg": "rgb(40, 101, 133)",
+                                    "data-s2-shell-primary": "rgb(36, 107, 87)",
+                                    "data-s2-shell-bg": "rgb(248, 247, 244)",
+                                    "data-s2-sheet-primary": "rgb(36, 107, 87)",
+                                    "data-s2-sheet-bg": "rgb(36, 107, 87)",
+                                    "data-s3-shell-primary": "rgb(40, 101, 133)",
+                                    "data-s3-shell-bg": "rgb(250, 241, 220)",
+                                    "data-s3-sheet-primary": "rgb(40, 101, 133)",
+                                    "data-s3-sheet-bg": "rgb(40, 101, 133)",
+                                    "data-nav-requests": "get /catalogue/producers,get /manage/stock,get /,get /cycles/cycle-1/order",
+                                    "data-s4-shell-primary": "rgb(40, 101, 133)",
+                                    "data-s4-shell-bg": "rgb(250, 241, 220)",
+                                    "data-s4-sheet-primary": "rgb(40, 101, 133)",
+                                    "data-s4-sheet-bg": "rgb(40, 101, 133)",
+                                    "data-w-landing": "0",
+                                    "data-w-sheet": "0",
+                                    "data-w-menu": "0",
+                                    "data-w-paper": "#faf1dc",
+                                    "data-w-blue": "#286585"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "nav-sheet-dark",
+                    "query": {
+                        "state": "nav-sheet"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-s1-shell-primary": "rgb(143, 197, 223)",
+                                    "data-s1-shell-bg": "rgb(28, 32, 31)",
+                                    "data-s1-sheet-primary": "rgb(143, 197, 223)",
+                                    "data-s1-sheet-bg": "rgb(35, 72, 92)",
+                                    "data-s2-shell-primary": "rgb(167, 215, 193)",
+                                    "data-s2-shell-bg": "rgb(27, 30, 28)",
+                                    "data-s2-sheet-primary": "rgb(167, 215, 193)",
+                                    "data-s2-sheet-bg": "rgb(32, 37, 33)",
+                                    "data-s3-shell-primary": "rgb(143, 197, 223)",
+                                    "data-s3-shell-bg": "rgb(28, 32, 31)",
+                                    "data-s3-sheet-primary": "rgb(143, 197, 223)",
+                                    "data-s3-sheet-bg": "rgb(35, 72, 92)",
+                                    "data-nav-requests": "get /catalogue/producers,get /manage/stock,get /,get /cycles/cycle-1/order",
+                                    "data-s4-shell-primary": "rgb(143, 197, 223)",
+                                    "data-s4-shell-bg": "rgb(28, 32, 31)",
+                                    "data-s4-sheet-primary": "rgb(143, 197, 223)",
+                                    "data-s4-sheet-bg": "rgb(35, 72, 92)",
+                                    "data-w-landing": "0",
+                                    "data-w-sheet": "0",
+                                    "data-w-menu": "0",
+                                    "data-w-paper": "#1c201f",
+                                    "data-w-blue": "#8fc5df"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "nav-menu-light",
+                    "query": {
+                        "state": "nav-menu"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-s1-shell-primary": "rgb(40, 101, 133)",
+                                    "data-s1-shell-bg": "rgb(250, 241, 220)",
+                                    "data-s1-menu-primary": "rgb(40, 101, 133)",
+                                    "data-s1-menu-bg": "rgb(255, 250, 240)",
+                                    "data-s2-shell-primary": "rgb(36, 107, 87)",
+                                    "data-s2-shell-bg": "rgb(248, 247, 244)",
+                                    "data-s2-menu-primary": "rgb(36, 107, 87)",
+                                    "data-s2-menu-bg": "rgb(255, 255, 255)",
+                                    "data-s3-shell-primary": "rgb(40, 101, 133)",
+                                    "data-s3-shell-bg": "rgb(250, 241, 220)",
+                                    "data-s3-menu-primary": "rgb(40, 101, 133)",
+                                    "data-s3-menu-bg": "rgb(255, 250, 240)",
+                                    "data-nav-requests": "get /catalogue/producers,get /manage/stock,get /,get /cycles/cycle-1/order",
+                                    "data-s4-shell-primary": "rgb(40, 101, 133)",
+                                    "data-s4-shell-bg": "rgb(250, 241, 220)",
+                                    "data-s4-menu-primary": "rgb(40, 101, 133)",
+                                    "data-s4-menu-bg": "rgb(255, 250, 240)",
+                                    "data-w-landing": "0",
+                                    "data-w-sheet": "0",
+                                    "data-w-menu": "0",
+                                    "data-w-paper": "#faf1dc",
+                                    "data-w-blue": "#286585"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "nav-menu-dark",
+                    "query": {
+                        "state": "nav-menu"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-s1-shell-primary": "rgb(143, 197, 223)",
+                                    "data-s1-shell-bg": "rgb(28, 32, 31)",
+                                    "data-s1-menu-primary": "rgb(143, 197, 223)",
+                                    "data-s1-menu-bg": "rgb(36, 42, 41)",
+                                    "data-s2-shell-primary": "rgb(167, 215, 193)",
+                                    "data-s2-shell-bg": "rgb(27, 30, 28)",
+                                    "data-s2-menu-primary": "rgb(167, 215, 193)",
+                                    "data-s2-menu-bg": "rgb(37, 42, 39)",
+                                    "data-s3-shell-primary": "rgb(143, 197, 223)",
+                                    "data-s3-shell-bg": "rgb(28, 32, 31)",
+                                    "data-s3-menu-primary": "rgb(143, 197, 223)",
+                                    "data-s3-menu-bg": "rgb(36, 42, 41)",
+                                    "data-nav-requests": "get /catalogue/producers,get /manage/stock,get /,get /cycles/cycle-1/order",
+                                    "data-s4-shell-primary": "rgb(143, 197, 223)",
+                                    "data-s4-shell-bg": "rgb(28, 32, 31)",
+                                    "data-s4-menu-primary": "rgb(143, 197, 223)",
+                                    "data-s4-menu-bg": "rgb(36, 42, 41)",
+                                    "data-w-landing": "0",
+                                    "data-w-sheet": "0",
+                                    "data-w-menu": "0",
+                                    "data-w-paper": "#1c201f",
+                                    "data-w-blue": "#8fc5df"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "nav-sheet-system-dark",
+                    "query": {
+                        "state": "nav-sheet"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "system-dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-s1-shell-primary": "rgb(143, 197, 223)",
+                                    "data-s1-shell-bg": "rgb(28, 32, 31)",
+                                    "data-s1-sheet-primary": "rgb(143, 197, 223)",
+                                    "data-s1-sheet-bg": "rgb(35, 72, 92)",
+                                    "data-s2-shell-primary": "rgb(167, 215, 193)",
+                                    "data-s2-shell-bg": "rgb(27, 30, 28)",
+                                    "data-s2-sheet-primary": "rgb(167, 215, 193)",
+                                    "data-s2-sheet-bg": "rgb(32, 37, 33)",
+                                    "data-s3-shell-primary": "rgb(143, 197, 223)",
+                                    "data-s3-shell-bg": "rgb(28, 32, 31)",
+                                    "data-s3-sheet-primary": "rgb(143, 197, 223)",
+                                    "data-s3-sheet-bg": "rgb(35, 72, 92)",
+                                    "data-nav-requests": "get /catalogue/producers,get /manage/stock,get /,get /cycles/cycle-1/order",
+                                    "data-s4-shell-primary": "rgb(143, 197, 223)",
+                                    "data-s4-shell-bg": "rgb(28, 32, 31)",
+                                    "data-s4-sheet-primary": "rgb(143, 197, 223)",
+                                    "data-s4-sheet-bg": "rgb(35, 72, 92)",
+                                    "data-w-landing": "0",
+                                    "data-w-sheet": "0",
+                                    "data-w-menu": "0",
+                                    "data-w-paper": "#1c201f",
+                                    "data-w-blue": "#8fc5df"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "nav-menu-system-dark",
+                    "query": {
+                        "state": "nav-menu"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "system-dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-s1-shell-primary": "rgb(143, 197, 223)",
+                                    "data-s1-shell-bg": "rgb(28, 32, 31)",
+                                    "data-s1-menu-primary": "rgb(143, 197, 223)",
+                                    "data-s1-menu-bg": "rgb(36, 42, 41)",
+                                    "data-s2-shell-primary": "rgb(167, 215, 193)",
+                                    "data-s2-shell-bg": "rgb(27, 30, 28)",
+                                    "data-s2-menu-primary": "rgb(167, 215, 193)",
+                                    "data-s2-menu-bg": "rgb(37, 42, 39)",
+                                    "data-s3-shell-primary": "rgb(143, 197, 223)",
+                                    "data-s3-shell-bg": "rgb(28, 32, 31)",
+                                    "data-s3-menu-primary": "rgb(143, 197, 223)",
+                                    "data-s3-menu-bg": "rgb(36, 42, 41)",
+                                    "data-nav-requests": "get /catalogue/producers,get /manage/stock,get /,get /cycles/cycle-1/order",
+                                    "data-s4-shell-primary": "rgb(143, 197, 223)",
+                                    "data-s4-shell-bg": "rgb(28, 32, 31)",
+                                    "data-s4-menu-primary": "rgb(143, 197, 223)",
+                                    "data-s4-menu-bg": "rgb(36, 42, 41)",
+                                    "data-w-landing": "0",
+                                    "data-w-sheet": "0",
+                                    "data-w-menu": "0",
+                                    "data-w-paper": "#1c201f",
+                                    "data-w-blue": "#8fc5df"
                                 }
                             }
                         ]

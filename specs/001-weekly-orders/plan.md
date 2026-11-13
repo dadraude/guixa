@@ -1236,8 +1236,9 @@ exigeix «Inventari i base compartida»: pàgines servides, components compartit
 
 **Punt de partida (actualitzat 2026-11-13).** Quan es va redactar aquest inventari, el tema de la landing
 (blau/crema) només era a `Welcome`. T84 està integrada (PR #408, aprovació visual a PR #409): la variant
-`landing-stock` s'admet per coincidència exacta a `Manage/Stock/Index` (`lib/pilotTheme.ts`). La resta de
-l'inventari està pendent. `isPilotThemePage` continua sent l'opt-in del tema verd anterior i **no** marca res
+la variant `landing` (abans `landing-stock`) s'admet per coincidència exacta a `Manage/Stock/Index`
+(`lib/pilotTheme.ts`), i també a `Orders/Index` i `Orders/Edit` (T85, implementada a PR #413, pendent de
+l'aprovació visual de l'usuari). La resta de l'inventari està pendent. `isPilotThemePage` continua sent l'opt-in del tema verd anterior i **no** marca res
 com a migrat a la landing.
 
 **Pàgines (52 rutes, 56 fitxers a `resources/js/pages/`; la resta són components fills, vegeu «Fora del mapa»).**
@@ -1247,7 +1248,7 @@ fase de la seva família perquè el tancament de la fase 5 exigeix cap portal am
 | Fase | Pàgines | Tema verd |
 | --- | --- | --- |
 | 1 (T84) | `Manage/Stock/Index` + `StockEditDialog`, shell i overlays | sí |
-| 2 | `Orders/Index`, `Orders/Edit` | sí |
+| 2 | `Orders/Index`, `Orders/Edit` (T85: implementada a PR #413; pendent d'aprovació visual) | sí |
 | 3 Catàleg | `Catalogue/Producers/{Index,Products}`, `WeeklyProduct/{Create,Edit}`, `Catalogue/Stock/Movements` | sí |
 | 3 Catàleg | `Catalogue/Producers/Availability` | **no** |
 | 3 Productor | `Producer/{Cutoff,CycleSummary}`, `Producer/Products/{Index,Create,Edit}`, `Producer/Stock/Movements` | sí |

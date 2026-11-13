@@ -9,7 +9,7 @@ import { initializeTheme } from '@/composables/useAppearance';
 import { installTranslations } from '@/lib/i18n';
 
 /*
- * Deterministic review fixture for T84 (landing-stock). Only the HTTP client is mocked: the real
+ * Deterministic review fixture for T84 (landing). Only the HTTP client is mocked: the real
  * Inertia router, layouts, pages and portals run. It proves presentation, never persistence or
  * authorization.
  */
@@ -71,6 +71,46 @@ const pageProps: Record<string, Record<string, unknown>> = {
             },
         ],
     },
+    'Orders/Edit': {
+        order: {
+            cycleId: 'cycle-1',
+            pickupDate: '2026-11-05',
+            cancelled: false,
+            producers: [
+                {
+                    producerId: 'producer-1',
+                    producerName: 'Hort de la Vall',
+                    open: true,
+                    products: [
+                        {
+                            id: 'product-1',
+                            name: 'Tomàquets',
+                            unit: 'kg',
+                            price: '3.20',
+                            variable: true,
+                            containersPerUnit: '1',
+                            active: true,
+                        },
+                    ],
+                },
+            ],
+            lines: [
+                {
+                    productId: 'product-1',
+                    producerId: 'producer-1',
+                    producerName: 'Hort de la Vall',
+                    name: 'Tomàquets',
+                    unit: 'kg',
+                    price: '3.20',
+                    variable: true,
+                    quantity: '2',
+                    notDelivered: false,
+                },
+            ],
+            basketId: null,
+        },
+        preview: { totalCents: 0, amountCents: {} },
+    },
     'Catalogue/Producers/Index': { producers: [producer] },
     Welcome: {},
 };
@@ -81,14 +121,15 @@ const areas = [
 ];
 const urls: Record<string, string> = {
     'Manage/Stock/Index': '/manage/stock',
-    'Orders/Index': '/orders',
+    'Orders/Index': '/',
+    'Orders/Edit': '/cycles/cycle-1/order',
     'Catalogue/Producers/Index': '/catalogue/producers',
     Welcome: '/',
 };
 const page = {
     component: pageName,
     url: urls[pageName] ?? '/manage/stock',
-    version: 'landing-stock',
+    version: 'landing',
     props: {
         name: 'Guixa',
         locale: 'ca',
@@ -139,7 +180,9 @@ if (state === 'dialog-processing') {
 // Request spy: interaction and navigation states count every request the real router sends.
 const requestLog: string[] = [];
 const pagesByPath: Record<string, string> = {
-    '/orders': 'Orders/Index',
+    '/': 'Orders/Index',
+    '/cycles/cycle-1/order': 'Orders/Edit',
+    '/catalogue/producers': 'Catalogue/Producers/Index',
     '/manage/stock': 'Manage/Stock/Index',
 };
 if (
@@ -150,16 +193,28 @@ if (
 ) {
     http.setClient({
         request: async (config: { url: string; method?: string }) => {
-            const path = new URL(config.url, window.location.origin).pathname;
+            const url = new URL(config.url, window.location.origin);
+            const path = url.pathname;
             requestLog.push(`${config.method ?? 'get'} ${path}`);
-            const component = pagesByPath[path] ?? 'Manage/Stock/Index';
+            // '/' is the member's order list, or Welcome for a guest (OrderController::index).
+            const guest =
+                path === '/' && url.searchParams.get('as') === 'guest';
+            const component = guest
+                ? 'Welcome'
+                : (pagesByPath[path] ?? 'Manage/Stock/Index');
             return {
                 status: 200,
                 data: JSON.stringify({
                     ...page,
                     component,
                     url: path,
-                    props: { ...page.props, ...pageProps[component] },
+                    props: {
+                        ...page.props,
+                        ...(guest
+                            ? { auth: { user: null, roles: [] }, roleAreas: [] }
+                            : {}),
+                        ...pageProps[component],
+                    },
                 }),
                 headers: { 'x-inertia': 'true' },
             };
@@ -255,6 +310,22 @@ const visit = async (path: string, title: string) => {
     router.visit(path);
     await waitFor(() => heading() === title);
     await sleep(150);
+};
+// A guest at '/' gets Welcome: no shell, so no sheet, menu or landing class may remain.
+const visitWelcome = async () => {
+    router.visit('/?as=guest');
+    await waitFor(() => document.querySelector('.welcome-page'));
+    await sleep(150);
+    const welcome = getComputedStyle(document.querySelector('.welcome-page')!);
+    const count = (selector: string) =>
+        String(document.querySelectorAll(selector).length);
+    const set = (name: string, value: string) =>
+        document.body.setAttribute(`data-w-${name}`, value);
+    set('landing', count('.landing'));
+    set('sheet', count(measured.sheet));
+    set('menu', count(measured.menu));
+    set('paper', welcome.getPropertyValue('--welcome-paper').trim());
+    set('blue', welcome.getPropertyValue('--welcome-blue').trim());
 };
 const openSheet = async () => {
     if (document.querySelector(measured.sheet)) return;
@@ -406,12 +477,20 @@ void createInertiaApp({
         const open = state === 'nav-sheet' ? openSheet : openMenu;
         await open();
         await snapshot('s1');
-        await visit('/orders', 'Comandes');
+        await visit('/catalogue/producers', 'Productors');
         await open();
         await snapshot('s2');
         await visit('/manage/stock', 'Estoc');
         await open();
         await snapshot('s3');
+        await visitWelcome();
+        const [back, title] =
+            pageName === 'Orders/Edit'
+                ? ['/cycles/cycle-1/order', 'La teva comanda']
+                : ['/', 'Comandes'];
+        await visit(back, title);
+        await open();
+        await snapshot('s4');
         document.body.dataset.navRequests = requestLog.join(',');
     }
     if (state === 'dialog-confirm-cancel') {

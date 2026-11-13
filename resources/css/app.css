@@ -2116,12 +2116,12 @@ html.dark:has(.reference-style) [data-sidebar='sidebar'][data-mobile='true'] {
 }
 
 /*
- * landing-stock: the landing identity (cream paper, blue, Nunito) for the stock pilot only.
+ * landing: the landing identity (cream paper, blue, Nunito) for the stock page and the member order pages (T84, T85).
  * The class is admitted by exact page match (lib/pilotTheme.ts) and carried by the shell and the
  * portalled overlays, so nothing here touches :root, Welcome or any other route. The --welcome-*
  * values mirror WelcomePage.vue; keep both in step.
  */
-.landing-stock {
+.landing {
     --welcome-paper: #faf1dc;
     --welcome-ink: #2c2c2b;
     --welcome-blue: #286585;
@@ -2159,7 +2159,7 @@ html.dark:has(.reference-style) [data-sidebar='sidebar'][data-mobile='true'] {
     --ring: var(--welcome-focus);
 }
 
-.dark .landing-stock {
+.dark .landing {
     --welcome-paper: #1c201f;
     --welcome-ink: #f2f0e9;
     --welcome-blue: #8fc5df;
@@ -2181,10 +2181,10 @@ html.dark:has(.reference-style) [data-sidebar='sidebar'][data-mobile='true'] {
 
 /*
  * The shell element also carries .reference-style, whose .dark rule (0,2,0) would win over a plain
- * .landing-stock, so the sidebar tokens are restated for both modes at equal specificity, later in the file.
+ * .landing, so the sidebar tokens are restated for both modes at equal specificity, later in the file.
  */
-.landing-stock,
-.dark .landing-stock {
+.landing,
+.dark .landing {
     --sidebar: var(--welcome-feature-surface);
     --sidebar-background: var(--welcome-feature-surface);
     --sidebar-foreground: var(--welcome-feature-cream);
@@ -2200,25 +2200,25 @@ html.dark:has(.reference-style) [data-sidebar='sidebar'][data-mobile='true'] {
     --material-selected-container: var(--sidebar-accent);
 }
 
-.landing-stock {
+.landing {
     /* Active menu item: darker than the sidebar so cream text keeps 4.5:1 (7.4:1 here). */
     --sidebar-accent: var(--welcome-blue-hover);
 }
 
-.dark .landing-stock {
+.dark .landing {
     /* Cream at 14% over the dark feature surface, as a literal so contrast can be measured. */
     --sidebar-accent: #41606e;
 }
 
 /* theme-colors.css loads after this file and sets the pilot status tokens on .pilot-theme: out-rank it. */
-.pilot-theme.landing-stock {
+.pilot-theme.landing {
     --pilot-success: var(--welcome-blue-hover);
     --pilot-success-foreground: #ffffff;
     --pilot-warning: var(--welcome-ochre);
     --pilot-warning-foreground: #ffffff;
 }
 
-.dark .pilot-theme.landing-stock {
+.dark .pilot-theme.landing {
     --pilot-success: var(--welcome-blue-hover);
     --pilot-warning: var(--welcome-ochre);
     --pilot-success-foreground: #10222c;
@@ -2226,14 +2226,14 @@ html.dark:has(.reference-style) [data-sidebar='sidebar'][data-mobile='true'] {
     --pilot-input-fill: var(--welcome-blue-soft);
 }
 
-.landing-stock .manager-dialog {
+.landing .manager-dialog {
     border-color: var(--welcome-border);
     box-shadow: 0 20px 60px rgb(44 44 43 / 25%);
 }
 
-/* The mobile sidebar is the portalled SheetContent itself (it carries .landing-stock and data-mobile). */
+/* The mobile sidebar is the portalled SheetContent itself (it carries .landing and data-mobile). */
 html:has(.reference-style)
-    [data-sidebar='sidebar'][data-mobile='true'].landing-stock {
+    [data-sidebar='sidebar'][data-mobile='true'].landing {
     --sidebar-background: var(--welcome-feature-surface);
     --sidebar-foreground: var(--welcome-feature-cream);
     --sidebar-accent: var(--welcome-blue-hover);
@@ -2242,6 +2242,6 @@ html:has(.reference-style)
 }
 
 html.dark:has(.reference-style)
-    [data-sidebar='sidebar'][data-mobile='true'].landing-stock {
+    [data-sidebar='sidebar'][data-mobile='true'].landing {
     --sidebar-accent: #41606e;
 }

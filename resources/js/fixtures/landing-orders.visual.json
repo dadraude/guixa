@@ -1,0 +1,2013 @@
+{
+    "baseUrl": "http://127.0.0.1:5269",
+    "rootFontPx": 16,
+    "darkSelector": "html.dark",
+    "matrix": {
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark", "system-light", "system-dark"],
+        "text": [100, 200]
+    },
+    "views": [
+        {
+            "id": "orders-edit",
+            "path": "/resources/js/fixtures/landing-orders.html",
+            "query": {
+                "page": "Orders/Edit"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]),#main-content p",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "#main-content a[href=\"/\"]",
+                "[data-test=\"quantity-product-1\"]"
+            ],
+            "states": [
+                {
+                    "id": "default",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "query": {
+                        "state": "default"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content a[href=\"/\"]",
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": ".pilot-amount",
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "[data-test=\"order-total\"] span",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing):not([data-slot=\"sheet-overlay\"])",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".pilot-layout-panel-header > span",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content p.text-muted-foreground",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test^=\"quantity-\"]",
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "#main-content button",
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test^=\"quantity-\"]",
+                                "contrast": 4.5
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "domain-error",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "query": {
+                        "state": "domain-error"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content a[href=\"/\"]",
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": ".pilot-amount",
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "[data-test=\"order-total\"] span",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing):not([data-slot=\"sheet-overlay\"])",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[role=\"alert\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[role=\"alert\"]",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test^=\"quantity-\"]",
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "#main-content button",
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"save-product-1\"]",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"save-product-1\"]",
+                                "attributes": {
+                                    "disabled": null
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "long",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "query": {
+                        "state": "long"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content a[href=\"/\"]",
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": ".pilot-amount",
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "[data-test=\"order-total\"] span",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing):not([data-slot=\"sheet-overlay\"])",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".pilot-layout-panel-header > span",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test^=\"quantity-\"]",
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "#main-content button",
+                                "minWidth": 44,
+                                "minHeight": 44
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "saving",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "query": {
+                        "state": "saving"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content a[href=\"/\"]",
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": ".pilot-amount",
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "[data-test=\"order-total\"] span",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing):not([data-slot=\"sheet-overlay\"])",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"save-product-1\"]",
+                                "attributes": {
+                                    "disabled": ""
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "preview",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "query": {
+                        "state": "preview"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content a[href=\"/\"]",
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": ".pilot-amount",
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "[data-test=\"order-total\"] span",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing):not([data-slot=\"sheet-overlay\"])",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"order-total\"] .pilot-amount",
+                                "text": "6,40 €"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "tokens-light",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "query": {
+                        "state": "default"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"save-product-1\"]",
+                                "styles": {
+                                    "background-color": "rgb(40, 101, 133)"
+                                }
+                            },
+                            {
+                                "selector": "[data-test=\"order-total\"]",
+                                "styles": {
+                                    "background-color": "rgb(40, 101, 133)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content section.pilot-layout-panel",
+                                "styles": {
+                                    "background-color": "rgb(255, 250, 240)"
+                                }
+                            },
+                            {
+                                "selector": "[data-test=\"quantity-product-1\"]",
+                                "styles": {
+                                    "background-color": "rgb(255, 250, 240)",
+                                    "border-color": "rgb(120, 117, 108)"
+                                }
+                            },
+                            {
+                                "selector": ".pilot-layout-panel-header > span",
+                                "styles": {
+                                    "background-color": "rgb(40, 101, 133)"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "tokens-dark",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "query": {
+                        "state": "default"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"save-product-1\"]",
+                                "styles": {
+                                    "background-color": "rgb(143, 197, 223)"
+                                }
+                            },
+                            {
+                                "selector": "[data-test=\"order-total\"]",
+                                "styles": {
+                                    "background-color": "rgb(143, 197, 223)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content section.pilot-layout-panel",
+                                "styles": {
+                                    "background-color": "rgb(36, 42, 41)"
+                                }
+                            },
+                            {
+                                "selector": "[data-test=\"quantity-product-1\"]",
+                                "styles": {
+                                    "background-color": "rgb(39, 54, 61)",
+                                    "border-color": "rgb(139, 150, 152)"
+                                }
+                            },
+                            {
+                                "selector": ".pilot-layout-panel-header > span",
+                                "styles": {
+                                    "background-color": "rgb(143, 197, 223)"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "system-light",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "query": {
+                        "state": "default"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "system-light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "html.dark",
+                                "count": 0
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "system-dark",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "query": {
+                        "state": "default"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "system-dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "html.dark",
+                                "count": 1
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "reduced-motion",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "query": {
+                        "state": "default"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            }
+                        ]
+                    },
+                    "reducedMotion": true
+                }
+            ]
+        },
+        {
+            "id": "orders-edit-readonly",
+            "path": "/resources/js/fixtures/landing-orders.html",
+            "query": {
+                "page": "Orders/Edit"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]),#main-content p",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["#main-content a[href=\"/\"]"],
+            "states": [
+                {
+                    "id": "badge-light",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "query": {
+                        "state": "marked"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".pilot-layout-panel-header > span:not(.bg-primary)",
+                                "styles": {
+                                    "border-color": "rgb(120, 117, 108)"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "badge-dark",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "query": {
+                        "state": "marked"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".pilot-layout-panel-header > span:not(.bg-primary)",
+                                "styles": {
+                                    "border-color": "rgb(139, 150, 152)"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "empty",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "query": {
+                        "state": "empty"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content a[href=\"/\"]",
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": ".pilot-amount",
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "[data-test=\"order-total\"] span",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing):not([data-slot=\"sheet-overlay\"])",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".pilot-layout-notice",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test^=\"quantity-\"]",
+                                "count": 0
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "cancelled",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "query": {
+                        "state": "cancelled"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content a[href=\"/\"]",
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": ".pilot-amount",
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "[data-test=\"order-total\"] span",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing):not([data-slot=\"sheet-overlay\"])",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"order-cancelled\"]",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test^=\"quantity-\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content button",
+                                "count": 0
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "marked",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "query": {
+                        "state": "marked"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content a[href=\"/\"]",
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": ".pilot-amount",
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "[data-test=\"order-total\"] span",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing):not([data-slot=\"sheet-overlay\"])",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".pilot-layout-panel-header > span",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content p.text-muted-foreground",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"remove-product-1\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"remove-product-1\"]",
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"remove-product-1\"]",
+                                "attributes": {
+                                    "aria-label": "Elimina — Tomàquets"
+                                }
+                            },
+                            {
+                                "selector": "[data-test=\"quantity-product-1\"]",
+                                "attributes": {
+                                    "disabled": ""
+                                }
+                            },
+                            {
+                                "selector": "[data-test=\"not-delivered-product-1\"]",
+                                "contrast": 4.5
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "basket",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "query": {
+                        "state": "basket"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content a[href=\"/\"]",
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": ".pilot-amount",
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "[data-test=\"order-total\"] span",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing):not([data-slot=\"sheet-overlay\"])",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"basket-link\"]",
+                                "attributes": {
+                                    "href": "/baskets/basket-1"
+                                }
+                            },
+                            {
+                                "selector": "[data-test=\"basket-link\"]",
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"basket-link\"]",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"pickup\"] h2",
+                                "contrast": 4.5
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "many",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "query": {
+                        "state": "many"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content a[href=\"/\"]",
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": ".pilot-amount",
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "[data-test=\"order-total\"] span",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing):not([data-slot=\"sheet-overlay\"])",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".pilot-layout-panel-header > span",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test^=\"quantity-\"]",
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "#main-content button",
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "#main-content ul.pilot-list > li",
+                                "count": 12
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "orders-index",
+            "path": "/resources/js/fixtures/landing-orders.html",
+            "query": {
+                "page": "Orders/Index"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]),#main-content p",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["#main-content a[href^=\"/cycles/\"]"],
+            "states": [
+                {
+                    "id": "default",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "query": {
+                        "state": "index-multiple"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h2",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content a[href^=\"/cycles/\"]",
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "#main-content p",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing):not([data-slot=\"sheet-overlay\"])",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content a[href^=\"/cycles/\"]",
+                                "count": 3
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "long",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "query": {
+                        "state": "long"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h2",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content a[href^=\"/cycles/\"]",
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "#main-content p",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing):not([data-slot=\"sheet-overlay\"])",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "closed-and-cancelled",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "query": {
+                        "state": "index-closed-cancelled"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h2",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content a[href^=\"/cycles/\"]",
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "#main-content p",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing):not([data-slot=\"sheet-overlay\"])",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content a[href^=\"/cycles/\"]",
+                                "count": 2
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "orders-index-empty",
+            "path": "/resources/js/fixtures/landing-orders.html",
+            "query": {
+                "page": "Orders/Index"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]),#main-content p",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "No cycle, so the page has no focusable control besides the shell.",
+            "states": [
+                {
+                    "id": "empty",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "query": {
+                        "state": "empty"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content h1",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"no-cycles\"]",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"no-cycles\"]",
+                                "text": "Encara no hi ha cap cicle de comanda."
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "orders-edit-fallback-font",
+            "path": "/resources/js/fixtures/landing-orders.html",
+            "query": {
+                "page": "Orders/Edit",
+                "fallback": "1"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]),#main-content p",
+            "fonts": ["16px sans-serif"],
+            "systemFonts": true,
+            "focus": [
+                "#main-content a[href=\"/\"]",
+                "[data-test=\"quantity-product-1\"]"
+            ],
+            "states": [
+                {
+                    "id": "default",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "query": {
+                        "state": "default"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "html[data-font-fallback=\"true\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style",
+                                "styles": {
+                                    "font-family": "ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "#main-content a[href=\"/\"]",
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test^=\"quantity-\"]",
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "#main-content button",
+                                "minWidth": 44,
+                                "minHeight": 44
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "long",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "query": {
+                        "state": "long"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "html[data-font-fallback=\"true\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style",
+                                "styles": {
+                                    "font-family": "ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "#main-content a[href=\"/\"]",
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test^=\"quantity-\"]",
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "#main-content button",
+                                "minWidth": 44,
+                                "minHeight": 44
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "orders-index-fallback-font",
+            "path": "/resources/js/fixtures/landing-orders.html",
+            "query": {
+                "page": "Orders/Index",
+                "fallback": "1"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]),#main-content p",
+            "fonts": ["16px sans-serif"],
+            "systemFonts": true,
+            "focus": ["#main-content a[href^=\"/cycles/\"]"],
+            "states": [
+                {
+                    "id": "default",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "query": {
+                        "state": "index-multiple"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "html[data-font-fallback=\"true\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style",
+                                "styles": {
+                                    "font-family": "ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "#main-content a[href^=\"/cycles/\"]",
+                                "minWidth": 44,
+                                "minHeight": 44
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "orders-edit-overlays",
+            "path": "/resources/js/fixtures/landing-orders.html",
+            "query": {
+                "page": "Orders/Edit"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]),#main-content p",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Overlay probe: the shell's focus order is unchanged and covered by the T84 views.",
+            "states": [
+                {
+                    "id": "sheet",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "query": {
+                        "overlay": "sheet"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing):not([data-slot=\"sheet-overlay\"])",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-sidebar=\"sidebar\"][data-mobile=\"true\"].landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-sidebar=\"sidebar\"][data-mobile=\"true\"]:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-sidebar=\"sidebar\"][data-mobile=\"true\"].pilot-theme",
+                                "count": 1
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "sheet-system-dark",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "query": {
+                        "overlay": "sheet"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "system-dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing):not([data-slot=\"sheet-overlay\"])",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-sidebar=\"sidebar\"][data-mobile=\"true\"].landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-sidebar=\"sidebar\"][data-mobile=\"true\"]:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-sidebar=\"sidebar\"][data-mobile=\"true\"].pilot-theme",
+                                "count": 1
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "menu",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "query": {
+                        "overlay": "menu"
+                    },
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing):not([data-slot=\"sheet-overlay\"])",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-slot=\"dropdown-menu-content\"].landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-slot=\"dropdown-menu-content\"]:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-slot=\"dropdown-menu-content\"].pilot-theme",
+                                "count": 1
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "orders-index-overlays",
+            "path": "/resources/js/fixtures/landing-orders.html",
+            "query": {
+                "page": "Orders/Index"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]),#main-content p",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Overlay probe: the shell's focus order is unchanged and covered by the T84 views.",
+            "states": [
+                {
+                    "id": "sheet",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "query": {
+                        "overlay": "sheet"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing):not([data-slot=\"sheet-overlay\"])",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-sidebar=\"sidebar\"][data-mobile=\"true\"].landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-sidebar=\"sidebar\"][data-mobile=\"true\"]:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-sidebar=\"sidebar\"][data-mobile=\"true\"].pilot-theme",
+                                "count": 1
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "sheet-system-dark",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "query": {
+                        "overlay": "sheet"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "system-dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing):not([data-slot=\"sheet-overlay\"])",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-sidebar=\"sidebar\"][data-mobile=\"true\"].landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-sidebar=\"sidebar\"][data-mobile=\"true\"]:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-sidebar=\"sidebar\"][data-mobile=\"true\"].pilot-theme",
+                                "count": 1
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "menu",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "query": {
+                        "overlay": "menu"
+                    },
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing):not([data-slot=\"sheet-overlay\"])",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-slot=\"dropdown-menu-content\"].landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-slot=\"dropdown-menu-content\"]:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-slot=\"dropdown-menu-content\"].pilot-theme",
+                                "count": 1
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    ]
+}
