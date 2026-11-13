@@ -1228,6 +1228,63 @@ L’aprovació literal consta a [l’entrada d’acceptació](history/2026-11-11
 El [desglossament del pilot](tasks/landing-style-pilot.md) ha estat acceptat per separat; ni aquest pla
 ni la preparació de tasques autoritzen implementar o publicar tiquets.
 
+### Inventari de desplegament — esborrany (2026-11-13)
+
+**Estat: esborrany pendent d'acceptació; no autoritza implementació.** Fotografia sobre `origin/main`
+(`0074d383`) d'allò que cada fase de la seqüència següent ha de cobrir. Fa servir el mateix inventari que
+exigeix «Inventari i base compartida»: pàgines servides, components compartits i superfícies fora d'Inertia.
+
+**Punt de partida.** El tema de la landing (blau/crema) només és a `Welcome`. `lib/pilotTheme.ts` és
+l'opt-in del tema verd anterior i **no** marca res com a migrat a la landing; la variant `landing-stock` de
+T84 encara no existeix al codi. Per tant, tot el que figura més avall està pendent.
+
+**Pàgines (52 rutes, 56 fitxers a `resources/js/pages/`; la resta són components fills, vegeu «Fora del mapa»).**
+«Tema verd» indica si la pàgina és a la llista de `pilotTheme.ts`; el que no hi és s'ha de revisar a la
+fase de la seva família perquè el tancament de la fase 5 exigeix cap portal amb tema antic.
+
+| Fase | Pàgines | Tema verd |
+| --- | --- | --- |
+| 1 (T84) | `Manage/Stock/Index` + `StockEditDialog`, shell i overlays | sí |
+| 2 | `Orders/Index`, `Orders/Edit` | sí |
+| 3 Catàleg | `Catalogue/Producers/{Index,Products}`, `WeeklyProduct/{Create,Edit}`, `Catalogue/Stock/Movements` | sí |
+| 3 Catàleg | `Catalogue/Producers/Availability` | **no** |
+| 3 Productor | `Producer/{Cutoff,CycleSummary}`, `Producer/Products/{Index,Create,Edit}`, `Producer/Stock/Movements` | sí |
+| 4 Finances i recepció | `Finance/Baskets/{Index,Create,Show}`, `Finance/Stock/{Index,Movements}`, `Receptions/{Index,Show}` | sí |
+| 4 Administració | `Manage/{Accounts/Index,Households/{Index,Show},Producers/Index,Cycles/{Index,Show},Settings}` | sí |
+| 4 Administració | `Manage/Roles/Index` (conserva les decisions de 003) | **no** |
+| 4 Estoc i envasos | `Manage/Stock/{Create,Edit,Movements}`, `Manage/ReturnItems/{Index,Create,Edit}` | sí |
+| 4 Vistes de membre pendents | `Wallet/Statement`, `Stock/Index` | sí |
+| 4 Vistes de membre pendents | `Member/Baskets/{Index,Show}` | **no** |
+| 5 Accés | `auth/{Login,AcceptInvitation,ConfirmPassword,ForgotPassword,ResetPassword,TwoFactorChallenge,VerifyEmail}` | sí |
+| 5 Preferències | `settings/{Profile,Appearance,Security}` | sí |
+| 5 Dashboard | `Dashboard` (reconciliar amb 004) | sí |
+| 5 Tancament | `Welcome` (ja és la referència; verificar transicions) | — |
+
+Les quatre pàgines «no» ja porten classes `pilot-*` però no són a la llista: s'han de recollir a la fase
+que toca, no es poden deduir del tema actual.
+
+**Fora del mapa de famílies.** Superfícies que la taula del pla no nomena i que no es veuen en recórrer
+només `pages/`:
+
+| Superfície | Per què importa | Fase proposada |
+| --- | --- | --- |
+| `Manage/Households/SettlementDetails.vue` | Component fill de `Households/{Index,Show}`; sense classes `pilot-*` | 4 Administració |
+| `Manage/Cycles/{CycleCreateDialog,CycleManageDialog}.vue` | Diàlegs de `Cycles/Index`; comprovar overlays | 4 Administració |
+| `components/ui/select/SelectContent.vue` | El pla ja diu que no consumeix el context de tema | 1 (base compartida) |
+| `resources/views/errors/minimal.blade.php` | Pàgina d'error de Laravel (403/404/500 sense Inertia): gris, tipografia del sistema, sense mode fosc ni marca; decidit 2026-11-13: només paleta i tipografia de la landing, sense il·lustració | 5 Tancament |
+| `resources/views/mail/{invitation,producer-order}.blade.php` | Correus amb el tema per defecte de `x-mail::message`; sense tema propi | Fora d'abast: es manté l'estil per defecte de Laravel (decidit 2026-11-13) |
+| `layouts/app/AppHeaderLayout`, `layouts/auth/{AuthCardLayout,AuthSplitLayout}` | Cap importació; no es renderitzen | Eliminar (decidit 2026-11-13), un cop confirmat que continuen sense consumidors |
+| `layouts/settings/Layout.vue` | Ja previst a la fase 5, però cal comprovar-ne la navegació | 5 Preferències |
+
+**Decisions pendents.** Cap. Correus, pàgina d'error i layouts sense ús: resolts, vegeu les entrades Q&A del
+2026-11-13. Valors de color: verificat contra `WelcomePage.vue` a `origin/main` (`0074d383`); els valors del
+pla (clar i fosc) coincideixen amb les variables `--welcome-*`. PR #398 només va reanomenar `hero` a `feature`
+i va afegir colors propis del bloc de contacte (`#173e53`, `#15232a`, `#fff9eb`), que no són tokens
+globals. Són la font vigent per definir els tokens de T84.
+
+**Comprovacions que falten.** No s'ha obert cap pàgina al navegador; la llista prové del codi. Tampoc
+s'ha revisat si les noves funcionalitats del dashboard (004) han afegit components fora de `Dashboard.vue`.
+
 ### Seqüència d'implementació futura
 
 Aquestes són fases proposades, sense IDs de tasca ni estimació de dies. Cada família posterior es divideix en
