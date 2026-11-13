@@ -1,6 +1,6 @@
 # 005 — Landing identity rollout: Catalogue role complete · Tasks
 
-**Status: Draft awaiting acceptance.** Accepting it authorizes no implementation or ticket publication. Source: [accepted spec](spec.md) R1–R13/S1–S12
+**Status: Accepted (2026-11-13, PR #418).** Accepting it authorized no implementation or ticket publication; the ticket batch is drafted in [ticket-drafts.md](ticket-drafts.md). Source: [accepted spec](spec.md) R1–R13/S1–S12
 (slice 1 only); [plan](plan.md) (accepted, PR #417); [constitution](../constitution.md).
 IDs are local to 005 and start at T01; 001 items are cited as "001 T84". This document authorizes no implementation, no
 ticket publication and no Linear writes. Everything marked *unverified* was not run; this draft is from code reading
