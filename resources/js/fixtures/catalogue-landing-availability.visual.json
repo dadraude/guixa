@@ -1,0 +1,1962 @@
+{
+    "baseUrl": "http://127.0.0.1:5274",
+    "rootFontPx": 16,
+    "darkSelector": "html.dark",
+    "matrix": {
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark", "system-light", "system-dark"],
+        "text": [100, 200]
+    },
+    "views": [
+        {
+            "id": "availability-index",
+            "path": "/resources/js/fixtures/catalogue-landing.html",
+            "query": {
+                "page": "Catalogue/Producers/Availability",
+                "role": "catalogue",
+                "state": "default"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content button,#main-content li,#main-content .material-status,#main-content [data-test=\"availability\"]",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["#main-content [data-test^=\"toggle-\"]"],
+            "states": [
+                {
+                    "id": "default",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content header p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content section > h2",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-layout-panel",
+                                "count": 2
+                            },
+                            {
+                                "selector": "#main-content .pilot-list-row",
+                                "count": 5,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-list-row > span.font-medium",
+                                "count": 5,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"availability\"]",
+                                "count": 5,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content button[data-test^=\"toggle-\"]",
+                                "count": 3,
+                                "contrast": 4.5,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "section[data-test=\"cycle-cycle-1\"] [data-test=\"product-p-1\"] [data-test=\"availability\"]",
+                                "count": 1,
+                                "text": "Disponible"
+                            },
+                            {
+                                "selector": "section[data-test=\"cycle-cycle-1\"] [data-test=\"product-p-2\"] [data-test=\"availability\"]",
+                                "count": 1,
+                                "text": "No disponible"
+                            },
+                            {
+                                "selector": "section[data-test=\"cycle-cycle-1\"] [data-test=\"toggle-p-1\"]",
+                                "count": 1,
+                                "text": "Marca com a no disponible"
+                            },
+                            {
+                                "selector": "section[data-test=\"cycle-cycle-1\"] [data-test=\"toggle-p-2\"]",
+                                "count": 1,
+                                "text": "Marca com a disponible"
+                            },
+                            {
+                                "selector": "section[data-test=\"cycle-cycle-2\"] [data-test=\"product-p-2\"] [data-test=\"availability\"]",
+                                "count": 1,
+                                "text": "No disponible"
+                            },
+                            {
+                                "selector": "section[data-test=\"cycle-cycle-2\"] form",
+                                "count": 0
+                            },
+                            {
+                                "selector": "section[data-test=\"cycle-cycle-2\"] button",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"producer-deactivated\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".pilot-layout-notice",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-page",
+                                "count": 1,
+                                "styles": {
+                                    "display": "flex"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-layout-panel",
+                                "count": 2,
+                                "styles": {
+                                    "border-top-width": "0px"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-page-border-ok": "true",
+                                    "data-ev-page-focus-ok": "true",
+                                    "data-ev-page-border-count": "3",
+                                    "data-ev-page-focus-count": "3",
+                                    "data-ev-page-focus-targets": "3"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "availability-manager",
+            "path": "/resources/js/fixtures/catalogue-landing.html",
+            "query": {
+                "page": "Catalogue/Producers/Availability",
+                "role": "manager",
+                "state": "default"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content button,#main-content li,#main-content .material-status,#main-content [data-test=\"availability\"]",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["#main-content [data-test^=\"toggle-\"]"],
+            "states": [
+                {
+                    "id": "default",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content header p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content section > h2",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-layout-panel",
+                                "count": 2
+                            },
+                            {
+                                "selector": "#main-content .pilot-list-row",
+                                "count": 5,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-list-row > span.font-medium",
+                                "count": 5,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"availability\"]",
+                                "count": 5,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content button[data-test^=\"toggle-\"]",
+                                "count": 3,
+                                "contrast": 4.5,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "section[data-test=\"cycle-cycle-1\"] [data-test=\"product-p-1\"] [data-test=\"availability\"]",
+                                "count": 1,
+                                "text": "Disponible"
+                            },
+                            {
+                                "selector": "section[data-test=\"cycle-cycle-1\"] [data-test=\"product-p-2\"] [data-test=\"availability\"]",
+                                "count": 1,
+                                "text": "No disponible"
+                            },
+                            {
+                                "selector": "section[data-test=\"cycle-cycle-1\"] [data-test=\"toggle-p-1\"]",
+                                "count": 1,
+                                "text": "Marca com a no disponible"
+                            },
+                            {
+                                "selector": "section[data-test=\"cycle-cycle-1\"] [data-test=\"toggle-p-2\"]",
+                                "count": 1,
+                                "text": "Marca com a disponible"
+                            },
+                            {
+                                "selector": "section[data-test=\"cycle-cycle-2\"] [data-test=\"product-p-2\"] [data-test=\"availability\"]",
+                                "count": 1,
+                                "text": "No disponible"
+                            },
+                            {
+                                "selector": "section[data-test=\"cycle-cycle-2\"] form",
+                                "count": 0
+                            },
+                            {
+                                "selector": "section[data-test=\"cycle-cycle-2\"] button",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"producer-deactivated\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".pilot-layout-notice",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-page",
+                                "count": 1,
+                                "styles": {
+                                    "display": "flex"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-layout-panel",
+                                "count": 2,
+                                "styles": {
+                                    "border-top-width": "0px"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-page-border-ok": "true",
+                                    "data-ev-page-focus-ok": "true",
+                                    "data-ev-page-border-count": "3",
+                                    "data-ev-page-focus-count": "3",
+                                    "data-ev-page-focus-targets": "3"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "availability-deactivated",
+            "path": "/resources/js/fixtures/catalogue-landing.html",
+            "query": {
+                "page": "Catalogue/Producers/Availability",
+                "role": "catalogue",
+                "state": "deactivated"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content button,#main-content li,#main-content .material-status,#main-content [data-test=\"availability\"]",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["#main-content [data-test^=\"toggle-\"]"],
+            "states": [
+                {
+                    "id": "deactivated",
+                    "query": {
+                        "state": "deactivated"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content header p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content section > h2",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-layout-panel",
+                                "count": 2
+                            },
+                            {
+                                "selector": "#main-content .pilot-list-row",
+                                "count": 5,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-list-row > span.font-medium",
+                                "count": 5,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"availability\"]",
+                                "count": 5,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content button[data-test^=\"toggle-\"]",
+                                "count": 3,
+                                "contrast": 4.5,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "section[data-test=\"cycle-cycle-1\"] [data-test=\"product-p-1\"] [data-test=\"availability\"]",
+                                "count": 1,
+                                "text": "Disponible"
+                            },
+                            {
+                                "selector": "section[data-test=\"cycle-cycle-1\"] [data-test=\"product-p-2\"] [data-test=\"availability\"]",
+                                "count": 1,
+                                "text": "No disponible"
+                            },
+                            {
+                                "selector": "section[data-test=\"cycle-cycle-1\"] [data-test=\"toggle-p-1\"]",
+                                "count": 1,
+                                "text": "Marca com a no disponible"
+                            },
+                            {
+                                "selector": "section[data-test=\"cycle-cycle-1\"] [data-test=\"toggle-p-2\"]",
+                                "count": 1,
+                                "text": "Marca com a disponible"
+                            },
+                            {
+                                "selector": "section[data-test=\"cycle-cycle-2\"] [data-test=\"product-p-2\"] [data-test=\"availability\"]",
+                                "count": 1,
+                                "text": "No disponible"
+                            },
+                            {
+                                "selector": "section[data-test=\"cycle-cycle-2\"] form",
+                                "count": 0
+                            },
+                            {
+                                "selector": "section[data-test=\"cycle-cycle-2\"] button",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"producer-deactivated\"]",
+                                "count": 1,
+                                "text": "Desactivat",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"producer-deactivated\"] .material-status-dot",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-layout-notice",
+                                "count": 1,
+                                "text": "No es pot fer comanda a un productor desactivat.",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-page-border-ok": "true",
+                                    "data-ev-page-focus-ok": "true",
+                                    "data-ev-page-dot-ok": "true",
+                                    "data-ev-page-dot-count": "1",
+                                    "data-ev-page-focus-targets": "3"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "availability-read-only",
+            "path": "/resources/js/fixtures/catalogue-landing.html",
+            "query": {
+                "page": "Catalogue/Producers/Availability",
+                "role": "catalogue",
+                "state": "read-only"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content button,#main-content li,#main-content .material-status,#main-content [data-test=\"availability\"]",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Every cycle is sent (canChange false): the page offers no control, only the state as text.",
+            "states": [
+                {
+                    "id": "read-only",
+                    "query": {
+                        "state": "read-only"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content header p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content section > h2",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-layout-panel",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content .pilot-list-row",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-list-row > span.font-medium",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"availability\"]",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content button[data-test^=\"toggle-\"]",
+                                "count": 0,
+                                "contrast": 4.5,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"availability\"]",
+                                "count": 2
+                            },
+                            {
+                                "selector": "section[data-test=\"cycle-cycle-2\"] [data-test=\"product-p-1\"] [data-test=\"availability\"]",
+                                "count": 1,
+                                "text": "Disponible"
+                            },
+                            {
+                                "selector": "section[data-test=\"cycle-cycle-2\"] [data-test=\"product-p-2\"] [data-test=\"availability\"]",
+                                "count": 1,
+                                "text": "No disponible"
+                            },
+                            {
+                                "selector": "#main-content form",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content button",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-page-focus-targets": "0"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "availability-empty",
+            "path": "/resources/js/fixtures/catalogue-landing.html",
+            "query": {
+                "page": "Catalogue/Producers/Availability",
+                "role": "catalogue",
+                "state": "empty"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content button,#main-content li,#main-content .material-status,#main-content [data-test=\"availability\"]",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "No cycle is open: the empty state has no interactive control in the content area.",
+            "states": [
+                {
+                    "id": "empty",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content header p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"no-cycles\"]",
+                                "count": 1,
+                                "text": "Cap cicle obert per a aquest productor.",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-layout-panel",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content button",
+                                "count": 0
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "availability-no-products",
+            "path": "/resources/js/fixtures/catalogue-landing.html",
+            "query": {
+                "page": "Catalogue/Producers/Availability",
+                "role": "catalogue",
+                "state": "no-products"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content button,#main-content li,#main-content .material-status,#main-content [data-test=\"availability\"]",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "The open cycle has no products, the sent cycle shows state only: no interactive control.",
+            "states": [
+                {
+                    "id": "no-products",
+                    "query": {
+                        "state": "no-products"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content header p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content section > p.pilot-layout-notice",
+                                "count": 1,
+                                "text": "Aquest productor no té productes setmanals actius.",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content section[data-test=\"cycle-cycle-2\"] .pilot-layout-panel",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content button[data-test^=\"toggle-\"]",
+                                "count": 0
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "availability-long-name",
+            "path": "/resources/js/fixtures/catalogue-landing.html",
+            "query": {
+                "page": "Catalogue/Producers/Availability",
+                "role": "catalogue",
+                "state": "long-name"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content button,#main-content li,#main-content .material-status,#main-content [data-test=\"availability\"]",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["#main-content [data-test^=\"toggle-\"]"],
+            "states": [
+                {
+                    "id": "long-name",
+                    "query": {
+                        "state": "long-name"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content header p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content section > h2",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-layout-panel",
+                                "count": 2
+                            },
+                            {
+                                "selector": "#main-content .pilot-list-row",
+                                "count": 4,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-list-row > span.font-medium",
+                                "count": 4,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"availability\"]",
+                                "count": 4,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content button[data-test^=\"toggle-\"]",
+                                "count": 2,
+                                "contrast": 4.5,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"producer-deactivated\"]",
+                                "count": 1,
+                                "text": "Desactivat",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "section[data-test=\"cycle-cycle-1\"] [data-test=\"product-p-1\"] [data-test=\"availability\"]",
+                                "count": 1,
+                                "text": "Disponible"
+                            },
+                            {
+                                "selector": "section[data-test=\"cycle-cycle-1\"] [data-test=\"product-p-2\"] [data-test=\"availability\"]",
+                                "count": 1,
+                                "text": "No disponible"
+                            },
+                            {
+                                "selector": "section[data-test=\"cycle-cycle-2\"] button",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-page-border-ok": "true",
+                                    "data-ev-page-focus-ok": "true",
+                                    "data-ev-page-dot-ok": "true",
+                                    "data-ev-page-dot-count": "1",
+                                    "data-ev-page-border-count": "2",
+                                    "data-ev-page-focus-count": "2",
+                                    "data-ev-page-focus-targets": "2"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "availability-fallback-font",
+            "path": "/resources/js/fixtures/catalogue-landing.html",
+            "query": {
+                "page": "Catalogue/Producers/Availability",
+                "role": "catalogue",
+                "state": "long-name",
+                "fallback": "1"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content button,#main-content li,#main-content .material-status,#main-content [data-test=\"availability\"]",
+            "fonts": ["16px sans-serif"],
+            "focus": ["#main-content [data-test^=\"toggle-\"]"],
+            "systemFonts": true,
+            "states": [
+                {
+                    "id": "long-name",
+                    "query": {
+                        "state": "long-name"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content header p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content section > h2",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-layout-panel",
+                                "count": 2
+                            },
+                            {
+                                "selector": "#main-content .pilot-list-row",
+                                "count": 4,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-list-row > span.font-medium",
+                                "count": 4,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"availability\"]",
+                                "count": 4,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content button[data-test^=\"toggle-\"]",
+                                "count": 2,
+                                "contrast": 4.5,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"producer-deactivated\"]",
+                                "count": 1,
+                                "text": "Desactivat",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "section[data-test=\"cycle-cycle-1\"] [data-test=\"product-p-1\"] [data-test=\"availability\"]",
+                                "count": 1,
+                                "text": "Disponible"
+                            },
+                            {
+                                "selector": "section[data-test=\"cycle-cycle-1\"] [data-test=\"product-p-2\"] [data-test=\"availability\"]",
+                                "count": 1,
+                                "text": "No disponible"
+                            },
+                            {
+                                "selector": "section[data-test=\"cycle-cycle-2\"] button",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-page-border-ok": "true",
+                                    "data-ev-page-focus-ok": "true",
+                                    "data-ev-page-dot-ok": "true",
+                                    "data-ev-page-dot-count": "1",
+                                    "data-ev-page-border-count": "2",
+                                    "data-ev-page-focus-count": "2",
+                                    "data-ev-page-focus-targets": "2"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "availability-toggle",
+            "path": "/resources/js/fixtures/catalogue-landing.html",
+            "query": {
+                "page": "Catalogue/Producers/Availability",
+                "role": "catalogue",
+                "state": "toggle"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content button,#main-content li,#main-content .material-status,#main-content [data-test=\"availability\"]",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Round-trip probe through the real router; the focus order of the page is covered by availability-index.",
+            "states": [
+                {
+                    "id": "light-375",
+                    "query": {
+                        "state": "toggle"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content header p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content button[data-test^=\"toggle-\"]",
+                                "count": 3,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-toggle-before": "Disponible",
+                                    "data-ev-toggle-after": "No disponible",
+                                    "data-ev-toggle-label": "Marca com a disponible",
+                                    "data-ev-toggle-back": "Disponible",
+                                    "data-ev-toggle-match": "true",
+                                    "data-ev-toggle-focus": "toggle-p-1",
+                                    "data-requests": "2",
+                                    "data-ev-toggle-requests": "post /catalogue/producers/producer-1/cycles/cycle-1/products/p-1/availability?_method=PUT available=0 ; post /catalogue/producers/producer-1/cycles/cycle-1/products/p-1/availability?_method=PUT available=1"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark-1280",
+                    "query": {
+                        "state": "toggle"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content header p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content button[data-test^=\"toggle-\"]",
+                                "count": 3,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-toggle-before": "Disponible",
+                                    "data-ev-toggle-after": "No disponible",
+                                    "data-ev-toggle-label": "Marca com a disponible",
+                                    "data-ev-toggle-back": "Disponible",
+                                    "data-ev-toggle-match": "true",
+                                    "data-ev-toggle-focus": "toggle-p-1",
+                                    "data-requests": "2",
+                                    "data-ev-toggle-requests": "post /catalogue/producers/producer-1/cycles/cycle-1/products/p-1/availability?_method=PUT available=0 ; post /catalogue/producers/producer-1/cycles/cycle-1/products/p-1/availability?_method=PUT available=1"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "availability-appearance",
+            "path": "/resources/js/fixtures/catalogue-landing.html",
+            "query": {
+                "page": "Catalogue/Producers/Availability",
+                "role": "catalogue",
+                "state": "default"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content button,#main-content li,#main-content .material-status,#main-content [data-test=\"availability\"]",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["#main-content [data-test^=\"toggle-\"]"],
+            "states": [
+                {
+                    "id": "system-light",
+                    "query": {},
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "system-light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content header p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content section > h2",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-layout-panel",
+                                "count": 2
+                            },
+                            {
+                                "selector": "#main-content .pilot-list-row",
+                                "count": 5,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-list-row > span.font-medium",
+                                "count": 5,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"availability\"]",
+                                "count": 5,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content button[data-test^=\"toggle-\"]",
+                                "count": 3,
+                                "contrast": 4.5,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(40, 101, 133)",
+                                    "data-now-shell-bg": "rgb(250, 241, 220)",
+                                    "data-ev-page-border-ok": "true",
+                                    "data-ev-page-focus-ok": "true"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "system-dark",
+                    "query": {},
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "system-dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content header p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content section > h2",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-layout-panel",
+                                "count": 2
+                            },
+                            {
+                                "selector": "#main-content .pilot-list-row",
+                                "count": 5,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-list-row > span.font-medium",
+                                "count": 5,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"availability\"]",
+                                "count": 5,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content button[data-test^=\"toggle-\"]",
+                                "count": 3,
+                                "contrast": 4.5,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(143, 197, 223)",
+                                    "data-now-shell-bg": "rgb(28, 32, 31)",
+                                    "data-ev-page-border-ok": "true",
+                                    "data-ev-page-focus-ok": "true"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "reduced-motion",
+                    "query": {},
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content header p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content section > h2",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-layout-panel",
+                                "count": 2
+                            },
+                            {
+                                "selector": "#main-content .pilot-list-row",
+                                "count": 5,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-list-row > span.font-medium",
+                                "count": 5,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"availability\"]",
+                                "count": 5,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content button[data-test^=\"toggle-\"]",
+                                "count": 3,
+                                "contrast": 4.5,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(40, 101, 133)",
+                                    "data-now-shell-bg": "rgb(250, 241, 220)",
+                                    "data-ev-page-border-ok": "true",
+                                    "data-ev-page-focus-ok": "true"
+                                }
+                            }
+                        ]
+                    },
+                    "reducedMotion": true
+                }
+            ]
+        },
+        {
+            "id": "availability-overlays",
+            "path": "/resources/js/fixtures/catalogue-landing.html",
+            "query": {
+                "page": "Catalogue/Producers/Availability",
+                "role": "catalogue",
+                "state": "default"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content button,#main-content li,#main-content .material-status,#main-content [data-test=\"availability\"]",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Overlay probes; focus order is the unchanged shell model.",
+            "states": [
+                {
+                    "id": "drawer-light",
+                    "query": {
+                        "drawer": "1"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-sidebar=\"sidebar\"][data-mobile=\"true\"].landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(40, 101, 133)",
+                                    "data-now-shell-bg": "rgb(250, 241, 220)"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "menu-light",
+                    "query": {
+                        "state": "account-menu"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-slot=\"dropdown-menu-content\"].landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(40, 101, 133)",
+                                    "data-now-shell-bg": "rgb(250, 241, 220)"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "drawer-dark",
+                    "query": {
+                        "drawer": "1"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-sidebar=\"sidebar\"][data-mobile=\"true\"].landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(143, 197, 223)",
+                                    "data-now-shell-bg": "rgb(28, 32, 31)"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "menu-dark",
+                    "query": {
+                        "state": "account-menu"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-slot=\"dropdown-menu-content\"].landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(143, 197, 223)",
+                                    "data-now-shell-bg": "rgb(28, 32, 31)"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "availability-migration-off",
+            "path": "/resources/js/fixtures/catalogue-landing.html",
+            "query": {
+                "page": "Catalogue/Producers/Availability",
+                "role": "catalogue",
+                "state": "migration-off"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content button,#main-content li,#main-content .material-status,#main-content [data-test=\"availability\"]",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Reversion fixture (page in neither list, as before the slice); only the exact pre-slice colours are checked.",
+            "states": [
+                {
+                    "id": "light",
+                    "query": {
+                        "state": "migration-off"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".pilot-theme",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(36, 107, 87)",
+                                    "data-now-shell-bg": "rgb(248, 247, 244)"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark",
+                    "query": {
+                        "state": "migration-off"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".pilot-theme",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(167, 215, 193)",
+                                    "data-now-shell-bg": "rgb(27, 30, 28)"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "availability-neighbours",
+            "path": "/resources/js/fixtures/catalogue-landing.html",
+            "query": {
+                "page": "Catalogue/Producers/Availability",
+                "role": "manager",
+                "state": "nav-neighbours"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content button,#main-content li,#main-content .material-status,#main-content [data-test=\"availability\"]",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Navigation probe; focus order is covered by availability-index.",
+            "states": [
+                {
+                    "id": "neighbours-light",
+                    "query": {
+                        "state": "nav-neighbours"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-s1-shell-primary": "rgb(40, 101, 133)",
+                                    "data-s1-shell-bg": "rgb(250, 241, 220)",
+                                    "data-s1-h1-ink": "rgb(44, 44, 43)",
+                                    "data-s1-h1-font": "\"Nunito Variable\"",
+                                    "data-s1-panel-bg": "rgb(243, 233, 208)",
+                                    "data-s1-panel-border": "rgb(44, 44, 43)",
+                                    "data-s2-shell-primary": "rgb(40, 101, 133)",
+                                    "data-s2-shell-bg": "rgb(250, 241, 220)",
+                                    "data-s2-h1-ink": "rgb(44, 44, 43)",
+                                    "data-s2-h1-font": "\"Nunito Variable\"",
+                                    "data-s2-panel-bg": "rgb(255, 250, 240)",
+                                    "data-s2-panel-border": "rgb(216, 215, 209)",
+                                    "data-s3-shell-primary": "rgb(40, 101, 133)",
+                                    "data-s3-shell-bg": "rgb(250, 241, 220)",
+                                    "data-s3-h1-ink": "rgb(44, 44, 43)",
+                                    "data-s3-h1-font": "\"Nunito Variable\"",
+                                    "data-s3-panel-bg": "rgb(255, 250, 240)",
+                                    "data-s3-panel-border": "rgb(216, 215, 209)",
+                                    "data-s4-shell-primary": "rgb(36, 107, 87)",
+                                    "data-s4-shell-bg": "rgb(248, 247, 244)",
+                                    "data-s4-h1-ink": "rgb(32, 43, 38)",
+                                    "data-s4-h1-font": "\"Nunito Variable\"",
+                                    "data-s5-shell-primary": "rgb(40, 101, 133)",
+                                    "data-s5-shell-bg": "rgb(250, 241, 220)",
+                                    "data-s5-h1-ink": "rgb(44, 44, 43)",
+                                    "data-s5-h1-font": "\"Nunito Variable\"",
+                                    "data-s5-panel-bg": "rgb(243, 233, 208)",
+                                    "data-s5-panel-border": "rgb(44, 44, 43)",
+                                    "data-nav-requests": "get /catalogue/producers,get /catalogue/producers/producer-1/products,get /manage/accounts,get /catalogue/producers/producer-1/availability"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "neighbours-dark",
+                    "query": {
+                        "state": "nav-neighbours"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-s1-shell-primary": "rgb(143, 197, 223)",
+                                    "data-s1-shell-bg": "rgb(28, 32, 31)",
+                                    "data-s1-h1-ink": "rgb(242, 240, 233)",
+                                    "data-s1-h1-font": "\"Nunito Variable\"",
+                                    "data-s1-panel-bg": "rgb(42, 49, 48)",
+                                    "data-s1-panel-border": "rgb(242, 240, 233)",
+                                    "data-s2-shell-primary": "rgb(143, 197, 223)",
+                                    "data-s2-shell-bg": "rgb(28, 32, 31)",
+                                    "data-s2-h1-ink": "rgb(242, 240, 233)",
+                                    "data-s2-h1-font": "\"Nunito Variable\"",
+                                    "data-s2-panel-bg": "rgb(36, 42, 41)",
+                                    "data-s2-panel-border": "rgb(79, 90, 93)",
+                                    "data-s3-shell-primary": "rgb(143, 197, 223)",
+                                    "data-s3-shell-bg": "rgb(28, 32, 31)",
+                                    "data-s3-h1-ink": "rgb(242, 240, 233)",
+                                    "data-s3-h1-font": "\"Nunito Variable\"",
+                                    "data-s3-panel-bg": "rgb(36, 42, 41)",
+                                    "data-s3-panel-border": "rgb(79, 90, 93)",
+                                    "data-s4-shell-primary": "rgb(167, 215, 193)",
+                                    "data-s4-shell-bg": "rgb(27, 30, 28)",
+                                    "data-s4-h1-ink": "rgb(236, 242, 237)",
+                                    "data-s4-h1-font": "\"Nunito Variable\"",
+                                    "data-s5-shell-primary": "rgb(143, 197, 223)",
+                                    "data-s5-shell-bg": "rgb(28, 32, 31)",
+                                    "data-s5-h1-ink": "rgb(242, 240, 233)",
+                                    "data-s5-h1-font": "\"Nunito Variable\"",
+                                    "data-s5-panel-bg": "rgb(42, 49, 48)",
+                                    "data-s5-panel-border": "rgb(242, 240, 233)",
+                                    "data-nav-requests": "get /catalogue/producers,get /catalogue/producers/producer-1/products,get /manage/accounts,get /catalogue/producers/producer-1/availability"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    ]
+}
