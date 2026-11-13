@@ -2245,3 +2245,12 @@ html.dark:has(.reference-style)
     [data-sidebar='sidebar'][data-mobile='true'].landing {
     --sidebar-accent: #41606e;
 }
+
+/*
+ * 005 T03: producer products list (Catalogue/Producers/Products). Only what a measurement showed missing:
+ * price and available quantity are plain text lines without .pilot-amount, so they get tabular figures here.
+ * The dialog of ProductAdministrationActions inherits the landing tokens through the shell DOM and needs no rule.
+ */
+.landing .pilot-manager-page .pilot-list > li.space-y-4 .min-w-0 > p {
+    font-variant-numeric: tabular-nums;
+}

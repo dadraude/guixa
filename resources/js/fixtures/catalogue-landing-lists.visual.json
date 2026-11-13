@@ -1,0 +1,2781 @@
+{
+    "baseUrl": "http://127.0.0.1:5273",
+    "rootFontPx": 16,
+    "darkSelector": "html.dark",
+    "matrix": {
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark", "system-light", "system-dark"],
+        "text": [100, 200]
+    },
+    "views": [
+        {
+            "id": "products-index",
+            "path": "/resources/js/fixtures/catalogue-landing.html",
+            "query": {
+                "page": "Catalogue/Producers/Products",
+                "role": "catalogue",
+                "state": "default"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content button,#main-content .pilot-status-switch,#main-content li",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "#main-content a[data-slot=\"button\"]",
+                "#main-content [data-test=\"change-product-classification\"]",
+                "#main-content .pilot-status-switch input",
+                "#main-content [data-test=\"stock-available\"] a"
+            ],
+            "states": [
+                {
+                    "id": "default",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content header p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-list",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content .pilot-list > li",
+                                "count": 4,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-list li .min-w-0 > h2",
+                                "count": 4,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-list li .min-w-0 > p",
+                                "count": 5,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-list li > div.space-y-4 > p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"stock-available\"]",
+                                "count": 1,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"stock-available\"] a",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "#main-content .pilot-status-switch",
+                                "count": 3,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "#main-content .pilot-status-switch span",
+                                "count": 3,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content a[data-slot=\"button\"]",
+                                "count": 8,
+                                "contrast": 4.5,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "#main-content a[aria-label^=\"Edita:\"]",
+                                "count": 4
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"change-product-classification\"]",
+                                "count": 3,
+                                "contrast": 4.5,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "dialog.manager-dialog",
+                                "count": 4
+                            },
+                            {
+                                "selector": "#main-content label:has([data-test=\"reactivate-product-3\"]) span",
+                                "count": 1,
+                                "text": "Desactivat",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-page-border-ok": "true",
+                                    "data-ev-page-focus-ok": "true",
+                                    "data-ev-page-focus-targets": "15",
+                                    "data-ev-page-switch-ok": "true"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "products-manager",
+            "path": "/resources/js/fixtures/catalogue-landing.html",
+            "query": {
+                "page": "Catalogue/Producers/Products",
+                "role": "manager",
+                "state": "default"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content button,#main-content .pilot-status-switch,#main-content li",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "#main-content a[data-slot=\"button\"]",
+                "#main-content [data-test=\"change-product-classification\"]",
+                "#main-content .pilot-status-switch input",
+                "#main-content [data-test=\"stock-available\"] a"
+            ],
+            "states": [
+                {
+                    "id": "default",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content header p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-list",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content .pilot-list > li",
+                                "count": 4,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-list li .min-w-0 > h2",
+                                "count": 4,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-list li .min-w-0 > p",
+                                "count": 5,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-list li > div.space-y-4 > p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"stock-available\"]",
+                                "count": 1,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"stock-available\"] a",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "#main-content .pilot-status-switch",
+                                "count": 3,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "#main-content .pilot-status-switch span",
+                                "count": 3,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content a[data-slot=\"button\"]",
+                                "count": 8,
+                                "contrast": 4.5,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "#main-content a[aria-label^=\"Edita:\"]",
+                                "count": 4
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"change-product-classification\"]",
+                                "count": 3,
+                                "contrast": 4.5,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "dialog.manager-dialog",
+                                "count": 4
+                            },
+                            {
+                                "selector": "#main-content label:has([data-test=\"reactivate-product-3\"]) span",
+                                "count": 1,
+                                "text": "Desactivat",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-page-border-ok": "true",
+                                    "data-ev-page-focus-ok": "true",
+                                    "data-ev-page-focus-targets": "15",
+                                    "data-ev-page-switch-ok": "true"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "products-empty",
+            "path": "/resources/js/fixtures/catalogue-landing.html",
+            "query": {
+                "page": "Catalogue/Producers/Products",
+                "role": "catalogue",
+                "state": "empty"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content button,#main-content .pilot-status-switch,#main-content li",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["#main-content a[data-slot=\"button\"]"],
+            "states": [
+                {
+                    "id": "empty",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content header p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-list",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content .pilot-layout-notice",
+                                "count": 1,
+                                "text": "Aquest productor encara no té productes.",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content a[data-slot=\"button\"]",
+                                "count": 4,
+                                "contrast": 4.5,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-page-border-count": "3",
+                                    "data-ev-page-border-ok": "true",
+                                    "data-ev-page-focus-count": "4",
+                                    "data-ev-page-focus-ok": "true",
+                                    "data-ev-page-focus-targets": "4",
+                                    "data-ev-page-switch-count": "0",
+                                    "data-ev-page-switch-ok": "false"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "products-long-name",
+            "path": "/resources/js/fixtures/catalogue-landing.html",
+            "query": {
+                "page": "Catalogue/Producers/Products",
+                "role": "catalogue",
+                "state": "long-name"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content button,#main-content .pilot-status-switch,#main-content li",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "#main-content a[data-slot=\"button\"]",
+                "#main-content [data-test=\"change-product-classification\"]",
+                "#main-content .pilot-status-switch input",
+                "#main-content [data-test=\"stock-available\"] a"
+            ],
+            "states": [
+                {
+                    "id": "long-name",
+                    "query": {
+                        "state": "long-name"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content header p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-list",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content .pilot-list > li",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-list li .min-w-0 > h2",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-list li .min-w-0 > p",
+                                "count": 3,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-list li > div.space-y-4 > p",
+                                "count": 0,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"stock-available\"]",
+                                "count": 1,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"stock-available\"] a",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "#main-content .pilot-status-switch",
+                                "count": 1,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "#main-content .pilot-status-switch span",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content a[data-slot=\"button\"]",
+                                "count": 6,
+                                "contrast": 4.5,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "#main-content a[aria-label^=\"Edita:\"]",
+                                "count": 2
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"change-product-classification\"]",
+                                "count": 2,
+                                "contrast": 4.5,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "dialog.manager-dialog",
+                                "count": 2
+                            },
+                            {
+                                "selector": "#main-content label:has([data-test=\"reactivate-product-2\"]) span",
+                                "count": 1,
+                                "text": "Desactivat",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-page-border-ok": "true",
+                                    "data-ev-page-focus-ok": "true",
+                                    "data-ev-page-focus-targets": "10",
+                                    "data-ev-page-switch-ok": "true"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-list li .min-w-0 > h2",
+                                "styles": {
+                                    "overflow-wrap": "anywhere"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "products-fallback-font",
+            "path": "/resources/js/fixtures/catalogue-landing.html",
+            "query": {
+                "page": "Catalogue/Producers/Products",
+                "role": "catalogue",
+                "state": "long-name",
+                "fallback": "1"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content button,#main-content .pilot-status-switch,#main-content li",
+            "fonts": ["16px sans-serif"],
+            "focus": [
+                "#main-content a[data-slot=\"button\"]",
+                "#main-content [data-test=\"change-product-classification\"]",
+                "#main-content .pilot-status-switch input",
+                "#main-content [data-test=\"stock-available\"] a"
+            ],
+            "systemFonts": true,
+            "states": [
+                {
+                    "id": "long-name",
+                    "query": {
+                        "state": "long-name"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content header p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-list",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content .pilot-list > li",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-list li .min-w-0 > h2",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-list li .min-w-0 > p",
+                                "count": 3,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-list li > div.space-y-4 > p",
+                                "count": 0,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"stock-available\"]",
+                                "count": 1,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"stock-available\"] a",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "#main-content .pilot-status-switch",
+                                "count": 1,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "#main-content .pilot-status-switch span",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content a[data-slot=\"button\"]",
+                                "count": 6,
+                                "contrast": 4.5,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "#main-content a[aria-label^=\"Edita:\"]",
+                                "count": 2
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"change-product-classification\"]",
+                                "count": 2,
+                                "contrast": 4.5,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "dialog.manager-dialog",
+                                "count": 2
+                            },
+                            {
+                                "selector": "#main-content label:has([data-test=\"reactivate-product-2\"]) span",
+                                "count": 1,
+                                "text": "Desactivat",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-page-border-ok": "true",
+                                    "data-ev-page-focus-ok": "true",
+                                    "data-ev-page-focus-targets": "10",
+                                    "data-ev-page-switch-ok": "true"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "products-read-only",
+            "path": "/resources/js/fixtures/catalogue-landing.html",
+            "query": {
+                "page": "Catalogue/Producers/Products",
+                "role": "catalogue",
+                "state": "read-only"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content button,#main-content .pilot-status-switch,#main-content li",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "#main-content a[data-slot=\"button\"]",
+                "#main-content [data-test=\"stock-available\"] a"
+            ],
+            "states": [
+                {
+                    "id": "read-only",
+                    "query": {
+                        "state": "read-only"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content header p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-list",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content .pilot-list > li",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-list li .min-w-0 > h2",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-list li .min-w-0 > p",
+                                "count": 3,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-list li > div.space-y-4 > p",
+                                "count": 0,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"stock-available\"]",
+                                "count": 1,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"stock-available\"] a",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "#main-content .pilot-status-switch",
+                                "count": 0,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "#main-content .pilot-status-switch span",
+                                "count": 0,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content a[data-slot=\"button\"]",
+                                "count": 3,
+                                "contrast": 4.5,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "#main-content a[aria-label^=\"Edita:\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"change-product-classification\"]",
+                                "count": 0,
+                                "contrast": 4.5,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "dialog.manager-dialog",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-page-border-ok": "true",
+                                    "data-ev-page-focus-ok": "true",
+                                    "data-ev-page-focus-targets": "4"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "products-dialog",
+            "path": "/resources/js/fixtures/catalogue-landing.html",
+            "query": {
+                "page": "Catalogue/Producers/Products",
+                "role": "catalogue",
+                "state": "checkpoint",
+                "dialog": "classify"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "dialog.manager-dialog h2,dialog.manager-dialog p,dialog.manager-dialog button",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "dialog.manager-dialog [data-test=\"cancel-product-action\"]",
+                "dialog.manager-dialog [data-test=\"confirm-product-action\"]",
+                "dialog.manager-dialog [aria-label=\"Tanca el diàleg\"]"
+            ],
+            "states": [
+                {
+                    "id": "light-375",
+                    "query": {},
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] h2",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] button",
+                                "count": 3,
+                                "contrast": 4.5,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] [data-test=\"confirm-product-action\"]",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-dialog-modal": "true",
+                                    "data-now-dialog-bg": "rgb(255, 250, 240)",
+                                    "data-now-dialog-ink": "rgb(44, 44, 43)",
+                                    "data-now-dialog-confirm-bg": "rgb(40, 101, 133)",
+                                    "data-ev-opener": "change-product-classification",
+                                    "data-ev-dialog-border-count": "1",
+                                    "data-ev-dialog-border-ok": "true",
+                                    "data-ev-dialog-focus-count": "3",
+                                    "data-ev-dialog-focus-targets": "3",
+                                    "data-ev-dialog-focus-ok": "true",
+                                    "data-requests": "0"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark-375",
+                    "query": {},
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] h2",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] button",
+                                "count": 3,
+                                "contrast": 4.5,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] [data-test=\"confirm-product-action\"]",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-dialog-modal": "true",
+                                    "data-now-dialog-bg": "rgb(36, 42, 41)",
+                                    "data-now-dialog-ink": "rgb(242, 240, 233)",
+                                    "data-now-dialog-confirm-bg": "rgb(143, 197, 223)",
+                                    "data-ev-opener": "change-product-classification",
+                                    "data-ev-dialog-border-count": "1",
+                                    "data-ev-dialog-border-ok": "true",
+                                    "data-ev-dialog-focus-count": "3",
+                                    "data-ev-dialog-focus-targets": "3",
+                                    "data-ev-dialog-focus-ok": "true",
+                                    "data-requests": "0"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "light-1280",
+                    "query": {},
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] h2",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] button",
+                                "count": 3,
+                                "contrast": 4.5,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] [data-test=\"confirm-product-action\"]",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-dialog-modal": "true",
+                                    "data-now-dialog-bg": "rgb(255, 250, 240)",
+                                    "data-now-dialog-ink": "rgb(44, 44, 43)",
+                                    "data-now-dialog-confirm-bg": "rgb(40, 101, 133)",
+                                    "data-ev-opener": "change-product-classification",
+                                    "data-ev-dialog-border-count": "1",
+                                    "data-ev-dialog-border-ok": "true",
+                                    "data-ev-dialog-focus-count": "3",
+                                    "data-ev-dialog-focus-targets": "3",
+                                    "data-ev-dialog-focus-ok": "true",
+                                    "data-requests": "0"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark-1280",
+                    "query": {},
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] h2",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] button",
+                                "count": 3,
+                                "contrast": 4.5,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] [data-test=\"confirm-product-action\"]",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-dialog-modal": "true",
+                                    "data-now-dialog-bg": "rgb(36, 42, 41)",
+                                    "data-now-dialog-ink": "rgb(242, 240, 233)",
+                                    "data-now-dialog-confirm-bg": "rgb(143, 197, 223)",
+                                    "data-ev-opener": "change-product-classification",
+                                    "data-ev-dialog-border-count": "1",
+                                    "data-ev-dialog-border-ok": "true",
+                                    "data-ev-dialog-focus-count": "3",
+                                    "data-ev-dialog-focus-targets": "3",
+                                    "data-ev-dialog-focus-ok": "true",
+                                    "data-requests": "0"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "light-375-200",
+                    "query": {},
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] h2",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] button",
+                                "count": 3,
+                                "contrast": 4.5,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] [data-test=\"confirm-product-action\"]",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-dialog-modal": "true",
+                                    "data-now-dialog-bg": "rgb(255, 250, 240)",
+                                    "data-now-dialog-ink": "rgb(44, 44, 43)",
+                                    "data-now-dialog-confirm-bg": "rgb(40, 101, 133)",
+                                    "data-ev-opener": "change-product-classification",
+                                    "data-ev-dialog-border-count": "1",
+                                    "data-ev-dialog-border-ok": "true",
+                                    "data-ev-dialog-focus-count": "3",
+                                    "data-ev-dialog-focus-targets": "3",
+                                    "data-ev-dialog-focus-ok": "true",
+                                    "data-requests": "0"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark-375-200",
+                    "query": {},
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] h2",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] button",
+                                "count": 3,
+                                "contrast": 4.5,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] [data-test=\"confirm-product-action\"]",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-dialog-modal": "true",
+                                    "data-now-dialog-bg": "rgb(36, 42, 41)",
+                                    "data-now-dialog-ink": "rgb(242, 240, 233)",
+                                    "data-now-dialog-confirm-bg": "rgb(143, 197, 223)",
+                                    "data-ev-opener": "change-product-classification",
+                                    "data-ev-dialog-border-count": "1",
+                                    "data-ev-dialog-border-ok": "true",
+                                    "data-ev-dialog-focus-count": "3",
+                                    "data-ev-dialog-focus-targets": "3",
+                                    "data-ev-dialog-focus-ok": "true",
+                                    "data-requests": "0"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "products-escape",
+            "path": "/resources/js/fixtures/catalogue-landing.html",
+            "query": {
+                "page": "Catalogue/Producers/Products",
+                "role": "catalogue",
+                "state": "checkpoint",
+                "dialog": "escape"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content button,#main-content .pilot-status-switch,#main-content li",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "#main-content [data-test=\"change-product-classification\"]"
+            ],
+            "noFocusReason": null,
+            "states": [
+                {
+                    "id": "light-375",
+                    "query": {},
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-opener": "change-product-classification",
+                                    "data-ev-escape-requests": "0",
+                                    "data-ev-escape-open": "false",
+                                    "data-ev-escape-focus": "change-product-classification",
+                                    "data-requests": "0"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark-1280",
+                    "query": {},
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-escape-requests": "0",
+                                    "data-ev-escape-open": "false",
+                                    "data-ev-escape-focus": "change-product-classification",
+                                    "data-requests": "0"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "products-confirm",
+            "path": "/resources/js/fixtures/catalogue-landing.html",
+            "query": {
+                "page": "Catalogue/Producers/Products",
+                "role": "catalogue",
+                "state": "checkpoint",
+                "dialog": "confirm"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content button,#main-content .pilot-status-switch,#main-content li",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Toast probe: the focus order of the list is covered by products-index.",
+            "states": [
+                {
+                    "id": "light-375",
+                    "query": {},
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-sonner-toast]",
+                                "count": 1,
+                                "text": "Classificació del producte actualitzada.",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-confirm-requests": "put /catalogue/products/product-3/classification",
+                                    "data-ev-confirm-open": "false",
+                                    "data-ev-confirm-focus": "change-product-classification",
+                                    "data-requests": "1"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark-1280",
+                    "query": {},
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-sonner-toast]",
+                                "count": 1,
+                                "text": "Classificació del producte actualitzada.",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-confirm-requests": "put /catalogue/products/product-3/classification",
+                                    "data-ev-confirm-open": "false",
+                                    "data-ev-confirm-focus": "change-product-classification",
+                                    "data-requests": "1"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "products-dialog-manager",
+            "path": "/resources/js/fixtures/catalogue-landing.html",
+            "query": {
+                "page": "Catalogue/Producers/Products",
+                "role": "manager",
+                "state": "checkpoint",
+                "dialog": "classify"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "dialog.manager-dialog h2,dialog.manager-dialog p,dialog.manager-dialog button",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "dialog.manager-dialog [data-test=\"cancel-product-action\"]",
+                "dialog.manager-dialog [data-test=\"confirm-product-action\"]",
+                "dialog.manager-dialog [aria-label=\"Tanca el diàleg\"]"
+            ],
+            "states": [
+                {
+                    "id": "light-375",
+                    "query": {},
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] h2",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] button",
+                                "count": 3,
+                                "contrast": 4.5,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] [data-test=\"confirm-product-action\"]",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-dialog-modal": "true",
+                                    "data-now-dialog-bg": "rgb(255, 250, 240)",
+                                    "data-now-dialog-ink": "rgb(44, 44, 43)",
+                                    "data-now-dialog-confirm-bg": "rgb(40, 101, 133)",
+                                    "data-ev-opener": "change-product-classification",
+                                    "data-ev-dialog-border-count": "1",
+                                    "data-ev-dialog-border-ok": "true",
+                                    "data-ev-dialog-focus-count": "3",
+                                    "data-ev-dialog-focus-targets": "3",
+                                    "data-ev-dialog-focus-ok": "true",
+                                    "data-requests": "0"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark-1280",
+                    "query": {},
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] h2",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] button",
+                                "count": 3,
+                                "contrast": 4.5,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] [data-test=\"confirm-product-action\"]",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-dialog-modal": "true",
+                                    "data-now-dialog-bg": "rgb(36, 42, 41)",
+                                    "data-now-dialog-ink": "rgb(242, 240, 233)",
+                                    "data-now-dialog-confirm-bg": "rgb(143, 197, 223)",
+                                    "data-ev-opener": "change-product-classification",
+                                    "data-ev-dialog-border-count": "1",
+                                    "data-ev-dialog-border-ok": "true",
+                                    "data-ev-dialog-focus-count": "3",
+                                    "data-ev-dialog-focus-targets": "3",
+                                    "data-ev-dialog-focus-ok": "true",
+                                    "data-requests": "0"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "products-dialog-appearance",
+            "path": "/resources/js/fixtures/catalogue-landing.html",
+            "query": {
+                "page": "Catalogue/Producers/Products",
+                "role": "catalogue",
+                "state": "checkpoint",
+                "dialog": "classify"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "dialog.manager-dialog h2,dialog.manager-dialog p,dialog.manager-dialog button",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "dialog.manager-dialog [data-test=\"cancel-product-action\"]",
+                "dialog.manager-dialog [data-test=\"confirm-product-action\"]",
+                "dialog.manager-dialog [aria-label=\"Tanca el diàleg\"]"
+            ],
+            "states": [
+                {
+                    "id": "system-light",
+                    "query": {},
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "system-light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] h2",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] button",
+                                "count": 3,
+                                "contrast": 4.5,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] [data-test=\"confirm-product-action\"]",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-dialog-modal": "true",
+                                    "data-now-dialog-bg": "rgb(255, 250, 240)",
+                                    "data-now-dialog-ink": "rgb(44, 44, 43)",
+                                    "data-now-dialog-confirm-bg": "rgb(40, 101, 133)",
+                                    "data-ev-opener": "change-product-classification",
+                                    "data-ev-dialog-border-count": "1",
+                                    "data-ev-dialog-border-ok": "true",
+                                    "data-ev-dialog-focus-count": "3",
+                                    "data-ev-dialog-focus-targets": "3",
+                                    "data-ev-dialog-focus-ok": "true",
+                                    "data-requests": "0"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "system-dark",
+                    "query": {},
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "system-dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] h2",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] button",
+                                "count": 3,
+                                "contrast": 4.5,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] [data-test=\"confirm-product-action\"]",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-dialog-modal": "true",
+                                    "data-now-dialog-bg": "rgb(36, 42, 41)",
+                                    "data-now-dialog-ink": "rgb(242, 240, 233)",
+                                    "data-now-dialog-confirm-bg": "rgb(143, 197, 223)",
+                                    "data-ev-opener": "change-product-classification",
+                                    "data-ev-dialog-border-count": "1",
+                                    "data-ev-dialog-border-ok": "true",
+                                    "data-ev-dialog-focus-count": "3",
+                                    "data-ev-dialog-focus-targets": "3",
+                                    "data-ev-dialog-focus-ok": "true",
+                                    "data-requests": "0"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "reduced-motion",
+                    "query": {},
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] h2",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] button",
+                                "count": 3,
+                                "contrast": 4.5,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] [data-test=\"confirm-product-action\"]",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-dialog-modal": "true",
+                                    "data-now-dialog-bg": "rgb(255, 250, 240)",
+                                    "data-now-dialog-ink": "rgb(44, 44, 43)",
+                                    "data-now-dialog-confirm-bg": "rgb(40, 101, 133)",
+                                    "data-ev-opener": "change-product-classification",
+                                    "data-ev-dialog-border-count": "1",
+                                    "data-ev-dialog-border-ok": "true",
+                                    "data-ev-dialog-focus-count": "3",
+                                    "data-ev-dialog-focus-targets": "3",
+                                    "data-ev-dialog-focus-ok": "true",
+                                    "data-requests": "0"
+                                }
+                            }
+                        ]
+                    },
+                    "reducedMotion": true
+                }
+            ]
+        },
+        {
+            "id": "products-error",
+            "path": "/resources/js/fixtures/catalogue-landing.html",
+            "query": {
+                "page": "Catalogue/Producers/Products",
+                "role": "catalogue",
+                "state": "error",
+                "dialog": "confirm"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content button,#main-content .pilot-status-switch,#main-content li",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Error probe: focus order of the list is covered by products-index.",
+            "states": [
+                {
+                    "id": "light",
+                    "query": {},
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content div[role=\"alert\"] p",
+                                "count": 1,
+                                "text": "No s’ha pogut canviar la classificació.",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-sonner-toast]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-requests": "1",
+                                    "data-ev-confirm-requests": "put /catalogue/products/product-3/classification",
+                                    "data-ev-confirm-open": "false",
+                                    "data-ev-confirm-focus": "change-product-classification"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark",
+                    "query": {},
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content div[role=\"alert\"] p",
+                                "count": 1,
+                                "text": "No s’ha pogut canviar la classificació.",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-sonner-toast]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-requests": "1",
+                                    "data-ev-confirm-requests": "put /catalogue/products/product-3/classification",
+                                    "data-ev-confirm-open": "false",
+                                    "data-ev-confirm-focus": "change-product-classification"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "products-busy",
+            "path": "/resources/js/fixtures/catalogue-landing.html",
+            "query": {
+                "page": "Catalogue/Producers/Products",
+                "role": "catalogue",
+                "state": "busy",
+                "dialog": "confirm"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content button,#main-content .pilot-status-switch,#main-content li",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Disabled controls are not focusable; busy probe checks the disabled attribute only.",
+            "states": [
+                {
+                    "id": "light-375",
+                    "query": {},
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"change-product-classification\"]",
+                                "count": 2,
+                                "attributes": {
+                                    "disabled": ""
+                                }
+                            },
+                            {
+                                "selector": "[data-sonner-toast]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-requests": "1",
+                                    "data-ev-confirm-requests": "put /catalogue/products/product-3/classification"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "products-variant-off",
+            "path": "/resources/js/fixtures/catalogue-landing.html",
+            "query": {
+                "page": "Catalogue/Producers/Products",
+                "role": "catalogue",
+                "state": "variant-off"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content button,#main-content .pilot-status-switch,#main-content li",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Reversion fixture; only the exact pre-slice colours are checked.",
+            "states": [
+                {
+                    "id": "light",
+                    "query": {
+                        "state": "variant-off"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(36, 107, 87)",
+                                    "data-now-shell-bg": "rgb(248, 247, 244)"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "products-overlays",
+            "path": "/resources/js/fixtures/catalogue-landing.html",
+            "query": {
+                "page": "Catalogue/Producers/Products",
+                "role": "catalogue",
+                "state": "default"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content button,#main-content .pilot-status-switch,#main-content li",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Overlay probes; focus order is the unchanged shell model.",
+            "states": [
+                {
+                    "id": "drawer-light",
+                    "query": {
+                        "drawer": "1"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-sidebar=\"sidebar\"][data-mobile=\"true\"].landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(40, 101, 133)",
+                                    "data-now-shell-bg": "rgb(250, 241, 220)"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "menu-light",
+                    "query": {
+                        "state": "account-menu"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-slot=\"dropdown-menu-content\"].landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(40, 101, 133)",
+                                    "data-now-shell-bg": "rgb(250, 241, 220)"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "drawer-dark",
+                    "query": {
+                        "drawer": "1"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-sidebar=\"sidebar\"][data-mobile=\"true\"].landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(143, 197, 223)",
+                                    "data-now-shell-bg": "rgb(28, 32, 31)"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "menu-dark",
+                    "query": {
+                        "state": "account-menu"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-slot=\"dropdown-menu-content\"].landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(143, 197, 223)",
+                                    "data-now-shell-bg": "rgb(28, 32, 31)"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "products-tooltip",
+            "path": "/resources/js/fixtures/catalogue-landing.html",
+            "query": {
+                "page": "Catalogue/Producers/Products",
+                "role": "catalogue",
+                "state": "default",
+                "tooltip": "1"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content button,#main-content .pilot-status-switch,#main-content li",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Tooltip probe; focus order is the unchanged shell model.",
+            "states": [
+                {
+                    "id": "tooltip-light",
+                    "query": {},
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-slot=\"tooltip-content\"]",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-slot=\"tooltip-content\"].landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-state=\"collapsed\"][data-collapsible=\"icon\"]",
+                                "count": 1
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "tooltip-dark",
+                    "query": {},
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-slot=\"tooltip-content\"]",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-slot=\"tooltip-content\"].landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-state=\"collapsed\"][data-collapsible=\"icon\"]",
+                                "count": 1
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "consumer-producer-edit",
+            "path": "/resources/js/fixtures/catalogue-landing.html",
+            "query": {
+                "page": "Producer/Products/Edit",
+                "role": "producer",
+                "dialog": "delete"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "dialog.manager-dialog h2,dialog.manager-dialog p,dialog.manager-dialog button",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Shared-consumer probe; only the absence of landing and the dialog values are checked.",
+            "states": [
+                {
+                    "id": "light",
+                    "query": {},
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-dialog-modal": "true",
+                                    "data-now-dialog-bg": "rgb(255, 255, 255)",
+                                    "data-now-dialog-ink": "rgb(32, 43, 38)",
+                                    "data-now-dialog-border": "rgb(214, 222, 216)",
+                                    "data-now-dialog-buttons": "rgb(255, 255, 255) | rgb(32, 43, 38) | rgb(120, 138, 125) | 1px ; rgb(255, 255, 255) | rgb(32, 43, 38) | rgb(120, 138, 125) | 1px ; rgb(36, 107, 87) | rgb(255, 255, 255) | rgb(214, 222, 216) | 0px"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark",
+                    "query": {},
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-dialog-modal": "true",
+                                    "data-now-dialog-bg": "rgb(37, 42, 39)",
+                                    "data-now-dialog-ink": "rgb(236, 242, 237)",
+                                    "data-now-dialog-border": "rgb(107, 120, 111)",
+                                    "data-now-dialog-buttons": "rgb(37, 42, 39) | rgb(236, 242, 237) | rgb(149, 169, 155) | 1px ; rgb(37, 42, 39) | rgb(236, 242, 237) | rgb(149, 169, 155) | 1px ; rgb(167, 215, 193) | rgb(27, 48, 38) | rgb(107, 120, 111) | 0px"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "consumer-cycles",
+            "path": "/resources/js/fixtures/catalogue-landing.html",
+            "query": {
+                "page": "Manage/Cycles/Index",
+                "role": "manager",
+                "dialog": "create"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "dialog.manager-dialog h2,dialog.manager-dialog p,dialog.manager-dialog button",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Shared-consumer probe; only the absence of landing and the dialog values are checked.",
+            "states": [
+                {
+                    "id": "light",
+                    "query": {},
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-dialog-modal": "true",
+                                    "data-now-dialog-bg": "rgb(255, 255, 255)",
+                                    "data-now-dialog-ink": "rgb(32, 43, 38)",
+                                    "data-now-dialog-border": "rgb(214, 222, 216)",
+                                    "data-now-dialog-buttons": "rgb(255, 255, 255) | rgb(32, 43, 38) | rgb(120, 138, 125) | 1px ; rgb(255, 255, 255) | rgb(32, 43, 38) | rgb(120, 138, 125) | 1px ; rgb(255, 255, 255) | rgb(32, 43, 38) | rgb(120, 138, 125) | 1px ; rgb(36, 107, 87) | rgb(255, 255, 255) | rgb(36, 107, 87) | 1px"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark",
+                    "query": {},
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-dialog-modal": "true",
+                                    "data-now-dialog-bg": "rgb(37, 42, 39)",
+                                    "data-now-dialog-ink": "rgb(236, 242, 237)",
+                                    "data-now-dialog-border": "rgb(107, 120, 111)",
+                                    "data-now-dialog-buttons": "rgb(37, 42, 39) | rgb(236, 242, 237) | rgb(149, 169, 155) | 1px ; rgb(37, 42, 39) | rgb(236, 242, 237) | rgb(149, 169, 155) | 1px ; rgb(37, 42, 39) | rgb(236, 242, 237) | rgb(149, 169, 155) | 1px ; rgb(167, 215, 193) | rgb(27, 48, 38) | rgb(167, 215, 193) | 1px"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    ]
+}

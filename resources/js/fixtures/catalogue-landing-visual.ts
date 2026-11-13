@@ -6,6 +6,7 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
 import { initializeTheme } from '@/composables/useAppearance';
 import { installTranslations } from '@/lib/i18n';
+import { initializeFlashToast } from '@/lib/flashToast';
 
 /*
  * Deterministic review fixture for the Catalogue pages in the landing identity (spec 005). Only the
@@ -65,19 +66,125 @@ const producersByState: Record<string, ReturnType<typeof makeProducer>[]> = {
         makeProducer('producer-3', 'Hort de la Vall'),
     ],
 };
+const makeProduct = (
+    id: string,
+    name: string,
+    over: Record<string, unknown> = {},
+) => ({
+    id,
+    producerId: 'producer-1',
+    name,
+    unit: 'unitat',
+    price: '3.50',
+    variable: false,
+    containersPerUnit: null,
+    active: true,
+    stock: false,
+    used: false,
+    can: { edit: true, changeClassification: true, delete: false },
+    available: null as string | null,
+    ...over,
+});
+const readOnly = {
+    can: { edit: false, changeClassification: false, delete: false },
+};
+const productsByState: Record<string, ReturnType<typeof makeProduct>[]> = {
+    default: [
+        makeProduct('product-1', 'Pa de pagès', { price: '3.50' }),
+        makeProduct('product-2', 'Mel de farigola', {
+            stock: true,
+            unit: 'pot',
+            price: '8.90',
+            available: '12.000',
+        }),
+        makeProduct('product-3', 'Brioix de l’àvia', {
+            active: false,
+            price: '2.25',
+        }),
+        makeProduct('product-4', 'Coca de recapte', { used: true }),
+    ],
+    // The inactive product comes first: the first checkpoint measures this state.
+    checkpoint: [
+        makeProduct('product-3', 'Brioix de l’àvia', {
+            active: false,
+            price: '2.25',
+        }),
+        makeProduct('product-2', 'Mel de farigola', {
+            stock: true,
+            unit: 'pot',
+            price: '8.90',
+            available: '12.000',
+        }),
+    ],
+    empty: [],
+    'long-name': [
+        makeProduct('product-1', longName, {
+            stock: true,
+            unit: 'pot',
+            price: '1234.50',
+            available: '1234567.000',
+        }),
+        makeProduct('product-2', longName, { active: false }),
+    ],
+    'read-only': [
+        makeProduct('product-2', 'Mel de farigola', {
+            ...readOnly,
+            stock: true,
+            unit: 'pot',
+            price: '8.90',
+            available: '12.000',
+        }),
+        makeProduct('product-1', 'Pa de pagès', readOnly),
+    ],
+};
+// Error and busy states reuse the checkpoint products; navigation and reversion states the default ones.
+const productsState =
+    { error: 'checkpoint', busy: 'checkpoint' }[state] ??
+    state.replace(/^(?:variant-off|nav-.*)$/, 'default');
+const productRows = (
+    productsByState[productsState] ?? productsByState.default
+).map((product) => ({ ...product }));
 const pageProps: Record<string, Record<string, unknown>> = {
     'Catalogue/Producers/Index': {
         producers: producersByState[state] ?? producersByState.default,
+    },
+    'Catalogue/Producers/Products': {
+        producer: { id: 'producer-1', name: 'Hort de la Vall' },
+        products: productRows,
+        canCreateStock: state !== 'read-only',
+    },
+    // Unmigrated consumers of the shared dialog, for the leakage probe.
+    'Producer/Products/Edit': {
+        product: {
+            id: 'product-1',
+            name: 'Pa de pagès',
+            unit: 'unitat',
+            price: '3.50',
+            variable: false,
+            containersPerUnit: null,
+            active: true,
+        },
+        used: false,
+    },
+    'Manage/Cycles/Index': {
+        cycles: [],
+        producers: [],
+        pickupWeekday: null,
+        pendingCollections: {},
     },
     'Manage/Accounts/Index': { accounts: [], households: [] },
     Welcome: {},
 };
 const areas = [
+    { role: 'producer', label: 'Producer', href: '/producer/products' },
     { role: 'manager', label: 'Cooperative', href: '/manage/cycles' },
     { role: 'catalogue', label: 'Catalogue', href: '/catalogue/producers' },
 ];
 const urls: Record<string, string> = {
     'Catalogue/Producers/Index': '/catalogue/producers',
+    'Catalogue/Producers/Products': '/catalogue/producers/producer-1/products',
+    'Producer/Products/Edit': '/producer/products/product-1/edit',
+    'Manage/Cycles/Index': '/manage/cycles',
     'Manage/Accounts/Index': '/manage/accounts',
     Welcome: '/',
 };
@@ -108,7 +215,7 @@ const page = {
             pageName === 'Welcome'
                 ? []
                 : areas.filter((area) => area.role === role),
-        sidebarOpen: true,
+        sidebarOpen: query.get('tooltip') !== '1',
         ...pageProps[pageName],
     },
 };
@@ -116,28 +223,53 @@ const page = {
 // Request spy: navigation states count every request the real router sends.
 const requestLog: string[] = [];
 const pagesByPath: Record<string, string> = {
+    '/catalogue/producers/producer-1/products': 'Catalogue/Producers/Products',
     '/catalogue/producers': 'Catalogue/Producers/Index',
     '/manage/accounts': 'Manage/Accounts/Index',
 };
-if (state.startsWith('nav-')) {
-    http.setClient({
-        request: async (config: { url: string; method?: string }) => {
-            const path = new URL(config.url, window.location.origin).pathname;
-            requestLog.push(`${config.method ?? 'get'} ${path}`);
-            const component = pagesByPath[path] ?? 'Catalogue/Producers/Index';
-            return {
-                status: 200,
-                data: JSON.stringify({
-                    ...page,
-                    component,
-                    url: path,
-                    props: { ...page.props, ...pageProps[component] },
-                }),
-                headers: { 'x-inertia': 'true' },
-            };
-        },
-    });
-}
+const flashMessage = 'Classificació del producte actualitzada.';
+http.setClient({
+    request: async (config: { url: string; method?: string }) => {
+        const path = new URL(config.url, window.location.origin).pathname;
+        const method = (config.method ?? 'get').toLowerCase();
+        requestLog.push(`${method} ${path}`);
+        const reply = (body: Record<string, unknown>) => ({
+            status: 200,
+            data: JSON.stringify(body),
+            headers: { 'x-inertia': 'true' },
+        });
+        // Busy state: the request never answers, so the page stays in `processing`.
+        if (method === 'put' && state === 'busy') return new Promise(() => {});
+        if (method === 'put' && state === 'error')
+            return reply({
+                ...page,
+                props: {
+                    ...page.props,
+                    errors: {
+                        domain: 'No s’ha pogut canviar la classificació.',
+                    },
+                },
+            });
+        if (method === 'put') {
+            // Classification saved: the real router applies the page and fires the flash event.
+            const product = productRows.find((row) => path.includes(row.id));
+            if (product) product.stock = !product.stock;
+            return reply({
+                ...page,
+                props: { ...page.props, products: productRows },
+                flash: { toast: { type: 'success', message: flashMessage } },
+            });
+        }
+        const component = pagesByPath[path] ?? 'Catalogue/Producers/Index';
+        return reply({
+            ...page,
+            component,
+            url: path,
+            props: { ...page.props, ...pageProps[component] },
+        });
+    },
+});
+initializeFlashToast();
 
 // Reversion fixture: the same route with the pilot theme but without the variant.
 const RevertedLayout = defineComponent({
@@ -398,6 +530,135 @@ const recordGraphicContrast = () => {
     );
 };
 
+// Overlay probes for the products page (spec 005 T03). The classify dialog is the NativeDialog of
+// ProductAdministrationActions: it renders inside the shell DOM and is promoted to the top layer.
+const dialogParam = query.get('dialog');
+// Each product renders its own closed dialog; the open one is the one under measurement.
+const dialogElement = () =>
+    document.querySelector<HTMLDialogElement>('dialog.manager-dialog[open]') ??
+    document.querySelector<HTMLDialogElement>('dialog.manager-dialog');
+const dataTest = (element: Element | null) =>
+    element?.getAttribute('data-test') ??
+    element?.tagName.toLowerCase() ??
+    'none';
+// A focused button is activated by Enter or Space as a click, which is what the opener receives.
+const openFrom = async (selector: string, label: string) => {
+    const opener = await waitFor(() =>
+        document.querySelector<HTMLElement>(selector),
+    );
+    opener.focus();
+    opener.click();
+    await waitFor(() => (dialogElement()?.open ? dialogElement() : null));
+    await sleep(350);
+    document.body.setAttribute('data-ev-opener', label);
+};
+const recordDialog = () => {
+    const dialog = dialogElement();
+    if (!dialog) return;
+    const style = getComputedStyle(dialog);
+    const buttons = [...dialog.querySelectorAll('button')].map((button) => {
+        const own = getComputedStyle(button);
+        return [
+            own.backgroundColor,
+            own.color,
+            own.borderTopColor,
+            own.borderTopWidth,
+        ].join(' | ');
+    });
+    const set = (name: string, value: string) =>
+        document.body.setAttribute(`data-now-dialog-${name}`, value);
+    set('modal', String(dialog.open && dialog.matches(':modal')));
+    set('bg', style.backgroundColor);
+    set('ink', style.color);
+    set('border', style.borderTopColor);
+    set('buttons', buttons.join(' ; '));
+    const confirm = dialog.querySelector(
+        '[data-test="confirm-product-action"]',
+    );
+    if (confirm) {
+        set('confirm-bg', getComputedStyle(confirm).backgroundColor);
+        set('confirm-ink', getComputedStyle(confirm).color);
+    }
+};
+// Non-text contrast (3:1) and keyboard focus outline for the controls of the products page and of
+// its dialog. Each class records its node count; a class with no nodes can never pass.
+const recordControlContrast = (scope: string, prefix: string) => {
+    const nodes = (selector: string) => [
+        ...document.querySelectorAll<HTMLElement>(
+            selector
+                .split(',')
+                .map((part) => `${scope} ${part.trim()}`)
+                .join(','),
+        ),
+    ];
+    const report = (name: string, ratios: number[]) => {
+        const weakest = ratios.length ? Math.min(...ratios) : 0;
+        document.body.setAttribute(
+            `data-ev-${prefix}-${name}-count`,
+            String(ratios.length),
+        );
+        document.body.setAttribute(
+            `data-ev-${prefix}-${name}-ratio`,
+            weakest.toFixed(2),
+        );
+        document.body.setAttribute(
+            `data-ev-${prefix}-${name}-ok`,
+            String(ratios.length > 0 && weakest >= 3),
+        );
+    };
+    const against = (colour: string, node: HTMLElement) =>
+        ratio(over(toRgba(colour), backdropOf(node)), backdropOf(node));
+    const outlined = nodes('[data-slot="button"]').filter(
+        (button) => parseFloat(getComputedStyle(button).borderTopWidth) > 0,
+    );
+    report(
+        'border',
+        outlined.map((button) =>
+            against(getComputedStyle(button).borderTopColor, button),
+        ),
+    );
+    const toggles = nodes('input[type="checkbox"]');
+    report(
+        'switch',
+        toggles.map((toggle) =>
+            against(getComputedStyle(toggle).borderTopColor, toggle),
+        ),
+    );
+    // The thumb is the ::before of the checkbox; it sits on the toggle's own fill.
+    report(
+        'thumb',
+        toggles.map((toggle) => {
+            const track = over(
+                toRgba(getComputedStyle(toggle).backgroundColor),
+                backdropOf(toggle),
+            );
+            return ratio(
+                over(
+                    toRgba(
+                        getComputedStyle(toggle, '::before').backgroundColor,
+                    ),
+                    track,
+                ),
+                track,
+            );
+        }),
+    );
+    const focusable = nodes('a, button, input[type="checkbox"]').filter(
+        (node) => visible(node),
+    );
+    report(
+        'focus',
+        focusable.flatMap((node) => {
+            const colour = focusOutlineColour(node);
+            return colour ? [against(colour, node)] : [];
+        }),
+    );
+    document.body.setAttribute(
+        `data-ev-${prefix}-focus-targets`,
+        String(focusable.length),
+    );
+};
+
 void createInertiaApp({
     resolve: (name) => components[`../pages/${name}.vue`].default,
     layout: (name) => {
@@ -423,13 +684,96 @@ void createInertiaApp({
         document.body.dataset.navRequests = requestLog.join(',');
     }
     if (state === 'account-menu') await openMenu();
+    if (query.get('tooltip') === '1') {
+        // Collapsed icon sidebar: the pointer resting on a menu button opens its tooltip.
+        const button = await waitFor(() =>
+            [
+                ...document.querySelectorAll<HTMLElement>(
+                    '[data-sidebar="menu-button"]:not([data-test="sidebar-menu-button"])',
+                ),
+            ].find(visible),
+        );
+        button.dispatchEvent(
+            new PointerEvent('pointermove', {
+                pointerType: 'mouse',
+                bubbles: true,
+            }),
+        );
+        await waitFor(() =>
+            document.querySelector('[data-slot="tooltip-content"]'),
+        );
+        await sleep(400);
+    }
     if (query.get('drawer') === '1') await openSheet();
+    if (
+        dialogParam === 'classify' ||
+        dialogParam === 'escape' ||
+        dialogParam === 'confirm'
+    )
+        await openFrom(
+            '[data-test="change-product-classification"]',
+            'change-product-classification',
+        );
+    if (dialogParam === 'create')
+        await openFrom('[data-test="open-create-cycle"]', 'open-create-cycle');
+    if (dialogParam === 'delete')
+        await openFrom(
+            '[data-test="delete-unused-product"]',
+            'delete-unused-product',
+        );
+    if (dialogParam === 'escape') {
+        // requestClose() is the close request Escape sends: cancel, then close, then the focus return.
+        dialogElement()?.requestClose();
+        await waitFor(() => (dialogElement()?.open ? null : document.body));
+        await sleep(150);
+        document.body.setAttribute(
+            'data-ev-escape-requests',
+            String(requestLog.length),
+        );
+        document.body.setAttribute(
+            'data-ev-escape-open',
+            String(dialogElement()?.open ?? false),
+        );
+        document.body.setAttribute(
+            'data-ev-escape-focus',
+            dataTest(document.activeElement),
+        );
+    }
+    if (dialogParam === 'confirm') {
+        dialogElement()
+            ?.querySelector<HTMLElement>('[data-test="confirm-product-action"]')
+            ?.click();
+        const outcome =
+            {
+                error: '#main-content div[role="alert"] p',
+                busy: '[data-test="change-product-classification"][disabled]',
+            }[state] ?? '[data-sonner-toast]';
+        await waitFor(() => document.querySelector(outcome));
+        await sleep(600);
+        document.body.setAttribute(
+            'data-ev-confirm-requests',
+            requestLog.join(','),
+        );
+        document.body.setAttribute(
+            'data-ev-confirm-open',
+            String(dialogElement()?.open ?? false),
+        );
+        document.body.setAttribute(
+            'data-ev-confirm-focus',
+            dataTest(document.activeElement),
+        );
+    }
+    recordDialog();
     await snapshot('now');
     if (
+        pageName === 'Catalogue/Producers/Index' &&
         !document.querySelector(measured.sheet) &&
         !document.querySelector(measured.menu)
     )
         recordGraphicContrast();
+    if (pageName === 'Catalogue/Producers/Products' && !dialogParam)
+        recordControlContrast('#main-content .pilot-page', 'page');
+    if (dialogElement()?.open) recordControlContrast('dialog[open]', 'dialog');
     document.body.dataset.requests = String(requestLog.length);
     document.body.dataset.active = describeActive();
     document.body.dataset.visualReady = state;

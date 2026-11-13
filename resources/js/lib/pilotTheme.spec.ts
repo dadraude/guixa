@@ -199,6 +199,9 @@ describe('landing variant admission', () => {
         ['Catalogue/Producers/Index', 'landing'],
         ['Catalogue/Producers/Index/Extra', null],
         ['Catalogue/Producers', null],
+        ['Catalogue/Producers/Products', 'landing'],
+        ['Catalogue/Producers/Products/Extra', null],
+        ['Catalogue/Producers/Product', null],
         ['Welcome', null],
     ])('%s -> %s', (page, expected) => {
         expect(pilotVariantFor(page)).toBe(expected);
@@ -213,6 +216,8 @@ describe('landing variant admission', () => {
             'Orders/Other',
             'Catalogue/Producers/Index/Extra',
             'Catalogue/Producers',
+            'Catalogue/Producers/Products/Extra',
+            'Catalogue/Producers/Product',
             'Manage/Stock/Movements',
             'Manage/Accounts/Index',
             'Manage/Stock/Create',
@@ -223,6 +228,9 @@ describe('landing variant admission', () => {
             expect(variant()).toBe('');
         }
         page.component = 'Catalogue/Producers/Index';
+        await nextTick();
+        expect(variant()).toBe('landing');
+        page.component = 'Catalogue/Producers/Products';
         await nextTick();
         expect(variant()).toBe('landing');
         page.component = 'Manage/Stock/Index';
