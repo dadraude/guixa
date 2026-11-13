@@ -1,6 +1,6 @@
 # 005 — Landing identity rollout: Catalogue role complete
 
-**Status: Draft, awaiting acceptance; no open questions.** Specification of delivery slice 1 only. The
+**Status: Accepted (2026-11-13, merge of PR #416); no open questions.** Specification of delivery slice 1 only. The
 [discovery](discovery.md) keeps slices 2-7 as a roadmap; they get no requirements here. Slice selection
 and boundary are recorded in [history](history/) (Q&A 2026-11-13: slice 1 selected; T85 visual approval
 granted; Manage stock and return-item pages moved into slice 1). Accepting this spec authorizes no plan,
@@ -87,7 +87,7 @@ wherever they appear on a Catalogue page, so that a page is never half-themed. `
 - **R7 — Layout.** No clipping and no horizontal page scroll at 375 px and 1280 px, in light and dark; at
   1024 px with 200% text for each composition on these pages: list or table (`Producers/Index`, `Producers/Products`,
   `ReturnItems/Index`), form (weekly product, stock and return-item create and edit), movement history,
-  availability and `StockEditDialog`. Quantities, amounts and dates keep their alignment and tabular figures.
+  availability and the dialog of `ProductAdministrationActions`. Quantities, amounts and dates keep their alignment and tabular figures.
   The same information is available at every width.
 - **R8 — States.** Each page is legible and unclipped in its full, empty, long-content, invalid and
   disabled states, as the page has them: long product, producer or return-item names; no producers, products
@@ -165,8 +165,8 @@ account opens its movement history, then it reads the same entries as before in 
 no entry, adjustment or count action (001 R28a), and a direct link to a quantity-changing action is still
 refused.
 
-**S7 — Overlays keep behaviour (R1, R6).** Given a Catalogue page that opens a dialog (today `StockEditDialog` on a producer's products; the plan
-verifies any others) or shows a toast after saving, when the dialog is opened with the
+**S7 — Overlays keep behaviour (R1, R6).** Given a Catalogue page that opens a dialog (today the one in `ProductAdministrationActions`, used by `Products`, `WeeklyProduct/Edit` and
+`Manage/Stock/Edit`; the plan verifies any others) or shows a toast after saving, when the dialog is opened with the
 keyboard, then its surface, text, buttons and focus ring use the landing identity, Escape closes it with no
 request sent, and focus returns to the control that opened it. A toast shown after an action is readable in
 both appearances.
