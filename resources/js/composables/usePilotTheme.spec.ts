@@ -245,7 +245,9 @@ describe('pilot theme layout and portal', () => {
 
         for (const component of [
             'Orders/Other',
-            'Catalogue/Producers/Index',
+            'Catalogue/Producers/Index/Extra',
+            'Catalogue/Producers',
+            'Manage/Stock/Movements',
             'Manage/Stock/Create',
             'Welcome',
         ]) {
@@ -261,7 +263,11 @@ describe('pilot theme layout and portal', () => {
         expect(shell.classes()).toContain('pilot-theme');
         expect(landing(dialog())).toBe(true);
         expect(landing(sheet())).toBe(true);
-        for (const component of ['Orders/Index', 'Orders/Edit']) {
+        for (const component of [
+            'Orders/Index',
+            'Orders/Edit',
+            'Catalogue/Producers/Index',
+        ]) {
             page.component = component;
             await nextTick();
             expect(shell.classes(), component).toContain('landing');
@@ -353,7 +359,11 @@ describe('pilot theme layout and portal', () => {
             for (const selector of Object.values(targets))
                 expect(has(selector), `${component} ${selector}`).toBe(false);
         }
-        for (const component of ['Orders/Index', 'Orders/Edit']) {
+        for (const component of [
+            'Orders/Index',
+            'Orders/Edit',
+            'Catalogue/Producers/Index',
+        ]) {
             page.component = component;
             await nextTick();
             for (const [name, selector] of Object.entries(targets))
