@@ -12,7 +12,7 @@ The public landing (T83) and two member/staff pilots (Manage/Stock/Index, T84; O
 
 **Reference:** `resources/js/components/WelcomePage.vue` and the `.landing` block in `resources/css/app.css:2119-2135` (dark in the following rules) are the source of truth for values. The opt-in mechanism is `resources/js/lib/pilotTheme.ts` (`pilotPages` at line 1, `landingPages` at line 54): a page is migrated only when it is in `landingPages`; `pilotPages` is the older green opt-in and does not mean migrated.
 
-**Done so far (001):** landing T83, Manage/Stock/Index T84, Orders/Index and Orders/Edit T85 (`specs/001-weekly-orders/tasks.md`, rows T83–T85). T85's user visual approval ("decision B") is still pending.
+**Done so far (001):** landing T83, Manage/Stock/Index T84, Orders/Index and Orders/Edit T85 (`specs/001-weekly-orders/tasks.md`, rows T83–T85). T85 visual approval (decisió B) was granted on 2026-11-13.
 
 ## Boundaries and dependencies
 
@@ -34,7 +34,7 @@ The public landing (T83) and two member/staff pilots (Manage/Stock/Index, T84; O
 - A route or component added or moved updates the deployment inventory before any boundary is removed.
 
 **Dependencies**
-- Delivered pilot tokens and shell from T84 and T85; T85 visual approval pending (see decisions).
+- Delivered pilot tokens and shell from T84 and T85; T85 visual approval granted 2026-11-13.
 - Spec 003 role decisions (Roles page keeps them); 003 R16 requires the Guixa visual system.
 - Spec 004 dashboard delivered; the dashboard restyle needs the visual-approval gate.
 - Unthemed today: `Manage/Roles/Index`, `Member/Baskets/{Index,Show}`, `Catalogue/Producers/Availability`, `resources/views/errors/minimal.blade.php`; `ui/select/SelectContent.vue` does not consume the theme context. Orphans to delete once confirmed unused: `layouts/app/AppHeaderLayout`, `layouts/auth/{AuthCardLayout,AuthSplitLayout}`, `components/AppHeader.vue` (`plan.md` inventory).
@@ -46,8 +46,8 @@ Each leaves a role or audience able to use all its screens in the landing style.
 
 1. **Catalogue role complete.**
    - Outcome: a Catalogue user works through Producers, their products, weekly-product create/edit, availability and stock movements in the landing identity.
-   - Boundary: `Catalogue/Producers/{Index,Products,Availability}`, `WeeklyProduct/{Create,Edit}`, `Catalogue/Stock/Movements`.
-   - Dependency reason: first real forms (FormSelect, Input, errors, buttons) outside the stock dialog, plus one unthemed page (Availability); unblocks reuse of form patterns by every later slice. Needs the select decision below.
+   - Boundary: `Catalogue/Producers/{Index,Products,Availability}`, `WeeklyProduct/{Create,Edit}`, `Catalogue/Stock/Movements`, plus `Manage/Stock/{Create,Edit}` and `Manage/ReturnItems/{Index,Create,Edit}`, which a Catalogue user also reaches (moved from slice 5 on 2026-11-13).
+   - Dependency reason: first real forms (Input, Label, errors, buttons, native dialog; no select) outside the stock dialog, plus one unthemed page (Availability); unblocks reuse of form patterns by every later slice.
    - Complete when: all pages in landingPages, the invariants measured per route, existing tests green, visual approval recorded.
 2. **Producer role complete.**
    - Outcome: a producer manages products, sees cutoff and cycle summary and reads stock movements in the landing style.
@@ -66,7 +66,7 @@ Each leaves a role or audience able to use all its screens in the landing style.
    - Complete when: overlays (dialogs) keep Escape and focus return; Roles semantics unchanged.
 5. **Remaining stock, returns and member views.**
    - Outcome: a member can use every member screen in the landing style (wallet, stock, baskets), and staff can use stock create/edit/movements and return items.
-   - Boundary: `Manage/Stock/{Create,Edit,Movements}`, `Manage/ReturnItems/{Index,Create,Edit}`, `Wallet/Statement`, `Stock/Index`, `Member/Baskets/{Index,Show}`.
+   - Boundary: `Manage/Stock/Movements`, `Wallet/Statement`, `Stock/Index`, `Member/Baskets/{Index,Show}`.
    - Dependency reason: completes the families whose pilots are already live; `Member/Baskets` is unthemed.
    - Complete when: the member journey from Orders to basket and wallet shows one identity.
 6. **Access and account settings.**
@@ -88,7 +88,7 @@ Each leaves a role or audience able to use all its screens in the landing style.
 1. Numbering: precedent in 003 and 004 is a per-feature numbering restarting at R1/S1/T01 (`specs/README.md` keeps R/S/T global within a feature's slices). Recommended: 005 starts its own R1/S1/T01 and cites 001 items as "001 T84". T86+ and R37+ would only apply if 005 were part of 001. Confirm.
 2. First slice: confirm slice 1 or choose an alternative.
 3. T85 visual approval (decision B): does 005 start before it, or is it a gate for slice 1? Slice 1 reuses patterns that approval would still change.
-4. Select/SelectContent: it must be themed before any form slice. Which slice owns it (slice 1 or a base task)? The draft inventory placed it in the shared base of phase 1, which T84/T85 did not close.
+4. Select/SelectContent: not used by any slice 1 page (verified 2026-11-13); the first slice that uses a select owns theming it.
 5. How the takeover is recorded: a 001 Change pointing phases 3–5 to 005, and which 001 documents stay as the source of the visual direction.
 6. Authorized next step (spec for the chosen slice only); Linear mapping and ticket publication are not authorized.
 
