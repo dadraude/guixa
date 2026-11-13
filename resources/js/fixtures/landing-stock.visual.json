@@ -1,0 +1,1174 @@
+{
+    "baseUrl": "http://127.0.0.1:5265",
+    "rootFontPx": 16,
+    "darkSelector": "html.dark",
+    "matrix": {
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark", "system-light", "system-dark"],
+        "text": [100, 200]
+    },
+    "views": [
+        {
+            "id": "stock-index",
+            "path": "/resources/js/fixtures/landing-stock.html",
+            "query": {
+                "page": "Manage/Stock/Index"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-manager-page, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]),#main-content td,#main-content th",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["#stock-search"],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "#main-content h1.pilot-heading, #main-content .manager-stock-list h2",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content label[for=\"stock-search\"]",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".reference-style.landing-stock",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content .manager-stock-rows .text-muted-foreground",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .manager-stock-rows .font-medium",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .manager-stock-rows .pilot-status-switch",
+                                "contrast": 4.5,
+                                "minHeight": 44
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "table",
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "#main-content h1.pilot-heading, #main-content .manager-stock-list h2",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content label[for=\"stock-search\"]",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".reference-style.landing-stock",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content .manager-stock-table tbody td, #main-content .manager-stock-table tbody th",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .manager-stock-table .pilot-status-switch",
+                                "contrast": 4.5,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "#main-content .manager-stock-table .pilot-table-actions :is(a, button)",
+                                "minHeight": 44,
+                                "minWidth": 44
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "empty",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "focus": ["#main-content a[href]"]
+                    }
+                },
+                {
+                    "id": "no-match",
+                    "query": {
+                        "state": "no-match"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "search",
+                    "query": {
+                        "state": "search"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "long-name",
+                    "query": {
+                        "state": "long-name"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "sidebar-light",
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-sidebar=\"sidebar\"]:not([data-mobile])",
+                                "count": 1,
+                                "styles": {
+                                    "background-color": "rgb(40, 101, 133)"
+                                }
+                            },
+                            {
+                                "selector": "[data-sidebar=\"sidebar\"]:not([data-mobile]) [data-sidebar=\"menu-button\"][data-active=\"true\"]",
+                                "count": 2,
+                                "styles": {
+                                    "background-color": "rgb(29, 82, 111)"
+                                },
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-sidebar=\"sidebar\"]:not([data-mobile]) :is(a[href=\"/dashboard\"], a[href=\"/manage/producers\"], a[href=\"/catalogue/return-items\"], button[data-sidebar=\"menu-button\"])",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".reference-style.landing-stock",
+                                "count": 1
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "sidebar-dark",
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-sidebar=\"sidebar\"]:not([data-mobile])",
+                                "count": 1,
+                                "styles": {
+                                    "background-color": "rgb(35, 72, 92)"
+                                }
+                            },
+                            {
+                                "selector": "[data-sidebar=\"sidebar\"]:not([data-mobile]) [data-sidebar=\"menu-button\"][data-active=\"true\"]",
+                                "count": 2,
+                                "styles": {
+                                    "background-color": "rgb(65, 96, 110)"
+                                },
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-sidebar=\"sidebar\"]:not([data-mobile]) :is(a[href=\"/dashboard\"], a[href=\"/manage/producers\"], a[href=\"/catalogue/return-items\"], button[data-sidebar=\"menu-button\"])",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".reference-style.landing-stock",
+                                "count": 1
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "stock-dialog",
+            "path": "/resources/js/fixtures/landing-stock.html",
+            "query": {
+                "page": "Manage/Stock/Index"
+            },
+            "root": "dialog[open]",
+            "panels": "dialog[open]",
+            "content": "dialog[open] h2,dialog[open] label,dialog[open] input,dialog[open] button,dialog[open] a,dialog[open] p,dialog[open] summary",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "dialog[open] #stock-available",
+                "dialog[open] [data-test=\"save-available\"]"
+            ],
+            "states": [
+                {
+                    "id": "dialog",
+                    "query": {
+                        "state": "dialog"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "dialog[open] .manager-button",
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "dialog[open] #stock-available",
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dialog-inactive",
+                    "query": {
+                        "state": "dialog-inactive"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "dialog-error-local",
+                    "query": {
+                        "state": "dialog-error-local"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "dialog-error-server",
+                    "query": {
+                        "state": "dialog-server-error"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "dialog-processing",
+                    "query": {
+                        "state": "dialog-processing"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "focus": ["dialog[open] #stock-available"]
+                    }
+                },
+                {
+                    "id": "dialog-confirm",
+                    "query": {
+                        "state": "dialog-confirm"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "stock-drawer",
+            "path": "/resources/js/fixtures/landing-stock.html",
+            "query": {
+                "page": "Manage/Stock/Index",
+                "drawer": "1"
+            },
+            "root": "[data-sidebar=\"sidebar\"][data-mobile=\"true\"]",
+            "panels": "[data-sidebar=\"sidebar\"][data-mobile=\"true\"]",
+            "content": "[data-sidebar=\"sidebar\"][data-mobile=\"true\"] a, [data-sidebar=\"sidebar\"][data-mobile=\"true\"] button",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Drawer focus order is the unchanged shell sidebar; colours only.",
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "stock-account-menu",
+            "path": "/resources/js/fixtures/landing-stock.html",
+            "query": {
+                "page": "Manage/Stock/Index",
+                "state": "account-menu"
+            },
+            "root": "[data-slot=\"dropdown-menu-content\"]",
+            "panels": "[data-slot=\"dropdown-menu-content\"]",
+            "content": "[data-slot=\"dropdown-menu-content\"] [role=\"menuitem\"], [data-slot=\"dropdown-menu-content\"] a",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Arrow-key menu focus is the unchanged Reka model; colours only.",
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "orders-unmigrated",
+            "path": "/resources/js/fixtures/landing-stock.html",
+            "query": {
+                "page": "Orders/Index",
+                "role": "member"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]),#main-content td,#main-content th",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Unmigrated route; only the absence of landing-stock is checked.",
+            "states": [
+                {
+                    "id": "light",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".landing-stock",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(36, 107, 87)",
+                                    "data-now-shell-bg": "rgb(248, 247, 244)"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark",
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".landing-stock",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(167, 215, 193)",
+                                    "data-now-shell-bg": "rgb(27, 30, 28)"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "catalogue-unmigrated",
+            "path": "/resources/js/fixtures/landing-stock.html",
+            "query": {
+                "page": "Catalogue/Producers/Index",
+                "role": "catalogue"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]),#main-content td,#main-content th",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Unmigrated route; only the absence of landing-stock is checked.",
+            "states": [
+                {
+                    "id": "light",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".landing-stock",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(36, 107, 87)",
+                                    "data-now-shell-bg": "rgb(248, 247, 244)"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark",
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".landing-stock",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(167, 215, 193)",
+                                    "data-now-shell-bg": "rgb(27, 30, 28)"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "stock-variant-off",
+            "path": "/resources/js/fixtures/landing-stock.html",
+            "query": {
+                "page": "Manage/Stock/Index",
+                "state": "variant-off"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .manager-stock-list, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]),#main-content td,#main-content th",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Reversion fixture; only the current green theme is checked.",
+            "states": [
+                {
+                    "id": "light",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".landing-stock",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(36, 107, 87)",
+                                    "data-now-shell-bg": "rgb(248, 247, 244)"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark",
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".landing-stock",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(167, 215, 193)",
+                                    "data-now-shell-bg": "rgb(27, 30, 28)"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "welcome-unchanged",
+            "path": "/resources/js/fixtures/landing-stock.html",
+            "query": {
+                "page": "Welcome"
+            },
+            "root": ".welcome-page",
+            "panels": ".welcome-page main",
+            "content": "main h1",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Welcome is untouched; only its resolved tokens and the absence of landing-stock are checked.",
+            "states": [
+                {
+                    "id": "light",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".landing-stock",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "styles": {
+                                    "background-color": "rgb(250, 241, 220)"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-welcome-paper": "#faf1dc",
+                                    "data-welcome-blue": "#286585"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark",
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".landing-stock",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "styles": {
+                                    "background-color": "rgb(28, 32, 31)"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-welcome-paper": "#1c201f",
+                                    "data-welcome-blue": "#8fc5df"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "stock-navigation",
+            "path": "/resources/js/fixtures/landing-stock.html",
+            "query": {
+                "page": "Manage/Stock/Index"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-manager-page",
+            "content": "#main-content h1:not(.sr-only)",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Navigation probe: focus order is covered by stock-index and stock-dialog.",
+            "states": [
+                {
+                    "id": "nav-sheet-light",
+                    "query": {
+                        "state": "nav-sheet"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-s1-shell-primary": "rgb(40, 101, 133)",
+                                    "data-s1-shell-bg": "rgb(250, 241, 220)",
+                                    "data-s1-sheet-primary": "rgb(40, 101, 133)",
+                                    "data-s1-sheet-bg": "rgb(40, 101, 133)",
+                                    "data-s2-shell-primary": "rgb(36, 107, 87)",
+                                    "data-s2-shell-bg": "rgb(248, 247, 244)",
+                                    "data-s2-sheet-primary": "rgb(36, 107, 87)",
+                                    "data-s2-sheet-bg": "rgb(36, 107, 87)",
+                                    "data-s3-shell-primary": "rgb(40, 101, 133)",
+                                    "data-s3-shell-bg": "rgb(250, 241, 220)",
+                                    "data-s3-sheet-primary": "rgb(40, 101, 133)",
+                                    "data-s3-sheet-bg": "rgb(40, 101, 133)",
+                                    "data-nav-requests": "get /orders,get /manage/stock"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "nav-sheet-dark",
+                    "query": {
+                        "state": "nav-sheet"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-s1-shell-primary": "rgb(143, 197, 223)",
+                                    "data-s1-shell-bg": "rgb(28, 32, 31)",
+                                    "data-s1-sheet-primary": "rgb(143, 197, 223)",
+                                    "data-s1-sheet-bg": "rgb(35, 72, 92)",
+                                    "data-s2-shell-primary": "rgb(167, 215, 193)",
+                                    "data-s2-shell-bg": "rgb(27, 30, 28)",
+                                    "data-s2-sheet-primary": "rgb(167, 215, 193)",
+                                    "data-s2-sheet-bg": "rgb(32, 37, 33)",
+                                    "data-s3-shell-primary": "rgb(143, 197, 223)",
+                                    "data-s3-shell-bg": "rgb(28, 32, 31)",
+                                    "data-s3-sheet-primary": "rgb(143, 197, 223)",
+                                    "data-s3-sheet-bg": "rgb(35, 72, 92)",
+                                    "data-nav-requests": "get /orders,get /manage/stock"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "nav-menu-light",
+                    "query": {
+                        "state": "nav-menu"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-s1-shell-primary": "rgb(40, 101, 133)",
+                                    "data-s1-shell-bg": "rgb(250, 241, 220)",
+                                    "data-s1-menu-primary": "rgb(40, 101, 133)",
+                                    "data-s1-menu-bg": "rgb(255, 250, 240)",
+                                    "data-s2-shell-primary": "rgb(36, 107, 87)",
+                                    "data-s2-shell-bg": "rgb(248, 247, 244)",
+                                    "data-s2-menu-primary": "rgb(36, 107, 87)",
+                                    "data-s2-menu-bg": "rgb(255, 255, 255)",
+                                    "data-s3-shell-primary": "rgb(40, 101, 133)",
+                                    "data-s3-shell-bg": "rgb(250, 241, 220)",
+                                    "data-s3-menu-primary": "rgb(40, 101, 133)",
+                                    "data-s3-menu-bg": "rgb(255, 250, 240)",
+                                    "data-nav-requests": "get /orders,get /manage/stock"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "nav-menu-dark",
+                    "query": {
+                        "state": "nav-menu"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-s1-shell-primary": "rgb(143, 197, 223)",
+                                    "data-s1-shell-bg": "rgb(28, 32, 31)",
+                                    "data-s1-menu-primary": "rgb(143, 197, 223)",
+                                    "data-s1-menu-bg": "rgb(36, 42, 41)",
+                                    "data-s2-shell-primary": "rgb(167, 215, 193)",
+                                    "data-s2-shell-bg": "rgb(27, 30, 28)",
+                                    "data-s2-menu-primary": "rgb(167, 215, 193)",
+                                    "data-s2-menu-bg": "rgb(37, 42, 39)",
+                                    "data-s3-shell-primary": "rgb(143, 197, 223)",
+                                    "data-s3-shell-bg": "rgb(28, 32, 31)",
+                                    "data-s3-menu-primary": "rgb(143, 197, 223)",
+                                    "data-s3-menu-bg": "rgb(36, 42, 41)",
+                                    "data-nav-requests": "get /orders,get /manage/stock"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "stock-system",
+            "path": "/resources/js/fixtures/landing-stock.html",
+            "query": {
+                "page": "Manage/Stock/Index",
+                "drawer": "1"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-manager-page",
+            "content": "#main-content h1:not(.sr-only)",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Appearance probe; focus order is covered elsewhere.",
+            "states": [
+                {
+                    "id": "system-dark",
+                    "ready": "body[data-visual-ready]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "system-dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "html.dark",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.landing-stock",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-sidebar=\"sidebar\"][data-mobile=\"true\"].landing-stock",
+                                "count": 1
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(143, 197, 223)",
+                                    "data-now-shell-bg": "rgb(28, 32, 31)",
+                                    "data-now-sheet-primary": "rgb(143, 197, 223)",
+                                    "data-now-sheet-bg": "rgb(35, 72, 92)"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "system-light",
+                    "ready": "body[data-visual-ready]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "system-light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "html.dark",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".reference-style.landing-stock",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-sidebar=\"sidebar\"][data-mobile=\"true\"].landing-stock",
+                                "count": 1
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(40, 101, 133)",
+                                    "data-now-shell-bg": "rgb(250, 241, 220)",
+                                    "data-now-sheet-primary": "rgb(40, 101, 133)",
+                                    "data-now-sheet-bg": "rgb(40, 101, 133)"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "stock-fallback-font",
+            "path": "/resources/js/fixtures/landing-stock.html",
+            "query": {
+                "page": "Manage/Stock/Index",
+                "fallback": "1"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-manager-page",
+            "content": "#main-content h1:not(.sr-only), #main-content h2, #main-content a, #main-content button",
+            "fonts": ["16px sans-serif"],
+            "systemFonts": true,
+            "focus": ["#stock-search"],
+            "states": [
+                {
+                    "id": "fallback",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "html[data-font-fallback=\"true\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style",
+                                "styles": {
+                                    "font-family": "ui-sans-serif, system-ui, sans-serif"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "stock-interactions",
+            "path": "/resources/js/fixtures/landing-stock.html",
+            "query": {
+                "page": "Manage/Stock/Index"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-manager-page",
+            "content": "#main-content h1:not(.sr-only)",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["#stock-search"],
+            "states": [
+                {
+                    "id": "confirm-cancel",
+                    "query": {
+                        "state": "dialog-confirm-cancel"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "focus": ["dialog[open] #stock-available"],
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-requests": "0",
+                                    "data-dialog-open": "true",
+                                    "data-confirm-visible": "false",
+                                    "data-confirm-shown": "true"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "escape",
+                    "query": {
+                        "state": "dialog-escape"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-requests": "0",
+                                    "data-dialog-open": "false",
+                                    "data-active": "Edita Producte 1"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "unchanged",
+                    "query": {
+                        "state": "dialog-unchanged"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-requests": "0",
+                                    "data-dialog-open": "false",
+                                    "data-active": "Edita Producte 1"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    ]
+}

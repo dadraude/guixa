@@ -3,17 +3,18 @@ import type { ToasterProps } from "vue-sonner"
 import { CircleCheckIcon, InfoIcon, Loader2Icon, OctagonXIcon, TriangleAlertIcon, XIcon } from "@lucide/vue"
 import { Toaster as Sonner } from "vue-sonner"
 import { cn } from "@/lib/utils"
-import { usePilotTheme } from "@/composables/usePilotTheme"
+import { usePilotTheme, usePilotVariantClass } from "@/composables/usePilotTheme"
 
 import 'vue-sonner/style.css';
 
 const props = defineProps<ToasterProps>()
 const pilotTheme = usePilotTheme()
+const pilotVariantClass = usePilotVariantClass()
 </script>
 
 <template>
   <Sonner
-    :class="cn('toaster group', props.class, pilotTheme && 'pilot-theme')"
+    :class="cn('toaster group', props.class, pilotTheme && 'pilot-theme', pilotVariantClass)"
     :style="{
       '--normal-bg': 'var(--popover)',
       '--normal-text': 'var(--popover-foreground)',
