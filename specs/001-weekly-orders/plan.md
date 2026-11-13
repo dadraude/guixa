@@ -1231,7 +1231,7 @@ ni la preparació de tasques autoritzen implementar o publicar tiquets.
 ### Inventari de desplegament — esborrany (2026-11-13)
 
 **Estat: esborrany pendent d'acceptació; no autoritza implementació.** Fotografia sobre `origin/main`
-(`0074d383`) d'allò que cada fase de la seqüència següent ha de cobrir. Fa servir el mateix inventari que
+(`0074d383`; substitueix la fotografia `cfda8e70` del mapa anterior) d'allò que cada fase de la seqüència següent ha de cobrir. Fa servir el mateix inventari que
 exigeix «Inventari i base compartida»: pàgines servides, components compartits i superfícies fora d'Inertia.
 
 **Punt de partida.** El tema de la landing (blau/crema) només és a `Welcome`. `lib/pilotTheme.ts` és
@@ -1275,6 +1275,12 @@ només `pages/`:
 | `resources/views/mail/{invitation,producer-order}.blade.php` | Correus amb el tema per defecte de `x-mail::message`; sense tema propi | Fora d'abast: es manté l'estil per defecte de Laravel (decidit 2026-11-13) |
 | `layouts/app/AppHeaderLayout`, `layouts/auth/{AuthCardLayout,AuthSplitLayout}` | Cap importació; no es renderitzen | Eliminar (decidit 2026-11-13), un cop confirmat que continuen sense consumidors |
 | `layouts/settings/Layout.vue` | Ja previst a la fase 5, però cal comprovar-ne la navegació | 5 Preferències |
+| `components/AppHeader.vue` | Només l'importa `AppHeaderLayout`; queda orfe en eliminar-lo | Eliminar amb el layout (fase 5) |
+| `components/{TwoFactorSetupModal,TwoFactorRecoveryCodes,ManageTwoFactor,ManagePasskeys,PasskeyItem,PasskeyRegister,PasskeyVerify,DeleteUser}.vue` | Peces i diàlegs de `settings/Security` i `settings/Profile` | 5 Preferències |
+| `components/{AppearanceMenu,NavUser,UserMenuContent}.vue` | Menús de compte i aparença del shell | 1 (base compartida) |
+| `components/{AppShell,AppContent,AppLogo,AppLogoIcon}.vue`, `components/ui/sonner/Sonner.vue` | Xassís del shell, marca i avisos | 1 (base compartida) |
+| `components/{orders,baskets,pickup,reception,roles,stock,manager}/*` | Components de pàgina: hereten la fase de les pàgines que els consumeixen; cada fitxa de fase els llista | Fase de la seva pàgina |
+| `resources/views/app.blade.php`, `public/{favicon.svg,favicon.ico,apple-touch-icon.png}` | Fons de l'html abans de carregar el CSS (`--background`, `#fff`/`#1b1e1c`) i icones de pestanya; no hi ha `theme-color` ni manifest | 5 Tancament |
 
 **Decisions pendents.** Cap. Correus, pàgina d'error i layouts sense ús: resolts, vegeu les entrades Q&A del
 2026-11-13. Valors de color: verificat contra `WelcomePage.vue` a `origin/main` (`0074d383`); els valors del
