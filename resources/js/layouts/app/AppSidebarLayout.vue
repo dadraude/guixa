@@ -10,21 +10,28 @@ import { Toaster } from '@/components/ui/sonner';
 import { useAppNavigation } from '@/composables/useAppNavigation';
 import type { BreadcrumbItem } from '@/types';
 import { computed, toRef } from 'vue';
-import { providePilotTheme } from '@/composables/usePilotTheme';
+import {
+    providePilotTheme,
+    providePilotVariant,
+} from '@/composables/usePilotTheme';
+import type { PilotVariant } from '@/lib/pilotTheme';
 import { dashboard } from '@/routes';
 
 type Props = {
     breadcrumbs?: BreadcrumbItem[];
     pilotTheme?: boolean;
+    pilotVariant?: PilotVariant | null;
     managerTheme?: boolean;
 };
 
 const props = withDefaults(defineProps<Props>(), {
     breadcrumbs: () => [],
     pilotTheme: false,
+    pilotVariant: null,
     managerTheme: false,
 });
 providePilotTheme(toRef(props, 'pilotTheme'));
+providePilotVariant(toRef(props, 'pilotVariant'));
 
 const page = usePage();
 const { areas, currentItem } = useAppNavigation();
@@ -50,7 +57,7 @@ const pageBreadcrumbs = computed(() => [
     <AppShell
         variant="sidebar"
         sidebar-width="min(16rem, 42vw)"
-        :class="`material-app-shell reference-style ${pilotTheme ? 'pilot-theme bg-background text-foreground' : ''} ${managerTheme ? 'coop-manager-shell' : ''}`"
+        :class="`material-app-shell reference-style ${pilotTheme ? 'pilot-theme bg-background text-foreground' : ''} ${managerTheme ? 'coop-manager-shell' : ''} ${pilotVariant ?? ''}`"
     >
         <a class="material-skip-link" href="#main-content">
             {{ trans('Skip to content') }}

@@ -5,7 +5,7 @@ import { nextTick } from 'vue';
 import { usePage } from '@inertiajs/vue3';
 import AppLayout from '@/layouts/AppLayout.vue';
 import AuthLayout from '@/layouts/AuthLayout.vue';
-import { isPilotThemePage } from './pilotTheme';
+import { isPilotThemePage, pilotVariantFor } from './pilotTheme';
 
 vi.mock('@inertiajs/vue3', async () => {
     const { reactive } = await import('vue');
@@ -17,10 +17,15 @@ vi.mock('@/layouts/app/AppSidebarLayout.vue', async () => {
     const { defineComponent, h } = await import('vue');
     return {
         default: defineComponent({
-            props: { pilotTheme: Boolean, managerTheme: Boolean },
+            props: {
+                pilotTheme: Boolean,
+                managerTheme: Boolean,
+                pilotVariant: String,
+            },
             setup(props) {
                 return () =>
                     h('div', {
+                        'data-variant': String(props.pilotVariant ?? ''),
                         'data-pilot': String(props.pilotTheme),
                         'data-manager': String(props.managerTheme),
                     });
@@ -170,5 +175,55 @@ describe('pilot theme page selection', () => {
         ['Orders/Other', false],
     ])('%s is pilot: %s', (page, expected) => {
         expect(isPilotThemePage(page)).toBe(expected);
+    });
+});
+
+describe('landing-stock variant admission', () => {
+    it.each([
+        ['Manage/Stock/Index', 'landing-stock'],
+        ['Manage/Stock/Create', null],
+        ['Manage/Stock/Edit', null],
+        ['Manage/Stock/Movements', null],
+        ['Manage/Stock/Index/Extra', null],
+        ['Manage/Stock/IndexOld', null],
+        ['manage/stock/index', null],
+        ['Manage/', null],
+        ['Manage/Accounts/Index', null],
+        ['Stock/Index', null],
+        ['Finance/Stock/Index', null],
+        ['Orders/Index', null],
+        ['Catalogue/Producers/Index', null],
+        ['Welcome', null],
+    ])('%s -> %s', (page, expected) => {
+        expect(pilotVariantFor(page)).toBe(expected);
+    });
+
+    it('passes the variant through the actual AppLayout only on the exact page and clears it on leaving', async () => {
+        const page = usePage();
+        const wrapper = mount(AppLayout);
+        const variant = () =>
+            wrapper.get('[data-pilot]').attributes('data-variant');
+        for (const component of [
+            'Orders/Index',
+            'Catalogue/Producers/Index',
+            'Manage/Accounts/Index',
+            'Manage/Stock/Create',
+            'Welcome',
+        ]) {
+            page.component = component;
+            await nextTick();
+            expect(variant()).toBe('');
+        }
+        page.component = 'Manage/Stock/Index';
+        await nextTick();
+        expect(variant()).toBe('landing-stock');
+        page.component = 'Orders/Index';
+        await nextTick();
+        expect(variant()).toBe('');
+        page.component = 'Manage/Stock/Index';
+        await nextTick();
+        expect(variant()).toBe('landing-stock');
+        wrapper.unmount();
+        page.component = 'Orders/Index';
     });
 });

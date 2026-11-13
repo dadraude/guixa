@@ -12,7 +12,22 @@ import { defineComponent, h, nextTick } from 'vue';
 import { usePage } from '@inertiajs/vue3';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { toast } from 'vue-sonner';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuSub,
+    DropdownMenuSubContent,
+    DropdownMenuSubTrigger,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 vi.mock('@inertiajs/vue3', async () => {
     const { defineComponent, h, reactive } = await import('vue');
@@ -118,6 +133,7 @@ describe('pilot theme layout and portal', () => {
         await nextTick();
         const warnings = vi.mocked(console.warn).mock.calls;
         vi.restoreAllMocks();
+        vi.unstubAllGlobals();
         expect(
             warnings.some(
                 ([message]) =>
@@ -209,5 +225,139 @@ describe('pilot theme layout and portal', () => {
                 .querySelector('[data-slot="dialog-overlay"]')
                 ?.classList.contains('pilot-theme'),
         ).toBe(false);
+    });
+
+    it('scopes landing-stock to shell, dialog and sheet portals of the exact stock page only', async () => {
+        const page = usePage();
+        page.component = 'Orders/Index';
+        const wrapper = mount(AppLayout, {
+            slots: { default: () => [h(Portal), h(SheetPortal)] },
+        });
+        mountedWrappers.push(wrapper);
+        await nextTick();
+        const shell = wrapper.get('[data-test="shell"]');
+        const dialog = () =>
+            document.querySelector('[data-slot="dialog-content"]');
+        const sheet = () =>
+            document.querySelector('[data-slot="sheet-content"]');
+        const landing = (element: Element | null | undefined) =>
+            element?.classList.contains('landing-stock');
+
+        for (const component of [
+            'Orders/Index',
+            'Catalogue/Producers/Index',
+            'Manage/Stock/Create',
+            'Welcome',
+        ]) {
+            page.component = component;
+            await nextTick();
+            expect(shell.classes()).not.toContain('landing-stock');
+            expect(landing(dialog())).toBe(false);
+            expect(landing(sheet())).toBe(false);
+        }
+        page.component = 'Manage/Stock/Index';
+        await nextTick();
+        expect(shell.classes()).toContain('landing-stock');
+        expect(shell.classes()).toContain('pilot-theme');
+        expect(landing(dialog())).toBe(true);
+        expect(landing(sheet())).toBe(true);
+        page.component = 'Orders/Index';
+        await nextTick();
+        expect(shell.classes()).not.toContain('landing-stock');
+        expect(landing(dialog())).toBe(false);
+        expect(landing(sheet())).toBe(false);
+        page.component = 'Manage/Stock/Index';
+        await nextTick();
+        expect(landing(dialog())).toBe(true);
+    });
+
+    it('does not apply landing-stock to a portal outside the layout', async () => {
+        const wrapper = mount(Portal);
+        mountedWrappers.push(wrapper);
+        await nextTick();
+        expect(
+            document
+                .querySelector('[data-slot="dialog-content"]')
+                ?.classList.contains('landing-stock'),
+        ).toBe(false);
+    });
+
+    it('adds and removes landing-stock on dropdown, submenu, tooltip and toaster content', async () => {
+        const { Toaster: RealToaster } = await vi.importActual<
+            typeof import('@/components/ui/sonner')
+        >('@/components/ui/sonner');
+        const Overlays = defineComponent({
+            setup() {
+                return () => [
+                    h(DropdownMenu, { open: true }, () => [
+                        h(DropdownMenuTrigger, () => 'Menu'),
+                        h(DropdownMenuContent, null, () =>
+                            h(DropdownMenuSub, { open: true }, () => [
+                                h(DropdownMenuSubTrigger, () => 'More'),
+                                h(DropdownMenuSubContent, () => 'Sub'),
+                            ]),
+                        ),
+                    ]),
+                    h(TooltipProvider, () =>
+                        h(Tooltip, { open: true }, () => [
+                            h(TooltipTrigger, () => 'Tip'),
+                            h(TooltipContent, () => 'Tooltip body'),
+                        ]),
+                    ),
+                    h(RealToaster),
+                ];
+            },
+        });
+        vi.stubGlobal(
+            'ResizeObserver',
+            class {
+                observe() {}
+                unobserve() {}
+                disconnect() {}
+            },
+        );
+        const page = usePage();
+        page.component = 'Orders/Index';
+        const wrapper = mount(AppLayout, {
+            slots: { default: () => h(Overlays) },
+        });
+        mountedWrappers.push(wrapper);
+        toast('Scope probe');
+        await nextTick();
+        await nextTick();
+        const targets = {
+            dropdown: '[data-slot="dropdown-menu-content"]',
+            submenu: '[data-slot="dropdown-menu-sub-content"]',
+            tooltip: '[data-slot="tooltip-content"]',
+            toaster: '[data-sonner-toaster]',
+        };
+        // The toaster renders in place (not portalled), so it lives in the wrapper.
+        const find = (selector: string) =>
+            document.querySelector(selector) ??
+            wrapper.element.querySelector(selector);
+        const has = (selector: string) =>
+            find(selector)?.classList.contains('landing-stock');
+        for (const selector of Object.values(targets))
+            expect(find(selector), selector).not.toBeNull();
+
+        for (const component of ['Orders/Index', 'Manage/Stock/Create']) {
+            page.component = component;
+            await nextTick();
+            for (const selector of Object.values(targets))
+                expect(has(selector), `${component} ${selector}`).toBe(false);
+        }
+        page.component = 'Manage/Stock/Index';
+        await nextTick();
+        for (const [name, selector] of Object.entries(targets)) {
+            expect(has(selector), name).toBe(true);
+            expect(
+                find(selector)?.classList.contains('pilot-theme'),
+                name,
+            ).toBe(true);
+        }
+        page.component = 'Orders/Index';
+        await nextTick();
+        for (const [name, selector] of Object.entries(targets))
+            expect(has(selector), name).toBe(false);
     });
 });
