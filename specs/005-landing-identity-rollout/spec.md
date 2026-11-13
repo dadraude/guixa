@@ -1,6 +1,6 @@
 # 005 — Landing identity rollout: Catalogue role complete
 
-**Status: Draft, not accepted.** Specification of delivery slice 1 only. The
+**Status: Draft, awaiting acceptance; no open questions.** Specification of delivery slice 1 only. The
 [discovery](discovery.md) keeps slices 2-7 as a roadmap; they get no requirements here. Slice selection
 and boundary are recorded in [history](history/) (Q&A 2026-11-13: slice 1 selected; T85 visual approval
 granted; Manage stock and return-item pages moved into slice 1). Accepting this spec authorizes no plan,
@@ -221,9 +221,8 @@ the user approves, the approval is logged in history with the evidence it covere
 
 ## Open questions
 
-- **OQ1 — Mixed look inside a task.** Some Catalogue-page links lead to pages that stay on the previous look
-  until their slice (for example Manager-only pages, and `Manage/Stock/Index` which is already migrated but
-  is not a Catalogue page). R3 accepts this change of look as expected. Confirm that it is acceptable for
-  the interim, or name the links that must wait. Blocks R3 only.
-- **OQ2 — Who approves and how is it recorded.** R12 and S12 assume the user records visual approval as a
-  Q&A in history, as for T84/T85. Confirm, and say whether one approval covers both Catalogue and Manager use of these pages and whether light and dark are reviewed in the same sitting. Blocks S12 only.
+None open. Answered 2026-11-13 (see history):
+
+- **OQ1 — Mixed look inside a task.** Acceptable until each page's own slice; R3 stands.
+- **OQ2 — Who approves and how is it recorded.** One approval in one sitting covers Catalogue and Manager use
+  of these pages, in light and dark; it is logged as a Q&A with the evidence it covered (R12, S12).
