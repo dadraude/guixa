@@ -291,3 +291,14 @@ Descriptions record the reconciliation; only T47 changes status. Fields and nati
 outside that authorized tracking update remain intact. T33 stays Todo with all 18 blockers;
 T48/T50/T51 remain closure gates. The historical baseline remains byte-identical. No T52 work,
 feature closure, deployment or PR merge is performed by this reconciliation.
+
+## Linear mapping — landing rollout
+
+T84 and T85 are standalone Coop tasks of the landing style rollout; neither has a parent. They do not
+change the weekly ordering requirements or scenarios. T85 follows the integrated T84 (PR #408), which is
+context, not a native blocking relation.
+
+| Task | Linear issue | After |
+| --- | --- | --- |
+| [T84](#t84) | [DRA-265](https://linear.app/draude/issue/DRA-265/t84-aplicar-la-identitat-de-la-landing-al-pilot-destoc-de-gestio) | — |
+| [T85](#t85) | [DRA-269](https://linear.app/draude/issue/DRA-269/t85-aplicar-la-identitat-de-la-landing-a-les-comandes-del-membre) | T84 (integrated) |
