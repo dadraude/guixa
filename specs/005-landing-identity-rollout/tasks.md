@@ -1,6 +1,6 @@
 # 005 — Landing identity rollout: Catalogue role complete · Tasks
 
-**Status: Draft awaiting acceptance.** Accepting it authorizes no implementation or ticket publication. Source: [accepted spec](spec.md) R1–R13/S1–S12
+**Status: Accepted (2026-11-13, PR #418).** Accepting it authorized no implementation or ticket publication; the ticket batch is drafted in [ticket-drafts.md](ticket-drafts.md). Source: [accepted spec](spec.md) R1–R13/S1–S12
 (slice 1 only); [plan](plan.md) (accepted, PR #417); [constitution](../constitution.md).
 IDs are local to 005 and start at T01; 001 items are cited as "001 T84". This document authorizes no implementation, no
 ticket publication and no Linear writes. Everything marked *unverified* was not run; this draft is from code reading
@@ -377,3 +377,19 @@ global promotion and Dashboard restyle are outside.
    contrast, seeder table names (`return_items`, `producer_cycle_availability`), runner path with no command run, and
    the ~150–170 case estimate (`run.mjs plan` decides). Pest test names and filters not run.
 5. No Linear publication, branch/worktree or implementation authorization is implied; no tracker column exists yet.
+
+## Linear mapping — slice 1
+
+Published 2026-11-13 ([record](linear-publication.md)). Parent: DRA-270 (no task ID, no label).
+
+| Task | Issue |
+| --- | --- |
+| T01 | DRA-271 |
+| T02 | DRA-272 |
+| T03 | DRA-273 |
+| T04 | DRA-274 |
+| T05 | DRA-277 |
+| T06 | DRA-278 |
+| T07 | DRA-275 |
+| T08 | DRA-276 |
+| T09 | DRA-279 |
