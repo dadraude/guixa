@@ -13,6 +13,9 @@ from the accepted graph. Product requirements and plan decisions are unchanged. 
 Només es detalla el pilot d’Estoc de gestió. La resta del desplegament conserva el full de ruta del pla
 fins a la revisió del pilot. No hi ha autorització d’implementació ni de publicació de tiquets.
 
+**2026-11-13 — Fase 2, comandes del membre:** T85 proposada (pendent d’acceptació); sense autorització
+d’execució ni de publicació de tiquets.
+
 Source: [spec](spec.md) and areas · [plan](plan.md) · [coverage allocation](tasks/coverage.md).
 
 ## File map
@@ -29,6 +32,7 @@ Source: [spec](spec.md) and areas · [plan](plan.md) · [coverage allocation](ta
 | [tasks/recorder-names.md](tasks/recorder-names.md) | T82: recorder names instead of account ids in the wallet statement and basket histories |
 | [tasks/landing.md](tasks/landing.md) | T83: approved light cooperative public landing |
 | [tasks/landing-style-pilot.md](tasks/landing-style-pilot.md) | T84: pilot d’Estoc de gestió amb la identitat de la landing; acceptada, preparació i cobertura parcial |
+| [tasks/landing-orders.md](tasks/landing-orders.md) | T85: fase 2, comandes del membre amb la identitat de la landing; proposta pendent d’acceptació |
 | [tasks/baseline.md](tasks/baseline.md) | Historical T01–T51 scopes, approval gates and dated evidence; superseded behavior is explicitly historical |
 
 IDs are feature-global. Detail files do not start separate numbering or redefine dependencies.
@@ -161,6 +165,7 @@ preserves; implement changed behavior through T52–T68; T69–T76 are the 2026-
 | T82 | <a id="t82"></a>[Show recorder names instead of account ids](tasks/recorder-names.md#t82) | R23a, R31 (recorder names) | T76 |
 | T83 | <a id="t83"></a>[Implement approved light cooperative landing](tasks/landing.md#t83) | Plan: Public Welcome landing direction | — |
 | T84 | <a id="t84"></a>[Aplicar la identitat de la landing al pilot d’Estoc de gestió](tasks/landing-style-pilot.md#t84) | Pla: llenguatge visual de la portada; regressió parcial 001 R25/R27/R28/R28a, S23/S71/S93; permisos 003 R4 | — (base integrada; sense autorització d’execució) |
+| T85 | <a id="t85"></a>[Aplicar la identitat de la landing a les comandes del membre](tasks/landing-orders.md#t85) | Pla: llenguatge visual de la portada, fase 2; regressió parcial 001 R3b, R4b, R7–R10, R23a, R35; S2/S4/S32/S33/S37/S48/S49 | T84 (integrada; sense autorització d’execució) |
 
 ## Linear mapping — 2026-11-05 audit tasks
 
