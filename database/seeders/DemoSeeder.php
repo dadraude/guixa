@@ -7,6 +7,8 @@ use DateTimeImmutable;
 use Guixa\Catalog\Application\CreateProducer;
 use Guixa\Catalog\Application\CreateProduct;
 use Guixa\Catalog\Application\CreateStockProduct;
+use Guixa\Catalog\Application\DeactivateProducer;
+use Guixa\Catalog\Application\DeactivateProduct;
 use Guixa\Membership\Application\CreateHousehold;
 use Guixa\Membership\Application\GrantStaffRole;
 use Guixa\Membership\Domain\Account;
@@ -17,6 +19,7 @@ use Guixa\Ordering\Application\CloseProducerNow;
 use Guixa\Ordering\Application\MarkProducerDistributed;
 use Guixa\Ordering\Application\OpenCycle;
 use Guixa\Ordering\Application\SetOrderLine;
+use Guixa\Ordering\Application\SetProductAvailability;
 use Guixa\Ordering\Application\SetReceivedTotal;
 use Guixa\Ordering\Application\ValidateReception;
 use Guixa\Ordering\Domain\CooperativeSettings;
@@ -29,6 +32,8 @@ use Guixa\Shared\Application\ActorResolver;
 use Guixa\Shared\Domain\Clock;
 use Guixa\Shared\Domain\Quantity;
 use Guixa\Shared\Domain\Role;
+use Guixa\Stock\Application\CreateReturnItem;
+use Guixa\Stock\Application\DeactivateReturnItem;
 use Guixa\Stock\Application\RecordStockEntry;
 use Guixa\Wallet\Application\RecordTopUp;
 use Illuminate\Database\Seeder;
@@ -142,6 +147,29 @@ final class DemoSeeder extends Seeder
 
         // A closed, ordered, unsent producer with an account is the one send the dashboard offers the manager (R9).
         app(CloseProducerNow::class)($manager, $cycles[2], $catalog['producers'][2]);
+
+        $this->createCatalogueStates($manager, $cycles[2], $catalog);
+    }
+
+    /**
+     * Created after the cycles so no cycle, order or reception changes: the deactivated producer and the inactive product
+     * never take part in a cycle, and the first producer's order in the unsent cycle still offers the availability toggle.
+     *
+     * @param  array{producers: list<string>, products: list<array{id: string, producerId: string}>}  $catalog
+     */
+    private function createCatalogueStates(Actor $manager, string $unsentCycleId, array $catalog): void
+    {
+        $formerProducerId = app(CreateProducer::class)($manager, 'Cooperativa Tancada', 2, '20:00');
+        app(DeactivateProducer::class)($manager, $formerProducerId);
+
+        $retiredProductId = app(CreateProduct::class)($manager, $catalog['producers'][1], 'Coca de recapte', 'peça', 420, false, null);
+        app(DeactivateProduct::class)($manager, $retiredProductId);
+
+        app(SetProductAvailability::class)($manager, $unsentCycleId, $catalog['products'][1]['id'], false);
+
+        app(CreateReturnItem::class)($manager, 'Caixa de fruita', 150);
+        $retiredReturnItemId = app(CreateReturnItem::class)($manager, 'Ampolla de vidre', 25);
+        app(DeactivateReturnItem::class)($manager, $retiredReturnItemId);
     }
 
     /** Settlement created one draft base basket per household; the first household's is validated and collected. */

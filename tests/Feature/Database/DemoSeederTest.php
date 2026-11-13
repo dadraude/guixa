@@ -19,8 +19,8 @@ it('seeds a usable cooperative with accounts, orders, reception and pickups', fu
 
     expect(User::count())->toBe(9);
     $this->assertDatabaseCount('households', 4);
-    $this->assertDatabaseCount('producers', 3);
-    $this->assertDatabaseCount('products', 8);
+    $this->assertDatabaseCount('producers', 4);
+    $this->assertDatabaseCount('products', 9);
     $this->assertDatabaseCount('cycles', 3);
     $this->assertDatabaseCount('orders', 12);
     expect(DB::table('order_lines')->count())->toBeGreaterThan(60);
@@ -107,6 +107,36 @@ it('shows each demo role its own opportunity below no false task: member orderin
         ->and($member->first()->cutoffs)->not->toBeEmpty()
         ->and($kinds('hort@demo.guixa.test')->pluck('kind')->unique()->all())->toBe(['producer_summary'])
         ->and($kinds('biel@demo.guixa.test')->pluck('kind')->all())->toContain('catalogue_maintenance');
+});
+
+it('seeds the Catalogue states', function () {
+    $this->seed(DemoSeeder::class);
+    $this->withoutVite();
+    $deactivated = DB::table('producers')->where('active', false)->pluck('id');
+    $unsentCycle = DB::table('cycles')->orderByDesc('pickup_date')->value('id');
+
+    expect($deactivated)->toHaveCount(1)
+        ->and(DB::table('cycle_producers')->where('producer_id', $deactivated->first())->count())->toBe(0);
+
+    $inactiveProducts = DB::table('products')->where('active', false)->pluck('id');
+    expect($inactiveProducts)->toHaveCount(1)
+        ->and(DB::table('order_lines')->where('product_id', $inactiveProducts->first())->count())->toBe(0);
+
+    $unavailable = DB::table('product_unavailabilities')->get();
+    expect($unavailable)->toHaveCount(1)
+        ->and($unavailable->first()->cycle_id)->toBe($unsentCycle)
+        ->and(DB::table('cycle_producers')->where('cycle_id', $unsentCycle)
+            ->where('producer_id', DB::table('products')->where('id', $unavailable->first()->product_id)->value('producer_id'))
+            ->value('sent_at'))->toBeNull();
+
+    expect(DB::table('return_items')->count())->toBe(2)
+        ->and(DB::table('return_items')->where('active', false)->count())->toBe(1);
+
+    $this->actingAs(User::query()->where('email', 'biel@demo.guixa.test')->firstOrFail());
+    $producer = DB::table('products')->where('id', $unavailable->first()->product_id)->value('producer_id');
+    foreach (['/catalogue/producers', "/catalogue/producers/{$producer}/products", "/catalogue/producers/{$producer}/availability", '/catalogue/return-items'] as $path) {
+        $this->get($path)->assertOk();
+    }
 });
 
 it('seeds staff role holders besides the manager', function () {
@@ -196,7 +226,7 @@ it('can be repeated without duplicating data or resetting demo edits', function 
     $cycle = DB::table('cycles')->orderByDesc('pickup_date')->value('id');
     $product = DB::table('products')->where('name', 'Pastanagues')->value('id');
     app(SetOrderLine::class)(app(ActorResolver::class)->forAccount($user->id), $cycle, $product, '3.250');
-    $tables = ['users', 'households', 'producers', 'products', 'cycles', 'orders', 'order_lines', 'wallet_movements', 'stock_movements', 'received_totals'];
+    $tables = ['users', 'households', 'producers', 'products', 'cycles', 'orders', 'order_lines', 'wallet_movements', 'stock_movements', 'received_totals', 'return_items', 'product_unavailabilities'];
     $counts = array_map(fn (string $table) => DB::table($table)->count(), $tables);
 
     $this->seed(DemoSeeder::class);
