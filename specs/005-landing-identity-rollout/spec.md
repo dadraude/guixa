@@ -143,7 +143,7 @@ pages (accounts, cycles, settings) still show their current look.
 **S3 — Forms: fields, errors, disabled (R5, R6, R8, R10).** Given the weekly product create form, the weekly
 product edit form, the stock create and edit forms and the return-item create and edit forms, when each is
 opened empty, submitted invalid and submitted with a server error, then every field has a persistent label,
-a border measured at 3:1 or more, an error message associated with its field and visible without clipping,
+a border measured at 3:1 or more, an error message shown directly after its field and visible without clipping,
 the busy or disabled state of the submit control is distinguishable by more than colour, and the submitted
 values, messages and redirects are the same as before this slice. Opening a form by keyboard only, every
 control is reachable in reading order and focus is visible.
