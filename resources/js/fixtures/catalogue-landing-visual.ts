@@ -234,6 +234,18 @@ const weeklyProduct = {
     active: true,
 };
 // --- end T05
+// --- T06 (DRA-278): the stock product the stock edit form is prefilled with. `used` locks unit and variable.
+const stockProduct = {
+    id: 'stock-1',
+    producerId: 'producer-1',
+    name: state === 'long-name' ? longName : 'Mel de farigola',
+    unit: 'pot',
+    price: '6.50',
+    variable: state === 'used',
+    containersPerUnit: '2.000',
+    active: true,
+};
+// --- end T06
 const pageProps: Record<string, Record<string, unknown>> = {
     'Catalogue/Producers/Index': {
         producers: producersByState[state] ?? producersByState.default,
@@ -262,6 +274,20 @@ const pageProps: Record<string, Record<string, unknown>> = {
         canDelete: state !== 'used' && state !== 'read-only',
     },
     // --- end T05 ---
+    // --- T06 (DRA-278): stock product forms and the unmigrated Movements neighbour ---
+    'Manage/Stock/Create': {
+        producer: { id: 'producer-1', name: 'Hort de la Vall' },
+    },
+    'Manage/Stock/Edit': {
+        product: stockProduct,
+        used: state === 'used',
+    },
+    'Manage/Stock/Movements': {
+        product: { ...stockProduct, available: '12.000' },
+        cycles: [],
+        history: { lines: [], total: 0, page: 1, prevUrl: null, nextUrl: null },
+    },
+    // --- end T06 ---
     // Unmigrated consumers of the shared dialog, for the leakage probe.
     // --- T05 (DRA-277): shared-consumer probe, WeeklyProductFields consumer left unmigrated
     'Producer/Products/Create': {},
@@ -304,6 +330,13 @@ const urls: Record<string, string> = {
         '/catalogue/producers/producer-1/products/weekly/product-1/edit',
     'Producer/Products/Create': '/producer/products/create',
     // --- end T05
+    // --- T06 (DRA-278)
+    'Manage/Stock/Create':
+        '/catalogue/producers/producer-1/products/stock/create',
+    'Manage/Stock/Edit':
+        '/catalogue/producers/producer-1/products/stock/stock-1/edit',
+    'Manage/Stock/Movements': '/manage/stock/stock-1/movements',
+    // --- end T06
     'Producer/Products/Edit': '/producer/products/product-1/edit',
     'Manage/Cycles/Index': '/manage/cycles',
     'Manage/Accounts/Index': '/manage/accounts',
@@ -347,6 +380,9 @@ const availabilityRequests: string[] = [];
 // --- T05 (DRA-277)
 const weeklyRequests: string[] = [];
 // --- end T05
+// --- T06 (DRA-278)
+const stockRequests: string[] = [];
+// --- end T06
 const pagesByPath: Record<string, string> = {
     '/catalogue/producers/producer-1/availability':
         'Catalogue/Producers/Availability',
@@ -415,6 +451,29 @@ http.setClient({
             return reply({ ...page, props: { ...page.props, errors } });
         }
         // --- end T05
+        // --- T06 (DRA-278): the stock forms post to /products/stock, same contract as the weekly ones.
+        if (path.includes('/products/stock') && method !== 'get') {
+            stockRequests.push(`${method} ${path}`);
+            if (state === 'busy') return new Promise(() => {});
+            const errors =
+                {
+                    invalid: {
+                        name: 'Ja existeix un producte d’estoc amb aquest nom.',
+                    },
+                    'invalid-all': {
+                        name: `Ja existeix un producte d’estoc amb aquest nom: ${longName}.`,
+                        unit: 'La unitat és obligatòria.',
+                        price: 'El preu ha de ser un import positiu.',
+                        containers_per_unit:
+                            'Els envasos per unitat han de ser un número positiu.',
+                    },
+                    'server-error': {
+                        domain: 'No s’ha pogut desar el producte.',
+                    },
+                }[state] ?? {};
+            return reply({ ...page, props: { ...page.props, errors } });
+        }
+        // --- end T06
         // Busy state: the request never answers, so the page stays in `processing`.
         if (method === 'put' && state === 'busy') return new Promise(() => {});
         if (method === 'put' && state === 'error')
@@ -953,6 +1012,33 @@ const recordFieldContrast = () => {
 };
 // --- end T05 ---------------------------------------------------------------------------------------
 
+// --- T06 (DRA-278): stock product forms. Same field contrast probe as the weekly forms (R5). ---------
+const stockForms = ['Manage/Stock/Create', 'Manage/Stock/Edit'];
+const submitStockForm = async () => {
+    const form = await waitFor(() =>
+        document.querySelector<HTMLFormElement>('#main-content form'),
+    );
+    const type = (name: string, value: string) => {
+        const input = form.querySelector<HTMLInputElement>(
+            `input[name="${name}"]`,
+        )!;
+        input.focus();
+        input.value = value;
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+    };
+    type('name', 'Mel de farigola');
+    type('unit', 'pot');
+    type('price', '6.50');
+    form.requestSubmit();
+    const outcome =
+        state === 'busy'
+            ? '[data-test="save-stock-product"][disabled]'
+            : '#main-content form [class*="text-destructive"]:not(:empty)';
+    await waitFor(() => document.querySelector(outcome));
+    await sleep(300);
+};
+// --- end T06 -----------------------------------------------------------------------------------------
+
 void createInertiaApp({
     resolve: (name) => components[`../pages/${name}.vue`].default,
     layout: (name) => {
@@ -1180,6 +1266,19 @@ void createInertiaApp({
             weeklyRequests.join(' ; '),
         );
     // --- end T05 ---
+    // --- T06 ---
+    if (
+        stockForms.includes(pageName) &&
+        ['invalid', 'invalid-all', 'server-error', 'busy'].includes(state)
+    )
+        await submitStockForm();
+    if (stockForms.includes(pageName) && !dialogParam) recordFieldContrast();
+    if (stockForms.includes(pageName))
+        document.body.setAttribute(
+            'data-ev-stock-requests',
+            stockRequests.join(' ; '),
+        );
+    // --- end T06 ---
     recordDialog();
     await snapshot('now');
     if (

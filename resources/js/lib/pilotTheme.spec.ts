@@ -182,8 +182,10 @@ describe('pilot theme page selection', () => {
 describe('landing variant admission', () => {
     it.each([
         ['Manage/Stock/Index', 'landing'],
-        ['Manage/Stock/Create', null],
-        ['Manage/Stock/Edit', null],
+        ['Manage/Stock/Create', 'landing'],
+        ['Manage/Stock/Create/Extra', null],
+        ['Manage/Stock/Edit', 'landing'],
+        ['Manage/Stock/Edit/Extra', null],
         ['Manage/Stock/Movements', null],
         ['Manage/Stock/Index/Extra', null],
         ['Manage/Stock/IndexOld', null],
@@ -232,7 +234,7 @@ describe('landing variant admission', () => {
             'Producer/Products/Edit',
             'Manage/Stock/Movements',
             'Manage/Accounts/Index',
-            'Manage/Stock/Create',
+            'Manage/Stock/Create/Extra',
             'Welcome',
         ]) {
             page.component = component;
@@ -255,6 +257,12 @@ describe('landing variant admission', () => {
         await nextTick();
         expect(variant()).toBe('landing');
         page.component = 'Manage/Stock/Index';
+        await nextTick();
+        expect(variant()).toBe('landing');
+        page.component = 'Manage/Stock/Create';
+        await nextTick();
+        expect(variant()).toBe('landing');
+        page.component = 'Manage/Stock/Edit';
         await nextTick();
         expect(variant()).toBe('landing');
         page.component = 'Orders/Other';
