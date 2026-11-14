@@ -2302,3 +2302,41 @@ html.dark:has(.reference-style)
         font-size: 0.875rem;
     }
 }
+
+/* 005 T07 */
+/*
+ * Return items (Manage/ReturnItems/Index). Measured at 200% text: the visually hidden table header keeps
+ * its cells on one line, so their text sits outside the viewport and the page reads as overflowing; and the
+ * non-wrapping create button is wider than a phone at 32px. Both are scoped to this page by its create link.
+ */
+@container pilot-manager (max-width: 58rem) {
+    .landing
+        .pilot-manager-page:has(> div > a[href$='/return-items/create'])
+        .pilot-manager-table
+        thead
+        th {
+        display: block;
+        white-space: normal;
+    }
+}
+
+.landing
+    .pilot-manager-page
+    > div
+    > a[data-slot='button'][href$='/return-items/create'] {
+    max-width: 100%;
+    height: auto;
+    min-height: 44px;
+    white-space: normal;
+}
+
+/* Amounts line up on their decimal point only when right-aligned; the phone card keeps its left-aligned label/value pairs. */
+@container pilot-manager (min-width: 58.001rem) {
+    .landing
+        .pilot-manager-page:has(> div > a[href$='/return-items/create'])
+        .pilot-manager-table
+        :is(th, td):nth-child(3) {
+        text-align: right;
+        padding-right: 2rem;
+    }
+}

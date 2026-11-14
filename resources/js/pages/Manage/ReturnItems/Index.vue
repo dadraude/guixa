@@ -60,12 +60,7 @@ defineProps<{
                     </tr>
                 </thead>
                 <tbody>
-                    <tr
-                        v-for="item in items"
-                        :key="item.id"
-                        class="border-b"
-                        :class="{ 'text-muted-foreground': !item.active }"
-                    >
+                    <tr v-for="item in items" :key="item.id" class="border-b">
                         <td class="py-2">
                             <span class="pilot-cell-label" aria-hidden="true">{{
                                 trans('Active')
