@@ -2340,3 +2340,59 @@ html.dark:has(.reference-style)
         padding-right: 2rem;
     }
 }
+
+/* 005 T08 */
+/*
+ * Stock movement history (Catalogue/Stock/Movements). The phone card of the shared wallet table was written for
+ * the wallet statement: it spans columns 1, 3 and 4 and sets both amounts on grid row 2, so on the eight-column
+ * history the quantity and the balance overlap, and a long figure squeezes the first grid track to zero width
+ * (measured at 375 px and at 1024 px/200 % text). This block gives the history its own card, scoped to the
+ * history table. Unmigrated consumers (Producer, Finance, Manage) keep the previous rules.
+ */
+@container pilot-wallet (max-width: 52rem) {
+    .landing .pilot-wallet-table[data-test='movement-history'] thead th {
+        display: block;
+        white-space: normal;
+    }
+
+    .landing
+        .pilot-t44-page
+        .pilot-wallet-table[data-test='movement-history']
+        tbody
+        tr {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .landing
+        .pilot-t44-page
+        .pilot-wallet-table[data-test='movement-history']
+        tbody
+        tr
+        td {
+        grid-column: 1 / -1;
+        grid-row: auto;
+        white-space: normal;
+        text-align: start;
+    }
+
+    .landing
+        .pilot-t44-page
+        .pilot-wallet-table[data-test='movement-history']
+        td.pilot-amount
+        .pilot-cell-label {
+        display: block;
+        margin-right: 0;
+    }
+}
+
+/* Quantity and balance share a row only where each half still holds a seven-digit figure at the current text size. */
+@container pilot-wallet (min-width: 17rem) and (max-width: 52rem) {
+    .landing
+        .pilot-t44-page
+        .pilot-wallet-table[data-test='movement-history']
+        tbody
+        tr
+        td.pilot-amount {
+        grid-column: auto;
+    }
+}

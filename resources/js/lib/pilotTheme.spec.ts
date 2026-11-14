@@ -157,6 +157,7 @@ describe('pilot theme page selection', () => {
         ['Manage/ReturnItems/Index', true],
         ['Manage/ReturnItems/Create', true],
         ['Manage/ReturnItems/Edit', true],
+        ['Catalogue/Stock/Movements', true],
         ['Finance/Baskets/Index', true],
         ['Finance/Baskets/Create', true],
         ['Finance/Baskets/Show', true],
@@ -217,6 +218,11 @@ describe('landing variant admission', () => {
         ['Manage/ReturnItems/Create/Extra', null],
         ['Manage/ReturnItems/Edit', 'landing'],
         ['Manage/ReturnItems/Edit/Extra', null],
+        ['Catalogue/Stock/Movements', 'landing'],
+        ['Catalogue/Stock/Movements/Extra', null],
+        ['Catalogue/Stock', null],
+        ['Producer/Stock/Movements', null],
+        ['Finance/Stock/Movements', null],
         ['Producer/Products/Create', null],
         ['Producer/Products/Edit', null],
         ['Welcome', null],
@@ -239,6 +245,9 @@ describe('landing variant admission', () => {
             'Catalogue/Producers/WeeklyProduct/Create/Extra',
             'Producer/Products/Edit',
             'Manage/Stock/Movements',
+            'Producer/Stock/Movements',
+            'Finance/Stock/Movements',
+            'Catalogue/Stock/Movements/Extra',
             'Manage/Accounts/Index',
             'Manage/Stock/Create/Extra',
             'Welcome',
@@ -260,6 +269,9 @@ describe('landing variant admission', () => {
         await nextTick();
         expect(variant()).toBe('landing');
         page.component = 'Catalogue/Producers/WeeklyProduct/Edit';
+        await nextTick();
+        expect(variant()).toBe('landing');
+        page.component = 'Catalogue/Stock/Movements';
         await nextTick();
         expect(variant()).toBe('landing');
         page.component = 'Manage/Stock/Index';

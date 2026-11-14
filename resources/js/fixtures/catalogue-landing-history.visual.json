@@ -1,0 +1,1194 @@
+{
+    "baseUrl": "http://127.0.0.1:5376",
+    "rootFontPx": 16,
+    "darkSelector": "html.dark",
+    "maxTabs": 120,
+    "matrix": {
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark", "system-light", "system-dark"],
+        "text": [100, 200]
+    },
+    "views": [
+        {
+            "id": "history-populated",
+            "path": "/resources/js/fixtures/catalogue-landing.html",
+            "query": {
+                "page": "Catalogue/Stock/Movements",
+                "role": "catalogue",
+                "state": "default"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content td",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["#main-content [data-test=\"movement-basket-link\"]"],
+            "states": [
+                {
+                    "id": "default",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5,
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "#main-content header p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h2#movement-history",
+                                "count": 1,
+                                "text": "Historial de moviments",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form, #main-content input, #main-content select, #main-content textarea, #main-content button",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content a[href*=\"entry\"], #main-content a[href*=\"adjust\"], #main-content a[href*=\"count\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-line\"]",
+                                "count": 4
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-line\"] td",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-line\"] td.pilot-amount",
+                                "count": 8,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-line\"] [data-slot=\"badge\"]",
+                                "count": 4,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-history-overlaps": "0",
+                                    "data-ev-history-collapsed": "0"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-basket-link\"]",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "minHeight": 44,
+                                "minWidth": 44
+                            },
+                            {
+                                "selector": "#main-content header p",
+                                "text": "12,000 pot disponibles"
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "text": "Mel de farigola"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "table",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5,
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "#main-content header p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h2#movement-history",
+                                "count": 1,
+                                "text": "Historial de moviments",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form, #main-content input, #main-content select, #main-content textarea, #main-content button",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content a[href*=\"entry\"], #main-content a[href*=\"adjust\"], #main-content a[href*=\"count\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-line\"]",
+                                "count": 4
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-line\"] td",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-line\"] td.pilot-amount",
+                                "count": 8,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-line\"] [data-slot=\"badge\"]",
+                                "count": 4,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-history-overlaps": "0",
+                                    "data-ev-history-collapsed": "0"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-basket-link\"]",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "minHeight": 44,
+                                "minWidth": 44
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-history\"] th",
+                                "count": 8,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-line\"] td.pilot-amount",
+                                "count": 8,
+                                "styles": {
+                                    "text-align": "end"
+                                }
+                            },
+                            {
+                                "selector": "#main-content header p",
+                                "text": "12,000 pot disponibles"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "long-content",
+                    "query": {
+                        "state": "long-content"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5,
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "#main-content header p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h2#movement-history",
+                                "count": 1,
+                                "text": "Historial de moviments",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form, #main-content input, #main-content select, #main-content textarea, #main-content button",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content a[href*=\"entry\"], #main-content a[href*=\"adjust\"], #main-content a[href*=\"count\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-line\"]",
+                                "count": 2
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-line\"] td",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-line\"] td.pilot-amount",
+                                "count": 4,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-line\"] [data-slot=\"badge\"]",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-history-overlaps": "0",
+                                    "data-ev-history-collapsed": "0"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-basket-link\"]",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "minHeight": 44,
+                                "minWidth": 44
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "history-paged",
+            "path": "/resources/js/fixtures/catalogue-landing.html",
+            "query": {
+                "page": "Catalogue/Stock/Movements",
+                "role": "catalogue",
+                "state": "default"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content td",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "#main-content a[rel=\"prev\"]",
+                "#main-content a[rel=\"next\"]"
+            ],
+            "states": [
+                {
+                    "id": "paged",
+                    "query": {
+                        "state": "paged"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5,
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "#main-content header p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h2#movement-history",
+                                "count": 1,
+                                "text": "Historial de moviments",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form, #main-content input, #main-content select, #main-content textarea, #main-content button",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content a[href*=\"entry\"], #main-content a[href*=\"adjust\"], #main-content a[href*=\"count\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-line\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-line\"] td",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-line\"] td.pilot-amount",
+                                "count": 2,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-line\"] [data-slot=\"badge\"]",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-history-overlaps": "0",
+                                    "data-ev-history-collapsed": "0"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-basket-link\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-paging\"] a",
+                                "count": 2,
+                                "contrast": 4.5,
+                                "minHeight": 44,
+                                "minWidth": 44
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-paging\"] > span.text-sm",
+                                "count": 1,
+                                "contrast": 4.5
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "history-empty",
+            "path": "/resources/js/fixtures/catalogue-landing.html",
+            "query": {
+                "page": "Catalogue/Stock/Movements",
+                "role": "catalogue",
+                "state": "default"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content td",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "The empty history has no interactive control: it is read-only text and the page offers no entry, adjustment or count action (001 R28a).",
+            "states": [
+                {
+                    "id": "empty",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5,
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "#main-content header p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h2#movement-history",
+                                "count": 1,
+                                "text": "Historial de moviments",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form, #main-content input, #main-content select, #main-content textarea, #main-content button",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content a[href*=\"entry\"], #main-content a[href*=\"adjust\"], #main-content a[href*=\"count\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-history-empty\"]",
+                                "count": 1,
+                                "text": "Encara no hi ha moviments.",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-line\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content table",
+                                "count": 0
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "history-variant-off",
+            "path": "/resources/js/fixtures/catalogue-landing.html",
+            "query": {
+                "page": "Catalogue/Stock/Movements",
+                "role": "catalogue",
+                "state": "default"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content td",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Reversibility probe (plan contract item 7): only the restored pre-admission computed values are checked.",
+            "states": [
+                {
+                    "id": "variant-off",
+                    "query": {
+                        "state": "variant-off"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "styles": {
+                                    "color": "rgb(32, 43, 38)",
+                                    "font-size": "24px"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-layout-panel",
+                                "styles": {
+                                    "background-color": "rgb(255, 255, 255)",
+                                    "border-top-color": "rgb(214, 222, 216)"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "leak-producer",
+            "path": "/resources/js/fixtures/catalogue-landing.html",
+            "query": {
+                "page": "Producer/Stock/Movements",
+                "role": "producer",
+                "state": "default"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Shared-consumer leakage probe (R2): only the absence of landing and the unchanged computed values are checked.",
+            "states": [
+                {
+                    "id": "light",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "styles": {
+                                    "color": "rgb(32, 43, 38)",
+                                    "font-size": "24px",
+                                    "font-weight": "800"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-layout-panel",
+                                "styles": {
+                                    "background-color": "rgb(255, 255, 255)",
+                                    "border-top-color": "rgb(214, 222, 216)",
+                                    "border-top-width": "1px",
+                                    "border-radius": "14px"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-history\"] th",
+                                "styles": {
+                                    "color": "rgb(88, 102, 94)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-line\"] [data-slot=\"badge\"]",
+                                "count": 4,
+                                "styles": {
+                                    "background-color": "rgb(242, 244, 241)",
+                                    "border-top-color": "rgb(214, 222, 216)",
+                                    "font-size": "12px"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-line\"] td.pilot-amount",
+                                "count": 8,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums",
+                                    "text-align": "end"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "styles": {
+                                    "background-color": "rgb(248, 247, 244)"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "styles": {
+                                    "color": "rgb(236, 242, 237)",
+                                    "font-size": "24px",
+                                    "font-weight": "800"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-layout-panel",
+                                "styles": {
+                                    "background-color": "rgb(37, 42, 39)",
+                                    "border-top-color": "rgb(107, 120, 111)",
+                                    "border-top-width": "1px",
+                                    "border-radius": "14px"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-history\"] th",
+                                "styles": {
+                                    "color": "rgb(188, 201, 191)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-line\"] [data-slot=\"badge\"]",
+                                "count": 4,
+                                "styles": {
+                                    "background-color": "rgb(47, 52, 48)",
+                                    "border-top-color": "rgb(107, 120, 111)",
+                                    "font-size": "12px"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-line\"] td.pilot-amount",
+                                "count": 8,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums",
+                                    "text-align": "end"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "styles": {
+                                    "background-color": "rgb(27, 30, 28)"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "leak-finance",
+            "path": "/resources/js/fixtures/catalogue-landing.html",
+            "query": {
+                "page": "Finance/Stock/Movements",
+                "role": "manager",
+                "state": "default"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Shared-consumer leakage probe (R2): only the absence of landing and the unchanged computed values are checked.",
+            "states": [
+                {
+                    "id": "light",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "styles": {
+                                    "color": "rgb(32, 43, 38)",
+                                    "font-size": "24px",
+                                    "font-weight": "800"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-layout-panel",
+                                "styles": {
+                                    "background-color": "rgb(255, 255, 255)",
+                                    "border-top-color": "rgb(214, 222, 216)",
+                                    "border-top-width": "1px",
+                                    "border-radius": "14px"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-history\"] th",
+                                "styles": {
+                                    "color": "rgb(88, 102, 94)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-line\"] [data-slot=\"badge\"]",
+                                "count": 4,
+                                "styles": {
+                                    "background-color": "rgb(242, 244, 241)",
+                                    "border-top-color": "rgb(214, 222, 216)",
+                                    "font-size": "12px"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-line\"] td.pilot-amount",
+                                "count": 8,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums",
+                                    "text-align": "end"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "styles": {
+                                    "background-color": "rgb(248, 247, 244)"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "styles": {
+                                    "color": "rgb(236, 242, 237)",
+                                    "font-size": "24px",
+                                    "font-weight": "800"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-layout-panel",
+                                "styles": {
+                                    "background-color": "rgb(37, 42, 39)",
+                                    "border-top-color": "rgb(107, 120, 111)",
+                                    "border-top-width": "1px",
+                                    "border-radius": "14px"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-history\"] th",
+                                "styles": {
+                                    "color": "rgb(188, 201, 191)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-line\"] [data-slot=\"badge\"]",
+                                "count": 4,
+                                "styles": {
+                                    "background-color": "rgb(47, 52, 48)",
+                                    "border-top-color": "rgb(107, 120, 111)",
+                                    "font-size": "12px"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-line\"] td.pilot-amount",
+                                "count": 8,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums",
+                                    "text-align": "end"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "styles": {
+                                    "background-color": "rgb(27, 30, 28)"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "leak-manage",
+            "path": "/resources/js/fixtures/catalogue-landing.html",
+            "query": {
+                "page": "Manage/Stock/Movements",
+                "role": "manager",
+                "state": "default"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Shared-consumer leakage probe (R2): only the absence of landing and the unchanged computed values are checked.",
+            "states": [
+                {
+                    "id": "light",
+                    "query": {
+                        "state": "history"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "styles": {
+                                    "color": "rgb(32, 43, 38)",
+                                    "font-size": "24px",
+                                    "font-weight": "800"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-layout-panel",
+                                "styles": {
+                                    "background-color": "rgb(255, 255, 255)",
+                                    "border-top-color": "rgb(214, 222, 216)",
+                                    "border-top-width": "1px",
+                                    "border-radius": "14px"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-history\"] th",
+                                "styles": {
+                                    "color": "rgb(88, 102, 94)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-line\"] [data-slot=\"badge\"]",
+                                "count": 4,
+                                "styles": {
+                                    "background-color": "rgb(242, 244, 241)",
+                                    "border-top-color": "rgb(214, 222, 216)",
+                                    "font-size": "12px"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-line\"] td.pilot-amount",
+                                "count": 8,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums",
+                                    "text-align": "end"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "styles": {
+                                    "background-color": "rgb(248, 247, 244)"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark",
+                    "query": {
+                        "state": "history"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "styles": {
+                                    "color": "rgb(236, 242, 237)",
+                                    "font-size": "24px",
+                                    "font-weight": "800"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-layout-panel",
+                                "styles": {
+                                    "background-color": "rgb(37, 42, 39)",
+                                    "border-top-color": "rgb(107, 120, 111)",
+                                    "border-top-width": "1px",
+                                    "border-radius": "14px"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-history\"] th",
+                                "styles": {
+                                    "color": "rgb(188, 201, 191)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-line\"] [data-slot=\"badge\"]",
+                                "count": 4,
+                                "styles": {
+                                    "background-color": "rgb(47, 52, 48)",
+                                    "border-top-color": "rgb(107, 120, 111)",
+                                    "font-size": "12px"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-line\"] td.pilot-amount",
+                                "count": 8,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums",
+                                    "text-align": "end"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "styles": {
+                                    "background-color": "rgb(27, 30, 28)"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    ]
+}
