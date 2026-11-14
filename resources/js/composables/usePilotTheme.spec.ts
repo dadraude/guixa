@@ -250,6 +250,7 @@ describe('pilot theme layout and portal', () => {
             'Catalogue/Producers/Products/Extra',
             'Catalogue/Producers/Product',
             'Catalogue/Producers/Availability/Extra',
+            'Catalogue/Producers/WeeklyProduct/Create/Extra',
             'Manage/Stock/Movements',
             'Manage/Stock/Create',
             'Welcome',
@@ -272,6 +273,8 @@ describe('pilot theme layout and portal', () => {
             'Catalogue/Producers/Index',
             'Catalogue/Producers/Products',
             'Catalogue/Producers/Availability',
+            'Catalogue/Producers/WeeklyProduct/Create',
+            'Catalogue/Producers/WeeklyProduct/Edit',
         ]) {
             page.component = component;
             await nextTick();
@@ -370,6 +373,8 @@ describe('pilot theme layout and portal', () => {
             'Catalogue/Producers/Index',
             'Catalogue/Producers/Products',
             'Catalogue/Producers/Availability',
+            'Catalogue/Producers/WeeklyProduct/Create',
+            'Catalogue/Producers/WeeklyProduct/Edit',
         ]) {
             page.component = component;
             await nextTick();
