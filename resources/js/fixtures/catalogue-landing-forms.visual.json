@@ -1,0 +1,988 @@
+{
+    "baseUrl": "http://127.0.0.1:5277",
+    "rootFontPx": 16,
+    "darkSelector": "html.dark",
+    "maxTabs": 120,
+    "matrix": {
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark", "system-light", "system-dark"],
+        "text": [100, 200]
+    },
+    "views": [
+        {
+            "id": "weekly-create",
+            "path": "/resources/js/fixtures/catalogue-landing.html",
+            "query": {
+                "page": "Catalogue/Producers/WeeklyProduct/Create",
+                "role": "catalogue",
+                "state": "default"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content button,#main-content label,#main-content input,#main-content form div",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "#main-content input[name=\"name\"]",
+                "#main-content input[name=\"unit\"]",
+                "#main-content input[name=\"price\"]",
+                "#main-content input[type=\"checkbox\"]",
+                "#main-content input[name=\"containers_per_unit\"]",
+                "#main-content [data-test=\"save-product\"]",
+                "#main-content a[href$=\"/products\"]"
+            ],
+            "states": [
+                {
+                    "id": "default",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "#main-content form input:not([type=\"hidden\"]):not([type=\"checkbox\"])",
+                                "count": 4,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form label",
+                                "count": 5,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form label[for]",
+                                "count": 5
+                            },
+                            {
+                                "selector": "#main-content form input[type=\"checkbox\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content button[data-test=\"save-product\"]",
+                                "count": 1,
+                                "text": "Crea",
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "contrast": 4.5,
+                                "attributes": {
+                                    "disabled": null
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-field-border-ok": "true",
+                                    "data-ev-field-count": "4"
+                                }
+                            },
+                            {
+                                "selector": "#main-content form p.text-destructive:not(:empty)",
+                                "count": 0
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "invalid",
+                    "query": {
+                        "state": "invalid"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "#main-content form input:not([type=\"hidden\"]):not([type=\"checkbox\"])",
+                                "count": 4,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form label",
+                                "count": 5,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form label[for]",
+                                "count": 5
+                            },
+                            {
+                                "selector": "#main-content form input[type=\"checkbox\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content form div:not([style*=\"none\"]) > p.text-destructive",
+                                "count": 1,
+                                "text": "Ja existeix un producte setmanal amb aquest nom.",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-field-border-ok": "true",
+                                    "data-ev-field-count": "4"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "invalid-long",
+                    "query": {
+                        "state": "invalid-long"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "#main-content form input:not([type=\"hidden\"]):not([type=\"checkbox\"])",
+                                "count": 4,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form label",
+                                "count": 5,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form label[for]",
+                                "count": 5
+                            },
+                            {
+                                "selector": "#main-content form input[type=\"checkbox\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content form div:not([style*=\"none\"]) > p.text-destructive",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-field-border-ok": "true",
+                                    "data-ev-field-count": "4"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "server-error",
+                    "query": {
+                        "state": "server-error"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "#main-content form input:not([type=\"hidden\"]):not([type=\"checkbox\"])",
+                                "count": 4,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form label",
+                                "count": 5,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form label[for]",
+                                "count": 5
+                            },
+                            {
+                                "selector": "#main-content form input[type=\"checkbox\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content form div:not([style*=\"none\"]) > p.text-destructive",
+                                "count": 1,
+                                "text": "No s’ha pogut desar el producte.",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-field-border-ok": "true",
+                                    "data-ev-field-count": "4"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "busy",
+                    "query": {
+                        "state": "busy"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "#main-content form input:not([type=\"hidden\"]):not([type=\"checkbox\"])",
+                                "count": 4,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form label",
+                                "count": 5,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form label[for]",
+                                "count": 5
+                            },
+                            {
+                                "selector": "#main-content form input[type=\"checkbox\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content button[data-test=\"save-product\"]",
+                                "count": 1,
+                                "text": "Crea",
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "attributes": {
+                                    "disabled": ""
+                                },
+                                "styles": {
+                                    "opacity": "0.5",
+                                    "pointer-events": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-weekly-requests": "post /catalogue/producers/producer-1/products/weekly"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-field-border-ok": "true",
+                                    "data-ev-field-count": "4"
+                                }
+                            }
+                        ],
+                        "focus": [
+                            "#main-content input[name=\"name\"]",
+                            "#main-content input[name=\"unit\"]",
+                            "#main-content input[name=\"price\"]",
+                            "#main-content input[type=\"checkbox\"]",
+                            "#main-content input[name=\"containers_per_unit\"]",
+                            "#main-content a[href$=\"/products\"]"
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "weekly-edit",
+            "path": "/resources/js/fixtures/catalogue-landing.html",
+            "query": {
+                "page": "Catalogue/Producers/WeeklyProduct/Edit",
+                "role": "catalogue",
+                "state": "default"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content button,#main-content label,#main-content input,#main-content form div",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "#main-content input[name=\"name\"]",
+                "#main-content input[name=\"unit\"]",
+                "#main-content input[name=\"price\"]",
+                "#main-content input[type=\"checkbox\"]",
+                "#main-content input[name=\"containers_per_unit\"]",
+                "#main-content [data-test=\"save-product\"]",
+                "#main-content [data-test=\"delete-unused-product\"]",
+                "#main-content a[href$=\"/products\"]"
+            ],
+            "states": [
+                {
+                    "id": "default",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "#main-content form input:not([type=\"hidden\"]):not([type=\"checkbox\"])",
+                                "count": 4,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form label",
+                                "count": 5,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form label[for]",
+                                "count": 5
+                            },
+                            {
+                                "selector": "#main-content form input[type=\"checkbox\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content button[data-test=\"save-product\"]",
+                                "count": 1,
+                                "text": "Desa",
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "contrast": 4.5,
+                                "attributes": {
+                                    "disabled": null
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"delete-unused-product\"]",
+                                "count": 1,
+                                "text": "Elimina el producte sense ús",
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-field-border-ok": "true",
+                                    "data-ev-field-count": "4"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "long-name",
+                    "query": {
+                        "state": "long-name"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "#main-content form input:not([type=\"hidden\"]):not([type=\"checkbox\"])",
+                                "count": 4,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form label",
+                                "count": 5,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form label[for]",
+                                "count": 5
+                            },
+                            {
+                                "selector": "#main-content form input[type=\"checkbox\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"delete-unused-product\"]",
+                                "count": 1,
+                                "text": "Elimina el producte sense ús",
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-field-border-ok": "true",
+                                    "data-ev-field-count": "4"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "no-delete",
+                    "query": {
+                        "state": "read-only"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "#main-content form input:not([type=\"hidden\"]):not([type=\"checkbox\"])",
+                                "count": 4,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form label",
+                                "count": 5,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form label[for]",
+                                "count": 5
+                            },
+                            {
+                                "selector": "#main-content form input[type=\"checkbox\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"delete-unused-product\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-field-border-ok": "true",
+                                    "data-ev-field-count": "4"
+                                }
+                            }
+                        ],
+                        "focus": [
+                            "#main-content input[name=\"name\"]",
+                            "#main-content input[name=\"unit\"]",
+                            "#main-content input[name=\"price\"]",
+                            "#main-content input[type=\"checkbox\"]",
+                            "#main-content input[name=\"containers_per_unit\"]",
+                            "#main-content [data-test=\"save-product\"]",
+                            "#main-content a[href$=\"/products\"]"
+                        ]
+                    }
+                },
+                {
+                    "id": "server-error",
+                    "query": {
+                        "state": "server-error"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "#main-content form input:not([type=\"hidden\"]):not([type=\"checkbox\"])",
+                                "count": 4,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form label",
+                                "count": 5,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form label[for]",
+                                "count": 5
+                            },
+                            {
+                                "selector": "#main-content form input[type=\"checkbox\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content form div:not([style*=\"none\"]) > p.text-destructive",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-field-border-ok": "true",
+                                    "data-ev-field-count": "4"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dialog-delete",
+                    "query": {
+                        "state": "default",
+                        "dialog": "delete"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "dialog[open]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "dialog[open] button",
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "dialog[open] p",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "dialog[open] h2",
+                                "text": "Elimina",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-opener": "delete-unused-product",
+                                    "data-now-dialog-modal": "true",
+                                    "data-ev-dialog-border-ok": "true",
+                                    "data-ev-dialog-focus-ok": "true"
+                                }
+                            }
+                        ],
+                        "focus": [
+                            "dialog[open] button[aria-label]",
+                            "dialog[open] [data-test=\"cancel-product-action\"]",
+                            "dialog[open] [data-test=\"confirm-product-action\"]"
+                        ]
+                    }
+                },
+                {
+                    "id": "dialog-cancel",
+                    "query": {
+                        "state": "default",
+                        "dialog": "delete-cancel"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "dialog[open]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-t05-close-requests": "0",
+                                    "data-ev-t05-close-focus": "delete-unused-product"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dialog-escape",
+                    "query": {
+                        "state": "default",
+                        "dialog": "delete-escape"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "dialog[open]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-t05-close-requests": "0",
+                                    "data-ev-t05-close-focus": "delete-unused-product"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    ]
+}

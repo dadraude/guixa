@@ -205,6 +205,12 @@ describe('landing variant admission', () => {
         ['Catalogue/Producers/Product', null],
         ['Catalogue/Producers/Availability', 'landing'],
         ['Catalogue/Producers/Availability/Extra', null],
+        ['Catalogue/Producers/WeeklyProduct/Create', 'landing'],
+        ['Catalogue/Producers/WeeklyProduct/Create/Extra', null],
+        ['Catalogue/Producers/WeeklyProduct/Edit', 'landing'],
+        ['Catalogue/Producers/WeeklyProduct/Edit/Extra', null],
+        ['Producer/Products/Create', null],
+        ['Producer/Products/Edit', null],
         ['Welcome', null],
     ])('%s -> %s', (page, expected) => {
         expect(pilotVariantFor(page)).toBe(expected);
@@ -222,6 +228,8 @@ describe('landing variant admission', () => {
             'Catalogue/Producers/Products/Extra',
             'Catalogue/Producers/Product',
             'Catalogue/Producers/Availability/Extra',
+            'Catalogue/Producers/WeeklyProduct/Create/Extra',
+            'Producer/Products/Edit',
             'Manage/Stock/Movements',
             'Manage/Accounts/Index',
             'Manage/Stock/Create',
@@ -238,6 +246,12 @@ describe('landing variant admission', () => {
         await nextTick();
         expect(variant()).toBe('landing');
         page.component = 'Catalogue/Producers/Availability';
+        await nextTick();
+        expect(variant()).toBe('landing');
+        page.component = 'Catalogue/Producers/WeeklyProduct/Create';
+        await nextTick();
+        expect(variant()).toBe('landing');
+        page.component = 'Catalogue/Producers/WeeklyProduct/Edit';
         await nextTick();
         expect(variant()).toBe('landing');
         page.component = 'Manage/Stock/Index';
