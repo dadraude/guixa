@@ -4,21 +4,9 @@
     "darkSelector": "html.dark",
     "maxTabs": 120,
     "matrix": {
-        "widths": [
-            375,
-            1024,
-            1280
-        ],
-        "modes": [
-            "light",
-            "dark",
-            "system-light",
-            "system-dark"
-        ],
-        "text": [
-            100,
-            200
-        ]
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark", "system-light", "system-dark"],
+        "text": [100, 200]
     },
     "views": [
         {
@@ -32,9 +20,7 @@
             "root": ".reference-style",
             "panels": "#main-content",
             "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content button,#main-content label,#main-content input,#main-content form div",
-            "fonts": [
-                "16px Nunito Variable"
-            ],
+            "fonts": ["16px Nunito Variable"],
             "focus": [
                 "#main-content input[name=\"name\"]",
                 "#main-content input[name=\"unit\"]",
@@ -50,9 +36,7 @@
                         "state": "default"
                     },
                     "ready": "body[data-visual-ready]",
-                    "settled": [
-                        ".reference-style"
-                    ],
+                    "settled": [".reference-style"],
                     "cases": [
                         {
                             "width": 375,
@@ -160,9 +144,7 @@
                         "state": "invalid"
                     },
                     "ready": "body[data-visual-ready]",
-                    "settled": [
-                        ".reference-style"
-                    ],
+                    "settled": [".reference-style"],
                     "cases": [
                         {
                             "width": 375,
@@ -251,9 +233,7 @@
                         "state": "invalid-all"
                     },
                     "ready": "body[data-visual-ready]",
-                    "settled": [
-                        ".reference-style"
-                    ],
+                    "settled": [".reference-style"],
                     "cases": [
                         {
                             "width": 375,
@@ -341,9 +321,7 @@
                         "state": "server-error"
                     },
                     "ready": "body[data-visual-ready]",
-                    "settled": [
-                        ".reference-style"
-                    ],
+                    "settled": [".reference-style"],
                     "cases": [
                         {
                             "width": 375,
@@ -422,9 +400,7 @@
                         "state": "busy"
                     },
                     "ready": "body[data-visual-ready]",
-                    "settled": [
-                        ".reference-style"
-                    ],
+                    "settled": [".reference-style"],
                     "cases": [
                         {
                             "width": 375,
@@ -531,9 +507,7 @@
             "root": ".reference-style",
             "panels": "#main-content",
             "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content button,#main-content label,#main-content input,#main-content form div",
-            "fonts": [
-                "16px Nunito Variable"
-            ],
+            "fonts": ["16px Nunito Variable"],
             "focus": [
                 "#main-content input[name=\"name\"]",
                 "#main-content input[name=\"unit\"]",
@@ -552,9 +526,7 @@
                         "state": "default"
                     },
                     "ready": "body[data-visual-ready]",
-                    "settled": [
-                        ".reference-style"
-                    ],
+                    "settled": [".reference-style"],
                     "cases": [
                         {
                             "width": 375,
@@ -678,9 +650,7 @@
                         "state": "long-name"
                     },
                     "ready": "body[data-visual-ready]",
-                    "settled": [
-                        ".reference-style"
-                    ],
+                    "settled": [".reference-style"],
                     "cases": [
                         {
                             "width": 375,
@@ -760,9 +730,7 @@
                         "state": "used"
                     },
                     "ready": "body[data-visual-ready]",
-                    "settled": [
-                        ".reference-style"
-                    ],
+                    "settled": [".reference-style"],
                     "cases": [
                         {
                             "width": 375,
@@ -884,9 +852,7 @@
                         "state": "invalid-all"
                     },
                     "ready": "body[data-visual-ready]",
-                    "settled": [
-                        ".reference-style"
-                    ],
+                    "settled": [".reference-style"],
                     "cases": [
                         {
                             "width": 375,
@@ -985,9 +951,7 @@
                         "state": "server-error"
                     },
                     "ready": "body[data-visual-ready]",
-                    "settled": [
-                        ".reference-style"
-                    ],
+                    "settled": [".reference-style"],
                     "cases": [
                         {
                             "width": 375,
@@ -1066,9 +1030,7 @@
                         "dialog": "delete"
                     },
                     "ready": "body[data-visual-ready]",
-                    "settled": [
-                        ".reference-style"
-                    ],
+                    "settled": [".reference-style"],
                     "cases": [
                         {
                             "width": 375,
@@ -1136,9 +1098,7 @@
                         "dialog": "delete-cancel"
                     },
                     "ready": "body[data-visual-ready]",
-                    "settled": [
-                        ".reference-style"
-                    ],
+                    "settled": [".reference-style"],
                     "cases": [
                         {
                             "width": 375,
@@ -1169,9 +1129,7 @@
                         "dialog": "delete-escape"
                     },
                     "ready": "body[data-visual-ready]",
-                    "settled": [
-                        ".reference-style"
-                    ],
+                    "settled": [".reference-style"],
                     "cases": [
                         {
                             "width": 375,
@@ -1202,9 +1160,7 @@
                         "dialog": "classify"
                     },
                     "ready": "body[data-visual-ready]",
-                    "settled": [
-                        ".reference-style"
-                    ],
+                    "settled": [".reference-style"],
                     "cases": [
                         {
                             "width": 375,
@@ -1289,9 +1245,7 @@
                         "dialog": "classify"
                     },
                     "ready": "body[data-visual-ready]",
-                    "settled": [
-                        ".reference-style"
-                    ],
+                    "settled": [".reference-style"],
                     "cases": [
                         {
                             "width": 375,
@@ -1376,9 +1330,7 @@
                         "dialog": "classify"
                     },
                     "ready": "body[data-visual-ready]",
-                    "settled": [
-                        ".reference-style"
-                    ],
+                    "settled": [".reference-style"],
                     "cases": [
                         {
                             "width": 1280,
@@ -1463,9 +1415,7 @@
                         "dialog": "classify"
                     },
                     "ready": "body[data-visual-ready]",
-                    "settled": [
-                        ".reference-style"
-                    ],
+                    "settled": [".reference-style"],
                     "cases": [
                         {
                             "width": 1280,
@@ -1550,9 +1500,7 @@
                         "dialog": "classify"
                     },
                     "ready": "body[data-visual-ready]",
-                    "settled": [
-                        ".reference-style"
-                    ],
+                    "settled": [".reference-style"],
                     "cases": [
                         {
                             "width": 375,
@@ -1637,9 +1585,7 @@
                         "dialog": "classify"
                     },
                     "ready": "body[data-visual-ready]",
-                    "settled": [
-                        ".reference-style"
-                    ],
+                    "settled": [".reference-style"],
                     "cases": [
                         {
                             "width": 375,
@@ -1730,9 +1676,7 @@
             "root": ".reference-style",
             "panels": "#main-content",
             "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content button,#main-content label,#main-content input",
-            "fonts": [
-                "16px Nunito Variable"
-            ],
+            "fonts": ["16px Nunito Variable"],
             "focus": [],
             "noFocusReason": "Shared-consumer probe; only the absence of landing and the unchanged computed values are checked.",
             "states": [
@@ -1740,9 +1684,7 @@
                     "id": "light",
                     "query": {},
                     "ready": "body[data-visual-ready]",
-                    "settled": [
-                        ".reference-style"
-                    ],
+                    "settled": [".reference-style"],
                     "cases": [
                         {
                             "width": 1280,
@@ -1786,9 +1728,7 @@
                     "id": "dark",
                     "query": {},
                     "ready": "body[data-visual-ready]",
-                    "settled": [
-                        ".reference-style"
-                    ],
+                    "settled": [".reference-style"],
                     "cases": [
                         {
                             "width": 1280,
@@ -1841,9 +1781,7 @@
             "root": ".reference-style",
             "panels": "#main-content",
             "content": "dialog.manager-dialog h2,dialog.manager-dialog p,dialog.manager-dialog button",
-            "fonts": [
-                "16px Nunito Variable"
-            ],
+            "fonts": ["16px Nunito Variable"],
             "focus": [],
             "noFocusReason": "Shared-consumer probe; only the absence of landing and the dialog values are checked.",
             "states": [
@@ -1851,9 +1789,7 @@
                     "id": "light",
                     "query": {},
                     "ready": "body[data-visual-ready]",
-                    "settled": [
-                        ".reference-style"
-                    ],
+                    "settled": [".reference-style"],
                     "cases": [
                         {
                             "width": 375,
@@ -1888,9 +1824,7 @@
                     "id": "dark",
                     "query": {},
                     "ready": "body[data-visual-ready]",
-                    "settled": [
-                        ".reference-style"
-                    ],
+                    "settled": [".reference-style"],
                     "cases": [
                         {
                             "width": 375,
