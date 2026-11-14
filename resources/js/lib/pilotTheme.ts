@@ -63,6 +63,9 @@ const landingPages = new Set([
     'Catalogue/Producers/Availability',
     'Catalogue/Producers/WeeklyProduct/Create',
     'Catalogue/Producers/WeeklyProduct/Edit',
+    'Manage/ReturnItems/Index',
+    'Manage/ReturnItems/Create',
+    'Manage/ReturnItems/Edit',
 ]);
 
 export function pilotVariantFor(pageName: string): PilotVariant | null {

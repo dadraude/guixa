@@ -246,6 +246,57 @@ const stockProduct = {
     active: true,
 };
 // --- end T06
+// --- T07 (DRA-275): return items. The inactive item comes first in `checkpoint`; `long-name` stresses wrapping. ---
+const makeReturnItem = (
+    id: string,
+    name: string,
+    amount: string,
+    active = true,
+) => ({ id, name, amount, active });
+const returnItemsByState: Record<string, ReturnType<typeof makeReturnItem>[]> =
+    {
+        default: [
+            makeReturnItem('item-1', 'Pot de vidre 500 ml', '0.25'),
+            makeReturnItem('item-2', 'Ampolla de vidre 1 L', '0.30', false),
+            makeReturnItem('item-3', 'Caixa de plàstic', '12.50'),
+        ],
+        checkpoint: [
+            makeReturnItem('item-2', 'Ampolla de vidre 1 L', '0.30', false),
+            makeReturnItem('item-1', 'Pot de vidre 500 ml', '0.25'),
+        ],
+        empty: [],
+        'long-name': [
+            makeReturnItem('item-1', longName, '1234.50'),
+            makeReturnItem('item-2', longName, '0.30', false),
+        ],
+    };
+const returnItem = makeReturnItem(
+    'item-1',
+    state === 'long-name' ? longName : 'Pot de vidre 500 ml',
+    '0.25',
+);
+// Probe for the shared ActiveSwitch consumer left unmigrated: Accounts with an active and a deactivated account.
+const accountsForSwitchProbe = [
+    {
+        accountId: 'account-a',
+        name: 'Anna Puig',
+        email: 'anna@example.test',
+        roles: ['member'],
+        active: true,
+        invitationPending: false,
+        householdName: 'Cal Puig',
+    },
+    {
+        accountId: 'account-b',
+        name: 'Biel Roca',
+        email: 'biel@example.test',
+        roles: ['member'],
+        active: false,
+        invitationPending: false,
+        householdName: null,
+    },
+];
+// --- end T07
 const pageProps: Record<string, Record<string, unknown>> = {
     'Catalogue/Producers/Index': {
         producers: producersByState[state] ?? producersByState.default,
@@ -310,7 +361,17 @@ const pageProps: Record<string, Record<string, unknown>> = {
         pickupWeekday: null,
         pendingCollections: {},
     },
-    'Manage/Accounts/Index': { accounts: [], households: [] },
+    'Manage/Accounts/Index': {
+        accounts: state === 'accounts-switch' ? accountsForSwitchProbe : [],
+        households: [],
+    },
+    // --- T07 (DRA-275)
+    'Manage/ReturnItems/Index': {
+        items: returnItemsByState[state] ?? returnItemsByState.default,
+    },
+    'Manage/ReturnItems/Create': {},
+    'Manage/ReturnItems/Edit': { item: returnItem },
+    // --- end T07
     Welcome: {},
 };
 const areas = [
@@ -337,6 +398,11 @@ const urls: Record<string, string> = {
         '/catalogue/producers/producer-1/products/stock/stock-1/edit',
     'Manage/Stock/Movements': '/manage/stock/stock-1/movements',
     // --- end T06
+    // --- T07 (DRA-275)
+    'Manage/ReturnItems/Index': '/catalogue/return-items',
+    'Manage/ReturnItems/Create': '/catalogue/return-items/create',
+    'Manage/ReturnItems/Edit': '/catalogue/return-items/item-1/edit',
+    // --- end T07
     'Producer/Products/Edit': '/producer/products/product-1/edit',
     'Manage/Cycles/Index': '/manage/cycles',
     'Manage/Accounts/Index': '/manage/accounts',
@@ -383,6 +449,9 @@ const weeklyRequests: string[] = [];
 // --- T06 (DRA-278)
 const stockRequests: string[] = [];
 // --- end T06
+// --- T07 (DRA-275)
+const returnItemRequests: string[] = [];
+// --- end T07
 const pagesByPath: Record<string, string> = {
     '/catalogue/producers/producer-1/availability':
         'Catalogue/Producers/Availability',
@@ -474,6 +543,26 @@ http.setClient({
             return reply({ ...page, props: { ...page.props, errors } });
         }
         // --- end T06
+        // --- T07 (DRA-275): return item forms and the switch post to /return-items; busy never answers.
+        if (path.includes('/return-items') && method !== 'get') {
+            returnItemRequests.push(`${method} ${path}`);
+            if (state === 'busy') return new Promise(() => {});
+            const errors =
+                {
+                    invalid: {
+                        name: 'Ja existeix un article retornable amb aquest nom.',
+                    },
+                    'invalid-all': {
+                        name: `Ja existeix un article retornable amb aquest nom: ${longName}.`,
+                        amount: 'L’import ha de ser positiu.',
+                    },
+                    'server-error': {
+                        domain: 'No s’ha pogut desar l’article retornable.',
+                    },
+                }[state] ?? {};
+            return reply({ ...page, props: { ...page.props, errors } });
+        }
+        // --- end T07
         // Busy state: the request never answers, so the page stays in `processing`.
         if (method === 'put' && state === 'busy') return new Promise(() => {});
         if (method === 'put' && state === 'error')
@@ -1039,6 +1128,94 @@ const submitStockForm = async () => {
 };
 // --- end T06 -----------------------------------------------------------------------------------------
 
+// --- T07 (DRA-275): return item forms and list switches ------------------------------------------------
+const returnItemForms = [
+    'Manage/ReturnItems/Create',
+    'Manage/ReturnItems/Edit',
+];
+const submitReturnItemForm = async () => {
+    const form = await waitFor(() =>
+        document.querySelector<HTMLFormElement>('#main-content form'),
+    );
+    const type = (name: string, value: string) => {
+        const input = form.querySelector<HTMLInputElement>(
+            `input[name="${name}"]`,
+        )!;
+        input.focus();
+        input.value = value;
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+    };
+    type('name', 'Pot de vidre 500 ml');
+    type('amount', '0.25');
+    form.requestSubmit();
+    const outcome =
+        state === 'busy'
+            ? '[data-test="save-return-item"][disabled]'
+            : '#main-content form [class*="text-destructive"]:not(:empty)';
+    await waitFor(() => document.querySelector(outcome));
+    await sleep(300);
+};
+// Switch geometry as the browser lays it out: the input, and the whole label that is its hit area.
+const recordSwitchGeometry = (scope: string) => {
+    const labels = [
+        ...document.querySelectorAll<HTMLElement>(
+            `${scope} .pilot-status-switch`,
+        ),
+    ];
+    const boxes = labels.map((label) => label.getBoundingClientRect());
+    const inputs = labels.map((label) =>
+        label.querySelector('input')!.getBoundingClientRect(),
+    );
+    const set = (name: string, value: string) =>
+        document.body.setAttribute(`data-ev-switch-${name}`, value);
+    set('count', String(labels.length));
+    set('hit-min-height', String(Math.min(...boxes.map((b) => b.height))));
+    set('hit-min-width', String(Math.min(...boxes.map((b) => b.width))));
+    set('input-width', String(Math.min(...inputs.map((b) => b.width))));
+    set('input-height', String(Math.min(...inputs.map((b) => b.height))));
+    set(
+        'label-colours',
+        labels
+            .map(
+                (label) => getComputedStyle(label.querySelector('span')!).color,
+            )
+            .join(' ; '),
+    );
+    set(
+        'label-contrast',
+        labels
+            .map((label) => {
+                const span = label.querySelector('span')!;
+                return ratio(
+                    over(
+                        toRgba(getComputedStyle(span).color),
+                        backdropOf(span),
+                    ),
+                    backdropOf(span),
+                ).toFixed(2);
+            })
+            .join(' ; '),
+    );
+};
+const recordAmountFigures = () => {
+    const cells = [
+        ...document.querySelectorAll<HTMLElement>(
+            '#main-content .pilot-data-table td:nth-child(3)',
+        ),
+    ];
+    document.body.setAttribute(
+        'data-ev-amount-numeric',
+        cells
+            .map((cell) => getComputedStyle(cell).fontVariantNumeric)
+            .join(' ; '),
+    );
+    document.body.setAttribute(
+        'data-ev-amount-align',
+        cells.map((cell) => getComputedStyle(cell).textAlign).join(' ; '),
+    );
+};
+// --- end T07 -----------------------------------------------------------------------------------------
+
 void createInertiaApp({
     resolve: (name) => components[`../pages/${name}.vue`].default,
     layout: (name) => {
@@ -1279,6 +1456,28 @@ void createInertiaApp({
             stockRequests.join(' ; '),
         );
     // --- end T06 ---
+    // --- T07 ---
+    if (
+        returnItemForms.includes(pageName) &&
+        ['invalid', 'invalid-all', 'server-error', 'busy'].includes(state)
+    )
+        await submitReturnItemForm();
+    if (returnItemForms.includes(pageName)) {
+        recordFieldContrast();
+        document.body.setAttribute(
+            'data-ev-return-requests',
+            returnItemRequests.join(' ; '),
+        );
+    }
+    if (
+        pageName === 'Manage/ReturnItems/Index' ||
+        (pageName === 'Manage/Accounts/Index' && state === 'accounts-switch')
+    ) {
+        recordSwitchGeometry('#main-content');
+        recordControlContrast('#main-content', 'page');
+    }
+    if (pageName === 'Manage/ReturnItems/Index') recordAmountFigures();
+    // --- end T07 ---
     recordDialog();
     await snapshot('now');
     if (

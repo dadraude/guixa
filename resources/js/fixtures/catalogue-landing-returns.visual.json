@@ -1,0 +1,1611 @@
+{
+    "baseUrl": "http://127.0.0.1:5301",
+    "rootFontPx": 16,
+    "darkSelector": "html.dark",
+    "maxTabs": 120,
+    "matrix": {
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark", "system-light", "system-dark"],
+        "text": [100, 200]
+    },
+    "views": [
+        {
+            "id": "returns-index",
+            "path": "/resources/js/fixtures/catalogue-landing.html",
+            "query": {
+                "page": "Manage/ReturnItems/Index",
+                "role": "catalogue",
+                "state": "default"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content p,#main-content a,#main-content button,#main-content label,#main-content td,#main-content .pilot-status-switch span",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "#main-content a[href$=\"/return-items/create\"]",
+                "#main-content [data-test=\"deactivate-item-1\"]",
+                "#main-content a[aria-label=\"Edita: Pot de vidre 500 ml\"]",
+                "#main-content [data-test=\"reactivate-item-2\"]",
+                "#main-content a[aria-label=\"Edita: Ampolla de vidre 1 L\"]",
+                "#main-content [data-test=\"deactivate-item-3\"]",
+                "#main-content a[aria-label=\"Edita: Caixa de plàstic\"]"
+            ],
+            "states": [
+                {
+                    "id": "default",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "system-dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-status-switch",
+                                "count": 3,
+                                "minHeight": 44,
+                                "minWidth": 44
+                            },
+                            {
+                                "selector": "#main-content .pilot-status-switch span",
+                                "count": 3,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-data-table td:nth-child(3)",
+                                "count": 3,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                },
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-data-table td.font-medium",
+                                "count": 3,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content a[aria-label^=\"Edita\"]",
+                                "count": 3,
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content a[href$=\"/return-items/create\"]",
+                                "count": 1,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content tbody tr:nth-child(1) .pilot-status-switch span",
+                                "text": "Actiu"
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-page-switch-ok": "true",
+                                    "data-ev-page-thumb-ok": "true",
+                                    "data-ev-page-focus-ok": "true",
+                                    "data-ev-switch-count": "3",
+                                    "data-ev-switch-hit-min-height": "44",
+                                    "data-ev-switch-input-width": "44",
+                                    "data-ev-switch-input-height": "24"
+                                }
+                            },
+                            {
+                                "selector": "#main-content tbody tr:nth-child(2) .pilot-status-switch span",
+                                "text": "Desactivat"
+                            },
+                            {
+                                "selector": "#main-content .pilot-data-table th",
+                                "count": 4
+                            }
+                        ],
+                        "focus": [
+                            "#main-content a[href$=\"/return-items/create\"]",
+                            "#main-content [data-test=\"deactivate-item-1\"]",
+                            "#main-content a[aria-label=\"Edita: Pot de vidre 500 ml\"]",
+                            "#main-content [data-test=\"reactivate-item-2\"]",
+                            "#main-content a[aria-label=\"Edita: Ampolla de vidre 1 L\"]",
+                            "#main-content [data-test=\"deactivate-item-3\"]",
+                            "#main-content a[aria-label=\"Edita: Caixa de plàstic\"]"
+                        ]
+                    }
+                },
+                {
+                    "id": "checkpoint",
+                    "query": {
+                        "state": "checkpoint"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-status-switch",
+                                "count": 2,
+                                "minHeight": 44,
+                                "minWidth": 44
+                            },
+                            {
+                                "selector": "#main-content .pilot-status-switch span",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-data-table td:nth-child(3)",
+                                "count": 2,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                },
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-data-table td.font-medium",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content a[aria-label^=\"Edita\"]",
+                                "count": 2,
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content a[href$=\"/return-items/create\"]",
+                                "count": 1,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content tbody tr:nth-child(1) .pilot-status-switch span",
+                                "text": "Desactivat"
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-page-switch-ok": "true",
+                                    "data-ev-page-thumb-ok": "true",
+                                    "data-ev-page-focus-ok": "true",
+                                    "data-ev-switch-count": "2",
+                                    "data-ev-switch-hit-min-height": "44",
+                                    "data-ev-switch-input-width": "44",
+                                    "data-ev-switch-input-height": "24"
+                                }
+                            },
+                            {
+                                "selector": "#main-content tbody tr:nth-child(2) .pilot-status-switch span",
+                                "text": "Actiu"
+                            }
+                        ],
+                        "focus": [
+                            "#main-content a[href$=\"/return-items/create\"]",
+                            "#main-content [data-test=\"reactivate-item-2\"]",
+                            "#main-content a[aria-label=\"Edita: Ampolla de vidre 1 L\"]",
+                            "#main-content [data-test=\"deactivate-item-1\"]",
+                            "#main-content a[aria-label=\"Edita: Pot de vidre 500 ml\"]"
+                        ]
+                    }
+                },
+                {
+                    "id": "empty",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "#main-content p.pilot-layout-notice",
+                                "count": 1,
+                                "text": "Encara no hi ha articles retornables.",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content table",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content a[href$=\"/return-items/create\"]",
+                                "count": 1,
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "contrast": 4.5
+                            }
+                        ],
+                        "focus": [
+                            "#main-content a[href$=\"/return-items/create\"]"
+                        ]
+                    }
+                },
+                {
+                    "id": "long-name",
+                    "query": {
+                        "state": "long-name"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-status-switch",
+                                "count": 2,
+                                "minHeight": 44,
+                                "minWidth": 44
+                            },
+                            {
+                                "selector": "#main-content .pilot-status-switch span",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-data-table td:nth-child(3)",
+                                "count": 2,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                },
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-data-table td.font-medium",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content a[aria-label^=\"Edita\"]",
+                                "count": 2,
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content a[href$=\"/return-items/create\"]",
+                                "count": 1,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content tbody tr:nth-child(1) .pilot-status-switch span",
+                                "text": "Actiu"
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-page-switch-ok": "true",
+                                    "data-ev-page-thumb-ok": "true",
+                                    "data-ev-page-focus-ok": "true",
+                                    "data-ev-switch-count": "2",
+                                    "data-ev-switch-hit-min-height": "44",
+                                    "data-ev-switch-input-width": "44",
+                                    "data-ev-switch-input-height": "24"
+                                }
+                            },
+                            {
+                                "selector": "#main-content tbody tr:nth-child(2) .pilot-status-switch span",
+                                "text": "Desactivat"
+                            }
+                        ],
+                        "focus": [
+                            "#main-content a[href$=\"/return-items/create\"]",
+                            "#main-content [data-test=\"deactivate-item-1\"]",
+                            "#main-content a[aria-label^=\"Edita: Cooperativa\"]"
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "returns-index-manager",
+            "path": "/resources/js/fixtures/catalogue-landing.html",
+            "query": {
+                "page": "Manage/ReturnItems/Index",
+                "role": "manager",
+                "state": "default"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content p,#main-content a,#main-content button,#main-content label,#main-content td,#main-content .pilot-status-switch span",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "#main-content a[href$=\"/return-items/create\"]",
+                "#main-content [data-test=\"deactivate-item-1\"]",
+                "#main-content a[aria-label=\"Edita: Pot de vidre 500 ml\"]",
+                "#main-content [data-test=\"reactivate-item-2\"]",
+                "#main-content a[aria-label=\"Edita: Ampolla de vidre 1 L\"]",
+                "#main-content [data-test=\"deactivate-item-3\"]",
+                "#main-content a[aria-label=\"Edita: Caixa de plàstic\"]"
+            ],
+            "states": [
+                {
+                    "id": "default",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-status-switch",
+                                "count": 3,
+                                "minHeight": 44,
+                                "minWidth": 44
+                            },
+                            {
+                                "selector": "#main-content .pilot-status-switch span",
+                                "count": 3,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-data-table td:nth-child(3)",
+                                "count": 3,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                },
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-data-table td.font-medium",
+                                "count": 3,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content a[aria-label^=\"Edita\"]",
+                                "count": 3,
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content a[href$=\"/return-items/create\"]",
+                                "count": 1,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content tbody tr:nth-child(1) .pilot-status-switch span",
+                                "text": "Actiu"
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-page-switch-ok": "true",
+                                    "data-ev-page-thumb-ok": "true",
+                                    "data-ev-page-focus-ok": "true",
+                                    "data-ev-switch-count": "3",
+                                    "data-ev-switch-hit-min-height": "44",
+                                    "data-ev-switch-input-width": "44",
+                                    "data-ev-switch-input-height": "24"
+                                }
+                            },
+                            {
+                                "selector": "#main-content tbody tr:nth-child(2) .pilot-status-switch span",
+                                "text": "Desactivat"
+                            },
+                            {
+                                "selector": "#main-content .pilot-data-table th",
+                                "count": 4
+                            }
+                        ],
+                        "focus": [
+                            "#main-content a[href$=\"/return-items/create\"]",
+                            "#main-content [data-test=\"deactivate-item-1\"]",
+                            "#main-content a[aria-label=\"Edita: Pot de vidre 500 ml\"]",
+                            "#main-content [data-test=\"reactivate-item-2\"]",
+                            "#main-content a[aria-label=\"Edita: Ampolla de vidre 1 L\"]",
+                            "#main-content [data-test=\"deactivate-item-3\"]",
+                            "#main-content a[aria-label=\"Edita: Caixa de plàstic\"]"
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "returns-create",
+            "path": "/resources/js/fixtures/catalogue-landing.html",
+            "query": {
+                "page": "Manage/ReturnItems/Create",
+                "role": "catalogue",
+                "state": "default"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content p,#main-content a,#main-content button,#main-content label,#main-content input,#main-content form div",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "#main-content input[name=\"name\"]",
+                "#main-content input[name=\"amount\"]",
+                "#main-content [data-test=\"save-return-item\"]"
+            ],
+            "states": [
+                {
+                    "id": "default",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "#main-content form input:not([type=\"hidden\"])",
+                                "count": 2,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form label[for]",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"save-return-item\"]",
+                                "count": 1,
+                                "minHeight": 44,
+                                "minWidth": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-field-border-ok": "true",
+                                    "data-ev-field-count": "2"
+                                }
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"save-return-item\"]",
+                                "text": "Crea",
+                                "contrast": 4.5,
+                                "attributes": {
+                                    "disabled": null
+                                }
+                            },
+                            {
+                                "selector": "#main-content form p.text-destructive:not(:empty)",
+                                "count": 0
+                            }
+                        ],
+                        "focus": [
+                            "#main-content input[name=\"name\"]",
+                            "#main-content input[name=\"amount\"]",
+                            "#main-content [data-test=\"save-return-item\"]"
+                        ]
+                    }
+                },
+                {
+                    "id": "invalid-all",
+                    "query": {
+                        "state": "invalid-all"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "#main-content form input:not([type=\"hidden\"])",
+                                "count": 2,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form label[for]",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"save-return-item\"]",
+                                "count": 1,
+                                "minHeight": 44,
+                                "minWidth": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-field-border-ok": "true",
+                                    "data-ev-field-count": "2"
+                                }
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content form div:not([style*=\"none\"]) > p.text-destructive",
+                                "count": 2,
+                                "contrast": 4.5
+                            }
+                        ],
+                        "focus": [
+                            "#main-content input[name=\"name\"]",
+                            "#main-content input[name=\"amount\"]",
+                            "#main-content [data-test=\"save-return-item\"]"
+                        ]
+                    }
+                },
+                {
+                    "id": "server-error",
+                    "query": {
+                        "state": "server-error"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "#main-content form input:not([type=\"hidden\"])",
+                                "count": 2,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form label[for]",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"save-return-item\"]",
+                                "count": 1,
+                                "minHeight": 44,
+                                "minWidth": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-field-border-ok": "true",
+                                    "data-ev-field-count": "2"
+                                }
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content form p.text-destructive:not(:empty)",
+                                "count": 1,
+                                "text": "No s’ha pogut desar l’article retornable.",
+                                "contrast": 4.5
+                            }
+                        ],
+                        "focus": [
+                            "#main-content input[name=\"name\"]",
+                            "#main-content input[name=\"amount\"]",
+                            "#main-content [data-test=\"save-return-item\"]"
+                        ]
+                    }
+                },
+                {
+                    "id": "busy",
+                    "query": {
+                        "state": "busy"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"save-return-item\"]",
+                                "count": 1,
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "attributes": {
+                                    "disabled": ""
+                                },
+                                "styles": {
+                                    "opacity": "0.5",
+                                    "pointer-events": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-return-requests": "post /catalogue/return-items"
+                                }
+                            }
+                        ],
+                        "focus": [
+                            "#main-content input[name=\"name\"]",
+                            "#main-content input[name=\"amount\"]"
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "returns-edit",
+            "path": "/resources/js/fixtures/catalogue-landing.html",
+            "query": {
+                "page": "Manage/ReturnItems/Edit",
+                "role": "catalogue",
+                "state": "default"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content p,#main-content a,#main-content button,#main-content label,#main-content input,#main-content form div",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "#main-content input[name=\"name\"]",
+                "#main-content input[name=\"amount\"]",
+                "#main-content [data-test=\"save-return-item\"]"
+            ],
+            "states": [
+                {
+                    "id": "default",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "#main-content form input:not([type=\"hidden\"])",
+                                "count": 2,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form label[for]",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"save-return-item\"]",
+                                "count": 1,
+                                "minHeight": 44,
+                                "minWidth": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-field-border-ok": "true",
+                                    "data-ev-field-count": "2"
+                                }
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"save-return-item\"]",
+                                "text": "Desa",
+                                "contrast": 4.5,
+                                "attributes": {
+                                    "disabled": null
+                                }
+                            },
+                            {
+                                "selector": "#main-content form p.text-destructive:not(:empty)",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content input[name=\"name\"]",
+                                "attributes": {}
+                            }
+                        ],
+                        "focus": [
+                            "#main-content input[name=\"name\"]",
+                            "#main-content input[name=\"amount\"]",
+                            "#main-content [data-test=\"save-return-item\"]"
+                        ]
+                    }
+                },
+                {
+                    "id": "invalid-all",
+                    "query": {
+                        "state": "invalid-all"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "#main-content form input:not([type=\"hidden\"])",
+                                "count": 2,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form label[for]",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"save-return-item\"]",
+                                "count": 1,
+                                "minHeight": 44,
+                                "minWidth": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-field-border-ok": "true",
+                                    "data-ev-field-count": "2"
+                                }
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content form div:not([style*=\"none\"]) > p.text-destructive",
+                                "count": 2,
+                                "contrast": 4.5
+                            }
+                        ],
+                        "focus": [
+                            "#main-content input[name=\"name\"]",
+                            "#main-content input[name=\"amount\"]",
+                            "#main-content [data-test=\"save-return-item\"]"
+                        ]
+                    }
+                },
+                {
+                    "id": "server-error",
+                    "query": {
+                        "state": "server-error"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "#main-content form input:not([type=\"hidden\"])",
+                                "count": 2,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form label[for]",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"save-return-item\"]",
+                                "count": 1,
+                                "minHeight": 44,
+                                "minWidth": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-field-border-ok": "true",
+                                    "data-ev-field-count": "2"
+                                }
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content form p.text-destructive:not(:empty)",
+                                "count": 1,
+                                "text": "No s’ha pogut desar l’article retornable.",
+                                "contrast": 4.5
+                            }
+                        ],
+                        "focus": [
+                            "#main-content input[name=\"name\"]",
+                            "#main-content input[name=\"amount\"]",
+                            "#main-content [data-test=\"save-return-item\"]"
+                        ]
+                    }
+                },
+                {
+                    "id": "busy",
+                    "query": {
+                        "state": "busy"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"save-return-item\"]",
+                                "count": 1,
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "attributes": {
+                                    "disabled": ""
+                                },
+                                "styles": {
+                                    "opacity": "0.5",
+                                    "pointer-events": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-return-requests": "post /catalogue/return-items/item-1"
+                                }
+                            }
+                        ],
+                        "focus": [
+                            "#main-content input[name=\"name\"]",
+                            "#main-content input[name=\"amount\"]"
+                        ]
+                    }
+                },
+                {
+                    "id": "long-name",
+                    "query": {
+                        "state": "long-name"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "#main-content form input:not([type=\"hidden\"])",
+                                "count": 2,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form label[for]",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"save-return-item\"]",
+                                "count": 1,
+                                "minHeight": 44,
+                                "minWidth": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-field-border-ok": "true",
+                                    "data-ev-field-count": "2"
+                                }
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            }
+                        ],
+                        "focus": [
+                            "#main-content input[name=\"name\"]",
+                            "#main-content input[name=\"amount\"]",
+                            "#main-content [data-test=\"save-return-item\"]"
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "accounts-switch-unmigrated",
+            "path": "/resources/js/fixtures/catalogue-landing.html",
+            "query": {
+                "page": "Manage/Accounts/Index",
+                "role": "manager",
+                "state": "default"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content .pilot-status-switch span,#main-content h2",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "states": [
+                {
+                    "id": "light",
+                    "query": {
+                        "state": "accounts-switch"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content .pilot-status-switch",
+                                "count": 2,
+                                "minHeight": 44,
+                                "minWidth": 44
+                            },
+                            {
+                                "selector": "#main-content .pilot-status-switch span",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-switch-hit-min-height": "44",
+                                    "data-ev-switch-input-width": "44",
+                                    "data-ev-switch-input-height": "24",
+                                    "data-ev-switch-label-colours": "rgb(32, 43, 38) ; rgb(32, 43, 38)",
+                                    "data-ev-page-switch-ratio": "6.04",
+                                    "data-ev-page-thumb-ratio": "6.04"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark",
+                    "query": {
+                        "state": "accounts-switch"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content .pilot-status-switch",
+                                "count": 2,
+                                "minHeight": 44,
+                                "minWidth": 44
+                            },
+                            {
+                                "selector": "#main-content .pilot-status-switch span",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-switch-hit-min-height": "44",
+                                    "data-ev-switch-input-width": "44",
+                                    "data-ev-switch-input-height": "24",
+                                    "data-ev-switch-label-colours": "rgb(236, 242, 237) ; rgb(236, 242, 237)",
+                                    "data-ev-page-switch-ratio": "8.51",
+                                    "data-ev-page-thumb-ratio": "8.51"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ],
+            "noFocusReason": "Shared-consumer probe: only the absence of landing and the switch values are compared with the pre-slice constants."
+        }
+    ]
+}
