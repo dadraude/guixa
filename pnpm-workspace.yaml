@@ -7,7 +7,7 @@ publicHoistPattern:
 ignoreScripts: true
 catalog:
     vite: npm:@voidzero-dev/vite-plus-core@1.4.0
-    vite-plus: 1.4.0
+    vite-plus: 1.5.0
 overrides:
     vite@*: 'catalog:'
     # js-beautify (via @vue/test-utils) pins vulnerable glob 13 / minimatch 10; it only uses them in its CLI.
