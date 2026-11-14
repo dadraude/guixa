@@ -252,7 +252,7 @@ describe('pilot theme layout and portal', () => {
             'Catalogue/Producers/Availability/Extra',
             'Catalogue/Producers/WeeklyProduct/Create/Extra',
             'Manage/Stock/Movements',
-            'Manage/Stock/Create',
+            'Manage/Stock/Create/Extra',
             'Welcome',
         ]) {
             page.component = component;
@@ -275,6 +275,8 @@ describe('pilot theme layout and portal', () => {
             'Catalogue/Producers/Availability',
             'Catalogue/Producers/WeeklyProduct/Create',
             'Catalogue/Producers/WeeklyProduct/Edit',
+            'Manage/Stock/Create',
+            'Manage/Stock/Edit',
         ]) {
             page.component = component;
             await nextTick();
@@ -361,7 +363,7 @@ describe('pilot theme layout and portal', () => {
         for (const selector of Object.values(targets))
             expect(find(selector), selector).not.toBeNull();
 
-        for (const component of ['Orders/Other', 'Manage/Stock/Create']) {
+        for (const component of ['Orders/Other', 'Manage/Stock/Movements']) {
             page.component = component;
             await nextTick();
             for (const selector of Object.values(targets))
@@ -375,6 +377,8 @@ describe('pilot theme layout and portal', () => {
             'Catalogue/Producers/Availability',
             'Catalogue/Producers/WeeklyProduct/Create',
             'Catalogue/Producers/WeeklyProduct/Edit',
+            'Manage/Stock/Create',
+            'Manage/Stock/Edit',
         ]) {
             page.component = component;
             await nextTick();

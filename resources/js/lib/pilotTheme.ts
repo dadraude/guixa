@@ -54,6 +54,8 @@ export type PilotVariant = 'landing';
 // Exact page names only: never a prefix such as 'Manage/' and never a role.
 const landingPages = new Set([
     'Manage/Stock/Index',
+    'Manage/Stock/Create',
+    'Manage/Stock/Edit',
     'Orders/Index',
     'Orders/Edit',
     'Catalogue/Producers/Index',

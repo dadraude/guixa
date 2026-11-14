@@ -2254,3 +2254,51 @@ html.dark:has(.reference-style)
 .landing .pilot-manager-page .pilot-list > li.space-y-4 .min-w-0 > p {
     font-variant-numeric: tabular-nums;
 }
+
+/* 005 T06 */
+/*
+ * Stock product create and edit (Manage/Stock/{Create,Edit}, served to Catalogue). The pages carry the Manager
+ * classes, so .coop-manager-shell sizes them differently from the weekly forms (D3). A cross-page probe showed
+ * the palette, font family/weight and field border already equal; only scale and width differed, so they are
+ * equalised here and nowhere else. Scoped by the form's save button so Manage/Stock/Index is untouched.
+ */
+.landing .pilot-manager-page:has(> form [data-test='save-stock-product']) {
+    max-width: 48rem;
+    margin-inline: 0;
+}
+
+.landing
+    .pilot-manager-page:has(> form [data-test='save-stock-product'])
+    > header {
+    margin-bottom: 0;
+}
+
+.landing
+    .pilot-manager-page:has(> form [data-test='save-stock-product'])
+    h1.pilot-heading {
+    font-size: 1.5rem;
+    line-height: 2rem;
+}
+
+.landing
+    .pilot-manager-page:has(> form [data-test='save-stock-product'])
+    > header[class~='space-y-0.5']:has(> p)
+    > h1.pilot-heading {
+    margin-bottom: 0.5rem;
+}
+
+.landing .pilot-manager-page > form:has([data-test='save-stock-product']) {
+    max-width: 36rem;
+}
+
+@media (min-width: 48rem) {
+    .landing .pilot-manager-page > form:has([data-test='save-stock-product']) {
+        padding: 1.5rem;
+    }
+
+    .landing
+        .pilot-manager-page:has(> form [data-test='save-stock-product'])
+        input:not([type='checkbox'], [type='radio'], [type='hidden']) {
+        font-size: 0.875rem;
+    }
+}
