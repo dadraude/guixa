@@ -252,8 +252,11 @@ describe('pilot theme layout and portal', () => {
             'Catalogue/Producers/Availability/Extra',
             'Catalogue/Producers/WeeklyProduct/Create/Extra',
             'Manage/Stock/Movements',
+            'Producer/Stock/Movements',
+            'Finance/Stock/Movements',
             'Manage/Stock/Create/Extra',
             'Manage/ReturnItems/Index/Extra',
+            'Catalogue/Stock/Movements/Extra',
             'Welcome',
         ]) {
             page.component = component;
@@ -281,6 +284,7 @@ describe('pilot theme layout and portal', () => {
             'Manage/ReturnItems/Index',
             'Manage/ReturnItems/Create',
             'Manage/ReturnItems/Edit',
+            'Catalogue/Stock/Movements',
         ]) {
             page.component = component;
             await nextTick();
@@ -367,7 +371,13 @@ describe('pilot theme layout and portal', () => {
         for (const selector of Object.values(targets))
             expect(find(selector), selector).not.toBeNull();
 
-        for (const component of ['Orders/Other', 'Manage/Stock/Movements']) {
+        for (const component of [
+            'Orders/Other',
+            'Manage/Stock/Movements',
+            'Producer/Stock/Movements',
+            'Finance/Stock/Movements',
+            'Catalogue/Stock/Movements/Extra',
+        ]) {
             page.component = component;
             await nextTick();
             for (const selector of Object.values(targets))
@@ -386,6 +396,7 @@ describe('pilot theme layout and portal', () => {
             'Manage/ReturnItems/Index',
             'Manage/ReturnItems/Create',
             'Manage/ReturnItems/Edit',
+            'Catalogue/Stock/Movements',
         ]) {
             page.component = component;
             await nextTick();

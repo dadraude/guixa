@@ -297,6 +297,97 @@ const accountsForSwitchProbe = [
     },
 ];
 // --- end T07
+// --- T08 (DRA-276): read-only stock movement history. Catalogue is the migrated page; Producer, Finance and
+// Manage consumers of MovementHistory stay unmigrated and serve as the leakage probe.
+const movementLine = (
+    id: string,
+    type: string,
+    quantity: string,
+    balanceAfter: string,
+    over: Record<string, unknown> = {},
+) => ({
+    id,
+    occurredAt: '2026-11-10 09:30',
+    type,
+    quantity,
+    balanceAfter,
+    note: null as string | null,
+    authorName: 'Maria Soler',
+    cycleId: 'cycle-1',
+    pickupDate: '2026-11-14',
+    basketId: null as string | null,
+    ...over,
+});
+const emptyHistory = {
+    lines: [],
+    total: 0,
+    page: 1,
+    prevUrl: null,
+    nextUrl: null,
+};
+const movementHistoriesByState: Record<string, typeof emptyHistory | object> = {
+    default: {
+        lines: [
+            movementLine('line-1', 'sale', '-3.000', '12.000', {
+                basketId: 'basket-1',
+            }),
+            movementLine('line-2', 'entry', '10.500', '15.000', {
+                note: 'Recepció setmanal',
+            }),
+            movementLine('line-3', 'adjustment', '-1.250', '4.500', {
+                note: 'Pot trencat',
+                pickupDate: null,
+                cycleId: null,
+            }),
+            movementLine('line-4', 'correction', '2.000', '5.750'),
+        ],
+        total: 4,
+        page: 1,
+        prevUrl: null,
+        nextUrl: null,
+    },
+    empty: emptyHistory,
+    // Long note, long author and seven-figure quantities stress the table and the 375 px card reflow.
+    'long-content': {
+        lines: [
+            movementLine(
+                'line-1',
+                'adjustment',
+                '-1234567.000',
+                '1234567.500',
+                {
+                    note: `Ajust per inventari complet del magatzem de ${longName}`,
+                    authorName: longName,
+                },
+            ),
+            movementLine('line-2', 'entry', '1234567.000', '2469134.500', {
+                basketId: 'basket-1',
+            }),
+        ],
+        total: 2,
+        page: 1,
+        prevUrl: null,
+        nextUrl: null,
+    },
+    paged: {
+        lines: [movementLine('line-1', 'sale', '-3.000', '12.000')],
+        total: 60,
+        page: 2,
+        prevUrl: '/catalogue/stock/stock-1/movements?page=1',
+        nextUrl: '/catalogue/stock/stock-1/movements?page=3',
+    },
+};
+const movementHistory =
+    movementHistoriesByState[
+        state.replace(/^(?:variant-off|migration-off|nav-.*)$/, 'default')
+    ] ?? movementHistoriesByState.default;
+const movementProduct = {
+    name: state === 'long-content' ? longName : 'Mel de farigola',
+    unit: 'pot',
+    available: state === 'long-content' ? '1234567.500' : '12.000',
+};
+// --- end T08 -----------------------------------------------------------------------------------------
+
 const pageProps: Record<string, Record<string, unknown>> = {
     'Catalogue/Producers/Index': {
         producers: producersByState[state] ?? producersByState.default,
@@ -336,9 +427,32 @@ const pageProps: Record<string, Record<string, unknown>> = {
     'Manage/Stock/Movements': {
         product: { ...stockProduct, available: '12.000' },
         cycles: [],
-        history: { lines: [], total: 0, page: 1, prevUrl: null, nextUrl: null },
+        history:
+            state === 'history'
+                ? movementHistory
+                : {
+                      lines: [],
+                      total: 0,
+                      page: 1,
+                      prevUrl: null,
+                      nextUrl: null,
+                  },
     },
     // --- end T06 ---
+    // --- T08 (DRA-276)
+    'Catalogue/Stock/Movements': {
+        product: movementProduct,
+        history: movementHistory,
+    },
+    'Producer/Stock/Movements': {
+        product: movementProduct,
+        history: movementHistory,
+    },
+    'Finance/Stock/Movements': {
+        product: movementProduct,
+        history: movementHistory,
+    },
+    // --- end T08
     // Unmigrated consumers of the shared dialog, for the leakage probe.
     // --- T05 (DRA-277): shared-consumer probe, WeeklyProductFields consumer left unmigrated
     'Producer/Products/Create': {},
@@ -398,6 +512,11 @@ const urls: Record<string, string> = {
         '/catalogue/producers/producer-1/products/stock/stock-1/edit',
     'Manage/Stock/Movements': '/manage/stock/stock-1/movements',
     // --- end T06
+    // --- T08 (DRA-276)
+    'Catalogue/Stock/Movements': '/catalogue/stock/stock-1/movements',
+    'Producer/Stock/Movements': '/producer/stock/stock-1/movements',
+    'Finance/Stock/Movements': '/finance/stock/stock-1/movements',
+    // --- end T08
     // --- T07 (DRA-275)
     'Manage/ReturnItems/Index': '/catalogue/return-items',
     'Manage/ReturnItems/Create': '/catalogue/return-items/create',
@@ -1216,6 +1335,32 @@ const recordAmountFigures = () => {
 };
 // --- end T07 -----------------------------------------------------------------------------------------
 
+// --- T08 (DRA-276): the phone card of the history must not stack two cells on one another or squeeze a track to nothing.
+const recordHistoryGeometry = () => {
+    let overlaps = 0;
+    let collapsed = 0;
+    for (const row of document.querySelectorAll(
+        '#main-content [data-test="movement-line"]',
+    )) {
+        const boxes = [...row.children]
+            .map((cell) => cell.getBoundingClientRect())
+            .filter((box) => box.height > 0);
+        collapsed += boxes.filter((box) => box.width < 1).length;
+        for (const [index, a] of boxes.entries())
+            for (const b of boxes.slice(index + 1))
+                if (
+                    a.left < b.right - 1 &&
+                    b.left < a.right - 1 &&
+                    a.top < b.bottom - 1 &&
+                    b.top < a.bottom - 1
+                )
+                    overlaps++;
+    }
+    document.body.setAttribute('data-ev-history-overlaps', String(overlaps));
+    document.body.setAttribute('data-ev-history-collapsed', String(collapsed));
+};
+// --- end T08 -----------------------------------------------------------------------------------------
+
 void createInertiaApp({
     resolve: (name) => components[`../pages/${name}.vue`].default,
     layout: (name) => {
@@ -1478,6 +1623,9 @@ void createInertiaApp({
     }
     if (pageName === 'Manage/ReturnItems/Index') recordAmountFigures();
     // --- end T07 ---
+    // --- T08 ---
+    if (pageName === 'Catalogue/Stock/Movements') recordHistoryGeometry();
+    // --- end T08 ---
     recordDialog();
     await snapshot('now');
     if (
