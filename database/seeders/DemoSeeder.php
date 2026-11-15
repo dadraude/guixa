@@ -9,6 +9,7 @@ use Guixa\Catalog\Application\CreateProduct;
 use Guixa\Catalog\Application\CreateStockProduct;
 use Guixa\Catalog\Application\DeactivateProducer;
 use Guixa\Catalog\Application\DeactivateProduct;
+use Guixa\Catalog\Application\DeactivateStockProduct;
 use Guixa\Membership\Application\CreateHousehold;
 use Guixa\Membership\Application\GrantStaffRole;
 use Guixa\Membership\Domain\Account;
@@ -34,7 +35,9 @@ use Guixa\Shared\Domain\Quantity;
 use Guixa\Shared\Domain\Role;
 use Guixa\Stock\Application\CreateReturnItem;
 use Guixa\Stock\Application\DeactivateReturnItem;
+use Guixa\Stock\Application\RecordStockAdjustment;
 use Guixa\Stock\Application\RecordStockEntry;
+use Guixa\Stock\Application\SetStockAvailable;
 use Guixa\Wallet\Application\RecordTopUp;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -82,6 +85,11 @@ final class DemoSeeder extends Seeder
             ['Iogurt natural', 'pot', 150, false, '1.000'],
         ]],
     ];
+
+    private const string EMPTY_PRODUCER_EMAIL = 'sense-productes@demo.guixa.test';
+
+    /** Stock history must exceed ListStockMovements::PER_PAGE (50) to span a second page. */
+    private const int EXTRA_MOVEMENTS = 51;
 
     private const array QUANTITIES = [
         ['1.500', '1.000', '1', '2', '0.250', '4'],
@@ -149,6 +157,57 @@ final class DemoSeeder extends Seeder
         app(CloseProducerNow::class)($manager, $cycles[2], $catalog['producers'][2]);
 
         $this->createCatalogueStates($manager, $cycles[2], $catalog);
+        $this->createProducerStates($manager, $catalog);
+    }
+
+    /**
+     * Created after the cycles, like the catalogue states, so no cycle, order or reception changes. The cycle with nothing to
+     * deliver is not seeded: the landing fixture and Vitest cover it, and it would shift cycles, receptions and the dashboard.
+     *
+     * @param  array{producers: list<string>, products: list<array{id: string, producerId: string}>}  $catalog
+     */
+    private function createProducerStates(Actor $manager, array $catalog): void
+    {
+        $emptyProducerId = app(CreateProducer::class)($manager, 'Ramaderia Nova', 2, '20:00');
+        $this->createAccount(Account::inviteProducer(
+            app(AccountRepository::class)->nextId(), 'Ramaderia Nova', Email::from(self::EMPTY_PRODUCER_EMAIL), $emptyProducerId,
+        ));
+
+        $this->createStockStates($manager, $catalog['producers'][0]);
+
+        $retiredWeeklyId = app(CreateProduct::class)($manager, $catalog['producers'][1], 'Coca de sucre', 'peça', 450, false, null);
+        app(DeactivateProduct::class)($manager, $retiredWeeklyId);
+    }
+
+    private function createStockStates(Actor $manager, string $producerId): void
+    {
+        app(CreateStockProduct::class)(
+            $manager, $producerId,
+            'Mongetes del ganxet de la cooperativa de Santa Pau, collita ecològica de tardor',
+            'bossa de mig quilo envasada al buit', 650, false, null,
+        );
+
+        $soldOutId = app(CreateStockProduct::class)($manager, $producerId, 'Llenties de la Cerdanya', 'kg', 420, true, null);
+        app(RecordStockEntry::class)($manager, $soldOutId, '5.000', 'Demo opening stock');
+        app(SetStockAvailable::class)($manager, $soldOutId, '0', 'Demo sold out');
+
+        $retiredId = app(CreateStockProduct::class)($manager, $producerId, 'Fesols de Santa Pau', 'kg', 900, true, null);
+        app(RecordStockEntry::class)($manager, $retiredId, '2.000', 'Demo opening stock');
+        app(DeactivateStockProduct::class)($manager, $producerId, $retiredId);
+
+        $this->createLongHistory($manager, DB::table('products')->where('name', 'Arròs integral')->value('id'));
+    }
+
+    private function createLongHistory(Actor $manager, string $productId): void
+    {
+        for ($count = 1; $count <= self::EXTRA_MOVEMENTS; $count++) {
+            if ($count % 2 === 0) {
+                app(RecordStockAdjustment::class)($manager, $productId, '-0.500', "Demo adjustment {$count}", null);
+
+                continue;
+            }
+            app(RecordStockEntry::class)($manager, $productId, '1.000', "Demo restock {$count}");
+        }
     }
 
     /**
