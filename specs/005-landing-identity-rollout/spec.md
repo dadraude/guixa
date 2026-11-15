@@ -1,6 +1,6 @@
 # 005 — Landing identity rollout: Catalogue role complete
 
-**Status: Accepted (2026-11-13, merge of PR #416); no open questions.** Specification of delivery slice 1 only. The
+**Status: Slice 1 accepted (2026-11-13, merge of PR #416); slice 2 section drafted 2026-11-15, awaiting acceptance (no open questions).** Slices 1 and 2 specified. The
 [discovery](discovery.md) keeps slices 2-7 as a roadmap; they get no requirements here. Slice selection
 and boundary are recorded in [history](history/) (Q&A 2026-11-13: slice 1 selected; T85 visual approval
 granted; Manage stock and return-item pages moved into slice 1). Accepting this spec authorizes no plan,
@@ -172,7 +172,7 @@ request sent, and focus returns to the control that opened it. A toast shown aft
 both appearances.
 
 **S8 — No leakage across navigation (R2).** Given a Catalogue account with the mobile menu or account menu
-open, when it navigates from a migrated Catalogue page to a page outside the landing page set and back,
+open, when it navigates from a migrated Catalogue page to a page outside the landing page set (for example the dashboard) and back,
 then the outside page keeps its current look, the Catalogue page recovers the landing identity, and the
 appearance preference (light, dark, system) is preserved throughout.
 
@@ -192,6 +192,86 @@ pairs meet R5, all interactive targets are 44 x 44 px or larger, and no page has
 **S12 — Visual approval gate (R12).** Given the measurement record for all pages in Scope, when the user has
 not recorded visual approval, then the slice is not complete and no later slice is specified or built. When
 the user approves, the approval is logged in history with the evidence it covered.
+
+## Slice 2 — Producer role complete
+
+**Status: Draft, awaiting acceptance.** Selected 2026-11-15 (see history, Q&A "Which slice is next"). It adds
+to the slice 1 requirements above and keeps them: R1 to R13 apply unchanged to slice 1's pages. R5 to R9 (the
+shared invariants) and R12 apply to the pages below with "Catalogue" read as "Producer". Accepting this
+section authorizes no plan, tasks, tickets or implementation.
+
+A producer works through every page of its own area in the landing identity, in light and dark, and nothing it
+can do changes.
+
+### Scope of slice 2
+
+Producer pages, from routes under `role:producer` (`routes/web.php`, `producer.` group, controllers in
+`app/Http/Controllers/Producer`). Checked against `main` at d824962a.
+
+| Page | Reached for |
+| --- | --- |
+| `Producer/Cutoff` | the producer's default cutoff (001 producer ordering rules) |
+| `Producer/CycleSummary` | what the producer must deliver in a cycle |
+| `Producer/Products/Index` | the producer's own products, with active and inactive state |
+| `Producer/Products/Create`, `Edit` | product forms, including the dialog of `ProductAdministrationActions` on Edit |
+| `Producer/Stock/Movements` | read-only quantity and movement history of a stock product |
+
+All six pages are in the older green opt-in list today and none is in the landing page set. Dashboard links to
+these pages stay on the dashboard's own slice. Shared components that other pages also use (`MovementHistory`,
+`WeeklyProductFields`, `ProductAdministrationActions`, `ActiveSwitch`) change only under the landing rules; the
+pages that still use them outside the landing page set keep their current look (R2).
+
+### Requirements
+
+- **R14 — Every Producer page in the landing page set.** Each page in the table above meets R1 to R4 for the
+  producer's shell and content, including the native dialog and toast it opens.
+- **R15 — One identity within the area, consistent with slice 1.** A producer moving between its pages sees no
+  change of palette or type, and the same page-title size as slice 1's pages (24 px at every width, OQ3 answered).
+- **R16 — Measurable conditions.** R5 to R9 hold on every page in the table, as measured text. R7's
+  compositions here are: product list, product form, cutoff form, cycle summary, movement history and the
+  `ProductAdministrationActions` dialog. R8's states here include a producer with no products, an inactive
+  product, a long product name, a cycle with nothing to deliver, a cycle not yet sent (availability toggle) and a cycle sent (read-only quantities), no stock products, an inactive and a sold-out stock product, a stock product with no movements and with a long movement list, a long unit, and a cutoff form with a validation error.
+- **R17 — Producer privacy and behaviour unchanged.** Routes, props, validation, copy, calculations and
+  authorization are unchanged (R10). A multi-role account sees these pages in the landing identity only through the producer role, and its other areas keep their own look (R2). A producer sees only its own products, cycles and stock; a direct link to
+  another producer's data or to a page of another role is refused as before.
+- **R18 — Existing tests stay green; gaps get coverage.** The existing Pest tests of these pages and the
+  `Producer/Products/Index` page spec pass unchanged in meaning (R11). `Cutoff`, `CycleSummary`, `Products/Create`,
+  `Products/Edit` and `Stock/Movements` have no page spec today and get regression coverage for what S13 to S16
+  observe before they are declared done.
+- **R19 — Evidence, approval, demo data.** The slice's acceptance record follows R12 for the six pages, and the
+  slice is complete only when the user records visual approval of the Producer pages in light and dark. The demo
+  seeder shows the states R16 needs, or the handoff says it already does (R13).
+
+### Scenarios of slice 2
+
+**S13 — A producer works one area in one identity (R14, R15).** Given a producer account, when it opens its
+products, a product form, its default cutoff, a cycle summary and a stock movement history in turn, in light
+and dark, then every page shows the landing identity in shell and content, with no green and no hero,
+illustration or texture.
+
+**S14 — Product list and forms (R16, R17).** Given a producer with no products, with several, with a very long
+name and with an inactive product, when it opens the list and the create and edit forms at 375 and 1280 px
+(1024 px at 200% text), submits them invalid and valid, and with no, an inactive and a sold-out stock product, then fields, errors, tables and the inactive marker meet
+R5 to R9 and values, messages and redirects are the same as before.
+
+**S15 — Cutoff and cycle summary (R16, R17).** Given a producer, when it opens its default cutoff and saves a
+valid and an invalid value, and opens a cycle summary with and without lines, then both pages meet R5 to R9
+and the saved value, message and summary figures are unchanged. Given a cycle not yet sent, when the producer
+toggles a product's availability, then the result is unchanged and the available and unavailable states differ by text as well as colour.
+
+**S16 — Movement history and dialog (R14, R17).** Given a stock product with movements, when the producer opens
+its history, then it reads the same entries read-only. Given the product Edit page, when the dialog of
+`ProductAdministrationActions` is opened by keyboard, then it uses the landing identity, Escape closes it with no
+request, and focus returns to the opener. Given the product list, when the producer toggles Active, reactivates or deletes an unused product,
+then results and redirects are unchanged and the busy and error states meet R8.
+
+**S17 — No leakage and access unchanged (R2, R17).** Given a producer, when it navigates from a migrated page
+to a page outside the landing page set and back with the menu open, then each page keeps its own look. Given
+another producer's data, a Catalogue-only account and a member, when each opens a producer URL it should not
+reach, then access is refused as before.
+
+**S18 — Visual approval gate (R19).** Given the measurement record for the six pages, when the user has not
+recorded visual approval, then the slice is not complete and no later slice is specified or built.
 
 ## Non-goals
 
@@ -221,7 +301,11 @@ the user approves, the approval is logged in history with the evidence it covere
 
 ## Open questions
 
-None open. Answered 2026-11-13 (see history):
+None open. Answered 2026-11-15:
+
+- **OQ3 — Page-title size on Producer pages.** One 24 px title at every width, as in slice 1 (Deviation T09); the six Producer pages follow it (R15). Confirmed by the user.
+
+Answered 2026-11-13 (see history):
 
 - **OQ1 — Mixed look inside a task.** Acceptable until each page's own slice; R3 stands.
 - **OQ2 — Who approves and how is it recorded.** One approval in one sitting covers Catalogue and Manager use
