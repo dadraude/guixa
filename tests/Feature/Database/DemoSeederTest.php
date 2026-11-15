@@ -17,10 +17,10 @@ it('seeds a usable cooperative with accounts, orders, reception and pickups', fu
     Mail::fake();
     $this->seed(DatabaseSeeder::class);
 
-    expect(User::count())->toBe(9);
+    expect(User::count())->toBe(10);
     $this->assertDatabaseCount('households', 4);
-    $this->assertDatabaseCount('producers', 4);
-    $this->assertDatabaseCount('products', 9);
+    $this->assertDatabaseCount('producers', 5);
+    $this->assertDatabaseCount('products', 13);
     $this->assertDatabaseCount('cycles', 3);
     $this->assertDatabaseCount('orders', 12);
     expect(DB::table('order_lines')->count())->toBeGreaterThan(60);
@@ -29,7 +29,7 @@ it('seeds a usable cooperative with accounts, orders, reception and pickups', fu
     expect(DB::table('baskets')->where('kind', 'weekly')->where('state', 'validated')->count())->toBe(1);
     expect(DB::table('baskets')->where('kind', 'weekly')->where('state', 'collected')->count())->toBe(1);
     expect(DB::table('received_totals')->count())->toBeGreaterThan(0);
-    expect(DB::table('stock_movements')->count())->toBe(2);
+    expect(DB::table('stock_movements')->count())->toBe(56);
     expect(DB::table('wallet_movements')->count())->toBeGreaterThanOrEqual(5);
     Mail::assertNothingSent();
 });
@@ -118,9 +118,9 @@ it('seeds the Catalogue states', function () {
     expect($deactivated)->toHaveCount(1)
         ->and(DB::table('cycle_producers')->where('producer_id', $deactivated->first())->count())->toBe(0);
 
-    $inactiveProducts = DB::table('products')->where('active', false)->pluck('id');
-    expect($inactiveProducts)->toHaveCount(1)
-        ->and(DB::table('order_lines')->where('product_id', $inactiveProducts->first())->count())->toBe(0);
+    $inactiveProducts = DB::table('products')->where('active', false)->where('stock', false)->pluck('id');
+    expect($inactiveProducts)->toHaveCount(2)
+        ->and(DB::table('order_lines')->whereIn('product_id', $inactiveProducts)->count())->toBe(0);
 
     $unavailable = DB::table('product_unavailabilities')->get();
     expect($unavailable)->toHaveCount(1)
@@ -137,6 +137,42 @@ it('seeds the Catalogue states', function () {
     foreach (['/catalogue/producers', "/catalogue/producers/{$producer}/products", "/catalogue/producers/{$producer}/availability", '/catalogue/return-items'] as $path) {
         $this->get($path)->assertOk();
     }
+});
+
+it('seeds the Producer states', function () {
+    $this->seed(DemoSeeder::class);
+    $this->withoutVite();
+    $producers = DB::table('producers')->pluck('id', 'name');
+    $hort = $producers['Hort de la Vall'];
+    $movements = fn (string $productId) => DB::table('stock_movements')->where('product_id', $productId)->count();
+
+    $empty = DB::table('producers')->whereNotIn('id', DB::table('products')->select('producer_id'))->where('active', true)->pluck('id');
+    expect($empty)->toHaveCount(1)
+        ->and(DB::table('cycle_producers')->where('producer_id', $empty->first())->count())->toBe(0)
+        ->and(DB::table('users')->where('producer_id', $empty->first())->count())->toBe(1);
+
+    $stock = DB::table('products')->where('producer_id', $hort)->where('stock', true)->get()->keyBy('name');
+    $long = $stock->first(fn ($product) => strlen($product->name) >= 60);
+    expect($long)->not->toBeNull()
+        ->and(strlen($long->unit))->toBeGreaterThanOrEqual(20)
+        ->and($movements($long->id))->toBe(0)
+        ->and($long->active)->toBeTrue();
+
+    $soldOut = $stock['Llenties de la Cerdanya'];
+    expect($soldOut->active)->toBeTrue()
+        ->and($movements($soldOut->id))->toBe(2)
+        ->and((float) DB::table('stock_movements')->where('product_id', $soldOut->id)->sum('quantity'))->toBe(0.0);
+    expect($stock->where('active', false)->keys()->all())->toBe(['Fesols de Santa Pau'])
+        ->and($movements($stock['Fesols de Santa Pau']->id))->toBe(1);
+
+    $longHistory = $stock['Arròs integral'];
+    expect($movements($longHistory->id))->toBeGreaterThanOrEqual(52)
+        ->and($movements($stock['Cigrons cuits']->id))->toBe(1);
+
+    $inactiveWeekly = DB::table('products')->where('stock', false)->where('active', false)->get();
+    expect($inactiveWeekly->pluck('name')->sort()->values()->all())->toBe(['Coca de recapte', 'Coca de sucre'])
+        ->and($inactiveWeekly->pluck('producer_id')->unique()->all())->toBe([$producers['Forn del Barri']])
+        ->and(DB::table('order_lines')->whereIn('product_id', $inactiveWeekly->pluck('id'))->count())->toBe(0);
 });
 
 it('seeds staff role holders besides the manager', function () {
@@ -205,6 +241,14 @@ it('lets every demo role log in and open its main screens', function (string $em
         $producer = DB::table('producers')->value('id');
         $this->get(route('receptions.show', [$cycle, $producer]))->assertOk();
     }
+    if ($email === 'hort@demo.guixa.test') {
+        $cycle = DB::table('cycles')->orderBy('pickup_date')->value('id');
+        $history = '/producer/stock/'.DB::table('products')->where('name', 'Arròs integral')->value('id').'/movements';
+        foreach (['/producer/cutoff', "/producer/cycles/{$cycle}", $history] as $path) {
+            $this->get($path)->assertOk();
+        }
+        expect(data_get($this->get("{$history}?page=2")->assertOk()->viewData('page')['props'], 'history.lines'))->not->toBeEmpty();
+    }
     if ($email === 'biel@demo.guixa.test') {
         $cycle = DB::table('cycles')->whereNotNull('settled_at')->value('id');
         $producer = DB::table('producers')->value('id');
@@ -215,6 +259,7 @@ it('lets every demo role log in and open its main screens', function (string $em
     'member' => ['anna@demo.guixa.test', ['/dashboard', '/', '/wallet']],
     'receiver' => ['biel@demo.guixa.test', ['/dashboard', '/receptions']],
     'producer' => ['hort@demo.guixa.test', ['/dashboard', '/producer/products']],
+    'producer without products' => ['sense-productes@demo.guixa.test', ['/dashboard', '/producer/products']],
 ]);
 
 it('can be repeated without duplicating data or resetting demo edits', function () {
