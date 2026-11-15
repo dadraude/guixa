@@ -92,7 +92,8 @@
                                 "selector": "#main-content h1:not(.sr-only)",
                                 "styles": {
                                     "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
-                                }
+                                },
+                                "fontSizeRem": 1.5
                             },
                             {
                                 "selector": "#main-content form input:not([type=\"hidden\"]):not([type=\"checkbox\"])",
@@ -189,7 +190,8 @@
                                 "selector": "#main-content h1:not(.sr-only)",
                                 "styles": {
                                     "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
-                                }
+                                },
+                                "fontSizeRem": 1.5
                             },
                             {
                                 "selector": "#main-content form input:not([type=\"hidden\"]):not([type=\"checkbox\"])",
@@ -267,7 +269,8 @@
                                 "selector": "#main-content h1:not(.sr-only)",
                                 "styles": {
                                     "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
-                                }
+                                },
+                                "fontSizeRem": 1.5
                             },
                             {
                                 "selector": "#main-content form input:not([type=\"hidden\"]):not([type=\"checkbox\"])",
@@ -344,7 +347,8 @@
                                 "selector": "#main-content h1:not(.sr-only)",
                                 "styles": {
                                     "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
-                                }
+                                },
+                                "fontSizeRem": 1.5
                             },
                             {
                                 "selector": "#main-content form input:not([type=\"hidden\"]):not([type=\"checkbox\"])",
@@ -422,7 +426,8 @@
                                 "selector": "#main-content h1:not(.sr-only)",
                                 "styles": {
                                     "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
-                                }
+                                },
+                                "fontSizeRem": 1.5
                             },
                             {
                                 "selector": "#main-content form input:not([type=\"hidden\"]):not([type=\"checkbox\"])",
@@ -567,7 +572,8 @@
                                 "selector": "#main-content h1:not(.sr-only)",
                                 "styles": {
                                     "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
-                                }
+                                },
+                                "fontSizeRem": 1.5
                             },
                             {
                                 "selector": "#main-content form input:not([type=\"hidden\"]):not([type=\"checkbox\"])",
@@ -657,7 +663,8 @@
                                 "selector": "#main-content h1:not(.sr-only)",
                                 "styles": {
                                     "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
-                                }
+                                },
+                                "fontSizeRem": 1.5
                             },
                             {
                                 "selector": "#main-content form input:not([type=\"hidden\"]):not([type=\"checkbox\"])",
@@ -731,7 +738,8 @@
                                 "selector": "#main-content h1:not(.sr-only)",
                                 "styles": {
                                     "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
-                                }
+                                },
+                                "fontSizeRem": 1.5
                             },
                             {
                                 "selector": "#main-content form input:not([type=\"hidden\"]):not([type=\"checkbox\"])",
@@ -816,7 +824,8 @@
                                 "selector": "#main-content h1:not(.sr-only)",
                                 "styles": {
                                     "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
-                                }
+                                },
+                                "fontSizeRem": 1.5
                             },
                             {
                                 "selector": "#main-content form input:not([type=\"hidden\"]):not([type=\"checkbox\"])",

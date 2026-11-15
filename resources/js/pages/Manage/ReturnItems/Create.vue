@@ -19,7 +19,9 @@ defineOptions({
 <template>
     <Head :title="trans('New return item')" />
 
-    <div class="pilot-page pilot-layout-page pilot-manager-page max-w-xl">
+    <div
+        class="pilot-page pilot-layout-page pilot-manager-page pilot-title-compact max-w-xl"
+    >
         <Heading :title="trans('New return item')" />
 
         <Form

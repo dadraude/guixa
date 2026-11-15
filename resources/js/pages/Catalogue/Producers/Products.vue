@@ -61,7 +61,9 @@ defineOptions({
 
 <template>
     <Head :title="trans('Products of :name', { name: producer.name })" />
-    <div class="pilot-page pilot-layout-page pilot-manager-page">
+    <div
+        class="pilot-page pilot-layout-page pilot-manager-page pilot-title-compact"
+    >
         <div class="flex flex-wrap items-start justify-between gap-4">
             <Heading
                 :title="trans('Products of :name', { name: producer.name })"
