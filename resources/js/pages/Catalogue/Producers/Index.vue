@@ -21,7 +21,9 @@ defineProps<{
 <template>
     <Head :title="trans('Producers')" />
 
-    <div class="pilot-page pilot-layout-page pilot-manager-page">
+    <div
+        class="pilot-page pilot-layout-page pilot-manager-page pilot-title-compact"
+    >
         <Heading
             :title="trans('Producers')"
             :description="trans('Choose a producer to administer its products')"

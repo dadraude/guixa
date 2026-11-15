@@ -34,7 +34,9 @@ defineOptions({
 
 <template>
     <Head :title="trans('Availability of :name', { name: producer.name })" />
-    <div class="pilot-page pilot-layout-page pilot-manager-page">
+    <div
+        class="pilot-page pilot-layout-page pilot-manager-page pilot-title-compact"
+    >
         <Heading
             :title="trans('Availability of :name', { name: producer.name })"
             :description="

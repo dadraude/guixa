@@ -24,7 +24,9 @@ defineProps<{
 <template>
     <Head :title="trans('Return items')" />
 
-    <div class="pilot-page pilot-layout-page pilot-manager-page">
+    <div
+        class="pilot-page pilot-layout-page pilot-manager-page pilot-title-compact"
+    >
         <div class="flex flex-wrap items-start justify-between gap-4">
             <Heading
                 :title="trans('Return items')"

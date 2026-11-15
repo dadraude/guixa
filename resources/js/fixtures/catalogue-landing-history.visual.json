@@ -145,7 +145,8 @@
                             },
                             {
                                 "selector": "#main-content h1:not(.sr-only)",
-                                "text": "Mel de farigola"
+                                "text": "Mel de farigola",
+                                "fontSizeRem": 1.5
                             }
                         ]
                     }

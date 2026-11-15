@@ -83,7 +83,8 @@
                             {
                                 "selector": "#main-content h1:not(.sr-only)",
                                 "count": 1,
-                                "contrast": 4.5
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
                             },
                             {
                                 "selector": "#main-content .pilot-page > header p",
@@ -175,7 +176,8 @@
                             {
                                 "selector": "#main-content h1:not(.sr-only)",
                                 "count": 1,
-                                "contrast": 4.5
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
                             },
                             {
                                 "selector": "#main-content .pilot-page > header p",
@@ -268,7 +270,8 @@
                             {
                                 "selector": "#main-content h1:not(.sr-only)",
                                 "count": 1,
-                                "contrast": 4.5
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
                             },
                             {
                                 "selector": "#main-content .pilot-page > header p",
@@ -370,7 +373,8 @@
                             {
                                 "selector": "#main-content h1:not(.sr-only)",
                                 "count": 1,
-                                "contrast": 4.5
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
                             },
                             {
                                 "selector": "#main-content .pilot-page > header p",
@@ -444,7 +448,8 @@
                             {
                                 "selector": "#main-content h1:not(.sr-only)",
                                 "count": 1,
-                                "contrast": 4.5
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
                             },
                             {
                                 "selector": "#main-content .pilot-page > header p",
@@ -531,7 +536,8 @@
                             {
                                 "selector": "#main-content h1:not(.sr-only)",
                                 "count": 1,
-                                "contrast": 4.5
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
                             },
                             {
                                 "selector": "#main-content .pilot-page > header p",
@@ -639,7 +645,8 @@
                             {
                                 "selector": "#main-content h1:not(.sr-only)",
                                 "count": 1,
-                                "contrast": 4.5
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
                             },
                             {
                                 "selector": "#main-content .pilot-page > header p",
@@ -731,7 +738,8 @@
                             {
                                 "selector": "#main-content h1:not(.sr-only)",
                                 "count": 1,
-                                "contrast": 4.5
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
                             },
                             {
                                 "selector": "#main-content .pilot-page > header p",
@@ -1415,7 +1423,8 @@
                             {
                                 "selector": "#main-content h1:not(.sr-only)",
                                 "count": 1,
-                                "contrast": 4.5
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
                             },
                             {
                                 "selector": "#main-content .pilot-page > header p",

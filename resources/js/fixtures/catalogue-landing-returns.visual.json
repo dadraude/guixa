@@ -104,7 +104,8 @@
                                 "contrast": 4.5,
                                 "styles": {
                                     "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
-                                }
+                                },
+                                "fontSizeRem": 1.5
                             },
                             {
                                 "selector": "#main-content .pilot-status-switch",
@@ -233,7 +234,8 @@
                                 "contrast": 4.5,
                                 "styles": {
                                     "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
-                                }
+                                },
+                                "fontSizeRem": 1.5
                             },
                             {
                                 "selector": "#main-content .pilot-status-switch",
@@ -351,7 +353,8 @@
                                 "contrast": 4.5,
                                 "styles": {
                                     "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
-                                }
+                                },
+                                "fontSizeRem": 1.5
                             },
                             {
                                 "selector": "#main-content p.pilot-layout-notice",
@@ -424,7 +427,8 @@
                                 "contrast": 4.5,
                                 "styles": {
                                     "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
-                                }
+                                },
+                                "fontSizeRem": 1.5
                             },
                             {
                                 "selector": "#main-content .pilot-status-switch",
@@ -564,7 +568,8 @@
                                 "contrast": 4.5,
                                 "styles": {
                                     "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
-                                }
+                                },
+                                "fontSizeRem": 1.5
                             },
                             {
                                 "selector": "#main-content .pilot-status-switch",
@@ -728,7 +733,8 @@
                                 "contrast": 4.5,
                                 "styles": {
                                     "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
-                                }
+                                },
+                                "fontSizeRem": 1.5
                             },
                             {
                                 "selector": "#main-content form input:not([type=\"hidden\"])",
@@ -828,7 +834,8 @@
                                 "contrast": 4.5,
                                 "styles": {
                                     "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
-                                }
+                                },
+                                "fontSizeRem": 1.5
                             },
                             {
                                 "selector": "#main-content form input:not([type=\"hidden\"])",
@@ -911,7 +918,8 @@
                                 "contrast": 4.5,
                                 "styles": {
                                     "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
-                                }
+                                },
+                                "fontSizeRem": 1.5
                             },
                             {
                                 "selector": "#main-content form input:not([type=\"hidden\"])",
@@ -995,7 +1003,8 @@
                                 "contrast": 4.5,
                                 "styles": {
                                     "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
-                                }
+                                },
+                                "fontSizeRem": 1.5
                             },
                             {
                                 "selector": "#main-content [data-test=\"save-return-item\"]",
@@ -1106,7 +1115,8 @@
                                 "contrast": 4.5,
                                 "styles": {
                                     "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
-                                }
+                                },
+                                "fontSizeRem": 1.5
                             },
                             {
                                 "selector": "#main-content form input:not([type=\"hidden\"])",
@@ -1210,7 +1220,8 @@
                                 "contrast": 4.5,
                                 "styles": {
                                     "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
-                                }
+                                },
+                                "fontSizeRem": 1.5
                             },
                             {
                                 "selector": "#main-content form input:not([type=\"hidden\"])",
@@ -1293,7 +1304,8 @@
                                 "contrast": 4.5,
                                 "styles": {
                                     "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
-                                }
+                                },
+                                "fontSizeRem": 1.5
                             },
                             {
                                 "selector": "#main-content form input:not([type=\"hidden\"])",
@@ -1377,7 +1389,8 @@
                                 "contrast": 4.5,
                                 "styles": {
                                     "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
-                                }
+                                },
+                                "fontSizeRem": 1.5
                             },
                             {
                                 "selector": "#main-content [data-test=\"save-return-item\"]",
@@ -1448,7 +1461,8 @@
                                 "contrast": 4.5,
                                 "styles": {
                                     "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
-                                }
+                                },
+                                "fontSizeRem": 1.5
                             },
                             {
                                 "selector": "#main-content form input:not([type=\"hidden\"])",

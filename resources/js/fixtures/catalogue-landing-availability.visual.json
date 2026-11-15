@@ -88,7 +88,8 @@
                             {
                                 "selector": "#main-content h1:not(.sr-only)",
                                 "count": 1,
-                                "contrast": 4.5
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
                             },
                             {
                                 "selector": "#main-content header p",
@@ -171,7 +172,8 @@
                                 "selector": "#main-content h1:not(.sr-only)",
                                 "styles": {
                                     "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
-                                }
+                                },
+                                "fontSizeRem": 1.5
                             },
                             {
                                 "selector": "#main-content .pilot-page",
@@ -272,7 +274,8 @@
                             {
                                 "selector": "#main-content h1:not(.sr-only)",
                                 "count": 1,
-                                "contrast": 4.5
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
                             },
                             {
                                 "selector": "#main-content header p",
@@ -355,7 +358,8 @@
                                 "selector": "#main-content h1:not(.sr-only)",
                                 "styles": {
                                     "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
-                                }
+                                },
+                                "fontSizeRem": 1.5
                             },
                             {
                                 "selector": "#main-content .pilot-page",
@@ -461,7 +465,8 @@
                             {
                                 "selector": "#main-content h1:not(.sr-only)",
                                 "count": 1,
-                                "contrast": 4.5
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
                             },
                             {
                                 "selector": "#main-content header p",
@@ -624,7 +629,8 @@
                             {
                                 "selector": "#main-content h1:not(.sr-only)",
                                 "count": 1,
-                                "contrast": 4.5
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
                             },
                             {
                                 "selector": "#main-content header p",
@@ -756,7 +762,8 @@
                             {
                                 "selector": "#main-content h1:not(.sr-only)",
                                 "count": 1,
-                                "contrast": 4.5
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
                             },
                             {
                                 "selector": "#main-content header p",
@@ -843,7 +850,8 @@
                             {
                                 "selector": "#main-content h1:not(.sr-only)",
                                 "count": 1,
-                                "contrast": 4.5
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
                             },
                             {
                                 "selector": "#main-content header p",
@@ -949,7 +957,8 @@
                             {
                                 "selector": "#main-content h1:not(.sr-only)",
                                 "count": 1,
-                                "contrast": 4.5
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
                             },
                             {
                                 "selector": "#main-content header p",
@@ -1081,7 +1090,8 @@
                             {
                                 "selector": "#main-content h1:not(.sr-only)",
                                 "count": 1,
-                                "contrast": 4.5
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
                             },
                             {
                                 "selector": "#main-content header p",
@@ -1212,7 +1222,8 @@
                             {
                                 "selector": "#main-content h1:not(.sr-only)",
                                 "count": 1,
-                                "contrast": 4.5
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
                             },
                             {
                                 "selector": "#main-content header p",
@@ -1282,7 +1293,8 @@
                             {
                                 "selector": "#main-content h1:not(.sr-only)",
                                 "count": 1,
-                                "contrast": 4.5
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
                             },
                             {
                                 "selector": "#main-content header p",
@@ -1366,7 +1378,8 @@
                             {
                                 "selector": "#main-content h1:not(.sr-only)",
                                 "count": 1,
-                                "contrast": 4.5
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
                             },
                             {
                                 "selector": "#main-content header p",
@@ -1455,7 +1468,8 @@
                             {
                                 "selector": "#main-content h1:not(.sr-only)",
                                 "count": 1,
-                                "contrast": 4.5
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
                             },
                             {
                                 "selector": "#main-content header p",
@@ -1544,7 +1558,8 @@
                             {
                                 "selector": "#main-content h1:not(.sr-only)",
                                 "count": 1,
-                                "contrast": 4.5
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
                             },
                             {
                                 "selector": "#main-content header p",

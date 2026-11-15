@@ -23,7 +23,9 @@ defineProps<{
 <template>
     <Head :title="trans('Edit return item')" />
 
-    <div class="pilot-page pilot-layout-page pilot-manager-page max-w-xl">
+    <div
+        class="pilot-page pilot-layout-page pilot-manager-page pilot-title-compact max-w-xl"
+    >
         <Heading :title="trans('Edit :name', { name: item.name })" />
 
         <Form

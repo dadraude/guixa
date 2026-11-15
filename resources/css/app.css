@@ -2396,3 +2396,14 @@ html.dark:has(.reference-style)
         grid-column: auto;
     }
 }
+
+/* 005 T09 */
+/*
+ * One page-title size across the Catalogue pages (R3). The generic .reference-style title (1.75-2.5rem) applied to the
+ * list and return-item pages while the weekly and stock forms and the movement history use 1.5rem (.pilot-t44-page, T06).
+ * The pages that still carried the larger size take the same 1.5rem; widths and spacing are left as they are.
+ */
+.landing .pilot-title-compact h1.pilot-heading {
+    font-size: 1.5rem;
+    line-height: 2rem;
+}
