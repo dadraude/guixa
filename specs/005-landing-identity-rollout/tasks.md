@@ -18,6 +18,16 @@ independent. T09 is the acceptance record and the visual-approval request; it wr
 needed. A flag is not used: removing the `landingPages` entry is the reversible switch (contract item 7). Mixed look
 between merges is accepted (spec OQ1); S1/R3 are verified only on the integrated base (T09).
 
+**Slice 2 (Producer role complete, T10–T16).** Source: [accepted spec](spec.md) "Slice 2" R14–R19/S13–S18 and the
+accepted slice 2 plan in [plan.md](plan.md) ("Slice 2 — Producer role complete · Plan", D6–D11 accepted by the user
+2026-11-15). Same mechanism: one exact-name `landingPages` entry per page; the six Producer pages are already in
+`pilotPages` (`resources/js/lib/pilotTheme.ts:10-15`), so no `pilotPages` edit is expected (*to confirm when reading*).
+T10 is the tracer: it creates the `producer-landing` fixture and `producer-landing-shared` manifest, re-points the three
+slice 1 probes that name Producer pages (D7) **before** any Producer page is admitted, measures the page-title size of the
+six pages (D6), and admits `Producer/Products/Index`. T11–T14 reuse that fixture, each admitting its own page(s) with its own
+manifest. T15 (seeder) is independent. T16 is the acceptance record and the visual-approval request; it writes no code
+unless a correction is needed. The reversible switch is again the `landingPages` entry (D8: no single switch for six pages).
+
 ## Execution and evidence contract (all tasks)
 
 - Tests first: write the failing check (Vitest admission/regression, or runner assertion with the failing value recorded),
@@ -70,9 +80,21 @@ No Linear column: tickets are not published. "After" lists genuine prerequisites
 | T07 | <a id="t07"></a>[Show the return-item list and forms in the landing identity](#t07-show-the-return-item-list-and-forms-in-the-landing-identity) | R1/R4–R9 for `Manage/ReturnItems/*`; S3 return-item portion; S4 table portion; S10 specs `Index`, `Create`, `Edit` | T01 |
 | T08 | <a id="t08"></a>[Show the stock movement history in the landing identity](#t08-show-the-stock-movement-history-in-the-landing-identity) | R1/R4–R9 for `Catalogue/Stock/Movements`; S6; S10 spec `Movements` | T01 |
 | T09 | <a id="t09"></a>[Record slice acceptance and request visual approval](#t09-record-slice-acceptance-and-request-visual-approval) | R3 (area-wide), R10, R11, R12; S1, S2, S8 (re-run), S9, S10, S11 (aggregate), S12 | T02–T08 |
+| T10 | <a id="t10"></a>[Show the producer product list in the landing identity, with fixture and controls re-pointed](#t10-show-the-producer-product-list-in-the-landing-identity-with-fixture-and-controls-re-pointed) | R14/R15 (title measurement)/R16/R17 for `Producer/Products/Index`; S13 (start), S14 (list), S16 (toggle, reactivate, delete busy and error), S17 (first states) | — |
+| T11 | <a id="t11"></a>[Show the producer product forms and classification dialog in the landing identity](#t11-show-the-producer-product-forms-and-classification-dialog-in-the-landing-identity) | R14–R16 for `Producer/Products/{Create,Edit}`; R18 (specs `Create`, `Edit`); S14 (forms), S16 (dialog) | T10 |
+| T12 | <a id="t12"></a>[Show the producer default cutoff in the landing identity](#t12-show-the-producer-default-cutoff-in-the-landing-identity) | R14–R16 for `Producer/Cutoff`; R18 (spec `Cutoff`); S15 (cutoff valid and invalid) | T10 |
+| T13 | <a id="t13"></a>[Show the producer cycle summary in the landing identity](#t13-show-the-producer-cycle-summary-in-the-landing-identity) | R14–R16 for `Producer/CycleSummary`; R18 (spec `CycleSummary`); S15 (summary, availability toggle) | T10 |
+| T14 | <a id="t14"></a>[Show the producer stock movement history in the landing identity](#t14-show-the-producer-stock-movement-history-in-the-landing-identity) | R14, R16 for `Producer/Stock/Movements`; R17; R18 (spec `Movements`, `layout-rules.spec.ts`); S16 (history) | T10 |
+| T15 | <a id="t15"></a>[Show the Producer states in the demo seeder](#t15-show-the-producer-states-in-the-demo-seeder) | R19 (demo data); supports S14–S16 | — |
+| T16 | <a id="t16"></a>[Record slice 2 acceptance and request visual approval](#t16-record-slice-2-acceptance-and-request-visual-approval) | R15 (area-wide, against slice 1), R17, R18, R19; S13, S17, S18 | T10–T15 |
 
 **Current dependency frontier (nothing merged on this base): T01 and T02.** After T01 integrates: T03, T04, T07, T08
 (and T05/T06 once T03 integrates; confirmed hard dependency, Q&A 2026-11-13). T09 needs all of T02–T08.
+
+**Slice 2 dependency frontier (slice 2 spec and plan accepted; nothing of slice 2 merged on this base): T10 and T15.**
+After T10 integrates: T11, T12, T13, T14 (mutually independent). T16 needs all of T10–T15. Slice 2 tasks do not depend on
+slice 1 tasks being merged in code terms beyond the integrated base they start from (slice 1 T01–T09 are integrated and the
+visual approval of 2026-11-15 is logged); slice 1 outcomes they reuse are Deviations T03, T06 (D3 outcome), T07, T09.
 
 Parallelism and hotspots (scheduling, not dependency edges): `resources/js/lib/pilotTheme.ts` (every task adds one
 or two array entries: serialize merges, rebase conflicts are mechanical); `resources/css/app.css` `.landing` block
@@ -82,6 +104,19 @@ textual conflicts); `lib/pilotTheme.spec.ts` and `composables/usePilotTheme.spec
 `fixtures/landing.visual.json` (T01 only edits the control; nobody else touches it); `DemoSeeder.php` + its test (T02
 only). Safe parallel set after T01: {T03, T04, T07, T08} are file-disjoint apart from the hotspots above; T05 and T06
 share `StockProductFields`/field CSS and should not run simultaneously (T05 first, T06 probes the regression).
+
+Slice 2 parallelism and hotspots (scheduling, not dependency edges): `resources/js/lib/pilotTheme.ts` (T10, T11, T12, T13,
+T14 each add one or two `landingPages` entries: serialize merges); `lib/pilotTheme.spec.ts` and
+`composables/usePilotTheme.spec.ts` (one flipped or added row per page; T11 and T14 also move the formerly negative
+`Producer/Products/Create`, `Producer/Products/Edit` and `Producer/Stock/Movements` rows); `resources/css/app.css`
+`.landing` block (one distinct commented sub-block per task: `/* 005 T10 … */`, `/* 005 T11 … */`, `/* 005 T12 … */`,
+`/* 005 T13 … */`, `/* 005 T14 … */`; if two tasks change the same block, the later one re-runs the earlier one's
+manifest as its probe); `resources/js/fixtures/producer-landing*.ts/.html` (T10 creates; later tasks only add states and a
+manifest of their own); `resources/js/fixtures/catalogue-landing-visual.ts` and the three slice 1 manifests that cite the
+Producer probes (T10 only, D7); `DemoSeeder.php` + its test (T15 only). Safe parallel set after T10: {T11, T12, T13, T14}
+are file-disjoint apart from the hotspots above. T15 runs in parallel with everything. `Producer/Products/Index`,
+`Create`, `Edit` and `Stock/Movements` share `ActiveSwitch`, `WeeklyProductFields`, `ProductAdministrationActions`,
+`MovementHistory` with already-admitted Catalogue pages, so their rules are reused, not rewritten.
 
 ## Coverage and conservation
 
@@ -115,6 +150,26 @@ share `StockProductFields`/field CSS and should not run simultaneously (T05 firs
 
 Every R1–R13 and S1–S12 has an owner. No criterion is deferred. Slices 2–7, mail, error pages, first paint, favicon,
 global promotion and Dashboard restyle are outside.
+
+### Coverage and conservation — slice 2
+
+| Ref | Owner(s) and what each completes |
+| --- | --- |
+| R14 | One page group each: T10 `Products/Index`; T11 `Products/Create`, `Edit` and the dialog; T12 `Cutoff`; T13 `CycleSummary`; T14 `Stock/Movements` (6 pages); shell overlays re-measured on a Producer page in T10; T16 re-confirms all six on the integrated base. |
+| R15 | T10 measures the title of the six pages (D6) and starts the cross-page probe; each page task checks its own title; T16 completes the probe over the six pages **and** `Catalogue/Producers/Products` (slice 1). |
+| R16 | R5–R9 per page task for its pages and compositions: product list T10; product form and dialog T11; cutoff form T12; cycle summary T13; movement history T14. Seeded states come from T15; states that are not seeded (nothing to deliver, D11) come from the fixture and Vitest. |
+| R17 | Each page task (presentation-only diff, guards unchanged); T16 aggregates and runs one multi-role navigation case. |
+| R18 | T11 (`Create.spec.ts`, `Edit.spec.ts`), T12 (`Cutoff.spec.ts`), T13 (`CycleSummary.spec.ts`), T14 (`Stock/Movements.spec.ts`, `layout-rules.spec.ts` row); T10 keeps `Producer/Products/Index.spec.ts` green; T16 confirms the set. |
+| R19 | Demo data: T15 (complete). Acceptance record and approval request: T16 (approval is the user's decision, never made by a task). |
+| S13 | T10 starts; each page task adds its page; complete in T16 (needs all six pages on the integrated base). |
+| S14 | Split: list T10; forms T11. Complete when T11 merges; T15 supplies the seeded rows; T16 confirms. |
+| S15 | Split: cutoff T12; summary and availability toggle T13. Complete when both merge; T16 confirms. |
+| S16 | Split: toggle, reactivate, delete busy and error T10; dialog T11; history T14. Complete when T14 merges; T16 confirms. |
+| S17 | T10 (first navigation and leak states, re-pointed controls); T16 completes (multi-role navigation, access refusals read from existing guards). |
+| S18 | T16 only. |
+
+Every R14–R19 and S13–S18 has an owner. No criterion is deferred. Slices 3–7 (see [discovery](discovery.md)), mail, error pages,
+the Dashboard links to these pages, first paint, favicon and global promotion are outside.
 
 ## Task details
 
@@ -365,6 +420,250 @@ global promotion and Dashboard restyle are outside.
 - **Size.** Documentation and evidence only (~0 code). **Limits.** Does not approve on the user's behalf; no slice 2.
 - **Acceptance record.** This task's output is the feature-slice record; verdict "pending approval" until the user answers.
 
+### Slice 2 task details
+
+Conventions of "Execution and evidence contract" apply unchanged, with "Catalogue" read as "Producer", the fixture
+`producer-landing` (role `producer`) in place of `catalogue-landing`, and the demo seeder owner T15 in place of T02.
+Pages are under `resources/js/pages/` (lowercase). Each page task states in its handoff "no PHP behaviour changed" and
+"Demo seeder: see T15". Every fixture, manifest and spec path below is *(planned)* and *unverified*; confirm against
+`catalogue-landing-visual.ts` before creating.
+
+### T10 Show the producer product list in the landing identity, with fixture and controls re-pointed
+
+- **Outcome.** A producer sees `Producer/Products/Index` in the landing identity, light and dark, with shell and
+  overlays, while the re-pointed unmigrated controls, Welcome, the slice 1 pages and the other five Producer pages are
+  unchanged. This is also the tracer for every later Producer page task.
+- **Requirements/scenarios.** R14, R15 (title measurement of the six pages, D6), R16 and R17 for `Products/Index`; S13
+  start; S14 list (no products, several, very long name, inactive product, no/inactive/sold-out stock product); S16 toggle,
+  reactivate and delete-unused with busy and error states; S17 first navigation states. Remainder: S13/S17/R15 final -> T16;
+  forms -> T11; other pages -> T12–T14.
+- **Plan sections.** Architecture overview (Title size, Shared consumers); Contract for admitting a Producer page; R14,
+  R15, R16 (product list), R17; Test plan; Visual evidence plan incl. First checkpoint; Risks; D6, D7, D8, D9.
+- **Files/surfaces reserved.** Edit: `resources/js/lib/pilotTheme.ts` (`landingPages` row for `Producer/Products/Index`),
+  `resources/css/app.css` `.landing` sub-block `/* 005 T10 … */` (only if a probe fails; stock table cells are the likely
+  overflow at 375 px/200 %), `resources/js/lib/pilotTheme.spec.ts` and `resources/js/composables/usePilotTheme.spec.ts`
+  (positive row for `Producer/Products/Index`; near-miss loop keeps a Producer-prefixed near name returning `null`),
+  `resources/js/fixtures/catalogue-landing-visual.ts` (probe re-pointing, ~`:447`, `:458`, `:460`, URL map `:506`, `:517`,
+  `:525`) and its uses in `catalogue-landing-history.visual.json` (~`:709`), `catalogue-landing-stock.visual.json`
+  (~`:1777`), `catalogue-landing-lists.visual.json` (~`:2616`) (line numbers from the plan, *to confirm when reading*).
+  New: `resources/js/fixtures/producer-landing.html`, `producer-landing-visual.ts`, `producer-landing-shared.visual.json`
+  (controls, navigation, title probe; plus a producer-list manifest `producer-landing-lists.visual.json`). The older
+  `dra-*`/`reference-*` manifests are left (manual-only). History entries (own files).
+- **Dependencies.** None; the shell, tokens, portals and slice 1 pages are integrated.
+- **UI reuse.** `pages/Producer/Products/Index.vue`, `ActiveSwitch`, `StatusIndicator`, `ui/button`, `ui/badge`; no new
+  component.
+- **Done when.**
+  - First checkpoint: `Producer/Products/Index` at 375 px light with the producer role first measures the primary element
+    at green `rgb(36, 107, 87)` (failing value recorded), then after admission `rgb(40, 101, 133)` (T84 constants).
+  - Given the re-pointed controls, the history probe measures `Manage/Stock/Movements` and `Finance/Stock/Movements`, the
+    dialog probe `Manage/Cycles/Index`, and the `WeeklyProductFields` probe is dropped; the slice 1 manifests that cited
+    `Producer/Stock/Movements`, `Producer/Products/Create` and `Producer/Products/Edit` run green on the base **before** the
+    `landingPages` row is added (D7), and still green after.
+  - Given the six Producer pages in the fixture, the runner reports `h1.pilot-heading` font size at 375 and 1280 px,
+    light and dark; expected 24 px (`fontSizeRem: 1.5`) from `.pilot-t44-page`. `pilot-title-compact` is added only to a page
+    that measures otherwise and recorded as a Deviation (D6, *to confirm when reading whether the other five pages mount
+    in the fixture before their own task; if not, each page task measures its own title and T10 records the expectation*).
+  - Given `Products/Index` in light and dark at 375/1280 px (and 1024 px/200 % text, product-list composition), the runner
+    reports `.reference-style.landing` count 1, `.pilot-theme:not(.landing)` count 0, `.welcome-page` count 0, no
+    `background-image` in `#main-content`, H1/muted/button/badge contrast at 4.5 (3 for borders and focus), interactive
+    targets >= 44 px (including `ActiveSwitch` and stock table controls), no horizontal overflow, real-Tab focus order.
+  - Given no products, several, very long name and unit, inactive product, no stock products, inactive and sold-out stock
+    product: text "Deactivated" is present on the inactive row, `Inactive` and `Sold out` are text badges, and nothing clips.
+  - Given toggle Active, reactivate and delete-unused, the busy and error states keep text and contrast; the real router
+    in a focused probe sends the same requests as before (R17).
+  - Given navigation Producer products -> `Manage/Accounts/Index` -> back, with the mobile sheet and with the account menu
+    open, light and dark and system preference, the control keeps green and `Index` recovers the landing colours (S17 first
+    states); one multi-role navigation case shows the other area keeps its own look.
+  - Variant-off fixture state restores the exact pre-slice values (reversibility). Welcome and the slice 1 pages unchanged.
+  - Vitest: `pilotVariantFor('Producer/Products/Index')` returns `'landing'`; the shell, dialog and sheet take `landing`
+    and lose it after leaving; existing `Producer/Products/Index.spec.ts` green. R10 guards
+    (`ProducerPagesTest.php`, `ProductPagesTest.php`, `ProducerProductsPageTest.php`, `RolePermissionMatrixTest.php`) pass
+    unchanged, plus `layout-rules.spec.ts`. Handoff: "Demo seeder: see T15".
+- **First checkpoint.** As above: record the green failure first, re-point the probes, admit, re-measure blue.
+- **Size.** ~250–400 authored lines (plan; medium confidence), excluding manifest JSON. At the upper bound because the
+  fixture, the probe re-pointing and the first admission cannot be demonstrated apart; the title measurement of the
+  other five pages is the first item to cut if the diff passes ~400 lines.
+- **Limits.** No other Producer page admitted. No shared-bootstrap extraction (D5/D9). No markup change in `ActiveSwitch`.
+- **Acceptance record.** Required at close: R14/R16/R17 for `Products/Index`, R15 title measurement, S14 list, S16
+  toggle/reactivate/delete, S17 first states, evidence, verdict, remainder owners above.
+
+### T11 Show the producer product forms and classification dialog in the landing identity
+
+- **Outcome.** `Producer/Products/Create` and `Edit`, and the `ProductAdministrationActions` dialog opened on `Edit`,
+  show the landing identity; fields, errors and busy state meet R5/R6; the new page specs exist.
+- **Requirements/scenarios.** R14–R16 for both forms and the dialog; R17; R18 specs `Create`, `Edit`; S14 forms (invalid and
+  valid submit); S16 dialog (opened by keyboard, Escape closes with no request, focus returns). Remainder: S14/S16 final
+  -> T16.
+- **Plan sections.** R14 (overlays), R16 (product form and dialog), Test plan rows `Products/Create`, `Products/Edit`; D7,
+  D8; Shared consumers (`WeeklyProductFields`, `ProductAdministrationActions` now fully migrated).
+- **Files/surfaces reserved.** `lib/pilotTheme.ts` rows (2); `lib/pilotTheme.spec.ts` and `composables/usePilotTheme.spec.ts`
+  (move `Producer/Products/Create` and `Producer/Products/Edit` from the negative rows, ~`:224-227` and
+  `:248-259`/`:376-379`, to the positive ones); `app.css` `.landing` sub-block `/* 005 T11 … */` if a probe fails; new
+  `pages/Producer/Products/Create.spec.ts` and `Edit.spec.ts`; `producer-landing-forms.visual.json`. `WeeklyProductFields.vue`
+  and `ProductAdministrationActions.vue` markup not edited.
+- **Dependencies.** T10: fixture and re-pointed dialog probe (`Manage/Cycles/Index`).
+- **UI reuse.** `WeeklyProductFields`, `ui/input`, `ui/label`, `InputError`, `ui/button`, `ProductAdministrationActions`
+  (`NativeDialog`); field pattern already measured in slice 1 T05.
+- **Done when.**
+  - Specs fail first then pass (SSR `renderToString` with `installTranslations`, mirroring `Products/Index.spec.ts`):
+    `Create` title "New product", submit "Create", field error rendered through `InputError`, submit `disabled` while
+    `processing`; `Edit` prefilled fields, delete-unused control present, dialog opens and Cancel sends no request.
+  - Measured at 375/1280 px light and dark: persistent label, field border >= 3:1 (including `dark:bg-input/30`), error
+    text contrast, error not clipped, disabled submit distinguishable by `disabled` and label; 1024 px/200 % form
+    composition and 375 px/200 % dialog no overflow; keyboard-only reading order with visible focus; long product name
+    and invalid form state.
+  - Dialog opened by keyboard on the producer role: landing surface/ink/focus, Escape sends no request, focus returns to
+    the opener, `NativeDialog.spec.ts` green (the toast is the synthetic Sonner probe already accepted in the slice 1 T03
+    Deviation, cited, not repeated).
+  - Shared-consumer probe: `NativeDialog` base on `Manage/Cycles/Index` unchanged. R10 guards pass.
+- **First checkpoint.** Failing `errors.name` spec for `Create`, then the measured Name field border on `Create` before
+  and after admission.
+- **Size.** ~200–350 lines (plan; medium). **Limits.** No copy/validation change; no new field or action.
+- **Acceptance record.** As convention; S14 and S16 dialog portions; remainder T16.
+
+### T12 Show the producer default cutoff in the landing identity
+
+- **Outcome.** `Producer/Cutoff` shows the landing identity, and saving a valid or invalid value keeps its behaviour.
+- **Requirements/scenarios.** R14–R16 for `Cutoff`; R17; R18 spec `Cutoff`; S15 cutoff (valid and invalid). Remainder: S15
+  summary -> T13; area-wide -> T16.
+- **Plan sections.** R16 (cutoff form), Test plan row `Cutoff`, Risks (touch targets).
+- **Files/surfaces reserved.** `lib/pilotTheme.ts` row; the two Vitest lists (positive row for `Producer/Cutoff`);
+  `app.css` `.landing` sub-block `/* 005 T12 … */` if a probe fails; new `pages/Producer/Cutoff.spec.ts`;
+  `producer-landing-cutoff.visual.json`.
+- **Dependencies.** T10: fixture and control.
+- **UI reuse.** `Cutoff.vue` (`data-test="save-cutoff"`), `ui/input`, `ui/label`, `InputError`, `ui/button`.
+- **Done when.**
+  - Spec fails first then passes: title "Default cutoff", both fields prefilled, `errors.days_before` and
+    `errors.time`/`errors.domain` rendered, `save-cutoff` disabled while `processing`.
+  - Measured: cutoff form at baseline plus 1024 px/200 %, validation-error state (text message present, field border
+    >= 3:1 from `--input`, error not clipped), busy submit; 44 px targets; no overflow; real-Tab focus order.
+  - Given a valid and an invalid value through the real router in a focused probe, the same request, message and
+    redirect result as before.
+  - Admission Vitest rows; R10 guards pass (`ProducerPagesTest.php`).
+- **First checkpoint.** Failing `Cutoff` error-display spec; then the green-to-blue measurement on the page.
+- **Size.** ~120–220 lines (plan; medium). **Limits.** No change to the cutoff rule or copy.
+- **Acceptance record.** S15 cutoff with assertions; remainder S15 summary T13, area-wide T16.
+
+### T13 Show the producer cycle summary in the landing identity
+
+- **Outcome.** `Producer/CycleSummary` shows the landing identity for sent (read-only quantities) and not-sent
+  (availability toggle) cycles, with the same figures and the same toggle result.
+- **Requirements/scenarios.** R14–R16 for `CycleSummary`; R17; R18 spec `CycleSummary`; S15 summary (with and without
+  lines) and availability toggle. Remainder: S15 cutoff -> T12; area-wide -> T16.
+- **Plan sections.** R16 (cycle summary), Test plan row `CycleSummary`, Visual evidence plan (cycle states), Risks (touch
+  targets of the toggle).
+- **Files/surfaces reserved.** `lib/pilotTheme.ts` row; the two Vitest lists (positive row for `Producer/CycleSummary`);
+  `app.css` `.landing` sub-block `/* 005 T13 … */` if a probe fails; new `pages/Producer/CycleSummary.spec.ts`;
+  `producer-landing-cycle.visual.json`.
+- **Dependencies.** T10: fixture and control.
+- **UI reuse.** `CycleSummary.vue` (`data-test="availability"`), `StatusIndicator`, `ui/button`,
+  `pilot-data-table`/`pilot-cell-label`.
+- **Done when.**
+  - Spec fails first then passes: sent with lines shows quantities and no toggle; sent without lines shows "Nothing to
+    deliver."; not sent shows `Available`/`Unavailable` text and the matching `Mark available`/`Mark unavailable` button;
+    no products shows "You have no products to offer.".
+  - Measured: all four states at baseline, 1024 px/200 % cycle-summary composition; quantity cells use `tabular-nums`
+    (which cells carry `pilot-amount`: *to confirm when reading*); toggle target >= 44 px; available and unavailable differ
+    by text as well as colour; no overflow; danger resolves to `--destructive`, no ochre on status.
+  - Given the toggle through the real router in a focused probe, the same request as before; "nothing to deliver" comes from
+    the fixture and Vitest, not the seeder (D11).
+  - Admission Vitest rows; R10 guards pass (`ProducerCycleSummaryPageTest.php`).
+- **First checkpoint.** Failing not-sent spec (`Available`/`Unavailable` text and button label); then toggle target
+  measurement.
+- **Size.** ~180–300 lines (plan; medium). **Limits.** No change to figures, availability use case or copy.
+- **Acceptance record.** S15 summary and toggle with assertions; remainder S15 cutoff T12, area-wide T16.
+
+### T14 Show the producer stock movement history in the landing identity
+
+- **Outcome.** `Producer/Stock/Movements` reads the same entries in the landing identity, read-only, and the Finance
+  and Manager histories are unchanged.
+- **Requirements/scenarios.** R14, R16 for `Stock/Movements` (R5–R9 for this page, as every page task owns them); R17;
+  R18 spec `Movements` and the 8 px grid row; S16 history. Remainder: S16 final -> T16.
+- **Plan sections.** R16 (movement history), Shared consumers (`MovementHistory`: `Finance/Stock/Movements`,
+  `Manage/Stock/Movements` unmigrated), Test plan rows `Stock/Movements` and layout grid, D7.
+- **Files/surfaces reserved.** `lib/pilotTheme.ts` row; the two Vitest lists (move `Producer/Stock/Movements` from the
+  negative to the positive row); `resources/js/layout-rules.spec.ts` (add `pages/Producer/Stock/Movements.vue`, ~`:11-15`);
+  `app.css` `.landing` sub-block `/* 005 T14 … */` if a probe fails; new `pages/Producer/Stock/Movements.spec.ts`;
+  `producer-landing-history.visual.json`. `MovementHistory.vue` not edited (`MovementHistory.spec.ts` green).
+- **Dependencies.** T10: fixture and the re-pointed history probe.
+- **UI reuse.** `MovementHistory`, `pilot-t44-page`, `pilot-data-table`, `pilot-cell-label`.
+- **Done when.**
+  - Spec fails first then passes: title, available-quantity line, `MovementHistory` rendered, no entry/adjustment/count
+    control.
+  - Measured: baseline plus 1024 px/200 % history composition, stock product with no movements, long movement list;
+    `tabular-nums` on quantity and balance; pagination links >= 44 px; no overflow.
+  - Mandatory leakage probe: `Manage/Stock/Movements` and `Finance/Stock/Movements` computed values unchanged before and
+    after the row is added; `MovementHistory` markup not touched.
+  - Direct link to a quantity-changing action or to another producer's history still refused
+    (`StockMovementHistoryPagesTest.php`, `RolePermissionMatrixTest.php` unchanged).
+  - `layout-rules.spec.ts` green with the new page in the 8 px list. R10 guards pass.
+- **First checkpoint.** Failing read-only spec, then the leakage probe values on the two unmigrated consumers.
+- **Size.** ~120–250 lines (plan; medium). **Limits.** No history component change.
+- **Acceptance record.** S16 history with assertions; R14/R16/R17; remainder T16.
+
+### T15 Show the Producer states in the demo seeder
+
+- **Outcome.** Running the demo seeder yields every Producer state the user must review: a producer with no products, an
+  inactive, a sold-out and a no-movements stock product, a long name and unit, a history that spans more than one page and
+  a second inactive weekly product on a different producer.
+- **Requirements/scenarios.** R19 (demo data, complete). Supports S14–S16. Remainder: none.
+- **Plan sections.** Seeder decision, slice 2 (items 1–5, including the 51+ movement correction); D10, D11.
+- **Files/surfaces reserved.** `database/seeders/DemoSeeder.php` (new `createProducerStates()` called after
+  `createCatalogueStates`, inside the existing transaction) and `tests/Feature/Database/DemoSeederTest.php` only. Use
+  existing use cases: `CreateProducer` + `Account::inviteProducer` (as `createCatalog`), the stock-creation use case
+  (*name to confirm when reading, `src/Catalog/Application`*), `SetStockAvailable`, `RecordStockEntry`,
+  `RecordStockAdjustment` (`src/Stock/Application`), `DeactivateStockProduct`
+  (`src/Catalog/Application/DeactivateStockProduct.php`), `CreateProduct` + `DeactivateProduct`.
+- **Dependencies.** None.
+- **Done when.**
+  - Test "seeds the Producer states" fails first, then passes, asserting: a fourth producer with an account and no products
+    (created after the cycles, in no cycle); for `hort@` a stock product with a long name and long unit and no movements, a
+    stock product sold out (`SetStockAvailable` quantity `0`) and a deactivated stock product (`DeactivateStockProduct`);
+    one existing stock product (not the no-movements one) with **51 or more further** `RecordStockEntry`/
+    `RecordStockAdjustment` calls so its history exceeds `ListStockMovements::PER_PAGE` (50) and spans a second page, the
+    other stock products keeping one opening movement; a second inactive unused weekly product `Coca de sucre` on `forn@`
+    alongside `Coca de recapte` (D10).
+  - Counts at `DemoSeederTest.php:20-23` updated (producers 4 -> 5 and products/users as applicable, *to confirm when
+    reading*); `'producer'` path list extended with `/producer/cutoff`, a cycle summary and a stock movement history; the new
+    account's `/producer/products` opens (empty state); idempotency table list gains any newly read table; dashboard
+    assertions (`:46-64`) unchanged. Whole file run, no flake under `PGTZ=UTC`; seeder idempotent on second run.
+  - The "cycle with nothing to deliver" state is **not** seeded (D11); the handoff says it is covered by the fixture and
+    Vitest and why (it would shift cycles, receptions and dashboard assertions).
+- **First checkpoint.** Failing assertion "one producer without products exists"; seed it; inspect counts.
+- **Size.** ~100–180 lines (plan; medium). PHP-only exception: no UI; data setup is the entire outcome and is independent
+  of the presentation tasks.
+- **Limits.** No new use case, migration or domain change; no change to cycle, reception or dashboard assertions; slice 1
+  Catalogue states (T02) untouched.
+- **Acceptance record.** R19 demo data with the test assertions listed; verdict; no remainder.
+
+### T16 Record slice 2 acceptance and request visual approval
+
+- **Outcome.** The integrated base has one acceptance record mapping every R14–R19/S13–S18 to task, evidence, verdict and
+  remainder, and the user has been asked for visual approval of the Producer pages in light and dark.
+- **Requirements/scenarios.** R15 (area-wide, against slice 1), R17, R18, R19; S13, S17, S18.
+- **Plan sections.** R15, R17, R18, R19, Visual evidence plan (negative/leak and navigation cases), Seeder decision.
+- **Files/surfaces reserved.** History entries (Q&A for approval, plus Deviations/Changes if any); `tasks.md` status
+  edits; no code unless a correction is found (then recorded as a Deviation and, if non-trivial, a new task).
+- **Dependencies.** T10–T15 integrated: all six pages admitted and the seeded states exist for the user's review.
+- **Done when.**
+  - All Producer manifests run on the integrated base SHA: the six pages share H1 font family, size (24 px), weight,
+    background, primary button colour, field border, max-width and padding, and so does `Catalogue/Producers/Products`
+    (slice 1) as comparison (R15 probe); navigation Producer -> unmigrated -> Producer with sheet and account menu passes
+    in both modes (S17); one multi-role account keeps its other area's look; Welcome and the slice 1 pages pass.
+  - S17 access: the existing guards (`ProducerPagesTest.php`, `ProductPagesTest.php`, `ProducerProductsPageTest.php`,
+    `ProducerCycleSummaryPageTest.php`, `StockMovementHistoryPagesTest.php`, `RolePermissionMatrixTest.php`) cover another
+    producer's data, a Catalogue-only account and a member; add one assertion only for a proven gap (*to confirm when
+    reading them*).
+  - Full suite green: `Producer/Products/Index.spec.ts`, the four new page specs plus `Create.spec.ts`/`Edit.spec.ts`,
+    `MovementHistory.spec.ts`, `NativeDialog.spec.ts`, `layout-rules.spec.ts`, `pilotTheme` specs, the PHP guards,
+    `DemoSeederTest.php`.
+  - The record lists, per page, R5–R9 as measured text (no screenshots unless an unexplained failure) and the user is asked
+    for approval of the six Producer pages in light and dark. Approval is logged only after the user's decision, as a Q&A
+    naming the evidence covered. Until then the status is "awaiting approval" and no slice 3 spec starts (S18).
+- **First checkpoint.** Run the shared manifest on the integrated base and read the R15 probe table.
+- **Size.** Documentation and evidence only (~0 code). **Limits.** Does not approve on the user's behalf; no slice 3.
+- **Acceptance record.** This task's output is the slice 2 record; verdict "pending approval" until the user answers.
+
 ## Coverage notes and settled decisions
 
 1. **Plan allocation gaps filled.** The plan's slicing table omits R4 for T02–T08, R7 and R9 for T05, R5/R6/R8
@@ -377,6 +676,25 @@ global promotion and Dashboard restyle are outside.
    contrast, seeder table names (`return_items`, `producer_cycle_availability`), runner path with no command run, and
    the ~150–170 case estimate (`run.mjs plan` decides). Pest test names and filters not run.
 5. No Linear publication, branch/worktree or implementation authorization is implied; no tracker column exists yet.
+6. **Slice 2 decisions D6–D11 are accepted** by the user, 2026-11-15 (plan, "Decisions the plan proposes, slice 2"):
+   D6 no `pilot-title-compact` on Producer pages unless a page measures other than 24 px (then a Deviation); D7 the three
+   slice 1 probes naming Producer pages are re-pointed once, in T10, before any admission (history probe to
+   `Manage/Stock/Movements` and `Finance/Stock/Movements`, dialog probe to `Manage/Cycles/Index`, `WeeklyProductFields`
+   probe dropped); D8 one page or family per task with its own reversible `landingPages` entry; D9 new `producer-landing`
+   fixture and manifests, no shared-bootstrap extraction; D10 a second inactive weekly product `Coca de sucre` on `forn@`
+   instead of changing `Coca de recapte`; D11 "cycle with nothing to deliver" is not seeded (fixture and Vitest only).
+7. **Older manifests left.** `dra-198`, `dra-205`, `dra-208`, `dra-209`, `reference-all-pages` and `reference-gates`
+   `.visual.json` still list Producer pages; they are manual-only (no CI step runs them) and describe the pre-landing look, so
+   no task edits them. The CI guard that changes is `lib/pilotTheme.spec.ts`.
+8. **Seeder history size.** `ListStockMovements::PER_PAGE` is 50 (`src/Stock/Application/ListStockMovements.php:20`), so T15
+   seeds 51 or more further movements on one existing stock product so the history spans a second page.
+9. **Allocation convention for slice 2.** As in slice 1, each page task (T10–T14) owns R5–R9 and the R17 guard for its own
+   pages even where the plan's slicing table lists only "R14–R16" or a subset; area-wide R15, S13, S17 and S18 close only in
+   T16. The R19 seeder part is T15; approval is T16 and never a task's own decision.
+10. **Unverified items carried from the slice 2 plan:** fixture mounting of the five non-tracer pages before their own task
+    (title measurement in T10), dialog inheritance for the producer role, `pilot-amount` cell coverage in the stock table
+    and cycle summary, seeder table names and counts, the stock-creation use case name, plan line numbers for the probe
+    re-pointing, and the ~95–125 case estimate (`run.mjs plan` decides). No test, build or command was run.
 
 ## Linear mapping — slice 1
 

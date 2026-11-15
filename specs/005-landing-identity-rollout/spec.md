@@ -1,6 +1,6 @@
 # 005 — Landing identity rollout: Catalogue role complete
 
-**Status: Slice 1 accepted (2026-11-13, merge of PR #416); slice 2 section drafted 2026-11-15, awaiting acceptance (no open questions).** Slices 1 and 2 specified. The
+**Status: Slice 1 accepted (2026-11-13, merge of PR #416); slice 2 accepted 2026-11-15 (merge of PR #435; no open questions).** Slices 1 and 2 specified. The
 [discovery](discovery.md) keeps slices 2-7 as a roadmap; they get no requirements here. Slice selection
 and boundary are recorded in [history](history/) (Q&A 2026-11-13: slice 1 selected; T85 visual approval
 granted; Manage stock and return-item pages moved into slice 1). Accepting this spec authorizes no plan,
@@ -195,7 +195,7 @@ the user approves, the approval is logged in history with the evidence it covere
 
 ## Slice 2 — Producer role complete
 
-**Status: Draft, awaiting acceptance.** Selected 2026-11-15 (see history, Q&A "Which slice is next"). It adds
+**Status: Accepted 2026-11-15 (merge of PR #435).** Selected 2026-11-15 (see history, Q&A "Which slice is next"). It adds
 to the slice 1 requirements above and keeps them: R1 to R13 apply unchanged to slice 1's pages. R5 to R9 (the
 shared invariants) and R12 apply to the pages below with "Catalogue" read as "Producer". Accepting this
 section authorizes no plan, tasks, tickets or implementation.
