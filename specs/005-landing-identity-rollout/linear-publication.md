@@ -21,3 +21,25 @@ Every child has DRA-270 as its native parent and no contextual links. The parent
 ## Verification
 
 A duplicate search in DRA/Coop ("Catalogue landing", full pagination) found no matching 005 issues before creation. The coordinator created the parent and then the children serially, using native `parentId`, `blockedBy` and `relatedTo` fields, and no body contains a tracker identifier. Read-back of titles, parent, status, labels and every relation matched the approved draft; the parent relates only to DRA-264, DRA-265 and DRA-269. No self-link, cycle or stray auto-relation was found. No pending operation.
+
+## Slice 2 (Producer role complete)
+
+**Published 2026-11-15 after the user approved the proposed batch.** Same workspace, team and project. All eight issues are Backlog, unassigned, with no labels, cycle, milestone, due date or priority. Publication does not authorize implementation. Bodies link to the spec, plan and tasks at `origin/main` commit `e55d5877`.
+
+Parent: [DRA-280 — Landing identity: Producer role complete (slice 2)](https://linear.app/draude/issue/DRA-280). Related context only, never a blocker: DRA-270 (slice 1).
+
+| Task | Published issue                                    | Blocked by         |
+| ---- | -------------------------------------------------- | ------------------ |
+| T10  | [DRA-281](https://linear.app/draude/issue/DRA-281) | none               |
+| T11  | [DRA-283](https://linear.app/draude/issue/DRA-283) | DRA-281            |
+| T12  | [DRA-284](https://linear.app/draude/issue/DRA-284) | DRA-281            |
+| T13  | [DRA-285](https://linear.app/draude/issue/DRA-285) | DRA-281            |
+| T14  | [DRA-286](https://linear.app/draude/issue/DRA-286) | DRA-281            |
+| T15  | [DRA-282](https://linear.app/draude/issue/DRA-282) | none               |
+| T16  | [DRA-287](https://linear.app/draude/issue/DRA-287) | DRA-281 to DRA-286 |
+
+Every child has DRA-280 as its native parent. The dependency frontier is T10 (DRA-281) and T15 (DRA-282). No task is admitted or marked ready-for-agent.
+
+### Verification
+
+A duplicate search in DRA/Coop ("Producer", full pagination) found no slice 2 issues before creation. The first create of the parent failed with a connection reset; a search of issues created in the last hour found nothing, so it was retried once. Read-back of the children list (titles, parent, status, labels) and of the relations on DRA-280 and DRA-287 matched the approved graph. No pending operation.
