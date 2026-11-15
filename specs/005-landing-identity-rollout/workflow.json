@@ -70,7 +70,7 @@
             "sliceId": "producer-role-complete",
             "tasks": {
                 "path": "specs/005-landing-identity-rollout/tasks.md",
-                "sha256": "8b3249b8f8d269148960670e97b5a50c9951b821ebd58470eac2d9e5bd7fc9cb"
+                "sha256": "a69c17d578be64d485e43f374eb5b13348c2ab5223741d6befa6bbfaf7d42924"
             },
             "acceptance": {
                 "path": "specs/005-landing-identity-rollout/history/2026-11-15T14-47-30.537Z-no-task-2feff354-70b9-4f8c-b652-d03ad329ac47.md",
