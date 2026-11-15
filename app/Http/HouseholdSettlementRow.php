@@ -8,12 +8,12 @@ use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 #[TypeScript]
 final readonly class HouseholdSettlementRow
 {
-    /** @param list<PendingPickupRow> $pendingPickups */
+    /** @param list<OpenBasketRow> $openBaskets */
     public function __construct(
         public string $householdId,
         public string $householdName,
         public int $balanceCents,
-        public array $pendingPickups,
+        public array $openBaskets,
     ) {}
 
     public static function from(HouseholdSettlement $settlement): self
@@ -22,7 +22,7 @@ final readonly class HouseholdSettlementRow
             $settlement->householdId,
             $settlement->householdName,
             $settlement->balanceCents,
-            array_map(PendingPickupRow::from(...), $settlement->pendingPickups),
+            array_map(OpenBasketRow::from(...), $settlement->openBaskets),
         );
     }
 }

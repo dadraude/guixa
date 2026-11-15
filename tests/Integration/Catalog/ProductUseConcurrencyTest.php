@@ -27,7 +27,7 @@ final class ProductUseConcurrencyTest extends TestCase
 
     protected function tearDown(): void
     {
-        foreach (['stock_movements', 'received_totals', 'order_stock_lines', 'order_lines', 'orders', 'cycle_producers', 'cycles', 'products', 'producers', 'users', 'households'] as $table) {
+        foreach (['stock_movements', 'received_totals', 'order_lines', 'orders', 'cycle_producers', 'cycles', 'products', 'producers', 'users', 'households'] as $table) {
             DB::table($table)->delete();
         }
         parent::tearDown();
@@ -152,7 +152,7 @@ final class ProductUseConcurrencyTest extends TestCase
                 DB::rollBack();
             }
         }
-        $this->assertSame(0, DB::table('stock_movements')->where('stock_product_id', $product)->count());
+        $this->assertSame(0, DB::table('stock_movements')->where('product_id', $product)->count());
         $this->assertFalse(ProductModel::query()->find($product)->stock);
     }
 
@@ -202,7 +202,7 @@ final class ProductUseConcurrencyTest extends TestCase
                 }
             }
             $this->assertSame('kg', ProductModel::query()->find($product)->unit, $action);
-            $this->assertSame(1, DB::table('stock_movements')->where('stock_product_id', $product)->count());
+            $this->assertSame(1, DB::table('stock_movements')->where('product_id', $product)->count());
         }
     }
 

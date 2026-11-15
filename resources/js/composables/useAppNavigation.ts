@@ -5,8 +5,10 @@ import {
     Home,
     LayoutGrid,
     Package,
+    PackageCheck,
     Settings,
     Settings2,
+    ShieldCheck,
     ShoppingBasket,
     Sprout,
     Timer,
@@ -18,19 +20,24 @@ import {
 } from '@lucide/vue';
 import type { LucideIcon } from '@lucide/vue';
 import { computed } from 'vue';
+import CatalogueProducerController from '@/actions/App/Http/Controllers/Catalogue/ProducerController';
 import OrderController from '@/actions/App/Http/Controllers/OrderController';
+import ReceptionCycleController from '@/actions/App/Http/Controllers/Receptions/ReceptionCycleController';
 import StockController from '@/actions/App/Http/Controllers/StockController';
 import AccountController from '@/actions/App/Http/Controllers/Manage/AccountController';
 import CycleController from '@/actions/App/Http/Controllers/Manage/CycleController';
 import HouseholdController from '@/actions/App/Http/Controllers/Manage/HouseholdController';
 import ProducerController from '@/actions/App/Http/Controllers/Manage/ProducerController';
-import ReturnItemController from '@/actions/App/Http/Controllers/Manage/ReturnItemController';
+import ReturnItemController from '@/actions/App/Http/Controllers/Catalogue/ReturnItemController';
+import RoleController from '@/actions/App/Http/Controllers/Manage/RoleController';
 import SettingsController from '@/actions/App/Http/Controllers/Manage/SettingsController';
 import StockProductController from '@/actions/App/Http/Controllers/Manage/StockProductController';
 import CutoffController from '@/actions/App/Http/Controllers/Producer/CutoffController';
 import ProductController from '@/actions/App/Http/Controllers/Producer/ProductController';
 import WalletController from '@/actions/App/Http/Controllers/WalletController';
 import BasketController from '@/actions/App/Http/Controllers/Finance/BasketController';
+import FinanceStockController from '@/actions/App/Http/Controllers/Finance/StockController';
+import MemberBasketController from '@/actions/App/Http/Controllers/Member/BasketController';
 import { toUrl } from '@/lib/utils';
 import { dashboard } from '@/routes';
 import type { NavItem } from '@/types';
@@ -46,8 +53,19 @@ const producerItems: NavItem[] = [
     { title: 'Default cutoff', href: CutoffController.show(), icon: Timer },
 ];
 
+const receptionsItem: NavItem = {
+    title: 'Receptions',
+    href: ReceptionCycleController.index(),
+    icon: PackageCheck,
+};
+
 const memberItems: NavItem[] = [
     { title: 'Orders', href: OrderController.index(), icon: CalendarDays },
+    {
+        title: 'My baskets',
+        href: MemberBasketController.index(),
+        icon: ShoppingBasket,
+    },
     { title: 'Stock catalogue', href: StockController.index(), icon: Package },
     { title: 'Wallet', href: WalletController.show(), icon: Wallet },
 ];
@@ -85,6 +103,44 @@ export function navigationSectionsFor(
                               href: BasketController.index(),
                               icon: ShoppingBasket,
                           },
+                          {
+                              title: 'Stock',
+                              href: FinanceStockController.index(),
+                              icon: Package,
+                              alsoActiveOn: ['/finance/stock'],
+                          },
+                          receptionsItem,
+                      ],
+                  },
+              ]
+            : []),
+        ...(roles.has('receiver') &&
+        !roles.has('manager') &&
+        !roles.has('finance')
+            ? [
+                  {
+                      title: 'Reception',
+                      icon: PackageCheck,
+                      items: [receptionsItem],
+                  },
+              ]
+            : []),
+        ...(roles.has('catalogue') && !roles.has('manager')
+            ? [
+                  {
+                      title: 'Catalogue',
+                      icon: Boxes,
+                      items: [
+                          {
+                              title: 'Producers',
+                              href: CatalogueProducerController.index(),
+                              icon: Wheat,
+                          },
+                          {
+                              title: 'Return items',
+                              href: ReturnItemController.index(),
+                              icon: Undo2,
+                          },
                       ],
                   },
               ]
@@ -100,10 +156,12 @@ export function navigationSectionsFor(
                               href: CycleController.index(),
                               icon: CalendarDays,
                           },
+                          receptionsItem,
                           {
                               title: 'Households',
                               href: HouseholdController.index(),
                               icon: Home,
+                              alsoActiveOn: ['/finance/households'],
                           },
                           {
                               title: 'Baskets',
@@ -120,6 +178,7 @@ export function navigationSectionsFor(
                               title: 'Producers',
                               href: ProducerController.index(),
                               icon: Wheat,
+                              alsoActiveOn: ['/catalogue'],
                           },
                           {
                               title: 'Stock',
@@ -141,6 +200,11 @@ export function navigationSectionsFor(
                               title: 'Accounts',
                               href: AccountController.index(),
                               icon: UserCog,
+                          },
+                          {
+                              title: 'Roles',
+                              href: RoleController.index(),
+                              icon: ShieldCheck,
                           },
                           {
                               title: 'Settings',
@@ -173,20 +237,24 @@ export function currentNavigationItem(
 ): NavItem | undefined {
     const currentPath = pathOf(currentUrl);
 
-    return [...items]
-        .filter((item) => {
-            const destination = pathOf(toUrl(item.href));
+    const matchingDestination = (item: NavItem): string | undefined =>
+        [pathOf(toUrl(item.href)), ...(item.alsoActiveOn ?? [])]
+            .filter(
+                (destination) =>
+                    currentPath === destination ||
+                    currentPath.startsWith(`${destination}/`),
+            )
+            .sort((left, right) => right.length - left.length)[0];
 
-            return (
-                currentPath === destination ||
-                currentPath.startsWith(`${destination}/`)
-            );
-        })
+    return items
+        .map((item) => ({ item, destination: matchingDestination(item) }))
+        .filter(
+            (match): match is { item: NavItem; destination: string } =>
+                match.destination !== undefined,
+        )
         .sort(
-            (left, right) =>
-                pathOf(toUrl(right.href)).length -
-                pathOf(toUrl(left.href)).length,
-        )[0];
+            (left, right) => right.destination.length - left.destination.length,
+        )[0]?.item;
 }
 
 export function useAppNavigation() {

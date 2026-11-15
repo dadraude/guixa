@@ -1,19 +1,153 @@
 {
-    "baseUrl": "http://127.0.0.1:5182",
+    "baseUrl": "http://127.0.0.1:5188",
     "rootFontPx": 16,
     "darkSelector": "html.dark",
     "views": [
         {
             "id": "welcome",
-            "path": "/visual-welcome.html",
+            "path": "/resources/visual/welcome.html",
             "root": "[data-visual-root]",
             "panels": "[data-visual-panel]",
             "content": "h1,h2,p,a,li",
             "fonts": ["16px Nunito Variable"],
-            "focus": ["#welcome-action"],
+            "focus": [
+                ".welcome-brand",
+                ".welcome-nav a",
+                "#welcome-action",
+                ".welcome-primary-action",
+                ".welcome-contact-button",
+                ".welcome-email"
+            ],
+            "assertions": [
+                {
+                    "selector": ".welcome-header .welcome-brand",
+                    "minHeight": 44
+                },
+                {
+                    "selector": ".welcome-access",
+                    "minHeight": 44,
+                    "contrast": 4.5
+                },
+                {
+                    "selector": ".welcome-primary-action",
+                    "minHeight": 44,
+                    "contrast": 4.5
+                },
+                {
+                    "selector": ".welcome-contact-button",
+                    "minHeight": 44,
+                    "contrast": 4.5
+                },
+                {
+                    "selector": ".welcome-step-number",
+                    "contrast": 4.5
+                },
+                {
+                    "selector": ".welcome-email",
+                    "attributes": {
+                        "href": "mailto:laguixamanresa@gmail.com"
+                    }
+                },
+                {
+                    "selector": ".welcome-eyebrow",
+                    "contrast": 4.5
+                },
+                {
+                    "selector": ".welcome-hero h1",
+                    "contrast": 4.5
+                },
+                {
+                    "selector": ".welcome-intro",
+                    "contrast": 4.5
+                },
+                {
+                    "selector": ".welcome-basket",
+                    "count": 1
+                }
+            ],
             "states": [
                 {
-                    "id": "guest",
+                    "id": "guest-mobile",
+                    "checks": {
+                        "focus": [
+                            ".welcome-brand",
+                            "#welcome-action",
+                            ".welcome-primary-action",
+                            ".welcome-contact-button",
+                            ".welcome-email"
+                        ],
+                        "assertions": [
+                            {
+                                "selector": ".welcome-header .welcome-brand",
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": ".welcome-access",
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-primary-action",
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-contact-button",
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-step-number",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-email",
+                                "attributes": {
+                                    "href": "mailto:laguixamanresa@gmail.com"
+                                }
+                            },
+                            {
+                                "selector": ".welcome-nav",
+                                "styles": {
+                                    "display": "none"
+                                }
+                            },
+                            {
+                                "selector": ".welcome-hero-actions",
+                                "styles": {
+                                    "flex-direction": "column"
+                                }
+                            },
+                            {
+                                "selector": ".welcome-eyebrow",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-hero h1",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-intro",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-basket",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".welcome-contact h2",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-contact p",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-email",
+                                "contrast": 4.5
+                            }
+                        ]
+                    },
                     "cases": [
                         {
                             "width": 375,
@@ -26,6 +160,94 @@
                             "text": 100
                         },
                         {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "guest-desktop",
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".welcome-header .welcome-brand",
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": ".welcome-access",
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-primary-action",
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-contact-button",
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-step-number",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-email",
+                                "attributes": {
+                                    "href": "mailto:laguixamanresa@gmail.com"
+                                }
+                            },
+                            {
+                                "selector": ".welcome-nav",
+                                "styles": {
+                                    "display": "flex"
+                                }
+                            },
+                            {
+                                "selector": ".welcome-steps li",
+                                "styles": {
+                                    "display": "block"
+                                }
+                            },
+                            {
+                                "selector": ".welcome-eyebrow",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-hero h1",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-intro",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-basket",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".welcome-contact h2",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-contact p",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-email",
+                                "contrast": 4.5
+                            }
+                        ]
+                    },
+                    "cases": [
+                        {
                             "width": 1280,
                             "mode": "light",
                             "text": 100
@@ -36,22 +258,22 @@
                             "text": 100
                         },
                         {
-                            "width": 1024,
+                            "width": 768,
                             "mode": "light",
                             "text": 200
                         },
                         {
-                            "width": 1024,
+                            "width": 768,
                             "mode": "dark",
                             "text": 200
                         },
                         {
-                            "width": 375,
+                            "width": 1024,
                             "mode": "light",
                             "text": 200
                         },
                         {
-                            "width": 375,
+                            "width": 1024,
                             "mode": "dark",
                             "text": 200
                         },
@@ -68,9 +290,89 @@
                     ]
                 },
                 {
-                    "id": "authenticated",
+                    "id": "authenticated-mobile",
                     "query": {
                         "authenticated": 1
+                    },
+                    "checks": {
+                        "focus": [
+                            ".welcome-brand",
+                            "#welcome-action",
+                            ".welcome-primary-action",
+                            ".welcome-contact-button",
+                            ".welcome-email"
+                        ],
+                        "assertions": [
+                            {
+                                "selector": ".welcome-header .welcome-brand",
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": ".welcome-access",
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-primary-action",
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-contact-button",
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-step-number",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-email",
+                                "attributes": {
+                                    "href": "mailto:laguixamanresa@gmail.com"
+                                }
+                            },
+                            {
+                                "selector": ".welcome-nav",
+                                "styles": {
+                                    "display": "none"
+                                }
+                            },
+                            {
+                                "selector": ".welcome-hero-actions",
+                                "styles": {
+                                    "flex-direction": "column"
+                                }
+                            },
+                            {
+                                "selector": ".welcome-eyebrow",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-hero h1",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-intro",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-basket",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".welcome-contact h2",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-contact p",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-email",
+                                "contrast": 4.5
+                            }
+                        ]
                     },
                     "cases": [
                         {
@@ -82,7 +384,88 @@
                             "width": 375,
                             "mode": "dark",
                             "text": 100
-                        },
+                        }
+                    ]
+                },
+                {
+                    "id": "authenticated-desktop",
+                    "query": {
+                        "authenticated": 1
+                    },
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".welcome-header .welcome-brand",
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": ".welcome-access",
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-primary-action",
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-contact-button",
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-step-number",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-email",
+                                "attributes": {
+                                    "href": "mailto:laguixamanresa@gmail.com"
+                                }
+                            },
+                            {
+                                "selector": ".welcome-nav",
+                                "styles": {
+                                    "display": "flex"
+                                }
+                            },
+                            {
+                                "selector": ".welcome-steps li",
+                                "styles": {
+                                    "display": "block"
+                                }
+                            },
+                            {
+                                "selector": ".welcome-eyebrow",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-hero h1",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-intro",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-basket",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".welcome-contact h2",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-contact p",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": ".welcome-email",
+                                "contrast": 4.5
+                            }
+                        ]
+                    },
+                    "cases": [
                         {
                             "width": 1280,
                             "mode": "light",
@@ -94,12 +477,120 @@
                             "text": 100
                         }
                     ]
+                },
+                {
+                    "id": "palette-light",
+                    "checks": {
+                        "focus": [
+                            ".welcome-brand",
+                            "#welcome-action",
+                            ".welcome-primary-action",
+                            ".welcome-contact-button",
+                            ".welcome-email"
+                        ],
+                        "assertions": [
+                            {
+                                "selector": ".welcome-hero-band",
+                                "styles": {
+                                    "background-color": "rgb(40, 101, 133)"
+                                }
+                            },
+                            {
+                                "selector": ".welcome-contact",
+                                "styles": {
+                                    "background-color": "rgb(40, 101, 133)",
+                                    "color": "rgb(250, 241, 220)"
+                                }
+                            },
+                            {
+                                "selector": ".welcome-contact-button",
+                                "styles": {
+                                    "background-color": "rgb(250, 241, 220)",
+                                    "color": "rgb(23, 62, 83)"
+                                },
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": ".welcome-email",
+                                "styles": {
+                                    "color": "rgb(250, 241, 220)"
+                                }
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "styles": {
+                                    "background-color": "rgb(250, 241, 220)"
+                                }
+                            }
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "palette-dark",
+                    "checks": {
+                        "focus": [
+                            ".welcome-brand",
+                            "#welcome-action",
+                            ".welcome-primary-action",
+                            ".welcome-contact-button",
+                            ".welcome-email"
+                        ],
+                        "assertions": [
+                            {
+                                "selector": ".welcome-hero-band",
+                                "styles": {
+                                    "background-color": "rgb(35, 72, 92)"
+                                }
+                            },
+                            {
+                                "selector": ".welcome-contact",
+                                "styles": {
+                                    "background-color": "rgb(35, 72, 92)",
+                                    "color": "rgb(250, 241, 220)"
+                                }
+                            },
+                            {
+                                "selector": ".welcome-contact-button",
+                                "styles": {
+                                    "background-color": "rgb(250, 241, 220)",
+                                    "color": "rgb(23, 62, 83)"
+                                },
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": ".welcome-email",
+                                "styles": {
+                                    "color": "rgb(250, 241, 220)"
+                                }
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "styles": {
+                                    "background-color": "rgb(28, 32, 31)"
+                                }
+                            }
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
                 }
             ]
         }
     ],
     "matrix": {
-        "widths": [375, 1024, 1280],
+        "widths": [375, 768, 1024, 1280],
         "modes": ["light", "dark"],
         "text": [100, 200]
     }

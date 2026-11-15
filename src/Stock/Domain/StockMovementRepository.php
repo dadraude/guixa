@@ -12,12 +12,12 @@ interface StockMovementRepository
     public function add(StockMovement $movement): void;
 
     /** @return list<StockMovement> oldest first */
-    public function forProduct(string $stockProductId): array;
+    public function forProduct(string $productId): array;
 
     /** Any movement is permanent first-use evidence, even when net quantity is zero. */
-    public function hasProductReference(string $stockProductId): bool;
+    public function hasProductReference(string $productId): bool;
 
-    public function available(string $stockProductId): SignedQuantity;
+    public function available(string $productId): SignedQuantity;
 
     /** @return array<string, SignedQuantity> available stock by stock product id; products without movements are absent */
     public function availableByProduct(): array;

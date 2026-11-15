@@ -100,7 +100,7 @@ function sectionId(title: string): string {
                                     aria-hidden="true"
                                 />
                                 <span
-                                    class="group-data-[collapsible=icon]:hidden"
+                                    class="group-data-[collapsible=icon]:sr-only"
                                 >
                                     {{ trans(section.items[0].title) }}
                                 </span>
@@ -119,7 +119,7 @@ function sectionId(title: string): string {
                             @click="toggleSection(section.title)"
                         >
                             <component :is="section.icon" aria-hidden="true" />
-                            <span class="group-data-[collapsible=icon]:hidden">
+                            <span class="group-data-[collapsible=icon]:sr-only">
                                 {{ trans(section.title) }}
                             </span>
                             <ChevronDown

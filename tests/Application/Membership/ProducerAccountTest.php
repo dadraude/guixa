@@ -122,7 +122,7 @@ it('removes the producer role, so an account with no other role cannot log in, a
 
 it('keeps the other roles of the account and lets it log in (R3a)', function () {
     $accountId = activeProducerAccount($this);
-    ($this->world->grantManagerRole)($this->world->manager, $accountId);
+    ($this->world->grantStaffRole)($this->world->manager, $accountId, 'manager');
 
     ($this->world->suspendProducerRole)(BAKER);
 

@@ -20,7 +20,7 @@ it('translates the stock and return line errors to Catalan', function (string $e
 
     expect($translator->has("errors.{$error}"))->toBeTrue()
         ->and($translator->get("errors.{$error}"))->not->toBe("errors.{$error}");
-})->with(['NotEnoughStock', 'StockProductInactive', 'InvalidLineQuantity', 'StockLineNotInPickup', 'ReturnLineNotInPickup', 'StockProductNotFound', 'ReturnItemNotFound']);
+})->with(['NotEnoughStock', 'StockProductNotFound', 'ReturnItemNotFound']);
 
 it('has a Catalan message for every domain error returned by the HTTP adapter', function () {
     $translator = new Translator(new FileLoader(new Filesystem, dirname(__DIR__, 2).'/lang'), 'ca');

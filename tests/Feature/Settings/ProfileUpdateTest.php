@@ -4,6 +4,7 @@ namespace Tests\Feature\Settings;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Inertia\Testing\AssertableInertia as Assert;
 use Tests\TestCase;
 
 class ProfileUpdateTest extends TestCase
@@ -19,6 +20,25 @@ class ProfileUpdateTest extends TestCase
             ->get(route('profile.edit'));
 
         $response->assertOk();
+    }
+
+    public function test_profile_page_flags_a_resent_verification_link()
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)
+            ->withSession(['status' => 'verification-link-sent'])
+            ->get(route('profile.edit'))
+            ->assertInertia(fn (Assert $page) => $page->where('verificationLinkSent', true));
+    }
+
+    public function test_profile_page_does_not_flag_a_verification_link_by_default()
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)
+            ->get(route('profile.edit'))
+            ->assertInertia(fn (Assert $page) => $page->where('verificationLinkSent', false));
     }
 
     public function test_profile_information_can_be_updated()

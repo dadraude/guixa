@@ -35,6 +35,7 @@ describe('manager cycles', () => {
                         pickupDate: '2026-11-07',
                         cancelled: false,
                         closed: false,
+                        settled: false,
                         participants: [
                             {
                                 producerId: 'baker',
@@ -42,12 +43,15 @@ describe('manager cycles', () => {
                                 participating: true,
                                 cutoff: '2026-11-06T14:00:00',
                                 open: true,
+                                sent: false,
+                                canSendManually: false,
                             },
                         ],
                     },
                 ],
                 producers: [{ id: 'baker', name: 'Forn' }],
                 pickupWeekday: 6,
+                pendingCollections: {},
             },
             global: { plugins: [{ install: installTranslations }] },
         });
@@ -100,6 +104,7 @@ describe('manager cycles', () => {
                     pickupDate: '2026-11-07',
                     cancelled: false,
                     closed: true,
+                    settled: false,
                     participants: [
                         {
                             producerId: 'baker',
@@ -113,6 +118,7 @@ describe('manager cycles', () => {
             ],
             producers: [{ id: 'grower', name: 'Hort' }],
             pickupWeekday: 6,
+            pendingCollections: { cycle: 2 },
         });
         installTranslations(app);
         const html = await renderToString(app);
@@ -122,6 +128,9 @@ describe('manager cycles', () => {
         expect(html).not.toContain('data-test="manage-cycle"');
         expect(html).not.toContain('data-test="add-cycle-grower"');
         expect(html).toContain('<dialog');
+        expect(html).toMatch(
+            /data-test="pending-collections"[^>]*>Recollides pendents: 2</,
+        );
     });
 
     it('offers per-producer management and a real add-producer form for open cycles', async () => {
@@ -132,6 +141,7 @@ describe('manager cycles', () => {
                     pickupDate: '2026-11-07',
                     cancelled: false,
                     closed: false,
+                    settled: false,
                     participants: [
                         {
                             producerId: 'baker',
@@ -148,11 +158,88 @@ describe('manager cycles', () => {
                 { id: 'grower', name: 'Hort' },
             ],
             pickupWeekday: 6,
+            pendingCollections: {},
         });
         installTranslations(app);
         const html = await renderToString(app);
         expect(html).toContain('data-test="manage-cycle-baker"');
         expect(html).toContain('data-test="add-cycle-grower"');
         expect(html).toContain('sense tancament programat');
+    });
+
+    it('hides the add-producer form once the cycle is settled', async () => {
+        const app = createSSRApp(Index, {
+            cycles: [
+                {
+                    id: 'cycle',
+                    pickupDate: '2026-11-07',
+                    cancelled: false,
+                    closed: false,
+                    settled: true,
+                    participants: [
+                        {
+                            producerId: 'baker',
+                            producerName: 'Forn',
+                            participating: true,
+                            cutoff: null,
+                            open: false,
+                            sent: true,
+                            canSendManually: false,
+                        },
+                    ],
+                },
+            ],
+            producers: [{ id: 'grower', name: 'Hort' }],
+            pickupWeekday: 6,
+            pendingCollections: {},
+        });
+        installTranslations(app);
+        const html = await renderToString(app);
+        expect(html).not.toContain('data-test="add-cycle-grower"');
+    });
+
+    it('shows a Sent status on a producer whose order was sent (R12a)', async () => {
+        const app = createSSRApp(Index, {
+            cycles: [
+                {
+                    id: 'cycle',
+                    pickupDate: '2026-11-07',
+                    cancelled: false,
+                    closed: false,
+                    settled: false,
+                    participants: [
+                        {
+                            producerId: 'baker',
+                            producerName: 'Forn',
+                            participating: true,
+                            cutoff: null,
+                            open: false,
+                            sent: true,
+                            canSendManually: false,
+                        },
+                        {
+                            producerId: 'grower',
+                            producerName: 'Hort',
+                            participating: true,
+                            cutoff: null,
+                            open: false,
+                            sent: false,
+                            canSendManually: false,
+                        },
+                    ],
+                },
+            ],
+            producers: [],
+            pickupWeekday: 6,
+            pendingCollections: {},
+        });
+        installTranslations(app);
+        const html = await renderToString(app);
+        const row = (id: string) =>
+            html
+                .split(`data-test="participant-cycle-${id}"`)[1]
+                .split('</li>')[0];
+        expect(row('baker')).toContain('Enviada');
+        expect(row('grower')).not.toContain('Enviada');
     });
 });

@@ -9,6 +9,7 @@ use App\Http\Requests\Producer\ProductRequest;
 use Guixa\Catalog\Application\CreateProduct;
 use Guixa\Catalog\Application\DeactivateProduct;
 use Guixa\Catalog\Application\DeleteUnusedProduct;
+use Guixa\Catalog\Application\GetProductProducer;
 use Guixa\Catalog\Application\IsProductUsed;
 use Guixa\Catalog\Application\ListProducerProducts;
 use Guixa\Catalog\Application\ListProducerStockProducts;
@@ -59,8 +60,9 @@ class ProductController extends Controller
         return Inertia::render('Producer/Products/Edit', ['product' => ProductRow::from($row), 'used' => $used($product)]);
     }
 
-    public function update(string $product, ProductRequest $request, Actor $actor, UpdateProduct $update): RedirectResponse
+    public function update(string $product, ProductRequest $request, Actor $actor, UpdateProduct $update, GetProductProducer $producerOf): RedirectResponse
     {
+        $this->ownProduct($product, $actor, $producerOf);
         $update(
             $actor,
             $product,
@@ -74,25 +76,34 @@ class ProductController extends Controller
         return to_route('producer.products.index');
     }
 
-    public function destroy(string $product, Actor $actor, DeactivateProduct $deactivate): RedirectResponse
+    public function destroy(string $product, Actor $actor, DeactivateProduct $deactivate, GetProductProducer $producerOf): RedirectResponse
     {
+        $this->ownProduct($product, $actor, $producerOf);
         $deactivate($actor, $product);
 
         return to_route('producer.products.index');
     }
 
-    public function deleteUnused(string $product, Actor $actor, DeleteUnusedProduct $delete): RedirectResponse
+    public function deleteUnused(string $product, Actor $actor, DeleteUnusedProduct $delete, GetProductProducer $producerOf): RedirectResponse
     {
+        $this->ownProduct($product, $actor, $producerOf);
         $delete($actor, $product);
 
         return to_route('producer.products.index');
     }
 
-    public function reactivate(string $product, Actor $actor, ReactivateProduct $reactivate): RedirectResponse
+    public function reactivate(string $product, Actor $actor, ReactivateProduct $reactivate, GetProductProducer $producerOf): RedirectResponse
     {
+        $this->ownProduct($product, $actor, $producerOf);
         $reactivate($actor, $product);
 
         return to_route('producer.products.index');
+    }
+
+    /** The Producer area only reaches the actor's own products; other producers' are for the Catàleg area (R3, S5). */
+    private function ownProduct(string $product, Actor $actor, GetProductProducer $producerOf): void
+    {
+        abort_unless($producerOf($product) === $this->producerId($actor), 403);
     }
 
     /** A producer role without a producer has nothing to manage. */

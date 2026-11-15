@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { trans } from 'laravel-vue-i18n';
 import { Form, Head } from '@inertiajs/vue3';
-import ReturnItemController from '@/actions/App/Http/Controllers/Manage/ReturnItemController';
+import ReturnItemController from '@/actions/App/Http/Controllers/Catalogue/ReturnItemController';
 import Heading from '@/components/Heading.vue';
 import ReturnItemFields from '@/components/ReturnItemFields.vue';
 import { Button } from '@/components/ui/button';
@@ -23,7 +23,9 @@ defineProps<{
 <template>
     <Head :title="trans('Edit return item')" />
 
-    <div class="pilot-page pilot-layout-page pilot-manager-page max-w-xl">
+    <div
+        class="pilot-page pilot-layout-page pilot-manager-page pilot-title-compact max-w-xl"
+    >
         <Heading :title="trans('Edit :name', { name: item.name })" />
 
         <Form

@@ -18,8 +18,8 @@ Stock movements and return items, global household wallets and receipts, househo
   A different unit or variable flag requires a new product record. Name, price and containers per unit
   remain editable; existing basket stock lines retain the snapshots required by R20.
 - **R25b** A producer can consult their own stock product records, current prices and available
-  quantities, but cannot create, edit, delete, deactivate or reactivate them, change their stock flag
-  or record stock movements while acting as a producer. An account also acting as a manager has the
+  quantities, and their movement history under R28a, but cannot create, edit, delete, deactivate or
+  reactivate them, change their stock flag or record stock movements while acting as a producer. An account also acting as a manager has the
   manager permissions (R36a).
 - **R25c** Members can consult an informational catalogue of the cooperative's active stock products,
   including those of deactivated producers. Each shows its producer, name, unit, current unit price
@@ -31,10 +31,23 @@ Stock movements and return items, global household wallets and receipts, househo
 - **R26** A manager records entries for stock products only (quantity > 0, optional note,
   e.g. "bought from X"). A weekly product cannot receive stock entries or adjustments (R27).
 - **R27** A manager records stock adjustments (positive or negative, mandatory note, e.g. "broken jar",
-  "inventory count", optional cycle). Available stock can never go below 0.
+  "inventory count", optional cycle). Available stock can never go below 0. After an inventory count a
+  manager may instead set the available quantity directly; the system records an adjustment for the
+  difference.
 - **R28** Available stock = Σ entries + Σ adjustments − Σ quantities sold at validated baskets,
   including signed corrective movements. Validation records the sale once (R22); physical collection
   records no stock movement. Stock movements are never edited or deleted.
+- **R28a** Managers and Finance can consult the movement history of any stock product; a producer, of
+  their own stock products only (R25b). The history stays available after the product or its producer
+  is deactivated; weekly products have none. Each line shows the movement's date, type (entry,
+  adjustment, sale or correction), signed quantity, the available stock right after it (R28), its note
+  (for a correction, its reason), its author's name (kept after that account is deactivated) and its
+  optional cycle. For managers and Finance, sale and correction lines link to their basket; a producer
+  sees neither the basket nor the household. Lines are listed newest first in a stable order, 50 per
+  page, without filters, so the newest line's available stock equals the current available quantity.
+  Finance reaches each product's history from its read-only stock list, which includes deactivated
+  products marked inactive; the producer's own list does the same for their products. Consulting the
+  history is read-only: only a manager records entries and adjustments (R26, R27).
 
 ### Wallet
 
@@ -45,7 +58,8 @@ Stock movements and return items, global household wallets and receipts, househo
 - **R30** Balance = Σ top-ups + Σ credits − Σ charges ± corrections. It may be negative, with no limit.
 - **R31** Members see their household balance and every movement. Charges/credits show their basket
   and optional cycle; corrections preserve the original source and optional cycle. Finance and Manager
-  can read household statements for the operations they perform. Baskets have no paid/part-paid status.
+  can read the statement of any household. Every movement shows its author's name (kept after that
+  account is deactivated), never an account identifier. Baskets have no paid/part-paid status.
 - **R32** Movements are never edited or deleted. Finance or a manager fixes mistakes with a new
   correcting movement: non-zero amount, mandatory reason, original source and optional basket/cycle
   reference. A correction does not rewrite the receipt, validated basket or original charge. Linked
@@ -87,8 +101,8 @@ Stock movements and return items, global household wallets and receipts, househo
 - **R36c** Only a manager grants or revokes the explicit Finance role on accounts. Manager retains
   every Finance power. Finance is an effective login role independently of household membership;
   Member remains derived from the current household link. Basket/Wallet capabilities are those in
-  R19a/R22/R23/R29/R32; the role grants no product/cycle/reception/account or unrelated inventory
-  administration. Configurable commissions are not part of this amendment.
+  R19a/R22/R23/R28a/R29/R32, R28a being read-only; the role grants no product/cycle/reception/account
+  or unrelated inventory administration. Configurable commissions are not part of this amendment.
 
 ## Acceptance scenarios
 
@@ -129,6 +143,19 @@ Then they can see their own stock product records, current prices and quantities
 but cannot see the oil producer's products
 And if that account is also a household member, it can consult both producers' active stock products
 through the informational member catalogue, without acquiring stock administration permissions.
+
+**S93 — Stock movement history** (R25b, R28, R28a, R36c)
+Given stock honey received an entry of 10 jars noted "bought from X", then an adjustment of −1 noted
+"broken jar", then a sale of 3 jars at a validated basket of household A, then a correction of +1
+jar to that basket noted "wrong count"
+When the manager opens the honey's movement history
+Then it lists the correction, sale, adjustment and entry in that order, with available stock 7, 6, 9
+and 10, each line's date, signed quantity, note, author and cycle, and the sale and correction
+linked to household A's basket
+And Finance sees the same lines but cannot record an entry or adjustment
+And the beekeeper, acting only as a producer, sees the same lines without the basket or household,
+and cannot open the oil producer's stock history
+And after the honey is deactivated, the history is still listed for all three.
 
 ### Wallet and accounts
 

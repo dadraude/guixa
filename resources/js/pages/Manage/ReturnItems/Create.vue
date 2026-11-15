@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { trans } from 'laravel-vue-i18n';
 import { Form, Head } from '@inertiajs/vue3';
-import ReturnItemController from '@/actions/App/Http/Controllers/Manage/ReturnItemController';
+import ReturnItemController from '@/actions/App/Http/Controllers/Catalogue/ReturnItemController';
 import Heading from '@/components/Heading.vue';
 import ReturnItemFields from '@/components/ReturnItemFields.vue';
 import { Button } from '@/components/ui/button';
@@ -19,7 +19,9 @@ defineOptions({
 <template>
     <Head :title="trans('New return item')" />
 
-    <div class="pilot-page pilot-layout-page pilot-manager-page max-w-xl">
+    <div
+        class="pilot-page pilot-layout-page pilot-manager-page pilot-title-compact max-w-xl"
+    >
         <Heading :title="trans('New return item')" />
 
         <Form

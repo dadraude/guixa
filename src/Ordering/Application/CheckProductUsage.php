@@ -14,8 +14,9 @@ final class CheckProductUsage
 
     public function __invoke(string $productId, bool $stock): bool
     {
+        // Ordering holds weekly demand only; stock products are referenced by Sales baskets and Stock movements.
         if ($stock) {
-            return $this->orders->hasStockReference($productId);
+            return false;
         }
 
         return $this->orders->hasWeeklyReference($productId)

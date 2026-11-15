@@ -22,6 +22,9 @@ interface CycleRepository
     /** @return list<Cycle> by pickup date, earliest first */
     public function list(): array;
 
+    /** @return list<Cycle> the cycles with at least one sent producer order, closed ones included, newest pickup date first (R8) */
+    public function listWithSentOrders(): array;
+
     /** Whether a cycle (cancelled ones do not count) has this pickup date (R4). */
     public function existsOnPickupDate(DateTimeInterface $pickupDate): bool;
 }

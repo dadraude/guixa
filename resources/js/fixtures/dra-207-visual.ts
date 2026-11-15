@@ -85,6 +85,7 @@ const propsByPage: Record<string, Record<string, unknown>> = {
             state === 'empty'
                 ? []
                 : [{ id: 'cycle-1', pickupDate: '2026-11-07' }],
+        history: { lines: [], total: 0, page: 1, prevUrl: null, nextUrl: null },
     },
 };
 

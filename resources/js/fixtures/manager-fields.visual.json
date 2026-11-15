@@ -10,7 +10,7 @@
     "views": [
         {
             "id": "manager-form-fields",
-            "path": "/visual-manager-fields.html",
+            "path": "/resources/visual/manager-fields.html",
             "root": "[data-visual-root]",
             "panels": ".visual-panel",
             "content": "h1,label,input,button,p",
@@ -99,7 +99,7 @@
         },
         {
             "id": "shared-action-tokens",
-            "path": "/visual-manager-fields.html",
+            "path": "/resources/visual/manager-fields.html",
             "root": "[data-visual-root]",
             "panels": ".visual-panel",
             "content": "h1,label,input,button,p",

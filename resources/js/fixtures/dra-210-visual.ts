@@ -3,6 +3,7 @@ import '../../../public/theme-colors.css';
 import { createInertiaApp, http } from '@inertiajs/vue3';
 import type { DefineComponent } from 'vue';
 import AppLayout from '@/layouts/AppLayout.vue';
+import { financeBasketRow } from './financeBasketRow';
 import { installTranslations } from '@/lib/i18n';
 
 const query = new URLSearchParams(window.location.search);
@@ -64,7 +65,7 @@ const stock = {
 const totalCents = state === 'empty' || state === 'cancelled' ? 0 : 1300;
 const balanceCents =
     basketState === 'draft' || basketState === 'cancelled' ? 500 : -800;
-const basket = {
+const basket = financeBasketRow({
     id: basketId,
     householdId,
     householdName,
@@ -77,7 +78,7 @@ const basket = {
     validatedAt: basketState === 'draft' ? null : '2026-10-30T09:00:00+01:00',
     collectedAt:
         basketState === 'collected' ? '2026-10-30T10:00:00+01:00' : null,
-};
+});
 const summaries =
     state === 'empty'
         ? []
@@ -86,16 +87,22 @@ const summaries =
                 id: `${basketId}-${index}`,
                 householdName: `${householdName} ${index + 1}`,
                 state: 'validated',
+                status: 'validated',
                 totalCents: 1300,
                 createdAt: '2026-10-30 09:00',
+                pendingCollection: true,
+                validatedAt: '2026-10-30 09:00',
             }))
           : [
                 {
                     id: basketId,
                     householdName,
                     state: 'validated',
+                    status: 'validated',
                     totalCents: 1300,
                     createdAt: '2026-10-30 09:00',
+                    pendingCollection: true,
+                    validatedAt: '2026-10-30 09:00',
                 },
             ];
 const wallet = {
@@ -115,6 +122,8 @@ const wallet = {
                               : 'Compra de cistella',
                       cycleId: null,
                       basketId,
+                      sourceMovementId: null,
+                      authorName: '',
                   },
                   ...(state === 'long'
                       ? [
@@ -127,24 +136,35 @@ const wallet = {
                                 cycleId: null,
                                 basketId:
                                     '0198f0a0-0000-7000-8000-000000000024',
+                                sourceMovementId: null,
+                                authorName: '',
                             },
                         ]
                       : []),
               ],
 };
 const propsByPage: Record<string, Record<string, unknown>> = {
-    'Finance/Baskets/Index': { baskets: summaries },
+    'Finance/Baskets/Index': { baskets: summaries, pending: false },
     'Finance/Baskets/Create': {
         households:
             state === 'empty' ? [] : [{ id: householdId, name: householdName }],
     },
-    'Finance/Baskets/Show': { basket, stockProducts: [stock] },
+    'Finance/Baskets/Show': {
+        basket,
+        containerBalance: 3,
+        stockProducts: [stock],
+        returnItems: [],
+    },
     'Wallet/Statement': {
         household:
             role === 'manager'
                 ? { id: householdId, name: householdName }
                 : null,
         wallet,
+        canManageReceipts: role === 'manager',
+        ...(role === 'manager'
+            ? { householdReturnHref: `/manage/households/${householdId}` }
+            : {}),
     },
 };
 const page = {

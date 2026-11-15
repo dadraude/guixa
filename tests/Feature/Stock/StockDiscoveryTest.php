@@ -43,7 +43,7 @@ it('shows active stock including zero with no cycle or stock writes (S73)', func
     discoveryProduct($beekeeper, 'Bread', stock: false);
     DB::table('stock_movements')->insert([
         'id' => (string) Str::uuid7(),
-        'stock_product_id' => $honey->id, 'type' => 'entry', 'quantity' => '5.000',
+        'product_id' => $honey->id, 'type' => 'entry', 'quantity' => '5.000',
         'occurred_at' => now(), 'recorded_by' => accountWith(Role::Manager)->id,
     ]);
     $before = DB::table('stock_movements')->count();

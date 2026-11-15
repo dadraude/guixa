@@ -13,7 +13,7 @@ function errorPageFixture(): Plugin {
         name: 'dra-205-real-laravel-error-pages',
         configureServer(server) {
             server.middlewares.use(
-                '/visual-dra-205-error.html',
+                '/resources/visual/dra-205-error.html',
                 (request, response) => {
                     try {
                         const query = new URL(

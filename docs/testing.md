@@ -2,7 +2,7 @@
 
 This guide describes the current commands. Local work uses focused checks; the pull request
 runs the selected complete CI jobs. See the [workflow profile](../.agent-workflow/profile.md)
-for task ownership and the [CI check map](../.github/README.md) for path-based job selection.
+for task ownership and the [CI check map](ci-checks.md) for path-based job selection.
 
 ## Isolate an application test
 
@@ -14,12 +14,13 @@ Use the project's PHP 8.5 runtime; the configured local option is the sibling wo
 PostgreSQL 17, and Redis 7. Local managed services need PostgreSQL and Redis available; a
 matching container setup is not configured in this repository.
 
-Before setup, copy the main checkout's `.env` privately into the task worktree, set
-`DB_DATABASE=guixa_test_draNN`, and verify that value without printing credentials.
-Do not modify the source `.env`. Check `.env.testing` if present and ensure neither it
-nor inherited database settings override the task database. The task wrapper validates these
-settings, the PHPUnit configuration, and cached configuration before launching a child.
-Stop if it rejects isolation; do not substitute `guixa` or shared `guixa_test`.
+Task worktrees have no `.env`: never read, copy or create any `.env*` file. The coordinator
+creates `guixa_test_draNN` on the local PostgreSQL before dispatch and generates one throwaway
+key with `php -r 'echo "base64:".base64_encode(random_bytes(32));'`. Pass it as `APP_KEY`, with
+`DB_USERNAME=postgres`, in the environment of every guarded invocation below; the wrapper sets
+`DB_DATABASE` to the task database and `phpunit.xml` supplies the rest. The task wrapper validates
+the database settings, the PHPUnit configuration, and cached configuration before launching a
+child. Stop if it rejects isolation; do not substitute `guixa` or shared `guixa_test`.
 
 Run setup and application commands from the task worktree through the wrapper below. Replace
 `NN` with the assigned **digits**, and `WORKTREE_ROOT` with the sibling worktree root;
@@ -34,9 +35,9 @@ Do not clear a shared Redis database.
 
 ```sh
 cd "$WORKTREE"
-REDIS_PREFIX="guixa-test-draNN:" PATH="$WORKTREE_ROOT/.bin:$PATH" node .agent-workflow/scripts/task-command.mjs NN -- composer install
-REDIS_PREFIX="guixa-test-draNN:" PATH="$WORKTREE_ROOT/.bin:$PATH" node .agent-workflow/scripts/task-command.mjs NN -- pnpm install --frozen-lockfile
-REDIS_PREFIX="guixa-test-draNN:" PATH="$WORKTREE_ROOT/.bin:$PATH" node .agent-workflow/scripts/task-command.mjs NN -- php artisan test --filter=TestName
+APP_KEY="$APP_KEY" DB_USERNAME=postgres REDIS_PREFIX="guixa-test-draNN:" PATH="$WORKTREE_ROOT/.bin:$PATH" node .agent-workflow/scripts/task-command.mjs NN -- composer install
+APP_KEY="$APP_KEY" DB_USERNAME=postgres REDIS_PREFIX="guixa-test-draNN:" PATH="$WORKTREE_ROOT/.bin:$PATH" node .agent-workflow/scripts/task-command.mjs NN -- pnpm install --frozen-lockfile
+APP_KEY="$APP_KEY" DB_USERNAME=postgres REDIS_PREFIX="guixa-test-draNN:" PATH="$WORKTREE_ROOT/.bin:$PATH" node .agent-workflow/scripts/task-command.mjs NN -- php artisan test --filter=TestName
 ```
 
 A frontend build is needed only when the focused test requires its Vite manifest or when
@@ -54,8 +55,8 @@ consume a changed contract. PHP test suites are `Unit`, `Application`, `Integrat
 runner's path selector:
 
 ```sh
-REDIS_PREFIX="guixa-test-draNN:" PATH="$WORKTREE_ROOT/.bin:$PATH" node .agent-workflow/scripts/task-command.mjs NN -- php artisan test tests/Application/Membership/AccountManagementTest.php
-REDIS_PREFIX="guixa-test-draNN:" PATH="$WORKTREE_ROOT/.bin:$PATH" node .agent-workflow/scripts/task-command.mjs NN -- pnpm exec vp test run resources/js/pages/Orders/Edit.spec.ts
+APP_KEY="$APP_KEY" DB_USERNAME=postgres REDIS_PREFIX="guixa-test-draNN:" PATH="$WORKTREE_ROOT/.bin:$PATH" node .agent-workflow/scripts/task-command.mjs NN -- php artisan test tests/Application/Membership/AccountManagementTest.php
+APP_KEY="$APP_KEY" DB_USERNAME=postgres REDIS_PREFIX="guixa-test-draNN:" PATH="$WORKTREE_ROOT/.bin:$PATH" node .agent-workflow/scripts/task-command.mjs NN -- pnpm exec vp test run resources/js/pages/Orders/Edit.spec.ts
 ```
 
 These are existing example paths; select the files relevant to your change. The frontend
@@ -76,7 +77,7 @@ affected test was found. Keep the plan and results with task artifacts, not trac
 ## Reproduce a CI failure
 
 1. Read the failing job and step in `.github/workflows/tests.yml`, then the
-   [check map](../.github/README.md). Record the commit, job, failing test or command,
+   [check map](ci-checks.md). Record the commit, job, failing test or command,
    PHP/Node/service versions, timezone, and any fixture or seed input. Redact secrets.
 2. Recreate the relevant task environment above and run the failing test path or selector
    through the wrapper. Add adjacent tests for the same changed contract. For frontend
@@ -95,3 +96,11 @@ full local check, not the default focused loop. CI always runs `docs`, selects
 aggregate `ci` check to pass. The backend CI job provisions PostgreSQL and Redis,
 runs `composer setup`, then `composer test`; reproduce only the failing part
 locally unless a broader run is needed to diagnose it.
+
+## Coverage
+
+`composer test:coverage` runs the PHP suite with coverage of `app/` and `src/` and fails below its
+`--min` (see `composer.json`). CI runs it in the backend job. The local PHP 8.5 build has no coverage
+driver, so read the total from the CI log. Feature work raises the floor: add tests for the
+under-covered existing code a task touches, then raise `--min` to the new total rounded down, as the
+[workflow profile](../.agent-workflow/profile.md) describes.

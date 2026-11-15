@@ -31,7 +31,7 @@ final class AddUnorderedProduct
     /** @param  string  $received  at most 3 decimals; whole units for a non-variable product */
     public function __invoke(Actor $actor, string $cycleId, string $producerId, string $productId, string $received = '0'): void
     {
-        Gate::forUser($actor)->authorize('manage');
+        Gate::forUser($actor)->authorize('receive');
 
         $total = Quantity::fromString($received);
 
@@ -53,6 +53,11 @@ final class AddUnorderedProduct
             // R14 only adds a product nobody ordered; one somebody ordered is already there and follows way A.
             if ($inReception !== null && ! $inReception->nobodyOrdered()) {
                 throw ProductAlreadyOrdered::withId($productId);
+            }
+
+            // Replacing a received total that arrived already is a redistribution; the first total is a late arrival.
+            if ($inReception !== null && ! $inReception->received->isZero()) {
+                $loaded->assertRedistributable($cycle, $productId);
             }
 
             $this->receivedTotals->set(new ReceivedTotal($cycleId, $producerId, $productId, $total));

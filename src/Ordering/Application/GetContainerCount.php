@@ -6,14 +6,16 @@ use Guixa\Ordering\Domain\CycleRepository;
 use Guixa\Ordering\Domain\Error\CycleNotFound;
 use Guixa\Ordering\Domain\Households;
 use Guixa\Ordering\Domain\NotDeliveredMarks;
+use Guixa\Ordering\Domain\OrderLine;
 use Guixa\Ordering\Domain\OrderRepository;
 use Guixa\Ordering\Domain\ProductAvailabilityRepository;
 use Guixa\Ordering\Domain\ProductCatalog;
+use Guixa\Ordering\Domain\WeeklyBasketView;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Quantity;
 use Illuminate\Support\Facades\Gate;
 
-/** Containers each household takes from its effective allocation and pickup stock snapshots (R18a). */
+/** Containers each household takes from Sales' effective weekly quantities, or its allocation before settlement (R18a). */
 final class GetContainerCount
 {
     private readonly NotDeliveredMarks $marks;
@@ -24,6 +26,7 @@ final class GetContainerCount
         private readonly Households $households,
         ProductCatalog $catalog,
         ProductAvailabilityRepository $availability,
+        private readonly WeeklyBasketView $baskets,
     ) {
         $this->marks = new NotDeliveredMarks($catalog, $availability, $orders);
     }
@@ -38,8 +41,10 @@ final class GetContainerCount
         }
 
         $orders = $this->orders->ofCycle($cycleId);
+        $baskets = $this->baskets->snapshot($cycleId);
         $ids = array_values(array_unique(array_map(fn ($order) => $order->householdId, $orders)));
         $names = $this->households->find($ids);
+        $balances = $this->baskets->containerBalances($ids);
         $rows = [];
         $total = 0;
 
@@ -52,18 +57,10 @@ final class GetContainerCount
                     continue;
                 }
 
-                $count += $this->roundedContainers($order->effectiveDelivered($line), $line->containersPerUnit);
+                $count += $this->taken($baskets->effective($order->householdId, $line->productId), $line)->containersAt($line->containersPerUnit);
             }
 
-            foreach ($order->stockLines() as $line) {
-                if ($line->containersPerUnit === null) {
-                    continue;
-                }
-
-                $count += $this->roundedContainers($line->quantity, $line->containersPerUnit);
-            }
-
-            $rows[] = new HouseholdContainerCountData($order->householdId, $names[$order->householdId]->name ?? $order->householdId, $count);
+            $rows[] = new HouseholdContainerCountData($order->householdId, $names[$order->householdId]->name ?? $order->householdId, $count, $balances[$order->householdId]);
             $total += $count;
         }
 
@@ -72,15 +69,9 @@ final class GetContainerCount
         return new ContainerCountData($cycleId, $total, $rows);
     }
 
-    private function roundedContainers(Quantity $quantity, Quantity $containersPerUnit): int
+    /** What the household takes: Sales' effective quantity once its base exists, the allocation before. */
+    private function taken(?int $effective, OrderLine $line): Quantity
     {
-        $wholeQuantity = intdiv($quantity->thousandths, 1000);
-        $fractionalQuantity = $quantity->thousandths % 1000;
-        $wholeRate = intdiv($containersPerUnit->thousandths, 1000);
-        $fractionalRate = $containersPerUnit->thousandths % 1000;
-        $fractionalProduct = ($wholeQuantity * $fractionalRate + $fractionalQuantity * $wholeRate) * 1000
-            + $fractionalQuantity * $fractionalRate;
-
-        return $wholeQuantity * $wholeRate + intdiv($fractionalProduct + 999999, 1000000);
+        return $effective === null ? $line->allocated : Quantity::ofThousandths($effective);
     }
 }

@@ -21,7 +21,7 @@ final class UpdateStockProduct
 
     public function __invoke(Actor $actor, string $producerId, string $id, string $name, string $unit, int $priceCents, bool $variable, ?string $containersPerUnit): void
     {
-        Gate::forUser($actor)->authorize('manage');
+        Gate::forUser($actor)->authorize('administer-catalogue');
 
         $this->transactions->run(function () use ($producerId, $id, $name, $unit, $priceCents, $variable, $containersPerUnit): void {
             $product = $this->products->getForUpdate($id);

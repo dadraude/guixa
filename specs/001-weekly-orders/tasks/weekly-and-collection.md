@@ -1,6 +1,6 @@
 # 001 — Weekly integration and collection task details
 
-Part of the [canonical registry](../tasks.md); dependencies live there. Status: the revised delivery boundaries below are **proposed (2026-10-31)**; product acceptance is unchanged.
+Part of the [canonical registry](../tasks.md); dependencies live there. Status: the revised delivery boundaries below were accepted (2026-10-31) and are delivered; product acceptance is unchanged.
 Authoritative behavior: [spec](../spec.md) and its areas; technical contracts: [plan](../plan.md).
 Every slice includes its affected adapters, tests, translations, UI evidence and document reconciliation.
 Paths in the ownership notes are edit surfaces, not new cross-context domain dependencies.
@@ -22,13 +22,14 @@ Acceptance:
   Staff changes actual weekly quantity (including zero) before validation; member sees ordered versus
   actual, reception flags differences but still balances on allocations. Only Sales owns actuals.
 - Reopen/synchronize resets affected unvalidated actual overrides, preserves stock/returns and revives
-  nothing-to-collect bases while open. Validate only a settled, current source, under the shared source
+  nothing-to-collect bases while open. A late arrival (received 0 → >0) adds to the open weekly draft
+  or creates one late weekly basket draft when all the household's weekly baskets are validated (S30/S91). Validate only a settled, current source, under the shared source
   cycle lock; stale source edits are rejected. Preserve cutoff/send and empty-order scheduler behavior.
-- Explicit unvalidated-only/all redistribution uses validation as financial freeze even if uncollected.
-  Exclusion subtracts effective validated quantities and rejects negative/no-claim remainders; inclusion
-  appends signed effective quantity/Wallet adjustments, with no stock/return resale. Unchanged targets
-  append nothing; successive changes use latest effective amounts. Never edit validated originals.
-- Close after settlement, distributed receptions and all bases validated/nothing to collect, irrespective
+- Validation is the financial freeze even if uncollected: a redistribution of a product any validated
+  basket contains is rejected before anything changes, pointing to per-basket corrections (T58/T68).
+  There is no drafts-only/all choice and reception never appends adjustments to validated baskets.
+  Products no validated basket contains synchronize into drafts (S63/S64/S89). Never edit validated originals.
+- Close after settlement, distributed receptions and all base/late weekly baskets validated/nothing to collect, irrespective
   of physical collection. Empty/no-content means no money or collection; real-content zero totals can
   validate. Closed weekly sources cannot reopen. Supplements never gate closure.
 - Switch all weekly financial writers and current source readers together, including pending/obligation
@@ -42,7 +43,7 @@ Acceptance:
   ownership and Wallet keeps ledger ownership. Retired schema cleanup remains in T63. Update the
   module-contract documentation and relevant rejection tests, then run `tests/Architecture`.
 
-Verify S78/S89 and S9/S14–S16/S19/S20/S27–S30/S39/S40/S42/S46/S47/S53/S54/S61/S63/S64 plus S88's
+Verify S78/S89 and S9/S14–S16/S19/S20/S27–S30/S39/S40/S42/S46/S47/S53/S54/S61/S63/S64/S91 plus S88's
 weekly no-contents/revival case. Preserve allocator/tie/overwrite/cutoff regressions instead of rewriting
 them. Integration proves source-sync versus validation serialization, idempotent settlement/redistribution,
 source uniqueness, weekly rollback, no reopening after closure and one charge despite old endpoint replay.
@@ -71,9 +72,10 @@ Internal checkpoints with the same owner, before broad final verification:
 1. Through public settlement and HTTP, create/reload one uncharged weekly base with original ordered
    and initial actual quantities. Assert source uniqueness and no ledger write; then validate once,
    close only when eligible, and collect without a second charge. Include an old-endpoint replay probe.
-2. Reopen/synchronize and exercise drafts-only/all redistribution with one validated pending basket
-   and one draft. Assert exact effective quantities/amounts, immutable originals, no resold stock/returns,
-   negative/no-claim remainder rejection and unchanged-target no-op. Preserve allocator regressions.
+2. Reopen/synchronize with one validated pending basket and one draft. Assert rejection of a
+   redistribution of a product the validated basket contains (nothing changes), draft sync for other
+   products, and late arrivals into the open draft or one late weekly basket with its own validation and
+   charge. Assert immutable originals and no Wallet write from reception. Preserve allocator regressions.
 3. Race source sync against validation under the cycle lock; prove rollback, empty/revived sources,
    scheduler and closed-cycle guards, Membership obligations, current readers and role boundaries.
    Reconcile the entrypoint inventory before independent review and candidate-bound CI.
@@ -95,43 +97,34 @@ Checkpoints bound feedback latency; source-specific scope must be reassessed bef
 
 ## T60
 
-**Late supplements and container attribution.** Staff can open another basket from an existing
-collection, including a basket collected the next day after its weekly cycle closed.
+**Household container balance.** Each household has an accumulated balance of containers it still has
+to return, across all its baskets and days. Validating a basket adds; return lines reduce. A late
+addition after validation is simply a new independent basket with no cycle.
 
-Source: [Basket sources](../plan.md#basket-aggregate-and-history),
-[collection](../plan.md#collection-and-corrections), R18a/R19/R24b.
+Source: [Basket sources](../plan.md#basket-aggregate-and-history), R18a/R19/R24b.
 
 Acceptance:
 
-- Supplement carries only newly chosen stock/return contents, not copied weekly lines. Optional
-  origin cycle is server-verified attribution, not an open/settled gate or an exclusive cycle mutation
-  lock. Multiple baskets per household/cycle are valid; cycleless purchases remain valid too. Cancelling a referenced pre-send cycle leaves an independent
-  stock basket and its posted movements intact (R4b); attribution never imports weekly cancellation.
-- For goods taken earlier and reported later, create/validate/collect with current recorded actor/time,
-  preserving origin attribution without backdating/reopening the cycle. Insufficient recorded stock
-  requires the existing justified Manager inventory process; Finance cannot bypass it.
-- Per-basket/household and cycle container counts use effective weekly/stock snapshots, ceil per line;
-  returns excluded. Before the base exists use allocations. Later attributed supplements update the
-  closed cycle's counts; cycleless baskets count only for themselves.
+- Additions go to a basket while it is not validated; once validated, anything added creates a new
+  independent basket with no cycle reference. For goods taken earlier and reported later, create,
+  validate and collect with the current recorded actor/time, without backdating or reopening a cycle.
+  Insufficient recorded stock requires the existing justified Manager inventory process; Finance
+  cannot bypass it.
+- The balance is derived: effective validated weekly/stock lines add quantity × snapshotted containers
+  per unit, ceil per line; validated return lines reduce it. No money movement is added (the container
+  price is already in the product price).
+- The balance may be negative; a return is never rejected for exceeding it (R18a, S92).
 
-Verify S80/S90 and updated S60 with late physical pickup then stock, cycleless purchases, multiple
-supplements and corrected effective quantities. PostgreSQL interleaving must prove an attributed stock
-sale and weekly validation cannot invert cycle/product locks via foreign-key key-share locks; use the
-plan's compatible stable-key cycle lock and ordered product locks. Test origin access/identity server-side.
+Verify S60 (per household), S80 and S92 with late physical pickup then a new independent basket, multiple
+baskets and corrected effective quantities. Test household scoping server-side.
 
-Ownership: Sales create-from-collection flow, attribution and count queries/adapters, Ordering cycle
-counts and Finance basket links. Reuse staff list/detail and cycle summary components with no new weekly
-order/session requirement. This supplements the T55 purchase tracer rather than adding a second sale path.
+Ownership: Sales balance read query/adapter, Ordering's container summary consumer and Finance basket
+links. Reuse staff list/detail components. This supplements the T55 purchase tracer rather than adding
+a second sale path. Focused checks: Sales public queries, persistence, role HTTP and real button interaction.
+Dependency reason: T59 supplies validated weekly baskets; T31 supplies container snapshots.
 
-
-First checkpoint: create one supplement from a closed collection via HTTP, validate/collect it, and
-read the exact combined count (S90: 2 + 1 = 3) without reopening. Then prove attribution identity,
-cycleless exclusion, cancellation independence and the PostgreSQL lock interleaving.
-Keep attribution and count integration together: exposing supplementary goods while the established
-container summary omits them would be an incorrect intermediate result. Existing `GetContainerCount`
-and pickup forms are reuse candidates; Sales attribution/count adapters are planned per the plan.
-After T59 for weekly source/current counts and T31 for retained container rules. Rough size 400–800
-authored lines, low confidence; no flag or layer-only task. T67 owns persistent pending badges.
+Size/rollout: roughly 150-350 authored lines, low confidence. No flag. Pending lists/dashboard/cycle
+badges stay in T67.
 
 ## T61
 
@@ -167,7 +160,7 @@ Pending lists/dashboard/cycle badges move to T67; this task does not require sup
 **Keep pending collection visible across pages and cycle closure.**
 
 Staff and members continue to see outstanding collections after the planned date and weekly closure,
-including cycleless purchases and attributed supplements, without reopening or charging them again.
+including cycleless purchases, without reopening or charging them again.
 
 Source: [Sales interface](../plan.md#sales), R24/R24b, S42/S54/S83.
 
@@ -177,7 +170,7 @@ Done when:
   validated effective outstanding goods remain visible, ordered by validation time/UUID. Members see
   only their current household; Finance/Manager sees all. Draft means preparation, not pending collection.
 - Dashboard and basket list use narrow Sales summaries; cycle list/detail show persistent count/link
-  including attributed supplements. Collection removes the pending item without reopening/recharging.
+  of weekly baskets. Collection removes the pending item without reopening/recharging.
   Full content reversal and corrected collection consume T68/T66 effective state; history remains accessible.
 - Preserve unrelated dashboard cards; do not revive feature-002 dashboard scope. Verify populated,
   empty, late/closed, long-name and role states with exact counts/status/actions before geometry.
@@ -186,10 +179,11 @@ First checkpoint: one closed-cycle pending basket appears with the correct count
 collection removes it while the cycle stays closed and ledger is unchanged. Widen the same query to
 dashboard/list and role cases; include source-scoped HTTP privacy and PostgreSQL reads.
 Paths: Sales pending queries/adapters (planned per plan), existing Dashboard, cycle list/detail and
-basket views, T60 attribution/count data and T61 collection action. Reuse layouts/navigation.
+basket views, T61 collection action. Reuse layouts/navigation. Delivered through `BasketRepository::pendingCollections`
+(both adapters); T62's draft obligations compose drafts with it, and the draft-inclusive `ReadPendingPickups` chain is left for T63.
 Focused checks: pending query/HTTP and membership regressions, dashboard/cycle/basket components,
 translations, exact effective-count fixtures. Related: DRA-202/DRA-203 as context only, never blockers.
-Dependency reasons: T60 supplies weekly plus supplement attribution; T61 supplies member collection
+Dependency reasons: T60 supplies independent baskets; T61 supplies member collection
 and transitively T66 corrected collection. T60/T59/T68 supply effective goods quantities.
 
 Size/rollout: roughly 400–800 authored lines, low confidence. One shared pending query must feed its
@@ -245,6 +239,8 @@ Source: [Context map](../plan.md#bounded-contexts), [Persistence](../plan.md#per
 
 Acceptance:
 
+- Drop column `baskets.reference_cycle_id` (created by an earlier migration) in the contract stage, with
+  its foreign key and any index; baskets carry no cycle reference of their own.
 - Remove Stock's duplicate product entity/table/metadata, Ordering stock/return/actual/pickup/charge
   ownership and obsolete adapters/helpers/tests of replaced behavior. Active commands/routes cannot
   invoke `CompletePickup`, charge-on-collection or automatic not-collected charging.
@@ -289,7 +285,7 @@ its original baseline remains historical. The accepted scope was published with 
 
 Acceptance:
 
-- Audit all 65 requirements and S1–S90 against meaningful assertions through the appropriate public
+- Audit all 65 requirements and S1–S92 (S90 retired) against meaningful assertions through the appropriate public
   seams, using [coverage allocation](coverage.md) as responsibility, not proof. Read assertions and
   failure boundaries, fill confirmed gaps without changing accepted behavior; identifier presence alone
   never establishes coverage. Include source/stock/Wallet concurrency, permissions and retained history.
@@ -299,6 +295,8 @@ Acceptance:
   has a native blocker. No local task row or tracker publication implies Done.
 - Collect each delivery's assertion-level acceptance evidence and current integration identities; investigate confirmed gaps rather than rerunning every prior suite. Record focused checks, independent review, required visual reports and exact-candidate CI evidence.
   Only then mark feature 001 Done in `specs/README.md`, with deviations reconciled in spec/plan and immutable history entries.
+
+Evidence: [traceability audit](traceability.md) (2026-11-05).
 
 Ownership: tests and missing assertions, traceability evidence and final feature documentation. No
 unapproved product choices, publishing or new implementation work is authorized by this document acceptance.

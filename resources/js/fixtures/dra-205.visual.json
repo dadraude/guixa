@@ -10,7 +10,7 @@
     "views": [
         {
             "id": "dashboard-manager",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Dashboard",
                 "role": "manager"
@@ -58,7 +58,20 @@
                             "mode": "dark",
                             "text": 200
                         }
-                    ]
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"attention-group\"] a",
+                                "count": 2,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"attention-count\"]",
+                                "count": 2
+                            }
+                        ]
+                    }
                 },
                 {
                     "id": "empty",
@@ -77,7 +90,131 @@
                             "text": 200
                         }
                     ],
-                    "ready": "body[data-visual-ready=\"empty\"]"
+                    "ready": "body[data-visual-ready=\"empty\"]",
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"attention-list\"]",
+                                "count": 0
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "long-content",
+                    "query": {
+                        "state": "long-content"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"long-content\"]"
+                }
+            ]
+        },
+        {
+            "id": "dashboard-finance",
+            "path": "/resources/visual/dra-205.html",
+            "query": {
+                "page": "Dashboard",
+                "role": "finance"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "button[data-sidebar=\"trigger\"]",
+                "[data-visual-page-focus-first]",
+                "[data-visual-page-focus-last]"
+            ],
+            "states": [
+                {
+                    "id": "default",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"attention-group\"] a",
+                                "count": 2,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"attention-count\"]",
+                                "count": 2
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "empty",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"empty\"]",
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"attention-list\"]",
+                                "count": 0
+                            }
+                        ],
+                        "panels": "#main-content",
+                        "focus": [],
+                        "noFocusReason": "A Finance dashboard with nothing pending has no actionable content."
+                    }
                 },
                 {
                     "id": "long-content",
@@ -102,7 +239,7 @@
         },
         {
             "id": "dashboard-member",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Dashboard",
                 "role": "member"
@@ -150,7 +287,20 @@
                             "mode": "dark",
                             "text": 200
                         }
-                    ]
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"attention-group\"]",
+                                "count": 2
+                            },
+                            {
+                                "selector": "[data-test=\"attention-group\"] a",
+                                "count": 2,
+                                "minHeight": 44
+                            }
+                        ]
+                    }
                 },
                 {
                     "id": "empty",
@@ -169,7 +319,15 @@
                             "text": 200
                         }
                     ],
-                    "ready": "body[data-visual-ready=\"empty\"]"
+                    "ready": "body[data-visual-ready=\"empty\"]",
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"attention-list\"]",
+                                "count": 0
+                            }
+                        ]
+                    }
                 },
                 {
                     "id": "long-content",
@@ -194,7 +352,7 @@
         },
         {
             "id": "dashboard-producer",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Dashboard",
                 "role": "producer"
@@ -267,7 +425,7 @@
         },
         {
             "id": "manage-accounts-index",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Manage/Accounts/Index"
             },
@@ -400,7 +558,7 @@
         },
         {
             "id": "manage-cycles-index",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Manage/Cycles/Index"
             },
@@ -447,7 +605,17 @@
                             "mode": "dark",
                             "text": 200
                         }
-                    ]
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"pending-collections\"]",
+                                "count": 1,
+                                "text": "Recollides pendents: 2",
+                                "minHeight": 44
+                            }
+                        ]
+                    }
                 },
                 {
                     "id": "empty",
@@ -687,7 +855,21 @@
                             "text": 200
                         }
                     ],
-                    "ready": "body[data-visual-ready=\"closed-cycle\"]"
+                    "ready": "body[data-visual-ready=\"closed-cycle\"]",
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"pending-collections\"]",
+                                "count": 1,
+                                "text": "Recollides pendents: 2",
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test^=\"manage-\"]",
+                                "count": 0
+                            }
+                        ]
+                    }
                 },
                 {
                     "id": "cancelled-cycle",
@@ -707,12 +889,44 @@
                         }
                     ],
                     "ready": "body[data-visual-ready=\"cancelled-cycle\"]"
+                },
+                {
+                    "id": "no-pending",
+                    "query": {
+                        "state": "no-pending"
+                    },
+                    "ready": "body[data-visual-ready=\"no-pending\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"pending-collections\"]",
+                                "count": 0
+                            }
+                        ]
+                    }
                 }
             ]
         },
         {
             "id": "manage-cycles-show",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Manage/Cycles/Show"
             },
@@ -755,7 +969,17 @@
                             "mode": "dark",
                             "text": 200
                         }
-                    ]
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"pending-collections\"]",
+                                "count": 1,
+                                "text": "Recollides pendents: 2",
+                                "minHeight": 44
+                            }
+                        ]
+                    }
                 },
                 {
                     "id": "empty",
@@ -813,12 +1037,44 @@
                         }
                     ],
                     "ready": "body[data-visual-ready=\"cancelled-cycle\"]"
+                },
+                {
+                    "id": "no-pending",
+                    "query": {
+                        "state": "no-pending"
+                    },
+                    "ready": "body[data-visual-ready=\"no-pending\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"pending-collections\"]",
+                                "count": 0
+                            }
+                        ]
+                    }
                 }
             ]
         },
         {
             "id": "manage-households-index",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Manage/Households/Index"
             },
@@ -947,7 +1203,7 @@
         },
         {
             "id": "manage-households-show",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Manage/Households/Show"
             },
@@ -1094,247 +1350,8 @@
             ]
         },
         {
-            "id": "manage-pickups-index",
-            "path": "/visual-dra-205.html",
-            "query": {
-                "page": "Manage/Pickups/Index"
-            },
-            "root": ".reference-style",
-            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
-            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
-            "fonts": ["16px Nunito Variable"],
-            "focus": [
-                "button[data-sidebar=\"trigger\"]",
-                "[data-visual-page-focus-first]",
-                "[data-visual-page-focus-last]"
-            ],
-            "states": [
-                {
-                    "id": "default",
-                    "cases": [
-                        {
-                            "width": 375,
-                            "mode": "light",
-                            "text": 100
-                        },
-                        {
-                            "width": 375,
-                            "mode": "dark",
-                            "text": 100
-                        },
-                        {
-                            "width": 1280,
-                            "mode": "light",
-                            "text": 100
-                        },
-                        {
-                            "width": 1280,
-                            "mode": "dark",
-                            "text": 100
-                        },
-                        {
-                            "width": 1024,
-                            "mode": "light",
-                            "text": 200
-                        },
-                        {
-                            "width": 1024,
-                            "mode": "dark",
-                            "text": 200
-                        }
-                    ]
-                },
-                {
-                    "id": "empty",
-                    "query": {
-                        "state": "empty"
-                    },
-                    "cases": [
-                        {
-                            "width": 375,
-                            "mode": "light",
-                            "text": 100
-                        },
-                        {
-                            "width": 1024,
-                            "mode": "dark",
-                            "text": 200
-                        }
-                    ],
-                    "ready": "body[data-visual-ready=\"empty\"]"
-                },
-                {
-                    "id": "long-content",
-                    "query": {
-                        "state": "long-content"
-                    },
-                    "cases": [
-                        {
-                            "width": 375,
-                            "mode": "light",
-                            "text": 100
-                        },
-                        {
-                            "width": 1024,
-                            "mode": "dark",
-                            "text": 200
-                        }
-                    ],
-                    "ready": "body[data-visual-ready=\"long-content\"]"
-                }
-            ]
-        },
-        {
-            "id": "manage-pickups-show",
-            "path": "/visual-dra-205.html",
-            "query": {
-                "page": "Manage/Pickups/Show"
-            },
-            "root": ".reference-style",
-            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
-            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
-            "fonts": ["16px Nunito Variable"],
-            "focus": [
-                "button[data-sidebar=\"trigger\"]",
-                "[data-visual-page-focus-first]",
-                "[data-visual-page-focus-last]"
-            ],
-            "states": [
-                {
-                    "id": "default",
-                    "cases": [
-                        {
-                            "width": 375,
-                            "mode": "light",
-                            "text": 100
-                        },
-                        {
-                            "width": 375,
-                            "mode": "dark",
-                            "text": 100
-                        },
-                        {
-                            "width": 1280,
-                            "mode": "light",
-                            "text": 100
-                        },
-                        {
-                            "width": 1280,
-                            "mode": "dark",
-                            "text": 100
-                        },
-                        {
-                            "width": 1024,
-                            "mode": "light",
-                            "text": 200
-                        },
-                        {
-                            "width": 1024,
-                            "mode": "dark",
-                            "text": 200
-                        }
-                    ]
-                },
-                {
-                    "id": "error",
-                    "query": {
-                        "state": "error"
-                    },
-                    "cases": [
-                        {
-                            "width": 375,
-                            "mode": "light",
-                            "text": 100
-                        },
-                        {
-                            "width": 1024,
-                            "mode": "dark",
-                            "text": 200
-                        }
-                    ],
-                    "ready": "body[data-visual-ready=\"error\"]"
-                },
-                {
-                    "id": "completed",
-                    "query": {
-                        "state": "completed"
-                    },
-                    "cases": [
-                        {
-                            "width": 375,
-                            "mode": "light",
-                            "text": 100
-                        },
-                        {
-                            "width": 1024,
-                            "mode": "dark",
-                            "text": 200
-                        }
-                    ],
-                    "ready": "body[data-visual-ready=\"completed\"]"
-                },
-                {
-                    "id": "long-content",
-                    "query": {
-                        "state": "long-content"
-                    },
-                    "cases": [
-                        {
-                            "width": 375,
-                            "mode": "light",
-                            "text": 100
-                        },
-                        {
-                            "width": 1024,
-                            "mode": "dark",
-                            "text": 200
-                        }
-                    ],
-                    "ready": "body[data-visual-ready=\"long-content\"]"
-                },
-                {
-                    "id": "stock-lines",
-                    "query": {
-                        "state": "stock-lines"
-                    },
-                    "cases": [
-                        {
-                            "width": 375,
-                            "mode": "light",
-                            "text": 100
-                        },
-                        {
-                            "width": 1024,
-                            "mode": "dark",
-                            "text": 200
-                        }
-                    ],
-                    "ready": "body[data-visual-ready=\"stock-lines\"]"
-                },
-                {
-                    "id": "return-lines",
-                    "query": {
-                        "state": "return-lines"
-                    },
-                    "cases": [
-                        {
-                            "width": 375,
-                            "mode": "light",
-                            "text": 100
-                        },
-                        {
-                            "width": 1024,
-                            "mode": "dark",
-                            "text": 200
-                        }
-                    ],
-                    "ready": "body[data-visual-ready=\"return-lines\"]"
-                }
-            ]
-        },
-        {
             "id": "manage-producers-index",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Manage/Producers/Index"
             },
@@ -1463,9 +1480,9 @@
         },
         {
             "id": "manage-reception-show",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
-                "page": "Manage/Reception/Show"
+                "page": "Receptions/Show"
             },
             "root": ".reference-style",
             "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
@@ -1592,35 +1609,6 @@
                     "ready": "body[data-visual-ready=\"manual-allocation\"]"
                 },
                 {
-                    "id": "received-scope-choice",
-                    "query": {
-                        "state": "received-scope-choice"
-                    },
-                    "cases": [
-                        {
-                            "width": 375,
-                            "mode": "light",
-                            "text": 100
-                        },
-                        {
-                            "width": 1024,
-                            "mode": "dark",
-                            "text": 200
-                        }
-                    ],
-                    "ready": "body[data-visual-ready=\"received-scope-choice\"]",
-                    "checks": {
-                        "root": "[role=\"dialog\"]",
-                        "panels": "[data-slot=\"dialog-header\"],[data-slot=\"dialog-title\"],[data-slot=\"dialog-description\"],[data-slot=\"dialog-footer\"],form",
-                        "content": "h1,h2,h3,p,label:not(.sr-only),input,textarea,button:not([data-slot=\"dialog-close\"]),[data-slot=\"dialog-title\"],[data-slot=\"dialog-description\"],.pilot-separator-label",
-                        "focus": [
-                            "[data-visual-overlay-focus-first]",
-                            "[data-visual-overlay-focus-last]"
-                        ]
-                    },
-                    "settled": ["[role=\"dialog\"]"]
-                },
-                {
                     "id": "received-overwrite",
                     "query": {
                         "state": "received-overwrite"
@@ -1653,7 +1641,7 @@
         },
         {
             "id": "manage-returnitems-create",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Manage/ReturnItems/Create"
             },
@@ -1744,7 +1732,7 @@
         },
         {
             "id": "manage-returnitems-edit",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Manage/ReturnItems/Edit"
             },
@@ -1835,7 +1823,7 @@
         },
         {
             "id": "manage-returnitems-index",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Manage/ReturnItems/Index"
             },
@@ -1929,7 +1917,7 @@
         },
         {
             "id": "manage-settings",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Manage/Settings"
             },
@@ -2020,7 +2008,7 @@
         },
         {
             "id": "manage-stock-create",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Manage/Stock/Create"
             },
@@ -2111,7 +2099,7 @@
         },
         {
             "id": "manage-stock-edit",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Manage/Stock/Edit"
             },
@@ -2202,7 +2190,7 @@
         },
         {
             "id": "manage-stock-index",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Manage/Stock/Index"
             },
@@ -2386,7 +2374,7 @@
         },
         {
             "id": "manage-stock-movements",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Manage/Stock/Movements"
             },
@@ -2477,7 +2465,7 @@
         },
         {
             "id": "orders-edit",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Orders/Edit"
             },
@@ -2606,7 +2594,7 @@
         },
         {
             "id": "orders-index",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Orders/Index"
             },
@@ -2720,7 +2708,7 @@
         },
         {
             "id": "producer-cutoff",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Producer/Cutoff"
             },
@@ -2811,7 +2799,7 @@
         },
         {
             "id": "producer-cyclesummary",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Producer/CycleSummary"
             },
@@ -2927,7 +2915,7 @@
         },
         {
             "id": "producer-products-create",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Producer/Products/Create"
             },
@@ -3018,7 +3006,7 @@
         },
         {
             "id": "producer-products-edit",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Producer/Products/Edit"
             },
@@ -3109,7 +3097,7 @@
         },
         {
             "id": "producer-products-index",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Producer/Products/Index"
             },
@@ -3203,7 +3191,7 @@
         },
         {
             "id": "wallet-statement-manager",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Wallet/Statement",
                 "role": "manager"
@@ -3314,7 +3302,7 @@
         },
         {
             "id": "wallet-statement-member",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Wallet/Statement",
                 "role": "member"
@@ -3402,7 +3390,7 @@
         },
         {
             "id": "welcome",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Welcome"
             },
@@ -3451,7 +3439,7 @@
         },
         {
             "id": "auth-acceptinvitation",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "auth/AcceptInvitation"
             },
@@ -3543,7 +3531,7 @@
         },
         {
             "id": "auth-confirmpassword",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "auth/ConfirmPassword"
             },
@@ -3635,7 +3623,7 @@
         },
         {
             "id": "auth-forgotpassword",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "auth/ForgotPassword"
             },
@@ -3727,7 +3715,7 @@
         },
         {
             "id": "auth-login",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "auth/Login"
             },
@@ -3820,7 +3808,7 @@
         },
         {
             "id": "auth-resetpassword",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "auth/ResetPassword"
             },
@@ -3912,7 +3900,7 @@
         },
         {
             "id": "auth-twofactorchallenge",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "auth/TwoFactorChallenge"
             },
@@ -4003,7 +3991,7 @@
         },
         {
             "id": "auth-verifyemail",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "auth/VerifyEmail"
             },
@@ -4075,7 +4063,7 @@
         },
         {
             "id": "settings-appearance",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "settings/Appearance"
             },
@@ -4156,7 +4144,7 @@
         },
         {
             "id": "settings-profile",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "settings/Profile"
             },
@@ -4334,7 +4322,7 @@
         },
         {
             "id": "settings-security",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "settings/Security"
             },
@@ -4648,7 +4636,7 @@
         },
         {
             "id": "framework-error-401",
-            "path": "/visual-dra-205-error.html",
+            "path": "/resources/visual/dra-205-error.html",
             "query": {
                 "status": "401"
             },
@@ -4690,7 +4678,7 @@
         },
         {
             "id": "framework-error-402",
-            "path": "/visual-dra-205-error.html",
+            "path": "/resources/visual/dra-205-error.html",
             "query": {
                 "status": "402"
             },
@@ -4732,7 +4720,7 @@
         },
         {
             "id": "framework-error-403",
-            "path": "/visual-dra-205-error.html",
+            "path": "/resources/visual/dra-205-error.html",
             "query": {
                 "status": "403"
             },
@@ -4774,7 +4762,7 @@
         },
         {
             "id": "framework-error-404",
-            "path": "/visual-dra-205-error.html",
+            "path": "/resources/visual/dra-205-error.html",
             "query": {
                 "status": "404"
             },
@@ -4826,7 +4814,7 @@
         },
         {
             "id": "framework-error-419",
-            "path": "/visual-dra-205-error.html",
+            "path": "/resources/visual/dra-205-error.html",
             "query": {
                 "status": "419"
             },
@@ -4868,7 +4856,7 @@
         },
         {
             "id": "framework-error-429",
-            "path": "/visual-dra-205-error.html",
+            "path": "/resources/visual/dra-205-error.html",
             "query": {
                 "status": "429"
             },
@@ -4910,7 +4898,7 @@
         },
         {
             "id": "framework-error-500",
-            "path": "/visual-dra-205-error.html",
+            "path": "/resources/visual/dra-205-error.html",
             "query": {
                 "status": "500"
             },
@@ -4952,7 +4940,7 @@
         },
         {
             "id": "framework-error-503",
-            "path": "/visual-dra-205-error.html",
+            "path": "/resources/visual/dra-205-error.html",
             "query": {
                 "status": "503"
             },

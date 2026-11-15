@@ -12,7 +12,7 @@ import {
 } from "reka-ui"
 import { cn } from "@/lib/utils"
 import SheetOverlay from "./SheetOverlay.vue"
-import { usePilotTheme } from "@/composables/usePilotTheme"
+import { usePilotTheme, usePilotVariantClass } from "@/composables/usePilotTheme"
 
 interface SheetContentProps extends DialogContentProps {
   class?: HTMLAttributes["class"]
@@ -32,6 +32,7 @@ const delegatedProps = reactiveOmit(props, "class", "side")
 
 const forwarded = useForwardPropsEmits(delegatedProps, emits)
 const pilotTheme = usePilotTheme()
+const pilotVariantClass = usePilotVariantClass()
 </script>
 
 <template>
@@ -49,7 +50,7 @@ const pilotTheme = usePilotTheme()
           && 'data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top inset-x-0 top-0 h-auto border-b',
         side === 'bottom'
           && 'data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom inset-x-0 bottom-0 h-auto border-t',
-        props.class, pilotTheme && 'pilot-theme')"
+        props.class, pilotTheme && 'pilot-theme', pilotVariantClass)"
       v-bind="{ ...$attrs, ...forwarded }"
     >
       <slot />

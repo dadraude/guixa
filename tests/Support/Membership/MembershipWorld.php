@@ -11,10 +11,11 @@ use Guixa\Membership\Application\CreateHousehold;
 use Guixa\Membership\Application\DeactivateAccount;
 use Guixa\Membership\Application\DeactivateEmptyHousehold;
 use Guixa\Membership\Application\DeactivateHousehold;
+use Guixa\Membership\Application\GetAccountNames;
 use Guixa\Membership\Application\GetHousehold;
 use Guixa\Membership\Application\GetHouseholdDeactivationWarning;
 use Guixa\Membership\Application\GetHouseholds;
-use Guixa\Membership\Application\GrantManagerRole;
+use Guixa\Membership\Application\GrantStaffRole;
 use Guixa\Membership\Application\InviteProducerAccount;
 use Guixa\Membership\Application\ListAccounts;
 use Guixa\Membership\Application\ListHouseholds;
@@ -23,7 +24,7 @@ use Guixa\Membership\Application\ListProducerAccounts;
 use Guixa\Membership\Application\MoveMember;
 use Guixa\Membership\Application\ReactivateAccount;
 use Guixa\Membership\Application\ReactivateHousehold;
-use Guixa\Membership\Application\RemoveManagerRole;
+use Guixa\Membership\Application\RemoveStaffRole;
 use Guixa\Membership\Application\RenameHousehold;
 use Guixa\Membership\Application\ResendInvitation;
 use Guixa\Membership\Application\RestoreProducerRole;
@@ -36,12 +37,13 @@ use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Role;
 use Tests\Support\FrozenClock;
 use Tests\Support\InMemory\FakeHouseholdBalances;
-use Tests\Support\InMemory\FakeHouseholdPickups;
+use Tests\Support\InMemory\FakeHouseholdBaskets;
 use Tests\Support\InMemory\FakeProducerDirectory;
 use Tests\Support\InMemory\ImmediateTransactionRunner;
 use Tests\Support\InMemory\InMemoryAccountRepository;
 use Tests\Support\InMemory\InMemoryHouseholdRepository;
 use Tests\Support\InMemory\InMemoryInvitationRepository;
+use Tests\Support\InMemory\InMemoryRoleChangeLog;
 use Tests\Support\InMemory\RecordingAccountPasswords;
 use Tests\Support\InMemory\RecordingInvitationSender;
 
@@ -52,7 +54,7 @@ final class MembershipWorld
 
     public readonly FakeHouseholdBalances $balances;
 
-    public readonly FakeHouseholdPickups $pickups;
+    public readonly FakeHouseholdBaskets $openBaskets;
 
     public readonly DeactivateHousehold $deactivateHousehold;
 
@@ -100,13 +102,17 @@ final class MembershipWorld
 
     public readonly GetHouseholds $getHouseholds;
 
+    public readonly GetAccountNames $getAccountNames;
+
     public readonly MoveMember $moveMember;
 
     public readonly UnlinkMember $unlinkMember;
 
-    public readonly GrantManagerRole $grantManagerRole;
+    public readonly GrantStaffRole $grantStaffRole;
 
-    public readonly RemoveManagerRole $removeManagerRole;
+    public readonly RemoveStaffRole $removeStaffRole;
+
+    public readonly InMemoryRoleChangeLog $roleChanges;
 
     public readonly DeactivateAccount $deactivateAccount;
 
@@ -128,7 +134,7 @@ final class MembershipWorld
     {
         $this->clock = new FrozenClock($now);
         $this->balances = new FakeHouseholdBalances;
-        $this->pickups = new FakeHouseholdPickups;
+        $this->openBaskets = new FakeHouseholdBaskets;
         $this->households = new InMemoryHouseholdRepository;
         $this->accounts = new InMemoryAccountRepository;
         $this->invitations = new InMemoryInvitationRepository;
@@ -163,18 +169,20 @@ final class MembershipWorld
         $this->listHouseholds = new ListHouseholds($this->households, $this->accounts);
         $this->deactivateHousehold = new DeactivateHousehold($this->households, $this->accounts, $this->transactions, $this->clock);
         $this->reactivateHousehold = new ReactivateHousehold($this->households, $this->transactions);
-        $this->getHouseholdDeactivationWarning = new GetHouseholdDeactivationWarning($this->households, $this->balances, $this->pickups);
-        $this->listHouseholdsToSettle = new ListHouseholdsToSettle($this->households, $this->balances, $this->pickups);
+        $this->getHouseholdDeactivationWarning = new GetHouseholdDeactivationWarning($this->households, $this->balances, $this->openBaskets);
+        $this->listHouseholdsToSettle = new ListHouseholdsToSettle($this->households, $this->balances, $this->openBaskets);
         $this->listProducerAccounts = new ListProducerAccounts($this->accounts);
         $this->getHouseholds = new GetHouseholds($this->households);
+        $this->getAccountNames = new GetAccountNames($this->accounts);
         $this->getHousehold = new GetHousehold($this->households, $this->accounts, $this->invitations, $this->clock);
 
         $deactivateEmptyHousehold = new DeactivateEmptyHousehold($this->households, $this->accounts, $this->clock);
 
         $this->moveMember = new MoveMember($this->households, $this->accounts, $deactivateEmptyHousehold, $this->transactions);
         $this->unlinkMember = new UnlinkMember($this->accounts, $this->households, $deactivateEmptyHousehold, $this->transactions);
-        $this->grantManagerRole = new GrantManagerRole($this->accounts, $this->households, $this->transactions);
-        $this->removeManagerRole = new RemoveManagerRole($this->accounts, $this->households, $this->transactions);
+        $this->roleChanges = new InMemoryRoleChangeLog;
+        $this->grantStaffRole = new GrantStaffRole($this->accounts, $this->households, $this->roleChanges, $this->transactions, $this->clock);
+        $this->removeStaffRole = new RemoveStaffRole($this->accounts, $this->households, $this->roleChanges, $this->transactions, $this->clock);
         $this->deactivateAccount = new DeactivateAccount($this->accounts, $this->households, $deactivateEmptyHousehold, $this->transactions, $this->clock);
         $this->reactivateAccount = new ReactivateAccount($this->accounts, $this->households, $this->transactions);
         $this->listAccounts = new ListAccounts($this->accounts, $this->households);

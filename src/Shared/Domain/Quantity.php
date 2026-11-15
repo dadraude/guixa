@@ -56,6 +56,19 @@ final readonly class Quantity
         return new self($wholeUnits * self::SCALE);
     }
 
+    /** Whole containers this quantity needs at the given containers-per-unit rate, rounded up (R18a). Split into whole and fraction so it cannot overflow. */
+    public function containersAt(self $containersPerUnit): int
+    {
+        $wholeQuantity = intdiv($this->thousandths, self::SCALE);
+        $fractionalQuantity = $this->thousandths % self::SCALE;
+        $wholeRate = intdiv($containersPerUnit->thousandths, self::SCALE);
+        $fractionalRate = $containersPerUnit->thousandths % self::SCALE;
+        $fractionalProduct = ($wholeQuantity * $fractionalRate + $fractionalQuantity * $wholeRate) * self::SCALE
+            + $fractionalQuantity * $fractionalRate;
+
+        return $wholeQuantity * $wholeRate + intdiv($fractionalProduct + 999_999, 1_000_000);
+    }
+
     public function equals(self $other): bool
     {
         return $this->thousandths === $other->thousandths;

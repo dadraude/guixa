@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Form, Head, Link } from '@inertiajs/vue3';
 import { Pencil, Plus } from '@lucide/vue';
-import ReturnItemController from '@/actions/App/Http/Controllers/Manage/ReturnItemController';
+import ReturnItemController from '@/actions/App/Http/Controllers/Catalogue/ReturnItemController';
 import Heading from '@/components/Heading.vue';
 import ActiveSwitch from '@/components/ActiveSwitch.vue';
 import { Button } from '@/components/ui/button';
@@ -24,7 +24,9 @@ defineProps<{
 <template>
     <Head :title="trans('Return items')" />
 
-    <div class="pilot-page pilot-layout-page pilot-manager-page">
+    <div
+        class="pilot-page pilot-layout-page pilot-manager-page pilot-title-compact"
+    >
         <div class="flex flex-wrap items-start justify-between gap-4">
             <Heading
                 :title="trans('Return items')"
@@ -60,12 +62,7 @@ defineProps<{
                     </tr>
                 </thead>
                 <tbody>
-                    <tr
-                        v-for="item in items"
-                        :key="item.id"
-                        class="border-b"
-                        :class="{ 'text-muted-foreground': !item.active }"
-                    >
+                    <tr v-for="item in items" :key="item.id" class="border-b">
                         <td class="py-2">
                             <span class="pilot-cell-label" aria-hidden="true">{{
                                 trans('Active')

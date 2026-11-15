@@ -1,0 +1,1861 @@
+{
+    "baseUrl": "http://127.0.0.1:5278",
+    "rootFontPx": 16,
+    "darkSelector": "html.dark",
+    "maxTabs": 120,
+    "matrix": {
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark", "system-light", "system-dark"],
+        "text": [100, 200]
+    },
+    "views": [
+        {
+            "id": "stock-create",
+            "path": "/resources/js/fixtures/catalogue-landing.html",
+            "query": {
+                "page": "Manage/Stock/Create",
+                "role": "catalogue",
+                "state": "default"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content button,#main-content label,#main-content input,#main-content form div",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "#main-content input[name=\"name\"]",
+                "#main-content input[name=\"unit\"]",
+                "#main-content input[name=\"price\"]",
+                "#main-content input[type=\"checkbox\"]",
+                "#main-content input[name=\"containers_per_unit\"]",
+                "#main-content [data-test=\"save-stock-product\"]"
+            ],
+            "states": [
+                {
+                    "id": "default",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                },
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content form input:not([type=\"hidden\"]):not([type=\"checkbox\"])",
+                                "count": 4,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form label",
+                                "count": 5,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form label[for]",
+                                "count": 5
+                            },
+                            {
+                                "selector": "#main-content form input[type=\"checkbox\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content button[data-test=\"save-stock-product\"]",
+                                "count": 1,
+                                "text": "Crea",
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "contrast": 4.5,
+                                "attributes": {
+                                    "disabled": null
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-field-border-ok": "true",
+                                    "data-ev-field-count": "4"
+                                }
+                            },
+                            {
+                                "selector": "#main-content form p.text-destructive:not(:empty)",
+                                "count": 0
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "invalid",
+                    "query": {
+                        "state": "invalid"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                },
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content form input:not([type=\"hidden\"]):not([type=\"checkbox\"])",
+                                "count": 4,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form label",
+                                "count": 5,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form label[for]",
+                                "count": 5
+                            },
+                            {
+                                "selector": "#main-content form input[type=\"checkbox\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content form div:not([style*=\"none\"]) > p.text-destructive",
+                                "count": 1,
+                                "text": "Ja existeix un producte d’estoc amb aquest nom.",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-field-border-ok": "true",
+                                    "data-ev-field-count": "4"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "invalid-all",
+                    "query": {
+                        "state": "invalid-all"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                },
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content form input:not([type=\"hidden\"]):not([type=\"checkbox\"])",
+                                "count": 4,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form label",
+                                "count": 5,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form label[for]",
+                                "count": 5
+                            },
+                            {
+                                "selector": "#main-content form input[type=\"checkbox\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content form div:not([style*=\"none\"]) > p.text-destructive",
+                                "count": 4,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-field-border-ok": "true",
+                                    "data-ev-field-count": "4"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "server-error",
+                    "query": {
+                        "state": "server-error"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                },
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content form input:not([type=\"hidden\"]):not([type=\"checkbox\"])",
+                                "count": 4,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form label",
+                                "count": 5,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form label[for]",
+                                "count": 5
+                            },
+                            {
+                                "selector": "#main-content form input[type=\"checkbox\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content form div:not([style*=\"none\"]) > p.text-destructive",
+                                "count": 1,
+                                "text": "No s’ha pogut desar el producte.",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-field-border-ok": "true",
+                                    "data-ev-field-count": "4"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "busy",
+                    "query": {
+                        "state": "busy"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                },
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content form input:not([type=\"hidden\"]):not([type=\"checkbox\"])",
+                                "count": 4,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form label",
+                                "count": 5,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form label[for]",
+                                "count": 5
+                            },
+                            {
+                                "selector": "#main-content form input[type=\"checkbox\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content button[data-test=\"save-stock-product\"]",
+                                "count": 1,
+                                "text": "Crea",
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "attributes": {
+                                    "disabled": ""
+                                },
+                                "styles": {
+                                    "opacity": "0.5",
+                                    "pointer-events": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-stock-requests": "post /catalogue/producers/producer-1/products/stock"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-field-border-ok": "true",
+                                    "data-ev-field-count": "4"
+                                }
+                            }
+                        ],
+                        "focus": [
+                            "#main-content input[name=\"name\"]",
+                            "#main-content input[name=\"unit\"]",
+                            "#main-content input[name=\"price\"]",
+                            "#main-content input[type=\"checkbox\"]",
+                            "#main-content input[name=\"containers_per_unit\"]"
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "stock-edit",
+            "path": "/resources/js/fixtures/catalogue-landing.html",
+            "query": {
+                "page": "Manage/Stock/Edit",
+                "role": "catalogue",
+                "state": "default"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content button,#main-content label,#main-content input,#main-content form div",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "#main-content input[name=\"name\"]",
+                "#main-content input[name=\"unit\"]",
+                "#main-content input[name=\"price\"]",
+                "#main-content input[type=\"checkbox\"]",
+                "#main-content input[name=\"containers_per_unit\"]",
+                "#main-content [data-test=\"save-stock-product\"]",
+                "#main-content [data-test=\"change-product-classification\"]",
+                "#main-content [data-test=\"delete-unused-product\"]",
+                "#main-content a[href$=\"/products\"]"
+            ],
+            "states": [
+                {
+                    "id": "default",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                },
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content form input:not([type=\"hidden\"]):not([type=\"checkbox\"])",
+                                "count": 4,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form label",
+                                "count": 5,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form label[for]",
+                                "count": 5
+                            },
+                            {
+                                "selector": "#main-content form input[type=\"checkbox\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content button[data-test=\"save-stock-product\"]",
+                                "count": 1,
+                                "text": "Desa",
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "contrast": 4.5,
+                                "attributes": {
+                                    "disabled": null
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"delete-unused-product\"]",
+                                "count": 1,
+                                "text": "Elimina el producte sense ús",
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"change-product-classification\"]",
+                                "count": 1,
+                                "text": "Canvia a producte setmanal",
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-field-border-ok": "true",
+                                    "data-ev-field-count": "4"
+                                }
+                            },
+                            {
+                                "selector": "#main-content form input[name=\"unit\"]",
+                                "attributes": {
+                                    "readonly": null
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "long-name",
+                    "query": {
+                        "state": "long-name"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                },
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content form input:not([type=\"hidden\"]):not([type=\"checkbox\"])",
+                                "count": 4,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form label",
+                                "count": 5,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form label[for]",
+                                "count": 5
+                            },
+                            {
+                                "selector": "#main-content form input[type=\"checkbox\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"delete-unused-product\"]",
+                                "count": 1,
+                                "text": "Elimina el producte sense ús",
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-field-border-ok": "true",
+                                    "data-ev-field-count": "4"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "used",
+                    "query": {
+                        "state": "used"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                },
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content form input:not([type=\"hidden\"]):not([type=\"checkbox\"])",
+                                "count": 4,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form label",
+                                "count": 5,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form label[for]",
+                                "count": 5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-field-border-ok": "true",
+                                    "data-ev-field-count": "4"
+                                }
+                            },
+                            {
+                                "selector": "#main-content form input[type=\"checkbox\"]",
+                                "count": 1,
+                                "attributes": {
+                                    "disabled": ""
+                                }
+                            },
+                            {
+                                "selector": "#main-content form input[name=\"unit\"]",
+                                "count": 1,
+                                "attributes": {
+                                    "readonly": "",
+                                    "aria-describedby": "stock-unit-lock-hint"
+                                }
+                            },
+                            {
+                                "selector": "#stock-unit-lock-hint",
+                                "count": 1,
+                                "text": "La unitat i la quantitat variable queden fixades després d’utilitzar l’estoc.",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"change-product-classification\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"delete-unused-product\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content .border-t .space-y-4 > p.text-muted-foreground",
+                                "count": 1,
+                                "text": "Aquest producte ja s’ha utilitzat. El pots desactivar, però no en pots canviar la classificació ni eliminar-lo.",
+                                "contrast": 4.5
+                            }
+                        ],
+                        "focus": [
+                            "#main-content input[name=\"name\"]",
+                            "#main-content input[name=\"unit\"]",
+                            "#main-content input[name=\"price\"]",
+                            "#main-content input[name=\"containers_per_unit\"]",
+                            "#main-content [data-test=\"save-stock-product\"]",
+                            "#main-content a[href$=\"/products\"]"
+                        ]
+                    }
+                },
+                {
+                    "id": "invalid-all",
+                    "query": {
+                        "state": "invalid-all"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                },
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content form input:not([type=\"hidden\"]):not([type=\"checkbox\"])",
+                                "count": 4,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form label",
+                                "count": 5,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form label[for]",
+                                "count": 5
+                            },
+                            {
+                                "selector": "#main-content form input[type=\"checkbox\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content form div:not([style*=\"none\"]) > p.text-destructive",
+                                "count": 4,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-field-border-ok": "true",
+                                    "data-ev-field-count": "4"
+                                }
+                            }
+                        ]
+                    },
+                    "focus": [
+                        "#main-content input[name=\"name\"]",
+                        "#main-content input[name=\"unit\"]",
+                        "#main-content input[name=\"price\"]",
+                        "#main-content input[type=\"checkbox\"]",
+                        "#main-content input[name=\"containers_per_unit\"]",
+                        "#main-content [data-test=\"save-stock-product\"]",
+                        "#main-content [data-test=\"change-product-classification\"]",
+                        "#main-content [data-test=\"delete-unused-product\"]",
+                        "#main-content a[href$=\"/products\"]"
+                    ]
+                },
+                {
+                    "id": "server-error",
+                    "query": {
+                        "state": "server-error"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                },
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content form input:not([type=\"hidden\"]):not([type=\"checkbox\"])",
+                                "count": 4,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form label",
+                                "count": 5,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form label[for]",
+                                "count": 5
+                            },
+                            {
+                                "selector": "#main-content form input[type=\"checkbox\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content form div:not([style*=\"none\"]) > p.text-destructive",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-field-border-ok": "true",
+                                    "data-ev-field-count": "4"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dialog-delete",
+                    "query": {
+                        "state": "default",
+                        "dialog": "delete"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "dialog[open]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "dialog[open] button",
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "dialog[open] p",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "dialog[open] h2",
+                                "text": "Elimina",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-opener": "delete-unused-product",
+                                    "data-now-dialog-modal": "true",
+                                    "data-ev-dialog-border-ok": "true",
+                                    "data-ev-dialog-focus-ok": "true"
+                                }
+                            }
+                        ],
+                        "focus": [
+                            "dialog[open] button[aria-label]",
+                            "dialog[open] [data-test=\"cancel-product-action\"]",
+                            "dialog[open] [data-test=\"confirm-product-action\"]"
+                        ]
+                    }
+                },
+                {
+                    "id": "dialog-cancel",
+                    "query": {
+                        "state": "default",
+                        "dialog": "delete-cancel"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "dialog[open]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-t05-close-requests": "0",
+                                    "data-ev-t05-close-focus": "delete-unused-product"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dialog-escape",
+                    "query": {
+                        "state": "default",
+                        "dialog": "delete-escape"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "dialog[open]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-t05-close-requests": "0",
+                                    "data-ev-t05-close-focus": "delete-unused-product"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dialog-classify-light-375",
+                    "query": {
+                        "state": "default",
+                        "dialog": "classify"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] h2",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] button",
+                                "count": 3,
+                                "contrast": 4.5,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] [data-test=\"confirm-product-action\"]",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-dialog-modal": "true",
+                                    "data-now-dialog-bg": "rgb(255, 250, 240)",
+                                    "data-now-dialog-ink": "rgb(44, 44, 43)",
+                                    "data-now-dialog-confirm-bg": "rgb(40, 101, 133)",
+                                    "data-ev-opener": "change-product-classification",
+                                    "data-ev-dialog-border-count": "1",
+                                    "data-ev-dialog-border-ok": "true",
+                                    "data-ev-dialog-focus-count": "3",
+                                    "data-ev-dialog-focus-targets": "3",
+                                    "data-ev-dialog-focus-ok": "true",
+                                    "data-requests": "0"
+                                }
+                            }
+                        ],
+                        "focus": [
+                            "dialog.manager-dialog [data-test=\"cancel-product-action\"]",
+                            "dialog.manager-dialog [data-test=\"confirm-product-action\"]",
+                            "dialog.manager-dialog [aria-label=\"Tanca el diàleg\"]"
+                        ]
+                    }
+                },
+                {
+                    "id": "dialog-classify-dark-375",
+                    "query": {
+                        "state": "default",
+                        "dialog": "classify"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] h2",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] button",
+                                "count": 3,
+                                "contrast": 4.5,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] [data-test=\"confirm-product-action\"]",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-dialog-modal": "true",
+                                    "data-now-dialog-bg": "rgb(36, 42, 41)",
+                                    "data-now-dialog-ink": "rgb(242, 240, 233)",
+                                    "data-now-dialog-confirm-bg": "rgb(143, 197, 223)",
+                                    "data-ev-opener": "change-product-classification",
+                                    "data-ev-dialog-border-count": "1",
+                                    "data-ev-dialog-border-ok": "true",
+                                    "data-ev-dialog-focus-count": "3",
+                                    "data-ev-dialog-focus-targets": "3",
+                                    "data-ev-dialog-focus-ok": "true",
+                                    "data-requests": "0"
+                                }
+                            }
+                        ],
+                        "focus": [
+                            "dialog.manager-dialog [data-test=\"cancel-product-action\"]",
+                            "dialog.manager-dialog [data-test=\"confirm-product-action\"]",
+                            "dialog.manager-dialog [aria-label=\"Tanca el diàleg\"]"
+                        ]
+                    }
+                },
+                {
+                    "id": "dialog-classify-light-1280",
+                    "query": {
+                        "state": "default",
+                        "dialog": "classify"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] h2",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] button",
+                                "count": 3,
+                                "contrast": 4.5,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] [data-test=\"confirm-product-action\"]",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-dialog-modal": "true",
+                                    "data-now-dialog-bg": "rgb(255, 250, 240)",
+                                    "data-now-dialog-ink": "rgb(44, 44, 43)",
+                                    "data-now-dialog-confirm-bg": "rgb(40, 101, 133)",
+                                    "data-ev-opener": "change-product-classification",
+                                    "data-ev-dialog-border-count": "1",
+                                    "data-ev-dialog-border-ok": "true",
+                                    "data-ev-dialog-focus-count": "3",
+                                    "data-ev-dialog-focus-targets": "3",
+                                    "data-ev-dialog-focus-ok": "true",
+                                    "data-requests": "0"
+                                }
+                            }
+                        ],
+                        "focus": [
+                            "dialog.manager-dialog [data-test=\"cancel-product-action\"]",
+                            "dialog.manager-dialog [data-test=\"confirm-product-action\"]",
+                            "dialog.manager-dialog [aria-label=\"Tanca el diàleg\"]"
+                        ]
+                    }
+                },
+                {
+                    "id": "dialog-classify-dark-1280",
+                    "query": {
+                        "state": "default",
+                        "dialog": "classify"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] h2",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] button",
+                                "count": 3,
+                                "contrast": 4.5,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] [data-test=\"confirm-product-action\"]",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-dialog-modal": "true",
+                                    "data-now-dialog-bg": "rgb(36, 42, 41)",
+                                    "data-now-dialog-ink": "rgb(242, 240, 233)",
+                                    "data-now-dialog-confirm-bg": "rgb(143, 197, 223)",
+                                    "data-ev-opener": "change-product-classification",
+                                    "data-ev-dialog-border-count": "1",
+                                    "data-ev-dialog-border-ok": "true",
+                                    "data-ev-dialog-focus-count": "3",
+                                    "data-ev-dialog-focus-targets": "3",
+                                    "data-ev-dialog-focus-ok": "true",
+                                    "data-requests": "0"
+                                }
+                            }
+                        ],
+                        "focus": [
+                            "dialog.manager-dialog [data-test=\"cancel-product-action\"]",
+                            "dialog.manager-dialog [data-test=\"confirm-product-action\"]",
+                            "dialog.manager-dialog [aria-label=\"Tanca el diàleg\"]"
+                        ]
+                    }
+                },
+                {
+                    "id": "dialog-classify-light-375-200",
+                    "query": {
+                        "state": "default",
+                        "dialog": "classify"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] h2",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] button",
+                                "count": 3,
+                                "contrast": 4.5,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] [data-test=\"confirm-product-action\"]",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-dialog-modal": "true",
+                                    "data-now-dialog-bg": "rgb(255, 250, 240)",
+                                    "data-now-dialog-ink": "rgb(44, 44, 43)",
+                                    "data-now-dialog-confirm-bg": "rgb(40, 101, 133)",
+                                    "data-ev-opener": "change-product-classification",
+                                    "data-ev-dialog-border-count": "1",
+                                    "data-ev-dialog-border-ok": "true",
+                                    "data-ev-dialog-focus-count": "3",
+                                    "data-ev-dialog-focus-targets": "3",
+                                    "data-ev-dialog-focus-ok": "true",
+                                    "data-requests": "0"
+                                }
+                            }
+                        ],
+                        "focus": [
+                            "dialog.manager-dialog [data-test=\"cancel-product-action\"]",
+                            "dialog.manager-dialog [data-test=\"confirm-product-action\"]",
+                            "dialog.manager-dialog [aria-label=\"Tanca el diàleg\"]"
+                        ]
+                    }
+                },
+                {
+                    "id": "dialog-classify-dark-375-200",
+                    "query": {
+                        "state": "default",
+                        "dialog": "classify"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] h2",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] button",
+                                "count": 3,
+                                "contrast": 4.5,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open] [data-test=\"confirm-product-action\"]",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-dialog-modal": "true",
+                                    "data-now-dialog-bg": "rgb(36, 42, 41)",
+                                    "data-now-dialog-ink": "rgb(242, 240, 233)",
+                                    "data-now-dialog-confirm-bg": "rgb(143, 197, 223)",
+                                    "data-ev-opener": "change-product-classification",
+                                    "data-ev-dialog-border-count": "1",
+                                    "data-ev-dialog-border-ok": "true",
+                                    "data-ev-dialog-focus-count": "3",
+                                    "data-ev-dialog-focus-targets": "3",
+                                    "data-ev-dialog-focus-ok": "true",
+                                    "data-requests": "0"
+                                }
+                            }
+                        ],
+                        "focus": [
+                            "dialog.manager-dialog [data-test=\"cancel-product-action\"]",
+                            "dialog.manager-dialog [data-test=\"confirm-product-action\"]",
+                            "dialog.manager-dialog [aria-label=\"Tanca el diàleg\"]"
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "movements-unchanged",
+            "path": "/resources/js/fixtures/catalogue-landing.html",
+            "query": {
+                "page": "Manage/Stock/Movements",
+                "role": "manager",
+                "state": "default"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content button,#main-content label,#main-content input",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Shared-consumer probe; only the absence of landing and the unchanged computed values are checked.",
+            "states": [
+                {
+                    "id": "light",
+                    "query": {},
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "styles": {
+                                    "font-size": "24px"
+                                }
+                            },
+                            {
+                                "selector": "#main-content form input[name=\"quantity\"]",
+                                "styles": {
+                                    "font-size": "16px",
+                                    "border-top-color": "rgb(120, 138, 125)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content form",
+                                "styles": {
+                                    "padding": "16px"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark",
+                    "query": {},
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "styles": {
+                                    "font-size": "24px"
+                                }
+                            },
+                            {
+                                "selector": "#main-content form input[name=\"quantity\"]",
+                                "styles": {
+                                    "font-size": "16px",
+                                    "border-top-color": "rgb(149, 169, 155)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content form",
+                                "styles": {
+                                    "padding": "16px"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "producer-edit-unchanged",
+            "path": "/resources/js/fixtures/catalogue-landing.html",
+            "query": {
+                "page": "Producer/Products/Edit",
+                "role": "producer",
+                "dialog": "delete"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "dialog.manager-dialog h2,dialog.manager-dialog p,dialog.manager-dialog button",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Shared-consumer probe; only the absence of landing and the dialog values are checked.",
+            "states": [
+                {
+                    "id": "light",
+                    "query": {},
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-dialog-modal": "true",
+                                    "data-now-dialog-bg": "rgb(255, 255, 255)",
+                                    "data-now-dialog-ink": "rgb(32, 43, 38)",
+                                    "data-now-dialog-border": "rgb(214, 222, 216)",
+                                    "data-now-dialog-buttons": "rgb(255, 255, 255) | rgb(32, 43, 38) | rgb(120, 138, 125) | 1px ; rgb(255, 255, 255) | rgb(32, 43, 38) | rgb(120, 138, 125) | 1px ; rgb(36, 107, 87) | rgb(255, 255, 255) | rgb(214, 222, 216) | 0px"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark",
+                    "query": {},
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": "dialog.manager-dialog[open]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-dialog-modal": "true",
+                                    "data-now-dialog-bg": "rgb(37, 42, 39)",
+                                    "data-now-dialog-ink": "rgb(236, 242, 237)",
+                                    "data-now-dialog-border": "rgb(107, 120, 111)",
+                                    "data-now-dialog-buttons": "rgb(37, 42, 39) | rgb(236, 242, 237) | rgb(149, 169, 155) | 1px ; rgb(37, 42, 39) | rgb(236, 242, 237) | rgb(149, 169, 155) | 1px ; rgb(167, 215, 193) | rgb(27, 48, 38) | rgb(107, 120, 111) | 0px"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    ]
+}

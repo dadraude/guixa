@@ -39,19 +39,10 @@ return new class extends Migration
             $table->timestampTz('distributed_at')->nullable();
             $table->primary(['cycle_id', 'producer_id']);
         });
-
-        // The stock movements waited for this table to point at their cycle (R27).
-        Schema::table('stock_movements', function (Blueprint $table) {
-            $table->foreign('cycle_id')->references('id')->on('cycles');
-        });
     }
 
     public function down(): void
     {
-        Schema::table('stock_movements', function (Blueprint $table) {
-            $table->dropForeign(['cycle_id']);
-        });
-
         Schema::dropIfExists('cycle_producers');
         Schema::dropIfExists('cycles');
         Schema::dropIfExists('cooperative_settings');

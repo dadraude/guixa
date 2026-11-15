@@ -4,25 +4,41 @@ namespace Tests\Support\InMemory;
 
 use Guixa\Shared\Domain\Money;
 use Guixa\Wallet\Domain\Error\BasketAlreadyCharged;
-use Guixa\Wallet\Domain\Error\PickupAlreadyCharged;
+use Guixa\Wallet\Domain\Error\CorrectionIdentityConflict;
 use Guixa\Wallet\Domain\Movement;
 use Guixa\Wallet\Domain\MovementRepository;
+use Guixa\Wallet\Domain\MovementType;
 
 /** @extends InMemoryRepository<Movement> */
 final class InMemoryMovementRepository extends InMemoryRepository implements MovementRepository
 {
     public function add(Movement $movement): void
     {
-        if ($movement->isChargeOrCredit()) {
-            if ($movement->basketId !== null && $this->hasBasketChargeOrCredit($movement->basketId)) {
-                throw BasketAlreadyCharged::create();
+        $existing = $this->findById($movement->id);
+        if ($existing !== null && $movement->type === MovementType::Correction) {
+            if ($existing->matchesCorrectionReplay($movement)) {
+                return;
             }
-            if ($movement->cycleId !== null && $this->hasChargeOrCredit($movement->householdId, $movement->cycleId)) {
-                throw PickupAlreadyCharged::create();
-            }
+
+            throw CorrectionIdentityConflict::create();
+        }
+
+        if ($movement->isChargeOrCredit() && $movement->basketId !== null && $this->hasBasketChargeOrCredit($movement->basketId)) {
+            throw BasketAlreadyCharged::create();
         }
 
         $this->save($movement);
+    }
+
+    public function findById(string $movementId): ?Movement
+    {
+        foreach ($this->all() as $movement) {
+            if ($movement->id === $movementId) {
+                return $movement;
+            }
+        }
+
+        return null;
     }
 
     public function balanceOf(string $householdId): Money
@@ -52,17 +68,6 @@ final class InMemoryMovementRepository extends InMemoryRepository implements Mov
     private function ofHousehold(string $householdId): array
     {
         return array_values(array_filter($this->all(), fn (Movement $movement) => $movement->householdId === $householdId));
-    }
-
-    private function hasChargeOrCredit(string $householdId, ?string $cycleId): bool
-    {
-        foreach ($this->ofHousehold($householdId) as $existing) {
-            if ($existing->isChargeOrCredit() && $existing->cycleId === $cycleId) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     private function hasBasketChargeOrCredit(string $basketId): bool

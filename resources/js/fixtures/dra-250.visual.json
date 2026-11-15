@@ -1,0 +1,324 @@
+{
+    "baseUrl": "http://127.0.0.1:5250",
+    "rootFontPx": 16,
+    "darkSelector": "html.dark",
+    "matrix": {
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark"],
+        "text": [100, 200]
+    },
+    "views": [
+        {
+            "id": "manager-roles-removal",
+            "path": "/resources/js/fixtures/roles.html",
+            "root": ".pilot-manager-page",
+            "panels": ".pilot-manager-page > section",
+            "content": "h1,h2,p,label,input:not([type=hidden]),button",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "#search-manager",
+                "#search-finance",
+                "#search-catalogue",
+                "#search-receiver"
+            ],
+            "assertions": [
+                {
+                    "selector": "h2",
+                    "fontSizeRem": 1.125
+                },
+                {
+                    "selector": "h1, h2, p:not(.text-destructive), label, .material-status",
+                    "contrast": 4.5
+                },
+                {
+                    "selector": "button",
+                    "minHeight": 44,
+                    "minWidth": 44
+                }
+            ],
+            "states": [
+                {
+                    "id": "populated",
+                    "query": {
+                        "state": "populated"
+                    },
+                    "ready": "body[data-visual-ready=\"populated\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "h2",
+                                "fontSizeRem": 1.125
+                            },
+                            {
+                                "selector": "h1, h2, p:not(.text-destructive), label, .material-status",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "button",
+                                "minHeight": 44,
+                                "minWidth": 44
+                            },
+                            {
+                                "selector": "button[aria-label='Remove Manager from Maria']",
+                                "attributes": {
+                                    "disabled": ""
+                                }
+                            },
+                            {
+                                "selector": "button[aria-label='Remove Finance from Eva']",
+                                "attributes": {
+                                    "disabled": null
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "long",
+                    "query": {
+                        "state": "long"
+                    },
+                    "ready": "body[data-visual-ready=\"long\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "remove-error",
+                    "query": {
+                        "state": "remove-error"
+                    },
+                    "ready": "body[data-visual-ready=\"remove-error\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "h2",
+                                "fontSizeRem": 1.125
+                            },
+                            {
+                                "selector": "button",
+                                "minHeight": 44,
+                                "minWidth": 44
+                            },
+                            {
+                                "selector": "div:not([style*='display: none']) > p.text-destructive",
+                                "count": 1,
+                                "contrast": 4.5
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "manager-roles-dialog",
+            "path": "/resources/js/fixtures/roles.html",
+            "root": "[role=dialog]",
+            "panels": "[role=dialog]",
+            "content": "h2,p,button",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["button"],
+            "states": [
+                {
+                    "id": "confirm",
+                    "query": {
+                        "state": "confirm"
+                    },
+                    "ready": "body[data-visual-ready=\"confirm\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[role=dialog]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "button",
+                                "minHeight": 44
+                            }
+                        ],
+                        "focus": ["button"]
+                    }
+                },
+                {
+                    "id": "confirm-self",
+                    "query": {
+                        "state": "confirm-self"
+                    },
+                    "ready": "body[data-visual-ready=\"confirm-self\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[role=dialog]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "button",
+                                "minHeight": 44
+                            }
+                        ],
+                        "focus": ["button"]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "manager-accounts-roles",
+            "path": "/resources/visual/accounts.html",
+            "root": ".pilot-manager-page",
+            "panels": ".pilot-list",
+            "content": "h1,h2,p,a,[data-slot=select-trigger],button,label",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "a[href$='/manage/roles']",
+                "[data-test=deactivate-admin]",
+                "[aria-label='Household for Admin']",
+                "[data-test=reactivate-producer]"
+            ],
+            "assertions": [
+                {
+                    "selector": "a[href$='/manage/roles']",
+                    "count": 1,
+                    "minHeight": 44
+                },
+                {
+                    "selector": "form[action*='role']",
+                    "count": 0
+                }
+            ],
+            "states": [
+                {
+                    "id": "populated",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "long-content",
+                    "query": {
+                        "long": 1
+                    },
+                    "checks": {
+                        "focus": [
+                            "a[href$='/manage/roles']",
+                            "[data-test=deactivate-admin]",
+                            "[aria-label^='Household for Administrador']"
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

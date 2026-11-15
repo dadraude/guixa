@@ -19,8 +19,9 @@ final readonly class Reception
      * @param  array<string, array<string, true>>  $marksByOrder  marked product ids per order id (`NotDeliveredMarks::of`)
      * @param  array<string, Quantity>  $receivedTotals  recorded totals by product id; a product without one was received in full
      * @param  array<string, OrderableProduct>  $catalog  the producer's products by id, deactivated ones included, for products added with no line
+     * @param  WeeklyBasketSnapshot  $baskets  Sales' effective quantities and validated bases: what households really take and which are frozen
      */
-    public static function of(string $producerId, array $orders, array $marksByOrder, array $receivedTotals, array $catalog): self
+    public static function of(string $producerId, array $orders, array $marksByOrder, array $receivedTotals, array $catalog, WeeklyBasketSnapshot $baskets = new WeeklyBasketSnapshot): self
     {
         /** @var array<string, list<array{order: Order, line: OrderLine}>> $linesByProduct */
         $linesByProduct = [];
@@ -36,7 +37,7 @@ final readonly class Reception
         $products = [];
 
         foreach (array_unique([...array_keys($linesByProduct), ...array_keys($receivedTotals)]) as $productId) {
-            $product = self::productOf($productId, $linesByProduct[$productId] ?? [], $receivedTotals[$productId] ?? null, $catalog[$productId] ?? null);
+            $product = self::productOf($productId, $linesByProduct[$productId] ?? [], $receivedTotals[$productId] ?? null, $catalog[$productId] ?? null, $baskets);
 
             if ($product !== null) {
                 $products[] = $product;
@@ -76,17 +77,16 @@ final readonly class Reception
      *
      * @param  list<array{order: Order, line: OrderLine}>  $entries
      */
-    private static function productOf(string $productId, array $entries, ?Quantity $recorded, ?OrderableProduct $catalogProduct): ?ReceptionProduct
+    private static function productOf(string $productId, array $entries, ?Quantity $recorded, ?OrderableProduct $catalogProduct, WeeklyBasketSnapshot $baskets): ?ReceptionProduct
     {
         $lines = array_map(fn (array $entry) => new ReceptionLine(
             $entry['order']->householdId,
             $entry['line']->id,
             $entry['line']->ordered,
-            $entry['order']->effectiveAllocated($entry['line']),
-            $entry['order']->effectiveDelivered($entry['line']),
+            $entry['line']->allocated,
+            self::actual($baskets, $entry['order']->householdId, $productId, $entry['line']),
             $entry['line']->allocatedByHand,
             $entry['line']->createdAt,
-            $entry['order']->isFrozen(),
         ), $entries);
 
         $snapshot = $entries[0]['line'] ?? null;
@@ -106,5 +106,13 @@ final readonly class Reception
             $recorded ?? $orderedInFull,
             $lines,
         );
+    }
+
+    /** What Sales says the household takes; before its base exists the allocation is the actual quantity. */
+    private static function actual(WeeklyBasketSnapshot $baskets, string $householdId, string $productId, OrderLine $line): Quantity
+    {
+        $thousandths = $baskets->effective($householdId, $productId);
+
+        return $thousandths === null ? $line->allocated : Quantity::ofThousandths($thousandths);
     }
 }

@@ -1,6 +1,6 @@
 # 001 — Weekly orders · Plan
 
-Status: Accepted (2026-10-21) · Spec: [spec.md](spec.md) + areas (R1–R36c, S1–S90) · Rules: [constitution](../constitution.md)
+Status: Accepted (2026-10-21) · Spec: [spec.md](spec.md) + areas (R1–R36c, S1–S92) · Rules: [constitution](../constitution.md)
 
 Accepted amendment (2026-10-24): **Application visual identity** below. The user approved the plan;
 the associated tasks were separately approved. The user subsequently authorized T39 implementation
@@ -25,7 +25,7 @@ schema directly, without a legacy import, data backfill or compatibility layer.
 - Laravel 13 **Vue starter kit** (Inertia 3 + Vue 3 + TS + Vite, Tailwind 4 + shadcn-vue, Fortify auth). Public registration disabled.
 - Postgres via `DB_CONNECTION=pgsql`; a separate `guixa_test` database for integration tests.
 - `composer.json` autoloads `Guixa\` → `src/`.
-- Dev tooling: `spatie/laravel-typescript-transformer`, Pest arch tests (A1–A8, A10–A12), Oxlint rules (A9), Vitest,
+- Dev tooling: `spatie/laravel-typescript-transformer`, Pest arch tests (A1–A8, A10–A17; A13–A17 are the presentation rules, enforced by `PresentationRulesTest`), Oxlint rules (A9), Vitest,
   Pint, Larastan, Oxfmt. Vite+ (`vp`) runs Oxlint, Oxfmt and Vitest.
 - GitHub Actions workflow on pull requests: Pint `--test`, Larastan, `vp check` (Oxlint + Oxfmt), vue-tsc,
   Pest against a Postgres service, Vitest.
@@ -44,29 +44,32 @@ schema directly, without a legacy import, data backfill or compatibility layer.
 | `Catalog` | Every product, immutable producer, stock flag, metadata and catalogue permissions | R1–R3c, R5, R25–R25c |
 | `Ordering` | Weekly demand, cycles, cutoffs, producer orders, reception and distribution | R3b–R18a, R24b |
 | `Sales` | Baskets, actual contents, validation, immutable sale snapshots, corrections and collection | R19–R24b |
-| `Stock` | Return items, immutable stock movements and availability | R20a, R26–R28 |
+| `Stock` | Return items, immutable stock movements, availability and movement history | R20a, R26–R28a |
 | `Wallet` | Global household balance, charges, confirmed receipts and corrections | R21–R22, R29–R32 |
 
 This is a modular monolith: one application and database, with context-local domain models.
 A weekly `Order` represents household demand and allocation; a `Basket` represents the goods actually
-sold. A stock basket need not reference any weekly order or cycle. A supplementary stock basket
-created from a collection can reference its original cycle, including a closed one, for grouping
-and container counts. That reference neither authorizes the sale nor changes cycle state.
+sold. A stock basket need not reference any weekly order or cycle. A basket added after a validated one is a
+new independent basket with no cycle attribution. Containers are counted per household, not per cycle
+(see the household container balance).
 
 ```text
 Ordering -> Catalog       ProductCatalog / ProducerCutoffRules (weekly products only)
 Ordering -> Sales         SalesBaskets (create/sync drafts; validation status and effective quantities)
 Ordering -> Membership    ProducerNotifier / Households
 Sales    -> Catalog       product identity/eligibility through its catalogue adapter
-Sales    -> Ordering      WeeklyBasketSource (ready source, source lock, cycle closure)
-Sales    -> Stock         StockCatalog / StockSeller / ReturnItemCatalog / BasketStockCorrections
+Sales    -> Ordering      WeeklyBasketSource (ready source, source lock, cycle closure) / WeeklySourceOrders (cycle of a source order, orders of a cycle) / CyclePickupDates (pickup date of each cycle)
+Sales    -> Catalog/Stock StockProducts (stock identity and product lock; Catalog adapter) / StockOfferCatalog / StockQuantities / StockSeller / StockCorrector / ReturnItems
 Sales    -> Wallet        WalletLedger (one charge/credit; reasoned corrections)
-Sales    -> Membership    Households (identity and active state)
-Stock    -> Catalog       StockProducts (stock identity/metadata and product lock)
+Sales    -> Membership    Households (identity and active state) / AccountNames (who recorded adjustments and collection marks)
+Stock    -> Catalog       StockProductRepository (stock identity/metadata and product lock; Catalog adapter)
+Stock    -> Membership    AccountNames (author names of movements, deactivated accounts included)
+Stock    -> Ordering      CyclePickupDates (pickup date shown for a movement's cycle)
 Catalog  -> Ordering      ProducerCycles / ProductUsage (weekly rules and retained references)
-Catalog  -> Sales/Stock   ProductUsage / StockAvailability (history; pure quantity query)
+Catalog  -> Ordering/Sales/Stock   ProductUsage (retained use: Ordering `CheckProductUsage`, Sales `HasProductHistory`, Stock `CheckProductUsage`) / StockAvailability (pure quantity query)
 Catalog  -> Membership    ProducerAccess
 Membership -> Catalog     ProducerDirectory
+Wallet   -> Membership    AccountNames (author names of movements, deactivated accounts included)
 Membership -> Wallet      HouseholdBalances
 Membership -> Sales       HouseholdBaskets (unresolved drafts and collections for to-settle views)
 ```
@@ -158,6 +161,9 @@ Use cases
 | `SuspendProducerRole`, `RestoreProducerRole` | — (called by Catalog) | R3a |
 | `ListProducerAccounts` (producer id → account email and whether its invitation is pending; the producers admin page shows it and hides the invite form for producers that have one) | manager | R36, S57 |
 | `GetProducerAccountEmail` | — (called by Ordering) | R12a |
+| `GetWalletHousehold` (a household's id, name and active state for the wallet pages) | finance, manager | R31 |
+| `GetAccountNames` (account id → name in one batch, deactivated accounts included) | — (called by Stock, Sales, Wallet) | R28a, R23a, R31 |
+| `ListActiveHouseholds`, `ListOtherHouseholds` (every household but the given one, for `MoveMember`), `CountHouseholds`, `CountAccounts` | manager | R33, R36a (admin pages, dashboard counts) |
 | `GetHouseholds` (household ids → name and active by id; unknown ids left out) | — (called by Ordering) | R13, R16, R19 |
 | `CreateFirstManager` (rejected once any manager exists) | — (installation command) | R36a |
 
@@ -220,8 +226,9 @@ reads them afterwards, in a new statement, so a waiting transaction sees the oth
 | `ListStockOfferProducts` | Internal Sales read in T54; active stock metadata including products of inactive producers, without quantity |
 | `GetOrderableProduct`, `ListOrderableProducts` | Internal; active weekly products of active producers only |
 | `ListProducerProductsForReception` | Internal; weekly products including inactive records/producers; never stock |
-| `GetStockProductData`, `ListStockProductData` | Internal metadata queries; mode stock, with producer id/name; stock sale does not require producer active |
-| `LockProductForUse` | Internal; locks, verifies expected mode and operation-specific active rules, returns a snapshot |
+| `GetStockProduct`, `ListStockProducts` | Internal metadata queries; mode stock, with producer id/name; stock sale does not require producer active |
+| `LockWeeklyProduct`, `LockStockProduct` | Internal; lock, verify the expected mode and operation-specific active rules, return a snapshot |
+| `CreateStockProduct`, `UpdateStockProduct`, `DeactivateStockProduct`, `ReactivateStockProduct` | Manager; stock-mode administration from the producer context |
 | `CreateProducer`, `ListProducers`, `DeactivateProducer`, `ReactivateProducer` | Existing Manager permissions |
 | `GetProducer`, `GetProducerCutoffRule`, `SetDefaultCutoff`, `GetDefaultCutoff` | Existing internal/own-producer rules |
 
@@ -275,18 +282,30 @@ Ordering does not maintain another delivered column to synchronize back on every
 2. At first settlement, drop marked/nonparticipating lines from active fulfilment, retaining history.
    Through `SalesBaskets`, create one idempotent base draft per source order with eligible allocations
    and its full ordered product snapshots. Retrying settlement cannot create a second base basket.
-3. After a permitted reopen, synchronize changed weekly allocations into unvalidated base drafts,
-   resetting actual overrides on the affected weekly lines as the earlier plan did. Keep stock/return
-   lines intact. Reopen a zero-content base draft when allocations become positive while the cycle is open.
-4. A validated basket is financially frozen even if physically pending collection. Redistribution uses
-   the existing explicit unfinished-only/all choice, where unfinished now means unvalidated. Subtract
-   validated effective quantities when excluding them; reject a negative remainder or absent eligible claims.
-   Including them appends signed Sales basket adjustments and Wallet corrections atomically, retaining
-   original lines/charges and never selling stock/returns again. An unchanged target appends nothing.
-5. Close when settled, every participating reception is distributed and every base basket is validated
-   or has nothing to collect. Stock-only/supplementary baskets do not gate weekly closure, even when
+3. After a permitted reopen, a product whose previous received total was 0 is a late arrival: its
+   allocations are added to the household's open weekly draft (base or late), reviving a zero-content
+   base while the cycle is open. A household whose weekly baskets in the cycle are all validated gets
+   one late weekly basket draft from the same source order with only the late lines. A household has
+   at most one unvalidated weekly draft per cycle; source uniqueness is one base plus at most one open
+   late draft per source order.
+4. Any other allocation change after a reopen is a redistribution: synchronize it into unvalidated
+   weekly drafts, resetting actual overrides on the affected weekly lines as the earlier plan did and
+   keeping stock/return lines intact. A validated basket is financially frozen even if physically
+   pending collection: under the cycle lock, reject the redistribution of a product that any validated
+   weekly basket of the cycle contains, before anything changes, and point staff to that basket's
+   corrections (T58/T68). Reception never appends adjustments or Wallet corrections to validated baskets.
+5. Close when settled, every participating reception is distributed and every base and late weekly
+   basket is validated or has nothing to collect. Stock-only/supplementary baskets do not gate weekly closure, even when
    they reference the cycle. Collection remains possible after closure, with a visible pending indicator.
    Closed weekly orders/receptions cannot reopen; later sale corrections retain their original records.
+
+Delivered by T59: after settlement an unvalidated base follows reception changes at once (sync on every
+allocation write and on re-distribution), resetting the actual quantity only of lines whose allocation
+changed; a validated base is never synchronized. Weekly validation and actual-quantity edits are refused
+while a producer is reopened after settlement. A scheduler-created base has no creator (`baskets.created_by`
+is nullable). The drafts-only/all choice and reception adjustments to validated baskets are removed
+(Change 2026-11-03). Staff reach a cycle's bases through `/finance/baskets?pending=1&cycle=`; the cycle pickups index is removed (T72, DRA-234)
+and only the old per-household pickup URL remains, redirecting to the basket.
 
 Ordering's `SalesBaskets` port creates/synchronizes sources and reads validation/effective-quantity
 summaries. Sales's `WeeklyBasketSource` calls narrow Ordering use cases for source readiness, its
@@ -308,9 +327,9 @@ constructor cycle. Stock-only validation does not call Ordering readiness/closur
 | `GetProducerCycleSummary`, `GetCycleSummary` | Own producer / Manager, with existing privacy and cancellation rules |
 | `GetReception`, `AddUnorderedProduct`, `SetReceivedTotal`, `SetAllocation` | Manager; weekly only; existing sent/editable/quantity guards |
 | `ValidateReception`, `MarkProducerDistributed`, `ReopenProducerOrder` | Manager; existing balance guards and closed-cycle restriction |
-| `GetContainerCount` | Manager; combine Sales effective weekly/stock lines of baskets attributed to this cycle |
-| `HasUnsettledLines`, `HasProductHistory`, `StopParticipatingWhereNotSent` | Internal queries/command for Catalog; history includes cancelled/removed records |
-| `GetWeeklyBasketSource`, `LockWeeklyBasketSource`, `CloseCycleAfterBasketValidation` | Internal Sales interface; snapshots/readiness/closure only |
+| `GetContainerCount` | Manager; per cycle, the expected container count of its orders, plus each household's accumulated balance read from Sales (validated lines minus return lines) |
+| `HasUnsettledLines`, `CheckProductUsage`, `StopParticipatingWhereNotSent` | Internal queries/command for Catalog; usage includes cancelled/removed records |
+| `WeeklySourceData`, `LockWeeklyBasketSource`, `CloseCycleAfterBasketValidation`, `ReadSourceOrderCycles`, `ReadCycleSourceOrders`, `ReadCyclePickupDates` | Internal Sales interface; snapshots/readiness/closure, source-order and pickup-date lookups only |
 
 The existing `ProductCatalog`, `ProducerCutoffRules`, `ProducerNotifier`, `Households`, repository
 and clock ports remain, with a Sales port replacing the pickup-facing Stock/Wallet ports. Sending
@@ -322,12 +341,17 @@ validate/distribute through the scheduler and common settlement (D10).
 ### Basket aggregate and history
 
 `Basket` is independent of `Order`: id, householdId, optional sourceOrderId (base weekly basket),
-optional referenceCycleId, draft/validated/cancelled/nothing-to-collect state, creation/validation
+draft/validated/cancelled/nothing-to-collect state, creation/validation
 actor/time and the immutable validated total. A base basket is unique per source order; any number of
 stock-only baskets can exist for a household without a source order or cycle.
-A weekly base uses its source cycle. A stock supplement created from a collection carries that cycle
-as attribution, even after closure. A standalone purchase may carry no cycle. It never imports the
-weekly contents again and does not reopen/gate the referenced cycle.
+A weekly base uses its source cycle through its source order: the basket stores no cycle column, and Sales
+resolves a source order's cycle, or a cycle's source orders, through Ordering's narrow read exports. Any other basket, including one added
+after a validated basket, has no cycle. It never imports the weekly contents again.
+
+The household container balance is a derived read model, not a stored duplicate: per household, the sum
+over validated basket lines of the effective quantity × snapshotted containers per unit (rounded up per
+line), minus the containers of validated return lines. It is not grouped by cycle and creates no money
+movement; the container price is already in the product price.
 
 Lines have their own stable ids and kind: weekly, stock or return. Weekly lines retain source line id,
 ordered/allocated snapshot and actual quantity; stock lines reference the single Catalog product;
@@ -344,7 +368,7 @@ is sales and linked corrections. Source or household ownership is always derived
 
 A draft is uncharged and stock is not reserved. Stock-only drafts can be cancelled while retaining
 history. A base with no positive quantity and no stock/return contents has nothing to collect and
-requires no charge; permitted redistribution can restore it to draft before cycle closure. Free goods
+requires no charge; a late arrival or permitted redistribution can restore it to draft before cycle closure. Free goods
 or a zero net total with real contents can still be validated. A return-only basket may yield a credit.
 
 ### ValidateBasket: the transactional seam
@@ -352,7 +376,7 @@ or a zero net total with real contents can still be validated. A return-only bas
 `ValidateBasket` is the public Sales Application use case. Within one `TransactionRunner`:
 
 1. Authorize Finance/Manager. For a weekly source, acquire its cycle/source lock and require settlement
-   with the latest synchronized source. Stock-only baskets need no cycle, even if attribution references one.
+   with the latest synchronized source. Stock-only baskets need no cycle.
 2. Lock/reload the basket, reject cancelled/already-validated drafts, and validate its effective contents.
    Original weekly snapshots are retained; actual quantities determine the charge. Reject stale source edits
    rather than applying a view of allocation that changed concurrently.
@@ -370,6 +394,11 @@ recorded through Wallet independently: real money received is not undone because
 basket state plus unique source references in stock/wallet persistence; duplicate validation never creates
 another sale or charge. No eventually consistent event is used for charge/stock invariants.
 
+**Lock order.** Every weekly mutation locks cycle, then basket, then product (in product-id order),
+never the reverse. Stock add/remove on a weekly draft takes no cycle lock: it locks only the basket
+(`AddStockToBasket` also locks the stock product it adds), which serializes it with source sync and
+validation, since those lock the same basket row after the cycle.
+
 ### Collection and corrections
 
 Validation creates pending collection. Finance, Manager or a current member of that same household
@@ -379,7 +408,7 @@ receipts and the global Wallet remain independent. Delayed collection stays pend
 date and after cycle closure; there is no date-based abandonment or automatic stock return/refund.
 
 When goods were already taken and reported later, staff creates the stock basket, keeps the recording
-instant, validates it and records collection. The origin cycle is attribution, not backdating. If stock
+instant, validates it and records collection. The sale is never backdated to a cycle. If stock
 records do not permit the sale, reconcile the inventory discrepancy through the existing justified
 inventory process before validating; do not allow negative stock to bypass R27.
 
@@ -388,31 +417,57 @@ or original receipt. Original lines, validation amount/time and ledger movements
 Finance/Manager may correct the agreed basket/receipt operations; they do not thereby acquire unrelated
 product or inventory administration. Cross-context corrective stock/money changes are atomic, preserve
 stock non-negativity and are idempotent by correction id. Distinguish pure financial correction from
-physical goods actually returned. Redistribution uses the same signed adjustment mechanism, with
-Ordering's before-cycle-closure restrictions, and never resells stock/returns.
+physical goods actually returned. Reception redistribution never uses this mechanism: a validated
+basket blocks redistribution of its products, and staff correct it individually.
+For a validated independent basket's amount-only correction, Sales appends a `basket_adjustments`
+row and Wallet appends a correction with the same identity in one transaction. The basket id is
+the original source, including when a zero-total basket has no base charge or credit. Its effective
+total is the immutable validated total minus the sum of signed Wallet correction amounts. Replay
+with the same basket, actor, amount and trimmed reason has one effect; changed contents under the
+same identity are rejected. Amount-only corrections never change quantities or Stock movements.
+A physical goods correction uses the same `CorrectBasket` command with the returned quantity of
+each stock product. Sales appends one signed `basket_adjustment_lines` row per product (negative: goods
+left the basket) to the correction; Stock records one `adjustment` movement per line through
+`CorrectBasketStock`, linked to the basket and to the correction id and carrying the reason. Its
+product-row lock and ledger keep stock non-negative, and a movement is unique per correction and
+product. Sales, Stock and Wallet effects share one transaction, so a later failure rolls back every
+earlier write. A product's effective quantity is its immutable line quantity plus the signed
+correction lines; a return cannot exceed it. The read model exposes original and effective quantity
+and amount per line, and `pendingCollection` is false once every stock line's effective quantity is
+zero and the basket has no active return lines (returned empties still need collection), while the
+validated state and original contents remain.
 A mistaken collection mark is corrected by staff with a reason and retained collection history,
 without financial changes. A full contents reversal leaves no effective goods pending collection.
+Collection history uses a basket-local append sequence assigned while holding the basket lock.
+Event time and correction identity remain intact but do not determine causal display order when
+collection, correction and recollection share a stored second. Replaying a correction does not append
+another event or sequence number.
+`GetBasket` and `GetMemberBasket` resolve the recorders of a basket's adjustments and collection
+events in one batch through Sales' `AccountNames` port (Membership adapter over `GetAccountNames`)
+and pass the names to `BasketData`. `BasketAdjustmentData` and `BasketCollectionEventData` carry
+`authorName` in place of the account id, so no account identifier reaches the page (R23a); an
+unknown account gives an empty name. List queries resolve no names: only the basket pages show history.
 
 ### Application interface
 
 | Use cases / queries | Actor and purpose |
 | --- | --- |
 | `CreateWeeklyBasket`, `SyncWeeklyBasket` | Internal Ordering calls; idempotent source order, authoritative allocation snapshots |
-| `CreateStockBasket` | Finance/Manager; active household; optional origin-cycle attribution |
+| `CreateStockBasket` | Finance/Manager; active household; no cycle |
 | `SetBasketActualQuantity`, `AddStockToBasket`, `RemoveStockFromBasket`, `AddReturnToBasket`, `RemoveReturnFromBasket` | Finance/Manager; draft only; archive removed references |
 | `CancelDraftBasket` | Finance/Manager; stock-only draft, no money/stock effect; retain history |
 | `ValidateBasket` | Finance/Manager; single charge/stock transaction |
 | `MarkBasketCollected` | Finance/Manager or own household member; validated only, no financial effect |
 | `CorrectBasket`, `CorrectBasketCollection` | Finance/Manager; mandatory reason, append-only history |
-| `ListBaskets`, `GetBasket` | Own household member / Finance / Manager, with restricted actions |
-| `ListPendingCollections`, `ReadPendingCollections` | All for Finance/Manager; own household for members; include closed-cycle and cycleless baskets |
+| `ListBaskets`, `GetBasket` | Finance / Manager; existing operational reads remain staff-only |
+| `ListMemberBaskets`, `GetMemberBasket` | Current own-household member; repository filters by household for list and identifier reads |
+| `ListPendingCollections`, `ListMemberPendingCollections`, `ReadPendingCollections` | All (optionally one weekly cycle) for Finance/Manager; own household for members through the separate member query; internal read without actor; all use `BasketRepository::pendingCollections`; include closed-cycle and cycleless baskets, exclude drafts |
 | `ListStockOffers` | T54 Member or Manager; active stock including zero, inactive producer allowed; no reservation/edit capability. Finance sales-staff access belongs to a later slice. |
-| `HasProductHistory`, `ReadOpenHouseholdBaskets`, `ReadWeeklyBasketStates`, `ReadEffectiveWeeklyQuantities`, `ReadContainerCounts` | Internal Catalog/Ordering/Membership queries; include history only where requested |
+| `HasProductHistory`, `ReadOpenHouseholdBaskets`, `ReadWeeklyBasketStates`, `ReadHouseholdContainerBalances` | Internal Catalog/Ordering/Membership queries; include history only where requested. Effective weekly quantities reach Ordering through its `SalesBaskets` port |
 
 Pending collection lists are ordered by validation instant, then UUID; monetary movement lists keep
-their existing recorded-time/id ordering. Grouping by an origin cycle never hides a basket because
-that cycle closed. Per-basket container totals sum rounded-up line snapshot counts; per-cycle totals
-include all attributed base/supplementary baskets, with independent baskets counted on their own.
+their existing recorded-time/id ordering. Per-basket container totals sum rounded-up line snapshot counts; the household balance sums validated
+baskets of any day and subtracts return lines.
 In T54, `ListStockOffers` composes Catalog's `ListStockOfferProducts` metadata with Stock's
 `GetAvailableQuantities` through Sales-owned read ports. One quantity batch supplies current
 availability, with zero for products without movements. This discovery query has no basket,
@@ -430,7 +485,7 @@ optional note/cycleId, and optional basketId/correctionId. Entries are positive,
 non-zero with a mandatory note, sales are negative with a basket source. Availability is the sum
 of committed movements; it never goes negative. A basket sale is recorded on validation, not collection.
 
-`StockProducts` is a Stock-owned port whose Catalog adapter locks and verifies the authoritative
+`StockProductRepository` is a Stock-owned port (Sales has its own `StockProducts` port) whose Catalog adapter locks and verifies the authoritative
 product id/mode. The same product-row lock protects both stock consistency and classification/deletion
 races. The Stock repository reads/inserts only its own movement tables; it does not import a Catalog
 model or directly lock a foreign-context persistence class. All stock writers use this protocol.
@@ -442,13 +497,27 @@ Catalog's pure internal metadata queries; quantity-only queries never call Catal
 | `CreateReturnItem`, `UpdateReturnItem`, `DeactivateReturnItem`, `ReactivateReturnItem` | Existing Manager-only administration |
 | `ListReturnItems` | Manager catalogue view and Finance's read-only basket return picker; no Finance editing |
 | `RecordStockEntry`, `RecordStockAdjustment` | Manager; stock mode only; positive entry / non-zero justified adjustment |
-| `ListStock`, `ListStockMovements` | Manager; metadata from Catalog, quantity/history from ledger |
-| `GetStockOffer`, `GetReturnItem` | Internal Ordering reads for stock/return snapshots; Sales also reads `GetReturnItem` through its own return-items port |
-| Stock-side `ListStockOffers` | Planned later Sales basket query; not the T54 discovery composition |
-| `SellStock` | Internal Sales operation, records the already-authorized actor; locks and checks stock |
+| `ListStock`, `ListActiveStock` | Manager; metadata from Catalog, current quantity from ledger. `ListStock` also serves Finance's read-only stock list (R28a) |
+| `ListStockMovements` | Manager or Finance for any stock product; a producer for their own (`owns` producer gate on the product's `producerId`), including inactive products and producers; weekly products are rejected as not stock. Returns one page of `StockMovementLine`s newest first, the total and the product header (name, unit, available) that Finance and producer pages show even for a deactivated product (R28a) |
+| `SetStockAvailable` | Manager; sets the available quantity after an inventory count: inside one transaction it locks the product, reads the available quantity under that lock and records an adjustment of the difference (R27). The caller passes the note already translated, since Application takes no framework i18n (A2) |
+| `AppendStockAdjustment` | Internal step for `RecordStockAdjustment` and `SetStockAvailable`; builds and records the adjustment, takes no lock: the caller holds the product lock in its transaction |
+| `GetReturnItem` | Internal read of a return item snapshot for Sales through its own return-items port |
+| `SellBasketStock` | Internal Sales operation, records the already-authorized actor and the basket source; locks and checks stock |
 | `CorrectBasketStock` | Internal Sales correction with source/reason; cannot make stock negative |
 | `GetAvailableQuantities` | T54 quantity-only batch query for Catalog and Sales discovery; no Catalog callback |
-| `HasProductMovements` | Internal history query for Catalog |
+| `CheckProductUsage` | Internal movement-history query for Catalog |
+
+`ListStockMovements` reads the product's whole ledger oldest first, ordered by `(occurred_at, id)`
+(UUID v7 ids break ties stably), and accumulates the available stock after each movement, so the
+balance needs no stored column and the newest line equals `available` (R28). It then reverses the
+list and slices page `n` of 50; per-product ledgers are small, so no SQL window function or cursor is
+needed. A line's displayed type is `correction` when an adjustment has a `correctionId` (`CorrectBasketStock`
+records corrections as adjustments carrying the reason as note); otherwise its `MovementType`.
+`StockMovementLine` carries date, type, signed quantity, balance after, note, author name, optional
+cycle id and pickup date, and `?basketId`. Author names and cycle pickup dates are resolved in one
+batch each through `AccountNames` and `CyclePickupDates`. For an actor reaching the product only as
+its producer, the use case sets `basketId` to null, so the basket never leaves the server; Manager and
+Finance get it on sale and correction lines. The history is read-only and takes no lock.
 
 Sale uniqueness is by basket/product; corrections have their own stable source ids. Product ids
 remain locked in ascending order for multi-product writes. Finance accesses sale/correction use cases
@@ -466,6 +535,12 @@ no required basket allocation; corrections are non-zero and require a reason.
 Enforce one base charge/credit per basket; independent baskets of the same household/cycle can each
 charge once. Amount zero records no movement. Existing negative-balance policy remains. Original
 movements cannot be edited or deleted; corrections preserve their references and reason.
+For confirmed receipt corrections, the statement form supplies the original receipt movement id and a
+client-generated correction id. The Wallet command verifies that the original is a top-up of the same
+household and treats a retry with the same id and contents as one movement; changed contents under an
+existing id are rejected. The database keeps the corrected-movement id nullable only for retained
+cycle-scoped Ordering redistribution corrections until their separate cutover. Receipt HTTP requests
+cannot supply a cycle id or use that legacy path.
 
 | Use cases / queries | Actor and rules |
 | --- | --- |
@@ -473,7 +548,12 @@ movements cannot be edited or deleted; corrections preserve their references and
 | `RecordCorrection` | Finance/Manager for agreed receipt/basket corrections; mandatory reason/source |
 | `ChargeForBasket` | Internal Sales call carrying the authorized actor and basket id; charge/credit/zero |
 | `GetBalance` | Internal query for authorized Sales/Membership compositions |
-| `GetWalletStatement` | Own household member / Finance / Manager |
+| `ReadHouseholdBalance` | Internal, no actor; Membership's household settlement (R35a) |
+| `GetWalletStatement` | Own household member / Finance / Manager; author names in one batch through Wallet's `AccountNames` port |
+
+`MovementData` and `WalletMovementRow` carry `authorName` in place of the recording account id, so the
+statement never shows an identifier (R31); an unknown account gives an empty name. The port mirrors
+Stock's: a Wallet `Domain` interface with a Membership adapter over `GetAccountNames`.
 
 No paid/partially-paid state exists on a basket. A receipt can cover several charges or leave credit.
 No payment-provider integration, producer invoicing, cash payout or automated bank reconciliation is
@@ -483,7 +563,9 @@ introduced by this amendment. Household deactivation retains balances, receipts 
 
 Design the fresh schema directly: no production data migration, legacy stock-product import, UUID
 remapping or dual-schema compatibility. Reorder creation migrations so Catalog products precede
-referencing tables and Sales baskets precede stock/wallet sale-source references. Existing unrelated
+referencing tables and Sales baskets precede stock/wallet sale-source references. The Wallet creation
+migration defines its final basket and correction references directly after baskets; no Wallet alteration
+chain or production backfill is required before launch. Existing unrelated
 settings, accounts, invitations, producers and return-item constraints remain.
 All ids are UUID v7; money is integer cents, quantities numeric(10,3), times timestamptz in UTC.
 
@@ -494,7 +576,7 @@ All ids are UUID v7; money is integer cents, quantities numeric(10,3), times tim
 | `cycles`, `cycle_producers`, `product_unavailabilities`, `received_totals` | Existing cycle/cutoff/reception model; weekly-product eligibility enforced through use cases |
 | `orders` | id, cycle_id, household_id, cancelled_at?; unique(cycle_id, household_id); no pickup/charge columns |
 | `order_lines` | Existing weekly snapshot/ordered/allocated/manual/creation fields plus removed_at?; no delivered column; one active line per order/product using a partial unique index |
-| `baskets` | id, household_id, source_order_id?, reference_cycle_id?, kind weekly/stock, state, created/validated/cancelled actor/time, validated_total_cents?; source order unique when present; source/household consistency checked at creation |
+| `baskets` | id, household_id, source_order_id?, kind weekly/stock, state, created/validated/cancelled actor/time, validated_total_cents?; source order unique when present; source/household consistency checked at creation |
 | `basket_lines` | id, basket_id, kind weekly/stock/return, product_id? or return_item_id?, source_order_line_id?, product/return snapshot, ordered/allocated snapshot?, actual quantity, removed_at?; kind-specific checks and one active source/item per basket |
 | `basket_adjustments` | id, basket_id, original line/source reference, signed quantity/amount/stock delta or target, reason, actor/time; append-only, unique correction source; validated original fields remain unchanged |
 | `basket_collection_events` | id, basket_id, collected/corrected-to-pending event, actor/time, reason on corrections; append-only; derived current collection state |
@@ -509,22 +591,18 @@ filter removed/cancelled contents, while explicit history methods do not. Re-add
 creates a new row/time so proportional tie-breaking stays correct.
 
 Current Basket and Cycle repository list reads load their children through ordered Eloquent
-relationships in one child query per list. Basket lines include removed history and retain their
-stored decimal snapshots; cycle producers retain participation and timestamp state. Single-record
-reads and locks still load children after selecting or locking the parent, and protected basket
+relationships, one child query per relationship rather than one query per parent. Basket lines include
+removed history and retain their stored decimal snapshots; ordered basket adjustments and collection
+events retain correction history by basket-local append sequence. Cycle producers retain
+participation and timestamp state. Single-record reads and locks still load children after
+selecting or locking the parent, and protected basket
 snapshot comparisons continue to use the stored lines.
 
 Concurrency and atomicity:
 - Weekly mutations lock their stable-key source cycle with `FOR NO KEY UPDATE` before affected
   orders/baskets; acquire multiple ids in stable order. Existing weekly line-edit guards use a
   conflicting shared/mutation lock so cutoff/send cannot race an order edit. Cycle ids never change.
-  Stock-only operations do not acquire an exclusive lock on an unrelated attribution cycle.
-  Keep cycle mutation locks compatible with the key-share locks needed by referencing inserts:
-  otherwise a stock supplement holding a product lock while inserting a cycle FK can deadlock with
-  weekly validation holding that cycle and waiting for the product. Stronger key-changing/deletion
-  operations are absent from this retained-history model. Check the attributed-sale/weekly-validation
-  interleaving explicitly against PostgreSQL's row-lock compatibility rules.
-  [PostgreSQL row locks](https://www.postgresql.org/docs/current/explicit-locking.html).
+  Stock-only operations do not acquire any cycle lock: they carry no cycle reference.
 - Source synchronization and weekly basket validation serialize on that source-cycle lock, preventing
   validation of stale allocation or closure during unfinished distribution.
 - Lock a basket before its state-changing operations. Product first-reference writes and catalogue
@@ -547,20 +625,23 @@ All route middleware is backed by Application gate/policy checks against the exp
 | Route / area | Page/action and use cases |
 | --- | --- |
 | `/cycles/{cycle}/order` and its line mutations | Existing `Orders/Edit` and SetOrderLine; weekly only, references to base/related baskets; archived lines hidden |
-| `/baskets`, `/baskets/{basket}` | Proposed `Baskets/Index`, `Baskets/Show`; member's own household, ordered-versus-actual content, validation/collection state and global wallet link |
+| `/baskets`, `/baskets/{basket}` | `Member/Baskets/Index`, `Member/Baskets/Show`; member's own household, ordered-versus-actual content, validation/collection state and global wallet link |
 | `PUT /baskets/{basket}/collection` | Own-household member action; validated basket only; `MarkBasketCollected`, no financial effect |
 | `/stock` | T54 `Stock/Index`; member read-only stock catalogue, active products incl zero sold out, producer/unit/current price/quantity |
-| `/finance/baskets`, `/finance/baskets/create`, `/finance/baskets/{basket}` | Proposed `Finance/Baskets/Index`, `Create`, `Show`; Manager or Finance; household selection, draft/validated/pending filters, immutable history |
-| `POST /finance/baskets` | `CreateStockBasket`; active household, optional reference cycle inherited when opened from a collection |
-| `PUT .../lines/{line}`, `POST/DELETE .../stock-lines`, `POST/DELETE .../return-lines` | Draft actual quantities and stock/return contents; archive removals |
+| `/finance/baskets`, `/finance/baskets/create`, `/finance/baskets/{basket}` | `Finance/Baskets/Index`, `Create`, `Show`; Manager or Finance; household selection, draft/validated/pending filters, immutable history |
+| `POST /finance/baskets` | `CreateStockBasket`; takes only `household_id` (active household, no cycle) |
+| `PUT {basket}/weekly-lines/{product}`, `POST/DELETE .../stock-lines` (delete by product), `POST/DELETE .../return-lines` (delete by return item) | Draft actual quantities and stock/return contents; archive removals |
 | `POST .../validation`, `PUT .../collection`, `POST .../corrections` | `ValidateBasket`, `MarkBasketCollected`, `CorrectBasket`; distinct actions with distinct effects |
 | `POST .../cancellation`, `POST .../collection-corrections` | Cancel a stock draft / justified staff correction of collection state |
-| `/finance/households/{household}/wallet` and receipt/correction posts | Reuse `Wallet/Statement` and confirmed top-up/correction forms, gated Finance/Manager |
+| `/finance/households/{household}/wallet` and receipt/correction posts | The only household wallet route (T72; the `/manage/households/{household}/wallet` copy is removed). Reuse `Wallet/Statement` and confirmed top-up/correction forms, gated Finance/Manager; a Manager also gets `householdReturnHref` to the manager household page, Finance-only gets none |
 | `/manage/producers/{producer}/products` | Manager catalogue page listing both modes and their allowed actions; entry from producer administration |
 | `/manage/producers/{producer}/products/...` | Stock product creation/edit/deactivate/reactivate/unused-delete from producer context; Manager only |
 | `/producer/products/...` | T54 index composes own weekly administration and read-only own stock with quantities; no stock-mode change by producer |
 | `/manage/products/{product}/classification` | Manager-only unused-mode change; no producer reassignment |
-| `/manage/stock/{product}/movements` and entries/adjustments | Existing inventory administration patterns; Catalog ids, Manager-only general inventory operations |
+| `/manage/stock/{product}/movements` and entries/adjustments | Existing inventory administration patterns; Catalog ids, Manager-only general inventory operations. The movements page adds the paged history (`?page=`, `ListStockMovements`) below the level and forms; sale and correction lines link to `/finance/baskets/{basket}` |
+| `/finance/stock`, `/finance/stock/{product}/movements` | Manager or Finance; read-only stock list (`ListStock` with `includeInactive`: deactivated products are listed too, marked inactive, each with its History link) and the paged history, with basket links; no entry/adjustment forms (R28a, R36c) |
+| `/producer/stock/{product}/movements` | Producer, own stock products only, linked from the stock section of `/producer/products`; the paged history without basket or household (R25b, R28a) |
+| `POST /manage/cycles/{cycle}/producers/{producer}/send` | `SendProducerOrderManually` (wraps `SendProducerOrder` with `refuseEmpty`) from the producer management dialog of `Manage/Cycles/Index`; Manager only; the button shows when `canSendManually` (closed, participating, unsent and with lines to send; empty orders are sent by the scheduler, so the use case refuses them under the cycle lock with `ProducerOrderEmpty`) and confirms first because it emails the producer; the row shows a Sent status via `sent`; domain errors (still open, already sent, empty, no account) show in the dialog (R12a, S36) |
 | `/manage/accounts/{account}/finance-role` | Grant/remove Finance on the existing account administration page, Manager only |
 
 `RoleAreas`, shared Inertia `roles`/`roleAreas` and `useAppNavigation` expose a Finance area for Finance
@@ -570,11 +651,12 @@ CRUD is delivered. Existing producer privacy and member household scoping remain
 Persistent pending-collection indication:
 - Member Dashboard and basket list show their own validated pending baskets, including closed-cycle
   and cycleless purchases. Use pending/preparation labels accurately; draft is not ready for collection.
-- Finance/Manager see all pending collections with household, validation date and optional origin cycle.
-- Cycle list/detail retain a pending-count badge/link after weekly closure, including attributed stock
-  supplements. Collection removes the corresponding pending item without reopening or recharging.
-- Adapt feature 002's dashboard data source from pending pickup cycle ids to Sales basket summaries;
-  preserve unrelated dashboard cards. An overdue date alone never produces an abandoned/cancelled state.
+- Finance/Manager see all pending collections with household, validation date.
+- Cycle list/detail retain a pending-count badge/link after weekly closure, counting weekly baskets only. Collection removes the corresponding pending item without reopening or recharging.
+- Adapt feature 002's dashboard data source from pending pickup cycle ids to Sales basket summaries read through `ListMemberPendingCollections` (members) and `ListPendingCollections` (staff) (member
+  `pendingPickups` lists basket id, validation date, weekly and late flags; Finance/Manager get the total); `?pending=1` on
+  `/baskets` and `/finance/baskets` (with `cycle` for staff) lists them, and cycle list/detail link to that view through
+  `SalesBaskets::pendingCollectionCounts` (the dashboard reads the Sales summaries, not that port); preserve unrelated dashboard cards. An overdue date alone never produces an abandoned/cancelled state.
 
 Concrete reuse inspected before planning:
 - `resources/js/components/StockProductFields.vue` supplies catalogue field presentation; retain it
@@ -801,6 +883,46 @@ visual fixture on identical markup. Check the guest and signed-in variants at
 375 and 1280 px in both themes and the guest page at 1024 px with 200% root
 text. Reuse the existing manager/shared-control manifest for action hierarchy.
 
+#### 2026-11-11 Cooperative landing direction
+
+For the public Welcome page, this supersedes the landing-specific styling in the
+2026-10-27 rollout; the rest of that app-wide direction remains in force. The
+user approved a lighter, content-first public landing for La Guixa. Keep a
+near-white cream canvas, muted blue actions and icons, discreet ochre step
+numbers, and a deep-blue contact area with cream text and button. Use a typographic approximation of the
+`la guixa` wordmark because no vector original is available. The page has a
+header with the cooperative link on desktop and member access at every
+width; a compact mobile header with the wordmark and member access side by side
+when space permits; a concise hero with a desktop-only line illustration of a
+vegetable basket; three cooperative values; the
+three-step weekly ordering process; a contact link to
+`laguixamanresa@gmail.com`; Manresa; and a short footer. Do not add an address,
+opening hours, textures, oversized dark panels or unrelated application-wide
+branding changes. Keep mobile content in one column and the contact action in the
+hero. Omit the process links from the header and hero; the cooperative link is
+sufficient navigation. Preserve the process section. On desktop, place step numbers above their
+labels; on mobile, beside them. The contact background spans the viewport while
+its text aligns with the main content. Make controls at least 44 px tall, and preserve clear focus and contrast in both
+themes. The `WelcomePage` remains a public composition surface and keeps the
+existing server route and authenticated access destination. See the immutable
+2026-11-11 Change history entry for the complete approved copy and visual source.
+
+The subsequent 2026-11-11 user refinement gives the hero more of the first proposal's
+character: a full-width muted-blue hero with cream heading/body, a cream primary
+button, and a more prominent headline and desktop basket. The navigation remains
+on the cream canvas in light appearance. This supersedes the cream-hero treatment
+above only; the cooperative values and steps remain light and
+spacious. The later contact refinement gives the contact area the hero's
+deep-blue surface and cream text and button, while the small footer stays on
+the cream canvas in light appearance. Preserve dark appearance contrast and
+text-zoom reflow. In the subsequent
+modern/rustic refinement, replace the provisional hand-coded basket with a
+clean, proportionate illustration based on the second approved mockup. Add
+screenprinted ink wear matching the explicitly selected original rustic mockup
+only to the blue hero: irregular cream paper chips and weathered edges. Keep
+solid blue behind copy/actions to preserve contrast under the stronger texture;
+retain the new basket and clean lower sections.
+
 T40 extends the same reactive opt-in to Dashboard, Wallet/Statement and the five existing producer
 pages. Their current page components retain their props, actions and form contracts. Shared page,
 panel, empty-state and mobile table presentation classes live under the pilot theme, so the two
@@ -1005,6 +1127,261 @@ Welcome coverage gates. Backlog on those new tickets does not mean the rollout m
 This annotation updates delivery evidence only; current spec 001 and T52–T63 retain ownership
 of superseding product behavior.
 
+## Llenguatge visual de la portada a tota l'aplicació — proposta de pla
+
+**Estat: pla acceptat (2026-11-11); desglossament T84 acceptat (2026-11-11). Ruta: plan-only, 001.** La portada integrada a
+PR #385 és la referència visual real. Aquesta esmena defineix com traslladar-ne el llenguatge a l'aplicació
+sencera; no canvia encara codi, tiquets ni el comportament. L’usuari n’ha aprovat la direcció i ha demanat
+el desglossament començant pel pilot d’Estoc de gestió. Substitueix la direcció cromàtica i el tractament
+de marca de «Reference style refresh» (verd de Common Ground) per a la futura implementació; el codi
+integrat continua sent la base fins que s’executi cada lliurament autoritzat. Es conserven els contractes funcionals i
+de revisió: rutes, rols, permisos, props d'Inertia, validacions, traduccions, estats, navegació accessible i
+les obligacions de les especificacions 003 i 004. El desplegament T47–T51 ja integrat és el punt de partida
+tècnic; no es repeteix com si fos feina pendent. La proposta 002 de dashboard està retirada i no és una
+dependència.
+
+### Referència i regles de trasllat
+
+La font visual és `resources/js/components/WelcomePage.vue` i les seves peces, amb el tractament real de PR
+#385; no els esbossos anteriors. En mode clar: paper `#faf1dc`, tinta `#2c2c2b`, blau principal `#286585`
+(hover `#1d526f`), blau suau `#e7f0f3`, ocre `#a05a10`, contorn `#d8d7d1` i focus `#a85f12`. En mode fosc:
+fons `#1c201f`, tinta `#f2f0e9`, blau principal `#8fc5df` (hover `#b2d9e8`), blau suau `#27363d`, ocre
+`#e5a650`, contorn `#4f5a5d` i focus `#f1bd6e`. En aparença fosca, el bloc principal de portada combina blau
+fosc `#23485c` i crema `#faf1dc`. Aquests valors fixen la direcció; cada parella de superfície, text, acció,
+estat i focus s'ha de verificar en el seu context. El càlcul sobre colors font dóna 5,68:1 per crema `#faf1dc`
+sobre blau `#286585`, 12,43:1 per tinta sobre crema i 8,79:1 per tinta `#1c201f` sobre blau `#8fc5df`. No és
+evidència de contrast en execució. Els contorns de portada només donen 1,28:1 en clar i 2,31:1 en fosc contra
+els fons respectius: són decoratius; els camps i altres límits essencials requereixen un token propi d'almenys
+3:1.
+
+Tipografia: `Nunito Variable` per al cos i els títols, `JetBrains Mono` només per a codi o identificadors
+tècnics. La portada usa un títol expressiu (`clamp(2.5rem, 6.5vw, 4.25rem)`, pes 900); les pantalles
+operatives conserven una jerarquia compacta, amb títols, subtítols, xifres i etiquetes fàcils d'escanejar.
+Conservar l'alineació i el format tabular de quantitats, imports i dates. Les CTA de portada tenen radi
+`.4rem`; les superfícies de l'aplicació poden mantenir `.625rem` si la jerarquia i la consistència ho
+justifiquen. No cal copiar la geometria del hero a formularis, taules o diàlegs.
+
+La textura de PR #385 només apareix com a desgast discret a les franges superior i inferior de 48 px en mòbil.
+Mai se situa darrere de text, controls, dades o accions. El tractament `pigment-wash` del cistell SVG és propi
+de la il·lustració: no s'aplica com a filtre global ni es repeteix en icones o superfícies de treball. Els
+elements comuns han de transmetre la mateixa calidesa amb color, tipografia, espai i contorns, sense
+perjudicar la densitat d'informació.
+
+### Inventari i base compartida
+
+Abans d'editar cap pantalla, inventariar les rutes realment servides i les seves variants per rol, els estats
+visibles i els components compartits; contrastar-ho amb els manifests històrics, que no acredita per si sol la
+cobertura actual. Incloure autenticació, dashboard, comandes, catàleg, productors, estoc, finances, recepció,
+recollida, configuració, compte, Welcome i estats buits, errors i overlays. Documentar per a cada família la
+pàgina, el contenidor, els patrons reutilitzables i la mostra de dades de revisió. Els canvis en rutes noves o
+moviments de components exigeixen actualitzar aquest inventari abans de retirar cap límit de desplegament.
+
+La paleta d'execució viu a `public/theme-colors.css`, carregat després de `@vite` per
+`resources/views/app.blade.php`; el verd `#246b57` és encara el valor principal actual. Definir-hi tokens
+semàntics de superfície, tinta, acció i text sobre acció, hover, focus, camp, contorn, estats i gràfics per
+als dos modes. El blau fosc/clar necessita parelles `primary`/`primary-foreground` diferents segons el mode;
+comprovar-les en botons, enllaços i navegació. Reconciliar `resources/css/app.css` amb aquests tokens,
+mantenint-hi la geometria i els patrons `.pilot-*` compartits. Evitar valors dispersos per pàgina i preservar
+colors semàntics de perill, èxit i avís quan el seu significat requereix distingir-los de la marca.
+
+`resources/js/layouts/AppLayout.vue` i `resources/js/lib/pilotTheme.ts` delimiten avui l'opt-in del tema.
+Revisar aquesta llista contra l'inventari de rutes abans d'ampliar-la o eliminar-la. `usePilotTheme` dóna
+context als portals: revisar conjuntament `ui/dialog`, `ui/sheet`, `ui/dropdown-menu`, `ui/tooltip`,
+`ui/sonner` i `ui/select/SelectContent.vue`, que actualment no consumeix aquest context. El criteri és que un
+overlay hereti el tema, el focus i els colors de la pàgina que l'obre, també quan es renderitza fora del seu
+arbre DOM. Reutilitzar `AppSidebarLayout.vue`, `AppSidebarHeader.vue`, `AppSidebar.vue`, `Breadcrumbs.vue`,
+`NavMain.vue` i els patrons de `components/ui/`; conservar breadcrumb a la capçalera, H1 en el contingut, skip
+link, control d'aparença i navegació mòbil.
+
+### Mapa de superfícies i components
+
+Inventari de famílies observades a `resources/js/pages/` sobre el commit `cfda8e70`; els noms següents són
+camins de pàgina, no noves rutes. Cada lliurament concretarà les variants de rol/estat contra les rutes
+vigents.
+
+| Família | Pàgines existents i abast |
+| --- | --- |
+| Públic i accés | `Welcome.vue`, `auth/{Login,AcceptInvitation,ConfirmPassword,ForgotPassword,ResetPassword,TwoFactorChallenge,VerifyEmail}.vue`; conservar destinació segons sessió |
+| Membre | `Orders/{Index,Edit}.vue`, `Member/Baskets/{Index,Show}.vue`, `Wallet/Statement.vue`, `Stock/Index.vue` |
+| Productor | `Producer/Products/{Index,Create,Edit}.vue`, `Producer/{Cutoff,CycleSummary}.vue`, `Producer/Stock/Movements.vue` |
+| Catàleg | `Catalogue/Producers/{Index,Products,Availability}.vue`, `Catalogue/Producers/WeeklyProduct/{Create,Edit}.vue`, `Catalogue/Stock/Movements.vue`; comprovar també pantalles compartides servides pels controladors de catàleg |
+| Administració | `Manage/Accounts/Index.vue`, `Manage/Roles/Index.vue`, `Manage/Households/{Index,Show}.vue`, `Manage/Producers/Index.vue`, `Manage/Cycles/{Index,Show}.vue`, `Manage/Settings.vue` |
+| Estoc i envasos | `Manage/Stock/{Index,Create,Edit,Movements}.vue`, `Manage/ReturnItems/{Index,Create,Edit}.vue`; conservar diàlegs interns |
+| Finances i recepció | `Finance/Baskets/{Index,Create,Show}.vue`, `Finance/Stock/{Index,Movements}.vue`, `Receptions/{Index,Show}.vue`; provar finances, recepció i administració segons permisos actuals |
+| Compartit | `Dashboard.vue`, `settings/{Profile,Appearance,Security}.vue`; dashboard segons la versió integrada de 004, sense avançar funcionalitat pendent |
+
+| Patró | Reutilització i canvi proposat |
+| --- | --- |
+| Navegació i marca | `components/{AppSidebar,AppSidebarHeader,NavMain,Breadcrumbs}.vue`: blau sòlid/crema, selecció amb indicador i text; adaptar el tractament tipogràfic del nom existent, conservar la icona compacta en col·lapsar. Sense textura sota enllaços |
+| Taules i llistes | `resources/css/app.css`: `.pilot-data-table`, `.pilot-list`, `.pilot-amount` i container queries existents; superfícies planes, separadors llegibles, xifres tabulars, mateixa informació en reflow mòbil |
+| Formularis | `components/FormSelect.vue`, `components/ui/input/Input.vue`, `components/InputError.vue`: camps amb superfície neta, contorn propi, etiqueta persistent i error associat; no substituir la validació existent |
+| Botons | `components/ui/button/index.ts` i `.manager-button` a CSS: principal blau, secundari neutre/blau suau, perill vermell. Preservar busy/disabled, nom accessible i jerarquia |
+| Diàlegs | `components/manager/NativeDialog.vue`, `components/ui/dialog/DialogContent.vue` i `pages/Manage/Stock/StockEditDialog.vue`: mateixa superfície i focus; conservar Escape, atrapament i retorn del focus |
+| Missatges i estats | `components/{StatusIndicator,AlertError,InputError}.vue`, `components/ui/sonner/Sonner.vue`: semàntica independent del blau i l'ocre; text/icona a més del color |
+| Decoració | `components/welcome/LandingHero.vue`, `resources/images/welcome/cooperative-basket.svg`: aquarel·la només en il·lustracions de capçalera o estats buits apropiats, petita i prescindible; vores orgàniques als extrems decoratius, geometria regular als controls |
+
+Els camins abreujats de components i pàgines parteixen de `resources/js/`. No afegir el cistell a cada
+pantalla: una taula, un error o una confirmació destructiva no necessiten il·lustració. No convertir l'ocre en
+avís ni els colors de les verdures en estats de negoci.
+
+L’aprovació literal consta a [l’entrada d’acceptació](history/2026-11-11T16-58-01.938Z-no-task-af456e57-d88a-4d3a-b411-52e529785370.md).
+El [desglossament del pilot](tasks/landing-style-pilot.md) ha estat acceptat per separat; ni aquest pla
+ni la preparació de tasques autoritzen implementar o publicar tiquets.
+
+### Inventari de desplegament — esborrany (2026-11-13)
+
+**Traspàs (2026-11-13):** les fases 3–5 d'aquesta seqüència passen a l'especificació [005](../005-landing-identity-rollout/discovery.md). Aquesta feature manté el pilot (T83–T85) i la direcció visual d'aquest pla; l'inventari següent és la font per al descobriment de 005.
+
+**Estat: esborrany pendent d'acceptació; no autoritza implementació.** Fotografia sobre `origin/main`
+(`0074d383`; substitueix la fotografia `cfda8e70` del mapa anterior) d'allò que cada fase de la seqüència següent ha de cobrir. Fa servir el mateix inventari que
+exigeix «Inventari i base compartida»: pàgines servides, components compartits i superfícies fora d'Inertia.
+
+**Punt de partida (actualitzat 2026-11-13).** Quan es va redactar aquest inventari, el tema de la landing
+(blau/crema) només era a `Welcome`. T84 està integrada (PR #408, aprovació visual a PR #409): la variant
+la variant `landing` (abans `landing-stock`) s'admet per coincidència exacta a `Manage/Stock/Index`
+(`lib/pilotTheme.ts`), i també a `Orders/Index` i `Orders/Edit` (T85, implementada a PR #413, pendent de
+l'aprovació visual de l'usuari). La resta de l'inventari està pendent. `isPilotThemePage` continua sent l'opt-in del tema verd anterior i **no** marca res
+com a migrat a la landing.
+
+**Pàgines (52 rutes, 56 fitxers a `resources/js/pages/`; la resta són components fills, vegeu «Fora del mapa»).**
+«Tema verd» indica si la pàgina és a la llista de `pilotTheme.ts`; el que no hi és s'ha de revisar a la
+fase de la seva família perquè el tancament de la fase 5 exigeix cap portal amb tema antic.
+
+| Fase | Pàgines | Tema verd |
+| --- | --- | --- |
+| 1 (T84) | `Manage/Stock/Index` + `StockEditDialog`, shell i overlays | sí |
+| 2 | `Orders/Index`, `Orders/Edit` (T85: implementada a PR #413; pendent d'aprovació visual) | sí |
+| 3 Catàleg | `Catalogue/Producers/{Index,Products}`, `WeeklyProduct/{Create,Edit}`, `Catalogue/Stock/Movements` | sí |
+| 3 Catàleg | `Catalogue/Producers/Availability` | **no** |
+| 3 Productor | `Producer/{Cutoff,CycleSummary}`, `Producer/Products/{Index,Create,Edit}`, `Producer/Stock/Movements` | sí |
+| 4 Finances i recepció | `Finance/Baskets/{Index,Create,Show}`, `Finance/Stock/{Index,Movements}`, `Receptions/{Index,Show}` | sí |
+| 4 Administració | `Manage/{Accounts/Index,Households/{Index,Show},Producers/Index,Cycles/{Index,Show},Settings}` | sí |
+| 4 Administració | `Manage/Roles/Index` (conserva les decisions de 003) | **no** |
+| 4 Estoc i envasos | `Manage/Stock/{Create,Edit,Movements}`, `Manage/ReturnItems/{Index,Create,Edit}` | sí |
+| 4 Vistes de membre pendents | `Wallet/Statement`, `Stock/Index` | sí |
+| 4 Vistes de membre pendents | `Member/Baskets/{Index,Show}` | **no** |
+| 5 Accés | `auth/{Login,AcceptInvitation,ConfirmPassword,ForgotPassword,ResetPassword,TwoFactorChallenge,VerifyEmail}` | sí |
+| 5 Preferències | `settings/{Profile,Appearance,Security}` | sí |
+| 5 Dashboard | `Dashboard` (reconciliar amb 004) | sí |
+| 5 Tancament | `Welcome` (ja és la referència; verificar transicions) | — |
+
+Les quatre pàgines «no» ja porten classes `pilot-*` però no són a la llista: s'han de recollir a la fase
+que toca, no es poden deduir del tema actual.
+
+**Fora del mapa de famílies.** Superfícies que la taula del pla no nomena i que no es veuen en recórrer
+només `pages/`:
+
+| Superfície | Per què importa | Fase proposada |
+| --- | --- | --- |
+| `Manage/Households/SettlementDetails.vue` | Component fill de `Households/{Index,Show}`; sense classes `pilot-*` | 4 Administració |
+| `Manage/Cycles/{CycleCreateDialog,CycleManageDialog}.vue` | Diàlegs de `Cycles/Index`; comprovar overlays | 4 Administració |
+| `components/ui/select/SelectContent.vue` | El pla ja diu que no consumeix el context de tema | 1 (base compartida) |
+| `resources/views/errors/minimal.blade.php` | Pàgina d'error de Laravel (403/404/500 sense Inertia): gris, tipografia del sistema, sense mode fosc ni marca; decidit 2026-11-13: només paleta i tipografia de la landing, sense il·lustració | 5 Tancament |
+| `resources/views/mail/{invitation,producer-order}.blade.php` | Correus amb el tema per defecte de `x-mail::message`; sense tema propi | Fora d'abast: es manté l'estil per defecte de Laravel (decidit 2026-11-13) |
+| `layouts/app/AppHeaderLayout`, `layouts/auth/{AuthCardLayout,AuthSplitLayout}` | Cap importació; no es renderitzen | Eliminar (decidit 2026-11-13), un cop confirmat que continuen sense consumidors |
+| `layouts/settings/Layout.vue` | Ja previst a la fase 5, però cal comprovar-ne la navegació | 5 Preferències |
+| `components/AppHeader.vue` | Només l'importa `AppHeaderLayout`; queda orfe en eliminar-lo | Eliminar amb el layout (fase 5) |
+| `components/{TwoFactorSetupModal,TwoFactorRecoveryCodes,ManageTwoFactor,ManagePasskeys,PasskeyItem,PasskeyRegister,PasskeyVerify,DeleteUser}.vue` | Peces i diàlegs de `settings/Security` i `settings/Profile` | 5 Preferències |
+| `components/{AppearanceMenu,NavUser,UserMenuContent}.vue` | Menús de compte i aparença del shell | 1 (base compartida) |
+| `components/{AppShell,AppContent,AppLogo,AppLogoIcon}.vue`, `components/ui/sonner/Sonner.vue` | Xassís del shell, marca i avisos | 1 (base compartida) |
+| `components/{orders,baskets,pickup,reception,roles,stock,manager}/*` | Components de pàgina: hereten la fase de les pàgines que els consumeixen; cada fitxa de fase els llista | Fase de la seva pàgina |
+| `resources/views/app.blade.php`, `public/{favicon.svg,favicon.ico,apple-touch-icon.png}` | Fons de l'html abans de carregar el CSS (`--background`, `#fff`/`#1b1e1c`) i icones de pestanya; no hi ha `theme-color` ni manifest | 5 Tancament |
+
+**Decisions pendents.** Cap. Correus, pàgina d'error i layouts sense ús: resolts, vegeu les entrades Q&A del
+2026-11-13. Valors de color: verificat contra `WelcomePage.vue` a `origin/main` (`0074d383`); els valors del
+pla (clar i fosc) coincideixen amb les variables `--welcome-*`. PR #398 només va reanomenar `hero` a `feature`
+i va afegir colors propis del bloc de contacte (`#173e53`, `#15232a`, `#fff9eb`), que no són tokens
+globals. Són la font vigent per definir els tokens de T84.
+
+**Comprovacions que falten.** No s'ha obert cap pàgina al navegador; la llista prové del codi. Tampoc
+s'ha revisat si les noves funcionalitats del dashboard (004) han afegit components fora de `Dashboard.vue`.
+
+### Seqüència d'implementació futura
+
+Aquestes són fases proposades, sense IDs de tasca ni estimació de dies. Cada família posterior es divideix en
+lliuraments petits quan s'accepti el seu detall; no és una única PR de tota l'app.
+
+1. **Pilot d'estoc i base compartida.** `Manage/Stock/Index.vue` + `StockEditDialog.vue`, shell i els seus overlays. Resultat demostrable: cercar un producte, obrir l'edició, llegir/modificar quantitat i tancar retornant el focus, amb la nova identitat. La taula d'escriptori, llista mòbil i formulari real redueixen més incertesa visual que començar per la landing o una pàgina simple. Sortida: mesures, regressió de les accions i aprovació visual del pilot.
+2. **Comandes del membre.** `Orders/{Index,Edit}.vue`, `components/orders/{CycleCard,OrderPageHeader,OrderProductRow}.vue`. Depèn dels tokens i shell validats al pilot. Sortida: escollir cicle, editar quantitats i llegir totals amb la mateixa petició explícita de desament i la mateixa previsualització del servidor; incloure obert/tancat/cancel·lat, línia marcada i enllaç a cistella quan pertoqui.
+3. **Catàleg i productor.** Primer `Catalogue/Producers/Products.vue` i formularis `WeeklyProduct/{Create,Edit}.vue`; després la família `Producer/` en lliuraments separats. Depèn de la jerarquia de camps/accions del pilot, no de canvis funcionals en comandes. Sortida per lliurament: mateix contingut i accions autoritzades, amb noms llargs, errors i controls desactivats llegibles.
+4. **Finances, recepció i administració.** Lliuraments separats per cistelles/cartera, recepcions, cicles/llars i comptes/rols/configuració; incloure estoc/envasos i vistes de membre pendents. Depenen dels patrons aprovats que consumeixen. Sortida per família: revisar imports, totals, estats i accions sensibles sense canviar càlculs, permisos ni destinacions. La família de rols conserva les decisions de 003.
+5. **Accés, preferències i tancament transversal.** Aplicar el sistema a `AuthLayout.vue`/`auth/AuthSimpleLayout.vue`, `settings/Layout.vue` i les seves pàgines; reconciliar `Dashboard.vue` amb 004. Aquestes famílies poden avançar després del pilot si no comparteixen fitxers en edició; només el tancament depèn de totes les anteriors. Verificar també Welcome i les transicions públic→accés→app. Sortida final: inventari complet sense rutes/portals amb tema antic, preferència clar/fosc/sistema preservada i revisió de totes les famílies.
+
+**Contenció del pilot:** no canviar directament els mappings globals de `:root` de `public/theme-colors.css` a
+la fase 1: restilarien totes les pantalles. Definir una sola família de valors de marca i aplicar-ne el
+mapping semàntic només al pilot mitjançant una variant explícita del context de tema existent; `.pilot-theme`
+ja cobreix moltes pàgines i no identifica per si sola aquest nou pilot. Estendre `AppLayout.vue`,
+`lib/pilotTheme.ts` i `usePilotTheme.ts` per transmetre aquesta variant també als portals; mantenir el
+comportament del flag actual durant la migració. És una extensió del sistema existent, sense duplicar paletes
+per pantalla. El mapping global només es promou quan tots els consumidors s'han revisat; després es retira la
+frontera temporal amb proves de navegació. La landing consumirà els mateixos valors de marca conservant els
+seus rols hero/paper i la seva composició. Durant el pilot ha de mantenir el resultat integrat de #385.
+
+Cada fase futura comença amb una fitxa de rutes/estats/components i acaba amb una revisió de patrons i
+evidència reproduïble. No crear una nova pantalla ni un nou component si un patró existent cobreix la
+necessitat. No modificar dades de negoci, regles d'autorització, contractes de rutes, props, validacions ni
+còpia traduïda fora de correccions estrictament visuals.
+
+### Criteris d'acceptació i evidència
+
+Per cada ruta afectada i cada rol que en canvia el contingut, comprovar 375 i 1280 px en clar i fosc; per cada
+patró de composició diferent, 1024 px amb text al 200% en tots dos modes. Incloure estats plens, buits,
+llargs, invàlids i desactivats, així com menú, selector, diàleg, full i toast oberts quan correspongui.
+Mesurar primer `getComputedStyle` i `getBoundingClientRect` o `measureLayout`/`measureFocus`, llegir
+estructura i text, i executar el visual runner en mode de mesures. Una previsualització petita es reserva per
+una direcció nova, una fallada inexplicada o una petició explícita. Verificar contrast mínim 4,5:1 en text
+normal i 3:1 en contorns significatius i focus, text gran d’almenys 3:1, objectius tàctils de 44 × 44 px,
+ordre de tabulació, focus visible, Escape i retorn del focus en overlays, absència de retall i desbordament,
+preferència de sistema, moviment reduït i font de reserva. Registrar els valors mesurats i les excepcions
+corregides abans de donar una família per acabada.
+
+La validació funcional futura usa les proves de Vue/PHP existents per confirmar que els fluxos, rols i
+permisos continuen iguals; afegir només comprovacions necessàries per riscos nous del tema o dels portals.
+Aquesta esmena documental es valida ara per enllaços, identificadors, coherència amb el pla i registre
+d'història; no exigeix proves d'aplicació. `database/seeders/DemoSeeder.php` no necessita cap canvi per una
+proposta de pla; ja conté actors de tots els rols. En una implementació futura, revisar-lo i ampliar
+`tests/Feature/Database/DemoSeederTest.php` només si calen dades o estats visibles nous per mostrar el
+resultat.
+
+**Preparació:** el comportament és fora d'abast i les obligacions 003/004 continuen vigents; la direcció
+visual i les fases d’aquest pla estan acceptades; el desglossament es presenta per separat. Els camins de referència i els patrons pilots
+s'han comprovat en el codi actual; l'inventari complet de rutes, la validació en execució i l'aprovació visual
+de cada fase corresponen a la implementació posterior. No hi ha cap dependència externa pendent per decidir
+sobre aquest pla.
+
+### Riscos i proves de regressió
+
+- **Propagació global accidental:** els tokens públics, `.reference-style`, estils natius i portals tenen abasts diferents. Mesurar una ruta pilot i una encara no migrada després d’una navegació Inertia, amb menú mòbil obert; conservar una sortida reversible per variant fins al tancament.
+- **Pèrdua de densitat o clipping:** no copiar els espais ni el títol gegant del hero. Conservar les container queries, seccions i imports; comprovar text al 200% també a 375 px en el formulari/diàleg més arriscat i a 1024 px en cada patró. Cap scroll horitzontal de pàgina, dades ocultes o control fora d’abast.
+- **Colors funcionals amb contrast insuficient:** comprovar hover, focus, invalid i disabled de cada parella; vores decoratives i filtres SVG no constitueixen una prova de contrast. Els camps mantenen contorn essencial ≥3:1 i errors recognoscibles sense color.
+- **Canvis de negoci accidentals:** retenir proves de `pages/Manage/Stock/Index.spec.ts`, `pages/Manage/Stock/Edit.spec.ts`, `components/manager/NativeDialog.spec.ts`, `pages/Orders/{Index,Edit}.spec.ts`, `composables/useAppNavigation.spec.ts`, `composables/usePilotTheme.spec.ts` i `lib/pilotTheme.spec.ts`; seleccionar les de cada família i les proves HTTP d’autorització afectades, sense donar per cobertes rutes noves pels tests de Welcome.
+- **Marca i rendiment:** Nunito local i fallback, espai reservat a la il·lustració; no repetir filtres d’aquarel·la en files. Confirmar menús amb fletxes/Enter i formularis amb teclat, no només el seu estat tancat. Les fixtures amb transport simulat no acrediten persistència ni permisos.
+
+A cada lliurament: manifest de casos lligat al commit/base, dades deterministes, mesures de
+font/color/mida/overflow i interaccions; comprovacions locals enfocades, tipus i format segons el diff, i CI
+del projecte. L’aprovació estètica del nou pilot és un punt explícit abans d’estendre la direcció; les mesures
+no la substitueixen. En aquesta sessió no s’han executat navegació, proves d’aplicació ni auditoria
+d’accessibilitat: s’ha preparat el pla i verificat fonts i contrast de parelles planes.
+
+### Fonts i límits de la descoberta
+
+Base inspeccionada: `origin/main` al commit `cfda8e70c4a5a0c56c5f8f52ca07c91905b0351f`, amb [PR #385
+fusionada](https://github.com/dadraude/guixa/pull/385) el 2026-11-11. Historial combinat de 001, 003 i 004
+llegit amb `history.mjs read`; les decisions acceptades de «Reference style refresh» i les posteriors
+refinacions de la landing es conserven com a historial; aquesta aprovació substitueix només la direcció visual descrita.
+
+Descoberta Verify: projecte de graf `guixa`, generació `2026-11-01T14:55:31Z`, índex fast anterior a la base
+actual. Les cerques, traça de `useAppNavigation` en les dues direccions i controls `check_index_coverage`
+mostren fonts canviades, pàgines noves no registrades, CSS parcial i exclusions de `public/`, fixtures i
+proves. Per això s’han contrastat els fitxers actuals directament, incloent paleta, layouts, navegació,
+directoris de pàgines, portals, demo i rangs CSS afectats. No s’infereix absència de consumidors de la traça
+ni cobertura funcional completa del graf.
+
+S’ha aplicat `ui-ux-pro-max` amb cerca de sistema visual i una reformulació per a gestió densa, més consulta
+Vue. Les paletes/fonts genèriques retornades no són adequades com a referència de marca i no s’han adoptat;
+només se’n retenen criteris de densitat i accessibilitat compatibles amb el projecte. S’ha consultat
+`vue-best-practices` per mantenir les fronteres dels components existents.
+
 ## Translations
 
 Constitution, UI (*Translatable*). `ca` is the default and fallback locale and the only one shipped.
@@ -1050,10 +1427,10 @@ for CI's full validation.
 | Level | What | Where |
 | --- | --- | --- |
 | Domain | Value objects, `LocalTime`, `CutoffRule`, `ProportionalAllocator` (property: Σ result == target), `Cycle`, `Order`, `Product`, `Basket` | `tests/Unit/<Context>` |
-| Application | **Every scenario S1–S90**, with in-memory repositories and `FrozenClock` | `tests/Application/<Context>` |
+| Application | **Every scenario S1–S92**, with in-memory repositories and `FrozenClock` | `tests/Application/<Context>` |
 | Infrastructure | Each Eloquent repository against `guixa_test` (constraints, locks, numeric mapping) | `tests/Integration` |
 | HTTP | Role gates, wiring, `assertInertia` props, error → 422 and `AuthorizationException` → 403 mapping | `tests/Feature` |
-| Architecture | A1–A12 (A9 through Oxlint); explicitly register Sales contracts as its slices land | `tests/Architecture` |
+| Architecture | A1–A17 (A9 through Oxlint); explicitly register Sales contracts as its slices land | `tests/Architecture` |
 | Translations | Every key used in PHP (`__()`, `trans()`) and Vue (`trans()`, `$t`), and every domain error class, has a `ca` translation | `tests/Architecture` |
 | Frontend | Display totals, A9 via Oxlint | `resources/js/**/*.spec.ts` |
 
@@ -1070,14 +1447,14 @@ Eloquent test (`Tests\TestCase` with `RefreshDatabase`) both use it and only imp
 
 ### Amendment verification
 
-Use existing public Application seams with in-memory ports/repositories; add Sales tests for S78–S90
+Use existing public Application seams with in-memory ports/repositories; add Sales tests for S78–S92
 and update existing scenarios whose charge/collection boundary changed. Do not preserve obsolete
 CompletePickup behavior behind a compatibility path. Contract-test both in-memory and Eloquent
 history filtering, one active line, removed references, source uniqueness and sale/charge source ids.
 Cross-context integration checks must prove rollback of a failed validation leaves basket, stock and
-wallet unchanged, simultaneous baskets cannot oversell, attributed stock sales do not invert cycle/product locks,
+wallet unchanged, simultaneous baskets cannot oversell, stock sales take no cycle lock,
 and classification/deletion cannot race first use.
-Check source redistribution against validated baskets, replay, negative/zero totals, product deactivation,
+Check redistribution rejection by validated baskets, late weekly baskets, replay, negative/zero totals, product deactivation,
 late collection after cycle closure, Finance boundaries, own-household self-collection and manual receipts.
 Rendered coverage includes draft/validated/collected, zero stock, empty, insufficient stock, long names,
 closed-cycle pending indicators and narrow-role navigation at the shared workflow's required dimensions.
@@ -1099,10 +1476,11 @@ not application tests. Implementation and task creation require their own later 
 - **D11** The pickup weekday is a single-row `cooperative_settings` table, not configuration: R4c lets a
   manager change it. It is still one value per installation, as the constitution allows for settings a
   manager changes in the app. Its value is null until a manager sets it, directly or when opening a cycle as permanent (R4c).
-- **D12** Redistribution before weekly closure keeps the explicit unfinished-only/all choice, now
-  keyed to basket validation rather than physical collection. Draft sources synchronize; validated
-  originals remain immutable and receive signed Sales adjustments and matching Wallet corrections
-  in one transaction. Repeated identical targets append nothing; stock/return lines are not sold again.
+- **D12** Reception changes before weekly closure never touch validated baskets (Change 2026-11-03).
+  A late arrival (received 0 → >0) goes to the household's open weekly draft or one new late weekly
+  basket; any other redistribution synchronizes drafts and is rejected when a validated basket contains
+  the product. Validated baskets change only through individual Sales corrections (R23), which keep
+  originals immutable and pair adjustments with Wallet corrections in one transaction.
 - **D13** Producer deactivation is a Catalog use case that calls Membership (producer role) and Ordering
   (participation) through ports, in one transaction (R3a).
 - **D14** Superseded destructive cancellation: retain cancelled orders/baskets and removed lines as
@@ -1137,8 +1515,17 @@ not application tests. Implementation and task creation require their own later 
   within one local transaction, with stable lock order and unique source ids. Collection and confirmed
   receipts are independent operations; no eventual financial consistency or online payment integration.
 - **D25** Weekly closure depends on distribution and base basket validation, not collection. Late
-  collections retain pending visual indicators after closure. Supplementary baskets may reference a
-  closed origin cycle for grouping/containers; the reference never gates or reopens that cycle.
+  collections retain pending visual indicators after closure. Supplementary baskets carry no cycle and never gate or reopen it;
+  containers are a per-household balance.
+- **D26** Stock movement history (R28a, T76) is computed on read from the immutable ledger: no stored
+  balance column, no new table or index (`stock_movements (product_id, occurred_at)` already serves it).
+  The producer view drops the basket in the use case, not in the page. One shared
+  `resources/js/components/stock/MovementHistory.vue` renders the lines and previous/next page links
+  for the three pages (Manager movements page, Finance stock history, producer stock history),
+  following `Wallet/Statement.vue`'s phone-first table/stacked-row pattern and `components/ui/`
+  (`badge` for the type, `button` links for paging). No pagination primitive exists in `components/ui/`,
+  so paging is two links driven by Laravel's `LengthAwarePaginator` built in the controller from the
+  use case's page and total. Type labels are translated under `stock.movement_types`.
 
 Dropped: D1 (pickup is a sequence of saved steps, R19–R22). D2 and D3 became spec rules (R4a, R6). D4 was
 replaced by R35 and R36b (unlinking keeps the account; deactivation is separate). D5, D6 and D8 became spec

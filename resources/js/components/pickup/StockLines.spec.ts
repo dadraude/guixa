@@ -7,10 +7,11 @@ const line = {
     stockProductId: 'honey',
     name: 'Honey',
     unit: 'jar',
-    variable: false,
     unitPriceCents: 600,
     quantity: '2.000',
     amountCents: 1200,
+    effectiveQuantity: '2.000',
+    effectiveAmountCents: 1200,
 };
 
 const options = [

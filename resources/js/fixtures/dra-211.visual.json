@@ -10,7 +10,7 @@
     "views": [
         {
             "id": "manager-account-finance-role",
-            "path": "/visual-dra-211.html",
+            "path": "/resources/visual/dra-211.html",
             "root": "#main-content",
             "panels": "#main-content section,#main-content form,#main-content .pilot-list,#main-content .pilot-layout-panel,#main-content .pilot-layout-notice,#main-content table",
             "content": "#main-content h1,#main-content h2,#main-content h3,#main-content p,#main-content label,#main-content input,#main-content a,#main-content button,#main-content th,#main-content td,#main-content li",
@@ -70,10 +70,6 @@
                             {
                                 "selector": "[data-visual-page-focus-last]",
                                 "count": 1
-                            },
-                            {
-                                "selector": "#main-content form[action*=\"finance-role\"] button",
-                                "minHeight": 44
                             }
                         ]
                     }
@@ -90,15 +86,7 @@
                             "mode": "dark",
                             "text": 100
                         }
-                    ],
-                    "checks": {
-                        "assertions": [
-                            {
-                                "selector": "#main-content form[action*=\"finance-role\"] button",
-                                "minHeight": 44
-                            }
-                        ]
-                    }
+                    ]
                 },
                 {
                     "id": "inactive",
@@ -118,7 +106,7 @@
         },
         {
             "id": "finance-baskets-index",
-            "path": "/visual-dra-211.html",
+            "path": "/resources/visual/dra-211.html",
             "root": "#main-content",
             "panels": "#main-content section,#main-content form,#main-content .pilot-list,#main-content .pilot-layout-panel,#main-content .pilot-layout-notice,#main-content table",
             "content": "#main-content h1,#main-content h2,#main-content h3,#main-content p,#main-content label,#main-content input,#main-content a,#main-content button,#main-content th,#main-content td,#main-content li",
@@ -190,7 +178,7 @@
         },
         {
             "id": "finance-baskets-create",
-            "path": "/visual-dra-211.html",
+            "path": "/resources/visual/dra-211.html",
             "root": "#main-content",
             "panels": "#main-content section,#main-content form,#main-content .pilot-list,#main-content .pilot-layout-panel,#main-content .pilot-layout-notice,#main-content table",
             "content": "#main-content h1,#main-content h2,#main-content h3,#main-content p,#main-content label,#main-content input,#main-content a,#main-content button,#main-content th,#main-content td,#main-content li",
@@ -272,9 +260,9 @@
         },
         {
             "id": "finance-basket-detail",
-            "path": "/visual-dra-211.html",
+            "path": "/resources/visual/dra-211.html",
             "root": "#main-content",
-            "panels": "#main-content section,#main-content form,#main-content .pilot-list,#main-content .pilot-layout-panel,#main-content .pilot-layout-notice,#main-content table",
+            "panels": "#main-content section,#main-content form,#main-content .pilot-list:has(li),#main-content .pilot-layout-panel,#main-content .pilot-layout-notice,#main-content table",
             "content": "#main-content h1,#main-content h2,#main-content h3,#main-content p,#main-content label,#main-content input,#main-content a,#main-content button,#main-content th,#main-content td,#main-content li",
             "fonts": ["16px Nunito Variable"],
             "focus": [
@@ -431,7 +419,7 @@
         },
         {
             "id": "finance-wallet-statement",
-            "path": "/visual-dra-211.html",
+            "path": "/resources/visual/dra-211.html",
             "root": "#main-content",
             "panels": "#main-content .pilot-layout-panel:not(:has(.pilot-wallet-movements)),#main-content .pilot-wallet-table tbody tr,#main-content .pilot-layout-notice",
             "content": "#main-content h1,#main-content h2,#main-content h3,#main-content p,#main-content label,#main-content input,#main-content a,#main-content button,#main-content td,#main-content .pilot-cell-label",
@@ -494,7 +482,17 @@
                             },
                             {
                                 "selector": ".pilot-wallet-forms",
-                                "count": 0
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"record-top-up\"]",
+                                "count": 1,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"record-correction\"]",
+                                "count": 1,
+                                "minHeight": 44
                             },
                             {
                                 "selector": "[data-test=\"basket-source-link\"]",
@@ -520,11 +518,9 @@
                         "assertions": [
                             {
                                 "selector": ".pilot-wallet-forms",
-                                "count": 0
+                                "count": 1
                             }
-                        ],
-                        "focus": [],
-                        "noFocusReason": "A Finance statement with no movements has no receipt forms or back-to-admin link."
+                        ]
                     }
                 },
                 {
@@ -545,7 +541,7 @@
         },
         {
             "id": "manager-wallet-statement",
-            "path": "/visual-dra-211.html",
+            "path": "/resources/visual/dra-211.html",
             "root": "#main-content",
             "panels": "#main-content .pilot-layout-panel:not(:has(.pilot-wallet-movements)),#main-content .pilot-wallet-table tbody tr,#main-content .pilot-layout-notice",
             "content": "#main-content h1,#main-content h2,#main-content h3,#main-content p,#main-content label,#main-content input,#main-content a,#main-content button,#main-content td,#main-content .pilot-cell-label",
@@ -642,7 +638,7 @@
         },
         {
             "id": "member-wallet-statement",
-            "path": "/visual-dra-211.html",
+            "path": "/resources/visual/dra-211.html",
             "root": "#main-content",
             "panels": "#main-content .pilot-layout-panel:not(:has(.pilot-wallet-movements)),#main-content .pilot-wallet-table tbody tr,#main-content .pilot-layout-notice",
             "content": "#main-content h1,#main-content h2,#main-content h3,#main-content p,#main-content label,#main-content input,#main-content a,#main-content button,#main-content td,#main-content .pilot-cell-label",
@@ -701,11 +697,11 @@
                                 "count": 0
                             },
                             {
-                                "selector": "[data-test=\"basket-source-link\"]",
+                                "selector": "[data-test=\"basket-source-text\"]",
                                 "count": 0
                             },
                             {
-                                "selector": "[data-test=\"basket-source-text\"]",
+                                "selector": "[data-test=\"basket-source-link\"]",
                                 "count": 1
                             },
                             {

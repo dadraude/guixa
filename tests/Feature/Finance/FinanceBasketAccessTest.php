@@ -20,14 +20,14 @@ it('grants Finance on an existing account for the next real basket request and p
     DB::table('households')->insert(['id' => $household, 'name' => 'Household H', 'created_at' => now(), 'updated_at' => now()]);
     $basket = app(CreateStockBasket::class)(Actor::manager($manager->id), $household);
 
-    $this->actingAs($manager)->put(route('manage.accounts.finance-role.update', $finance->id))->assertRedirect();
+    $this->actingAs($manager)->post('/manage/roles/finance/holders', ['account_id' => $finance->id])->assertRedirect();
     $this->actingAs($finance)->get("/finance/baskets/{$basket}")
         ->assertOk()->assertInertia(fn (Assert $page) => $page->component('Finance/Baskets/Show')->where('basket.id', $basket));
     $actor = app(ActorResolver::class)->forAccount($finance->id);
     expect($actor->hasRole(Role::Finance))->toBeTrue();
     expect(app(GetBasket::class)($actor, $basket)->id)->toBe($basket);
 
-    $this->actingAs($manager)->delete(route('manage.accounts.finance-role.destroy', $finance->id))->assertRedirect();
+    $this->actingAs($manager)->delete("/manage/roles/finance/holders/{$finance->id}")->assertRedirect();
     $this->actingAs($finance)->get("/finance/baskets/{$basket}")->assertForbidden();
 });
 
@@ -42,7 +42,7 @@ it('lets Finance-only create, add, validate and collect an independent basket wi
     $product = (string) Str::uuid7();
     DB::table('products')->insert(['id' => $product, 'producer_id' => $producer->id, 'stock' => true,
         'name' => 'Oil', 'unit' => 'bottle', 'price_cents' => 1200, 'variable' => false, 'active' => true]);
-    DB::table('stock_movements')->insert(['id' => (string) Str::uuid7(), 'stock_product_id' => $product,
+    DB::table('stock_movements')->insert(['id' => (string) Str::uuid7(), 'product_id' => $product,
         'type' => 'entry', 'quantity' => '2', 'occurred_at' => now(), 'recorded_by' => $manager->id]);
 
     $this->actingAs($finance)->get('/finance/baskets')->assertOk();
@@ -56,7 +56,7 @@ it('lets Finance-only create, add, validate and collect an independent basket wi
     $this->put("/finance/baskets/{$basket}/collection")->assertRedirect();
     $this->get("/finance/baskets/{$basket}")->assertInertia(fn (Assert $page) => $page->where('basket.state', 'collected'));
     $this->get("/finance/households/{$household}/wallet")->assertInertia(fn (Assert $page) => $page
-        ->component('Wallet/Statement')->where('canManageReceipts', false)->where('wallet.movements.0.basketId', $basket));
+        ->component('Wallet/Statement')->where('canManageReceipts', true)->missing('householdReturnHref')->where('wallet.movements.0.basketId', $basket));
     expect(DB::table('stock_movements')->where('basket_id', $basket)->value('recorded_by'))->toBe($finance->id)
         ->and(DB::table('wallet_movements')->where('basket_id', $basket)->value('recorded_by'))->toBe($finance->id);
 });
@@ -91,7 +91,7 @@ it('lets Finance-only add, remove and validate return contents without catalogue
         ->and(DB::table('wallet_movements')->where('basket_id', $basket)->value('type'))->toBe('credit')
         ->and((int) DB::table('wallet_movements')->where('basket_id', $basket)->value('amount_cents'))->toBe(150)
         ->and(DB::table('basket_lines')->where('basket_id', $basket)->count())->toBe(2);
-    $this->get('/manage/return-items')->assertForbidden();
+    $this->get('/catalogue/return-items')->assertForbidden();
 });
 
 it('returns a domain error for an over-limit return request without changing the Finance draft or ledgers (R20a)', function () {
@@ -127,9 +127,9 @@ it('keeps Finance out of account, catalogue, cycle, reception, stock administrat
     $this->get('/manage/stock')->assertForbidden();
     $this->get('/manage/cycles')->assertForbidden();
     $this->get('/manage/producers')->assertForbidden();
-    $this->get('/manage/return-items')->assertForbidden();
-    $this->put('/manage/accounts/'.$finance->id.'/finance-role')->assertForbidden();
-    $this->post('/manage/households/'.Str::uuid7().'/wallet/top-ups', ['amount' => '1'])->assertForbidden();
+    $this->get('/catalogue/return-items')->assertForbidden();
+    $this->post('/manage/roles/finance/holders', ['account_id' => $finance->id])->assertForbidden();
+    $this->post('/manage/households', ['name' => 'X'])->assertForbidden();
     $this->get('/dashboard')->assertInertia(fn (Assert $page) => $page
         ->where('auth.roles', ['finance'])->has('roleAreas', 1)->where('roleAreas.0.role', 'finance'));
 });
@@ -151,14 +151,14 @@ it('preserves member household privacy and combined Manager access (R31, R36a, S
 it('lets an activated Finance-only account sign in after grant and denies sign-in after revocation (R36c, S84)', function () {
     $manager = accountWith(Role::Manager);
     $finance = accountWith();
-    $this->actingAs($manager)->put(route('manage.accounts.finance-role.update', $finance->id))->assertRedirect();
+    $this->actingAs($manager)->post('/manage/roles/finance/holders', ['account_id' => $finance->id])->assertRedirect();
     auth()->logout();
 
     $this->post(route('login.store'), ['email' => $finance->email, 'password' => 'password']);
     $this->assertAuthenticatedAs($finance);
     auth()->logout();
 
-    $this->actingAs($manager)->delete(route('manage.accounts.finance-role.destroy', $finance->id))->assertRedirect();
+    $this->actingAs($manager)->delete("/manage/roles/finance/holders/{$finance->id}")->assertRedirect();
     auth()->logout();
     $this->post(route('login.store'), ['email' => $finance->email, 'password' => 'password'])->assertSessionHasErrors();
     $this->assertGuest();
@@ -169,10 +169,10 @@ it('shows the granted and revoked Finance state on the existing Manager account 
     $manager->forceFill(['name' => 'Alpha Manager'])->save();
     $finance = accountWith();
     $finance->forceFill(['name' => 'Zulu Finance'])->save();
-    $this->actingAs($manager)->put(route('manage.accounts.finance-role.update', $finance->id))->assertRedirect();
+    $this->actingAs($manager)->post('/manage/roles/finance/holders', ['account_id' => $finance->id])->assertRedirect();
     $this->get(route('manage.accounts.index'))->assertInertia(fn (Assert $page) => $page
         ->component('Manage/Accounts/Index')->where('accounts.1.roles', ['finance']));
-    $this->delete(route('manage.accounts.finance-role.destroy', $finance->id))->assertRedirect();
+    $this->delete("/manage/roles/finance/holders/{$finance->id}")->assertRedirect();
     $this->get(route('manage.accounts.index'))->assertInertia(fn (Assert $page) => $page
         ->where('accounts.1.roles', []));
 });

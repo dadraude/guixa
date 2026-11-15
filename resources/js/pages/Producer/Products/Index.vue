@@ -2,6 +2,7 @@
 import { Form, Head, Link } from '@inertiajs/vue3';
 import { Pencil, Plus } from '@lucide/vue';
 import ProductController from '@/actions/App/Http/Controllers/Producer/ProductController';
+import StockMovementController from '@/actions/App/Http/Controllers/Producer/StockMovementController';
 import Heading from '@/components/Heading.vue';
 import ActiveSwitch from '@/components/ActiveSwitch.vue';
 import { Button } from '@/components/ui/button';
@@ -205,6 +206,15 @@ defineProps<{
                         >
                             {{ trans('Sold out') }}
                         </span>
+                        <Button variant="outline" class="min-h-11" as-child>
+                            <Link
+                                :href="StockMovementController.show(stock.id)"
+                                :aria-label="`${trans('Movement history')}: ${stock.name}`"
+                                data-test="producer-stock-history"
+                            >
+                                {{ trans('History') }}
+                            </Link>
+                        </Button>
                     </div>
                 </li>
             </ul>

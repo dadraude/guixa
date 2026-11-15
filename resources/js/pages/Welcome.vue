@@ -7,7 +7,6 @@ import { dashboard, login } from '@/routes';
 <template>
     <Head title="Guixa" />
     <WelcomePage
-        :authenticated="Boolean($page.props.auth.user)"
         :action-href="$page.props.auth.user ? dashboard().url : login().url"
     />
 </template>

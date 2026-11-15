@@ -49,13 +49,38 @@ jobs:
           node-version: '22'
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
       - name: Check formatting and lint
         run: pnpm run check
+
+  # Known-vulnerable dependencies fail every PR; exceptions live in composer.json (audit.ignore).
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # v2
+        with:
+          php-version: '8.5'
+          tools: composer:v2
+          coverage: none
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+
+      - name: Audit Composer dependencies
+        run: composer audit --locked --no-interaction
+
+      - name: Audit npm dependencies
+        run: pnpm audit
 
   frontend:
     needs: changes
@@ -83,7 +108,7 @@ jobs:
           node-version: '22'
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
 
       # Wayfinder generates routes while building; PHP is needed, services are not.
       # One command per step: PowerShell only fails a step on its last exit code.
@@ -160,7 +185,9 @@ jobs:
           php-version: '8.5'
           extensions: pdo_pgsql, redis
           tools: composer:v2
-          coverage: none
+          coverage: pcov
+          # pcov ignores app/ unless told; ini_set from phpunit.xml is refused, so set it at startup.
+          ini-values: pcov.directory=${{ github.workspace }}, pcov.exclude="~/(vendor|tests|node_modules|storage|bootstrap)/~"
 
       # Node first: pnpm's installer needs npm, which the runner lacks. The pnpm
       # store persists on the self-hosted runner, so no setup-node cache.
@@ -170,13 +197,13 @@ jobs:
           node-version: '22'
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
 
       - name: Setup Application
         run: composer setup
 
       - name: Run PHP checks and tests
-        run: composer test
+        run: composer test:coverage
 
       - name: Stop Postgres and Redis
         if: always()
@@ -219,7 +246,7 @@ jobs:
 
   ci:
     if: always()
-    needs: [changes, docs, frontend, backend, tooling]
+    needs: [changes, docs, audit, frontend, backend, tooling]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code

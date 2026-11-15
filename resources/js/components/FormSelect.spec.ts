@@ -22,6 +22,7 @@ const FormWithSelect = defineComponent({
                 required
                 :options="options"
                 default-value="south"
+                content-class="wallet-receipt-menu"
             />
         </form>
     `,
@@ -55,4 +56,19 @@ describe('FormSelect', () => {
 
         wrapper.unmount();
     });
+});
+
+it('forwards an optional content class only to the opened portal, leaving trigger classes unchanged', async () => {
+    const wrapper = mount(FormWithSelect, { attachTo: document.body });
+    await nextTick();
+    const trigger = wrapper.get('[role="combobox"]');
+    expect(trigger.classes()).not.toContain('wallet-receipt-menu');
+    await trigger.trigger('keydown', { key: 'ArrowDown', code: 'ArrowDown' });
+    await nextTick();
+    expect(
+        document
+            .querySelector('[data-slot="select-content"]')
+            ?.classList.contains('wallet-receipt-menu'),
+    ).toBe(true);
+    wrapper.unmount();
 });

@@ -30,6 +30,21 @@ it('derives stock use from movements without relying on quantity on hand (R1b, R
             return null;
         }
 
+        public function getBySourceOrder(string $orderId): ?Basket
+        {
+            return null;
+        }
+
+        public function getOpenLateBySourceOrder(string $orderId): ?Basket
+        {
+            return null;
+        }
+
+        public function weeklyOfSourceOrders(array $sourceOrderIds): array
+        {
+            return [];
+        }
+
         public function lock(string $id): ?Basket
         {
             return null;
@@ -38,6 +53,38 @@ it('derives stock use from movements without relying on quantity on hand (R1b, R
         public function list(): array
         {
             return [];
+        }
+
+        public function getForHousehold(string $id, string $householdId): ?Basket
+        {
+            $basket = $this->get($id);
+
+            return $basket?->householdId === $householdId ? $basket : null;
+        }
+
+        public function listForHousehold(string $householdId): array
+        {
+            return array_values(array_filter($this->list(),
+                fn (Basket $basket) => $basket->householdId === $householdId));
+        }
+
+        public function settledForHouseholds(array $householdIds): array
+        {
+            return [];
+        }
+
+        public function drafts(): array
+        {
+            return array_values(array_filter($this->list(), fn (Basket $basket) => $basket->state->isDraft()));
+        }
+
+        public function pendingCollections(?string $householdId = null): array
+        {
+            $pending = array_filter($this->list(), fn (Basket $basket) => $basket->isPendingCollection()
+                && ($householdId === null || $basket->householdId === $householdId));
+            usort($pending, fn (Basket $a, Basket $b) => [$a->validatedAt, $a->id] <=> [$b->validatedAt, $b->id]);
+
+            return array_values($pending);
         }
 
         public function hasProductHistory(string $productId): bool

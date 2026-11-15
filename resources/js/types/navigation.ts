@@ -11,4 +11,6 @@ export type NavItem = {
     href: NonNullable<InertiaLinkProps['href']>;
     icon?: LucideIcon;
     isActive?: boolean;
+    /** Other URL prefixes that keep this item active, for pages shared with another area. */
+    alsoActiveOn?: string[];
 };

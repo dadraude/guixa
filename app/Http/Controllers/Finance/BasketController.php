@@ -13,22 +13,31 @@ use Guixa\Sales\Application\CancelDraftBasket;
 use Guixa\Sales\Application\CreateStockBasket;
 use Guixa\Sales\Application\GetBasket;
 use Guixa\Sales\Application\GetBasketBalance;
+use Guixa\Sales\Application\GetHouseholdContainerBalance;
 use Guixa\Sales\Application\ListActiveHouseholds;
 use Guixa\Sales\Application\ListBaskets;
+use Guixa\Sales\Application\ListPendingCollections;
 use Guixa\Sales\Domain\Error\BasketNotFound;
 use Guixa\Shared\Application\Actor;
+use Guixa\Stock\Application\ListActiveStock;
 use Guixa\Stock\Application\ListReturnItems;
-use Guixa\Stock\Application\ListStock;
-use Guixa\Stock\Application\StockLevelData;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
 final class BasketController extends Controller
 {
-    public function index(Actor $actor, ListBaskets $list): Response
+    public function index(Request $request, Actor $actor, ListBaskets $list, ListPendingCollections $pending): Response
     {
-        return Inertia::render('Finance/Baskets/Index', ['baskets' => array_map(BasketSummaryRow::from(...), $list($actor))]);
+        $baskets = $request->boolean('pending')
+            ? $pending($actor, $request->string('cycle')->toString() ?: null)
+            : $list($actor);
+
+        return Inertia::render('Finance/Baskets/Index', [
+            'baskets' => array_map(BasketSummaryRow::from(...), $baskets),
+            'pending' => $request->boolean('pending'),
+        ]);
     }
 
     public function create(Actor $actor, ListActiveHouseholds $households): Response
@@ -43,8 +52,8 @@ final class BasketController extends Controller
         return to_route('finance.baskets.show', ['basket' => $id]);
     }
 
-    public function show(string $basket, Actor $actor, GetBasket $get, GetBasketBalance $balance, ListStock $stock,
-        ListReturnItems $returns): Response
+    public function show(string $basket, Actor $actor, GetBasket $get, GetBasketBalance $balance, GetHouseholdContainerBalance $containers,
+        ListActiveStock $stock, ListReturnItems $returns): Response
     {
         try {
             $record = $get($actor, $basket);
@@ -54,10 +63,11 @@ final class BasketController extends Controller
 
         return Inertia::render('Finance/Baskets/Show', [
             'basket' => BasketRow::from($record, $balance($actor, $record->householdId)),
-            'stockProducts' => $record->state === 'draft'
-                ? array_map(StockLevelRow::from(...), array_values(array_filter($stock($actor), fn (StockLevelData $level) => $level->active)))
+            'containerBalance' => $containers($actor, $record->householdId),
+            'stockProducts' => $record->can->edit
+                ? array_map(StockLevelRow::from(...), $stock($actor))
                 : [],
-            'returnItems' => $record->state === 'draft'
+            'returnItems' => $record->can->edit
                 ? array_map(ReturnItemRow::from(...), $returns($actor))
                 : [],
         ]);

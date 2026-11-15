@@ -10,7 +10,7 @@
     "views": [
         {
             "id": "manage-accounts-index",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Manage/Accounts/Index",
                 "role": "manager",
@@ -176,7 +176,7 @@
         },
         {
             "id": "manage-cycles-index",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Manage/Cycles/Index",
                 "role": "manager",
@@ -501,7 +501,7 @@
         },
         {
             "id": "manage-cycles-show",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Manage/Cycles/Show",
                 "role": "manager",
@@ -609,7 +609,7 @@
         },
         {
             "id": "manage-households-index",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Manage/Households/Index",
                 "role": "manager",
@@ -740,7 +740,7 @@
         },
         {
             "id": "manage-households-show",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Manage/Households/Show",
                 "role": "manager",
@@ -889,251 +889,8 @@
             ]
         },
         {
-            "id": "manage-pickups-index",
-            "path": "/visual-dra-205.html",
-            "query": {
-                "page": "Manage/Pickups/Index",
-                "role": "manager",
-                "route": "/manage/cycles/cycle-1/pickups"
-            },
-            "root": ".reference-style",
-            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
-            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
-            "fonts": ["16px Nunito Variable"],
-            "focus": [
-                "button[data-sidebar=\"trigger\"]",
-                "[data-visual-page-focus-first]",
-                "[data-visual-page-focus-last]"
-            ],
-            "states": [
-                {
-                    "id": "default",
-                    "cases": [
-                        {
-                            "width": 375,
-                            "mode": "light",
-                            "text": 100
-                        },
-                        {
-                            "width": 375,
-                            "mode": "dark",
-                            "text": 100
-                        },
-                        {
-                            "width": 1280,
-                            "mode": "light",
-                            "text": 100
-                        },
-                        {
-                            "width": 1280,
-                            "mode": "dark",
-                            "text": 100
-                        },
-                        {
-                            "width": 1024,
-                            "mode": "light",
-                            "text": 200
-                        },
-                        {
-                            "width": 1024,
-                            "mode": "dark",
-                            "text": 200
-                        }
-                    ]
-                },
-                {
-                    "id": "empty",
-                    "query": {
-                        "state": "empty"
-                    },
-                    "cases": [
-                        {
-                            "width": 375,
-                            "mode": "light",
-                            "text": 100
-                        },
-                        {
-                            "width": 1024,
-                            "mode": "dark",
-                            "text": 200
-                        }
-                    ],
-                    "ready": "body[data-visual-ready=\"empty\"]"
-                },
-                {
-                    "id": "long-content",
-                    "query": {
-                        "state": "long-content"
-                    },
-                    "cases": [
-                        {
-                            "width": 375,
-                            "mode": "light",
-                            "text": 100
-                        },
-                        {
-                            "width": 1024,
-                            "mode": "dark",
-                            "text": 200
-                        }
-                    ],
-                    "ready": "body[data-visual-ready=\"long-content\"]"
-                }
-            ]
-        },
-        {
-            "id": "manage-pickups-show",
-            "path": "/visual-dra-205.html",
-            "query": {
-                "page": "Manage/Pickups/Show",
-                "role": "manager",
-                "route": "/manage/cycles/cycle-1/pickups/household-1"
-            },
-            "root": ".reference-style",
-            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
-            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
-            "fonts": ["16px Nunito Variable"],
-            "focus": [
-                "button[data-sidebar=\"trigger\"]",
-                "[data-visual-page-focus-first]",
-                "[data-visual-page-focus-last]"
-            ],
-            "states": [
-                {
-                    "id": "default",
-                    "cases": [
-                        {
-                            "width": 375,
-                            "mode": "light",
-                            "text": 100
-                        },
-                        {
-                            "width": 375,
-                            "mode": "dark",
-                            "text": 100
-                        },
-                        {
-                            "width": 1280,
-                            "mode": "light",
-                            "text": 100
-                        },
-                        {
-                            "width": 1280,
-                            "mode": "dark",
-                            "text": 100
-                        },
-                        {
-                            "width": 1024,
-                            "mode": "light",
-                            "text": 200
-                        },
-                        {
-                            "width": 1024,
-                            "mode": "dark",
-                            "text": 200
-                        }
-                    ]
-                },
-                {
-                    "id": "error",
-                    "query": {
-                        "state": "error"
-                    },
-                    "cases": [
-                        {
-                            "width": 375,
-                            "mode": "light",
-                            "text": 100
-                        },
-                        {
-                            "width": 1024,
-                            "mode": "dark",
-                            "text": 200
-                        }
-                    ],
-                    "ready": "body[data-visual-ready=\"error\"]"
-                },
-                {
-                    "id": "completed",
-                    "query": {
-                        "state": "completed"
-                    },
-                    "cases": [
-                        {
-                            "width": 375,
-                            "mode": "light",
-                            "text": 100
-                        },
-                        {
-                            "width": 1024,
-                            "mode": "dark",
-                            "text": 200
-                        }
-                    ],
-                    "ready": "body[data-visual-ready=\"completed\"]"
-                },
-                {
-                    "id": "long-content",
-                    "query": {
-                        "state": "long-content"
-                    },
-                    "cases": [
-                        {
-                            "width": 375,
-                            "mode": "light",
-                            "text": 100
-                        },
-                        {
-                            "width": 1024,
-                            "mode": "dark",
-                            "text": 200
-                        }
-                    ],
-                    "ready": "body[data-visual-ready=\"long-content\"]"
-                },
-                {
-                    "id": "stock-lines",
-                    "query": {
-                        "state": "stock-lines"
-                    },
-                    "cases": [
-                        {
-                            "width": 375,
-                            "mode": "light",
-                            "text": 100
-                        },
-                        {
-                            "width": 1024,
-                            "mode": "dark",
-                            "text": 200
-                        }
-                    ],
-                    "ready": "body[data-visual-ready=\"stock-lines\"]"
-                },
-                {
-                    "id": "return-lines",
-                    "query": {
-                        "state": "return-lines"
-                    },
-                    "cases": [
-                        {
-                            "width": 375,
-                            "mode": "light",
-                            "text": 100
-                        },
-                        {
-                            "width": 1024,
-                            "mode": "dark",
-                            "text": 200
-                        }
-                    ],
-                    "ready": "body[data-visual-ready=\"return-lines\"]"
-                }
-            ]
-        },
-        {
             "id": "manage-producers-index",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Manage/Producers/Index",
                 "role": "manager",
@@ -1264,11 +1021,11 @@
         },
         {
             "id": "manage-reception-show",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
-                "page": "Manage/Reception/Show",
+                "page": "Receptions/Show",
                 "role": "manager",
-                "route": "/manage/cycles/cycle-1/receptions/producer-1"
+                "route": "/receptions/cycle-1/producer-1"
             },
             "root": ".reference-style",
             "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
@@ -1453,40 +1210,6 @@
                         }
                     ],
                     "ready": "body[data-visual-ready=\"manual-allocation\"]"
-                },
-                {
-                    "id": "received-scope-choice",
-                    "query": {
-                        "state": "received-scope-choice"
-                    },
-                    "cases": [
-                        {
-                            "width": 375,
-                            "mode": "light",
-                            "text": 100
-                        },
-                        {
-                            "width": 1024,
-                            "mode": "dark",
-                            "text": 200
-                        },
-                        {
-                            "width": 1024,
-                            "mode": "light",
-                            "text": 200
-                        }
-                    ],
-                    "ready": "body[data-visual-ready=\"received-scope-choice\"]",
-                    "checks": {
-                        "root": "[role=\"dialog\"]",
-                        "panels": "[data-slot=\"dialog-header\"],[data-slot=\"dialog-title\"],[data-slot=\"dialog-description\"],[data-slot=\"dialog-footer\"],form",
-                        "content": "h1,h2,h3,p,label:not(.sr-only),input,textarea,button:not([data-slot=\"dialog-close\"]),[data-slot=\"dialog-title\"],[data-slot=\"dialog-description\"],.pilot-separator-label",
-                        "focus": [
-                            "[data-visual-overlay-focus-first]",
-                            "[data-visual-overlay-focus-last]"
-                        ]
-                    },
-                    "settled": ["[role=\"dialog\"]"]
                 },
                 {
                     "id": "received-overwrite",
@@ -1692,7 +1415,7 @@
         },
         {
             "id": "manage-returnitems-create",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Manage/ReturnItems/Create",
                 "role": "manager",
@@ -1785,7 +1508,7 @@
         },
         {
             "id": "manage-returnitems-edit",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Manage/ReturnItems/Edit",
                 "role": "manager",
@@ -1878,7 +1601,7 @@
         },
         {
             "id": "manage-returnitems-index",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Manage/ReturnItems/Index",
                 "role": "manager",
@@ -1974,7 +1697,7 @@
         },
         {
             "id": "manage-settings",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Manage/Settings",
                 "role": "manager",
@@ -2067,7 +1790,7 @@
         },
         {
             "id": "manage-stock-create",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Manage/Stock/Create",
                 "role": "manager",
@@ -2160,7 +1883,7 @@
         },
         {
             "id": "manage-stock-edit",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Manage/Stock/Edit",
                 "role": "manager",
@@ -2253,7 +1976,7 @@
         },
         {
             "id": "manage-stock-index",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Manage/Stock/Index",
                 "role": "manager",
@@ -2439,7 +2162,7 @@
         },
         {
             "id": "manage-stock-movements",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Manage/Stock/Movements",
                 "role": "manager",
@@ -2532,7 +2255,7 @@
         },
         {
             "id": "producer-cutoff",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Producer/Cutoff",
                 "role": "producer",
@@ -2625,7 +2348,7 @@
         },
         {
             "id": "producer-cyclesummary",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Producer/CycleSummary",
                 "role": "producer",
@@ -2743,7 +2466,7 @@
         },
         {
             "id": "producer-products-create",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Producer/Products/Create",
                 "role": "producer",
@@ -2836,7 +2559,7 @@
         },
         {
             "id": "producer-products-edit",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Producer/Products/Edit",
                 "role": "producer",
@@ -2929,7 +2652,7 @@
         },
         {
             "id": "producer-products-index",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Producer/Products/Index",
                 "role": "producer",
@@ -3067,7 +2790,7 @@
         },
         {
             "id": "welcome-authenticated",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Welcome",
                 "authenticated": "1",
@@ -3130,7 +2853,7 @@
         },
         {
             "id": "welcome-guest-control",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Welcome",
                 "route": "/"
@@ -3160,7 +2883,7 @@
         },
         {
             "id": "settings-appearance-manager",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "settings/Appearance",
                 "role": "manager",
@@ -3243,7 +2966,7 @@
         },
         {
             "id": "dashboard-member",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Dashboard",
                 "role": "member",
@@ -3340,7 +3063,7 @@
         },
         {
             "id": "orders-index",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Orders/Index",
                 "role": "member",
@@ -3395,7 +3118,7 @@
         },
         {
             "id": "wallet-statement-member",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Wallet/Statement",
                 "role": "member",
@@ -3446,7 +3169,7 @@
         },
         {
             "id": "settings-profile",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "settings/Profile",
                 "role": "member",
@@ -3501,7 +3224,7 @@
         },
         {
             "id": "dashboard-manager",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Dashboard",
                 "role": "manager",
@@ -3556,7 +3279,7 @@
         },
         {
             "id": "dashboard-producer",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Dashboard",
                 "role": "producer",
@@ -3611,7 +3334,7 @@
         },
         {
             "id": "orders-edit",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Orders/Edit",
                 "role": "member",
@@ -3666,11 +3389,11 @@
         },
         {
             "id": "wallet-statement-manager",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "Wallet/Statement",
                 "role": "manager",
-                "route": "/manage/households/household-1/wallet"
+                "route": "/finance/households/household-1/wallet"
             },
             "root": ".reference-style",
             "panels": "#main-content .pilot-wallet-forms .pilot-layout-panel, #main-content .pilot-wallet-table tbody tr, #main-content .pilot-layout-notice, [data-sidebar=\"sidebar\"]",
@@ -3721,7 +3444,7 @@
         },
         {
             "id": "settings-appearance-member",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "settings/Appearance",
                 "role": "member",
@@ -3777,7 +3500,7 @@
         },
         {
             "id": "settings-appearance-producer",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "settings/Appearance",
                 "role": "producer",
@@ -3833,7 +3556,7 @@
         },
         {
             "id": "settings-profile-manager",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "settings/Profile",
                 "role": "manager",
@@ -3888,7 +3611,7 @@
         },
         {
             "id": "settings-profile-producer",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "settings/Profile",
                 "role": "producer",
@@ -3943,7 +3666,7 @@
         },
         {
             "id": "settings-security-member",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "settings/Security",
                 "role": "member",
@@ -3998,7 +3721,7 @@
         },
         {
             "id": "settings-security-manager",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "settings/Security",
                 "role": "manager",
@@ -4053,7 +3776,7 @@
         },
         {
             "id": "settings-security-producer",
-            "path": "/visual-dra-205.html",
+            "path": "/resources/visual/dra-205.html",
             "query": {
                 "page": "settings/Security",
                 "role": "producer",

@@ -10,6 +10,7 @@ use Guixa\Shared\Domain\Quantity;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\Support\Contracts\OrderRepositoryContract;
 use Tests\TestCase;
@@ -41,12 +42,6 @@ final class EloquentOrderRepositoryTest extends TestCase
                 'id' => $id, 'producer_id' => self::BAKER, 'name' => "Product {$id}", 'unit' => 'unit', 'price_cents' => 100, 'variable' => false,
             ]);
         }
-
-        foreach ([self::HONEY, self::CHEESE] as $id) {
-            DB::table('products')->insertOrIgnore(['id' => $id, 'producer_id' => self::BAKER, 'stock' => true, 'name' => "Stock {$id}", 'unit' => 'unit', 'price_cents' => 100, 'variable' => false, 'active' => true]);
-        }
-
-        DB::table('return_items')->insertOrIgnore(['id' => self::JAR, 'name' => 'Glass jar', 'amount_cents' => 50, 'active' => true]);
 
         if (! User::query()->whereKey(self::ANNA)->exists()) {
             User::factory()->create(['id' => self::ANNA]);
@@ -105,18 +100,14 @@ final class EloquentOrderRepositoryTest extends TestCase
     }
 
     #[Test]
-    public function the_database_refuses_a_stock_or_return_line_of_zero(): void
+    public function the_schema_keeps_no_pickup_stock_return_adjustment_or_charge_ownership_in_ordering(): void
     {
-        $this->referencedRowsExist();
-        $order = $this->repository()->lockFor(self::CYCLE, self::HOUSEHOLD);
+        foreach (['order_stock_lines', 'order_return_lines', 'order_pickup_adjustments'] as $table) {
+            $this->assertFalse(Schema::hasTable($table), $table);
+        }
 
-        $this->assertThrows(fn () => DB::table('order_stock_lines')->insert([
-            'id' => $this->repository()->nextId(), 'order_id' => $order->id, 'stock_product_id' => self::HONEY, 'name' => 'Honey',
-            'unit' => 'jar', 'unit_price_cents' => 650, 'variable' => false, 'quantity' => '0',
-        ]), QueryException::class);
-        $this->assertThrows(fn () => DB::table('order_return_lines')->insert([
-            'id' => $this->repository()->nextId(), 'order_id' => $order->id, 'return_item_id' => self::JAR, 'name' => 'Glass jar',
-            'amount_cents' => 50, 'quantity' => 0,
-        ]), QueryException::class);
+        $this->assertFalse(Schema::hasColumns('orders', ['pickup_status']));
+        $this->assertSame([], array_values(array_intersect(Schema::getColumnListing('orders'), ['pickup_status', 'pickup_opened_at', 'pickup_done_at', 'charged_cents'])));
+        $this->assertSame([], array_values(array_intersect(Schema::getColumnListing('order_lines'), ['delivered_quantity'])));
     }
 }

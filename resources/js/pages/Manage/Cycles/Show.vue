@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import { formatPickupDate, formatQuantity } from '@/lib/locale';
-import { Head } from '@inertiajs/vue3';
+import { Head, Link } from '@inertiajs/vue3';
 import { trans } from 'laravel-vue-i18n';
 import CycleController from '@/actions/App/Http/Controllers/Manage/CycleController';
 import Heading from '@/components/Heading.vue';
+import { Button } from '@/components/ui/button';
 
 defineProps<{
     summary: App.Http.CycleSummaryRow;
     containers: App.Http.ContainerCountRow;
+    pendingCollections: { count: number; href: string | null };
 }>();
 
 defineOptions({
@@ -33,6 +35,22 @@ defineOptions({
             "
             :description="trans('What was ordered, per producer and product')"
         />
+
+        <Button
+            v-if="pendingCollections.href !== null"
+            as-child
+            variant="outline"
+            class="min-h-11 self-start"
+            ><Link
+                :href="pendingCollections.href"
+                data-test="pending-collections"
+                >{{
+                    trans('Pending collections: :count', {
+                        count: String(pendingCollections.count),
+                    })
+                }}</Link
+            ></Button
+        >
 
         <p
             v-if="summary.cancelled"
@@ -69,7 +87,7 @@ defineOptions({
                 <li
                     v-for="household in containers.households"
                     :key="household.householdId"
-                    class="flex items-center justify-between gap-4"
+                    class="flex flex-wrap items-center justify-between gap-x-4 gap-y-1"
                     :data-test="`container-household-${household.householdId}`"
                 >
                     <span class="min-w-0 break-words">{{
@@ -78,6 +96,17 @@ defineOptions({
                     <span class="shrink-0">{{
                         formatQuantity(String(household.count))
                     }}</span>
+                    <span
+                        class="min-w-0 break-words text-muted-foreground"
+                        :data-test="`container-balance-${household.householdId}`"
+                        >{{
+                            trans('Containers to return: :count', {
+                                count: formatQuantity(
+                                    String(household.balance),
+                                ),
+                            })
+                        }}</span
+                    >
                 </li>
             </ul>
         </section>

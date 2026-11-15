@@ -2,7 +2,7 @@
 import AppLayout from '@/layouts/app/AppSidebarLayout.vue';
 import { usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
-import { isPilotThemePage } from '@/lib/pilotTheme';
+import { isPilotThemePage, pilotVariantFor } from '@/lib/pilotTheme';
 import type { BreadcrumbItem } from '@/types';
 
 const { breadcrumbs = [] } = defineProps<{
@@ -10,6 +10,7 @@ const { breadcrumbs = [] } = defineProps<{
 }>();
 const page = usePage();
 const pilotTheme = computed(() => isPilotThemePage(page.component));
+const pilotVariant = computed(() => pilotVariantFor(page.component));
 const managerTheme = computed(
     () =>
         page.component.startsWith('Manage/') ||
@@ -21,6 +22,7 @@ const managerTheme = computed(
     <AppLayout
         :breadcrumbs="breadcrumbs"
         :pilot-theme="pilotTheme"
+        :pilot-variant="pilotVariant"
         :manager-theme="managerTheme"
     >
         <slot />

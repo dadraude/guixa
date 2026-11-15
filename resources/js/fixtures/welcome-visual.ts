@@ -10,7 +10,6 @@ document.documentElement.style.fontSize =
     query.get('text') === '200' ? '32px' : '16px';
 
 const app = createApp(WelcomePage, {
-    authenticated: query.has('authenticated'),
     actionHref: query.has('authenticated') ? '/dashboard' : '/login',
 });
 installTranslations(app, 'ca');

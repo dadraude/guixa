@@ -21,28 +21,39 @@ final readonly class BasketLine
         public Quantity $quantity,
         public DateTimeImmutable $createdAt,
         public ?DateTimeImmutable $removedAt = null,
-        public string $kind = 'stock',
+        public BasketLineKind $kind = BasketLineKind::Stock,
         public ?string $returnItemId = null,
+        public ?string $sourceOrderLineId = null,
+        public ?Quantity $orderedQuantity = null,
+        public ?Quantity $allocatedQuantity = null,
     ) {}
 
     public function amountCents(): int
     {
         $amount = Money::ofCents($this->priceCents)->multiply($this->quantity)->cents;
 
-        return $this->kind === 'return' ? -$amount : $amount;
+        return $this->kind->isReturn() ? -$amount : $amount;
     }
 
     public function withQuantity(Quantity $quantity): self
     {
         return new self($this->id, $this->basketId, $this->productId, $this->name, $this->unit,
             $this->priceCents, $this->variable, $this->containersPerUnit, $quantity, $this->createdAt,
-            $this->removedAt, $this->kind, $this->returnItemId);
+            $this->removedAt, $this->kind, $this->returnItemId, $this->sourceOrderLineId, $this->orderedQuantity, $this->allocatedQuantity);
     }
 
     public function removedAt(DateTimeImmutable $when): self
     {
         return new self($this->id, $this->basketId, $this->productId, $this->name, $this->unit,
             $this->priceCents, $this->variable, $this->containersPerUnit, $this->quantity, $this->createdAt,
-            $when, $this->kind, $this->returnItemId);
+            $when, $this->kind, $this->returnItemId, $this->sourceOrderLineId, $this->orderedQuantity, $this->allocatedQuantity);
+    }
+
+    /** The allocation changed at the source: the snapshot follows it and a staff override of the actual quantity is reset. */
+    public function reallocated(Quantity $allocated): self
+    {
+        return new self($this->id, $this->basketId, $this->productId, $this->name, $this->unit,
+            $this->priceCents, $this->variable, $this->containersPerUnit, $allocated, $this->createdAt,
+            $this->removedAt, $this->kind, $this->returnItemId, $this->sourceOrderLineId, $this->orderedQuantity, $allocated);
     }
 }

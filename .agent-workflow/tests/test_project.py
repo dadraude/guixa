@@ -29,6 +29,33 @@ class ProjectWorkflowTest(unittest.TestCase):
             self.assertIn(WORKFLOW / "core" / f"{new}.md", set(local_links(path)))
             self.assertLess(len(path.read_text().splitlines()), 12)
 
+    def test_spec_entrypoints_share_project_references(self):
+        for stem in ("spec-flow", "spec-gaps"):
+            reference = ROOT / ".agent-workflow/references" / f"{stem}.md"
+            self.assertTrue(reference.is_file())
+            for entry in (
+                ROOT / ".claude/skills" / stem / "SKILL.md",
+                ROOT / ".agents/skills" / f"agent-workflow-{stem}" / "SKILL.md",
+            ):
+                with self.subTest(entry=entry):
+                    self.assertIn(reference, set(local_links(entry)))
+                    self.assertLess(len(entry.read_text().splitlines()), 15)
+                    self.assertNotIn("disable-model-invocation: true", entry.read_text())
+            self.assertGreater(len(reference.read_text().splitlines()), 15)
+
+    def test_workflow_document_links_resolve(self):
+        paths = [
+            ROOT / ".agent-workflow/references/spec-flow.md",
+            ROOT / ".agent-workflow/references/spec-gaps.md",
+            ROOT / ".agent-workflow/references/feature-acceptance.md",
+            ROOT / ".agent-workflow/profile.md",
+            ROOT / "specs/README.md",
+        ]
+        for path in paths:
+            for target in local_links(path):
+                with self.subTest(source=path, target=target):
+                    self.assertTrue(target.exists())
+
     def test_codex_agents_pin_the_profile_models(self):
         section = (ROOT / ".agent-workflow/profile.md").read_text().split("## Model routing", 1)[1]
         for tier, model in re.findall(r"^\| (Light|Standard|Strong) .*\| `([\w.-]+)` *\|$", section, re.MULTILINE):

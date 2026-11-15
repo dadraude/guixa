@@ -4,6 +4,7 @@ namespace Guixa\Sales\Application;
 
 use Guixa\Sales\Domain\Basket;
 use Guixa\Sales\Domain\BasketRepository;
+use Guixa\Sales\Domain\BasketState;
 use Guixa\Sales\Domain\Error\HouseholdUnavailable;
 use Guixa\Sales\Domain\HouseholdDirectory;
 use Guixa\Shared\Application\Actor;
@@ -20,7 +21,7 @@ final class CreateStockBasket
         foreach ($this->households->all() as $household) {
             if ($household->id === $householdId && $household->active) {
                 $id = $this->baskets->nextId();
-                $this->baskets->save(new Basket($id, $householdId, $household->name, 'draft', $actor->accountId, $this->clock->now()));
+                $this->baskets->save(new Basket($id, $householdId, $household->name, BasketState::Draft, $actor->accountId, $this->clock->now()));
 
                 return $id;
             }

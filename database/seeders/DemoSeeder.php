@@ -7,23 +7,33 @@ use DateTimeImmutable;
 use Guixa\Catalog\Application\CreateProducer;
 use Guixa\Catalog\Application\CreateProduct;
 use Guixa\Catalog\Application\CreateStockProduct;
+use Guixa\Catalog\Application\DeactivateProducer;
+use Guixa\Catalog\Application\DeactivateProduct;
 use Guixa\Membership\Application\CreateHousehold;
+use Guixa\Membership\Application\GrantStaffRole;
 use Guixa\Membership\Domain\Account;
 use Guixa\Membership\Domain\AccountPasswords;
 use Guixa\Membership\Domain\AccountRepository;
 use Guixa\Membership\Domain\ValueObject\Email;
-use Guixa\Ordering\Application\CompletePickup;
+use Guixa\Ordering\Application\CloseProducerNow;
 use Guixa\Ordering\Application\MarkProducerDistributed;
 use Guixa\Ordering\Application\OpenCycle;
 use Guixa\Ordering\Application\SetOrderLine;
+use Guixa\Ordering\Application\SetProductAvailability;
 use Guixa\Ordering\Application\SetReceivedTotal;
 use Guixa\Ordering\Application\ValidateReception;
 use Guixa\Ordering\Domain\CooperativeSettings;
 use Guixa\Ordering\Domain\CycleRepository;
+use Guixa\Sales\Application\FindWeeklyBaseBasket;
+use Guixa\Sales\Application\MarkBasketCollected;
+use Guixa\Sales\Application\ValidateBasket;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Application\ActorResolver;
 use Guixa\Shared\Domain\Clock;
 use Guixa\Shared\Domain\Quantity;
+use Guixa\Shared\Domain\Role;
+use Guixa\Stock\Application\CreateReturnItem;
+use Guixa\Stock\Application\DeactivateReturnItem;
 use Guixa\Stock\Application\RecordStockEntry;
 use Guixa\Wallet\Application\RecordTopUp;
 use Illuminate\Database\Seeder;
@@ -36,13 +46,26 @@ final class DemoSeeder extends Seeder
 
     private const string MANAGER_EMAIL = 'gestora@demo.guixa.test';
 
-    private const string PASSWORD = 'demo-password';
+    private const string PASSWORD = 'password';
+
+    private const string UNLINKED_NAME = 'Eva Sense Llar';
+
+    private const string UNLINKED_EMAIL = 'eva@demo.guixa.test';
 
     private const array HOUSEHOLDS = [
         ['Can Roca', 'Anna Roca', 'anna@demo.guixa.test', 10000],
         ['La Plaça', 'Biel Soler', 'biel@demo.guixa.test', 7500],
         ['Els Pins', 'Carla Pons', 'carla@demo.guixa.test', 5000],
         ['La Font', 'David Font', 'david@demo.guixa.test', 2500],
+    ];
+
+    /**
+     * Staff roles granted to the households' accounts, by household index, so the role screen has holders. The first account is
+     * member, Finance and Receiver at once, the combined-role dashboard (one collection group, no duplicated role rows).
+     */
+    private const array STAFF_ROLES = [
+        0 => [Role::Finance, Role::Receiver],
+        1 => [Role::Catalogue, Role::Receiver],
     ];
 
     private const array PRODUCERS = [
@@ -89,6 +112,8 @@ final class DemoSeeder extends Seeder
             self::MANAGER_ID, 'Gestora Demo', Email::from(self::MANAGER_EMAIL),
         ));
         $members = $this->createHouseholds($manager);
+        $this->grantStaffRoles($manager, $members);
+        $this->createUnlinkedAccount($members[0]['householdId']);
         $catalog = $this->createCatalog($manager);
         $this->createStock($manager, $catalog['producers'][0]);
         $dates = $this->pickupDates();
@@ -110,10 +135,56 @@ final class DemoSeeder extends Seeder
             app(ValidateReception::class)($manager, $cycles[0], $producerId);
             app(MarkProducerDistributed::class)($manager, $cycles[0], $producerId);
         }
-        app(CompletePickup::class)($manager, $cycles[0], $members[0]['householdId']);
+        $this->collectFirstBasket($manager, $cycles[0], $members[0]['householdId']);
+        $this->validateBasketAwaitingCollection($manager, $cycles[0], $members[1]['householdId']);
 
         $this->prepareReception($cycles[1], $catalog['producers']);
+        // The next cycle shows every reception state the dashboard lists: the first producer is validated and balanced
+        // (awaiting distribution), the third has default totals recorded but is unvalidated, the second was never opened.
         $this->receiveProducts($manager, $cycles[1], array_slice($catalog['products'], 0, 2));
+        $this->receiveProducts($manager, $cycles[1], array_slice($catalog['products'], 4, 2), firstQuantityColumn: 4);
+        app(ValidateReception::class)($manager, $cycles[1], $catalog['producers'][0]);
+
+        // A closed, ordered, unsent producer with an account is the one send the dashboard offers the manager (R9).
+        app(CloseProducerNow::class)($manager, $cycles[2], $catalog['producers'][2]);
+
+        $this->createCatalogueStates($manager, $cycles[2], $catalog);
+    }
+
+    /**
+     * Created after the cycles so no cycle, order or reception changes: the deactivated producer and the inactive product
+     * never take part in a cycle, and the first producer's order in the unsent cycle still offers the availability toggle.
+     *
+     * @param  array{producers: list<string>, products: list<array{id: string, producerId: string}>}  $catalog
+     */
+    private function createCatalogueStates(Actor $manager, string $unsentCycleId, array $catalog): void
+    {
+        $formerProducerId = app(CreateProducer::class)($manager, 'Cooperativa Tancada', 2, '20:00');
+        app(DeactivateProducer::class)($manager, $formerProducerId);
+
+        $retiredProductId = app(CreateProduct::class)($manager, $catalog['producers'][1], 'Coca de recapte', 'peça', 420, false, null);
+        app(DeactivateProduct::class)($manager, $retiredProductId);
+
+        app(SetProductAvailability::class)($manager, $unsentCycleId, $catalog['products'][1]['id'], false);
+
+        app(CreateReturnItem::class)($manager, 'Caixa de fruita', 150);
+        $retiredReturnItemId = app(CreateReturnItem::class)($manager, 'Ampolla de vidre', 25);
+        app(DeactivateReturnItem::class)($manager, $retiredReturnItemId);
+    }
+
+    /** Settlement created one draft base basket per household; the first household's is validated and collected. */
+    private function collectFirstBasket(Actor $manager, string $cycleId, string $householdId): void
+    {
+        $basket = app(FindWeeklyBaseBasket::class)($manager, $cycleId, $householdId);
+        app(ValidateBasket::class)($manager, $basket->id);
+        app(MarkBasketCollected::class)($manager, $basket->id);
+    }
+
+    /** A validated, uncollected basket gives the dashboard a pending collection to show. */
+    private function validateBasketAwaitingCollection(Actor $manager, string $cycleId, string $householdId): void
+    {
+        $basket = app(FindWeeklyBaseBasket::class)($manager, $cycleId, $householdId);
+        app(ValidateBasket::class)($manager, $basket->id);
     }
 
     private function createAccount(Account $account): Actor
@@ -141,6 +212,25 @@ final class DemoSeeder extends Seeder
         }
 
         return $members;
+    }
+
+    /** @param list<array{actor: Actor, householdId: string}> $members */
+    private function grantStaffRoles(Actor $manager, array $members): void
+    {
+        foreach (self::STAFF_ROLES as $memberIndex => $roles) {
+            foreach ($roles as $role) {
+                app(GrantStaffRole::class)($manager, $members[$memberIndex]['actor']->accountId, $role->value);
+            }
+        }
+    }
+
+    /** A former member whose household link was removed: no household, producer or staff role, so the dashboard explains the absence (R14). */
+    private function createUnlinkedAccount(string $formerHouseholdId): void
+    {
+        $actor = $this->createAccount(Account::inviteMember(
+            app(AccountRepository::class)->nextId(), self::UNLINKED_NAME, Email::from(self::UNLINKED_EMAIL), $formerHouseholdId,
+        ));
+        DB::table('users')->where('id', $actor->accountId)->update(['household_id' => null]);
     }
 
     /** @return array{producers: list<string>, products: list<array{id: string, producerId: string}>} */
@@ -220,13 +310,16 @@ final class DemoSeeder extends Seeder
         $cycles->add($cycle);
     }
 
-    /** @param list<array{id: string, producerId: string}> $products */
-    private function receiveProducts(Actor $manager, string $cycleId, array $products): void
+    /**
+     * @param  list<array{id: string, producerId: string}>  $products
+     * @param  int  $firstQuantityColumn  the QUANTITIES column of the first product
+     */
+    private function receiveProducts(Actor $manager, string $cycleId, array $products, int $firstQuantityColumn = 0): void
     {
         foreach ($products as $index => $product) {
             $thousandths = 0;
             foreach (self::QUANTITIES as $quantities) {
-                $thousandths += Quantity::fromString($quantities[$index])->thousandths;
+                $thousandths += Quantity::fromString($quantities[$firstQuantityColumn + $index])->thousandths;
             }
             app(SetReceivedTotal::class)($manager, $cycleId, $product['producerId'], $product['id'], Quantity::ofThousandths($thousandths)->toString());
         }

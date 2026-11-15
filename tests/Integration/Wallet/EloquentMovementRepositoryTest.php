@@ -58,9 +58,11 @@ final class EloquentMovementRepositoryTest extends TestCase
             'top-up of zero' => [['type' => 'top_up', 'amount_cents' => 0]],
             'top-up in a cycle' => [['type' => 'top_up', 'amount_cents' => 100, 'cycle_id' => 'cycle']],
             'charge that is positive' => [['type' => 'charge', 'amount_cents' => 100, 'cycle_id' => 'cycle']],
-            'charge without a cycle' => [['type' => 'charge', 'amount_cents' => -100]],
+            'charge without a basket' => [['type' => 'charge', 'amount_cents' => -100]],
+            'charge for a household and cycle' => [['type' => 'charge', 'amount_cents' => -100, 'cycle_id' => 'cycle']],
             'credit that is negative' => [['type' => 'credit', 'amount_cents' => -100, 'cycle_id' => 'cycle']],
-            'credit without a cycle' => [['type' => 'credit', 'amount_cents' => 100]],
+            'credit without a basket' => [['type' => 'credit', 'amount_cents' => 100]],
+            'credit for a household and cycle' => [['type' => 'credit', 'amount_cents' => 100, 'cycle_id' => 'cycle']],
             'correction of zero' => [['type' => 'correction', 'amount_cents' => 0, 'note' => 'x']],
             'correction without a note' => [['type' => 'correction', 'amount_cents' => 100, 'note' => '']],
             'unknown type' => [['type' => 'gift', 'amount_cents' => 100]],
@@ -88,16 +90,11 @@ final class EloquentMovementRepositoryTest extends TestCase
     }
 
     #[Test]
-    public function the_partial_unique_index_rejects_a_second_charge_or_credit_for_a_household_and_cycle(): void
+    public function the_schema_has_no_household_and_cycle_charge_uniqueness_only_one_charge_per_basket(): void
     {
-        $household = $this->household();
-        $cycle = (string) Str::uuid7();
-        $insert = fn (string $type, int $cents) => fn () => DB::table('wallet_movements')->insert([
-            'id' => (string) Str::uuid7(), 'household_id' => $household, 'type' => $type, 'amount_cents' => $cents,
-            'occurred_at' => now(), 'recorded_by' => $this->account(), 'cycle_id' => $cycle,
-        ]);
-        $insert('charge', -100)();
+        $indexes = array_column(DB::select("select indexname from pg_indexes where tablename = 'wallet_movements'"), 'indexname');
 
-        $this->assertThrows($insert('credit', 50), QueryException::class);
+        $this->assertNotContains('wallet_movements_one_charge_per_cycle', $indexes);
+        $this->assertContains('wallet_movements_one_charge_per_basket', $indexes);
     }
 }

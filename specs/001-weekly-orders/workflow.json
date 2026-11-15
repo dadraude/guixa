@@ -1,0 +1,127 @@
+{
+  "schemaVersion": 1,
+  "slice": {
+    "id": "landing-style-stock-pilot",
+    "scopeRefs": [
+      "specs/001-weekly-orders/tasks.md#t84",
+      "specs/001-weekly-orders/tasks/landing-style-pilot.md#t84",
+      "specs/001-weekly-orders/stock-wallet.md (R25/R25a/R27/R28/R28a; partial regression only)",
+      "specs/003-role-management/spec.md (R4 permission preservation)"
+    ],
+    "deferredRefs": [
+      "specs/001-weekly-orders/discovery.md (later visual rollout phases 2–5)"
+    ]
+  },
+  "stages": {
+    "discovery": {
+      "request": {
+        "path": "specs/001-weekly-orders/history/2026-11-11T16-38-52.821Z-no-task-e8ac632f-06de-471a-96fa-f051311ab013.md",
+        "sha256": "3b04b30781a9baf83628a50c687f3f2b8bcf886a52183b722dfded53b7eaaa35"
+      },
+      "discovery": {
+        "path": "specs/001-weekly-orders/discovery.md",
+        "sha256": "df9a67db4c2f810be2ccb626eb0736bd15c400504c2e84423a0bf7b4062d4516"
+      }
+    },
+    "scope": {
+      "sliceId": "landing-style-stock-pilot",
+      "slices": {
+        "path": "specs/001-weekly-orders/discovery.md",
+        "sha256": "df9a67db4c2f810be2ccb626eb0736bd15c400504c2e84423a0bf7b4062d4516"
+      },
+      "selectionDecision": {
+        "path": "specs/001-weekly-orders/history/2026-11-11T17-11-48.918Z-no-task-f1d25139-bd9e-455b-8b11-b1728e63688a.md",
+        "sha256": "5701e25dc3b1ed2c6768ad3dda5f2119948beb150dbe8482602745cb6926a9cb"
+      },
+      "sources": [
+        {
+          "path": "specs/001-weekly-orders/history/2026-11-11T16-58-01.938Z-no-task-af456e57-d88a-4d3a-b411-52e529785370.md",
+          "sha256": "18b47ba9588788b4a7ba078cb31a2f1827011f6246985e7da627c52e4cf908dc"
+        }
+      ]
+    },
+    "spec": {
+      "sliceId": "landing-style-stock-pilot",
+      "specification": {
+        "path": "specs/001-weekly-orders/spec.md",
+        "sha256": "7ff4639a8061793101ec97b24991a45d3a26ded8e15112107cdc05d39a413b94"
+      },
+      "gapReview": {
+        "path": "specs/001-weekly-orders/history/2026-11-11T17-13-51.902Z-no-task-3e516c27-80d5-4d9d-858d-157a94638a13.md",
+        "sha256": "0f3d6af79efce1d2e32dadd681bd9adb20b1f9612ac504ffcd321b9e21998173"
+      },
+      "acceptance": {
+        "path": "specs/001-weekly-orders/history/2026-11-11T17-13-19.351Z-no-task-fc3b6b38-d120-44a5-ab37-f8548c940fe1.md",
+        "sha256": "ffa6377c14977e07ce2f6460125785a32218dae620815640fa208498b969e87a"
+      },
+      "sources": [
+        {
+          "path": "specs/001-weekly-orders/stock-wallet.md",
+          "sha256": "4a3194d4abd0941a0edb8a3478715e9f42600a051518ca37a8765f34e5928ff0"
+        },
+        {
+          "path": "specs/001-weekly-orders/ordering.md",
+          "sha256": "c599975af55222d7474a3f1ffb5f4a38ceb0de2d3e81c52940bb0dbc4e9894d4"
+        },
+        {
+          "path": "specs/003-role-management/spec.md",
+          "sha256": "200be7dc4f719ed7589e33a55f2ca0bbc52cac01de7a032c626a3a7bfa4b4ae5"
+        },
+        {
+          "path": "specs/constitution.md",
+          "sha256": "9f1c5e4cc45e5f64f23dd2707cc7f3b64d12d30ef2489c730daab29c13dad5f2"
+        },
+        {
+          "path": "specs/001-weekly-orders/log.md",
+          "sha256": "fbc24d83d9c1d319ee8a8ed266fc00e870f58af24999d3bf4297ac9854f36686"
+        },
+        {
+          "path": "specs/001-weekly-orders/history/2026-11-06T18-06-47.415Z-DRA-238-79b96903-bc29-4639-a94c-51fb656e97cc.md",
+          "sha256": "33c8024c5eaf324af20e4532b3f2fce394a972a3a7f8853dc354fad4b7b7c0f1"
+        }
+      ]
+    },
+    "plan": {
+      "sliceId": "landing-style-stock-pilot",
+      "plan": {
+        "path": "specs/001-weekly-orders/plan.md",
+        "sha256": "bd5696f816cc681f3b75ec547aee4c0f0821774c571931802e1927339350b9ac"
+      },
+      "acceptance": {
+        "path": "specs/001-weekly-orders/history/2026-11-11T16-58-01.938Z-no-task-af456e57-d88a-4d3a-b411-52e529785370.md",
+        "sha256": "18b47ba9588788b4a7ba078cb31a2f1827011f6246985e7da627c52e4cf908dc"
+      },
+      "sources": [
+        {
+          "path": "specs/001-weekly-orders/discovery.md",
+          "sha256": "df9a67db4c2f810be2ccb626eb0736bd15c400504c2e84423a0bf7b4062d4516"
+        },
+        {
+          "path": "specs/001-weekly-orders/history/2026-11-11T17-11-48.918Z-no-task-f1d25139-bd9e-455b-8b11-b1728e63688a.md",
+          "sha256": "5701e25dc3b1ed2c6768ad3dda5f2119948beb150dbe8482602745cb6926a9cb"
+        }
+      ]
+    },
+    "tasks": {
+      "sliceId": "landing-style-stock-pilot",
+      "tasks": {
+        "path": "specs/001-weekly-orders/tasks.md",
+        "sha256": "18509cbf84877e3f026ca8be293773a52f3b52ec904a66f36f12e16bb35a54c5"
+      },
+      "acceptance": {
+        "path": "specs/001-weekly-orders/history/2026-11-11T17-11-48.918Z-no-task-f1d25139-bd9e-455b-8b11-b1728e63688a.md",
+        "sha256": "5701e25dc3b1ed2c6768ad3dda5f2119948beb150dbe8482602745cb6926a9cb"
+      },
+      "sources": [
+        {
+          "path": "specs/001-weekly-orders/tasks/landing-style-pilot.md",
+          "sha256": "fa0557b6fefb6afc78c3bbdd3d079f6aeddd348dabe5183d223ce9c841a6547e"
+        },
+        {
+          "path": "specs/001-weekly-orders/discovery.md",
+          "sha256": "df9a67db4c2f810be2ccb626eb0736bd15c400504c2e84423a0bf7b4062d4516"
+        }
+      ]
+    }
+  }
+}

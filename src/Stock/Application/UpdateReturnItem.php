@@ -14,7 +14,7 @@ final class UpdateReturnItem
 
     public function __invoke(Actor $actor, string $id, string $name, int $amountCents): void
     {
-        Gate::forUser($actor)->authorize('manage');
+        Gate::forUser($actor)->authorize('administer-catalogue');
 
         $item = $this->items->get($id) ?? throw ReturnItemNotFound::withId($id);
         $item->change($name, Money::ofCents($amountCents));

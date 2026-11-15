@@ -4,6 +4,7 @@ namespace Guixa\Sales\Application;
 
 use DomainException;
 use Guixa\Sales\Domain\BasketLine;
+use Guixa\Sales\Domain\BasketLineKind;
 use Guixa\Sales\Domain\BasketRepository;
 use Guixa\Sales\Domain\Error\BasketNotEditable;
 use Guixa\Sales\Domain\Error\BasketNotFound;
@@ -35,7 +36,7 @@ final class AddReturnToBasket
 
         $this->transactions->run(function () use ($basketId, $returnItemId, $addition): void {
             $basket = $this->baskets->lock($basketId) ?? throw BasketNotFound::withId($basketId);
-            if ($basket->state !== 'draft') {
+            if (! $basket->state->isDraft()) {
                 throw BasketNotEditable::create();
             }
             $item = $this->items->get($returnItemId);
@@ -45,7 +46,7 @@ final class AddReturnToBasket
 
             $lines = $basket->lines;
             foreach ($lines as $index => $line) {
-                if ($line->kind === 'return' && $line->returnItemId === $returnItemId && $line->removedAt === null) {
+                if ($line->kind->isReturn() && $line->returnItemId === $returnItemId && $line->removedAt === null) {
                     try {
                         $combined = Quantity::fromString(
                             Quantity::ofThousandths($line->quantity->thousandths + $addition->thousandths)->toString()
@@ -61,7 +62,7 @@ final class AddReturnToBasket
             }
             $lines[] = new BasketLine($this->baskets->nextId(), $basketId, null, $item->name, 'item',
                 $item->amountCents, false, null, $addition, $this->clock->now(),
-                kind: 'return', returnItemId: $returnItemId);
+                kind: BasketLineKind::Return, returnItemId: $returnItemId);
             $this->baskets->save($basket->withLines($lines));
         });
     }

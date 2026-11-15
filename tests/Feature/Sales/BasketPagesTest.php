@@ -38,7 +38,7 @@ it('creates, adds, validates and collects through Manager routes while denying m
     $product = (string) Str::uuid7();
     DB::table('products')->insert(['id' => $product, 'producer_id' => $producer->id, 'stock' => true,
         'name' => 'Oil', 'unit' => 'bottle', 'price_cents' => 1200, 'variable' => false, 'active' => true]);
-    DB::table('stock_movements')->insert(['id' => (string) Str::uuid7(), 'stock_product_id' => $product,
+    DB::table('stock_movements')->insert(['id' => (string) Str::uuid7(), 'product_id' => $product,
         'type' => 'entry', 'quantity' => '2', 'occurred_at' => now(), 'recorded_by' => $manager->id]);
 
     $this->actingAs($manager)->post('/finance/baskets', ['household_id' => $household])->assertRedirect();
@@ -94,7 +94,7 @@ it('lets a Manager remove stock and cancel a draft through HTTP while retaining 
     $product = (string) Str::uuid7();
     DB::table('products')->insert(['id' => $product, 'producer_id' => $producer->id, 'stock' => true,
         'name' => 'Oil', 'unit' => 'bottle', 'price_cents' => 1200, 'variable' => false, 'active' => true]);
-    DB::table('stock_movements')->insert(['id' => (string) Str::uuid7(), 'stock_product_id' => $product,
+    DB::table('stock_movements')->insert(['id' => (string) Str::uuid7(), 'product_id' => $product,
         'type' => 'entry', 'quantity' => '2', 'occurred_at' => now(), 'recorded_by' => $manager->id]);
 
     $this->actingAs($manager)->post('/finance/baskets', ['household_id' => $household])->assertRedirect();
@@ -138,7 +138,7 @@ it('denies every basket read and mutation route to non-managers at T55 (R19a)', 
     ['post', '/finance/baskets/{basket}/cancellation'],
 ]);
 
-it('shows a basket-sourced charge on Manager and member Wallet statements without member basket access (R31)', function () {
+it('shows a basket-sourced charge on Manager and member Wallet statements while Finance basket routes stay denied to members (R31)', function () {
     $household = basketHousehold();
     $manager = accountWith(Role::Manager);
     $basket = app(CreateStockBasket::class)(Actor::manager($manager->id), $household);
@@ -146,9 +146,43 @@ it('shows a basket-sourced charge on Manager and member Wallet statements withou
         'type' => 'charge', 'amount_cents' => -1200, 'occurred_at' => now(),
         'recorded_by' => $manager->id, 'basket_id' => $basket]);
 
-    $this->actingAs($manager)->get("/manage/households/{$household}/wallet")
+    $this->actingAs($manager)->get("/finance/households/{$household}/wallet")
         ->assertInertia(fn (Assert $page) => $page->where('wallet.movements.0.basketId', $basket));
     $this->actingAs(memberOf($household))->get('/wallet')
         ->assertInertia(fn (Assert $page) => $page->where('wallet.movements.0.basketId', $basket));
     $this->get("/finance/baskets/{$basket}")->assertForbidden();
+    $this->get("/baskets/{$basket}")->assertOk();
+});
+
+it('shows the household container balance on the Finance detail across baskets, going negative (S92, R18a)', function () {
+    $household = basketHousehold();
+    $manager = accountWith(Role::Manager);
+    $producer = ProducerModel::query()->create([
+        'name' => 'Honey maker', 'active' => true, 'cutoff_days_before' => 3, 'cutoff_time' => '20:00',
+    ]);
+    $product = (string) Str::uuid7();
+    DB::table('products')->insert(['id' => $product, 'producer_id' => $producer->id, 'stock' => true,
+        'name' => 'Honey', 'unit' => 'jar', 'price_cents' => 700, 'variable' => false, 'active' => true, 'containers_per_unit' => '1']);
+    DB::table('stock_movements')->insert(['id' => (string) Str::uuid7(), 'product_id' => $product,
+        'type' => 'entry', 'quantity' => '10', 'occurred_at' => now(), 'recorded_by' => $manager->id]);
+    $item = app(CreateReturnItem::class)(Actor::manager($manager->id), 'Glass jar', 50);
+    $newBasket = function () use ($household): string {
+        $this->post('/finance/baskets', ['household_id' => $household])->assertRedirect();
+
+        return (string) DB::table('baskets')->orderByDesc('id')->value('id');
+    };
+    $balance = fn (string $id) => $this->get("/finance/baskets/{$id}")->assertOk()->viewData('page')['props']['containerBalance'];
+
+    $this->actingAs($manager);
+    $first = $newBasket();
+    $this->post("/finance/baskets/{$first}/stock-lines", ['stock_product_id' => $product, 'stock_quantity' => '3'])->assertRedirect();
+    expect($balance($first))->toBe(0);
+    $this->post("/finance/baskets/{$first}/validation")->assertRedirect();
+    expect($balance($first))->toBe(3);
+
+    $second = $newBasket();
+    $this->post("/finance/baskets/{$second}/return-lines", ['return_item_id' => $item, 'return_quantity' => '5'])->assertRedirect();
+    $this->post("/finance/baskets/{$second}/validation")->assertRedirect();
+
+    expect($balance($second))->toBe(-2);
 });

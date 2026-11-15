@@ -1,0 +1,1265 @@
+{
+    "baseUrl": "http://127.0.0.1:5263",
+    "rootFontPx": 16,
+    "darkSelector": "html.dark",
+    "matrix": {
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark"],
+        "text": [100, 200]
+    },
+    "views": [
+        {
+            "id": "dashboard-member",
+            "path": "/resources/visual/dra-205.html",
+            "query": {
+                "page": "Dashboard",
+                "role": "member"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content a,#main-content [data-test=\"attention-count\"],#main-content [data-test=\"opportunity-cutoff\"]",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "button[data-sidebar=\"trigger\"]",
+                "[data-test=\"attention-group\"] a"
+            ],
+            "states": [
+                {
+                    "id": "populated",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"attention-group\"]",
+                                "count": 2
+                            },
+                            {
+                                "selector": "[data-test=\"attention-group\"] a",
+                                "count": 2,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"attention-count\"]",
+                                "count": 2
+                            },
+                            {
+                                "selector": "[data-test=\"freshness-time\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-visual-requests": "0",
+                                    "data-visual-writes": "0"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "narrow-enlarged",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"attention-group\"]",
+                                "count": 2
+                            },
+                            {
+                                "selector": "[data-test=\"attention-group\"] a",
+                                "count": 2,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"attention-count\"]",
+                                "count": 2
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "no-collection-work",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"empty\"]",
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"attention-list\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content .pilot-list",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"attention-count\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"caught-up\"]",
+                                "count": 1
+                            }
+                        ],
+                        "focus": [],
+                        "noFocusReason": "A member with no collection work has no attention links; the caught-up message, sidebar and shortcuts carry no extra focus target in this fixture."
+                    }
+                },
+                {
+                    "id": "opportunities",
+                    "query": {
+                        "state": "opportunities"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"opportunities\"]",
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"opportunity\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"opportunity\"] a",
+                                "count": 1,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"opportunity-cutoff\"]",
+                                "count": 2
+                            },
+                            {
+                                "selector": "[data-test=\"attention-group\"]",
+                                "count": 2
+                            }
+                        ],
+                        "focus": [
+                            "button[data-sidebar=\"trigger\"]",
+                            "[data-test=\"attention-group\"] a",
+                            "[data-test=\"opportunity\"] a"
+                        ]
+                    }
+                },
+                {
+                    "id": "caught-up",
+                    "query": {
+                        "state": "caught-up"
+                    },
+                    "ready": "body[data-visual-ready=\"caught-up\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"caught-up\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"attention-group\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"no-context\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"opportunity\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"opportunity\"] a",
+                                "count": 1,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            }
+                        ],
+                        "focus": [
+                            "button[data-sidebar=\"trigger\"]",
+                            "[data-test=\"opportunity\"] a"
+                        ]
+                    }
+                },
+                {
+                    "id": "no-context",
+                    "query": {
+                        "state": "no-context"
+                    },
+                    "ready": "body[data-visual-ready=\"no-context\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"no-context\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"caught-up\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"attention-group\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"opportunity\"]",
+                                "count": 0
+                            }
+                        ],
+                        "focus": [],
+                        "noFocusReason": "An account with no context has no links on the page; the explanation is plain text."
+                    }
+                }
+            ]
+        },
+        {
+            "id": "dashboard-staff",
+            "path": "/resources/visual/dra-205.html",
+            "query": {
+                "page": "Dashboard",
+                "role": "finance"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content a,#main-content [data-test=\"attention-count\"]",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "button[data-sidebar=\"trigger\"]",
+                "[data-test=\"attention-group\"] a"
+            ],
+            "states": [
+                {
+                    "id": "populated",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"attention-group\"]",
+                                "count": 2
+                            },
+                            {
+                                "selector": "[data-test=\"attention-group\"] a",
+                                "count": 2,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"attention-count\"]",
+                                "count": 2
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "narrow-enlarged",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"attention-group\"]",
+                                "count": 2
+                            },
+                            {
+                                "selector": "[data-test=\"attention-group\"] a",
+                                "count": 2,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"attention-count\"]",
+                                "count": 2
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "reception",
+                    "query": {
+                        "state": "reception"
+                    },
+                    "ready": "body[data-visual-ready=\"reception\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"attention-group\"]",
+                                "count": 4
+                            },
+                            {
+                                "selector": "[data-test=\"attention-group\"] a",
+                                "count": 4,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"attention-count\"]",
+                                "count": 4
+                            },
+                            {
+                                "selector": "[data-test=\"attention-blocker\"]",
+                                "count": 1
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "reception-long-name",
+                    "query": {
+                        "state": "reception-long-name"
+                    },
+                    "ready": "body[data-visual-ready=\"reception-long-name\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"attention-group\"]",
+                                "count": 4
+                            },
+                            {
+                                "selector": "[data-test=\"attention-group\"] a",
+                                "count": 4,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"attention-count\"]",
+                                "count": 4
+                            },
+                            {
+                                "selector": "[data-test=\"attention-blocker\"]",
+                                "count": 1
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "baskets",
+                    "query": {
+                        "state": "baskets"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"attention-group\"]",
+                                "count": 4
+                            },
+                            {
+                                "selector": "[data-test=\"attention-group\"] a",
+                                "count": 4,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"attention-count\"]",
+                                "count": 4
+                            }
+                        ]
+                    },
+                    "ready": "body[data-visual-ready=\"baskets\"]"
+                },
+                {
+                    "id": "baskets-narrow-enlarged",
+                    "query": {
+                        "state": "baskets"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"attention-group\"]",
+                                "count": 4
+                            },
+                            {
+                                "selector": "[data-test=\"attention-group\"] a",
+                                "count": 4,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"attention-count\"]",
+                                "count": 4
+                            }
+                        ]
+                    },
+                    "ready": "body[data-visual-ready=\"baskets\"]"
+                },
+                {
+                    "id": "manual-send-absent",
+                    "query": {
+                        "state": "manual-send"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"attention-group\"]",
+                                "count": 3
+                            },
+                            {
+                                "selector": "[data-test=\"attention-group\"] a",
+                                "count": 3,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"attention-count\"]",
+                                "count": 3
+                            },
+                            {
+                                "selector": "[data-test=\"attention-group\"] a[href=\"/manage/cycles\"]",
+                                "count": 0
+                            }
+                        ]
+                    },
+                    "ready": "body[data-visual-ready=\"manual-send\"]"
+                },
+                {
+                    "id": "combined",
+                    "query": {
+                        "state": "combined"
+                    },
+                    "ready": "body[data-visual-ready=\"combined\"]",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"attention-group\"]",
+                                "count": 2
+                            },
+                            {
+                                "selector": "[data-test=\"attention-group\"] a",
+                                "count": 2,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"attention-count\"]",
+                                "count": 2
+                            },
+                            {
+                                "selector": "[data-test=\"caught-up\"]",
+                                "count": 0
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "dashboard-manager",
+            "path": "/resources/visual/dra-205.html",
+            "query": {
+                "page": "Dashboard",
+                "role": "manager"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content a,#main-content [data-test=\"attention-count\"]",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "button[data-sidebar=\"trigger\"]",
+                "[data-test=\"attention-group\"] a"
+            ],
+            "states": [
+                {
+                    "id": "baskets",
+                    "query": {
+                        "state": "baskets"
+                    },
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"attention-group\"]",
+                                "count": 4
+                            },
+                            {
+                                "selector": "[data-test=\"attention-group\"] a",
+                                "count": 4,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"attention-count\"]",
+                                "count": 4
+                            }
+                        ]
+                    },
+                    "ready": "body[data-visual-ready=\"baskets\"]"
+                },
+                {
+                    "id": "manual-send",
+                    "query": {
+                        "state": "manual-send"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"attention-group\"]",
+                                "count": 4
+                            },
+                            {
+                                "selector": "[data-test=\"attention-group\"] a",
+                                "count": 4,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"attention-count\"]",
+                                "count": 4
+                            },
+                            {
+                                "selector": "[data-test=\"attention-group\"] a[href=\"/manage/cycles\"]",
+                                "count": 1
+                            }
+                        ]
+                    },
+                    "ready": "body[data-visual-ready=\"manual-send\"]"
+                }
+            ]
+        },
+        {
+            "id": "dashboard-producer-opportunity",
+            "path": "/resources/visual/dra-205.html",
+            "query": {
+                "page": "Dashboard",
+                "role": "producer"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content a,#main-content [data-test=\"attention-count\"],#main-content [data-test=\"opportunity-cutoff\"]",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "button[data-sidebar=\"trigger\"]",
+                "[data-test=\"opportunity\"] a"
+            ],
+            "states": [
+                {
+                    "id": "opportunities",
+                    "query": {
+                        "state": "opportunities"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"opportunities\"]",
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"opportunity\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"opportunity\"] a",
+                                "count": 1,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"opportunity-cutoff\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"attention-list\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"attention-count\"]",
+                                "count": 0
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "two-summaries",
+                    "query": {
+                        "state": "opportunities-repeated"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"opportunities-repeated\"]",
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"opportunity\"]",
+                                "count": 2
+                            },
+                            {
+                                "selector": "[data-test=\"opportunity\"] a",
+                                "count": 2,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"opportunity-cutoff\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"attention-list\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"attention-count\"]",
+                                "count": 0
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "dashboard-catalogue-opportunity",
+            "path": "/resources/visual/dra-205.html",
+            "query": {
+                "page": "Dashboard",
+                "role": "catalogue"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content a,#main-content [data-test=\"attention-count\"],#main-content [data-test=\"opportunity-cutoff\"]",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "button[data-sidebar=\"trigger\"]",
+                "[data-test=\"opportunity\"] a"
+            ],
+            "states": [
+                {
+                    "id": "opportunities",
+                    "query": {
+                        "state": "opportunities"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"opportunities\"]",
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"opportunity\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"opportunity\"] a",
+                                "count": 1,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"opportunity-cutoff\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"attention-list\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"attention-count\"]",
+                                "count": 0
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "dashboard-freshness",
+            "path": "/resources/visual/dra-205.html",
+            "query": {
+                "page": "Dashboard",
+                "role": "finance"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, [data-sidebar=\"sidebar\"]",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content a,#main-content button,#main-content [role=\"alert\"],#main-content [role=\"status\"],#main-content [data-test=\"freshness-time\"],#main-content [data-test=\"freshness-stale\"],#main-content [data-test=\"attention-count\"]",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "button[data-sidebar=\"trigger\"]",
+                "[data-test=\"refresh-button\"]"
+            ],
+            "states": [
+                {
+                    "id": "refresh-busy",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"refresh-busy\"]",
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"refresh-button\"]",
+                                "count": 1,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-visual-writes": "0"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-visual-requests": "1"
+                                }
+                            },
+                            {
+                                "selector": "[data-test=\"refresh-busy\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"read-error\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"refresh-button\"]",
+                                "attributes": {
+                                    "aria-disabled": "true"
+                                }
+                            }
+                        ],
+                        "focus": [
+                            "button[data-sidebar=\"trigger\"]",
+                            "[data-test=\"refresh-button\"]"
+                        ]
+                    },
+                    "query": {
+                        "state": "refresh-busy"
+                    }
+                },
+                {
+                    "id": "stale-error",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"stale-error\"]",
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"refresh-button\"]",
+                                "count": 1,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-visual-writes": "0"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-visual-requests": "1"
+                                }
+                            },
+                            {
+                                "selector": "[data-test=\"attention-group\"]",
+                                "count": 2
+                            },
+                            {
+                                "selector": "[data-test=\"freshness-time\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"freshness-stale\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[role=\"alert\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"attention-list\"]",
+                                "count": 1
+                            }
+                        ],
+                        "focus": [
+                            "button[data-sidebar=\"trigger\"]",
+                            "[data-test=\"refresh-button\"]"
+                        ]
+                    },
+                    "query": {
+                        "state": "stale-error"
+                    }
+                },
+                {
+                    "id": "initial-error",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"initial-error\"]",
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"refresh-button\"]",
+                                "count": 1,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-visual-writes": "0"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-visual-requests": "0"
+                                }
+                            },
+                            {
+                                "selector": "[data-test=\"attention-group\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"attention-list\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"freshness-time\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[role=\"alert\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"attention-list\"]",
+                                "count": 0
+                            }
+                        ],
+                        "focus": [
+                            "button[data-sidebar=\"trigger\"]",
+                            "[data-test=\"refresh-button\"]"
+                        ]
+                    },
+                    "query": {
+                        "state": "initial-error",
+                        "role": "manager"
+                    }
+                },
+                {
+                    "id": "history-probe",
+                    "query": {
+                        "state": "history-probe"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "ready": "body[data-visual-ready=\"history-probe\"]",
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-visual-idle-reads": "0",
+                                    "data-visual-return-reads": "1",
+                                    "data-visual-return-time": "Actualitzat el 12/11 09:45",
+                                    "data-visual-writes": "0"
+                                }
+                            },
+                            {
+                                "selector": "[data-test=\"freshness-time\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test=\"read-error\"]",
+                                "count": 0
+                            }
+                        ],
+                        "focus": [
+                            "button[data-sidebar=\"trigger\"]",
+                            "[data-test=\"refresh-button\"]"
+                        ]
+                    }
+                }
+            ]
+        }
+    ]
+}

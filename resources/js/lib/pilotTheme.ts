@@ -12,15 +12,23 @@ const pilotPages = new Set([
     'Producer/Products/Index',
     'Producer/Products/Create',
     'Producer/Products/Edit',
+    'Producer/Stock/Movements',
+    'Finance/Stock/Index',
+    'Finance/Stock/Movements',
+    'Catalogue/Stock/Movements',
     'Manage/Accounts/Index',
     'Manage/Households/Index',
     'Manage/Households/Show',
     'Manage/Producers/Index',
+    'Catalogue/Producers/Index',
+    'Catalogue/Producers/Products',
+    'Catalogue/Producers/Availability',
+    'Catalogue/Producers/WeeklyProduct/Create',
+    'Catalogue/Producers/WeeklyProduct/Edit',
     'Manage/Cycles/Index',
     'Manage/Cycles/Show',
-    'Manage/Pickups/Index',
-    'Manage/Pickups/Show',
-    'Manage/Reception/Show',
+    'Receptions/Index',
+    'Receptions/Show',
     'Manage/Settings',
     'Manage/Stock/Index',
     'Manage/Stock/Create',
@@ -40,6 +48,30 @@ const pilotPages = new Set([
     'auth/TwoFactorChallenge',
     'auth/VerifyEmail',
 ]);
+
+export type PilotVariant = 'landing';
+
+// Exact page names only: never a prefix such as 'Manage/' and never a role.
+const landingPages = new Set([
+    'Manage/Stock/Index',
+    'Manage/Stock/Create',
+    'Manage/Stock/Edit',
+    'Orders/Index',
+    'Orders/Edit',
+    'Catalogue/Producers/Index',
+    'Catalogue/Producers/Products',
+    'Catalogue/Producers/Availability',
+    'Catalogue/Producers/WeeklyProduct/Create',
+    'Catalogue/Producers/WeeklyProduct/Edit',
+    'Manage/ReturnItems/Index',
+    'Manage/ReturnItems/Create',
+    'Manage/ReturnItems/Edit',
+    'Catalogue/Stock/Movements',
+]);
+
+export function pilotVariantFor(pageName: string): PilotVariant | null {
+    return landingPages.has(pageName) ? 'landing' : null;
+}
 
 export function isPilotThemePage(pageName: string): boolean {
     return pilotPages.has(pageName);

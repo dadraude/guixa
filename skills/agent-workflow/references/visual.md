@@ -28,6 +28,11 @@ Run `node skills/agent-workflow/scripts/visual/run.mjs plan path/to/visual.json`
 implementation. The coordinator checks case count, rationale, component reuse and acceptance coverage.
 Prove the first end-to-end route and fixture state before widening equivalent patterns. Do not remove
 failing cases or omit baseline page/role coverage to reduce execution time.
+For a new essential interaction, prove one focused path through the actual component before expanding
+the matrix: open its portal, use its real keyboard model, expose a long real option, select it, and
+inspect the submitted source, id and action. Inventory portal surfaces from the components in use.
+Closed initial markup or geometry alone does not prove that interaction. Apply this checkpoint only
+to interaction work that has this risk.
 
 During implementation probe changed patterns at their riskiest combinations first: narrow enlarged
 text for forms/tables, both themes for colors, and opened overlays for portals. Fix the pattern before

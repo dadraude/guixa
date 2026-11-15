@@ -52,7 +52,7 @@ describe('wallet statement mobile row labels', () => {
         expect(html).not.toContain('2026-10-24 12:00');
     });
 
-    it('links a basket source for a manager but leaves member source as text', async () => {
+    it('links each basket source to the permitted staff or own-household detail', async () => {
         const wallet = {
             balance: '-12.50',
             movements: [
@@ -91,10 +91,141 @@ describe('wallet statement mobile row labels', () => {
         const member = createSSRApp(Statement, { household: null, wallet });
         installTranslations(member);
         const memberHtml = await renderToString(member);
-        expect(memberHtml).toContain('data-test="basket-source-text"');
+        expect(memberHtml).not.toContain('data-test="basket-source-text"');
         expect(memberHtml).toContain('Cistella: basket-one');
         expect(memberHtml).toContain('Cistella: basket-two');
-        expect(memberHtml).not.toContain('data-test="basket-source-link"');
+        expect(memberHtml).toContain('data-test="basket-source-link"');
+        expect(memberHtml).toContain('/baskets/basket-one');
+        expect(memberHtml).toContain('/baskets/basket-two');
         expect(memberHtml).not.toContain('/finance/baskets/basket-one');
+    });
+});
+
+describe('confirmed receipt forms and linked correction text', () => {
+    it('shows the receipt controls and Catalan confirmation to staff, and only movement text to members', async () => {
+        const receiptId = '0198f0a0-0000-7000-8000-000000000001';
+        const wallet = {
+            balance: '0.00',
+            movements: [
+                {
+                    id: 'correction',
+                    type: 'correction',
+                    amount: '-50.00',
+                    occurredAt: '2026-10-24 13:00',
+                    note: 'duplicated',
+                    cycleId: null,
+                    basketId: null,
+                    sourceMovementId: receiptId,
+                    authorName: 'finance',
+                },
+                {
+                    id: receiptId,
+                    type: 'top_up',
+                    amount: '50.00',
+                    occurredAt: '2026-10-24 12:00',
+                    note: 'cash',
+                    cycleId: null,
+                    basketId: null,
+                    sourceMovementId: null,
+                    authorName: 'finance',
+                },
+            ],
+        };
+        const staff = createSSRApp(Statement, {
+            household: { id: 'household-one', name: 'La Figuera' },
+            wallet,
+            canManageReceipts: true,
+            receiptAction: '/finance/households/household-one/wallet/top-ups',
+            correctionAction:
+                '/finance/households/household-one/wallet/corrections',
+            correctionId: 'correction-id',
+            status: 'Ingrés registrat.',
+        });
+        installTranslations(staff);
+        const staffHtml = await renderToString(staff);
+        expect(staffHtml).toContain('Ingrés original');
+        expect(staffHtml).toContain('Tria un ingrés');
+        expect(staffHtml).toContain('data-test="record-top-up"');
+        expect(staffHtml).toContain('data-test="record-correction"');
+        expect(staffHtml).toContain('data-test="receipt-correction-source"');
+        expect(staffHtml).toContain('Correcció de l’ingrés de 50,00');
+        expect(staffHtml).toContain('Ingrés registrat.');
+
+        const member = createSSRApp(Statement, {
+            household: null,
+            wallet,
+            canManageReceipts: false,
+        });
+        installTranslations(member);
+        const memberHtml = await renderToString(member);
+        expect(memberHtml).toContain('Correcció de l’ingrés de 50,00');
+        expect(memberHtml).not.toContain('data-test="record-top-up"');
+        expect(memberHtml).not.toContain('data-test="record-correction"');
+    });
+});
+
+describe('statement author names', () => {
+    const movement = (id: string, authorName: string) => ({
+        id,
+        type: 'top_up',
+        amount: '50.00',
+        occurredAt: '2026-10-24 12:00',
+        note: null,
+        cycleId: null,
+        basketId: null,
+        sourceMovementId: null,
+        authorName,
+    });
+
+    it('shows who recorded a movement and hides the line when the name is empty', async () => {
+        const app = createSSRApp(Statement, {
+            household: null,
+            wallet: {
+                balance: '100.00',
+                movements: [
+                    movement('named', 'Maria Soler'),
+                    movement('unnamed', ''),
+                ],
+            },
+            canManageReceipts: false,
+        });
+        installTranslations(app);
+        const html = await renderToString(app);
+        expect(html).toContain('Registrat per Maria Soler');
+        expect(html.match(/Registrat per/g)).toHaveLength(1);
+    });
+});
+
+describe('statement navigation boundaries', () => {
+    it('keeps the Manager household return link while Finance receipt forms have no forbidden Manager link', async () => {
+        const wallet = { balance: '0.00', movements: [] };
+        const household = { id: 'household-one', name: 'La Figuera' };
+        const manager = createSSRApp(Statement, {
+            household,
+            wallet,
+            canManageReceipts: true,
+            receiptAction: '/finance/households/household-one/wallet/top-ups',
+            correctionAction:
+                '/finance/households/household-one/wallet/corrections',
+            householdReturnHref: '/manage/households/household-one',
+        });
+        installTranslations(manager);
+        const managerHtml = await renderToString(manager);
+        expect(managerHtml).toContain('/manage/households/household-one');
+        expect(managerHtml).toContain('Torna a La Figuera');
+
+        const finance = createSSRApp(Statement, {
+            household,
+            wallet,
+            canManageReceipts: true,
+            receiptAction: '/finance/households/household-one/wallet/top-ups',
+            correctionAction:
+                '/finance/households/household-one/wallet/corrections',
+        });
+        installTranslations(finance);
+        const financeHtml = await renderToString(finance);
+        expect(financeHtml).toContain('data-test="record-top-up"');
+        expect(financeHtml).not.toContain('Torna a La Figuera');
+        expect(financeHtml).not.toContain('/manage/households/household-one');
     });
 });

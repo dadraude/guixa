@@ -6,6 +6,7 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import AuthLayout from '@/layouts/AuthLayout.vue';
 import SettingsLayout from '@/layouts/settings/Layout.vue';
 import { installTranslations } from '@/lib/i18n';
+import { trans } from 'laravel-vue-i18n';
 
 const query = new URLSearchParams(window.location.search);
 const fixtureUrl = window.location.href;
@@ -99,39 +100,11 @@ const cycle = {
         },
     ],
 };
-const pickup = {
-    cycleId,
-    pickupDate,
-    householdId,
-    householdName: household.name,
-    status: 'pending',
-    lines: [
-        {
-            productId,
-            name: product.name,
-            unit: product.unit,
-            variable: product.variable,
-            unitPriceCents: 320,
-            ordered: '2',
-            allocated: '2',
-            delivered: '2',
-            adjusted: false,
-            amountCents: 640,
-        },
-    ],
-    totalCents: 640,
-    balanceCents: 2000,
-    resultingBalanceCents: 1360,
-    stockLines: [],
-    returnLines: [],
-    adjustments: [],
-    originalChargeCents: null,
-};
 const settlement = {
     householdId,
     householdName: household.name,
     balanceCents: 2000,
-    pendingPickups: [{ cycleId, pickupDate }],
+    openBaskets: [{ basketId: 'basket-1', status: 'draft', date: pickupDate }],
 };
 const reception = {
     cycleId,
@@ -155,7 +128,6 @@ const reception = {
             balancedForDistribution: true,
             hasManualAllocations: false,
             hasAdjustments: false,
-            hasDonePickups: false,
             allocations: [
                 {
                     householdId,
@@ -195,7 +167,7 @@ const order = {
             notDelivered: false,
         },
     ],
-    pickup: null,
+    basketId: null,
 };
 
 const pageProps: Record<string, Record<string, unknown>> = {
@@ -203,20 +175,16 @@ const pageProps: Record<string, Record<string, unknown>> = {
         roles: ['manager', 'member', 'producer'],
         isManager: true,
         isMember: true,
-        nextPickup: pickupDate,
-        openCycles: 1,
-        balance: 2000,
-        pendingPickups: [{ cycleId, pickupDate }],
-        managerSummary: {
-            cycles: 1,
-            activeCycles: 1,
-            households: 1,
-            activeHouseholds: 1,
-            accounts: 1,
-            pendingInvitations: 0,
-            producers: 1,
-            activeProducers: 1,
-        },
+        attention: [
+            {
+                key: 'collect_basket:cycle:visual-cycle',
+                action: 'collect_basket',
+                cycleId: 'visual-cycle',
+                scheduledDate: pickupDate,
+                count: 1,
+                href: '/baskets/visual-basket',
+            },
+        ],
     },
     'Manage/Accounts/Index': {
         accounts: [
@@ -237,8 +205,13 @@ const pageProps: Record<string, Record<string, unknown>> = {
         cycles: [cycle],
         producers: [{ id: producerId, name: producer.name }],
         pickupWeekday: 4,
+        pendingCollections: { [cycleId]: 2 },
     },
     'Manage/Cycles/Show': {
+        pendingCollections: {
+            count: 2,
+            href: `/finance/baskets?pending=1&cycle=${cycleId}`,
+        },
         summary: {
             cycleId,
             pickupDate,
@@ -267,9 +240,31 @@ const pageProps: Record<string, Record<string, unknown>> = {
         },
         containers: {
             total: 2,
-            households: [
-                { householdId, householdName: household.name, count: 2 },
-            ],
+            households:
+                state === 'balances'
+                    ? [
+                          {
+                              householdId,
+                              householdName: household.name,
+                              count: 2,
+                              balance: -2,
+                          },
+                          {
+                              householdId: 'household-2',
+                              householdName:
+                                  'Cooperativa agroecològica de la Vall de Sant Joan i dels Masos de Baix',
+                              count: 1234,
+                              balance: 5678,
+                          },
+                      ]
+                    : [
+                          {
+                              householdId,
+                              householdName: household.name,
+                              count: 2,
+                              balance: 3,
+                          },
+                      ],
         },
     },
     'Manage/Households/Index': {
@@ -286,27 +281,10 @@ const pageProps: Record<string, Record<string, unknown>> = {
         otherHouseholds: [],
         deactivationWarning: settlement,
     },
-    'Manage/Pickups/Index': {
-        cycleId,
-        closed: false,
-        pickups: [
-            {
-                householdId,
-                householdName: household.name,
-                status: 'pending',
-                totalCents: 640,
-            },
-        ],
-        households: [household],
-    },
-    'Manage/Pickups/Show': {
-        pickup,
-        stockProducts: [stockProduct],
-        returnItems: [returnItem],
-    },
     'Manage/Producers/Index': { producers: [producer] },
-    'Manage/Reception/Show': {
+    'Receptions/Show': {
         reception,
+        can: { edit: true, validate: true, distribute: false, reopen: false },
         distribution: {
             validated: false,
             distributed: false,
@@ -323,8 +301,9 @@ const pageProps: Record<string, Record<string, unknown>> = {
     'Manage/Stock/Movements': {
         product: stockProduct,
         cycles: [{ id: cycleId, pickupDate }],
+        history: { lines: [], total: 0, page: 1, prevUrl: null, nextUrl: null },
     },
-    'Orders/Edit': { order },
+    'Orders/Edit': { order, preview: { totalCents: 0, amountCents: {} } },
     'Orders/Index': {
         cycles: [
             { cycleId, pickupDate, open: true, cancelled: false, lineCount: 1 },
@@ -449,30 +428,14 @@ if (pageName === 'Dashboard') {
     visualProps.roles = [role];
     visualProps.isManager = role === 'manager';
     visualProps.isMember = role === 'member';
-    visualProps.managerSummary =
-        role === 'manager' ? visualProps.managerSummary : null;
-    visualProps.pendingPickups =
-        role === 'member' ? visualProps.pendingPickups : [];
-    visualProps.nextPickup = role === 'member' ? visualProps.nextPickup : null;
-    visualProps.openCycles = role === 'member' ? visualProps.openCycles : 0;
-    visualProps.balance = role === 'member' ? visualProps.balance : null;
-    if (state === 'empty' || state === 'no-cycle' || state === 'no-data') {
-        visualProps.nextPickup = null;
-        visualProps.openCycles = 0;
-        visualProps.pendingPickups = [];
-        if (role === 'manager') {
-            visualProps.managerSummary = {
-                cycles: 0,
-                activeCycles: 0,
-                households: 0,
-                activeHouseholds: 0,
-                accounts: 0,
-                pendingInvitations: 0,
-                producers: 0,
-                activeProducers: 0,
-            };
-        }
-    }
+    visualProps.attention = role === 'member' ? visualProps.attention : [];
+    if (state === 'empty' || state === 'no-cycle' || state === 'no-data')
+        visualProps.attention = [];
+    // The server's flag: a person with a context and no pending work is caught up (R14).
+    visualProps.can = {
+        showCaughtUp: visualProps.attention.length === 0,
+        showNoContext: false,
+    };
 }
 
 if (pageName === 'Wallet/Statement') {
@@ -578,14 +541,16 @@ void createInertiaApp({
             '#main-content .pilot-t44-page',
         );
         const present = (name: string) =>
-            !!root?.querySelector(`section[aria-label="${name}"]`);
+            !!root?.querySelector(`section[aria-label="${trans(name)}"]`);
         const valid =
             present('member actions') === (role === 'member') &&
             present('producer actions') === (role === 'producer') &&
             present('manager actions') === (role === 'manager') &&
-            present('cooperative summary') === (role === 'manager') &&
-            present('pending pickups') ===
-                (role === 'member' && state !== 'empty');
+            !present('cooperative summary') &&
+            !!root?.querySelector('[data-test="attention-list"]') ===
+                (role === 'member' && state !== 'empty') &&
+            !!root?.querySelector('[data-test="caught-up"]') ===
+                !(role === 'member' && state !== 'empty');
         if (root) root.dataset.visualRoleValid = String(valid);
     }
     if (state === 'errors') {

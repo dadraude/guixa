@@ -19,7 +19,9 @@ class CorrectionRequest extends FormRequest
         return [
             'amount' => ['required', 'string', 'regex:'.EuroAmount::PATTERN],
             'note' => ['required', 'string', 'max:500'],
-            'cycle_id' => ['nullable', 'uuid'],
+            'cycle_id' => ['prohibited'],
+            'source_movement_id' => ['required', 'uuid'],
+            'correction_id' => ['required', 'uuid'],
         ];
     }
 

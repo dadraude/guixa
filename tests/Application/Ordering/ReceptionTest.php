@@ -1,5 +1,11 @@
 <?php
 
+use Guixa\Ordering\Application\CycleSettlement;
+use Guixa\Ordering\Application\ListReceptionCycles;
+use Guixa\Ordering\Application\ListReceptionHouseholds;
+use Guixa\Ordering\Application\MarkProducerDistributed;
+use Guixa\Ordering\Application\ReopenProducerOrder;
+use Guixa\Ordering\Application\ValidateReception;
 use Guixa\Ordering\Domain\Error\CycleNotFound;
 use Guixa\Ordering\Domain\Error\FractionalQuantityNotAllowed;
 use Guixa\Ordering\Domain\Error\HouseholdInactive;
@@ -12,9 +18,16 @@ use Guixa\Ordering\Domain\Error\ProducerOrderNotSent;
 use Guixa\Ordering\Domain\Error\ProductAlreadyOrdered;
 use Guixa\Ordering\Domain\Error\ProductNotInReception;
 use Guixa\Ordering\Domain\Error\ProductNotOrderable;
+use Guixa\Ordering\Domain\Error\RedistributionBlockedByValidatedBasket;
+use Guixa\Ordering\Domain\NotDeliveredMarks;
+use Guixa\Ordering\Domain\ReceptionLoader;
 use Guixa\Shared\Application\Actor;
 use Guixa\Shared\Domain\Error\InvalidQuantity;
+use Guixa\Shared\Domain\Role;
 use Illuminate\Auth\Access\AuthorizationException;
+use Tests\Support\InMemory\FakeReceptionHouseholds;
+use Tests\Support\InMemory\FakeReceptionProducerNames;
+use Tests\Support\InMemory\ImmediateTransactionRunner;
 use Tests\Support\Ordering\OrderingWorld;
 
 const RECEPTION_A = '00000000-0000-7000-8000-0000000000e1';
@@ -291,6 +304,21 @@ it('shares leftover grams one by one to the earliest lines (R15, R17, S12)', fun
         ->and(($this->product)($this->cheese)->balanced)->toBeTrue();
 });
 
+it('breaks a remainder tie by line creation: removing and re-adding gives a new moment, changing the quantity keeps it (R15)', function () {
+    ($this->order)('A', $this->cheese, '1');
+    ($this->order)('B', $this->cheese, '1');
+    ($this->order)('C', $this->cheese, '1');
+    ($this->order)('A', $this->cheese, '0');
+    ($this->order)('A', $this->cheese, '1');
+    ($this->order)('B', $this->cheese, '2');
+    ($this->order)('B', $this->cheese, '1');
+    ($this->send)();
+
+    ($this->setReceived)($this->cheese, '1');
+
+    expect(($this->shares)($this->cheese))->toBe(['Household A' => '0.333', 'Household B' => '0.334', 'Household C' => '0.333']);
+});
+
 it('refuses a received total in fractions for a non-variable product (R9, R15)', function () {
     ($this->orderBreadLikeS10)();
 
@@ -496,4 +524,246 @@ it('keeps allocation-only lines out of what members ordered, cycle totals and pr
         ->and(collect($producerSummary->products)->pluck('name')->all())->toBe(['Bread'])
         ->and(collect($memberOrder->lines)->pluck('productId')->all())->toBe([$this->bread])
         ->and(($this->world->listMemberCycles)($this->households['A'])[0]->lineCount)->toBe(1);
+});
+
+// T06 — Receiver and Finance receive (R6, R7, R8, S7)
+
+beforeEach(function () {
+    $transactions = new ImmediateTransactionRunner;
+    $loader = new ReceptionLoader($this->world->orders, $this->world->catalog, $this->world->availability, $this->world->receivedTotals, $this->world->baskets);
+    $settlement = new CycleSettlement($this->world->orders, new NotDeliveredMarks($this->world->catalog, $this->world->availability, $this->world->orders), $this->world->baskets);
+    $this->validateReception = new ValidateReception($this->world->cycles, $transactions, $this->world->clock);
+    $this->markDistributed = new MarkProducerDistributed($this->world->cycles, $loader, $settlement, $transactions, $this->world->clock);
+    $this->reopenProducerOrder = new ReopenProducerOrder($this->world->cycles, $transactions);
+    $this->producerNames = new FakeReceptionProducerNames;
+    $this->producerNames->know(OrderingWorld::BAKER, 'Baker');
+    $this->producerNames->know(OrderingWorld::GROWER, 'Grower');
+    $this->listReceptionCycles = new ListReceptionCycles($this->world->cycles, $this->producerNames);
+    $this->receiver = new Actor('00000000-0000-7000-8000-0000000000f1', [Role::Receiver]);
+    $this->finance = new Actor('00000000-0000-7000-8000-0000000000f2', [Role::Finance]);
+    $this->settle = function () {
+        ($this->validateReception)($this->world->manager, $this->cycleId, OrderingWorld::BAKER);
+        ($this->markDistributed)($this->world->manager, $this->cycleId, OrderingWorld::BAKER);
+    };
+});
+
+it('lets a Receiver set a received total and an allocation, which are kept (R6, S7)', function () {
+    ($this->orderBreadLikeS10)();
+
+    ($this->world->setReceivedTotal)($this->receiver, $this->cycleId, OrderingWorld::BAKER, $this->bread, '10');
+    ($this->world->setAllocation)($this->receiver, $this->cycleId, OrderingWorld::BAKER, $this->bread, RECEPTION_D, '2');
+
+    expect(($this->product)($this->bread)->received)->toBe('10.000')
+        ->and(($this->shares)($this->bread))->toMatchArray(['Household D' => '2.000'])
+        ->and($this->world->receivedTotals->ofProducer($this->cycleId, OrderingWorld::BAKER))->not->toBe([]);
+});
+
+it('lets a Receiver add an unordered product to the reception (R6)', function () {
+    ($this->send)();
+
+    ($this->world->addUnorderedProduct)($this->receiver, $this->cycleId, OrderingWorld::BAKER, $this->rye, '3');
+
+    expect(($this->product)($this->rye)->received)->toBe('3.000');
+});
+
+it('lets Finance receive through the same use cases (R7)', function () {
+    ($this->orderBreadLikeS10)();
+
+    ($this->world->setReceivedTotal)($this->finance, $this->cycleId, OrderingWorld::BAKER, $this->bread, '10');
+    ($this->world->setAllocation)($this->finance, $this->cycleId, OrderingWorld::BAKER, $this->bread, RECEPTION_D, '1');
+
+    expect(($this->reception)($this->finance)->products)->not->toBe([])
+        ->and(($this->product)($this->bread)->received)->toBe('10.000');
+});
+
+it('refuses a Receiver the validation, the distribution and the reopening, which stay with Finance and the manager (R6, S7)', function () {
+    ($this->orderBreadLikeS10)();
+    ($this->validateReception)($this->world->manager, $this->cycleId, OrderingWorld::BAKER);
+
+    expect(fn () => ($this->validateReception)($this->receiver, $this->cycleId, OrderingWorld::BAKER))->toThrow(AuthorizationException::class)
+        ->and(fn () => ($this->markDistributed)($this->receiver, $this->cycleId, OrderingWorld::BAKER))->toThrow(AuthorizationException::class)
+        ->and(fn () => ($this->reopenProducerOrder)($this->receiver, $this->cycleId, OrderingWorld::BAKER))->toThrow(AuthorizationException::class);
+});
+
+// T07 — Finance validates, distributes and reopens (R6, R7, S8, S12)
+
+it('lets Finance validate and distribute what a Receiver recorded once allocations balance (R7, S8)', function () {
+    ($this->orderBreadLikeS10)();
+    ($this->world->setReceivedTotal)($this->receiver, $this->cycleId, OrderingWorld::BAKER, $this->bread, '20');
+
+    ($this->validateReception)($this->finance, $this->cycleId, OrderingWorld::BAKER);
+    expect(($this->reception)()->validated)->toBeTrue();
+
+    ($this->markDistributed)($this->finance, $this->cycleId, OrderingWorld::BAKER);
+    expect(($this->reception)()->distributed)->toBeTrue();
+});
+
+it('lets a Receiver give a late arrival to the weekly basket drafts of a reception Finance reopened (R6, R7, S12)', function () {
+    ($this->world->stopParticipating)($this->world->manager, $this->cycleId, OrderingWorld::GROWER);
+    ($this->order)('A', $this->bread, '4');
+    ($this->order)('A', $this->rye, '1');
+    ($this->order)('B', $this->rye, '1');
+    ($this->order)('C', $this->bread, '10');
+    ($this->send)();
+    ($this->setReceived)($this->rye, '0');
+    ($this->validateReception)($this->finance, $this->cycleId, OrderingWorld::BAKER);
+    ($this->markDistributed)($this->finance, $this->cycleId, OrderingWorld::BAKER);
+    $this->world->baskets->validate($this->world->orders->ofHousehold($this->cycleId, RECEPTION_A)->id);
+
+    ($this->reopenProducerOrder)($this->finance, $this->cycleId, OrderingWorld::BAKER);
+    ($this->world->setReceivedTotal)($this->receiver, $this->cycleId, OrderingWorld::BAKER, $this->rye, '2');
+
+    $snapshot = $this->world->baskets->snapshot($this->cycleId);
+    expect(collect($this->world->baskets->latesOfHousehold($this->cycleId, RECEPTION_A))->map(fn (array $late) => [$late['state'], $late['effective']])->all())
+        ->toBe([['draft', [$this->rye => 1000]]])
+        ->and($snapshot->effective(RECEPTION_A, $this->rye))->toBe(1000)
+        ->and($this->world->baskets->stateOfHousehold($this->cycleId, RECEPTION_B))->toBe('draft')
+        ->and($snapshot->effective(RECEPTION_B, $this->rye))->toBe(1000)
+        ->and(($this->reception)($this->receiver)->canEdit)->toBeTrue()
+        ->and(($this->reception)($this->receiver)->canValidate)->toBeFalse();
+});
+
+it('still refuses a Receiver to redistribute a product of a validated basket in a reopened reception (R6, D12)', function () {
+    ($this->world->stopParticipating)($this->world->manager, $this->cycleId, OrderingWorld::GROWER);
+    ($this->order)('A', $this->bread, '4');
+    ($this->order)('A', $this->rye, '1');
+    ($this->order)('B', $this->rye, '1');
+    ($this->order)('C', $this->bread, '10');
+    ($this->send)();
+    ($this->setReceived)($this->rye, '0');
+    ($this->validateReception)($this->finance, $this->cycleId, OrderingWorld::BAKER);
+    ($this->markDistributed)($this->finance, $this->cycleId, OrderingWorld::BAKER);
+    $this->world->baskets->validate($this->world->orders->ofHousehold($this->cycleId, RECEPTION_A)->id);
+    ($this->reopenProducerOrder)($this->finance, $this->cycleId, OrderingWorld::BAKER);
+    ($this->world->setReceivedTotal)($this->receiver, $this->cycleId, OrderingWorld::BAKER, $this->rye, '2');
+
+    expect(fn () => ($this->world->setReceivedTotal)($this->receiver, $this->cycleId, OrderingWorld::BAKER, $this->rye, '3'))
+        ->toThrow(RedistributionBlockedByValidatedBasket::class);
+});
+
+it('clears the validation when a Receiver changes a received total (R6)', function () {
+    ($this->orderBreadLikeS10)();
+    ($this->validateReception)($this->world->manager, $this->cycleId, OrderingWorld::BAKER);
+    expect(($this->reception)()->validated)->toBeTrue();
+
+    ($this->world->setReceivedTotal)($this->receiver, $this->cycleId, OrderingWorld::BAKER, $this->bread, '19');
+
+    expect(($this->reception)()->validated)->toBeFalse();
+});
+
+it('keeps the reception out of reach of other roles (R14, S11)', function () {
+    ($this->orderBreadLikeS10)();
+    $others = [
+        Actor::producer('00000000-0000-7000-8000-0000000000aa', OrderingWorld::BAKER),
+        new Actor('00000000-0000-7000-8000-0000000000f3', [Role::Catalogue]),
+        $this->households['A'],
+    ];
+
+    foreach ($others as $actor) {
+        expect(fn () => ($this->reception)($actor))->toThrow(AuthorizationException::class)
+            ->and(fn () => ($this->listReceptionCycles)($actor))->toThrow(AuthorizationException::class);
+    }
+});
+
+it('reports the actions each role is allowed on a reception (A13)', function () {
+    ($this->orderBreadLikeS10)();
+    $flags = fn (Actor $actor) => [($this->reception)($actor)->canEdit, ($this->reception)($actor)->canValidate, ($this->reception)($actor)->canDistribute, ($this->reception)($actor)->canReopen];
+
+    expect($flags($this->receiver))->toBe([true, false, false, false])
+        ->and($flags($this->finance))->toBe([true, true, false, false])
+        ->and($flags($this->world->manager))->toBe([true, true, false, false]);
+
+    ($this->validateReception)($this->world->manager, $this->cycleId, OrderingWorld::BAKER);
+    expect($flags($this->world->manager))->toBe([true, false, true, false])
+        ->and($flags($this->finance))->toBe([true, false, true, false]);
+
+    ($this->markDistributed)($this->world->manager, $this->cycleId, OrderingWorld::BAKER);
+    expect($flags($this->world->manager))->toBe([false, false, false, true])
+        ->and($flags($this->finance))->toBe([false, false, false, true])
+        ->and($flags($this->receiver))->toBe([false, false, false, false]);
+});
+
+// R8 — the cycle list
+
+it('lists the cycles that have a sent order, newest pickup first, with each order\'s reception state (R8)', function () {
+    $older = ($this->world->openCycle)($this->world->manager, '2026-11-14', [OrderingWorld::BAKER, OrderingWorld::GROWER]);
+    expect(($this->listReceptionCycles)($this->receiver))->toBe([]);
+
+    ($this->orderBreadLikeS10)();
+    ($this->world->closeProducerNow)($this->world->manager, $older, OrderingWorld::GROWER);
+    ($this->world->sendProducerOrder)($this->world->manager, $older, OrderingWorld::GROWER);
+
+    $cycles = ($this->listReceptionCycles)($this->receiver);
+
+    expect(collect($cycles)->pluck('cycleId')->all())->toBe([$older, $this->cycleId])
+        ->and(collect($cycles[0]->producers)->map(fn ($p) => [$p->producerId, $p->state->value])->all())->toBe([[OrderingWorld::GROWER, 'sent']])
+        ->and($cycles[1]->pickupDate)->toBe('2026-11-07');
+
+    ($this->validateReception)($this->world->manager, $this->cycleId, OrderingWorld::BAKER);
+    expect(($this->listReceptionCycles)($this->finance)[1]->producers[0]->state->value)->toBe('validated');
+
+    ($this->markDistributed)($this->world->manager, $this->cycleId, OrderingWorld::BAKER);
+    expect(($this->listReceptionCycles)($this->world->manager)[1]->producers[0]->state->value)->toBe('distributed');
+});
+
+it('offers a receiver only the active households, by name (R16)', function () {
+    $households = new FakeReceptionHouseholds;
+    $households->know('00000000-0000-7000-8000-0000000000c3', 'Zeta');
+    $households->know('00000000-0000-7000-8000-0000000000c1', 'alpha');
+    $households->know('00000000-0000-7000-8000-0000000000c2', 'Beta Gone', active: false);
+    $list = new ListReceptionHouseholds($households);
+
+    expect(array_column($list($this->receiver), 'name'))->toBe(['alpha', 'Zeta'])
+        ->and(array_column($list($this->finance), 'name'))->toBe(['alpha', 'Zeta'])
+        ->and(fn () => $list($this->households['A']))->toThrow(AuthorizationException::class);
+});
+
+it('names the producers of the reception list with one read (R8)', function () {
+    ($this->orderBreadLikeS10)();
+    $older = ($this->world->openCycle)($this->world->manager, '2026-11-14', [OrderingWorld::BAKER, OrderingWorld::GROWER]);
+    ($this->world->closeProducerNow)($this->world->manager, $older, OrderingWorld::GROWER);
+    ($this->world->sendProducerOrder)($this->world->manager, $older, OrderingWorld::GROWER);
+
+    $cycles = ($this->listReceptionCycles)($this->receiver);
+
+    expect($cycles[0]->producers[0]->producerName)->toBe('Grower')
+        ->and($cycles[1]->producers[0]->producerName)->toBe('Baker')
+        ->and($this->producerNames->reads)->toBe(1);
+});
+
+it('loads several producers\' receptions of a cycle exactly as loading each one alone (R14, R17)', function () {
+    ($this->world->setOrderLine)($this->households['A'], $this->cycleId, $this->bread, '4');
+    ($this->world->setOrderLine)($this->households['B'], $this->cycleId, $this->bread, '6');
+    ($this->world->setOrderLine)($this->households['A'], $this->cycleId, $this->apples, '2.5');
+    ($this->world->setOrderLine)($this->households['B'], $this->cycleId, $this->jam, '1');
+    ($this->world->setProductAvailability)(Actor::producer('00000000-0000-7000-8000-0000000000aa', OrderingWorld::BAKER), $this->cycleId, $this->jam, false);
+    foreach ([OrderingWorld::BAKER, OrderingWorld::GROWER] as $producerId) {
+        ($this->world->closeProducerNow)($this->world->manager, $this->cycleId, $producerId);
+        ($this->world->sendProducerOrder)($this->world->manager, $this->cycleId, $producerId);
+    }
+    ($this->setReceived)($this->bread, '8');
+    $loader = new ReceptionLoader($this->world->orders, $this->world->catalog, $this->world->availability, $this->world->receivedTotals, $this->world->baskets);
+    $cycle = $this->world->cycles->get($this->cycleId);
+
+    $batch = $loader->loadAll($cycle, [OrderingWorld::BAKER, OrderingWorld::GROWER]);
+
+    expect(array_keys($batch))->toBe([OrderingWorld::BAKER, OrderingWorld::GROWER])
+        ->and($batch[OrderingWorld::BAKER])->toEqual($loader->load($cycle, OrderingWorld::BAKER))
+        ->and($batch[OrderingWorld::GROWER])->toEqual($loader->load($cycle, OrderingWorld::GROWER))
+        ->and($batch[OrderingWorld::BAKER]->reception->products)->not->toBe([]);
+});
+
+it('shows the same marks before sending as the ones send derives to store (R3b, R6c, D9)', function () {
+    foreach ([$this->bread, $this->jam, $this->rye] as $productId) {
+        ($this->world->setOrderLine)($this->households['A'], $this->cycleId, $productId, '1');
+    }
+    ($this->world->setProductAvailability)(Actor::producer('00000000-0000-7000-8000-0000000000aa', OrderingWorld::BAKER), $this->cycleId, $this->jam, false);
+    $this->world->catalog->deactivate($this->rye);
+    $marks = new NotDeliveredMarks($this->world->catalog, $this->world->availability, $this->world->orders);
+    $cycle = $this->world->cycles->get($this->cycleId);
+    $order = $this->world->orders->ofHousehold($this->cycleId, RECEPTION_A);
+
+    expect($marks->of($cycle, $order))->toBe($marks->derivedOf($cycle, $order))
+        ->and(array_keys($marks->of($cycle, $order)))->toEqualCanonicalizing([$this->jam, $this->rye])
+        ->and($marks->ofAll($cycle, [$order]))->toBe($marks->derivedOfAll($cycle, [$order]));
 });

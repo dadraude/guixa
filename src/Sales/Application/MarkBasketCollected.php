@@ -16,16 +16,16 @@ final class MarkBasketCollected
 
     public function __invoke(Actor $actor, string $basketId): void
     {
-        Gate::forUser($actor)->authorize('manage-sales');
         $this->transactions->run(function () use ($actor, $basketId): void {
             $basket = $this->baskets->lock($basketId) ?? throw BasketNotFound::withId($basketId);
-            if ($basket->state === 'collected') {
+            Gate::forUser($actor)->authorize('collectFor', ['household', $basket->householdId]);
+            if ($basket->state->isCollected()) {
                 return;
             }
-            if ($basket->state !== 'validated') {
+            if (! $basket->state->isValidated()) {
                 throw BasketNotEditable::create();
             }
-            $this->baskets->save($basket->collected($actor->accountId, $this->clock->now()));
+            $this->baskets->save($basket->collected($actor->accountId, $this->clock->now(), $this->baskets->nextId()));
         });
     }
 }

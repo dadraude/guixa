@@ -10,7 +10,6 @@ use Guixa\Ordering\Domain\NotDeliveredMarks;
 use Guixa\Ordering\Domain\Order;
 use Guixa\Ordering\Domain\OrderLine;
 use Guixa\Ordering\Domain\OrderRepository;
-use Guixa\Ordering\Domain\PickupStatus;
 use Guixa\Ordering\Domain\ProducerOrder;
 use Guixa\Ordering\Domain\ProductAvailabilityRepository;
 use Guixa\Ordering\Domain\ProductCatalog;
@@ -27,6 +26,7 @@ final class GetHouseholdOrder
         private readonly ProductCatalog $catalog,
         private readonly ProductAvailabilityRepository $availability,
         private readonly Clock $clock,
+        private readonly SalesBaskets $baskets,
     ) {}
 
     public function __invoke(Actor $actor, string $cycleId): HouseholdOrderData
@@ -64,17 +64,17 @@ final class GetHouseholdOrder
             $cycle->isCancelled(),
             $producers,
             array_map(fn (OrderLine $line) => OrderLineData::of($line, isset($marked[$line->productId])), $lines),
-            $this->pickupOf($cycle, $order),
+            $this->basketOf($cycle, $order),
         );
     }
 
-    /** Members see the pickup once the cycle is settled (R23a). */
-    private function pickupOf(Cycle $cycle, ?Order $order): ?PickupData
+    /** Members reach their Sales base basket once the cycle is settled (R23a). */
+    private function basketOf(Cycle $cycle, ?Order $order): ?string
     {
-        if ($order === null || ! $cycle->isSettled() || $order->pickup() === PickupStatus::None) {
+        if ($order === null || ! $cycle->isSettled()) {
             return null;
         }
 
-        return PickupData::of($order, $cycle->pickupDate()->format('Y-m-d'), null);
+        return $this->baskets->snapshot($cycle->id)->basketId($order->householdId);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Guixa\Sales\Application;
 
+use Guixa\Sales\Domain\Basket;
 use Guixa\Sales\Domain\BasketRepository;
 use Guixa\Sales\Domain\Error\BasketAlreadyValidated;
 use Guixa\Sales\Domain\Error\BasketHasNoContents;
@@ -18,17 +19,24 @@ final class ValidateBasket
 {
     public function __construct(private readonly BasketRepository $baskets, private readonly StockProducts $products,
         private readonly StockSeller $stock, private readonly WalletLedger $wallet,
+        private readonly WeeklyBasketSource $weeklySource,
         private readonly TransactionRunner $transactions, private readonly Clock $clock) {}
 
     public function __invoke(Actor $actor, string $basketId): void
     {
         Gate::forUser($actor)->authorize('manage-sales');
         $this->transactions->run(function () use ($actor, $basketId): void {
+            $source = $this->baskets->get($basketId) ?? throw BasketNotFound::withId($basketId);
+            $cycleId = $this->cycleOf($source);
+            if ($cycleId !== null) {
+                // The cycle lock comes before the basket lock, like every other weekly mutation.
+                $this->weeklySource->lockSettled($cycleId);
+            }
             $basket = $this->baskets->lock($basketId) ?? throw BasketNotFound::withId($basketId);
-            if ($basket->state === 'validated' || $basket->state === 'collected') {
+            if ($basket->state->isSettled()) {
                 throw BasketAlreadyValidated::create();
             }
-            if ($basket->state !== 'draft') {
+            if (! $basket->state->isDraft()) {
                 throw BasketNotEditable::create();
             }
             $lines = $basket->activeLines();
@@ -36,7 +44,7 @@ final class ValidateBasket
                 throw BasketHasNoContents::create();
             }
 
-            $stockLines = array_values(array_filter($lines, fn ($line) => $line->kind === 'stock'));
+            $stockLines = array_values(array_filter($lines, fn ($line) => $line->kind->isStock()));
             usort($stockLines, fn ($left, $right) => strcmp($left->productId, $right->productId));
             foreach ($stockLines as $line) {
                 // Lock every product identity in a stable order before any sale.
@@ -52,6 +60,19 @@ final class ValidateBasket
                 $this->wallet->charge($actor, $basket->householdId, $basketId, $validated->validatedTotalCents);
             }
             $this->baskets->save($validated);
+            if ($cycleId !== null) {
+                $this->weeklySource->closeIfFinished($cycleId);
+            }
         });
+    }
+
+    /** The source cycle of a weekly basket, or null for any other basket or an unknown source order. */
+    private function cycleOf(Basket $basket): ?string
+    {
+        if (! $basket->kind->isWeekly()) {
+            return null;
+        }
+
+        return $this->weeklySource->cyclesOf([(string) $basket->sourceOrderId])[(string) $basket->sourceOrderId] ?? null;
     }
 }

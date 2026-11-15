@@ -15,6 +15,7 @@ use Guixa\Sales\Application\ValidateBasket;
 use Guixa\Sales\Application\WalletLedger;
 use Guixa\Sales\Domain\Basket;
 use Guixa\Sales\Domain\BasketRepository;
+use Guixa\Sales\Domain\BasketState;
 use Guixa\Sales\Domain\Error\BasketAlreadyValidated;
 use Guixa\Sales\Domain\Error\BasketHasNoContents;
 use Guixa\Sales\Domain\Error\BasketNotEditable;
@@ -36,6 +37,7 @@ use Guixa\Shared\Domain\Role;
 use Illuminate\Auth\Access\AuthorizationException;
 use Tests\Support\FrozenClock;
 use Tests\Support\InMemory\ImmediateTransactionRunner;
+use Tests\Support\InMemory\Sales\NoWeeklyBasketSource;
 
 beforeEach(function () {
     $this->actor = Actor::manager('manager');
@@ -62,6 +64,21 @@ beforeEach(function () {
             return $this->rows[$id] ?? null;
         }
 
+        public function getBySourceOrder(string $orderId): ?Basket
+        {
+            return null;
+        }
+
+        public function getOpenLateBySourceOrder(string $orderId): ?Basket
+        {
+            return null;
+        }
+
+        public function weeklyOfSourceOrders(array $sourceOrderIds): array
+        {
+            return [];
+        }
+
         public function lock(string $id): ?Basket
         {
             return $this->get($id);
@@ -70,6 +87,38 @@ beforeEach(function () {
         public function list(): array
         {
             return array_values($this->rows);
+        }
+
+        public function getForHousehold(string $id, string $householdId): ?Basket
+        {
+            $basket = $this->get($id);
+
+            return $basket?->householdId === $householdId ? $basket : null;
+        }
+
+        public function listForHousehold(string $householdId): array
+        {
+            return array_values(array_filter($this->list(),
+                fn (Basket $basket) => $basket->householdId === $householdId));
+        }
+
+        public function settledForHouseholds(array $householdIds): array
+        {
+            return [];
+        }
+
+        public function drafts(): array
+        {
+            return array_values(array_filter($this->list(), fn (Basket $basket) => $basket->state->isDraft()));
+        }
+
+        public function pendingCollections(?string $householdId = null): array
+        {
+            $pending = array_filter($this->list(), fn (Basket $basket) => $basket->isPendingCollection()
+                && ($householdId === null || $basket->householdId === $householdId));
+            usort($pending, fn (Basket $a, Basket $b) => [$a->validatedAt, $a->id] <=> [$b->validatedAt, $b->id]);
+
+            return array_values($pending);
         }
 
         public function hasProductHistory(string $productId): bool
@@ -138,6 +187,8 @@ beforeEach(function () {
         {
             return 500;
         }
+
+        public function correct(Actor $actor, string $householdId, string $basketId, int $amountCents, string $reason, string $correctionId): void {}
     };
     $this->returnItems = new class implements ReturnItems
     {
@@ -155,7 +206,7 @@ beforeEach(function () {
     $this->create = new CreateStockBasket($this->baskets, $this->households, $this->clock);
     $this->add = new AddStockToBasket($this->baskets, $this->products, $this->quantities, $this->transactions, $this->clock);
     $this->addReturn = new AddReturnToBasket($this->baskets, $this->returnItems, $this->transactions, $this->clock);
-    $this->validate = new ValidateBasket($this->baskets, $this->products, $this->stock, $this->wallet, $this->transactions, $this->clock);
+    $this->validate = new ValidateBasket($this->baskets, $this->products, $this->stock, $this->wallet, new NoWeeklyBasketSource, $this->transactions, $this->clock);
     $this->collect = new MarkBasketCollected($this->baskets, $this->transactions, $this->clock);
     $this->remove = new RemoveStockFromBasket($this->baskets, $this->transactions, $this->clock);
     $this->cancel = new CancelDraftBasket($this->baskets, $this->transactions, $this->clock);
@@ -165,21 +216,21 @@ it('creates, snapshots, validates and collects an independent stock basket once 
     $id = ($this->create)($this->actor, 'household');
     ($this->add)($this->actor, $id, 'oil', '1');
     $draft = $this->baskets->get($id);
-    expect($draft->state)->toBe('draft')
+    expect($draft->state)->toBe(BasketState::Draft)
         ->and($draft->lines[0]->name)->toBe('Oil')
         ->and($draft->lines[0]->priceCents)->toBe(1200)
         ->and($this->stock->sales)->toBe([])
         ->and($this->wallet->charges)->toBe([]);
 
     ($this->validate)($this->actor, $id);
-    expect($this->baskets->get($id)->state)->toBe('validated')
+    expect($this->baskets->get($id)->state)->toBe(BasketState::Validated)
         ->and($this->stock->sales)->toHaveCount(1)
         ->and($this->wallet->charges)->toBe([['manager', 'household', $id, 1200]]);
 
     ($this->collect)($this->actor, $id);
     $firstCollection = $this->baskets->get($id)->collectedAt;
     ($this->collect)($this->actor, $id);
-    expect($this->baskets->get($id)->state)->toBe('collected')
+    expect($this->baskets->get($id)->state)->toBe(BasketState::Collected)
         ->and($this->baskets->get($id)->collectedAt)->toEqual($firstCollection)
         ->and($this->stock->sales)->toHaveCount(1)
         ->and($this->wallet->charges)->toHaveCount(1);
@@ -227,7 +278,7 @@ it('validates real-content net-zero goods without a Wallet movement (S88, R22)',
     ($this->validate)($this->actor, $id);
     ($this->collect)($this->actor, $id);
 
-    expect($this->baskets->get($id)->state)->toBe('collected')
+    expect($this->baskets->get($id)->state)->toBe(BasketState::Collected)
         ->and($this->baskets->get($id)->validatedTotalCents)->toBe(0)
         ->and($this->wallet->charges)->toBe([]);
 });
@@ -236,7 +287,7 @@ it('rejects empty validation but cancels an empty draft without money or stock e
     $id = ($this->create)($this->actor, 'household');
     expect(fn () => ($this->validate)($this->actor, $id))->toThrow(BasketHasNoContents::class);
     ($this->cancel)($this->actor, $id);
-    expect($this->baskets->get($id)->state)->toBe('cancelled')
+    expect($this->baskets->get($id)->state)->toBe(BasketState::Cancelled)
         ->and($this->wallet->charges)->toBe([])
         ->and($this->stock->sales)->toBe([]);
 });
@@ -327,7 +378,7 @@ it('retains removed and cancelled draft references but excludes them from curren
     expect($this->baskets->get($id)->lines)->toHaveCount(2)
         ->and($this->baskets->get($id)->activeLineFor('oil')->priceCents)->toBe(1500);
     ($this->cancel)($this->actor, $id);
-    expect($this->baskets->get($id)->state)->toBe('cancelled')
+    expect($this->baskets->get($id)->state)->toBe(BasketState::Cancelled)
         ->and($this->baskets->get($id)->activeLines())->toBe([])
         ->and($this->baskets->get($id)->totalCents())->toBe(0)
         ->and(BasketData::from($this->baskets->get($id))->stockLines)->toBe([])
@@ -382,7 +433,7 @@ it('accepts the same Finance Actor through every public independent-basket use c
     ($this->validate)($finance, $id);
     ($this->collect)($finance, $id);
 
-    expect($this->baskets->get($id)->state)->toBe('collected')
+    expect($this->baskets->get($id)->state)->toBe(BasketState::Collected)
         ->and($this->stock->sales[0][0])->toBe('finance')
         ->and($this->wallet->charges[0][0])->toBe('finance');
 });

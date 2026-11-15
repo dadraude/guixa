@@ -8,7 +8,7 @@ Existing presentation tasks T37–T51 retain their regression/visual scopes and 
 
 ## Requirements
 
-All 65 current requirement IDs, ordered as declared in the area specifications. Entries before a
+All 66 current requirement IDs, ordered as declared in the area specifications. Entries before a
 semicolon identify retained work; the amendment owner implements the stated changed boundary.
 
 | Rule | Delivery responsibility |
@@ -24,7 +24,7 @@ semicolon identify retained work; the amendment owner implements the stated chan
 | [R3c](../ordering.md) | [T15](../tasks.md#t15); [T52](../tasks.md#t52) (weekly only) |
 | [R4](../ordering.md) | [T11](../tasks.md#t11); [T55](../tasks.md#t55)/[T59](../tasks.md#t59) (purchase/validation boundary) |
 | [R4a](../ordering.md) | [T11](../tasks.md#t11)/[T14](../tasks.md#t14) |
-| [R4b](../ordering.md) | [T17](../tasks.md#t17); [T53](../tasks.md#t53) (archive), [T60](../tasks.md#t60) (independent attributed baskets) |
+| [R4b](../ordering.md) | [T17](../tasks.md#t17); [T53](../tasks.md#t53) (archive), [T60](../tasks.md#t60) (independent baskets) |
 | [R4c](../ordering.md) | [T11](../tasks.md#t11) |
 | [R5](../ordering.md) | [T08](../tasks.md#t08)/[T11](../tasks.md#t11) |
 | [R6](../ordering.md) | [T12](../tasks.md#t12) |
@@ -54,21 +54,22 @@ semicolon identify retained work; the amendment owner implements the stated chan
 | [R21](../pickup.md) | [T55](../tasks.md#t55) (basket amounts), [T64](../tasks.md#t64) (receipts), [T57](../tasks.md#t57) (returns), [T65](../tasks.md#t65) (member read), [T59](../tasks.md#t59) (weekly) |
 | [R22](../pickup.md) | [T55](../tasks.md#t55)/[T57](../tasks.md#t57)/[T59](../tasks.md#t59) |
 | [R23](../pickup.md) | [T58](../tasks.md#t58) (amount), [T68](../tasks.md#t68) (goods/effective quantities), [T59](../tasks.md#t59) (weekly) |
-| [R23a](../pickup.md) | [T65](../tasks.md#t65) (read), [T59](../tasks.md#t59) (weekly), [T61](../tasks.md#t61) (action), [T67](../tasks.md#t67) (indicators) |
+| [R23a](../pickup.md) | [T65](../tasks.md#t65) (read), [T59](../tasks.md#t59) (weekly), [T61](../tasks.md#t61) (action), [T67](../tasks.md#t67) (indicators), [T82](../tasks.md#t82) (recorder names) |
 | [R23b](../pickup.md) | [T55](../tasks.md#t55) (staff collection), [T66](../tasks.md#t66) (correction), [T61](../tasks.md#t61) (member action) |
-| [R24](../pickup.md) | [T67](../tasks.md#t67) |
+| [R24](../pickup.md) | [T55](../tasks.md#t55), [T59](../tasks.md#t59), [T67](../tasks.md#t67) |
 | [R24a](../pickup.md) | [T55](../tasks.md#t55)/[T57](../tasks.md#t57) (contents), [T68](../tasks.md#t68) (reversal), [T59](../tasks.md#t59) (weekly empty), [T65](../tasks.md#t65) (read) |
 | [R24b](../pickup.md) | [T59](../tasks.md#t59) (closure), [T60](../tasks.md#t60) (supplements), [T67](../tasks.md#t67) (indicators) |
 | [R25](../stock-wallet.md) | [T24](../tasks.md#t24); [T52](../tasks.md#t52)/[T53](../tasks.md#t53) |
 | [R25a](../stock-wallet.md) | [T53](../tasks.md#t53)/[T55](../tasks.md#t55) |
-| [R25b](../stock-wallet.md) | [T52](../tasks.md#t52)/[T54](../tasks.md#t54) |
+| [R25b](../stock-wallet.md) | [T52](../tasks.md#t52)/[T54](../tasks.md#t54); [T76](../tasks.md#t76) (own movement history) |
 | [R25c](../stock-wallet.md) | [T54](../tasks.md#t54) |
 | [R26](../stock-wallet.md) | [T25](../tasks.md#t25); [T52](../tasks.md#t52) |
 | [R27](../stock-wallet.md) | [T25](../tasks.md#t25); [T52](../tasks.md#t52)/[T68](../tasks.md#t68) |
 | [R28](../stock-wallet.md) | [T25](../tasks.md#t25); [T54](../tasks.md#t54)/[T55](../tasks.md#t55)/[T68](../tasks.md#t68) |
+| [R28a](../stock-wallet.md) | [T76](../tasks.md#t76) |
 | [R29](../stock-wallet.md) | [T26](../tasks.md#t26); [T64](../tasks.md#t64) |
 | [R30](../stock-wallet.md) | [T26](../tasks.md#t26); [T55](../tasks.md#t55)/[T64](../tasks.md#t64) |
-| [R31](../stock-wallet.md) | [T26](../tasks.md#t26); [T55](../tasks.md#t55) (source), [T56](../tasks.md#t56) (Finance read), [T64](../tasks.md#t64) (receipts), [T65](../tasks.md#t65) (member read), [T58](../tasks.md#t58)/[T68](../tasks.md#t68) (adjustments) |
+| [R31](../stock-wallet.md) | [T26](../tasks.md#t26); [T55](../tasks.md#t55) (source), [T56](../tasks.md#t56) (Finance read), [T64](../tasks.md#t64) (receipts), [T65](../tasks.md#t65) (member read), [T58](../tasks.md#t58)/[T68](../tasks.md#t68) (adjustments), [T82](../tasks.md#t82) (author names) |
 | [R32](../stock-wallet.md) | [T26](../tasks.md#t26); [T64](../tasks.md#t64) (receipt), [T58](../tasks.md#t58) (amount), [T68](../tasks.md#t68) (goods) |
 | [R33](../stock-wallet.md) | [T06](../tasks.md#t06) |
 | [R34](../stock-wallet.md) | [T06](../tasks.md#t06) |
@@ -77,7 +78,7 @@ semicolon identify retained work; the amendment owner implements the stated chan
 | [R36](../stock-wallet.md) | [T08](../tasks.md#t08)/[T09](../tasks.md#t09) |
 | [R36a](../stock-wallet.md) | [T04](../tasks.md#t04)/[T07](../tasks.md#t07)/[T34](../tasks.md#t34); [T56](../tasks.md#t56) |
 | [R36b](../stock-wallet.md) | [T07](../tasks.md#t07); [T56](../tasks.md#t56)/[T62](../tasks.md#t62) |
-| [R36c](../stock-wallet.md) | [T56](../tasks.md#t56) (role/baskets), [T64](../tasks.md#t64) (receipts) |
+| [R36c](../stock-wallet.md) | [T56](../tasks.md#t56) (role/baskets), [T64](../tasks.md#t64) (receipts), [T76](../tasks.md#t76) (read-only stock history) |
 
 ## Scenarios
 
@@ -149,8 +150,8 @@ behavior and verify its regression through the new final contracts, not that the
 | [S60 — Counting containers](../reception.md) | [T31](../tasks.md#t31) | [T60](../tasks.md#t60) |
 | [S61 — Redistributing after an actual-quantity adjustment](../pickup.md) | [T30](../tasks.md#t30) | [T59](../tasks.md#t59) |
 | [S62 — Totals of a cancelled cycle](../ordering.md) | [T35](../tasks.md#t35), [T41](../tasks.md#t41) | [T53](../tasks.md#t53) (archive regression) |
-| [S63 — Explicit redistribution across validated baskets](../reception.md) | [T30](../tasks.md#t30) | [T59](../tasks.md#t59) |
-| [S64 — Successive basket adjustments retain history](../reception.md) | [T30](../tasks.md#t30) | [T59](../tasks.md#t59) |
+| [S63 — A validated basket blocks redistribution of its product](../reception.md) | [T30](../tasks.md#t30) | [T59](../tasks.md#t59) |
+| [S64 — Redistributing a product no validated basket contains](../reception.md) | [T30](../tasks.md#t30) | [T59](../tasks.md#t59) |
 | [S65 — A product stays with its producer](../ordering.md) | — | [T52](../tasks.md#t52) |
 | [S66 — Separate weekly and stock records](../ordering.md) | — | [T52](../tasks.md#t52) (separate modes), [T54](../tasks.md#t54) (visibility) |
 | [S67 — Only the manager changes an unused classification](../ordering.md) | — | [T53](../tasks.md#t53) |
@@ -175,8 +176,11 @@ behavior and verify its regression through the new final contracts, not that the
 | [S86 — Corrections retain the validated original](../pickup.md) | — | [T68](../tasks.md#t68) |
 | [S87 — Retained references establish use](../pickup.md) | — | [T53](../tasks.md#t53) (orders), [T55](../tasks.md#t55) (baskets) |
 | [S88 — Returns, zero total and no contents](../pickup.md) | — | [T57](../tasks.md#t57) (returns/real contents), [T59](../tasks.md#t59) (weekly empty) |
-| [S89 — Redistribution uses validation, not collection](../pickup.md) | — | [T59](../tasks.md#t59) |
-| [S90 — Supplementary containers retain cycle attribution](../pickup.md) | — | [T60](../tasks.md#t60) |
+| [S89 — Validation, not collection, freezes a basket](../pickup.md) | — | [T59](../tasks.md#t59) |
+| S90 — retired | — | — |
+| [S91 — Successive late arrivals share one open draft](../pickup.md) | — | [T59](../tasks.md#t59) |
+| [S92 — Container balance accumulates per household](../reception.md) | — | [T60](../tasks.md#t60) |
+| [S93 — Stock movement history](../stock-wallet.md) | — | [T76](../tasks.md#t76) |
 
 ## Required checks beyond scenario identifiers
 
@@ -189,7 +193,6 @@ behavior and verify its regression through the new final contracts, not that the
 | Amount-only corrections; physical stock/money atomicity, originals and replay | T58 / T68; T59 weekly integration |
 | Collection correction with retained history and no financial effects | T66 |
 | Settlement/source-sync/validation lock, immutable financial freeze, effective redistribution | T59 |
-| Attributed stock insert versus weekly cycle/product lock interleaving | T60 |
 | Current own-household reads, duplicate collection and late/closed indicators | T65 / T61 / T67; T62 lifecycle |
 | Fresh final schema, no duplicate metadata/financial writers or retired live routes | T63 |
 | Semantic R#/S# audit, T36 and visual integration, exact-candidate CI | T33 |

@@ -7,6 +7,7 @@ use Illuminate\Auth\Events\Verified;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\URL;
+use Inertia\Testing\AssertableInertia as Assert;
 use Laravel\Fortify\Features;
 use Tests\TestCase;
 
@@ -19,6 +20,25 @@ class EmailVerificationTest extends TestCase
         parent::setUp();
 
         $this->skipUnlessFortifyHas(Features::emailVerification());
+    }
+
+    public function test_verification_screen_flags_a_resent_link()
+    {
+        $user = User::factory()->unverified()->create();
+
+        $this->actingAs($user)
+            ->withSession(['status' => 'verification-link-sent'])
+            ->get(route('verification.notice'))
+            ->assertInertia(fn (Assert $page) => $page->where('verificationLinkSent', true));
+    }
+
+    public function test_verification_screen_does_not_flag_a_link_by_default()
+    {
+        $user = User::factory()->unverified()->create();
+
+        $this->actingAs($user)
+            ->get(route('verification.notice'))
+            ->assertInertia(fn (Assert $page) => $page->where('verificationLinkSent', false));
     }
 
     public function test_email_verification_screen_can_be_rendered()

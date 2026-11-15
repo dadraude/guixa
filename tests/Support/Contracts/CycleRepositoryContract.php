@@ -183,6 +183,28 @@ trait CycleRepositoryContract
     }
 
     #[Test]
+    public function it_lists_only_cycles_with_a_sent_order_newest_pickup_first(): void
+    {
+        $repository = $this->repository();
+        $now = $this->madrid('2026-11-20 10:00');
+        $ids = [];
+        foreach (['2026-11-07' => true, '2026-11-14' => false, '2026-12-05' => true] as $date => $sent) {
+            $cycle = $this->cycle($repository, $date);
+            $cycle->addParticipant(self::BAKER, CutoffRule::of(3, '20:00'), $this->madrid('2026-10-22 10:00'));
+            if ($sent) {
+                $cycle->closeNow(self::BAKER, $now);
+                $cycle->send(self::BAKER, $now);
+                $ids[$date] = $cycle->id;
+            }
+            $repository->add($cycle);
+        }
+
+        $listed = array_map(fn (Cycle $cycle) => $cycle->id, $repository->listWithSentOrders());
+
+        $this->assertSame([$ids['2026-12-05'], $ids['2026-11-07']], $listed);
+    }
+
+    #[Test]
     public function it_knows_whether_a_cycle_has_a_pickup_date(): void
     {
         $repository = $this->repository();

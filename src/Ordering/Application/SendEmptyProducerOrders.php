@@ -23,11 +23,12 @@ final class SendEmptyProducerOrders
         private readonly OrderRepository $orders,
         ProductCatalog $catalog,
         ProductAvailabilityRepository $availability,
+        SalesBaskets $baskets,
         private readonly TransactionRunner $transactions,
         private readonly Clock $clock,
     ) {
         $this->marks = new NotDeliveredMarks($catalog, $availability, $orders);
-        $this->settlement = new CycleSettlement($orders, $this->marks);
+        $this->settlement = new CycleSettlement($orders, $this->marks, $baskets);
     }
 
     /**
@@ -57,11 +58,7 @@ final class SendEmptyProducerOrders
         }
 
         $orders = $this->orders->ofCycle($cycleId);
-        $marked = [];
-
-        foreach ($orders as $order) {
-            $marked[$order->id] = $this->marks->derivedOf($cycle, $order);
-        }
+        $marked = $this->marks->derivedOfAll($cycle, $orders);
 
         foreach ($cycle->producersReadyToSend($now) as $producerId) {
             if ($cycle->totalsToSend($producerId, $orders, $marked) !== []) {

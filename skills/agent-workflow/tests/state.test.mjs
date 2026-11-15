@@ -4,7 +4,11 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
-import { applyEvent, compatibleTranslations } from '../scripts/state.mjs';
+import {
+    applyEvent,
+    compatibleTranslations,
+    recoveryStatus,
+} from '../scripts/state.mjs';
 const initialize = (owner = {}, at) =>
     applyEvent(owner, {
         type: 'initialize',
@@ -34,6 +38,159 @@ const result = (mechanism, outcome) => ({
     mechanism,
     outcome,
     evidence: `Focused probe ${outcome}`,
+});
+void test('recovery status preserves a successful focused correction before a later full failure', () => {
+    let owner = initialize();
+    owner = applyEvent(owner, failure('harness', 'untracked-manifest'));
+    owner = applyEvent(owner, recovery('untracked-manifest'));
+    owner = applyEvent(owner, result('untracked-manifest', 'success'));
+    owner = applyEvent(owner, failure('harness', 'clipped-header'));
+    owner = applyEvent(owner, recovery('clipped-header'));
+    owner = applyEvent(owner, result('clipped-header', 'failure'));
+    owner = applyEvent(owner, recovery('clipped-header'));
+    owner = applyEvent(owner, result('clipped-header', 'success'));
+    owner = applyEvent(owner, failure('harness', 'clipped-header'));
+    const before = structuredClone(owner);
+    const status = recoveryStatus(owner, 'visual', 'clipped-header');
+    assert.deepEqual(owner, before);
+    assert.equal(status.canRetry, true);
+    assert.equal(status.reason, 'allowed');
+    assert.equal(status.failures, 1);
+    assert.equal(status.stageAttempts, 3);
+    assert.equal(status.pending, null);
+    assert.equal(status.blocker, null);
+    owner = applyEvent(owner, recovery('clipped-header'));
+    assert.equal(
+        recoveryStatus(owner, 'visual', 'clipped-header').reason,
+        'pending',
+    );
+});
+
+void test('recovery status reports exhausted and legacy boundaries without mutation', () => {
+    let owner = applyEvent(initialize(), failure('harness'));
+    assert.equal(
+        recoveryStatus(owner, 'visual', 'fixture-ready').canRetry,
+        true,
+    );
+    for (let index = 0; index < 2; index++) {
+        owner = applyEvent(owner, recovery());
+        owner = applyEvent(owner, result('fixture-ready', 'failure'));
+    }
+    const status = recoveryStatus(owner, 'visual', 'fixture-ready');
+    assert.equal(status.canRetry, false);
+    assert.equal(status.reason, 'exhausted');
+    assert.equal(status.failures, 2);
+    const legacy = structuredClone(owner);
+    delete legacy.pipeline.recoveryLedger;
+    assert.equal(
+        recoveryStatus(legacy, 'visual', 'fixture-ready').reason,
+        'legacy-history',
+    );
+});
+
+void test('recovery status distinguishes unknown legacy attempts from known zero', () => {
+    const baseline = applyEvent(
+        {},
+        {
+            type: 'initialize',
+            evidence:
+                'Recovered known stage total, mechanism outcomes unavailable',
+            counters: {
+                substantive: 0,
+                mechanical: 0,
+                product: {},
+                recovery: { visual: 3 },
+            },
+        },
+    );
+    const legacy = recoveryStatus(baseline, 'visual', 'clipped-header');
+    assert.equal(legacy.canRetry, false);
+    assert.equal(legacy.reason, 'legacy-history');
+    assert.equal(legacy.stageAttempts, 3);
+    assert.equal(legacy.failures, null);
+    assert.equal(legacy.extraUsed, null);
+    assert.equal(legacy.authorizedAttempts, null);
+    assert.equal(legacy.failureLimit, null);
+    assert.equal(legacy.stageAttemptLimit, null);
+    const uninitialized = recoveryStatus({}, 'visual', 'clipped-header');
+    assert.equal(uninitialized.canRetry, false);
+    assert.equal(uninitialized.stageAttempts, null);
+    assert.equal(uninitialized.failures, null);
+    const knownZero = recoveryStatus(initialize(), 'visual', 'clipped-header');
+    assert.equal(knownZero.failures, 0);
+    assert.equal(knownZero.stageAttempts, 0);
+    assert.equal(knownZero.extraUsed, 0);
+});
+
+void test('CLI recovery status is read only and returns structured admission evidence', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'workflow-status-'));
+    try {
+        const ownerPath = join(dir, 'owner.json');
+        writeFileSync(
+            ownerPath,
+            JSON.stringify(applyEvent(initialize(), failure('harness'))),
+        );
+        const before = readFileSync(ownerPath);
+        const run = spawnSync(
+            process.execPath,
+            [
+                'skills/agent-workflow/scripts/state.mjs',
+                'status',
+                ownerPath,
+                'visual',
+                'fixture-ready',
+            ],
+            { cwd: new URL('../../..', import.meta.url), encoding: 'utf8' },
+        );
+        assert.equal(run.status, 0, run.stderr);
+        assert.equal(JSON.parse(run.stdout).canRetry, true);
+        assert.deepEqual(readFileSync(ownerPath), before);
+        const legacy = applyEvent(
+            {},
+            {
+                type: 'initialize',
+                evidence: 'Recovered stage attempts',
+                counters: {
+                    substantive: 0,
+                    mechanical: 0,
+                    product: {},
+                    recovery: { visual: 3 },
+                },
+            },
+        );
+        writeFileSync(ownerPath, JSON.stringify(legacy));
+        const legacyRun = spawnSync(
+            process.execPath,
+            [
+                'skills/agent-workflow/scripts/state.mjs',
+                'status',
+                ownerPath,
+                'visual',
+                'fixture-ready',
+            ],
+            { cwd: new URL('../../..', import.meta.url), encoding: 'utf8' },
+        );
+        assert.equal(legacyRun.status, 0, legacyRun.stderr);
+        assert.equal(JSON.parse(legacyRun.stdout).stageAttempts, 3);
+        assert.equal(JSON.parse(legacyRun.stdout).failures, null);
+        writeFileSync(ownerPath, JSON.stringify({}));
+        const unknown = spawnSync(
+            process.execPath,
+            [
+                'skills/agent-workflow/scripts/state.mjs',
+                'status',
+                ownerPath,
+                'visual',
+                'fixture-ready',
+            ],
+            { cwd: new URL('../../..', import.meta.url), encoding: 'utf8' },
+        );
+        assert.equal(unknown.status, 0, unknown.stderr);
+        assert.equal(JSON.parse(unknown.stdout).stageAttempts, null);
+        assert.equal(JSON.parse(unknown.stdout).failures, null);
+    } finally {
+        rmSync(dir, { recursive: true, force: true });
+    }
 });
 void test('successful unrelated recoveries do not spend a mechanism failure allowance', () => {
     let owner = initialize({ implementer_id: 'original' });
@@ -388,6 +545,10 @@ void test('scoped authorization adds bounded recovery capacity without changing 
         authorization: 'User approved one focused retry',
         evidence: 'Two failures reviewed; same selector diagnosis',
     });
+    const admission = recoveryStatus(owner, 'visual', 'fixture-ready');
+    assert.equal(admission.canRetry, true);
+    assert.equal(admission.failureLimit, 3);
+    assert.equal(admission.authorizedAttempts, 1);
     owner = applyEvent(owner, recovery());
     owner = applyEvent(owner, result('fixture-ready', 'success'));
     assert.equal(owner.pipeline.limits.product, 2);

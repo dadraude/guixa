@@ -54,6 +54,17 @@ automatic rewrite. When reslicing is requested, apply the planning reference's e
 reconciliation and show scope/edge deltas before tracker updates. Drafting tickets alone does not
 authorize changes to the canonical task registry; honor explicit document-edit authorization.
 
+## Delegation
+
+The coordinator keeps the graph, the approval and every tracker write; workers return digests. Use
+[role-scoped context](handoff.md) and never put tracker credentials in a prompt.
+
+- Discovery worker: duplicate and existing-relationship inspection before drafting, and the read-back
+  comparison after publishing. It returns only mismatches and unknown outcomes, with issue identities.
+- Preparation worker: drafts bodies from the planning handoff when the batch is larger than a few
+  slices, as files in a task-local artifact path. The coordinator reviews them against the planning gates.
+- Writes stay serial in the coordinator, so a partial failure is reconciled from one mapping.
+
 ## Execution Steps
 
 1. Inspect the current project, matching issues and relationships to avoid duplicates. Check readiness

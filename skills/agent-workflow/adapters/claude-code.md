@@ -15,7 +15,8 @@ and applicable to that worker. Do not assume `ToolSearch`, team messaging or bac
 Pass the role's model from the profile's Model routing on every `Agent` call; an omitted `model`
 inherits the coordinator's and spends a higher tier. Host/user policy wins; if a requested model is
 unavailable, report it and use only an explicitly permitted fallback. Do not silently weaken independent
-review or invent a model. No nested delegation, even when the host would allow it.
+review or invent a model. No nested delegation, even when the host would allow it. Any skill that delegates, including the
+spec and ticket skills outside the task pipeline, follows this model rule.
 Cap parallelism by both the project limit and live host capacity.
 
 Use [role-scoped handoffs](../core/handoff.md) with explicit relevant paths/sections and resolved settings,

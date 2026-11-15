@@ -200,7 +200,6 @@ return [
         'available' => 'disponibilitat',
         'received' => 'quantitat rebuda',
         'overwrite_manual' => 'substitució de les assignacions manuals',
-        'include_completed' => 'inclusió de les recollides completades',
         'top_up' => 'ingrés',
         'containers_per_unit' => 'envasos per unitat',
         'variable' => 'quantitat variable',

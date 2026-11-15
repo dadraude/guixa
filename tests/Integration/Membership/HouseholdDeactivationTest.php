@@ -2,6 +2,7 @@
 
 namespace Tests\Integration\Membership;
 
+use App\Models\User;
 use Guixa\Membership\Application\AddMember;
 use Guixa\Membership\Application\DeactivateHousehold;
 use Guixa\Shared\Application\Actor;
@@ -71,7 +72,7 @@ final class HouseholdDeactivationTest extends TestCase
         $member = app(AddMember::class)($this->manager(), $household, 'Anna', 'anna@example.org');
         DB::beginTransaction();
         app(DeactivateHousehold::class)($this->manager(), $household);
-        $pipes = $this->startWorker('grant', $household, $member);
+        $pipes = $this->startWorker('grant', $household, $member, User::factory()->create()->id);
         $this->waitForLock();
         DB::commit();
 
@@ -95,10 +96,10 @@ final class HouseholdDeactivationTest extends TestCase
     }
 
     /** @return array<int, resource> */
-    private function startWorker(string $command, string $household, ?string $member = null): array
+    private function startWorker(string $command, string $household, ?string $member = null, string $actorId = ''): array
     {
         $worker = proc_open(
-            [PHP_BINARY, dirname(__DIR__, 2).'/Support/Scripts/household_membership.php', $command, $household, $member ?? ''],
+            [PHP_BINARY, dirname(__DIR__, 2).'/Support/Scripts/household_membership.php', $command, $household, $member ?? '', $actorId],
             [1 => ['pipe', 'w'], 2 => ['pipe', 'w']],
             $pipes,
             null,

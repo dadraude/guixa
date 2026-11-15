@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { describe, expect, it, vi } from 'vite-plus/test';
+import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 import {
     createApp,
     createSSRApp,
@@ -13,6 +13,8 @@ import { renderToString } from 'vue/server-renderer';
 import { installTranslations } from '@/lib/i18n';
 import Edit from './Edit.vue';
 
+const pageErrors = vi.hoisted(() => ({ value: {} as Record<string, string> }));
+
 vi.mock('@inertiajs/vue3', () => ({
     Head: () => null,
     Link: defineComponent({
@@ -21,10 +23,11 @@ vi.mock('@inertiajs/vue3', () => ({
             () =>
                 h('a', attrs, slots.default?.()),
     }),
-    usePage: () => ({ props: { errors: {} } }),
-    router: { put: vi.fn(), delete: vi.fn() },
+    usePage: () => ({ props: { errors: pageErrors.value } }),
+    router: { put: vi.fn(), delete: vi.fn(), get: vi.fn() },
 }));
 
+const preview = { totalCents: 0, amountCents: {} };
 const order = {
     cycleId: 'cycle',
     pickupDate: '2026-10-30',
@@ -55,11 +58,15 @@ async function render(component: Component, props: Record<string, unknown>) {
 }
 
 describe('member order editor presentation', () => {
+    afterEach(() => {
+        pageErrors.value = {};
+    });
+
     it('keeps the explicit Enter save request and its partial reload', async () => {
         const put = vi.spyOn(router, 'put');
         const element = document.createElement('div');
         document.body.append(element);
-        const app = createApp(Edit, { order });
+        const app = createApp(Edit, { order, preview });
         installTranslations(app);
         app.mount(element);
 
@@ -68,9 +75,6 @@ describe('member order editor presentation', () => {
         quantity.value = '2';
         quantity.dispatchEvent(new Event('input', { bubbles: true }));
         await nextTick();
-        expect(
-            element.querySelector('[data-test="order-total"]')?.textContent,
-        ).toContain('7,00');
         quantity.dispatchEvent(
             new KeyboardEvent('keydown', { bubbles: true, key: 'Enter' }),
         );
@@ -87,8 +91,47 @@ describe('member order editor presentation', () => {
         element.remove();
     });
 
+    it('asks the server to price what is typed after a short pause, and shows its answer', async () => {
+        vi.useFakeTimers();
+        const get = vi.spyOn(router, 'get');
+        get.mockClear();
+        const element = document.createElement('div');
+        document.body.append(element);
+        const app = createApp(Edit, {
+            order,
+            preview: { totalCents: 700, amountCents: { bread: 700 } },
+        });
+        installTranslations(app);
+        app.mount(element);
+
+        const quantity =
+            element.querySelector<HTMLInputElement>('#quantity-bread')!;
+        quantity.value = '2';
+        quantity.dispatchEvent(new Event('input', { bubbles: true }));
+        await nextTick();
+        expect(get).not.toHaveBeenCalled();
+        vi.advanceTimersByTime(300);
+
+        expect(get).toHaveBeenCalledTimes(1);
+        expect(get).toHaveBeenCalledWith(
+            '/cycles/cycle/order',
+            { typed: { bread: '2' } },
+            expect.objectContaining({
+                only: ['preview'],
+                preserveState: true,
+                preserveScroll: true,
+            }),
+        );
+        expect(
+            element.querySelector('[data-test="order-total"]')?.textContent,
+        ).toContain('7,00');
+        app.unmount();
+        element.remove();
+        vi.useRealTimers();
+    });
+
     it('labels quantity inputs and keeps explicit save and the running total', async () => {
-        const html = await render(Edit, { order });
+        const html = await render(Edit, { order, preview });
 
         expect(html).toContain('La teva comanda');
         expect(html).toContain('for="quantity-bread"');
@@ -104,7 +147,7 @@ describe('member order editor presentation', () => {
         const rowMarkup = async (order: unknown) => {
             const element = document.createElement('div');
             document.body.append(element);
-            const app = createApp(Edit, { order });
+            const app = createApp(Edit, { order, preview });
             installTranslations(app);
             app.mount(element);
             await nextTick();
@@ -152,6 +195,7 @@ describe('member order editor presentation', () => {
 
     it('retains the cancelled notice without any product controls', async () => {
         const html = await render(Edit, {
+            preview,
             order: { ...order, cancelled: true },
         });
 
@@ -161,6 +205,7 @@ describe('member order editor presentation', () => {
 
     it('keeps closed rows read-only and marked lines removable with a zero amount', async () => {
         const html = await render(Edit, {
+            preview,
             order: {
                 ...order,
                 producers: [{ ...order.producers[0], open: false }],
@@ -189,118 +234,95 @@ describe('member order editor presentation', () => {
         expect(html).toContain('0,00');
     });
 
-    it('shows the pickup once the cycle is settled, with the delivered quantities and the total', async () => {
+    it('links the settled cycle to the household basket, where ordered versus actual is shown (R23a)', async () => {
         const html = await render(Edit, {
-            order: {
-                ...order,
-                pickup: {
-                    cycleId: 'cycle',
-                    pickupDate: '2026-10-30',
-                    householdId: 'home',
-                    householdName: '',
-                    status: 'pending',
-                    totalCents: 1050,
-                    balanceCents: null,
-                    resultingBalanceCents: null,
-                    stockLines: [],
-                    returnLines: [],
-                    lines: [
-                        {
-                            productId: 'bread',
-                            name: 'Pa de pagès',
-                            unit: 'unitat',
-                            variable: false,
-                            unitPriceCents: 350,
-                            ordered: '4.000',
-                            allocated: '4.000',
-                            delivered: '3.000',
-                            adjusted: true,
-                            amountCents: 1050,
-                        },
-                    ],
-                },
-            },
+            preview,
+            order: { ...order, basketId: 'basket-1' },
         });
 
         expect(html).toContain('data-test="pickup"');
-        expect(html).toContain('La teva recollida');
-        expect(html).toContain('Demanat 4,000, lliurat 3,000');
-        expect(html).toContain('data-test="pickup-total"');
-        expect(html).toContain('10,50');
+        expect(html).toContain('La teva cistella');
+        expect(html).toContain('data-test="basket-link"');
     });
 
-    it('shows the stock and return lines of the pickup read-only, since the total includes them (R22, R23a)', async () => {
-        const html = await render(Edit, {
-            order: {
-                ...order,
-                pickup: {
-                    cycleId: 'cycle',
-                    pickupDate: '2026-10-30',
-                    householdId: 'home',
-                    householdName: '',
-                    status: 'pending',
-                    totalCents: 1000,
-                    balanceCents: null,
-                    resultingBalanceCents: null,
-                    lines: [],
-                    stockLines: [
-                        {
-                            stockProductId: 'honey',
-                            name: 'Mel',
-                            unit: 'pot',
-                            variable: false,
-                            unitPriceCents: 600,
-                            quantity: '2.000',
-                            amountCents: 1200,
-                        },
-                    ],
-                    returnLines: [
-                        {
-                            returnItemId: 'jar',
-                            name: 'Pot de vidre',
-                            amountCents: 50,
-                            quantity: 4,
-                            creditCents: 200,
-                        },
-                    ],
-                },
-            },
-        });
-
-        expect(html).toContain('data-test="stock-line-honey"');
-        expect(html).toContain('data-test="return-line-jar"');
-        expect(html).not.toContain('data-test="add-stock-form"');
-        expect(html).not.toContain('data-test="add-return-form"');
-        expect(html).not.toContain('data-test="remove-stock-honey"');
-    });
-
-    it('shows no stock or return section when the pickup has none', async () => {
-        const html = await render(Edit, {
-            order: {
-                ...order,
-                pickup: {
-                    cycleId: 'cycle',
-                    pickupDate: '2026-10-30',
-                    householdId: 'home',
-                    householdName: '',
-                    status: 'pending',
-                    totalCents: 0,
-                    balanceCents: null,
-                    resultingBalanceCents: null,
-                    lines: [],
-                    stockLines: [],
-                    returnLines: [],
-                },
-            },
-        });
-
-        expect(html).not.toContain('data-test="stock-lines"');
-        expect(html).not.toContain('data-test="return-lines"');
-    });
-
-    it('shows no pickup before the cycle is settled', async () => {
-        const html = await render(Edit, { order });
+    it('shows no basket link before the cycle is settled', async () => {
+        const html = await render(Edit, { order, preview });
 
         expect(html).not.toContain('data-test="pickup"');
+    });
+
+    it('sends the existing DELETE when a marked line of a closed producer is removed', async () => {
+        const destroy = vi.spyOn(router, 'delete');
+        const element = document.createElement('div');
+        document.body.append(element);
+        const app = createApp(Edit, {
+            preview,
+            order: {
+                ...order,
+                producers: [
+                    { ...order.producers[0], open: false },
+                    {
+                        ...order.producers[0],
+                        producerId: 'empty',
+                        products: [],
+                    },
+                ],
+                lines: [
+                    {
+                        productId: 'bread',
+                        producerId: 'baker',
+                        producerName: 'Forn de la plaça',
+                        name: 'Pa de pagès',
+                        unit: 'unitat',
+                        price: '3.50',
+                        variable: false,
+                        quantity: '2.000',
+                        notDelivered: true,
+                    },
+                ],
+            },
+        });
+        installTranslations(app);
+        app.mount(element);
+
+        expect(element.textContent).toContain('Tancat');
+        expect(element.textContent).toContain(
+            'Aquest productor no té productes per demanar.',
+        );
+        element
+            .querySelector<HTMLButtonElement>('[data-test="remove-bread"]')!
+            .click();
+
+        expect(destroy).toHaveBeenCalledWith(
+            '/cycles/cycle/order/lines/bread',
+            expect.objectContaining({ only: ['order', 'errors'] }),
+        );
+        app.unmount();
+        element.remove();
+    });
+
+    it('shows a server domain error as an alert and keeps the typed quantity', async () => {
+        pageErrors.value = { domain: 'Aquest productor ja ha tancat.' };
+        const element = document.createElement('div');
+        document.body.append(element);
+        const app = createApp(Edit, { order, preview });
+        installTranslations(app);
+        app.mount(element);
+
+        const quantity =
+            element.querySelector<HTMLInputElement>('#quantity-bread')!;
+        quantity.value = '4';
+        quantity.dispatchEvent(new Event('input', { bubbles: true }));
+        await nextTick();
+        element
+            .querySelector<HTMLButtonElement>('[data-test="save-bread"]')!
+            .click();
+        await nextTick();
+
+        const alert = element.querySelector('[role="alert"]');
+        expect(alert?.textContent).toContain('Aquest productor ja ha tancat.');
+        expect(quantity.value).toBe('4');
+        app.unmount();
+        element.remove();
     });
 });

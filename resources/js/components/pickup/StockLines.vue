@@ -9,7 +9,7 @@ import { euros } from './euros';
 import { formatQuantity } from '@/lib/locale';
 
 const props = defineProps<{
-    lines: App.Http.PickupStockLineRow[] | App.Http.BasketStockLineRow[];
+    lines: App.Http.BasketStockLineRow[];
     options: App.Http.StockLevelRow[];
     editable: boolean;
     processing: boolean;
@@ -31,6 +31,12 @@ const productOptions = computed(() =>
         label: `${option.name} (${formatQuantity(option.available)} ${option.unit})`,
     })),
 );
+
+/** Only corrected basket lines carry an effective quantity that differs from the original. */
+const corrected = (line: (typeof props.lines)[number]) =>
+    'effectiveQuantity' in line && line.effectiveQuantity !== line.quantity
+        ? line
+        : null;
 
 const submit = () => {
     if (productId.value === '' || quantity.value.trim() === '') {
@@ -69,10 +75,40 @@ const submit = () => {
                         {{ formatQuantity(line.quantity) }} {{ line.unit }} ·
                         {{ euros(line.unitPriceCents) }} / {{ line.unit }}
                     </span>
+                    <span
+                        v-if="corrected(line)"
+                        class="text-xs text-muted-foreground"
+                        data-test="effective-quantity"
+                    >
+                        {{
+                            trans('Effective quantity: :quantity :unit', {
+                                quantity: formatQuantity(
+                                    corrected(line)!.effectiveQuantity,
+                                ),
+                                unit: line.unit,
+                            })
+                        }}
+                    </span>
                 </div>
-                <span class="pilot-amount" data-test="amount">{{
-                    euros(line.amountCents)
-                }}</span>
+                <span class="pilot-list-figures">
+                    <span
+                        class="pilot-amount"
+                        :class="{
+                            'text-muted-foreground line-through':
+                                corrected(line),
+                        }"
+                        data-test="amount"
+                        >{{ euros(line.amountCents) }}</span
+                    >
+                    <span
+                        v-if="corrected(line)"
+                        class="pilot-amount"
+                        data-test="effective-amount"
+                        >{{
+                            euros(corrected(line)!.effectiveAmountCents)
+                        }}</span
+                    >
+                </span>
                 <Button
                     v-if="editable"
                     type="button"

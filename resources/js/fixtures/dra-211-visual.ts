@@ -3,6 +3,7 @@ import '../../../public/theme-colors.css';
 import { createInertiaApp } from '@inertiajs/vue3';
 import type { DefineComponent } from 'vue';
 import AppLayout from '@/layouts/AppLayout.vue';
+import { financeBasketRow } from './financeBasketRow';
 import { installTranslations } from '@/lib/i18n';
 
 const query = new URLSearchParams(window.location.search);
@@ -44,7 +45,7 @@ const productName =
         : 'Mel de romaní';
 const basketState =
     state === 'validated' || state === 'collected' ? state : 'draft';
-const basket = {
+const basket = financeBasketRow({
     id: basketId,
     householdId,
     householdName,
@@ -68,7 +69,7 @@ const basket = {
     validatedAt: basketState === 'draft' ? null : '2026-10-30T09:00:00+01:00',
     collectedAt:
         basketState === 'collected' ? '2026-10-30T10:00:00+01:00' : null,
-};
+});
 const stock = {
     id: productId,
     producerId: 'producer-one',
@@ -135,13 +136,18 @@ const propsByPage: Record<string, Record<string, unknown>> = {
     },
     'Finance/Baskets/Show': {
         basket,
+        containerBalance: 3,
         stockProducts: basketState === 'draft' ? [stock] : [],
+        returnItems: [],
     },
     'Wallet/Statement': {
         wallet,
         household:
             role === 'member' ? null : { id: householdId, name: householdName },
-        canManageReceipts: role === 'manager',
+        canManageReceipts: role !== 'member',
+        ...(role === 'manager'
+            ? { householdReturnHref: `/manage/households/${householdId}` }
+            : {}),
     },
 };
 const page = {

@@ -6,7 +6,7 @@ import SettlementDetails from './SettlementDetails.vue';
 import AccountHouseholdController from '@/actions/App/Http/Controllers/Manage/AccountHouseholdController';
 import HouseholdController from '@/actions/App/Http/Controllers/Manage/HouseholdController';
 import HouseholdMemberController from '@/actions/App/Http/Controllers/Manage/HouseholdMemberController';
-import HouseholdWalletController from '@/actions/App/Http/Controllers/Manage/HouseholdWalletController';
+import HouseholdWalletController from '@/actions/App/Http/Controllers/Finance/HouseholdWalletController';
 import InvitationController from '@/actions/App/Http/Controllers/Manage/InvitationController';
 import FormSelect from '@/components/FormSelect.vue';
 import Heading from '@/components/Heading.vue';

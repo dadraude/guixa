@@ -2,13 +2,14 @@
 import { trans } from 'laravel-vue-i18n';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { euros } from '@/components/pickup/euros';
 import { formatMoney } from '@/lib/locale';
 import type { OrderRow } from '@/lib/orderRows';
 
 defineProps<{
     row: OrderRow;
     quantity: string;
-    amount: string;
+    amountCents: number;
     open: boolean;
     saving: boolean;
     dirty: boolean;
@@ -67,7 +68,7 @@ const emit = defineEmits<{
                 <p
                     class="pilot-amount font-semibold @2xl:flex @2xl:min-h-11 @2xl:items-center"
                 >
-                    {{ formatMoney(amount) }}
+                    {{ euros(amountCents) }}
                 </p>
             </div>
             <div class="pilot-action-row @2xl:justify-end">

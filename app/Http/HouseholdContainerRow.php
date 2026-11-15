@@ -12,10 +12,11 @@ final readonly class HouseholdContainerRow
         public string $householdId,
         public string $householdName,
         public int $count,
+        public int $balance,
     ) {}
 
     public static function from(HouseholdContainerCountData $data): self
     {
-        return new self($data->householdId, $data->householdName, $data->count);
+        return new self($data->householdId, $data->householdName, $data->count, $data->balance);
     }
 }

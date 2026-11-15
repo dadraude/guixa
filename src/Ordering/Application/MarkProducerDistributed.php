@@ -23,7 +23,7 @@ final class MarkProducerDistributed
 
     public function __invoke(Actor $actor, string $cycleId, string $producerId): void
     {
-        Gate::forUser($actor)->authorize('manage');
+        Gate::forUser($actor)->authorize('settle-reception');
 
         $now = $this->clock->now()->setTimezone($this->clock->timezone());
 

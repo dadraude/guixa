@@ -1,5 +1,6 @@
 <?php
 
+use Guixa\Catalog\Application\CreateStockProduct;
 use Guixa\Catalog\Domain\Error\InvalidContainersPerUnit;
 use Guixa\Catalog\Domain\Error\InvalidPrice;
 use Guixa\Catalog\Domain\Error\NameRequired;
@@ -7,6 +8,7 @@ use Guixa\Catalog\Domain\Error\ProductHasUnsettledLines;
 use Guixa\Catalog\Domain\Error\ProductNotFound;
 use Guixa\Catalog\Domain\Error\UnitRequired;
 use Guixa\Shared\Application\Actor;
+use Guixa\Shared\Domain\Role;
 use Illuminate\Auth\Access\AuthorizationException;
 use Tests\Support\Catalog\CatalogWorld;
 
@@ -169,7 +171,7 @@ it('keeps another producer from seeing or editing the products (R2, S57)', funct
     expect($product->name)->toBe('Bread')->and($product->active)->toBeTrue();
 });
 
-it('keeps product management to producers, not managers or members (R1, R2)', function (Actor $actor) {
+it('keeps product management to producers and the catalogue roles, not members, finance or receivers (R1, R2, R14)', function (Actor $actor) {
     $id = bread($this);
 
     expect(fn () => ($this->world->listProducerProducts)($actor, $this->baker))->toThrow(AuthorizationException::class)
@@ -177,9 +179,107 @@ it('keeps product management to producers, not managers or members (R1, R2)', fu
         ->and(fn () => ($this->world->updateProduct)($actor, $id, 'Stolen', 'loaf', 100, false, null))->toThrow(AuthorizationException::class)
         ->and(fn () => ($this->world->deactivateProduct)($actor, $id))->toThrow(AuthorizationException::class);
 })->with([
-    'manager' => fn () => Actor::manager('00000000-0000-7000-8000-00000000000a'),
+    'finance' => fn () => new Actor('00000000-0000-7000-8000-00000000000c', [Role::Finance]),
+    'receiver' => fn () => new Actor('00000000-0000-7000-8000-00000000000d', [Role::Receiver]),
     'member' => fn () => Actor::memberOf('00000000-0000-7000-8000-00000000000b', 'h1'),
 ]);
+
+// R3 — Catalogue and the manager administer any producer's weekly products under the producer's rules
+
+it('lets a catalogue actor edit another producer\'s weekly product, which a producer cannot do (R3, S4)', function () {
+    $id = bread($this);
+    $catalogue = $this->world->catalogueActor();
+
+    ($this->world->updateProduct)($catalogue, $id, 'Rye bread', 'loaf', 400, false, null);
+
+    expect(bakerProducts($this)[0]->name)->toBe('Rye bread')
+        ->and(bakerProducts($this)[0]->priceCents)->toBe(400);
+});
+
+it('lets a manager edit another producer\'s weekly product (R3, S4)', function () {
+    $id = bread($this);
+
+    ($this->world->updateProduct)($this->world->manager, $id, 'Rye bread', 'loaf', 400, false, null);
+
+    expect(bakerProducts($this)[0]->priceCents)->toBe(400);
+});
+
+it('saves the price and rejects the unit of a catalogue edit while lines are unsettled, then the producer\'s later edit replaces it (R3, S4)', function (Actor $actor) {
+    $id = bread($this);
+    $this->world->cycles->lock($id);
+
+    ($this->world->updateProduct)($actor, $id, 'Bread', 'loaf', 500, false, '2.000');
+    expect(fn () => ($this->world->updateProduct)($actor, $id, 'Bread', 'kg', 500, false, '2.000'))->toThrow(ProductHasUnsettledLines::class);
+    expect(bakerProducts($this)[0]->priceCents)->toBe(500)->and(bakerProducts($this)[0]->unit)->toBe('loaf');
+
+    ($this->world->updateProduct)($this->bakerActor, $id, 'Bread', 'loaf', 360, false, '2.000');
+    expect(bakerProducts($this)[0]->priceCents)->toBe(360);
+})->with([
+    'catalogue' => fn () => (new CatalogWorld)->catalogueActor(),
+    'manager' => fn () => Actor::manager('00000000-0000-7000-8000-00000000000a'),
+]);
+
+it('lets a catalogue actor or manager create, deactivate, reactivate and delete unused products of any producer (R3)', function (Actor $actor) {
+    $id = ($this->world->createProduct)($actor, $this->baker, 'Focaccia', 'piece', 250, false, null);
+    expect(bakerProducts($this)[0]->id)->toBe($id);
+
+    ($this->world->deactivateProduct)($actor, $id);
+    expect(bakerProducts($this)[0]->active)->toBeFalse();
+    ($this->world->reactivateProduct)($actor, $id);
+    expect(bakerProducts($this)[0]->active)->toBeTrue();
+
+    ($this->world->deleteUnusedProduct)($actor, $id);
+    expect(bakerProducts($this))->toBe([]);
+})->with([
+    'catalogue' => fn () => (new CatalogWorld)->catalogueActor(),
+    'manager' => fn () => Actor::manager('00000000-0000-7000-8000-00000000000a'),
+]);
+
+it('lets a producer\'s account with Catalogue edit other producers\' products through the role only (R3, S5)', function () {
+    $id = bread($this);
+    $both = new Actor('00000000-0000-7000-8000-0000000000dd', [Role::Producer, Role::Catalogue], producerId: $this->cheesemaker);
+
+    ($this->world->updateProduct)($both, $id, 'Bread', 'loaf', 420, false, null);
+
+    expect(bakerProducts($this)[0]->priceCents)->toBe(420)
+        ->and(fn () => ($this->world->listProducerProducts)($both, $this->baker))->toThrow(AuthorizationException::class)
+        ->and(($this->world->listProducerProducts)($both, $this->cheesemaker))->toBe([]);
+});
+
+it('keeps stock products out of the weekly policy for catalogue edits (R3)', function () {
+    $catalogue = $this->world->catalogueActor();
+    $stock = (new CreateStockProduct($this->world->products, $this->world->producers))($this->world->manager, $this->baker, 'Honey', 'jar', 650, false, null);
+
+    expect(fn () => ($this->world->updateProduct)($catalogue, $stock, 'Honey', 'jar', 100, false, null))->toThrow(AuthorizationException::class);
+});
+
+// R5 — the producer list and a producer's products are read through gates
+
+it('lists producers for the manager and Catalogue, deactivated ones marked, and refuses other roles (R5, R14)', function () {
+    ($this->world->deactivateProducer)($this->world->manager, $this->cheesemaker);
+
+    foreach ([$this->world->manager, $this->world->catalogueActor()] as $actor) {
+        $listed = collect(($this->world->listProducers)($actor))->keyBy('id');
+        expect($listed[$this->baker]->active)->toBeTrue()->and($listed[$this->cheesemaker]->active)->toBeFalse();
+    }
+
+    foreach ([new Actor('f', [Role::Finance]), new Actor('r', [Role::Receiver]), Actor::memberOf('m', 'h1')] as $actor) {
+        expect(fn () => ($this->world->listProducers)($actor))->toThrow(AuthorizationException::class);
+    }
+});
+
+it('lists the products of a producer with can flags to the manager and Catalogue only (R3, R5, R14)', function () {
+    $id = bread($this);
+
+    foreach ([$this->world->manager, $this->world->catalogueActor()] as $actor) {
+        $row = ($this->world->listProductsOfProducer)($actor, $this->baker)[0];
+        expect($row->id)->toBe($id)->and($row->canEdit)->toBeTrue()->and($row->canDelete)->toBeTrue();
+    }
+
+    foreach ([new Actor('f', [Role::Finance]), new Actor('r', [Role::Receiver]), Actor::memberOf('m', 'h1'), $this->bakerActor] as $actor) {
+        expect(fn () => ($this->world->listProductsOfProducer)($actor, $this->baker))->toThrow(AuthorizationException::class);
+    }
+});
 
 it('locks a weekly product before checking its unsettled-line edit guard (R1, S5)', function () {
     $id = ($this->world->createProduct)($this->bakerActor, $this->baker, 'Bread', 'loaf', 350, false, null);

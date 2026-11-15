@@ -10,7 +10,7 @@
     "views": [
         {
             "id": "manager-accounts",
-            "path": "/visual-accounts.html",
+            "path": "/resources/visual/accounts.html",
             "root": ".pilot-manager-page",
             "panels": ".pilot-list",
             "content": "h1,h2,p,[data-slot=select-trigger],button,label",

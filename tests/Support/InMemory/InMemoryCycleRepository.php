@@ -37,6 +37,14 @@ final class InMemoryCycleRepository extends InMemoryRepository implements CycleR
         return $cycles;
     }
 
+    public function listWithSentOrders(): array
+    {
+        $cycles = array_values(array_filter($this->all(), fn (Cycle $cycle) => array_filter($cycle->producerOrders(), fn ($order) => $order->isSent()) !== []));
+        usort($cycles, fn (Cycle $a, Cycle $b) => [$b->pickupDate()->format('Y-m-d'), $b->id] <=> [$a->pickupDate()->format('Y-m-d'), $a->id]);
+
+        return $cycles;
+    }
+
     public function existsOnPickupDate(DateTimeInterface $pickupDate): bool
     {
         foreach ($this->all() as $cycle) {

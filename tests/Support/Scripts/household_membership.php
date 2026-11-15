@@ -3,7 +3,7 @@
 /* Runs one membership command in another database session for deterministic locking tests. */
 
 use Guixa\Membership\Application\AddMember;
-use Guixa\Membership\Application\GrantManagerRole;
+use Guixa\Membership\Application\GrantStaffRole;
 use Guixa\Membership\Application\MoveMember;
 use Guixa\Shared\Application\Actor;
 use Illuminate\Contracts\Console\Kernel;
@@ -21,7 +21,8 @@ try {
         $app->make(MoveMember::class)($manager, $argv[3], $argv[2]);
         echo 'moved';
     } else {
-        $app->make(GrantManagerRole::class)($manager, $argv[3]);
+        // The role change log keeps the actor as a user, so a grant needs a real one (argv[4]).
+        $app->make(GrantStaffRole::class)(Actor::manager($argv[4]), $argv[3], 'manager');
         echo 'granted';
     }
 } catch (Throwable $error) {

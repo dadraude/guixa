@@ -17,27 +17,178 @@ it('seeds a usable cooperative with accounts, orders, reception and pickups', fu
     Mail::fake();
     $this->seed(DatabaseSeeder::class);
 
-    expect(User::count())->toBe(8);
+    expect(User::count())->toBe(9);
     $this->assertDatabaseCount('households', 4);
-    $this->assertDatabaseCount('producers', 3);
-    $this->assertDatabaseCount('products', 8);
+    $this->assertDatabaseCount('producers', 4);
+    $this->assertDatabaseCount('products', 9);
     $this->assertDatabaseCount('cycles', 3);
     $this->assertDatabaseCount('orders', 12);
     expect(DB::table('order_lines')->count())->toBeGreaterThan(60);
     expect(DB::table('cycles')->whereNotNull('settled_at')->count())->toBe(1);
-    expect(DB::table('orders')->where('pickup_status', 'pending')->count())->toBe(3);
-    expect(DB::table('orders')->where('pickup_status', 'completed')->count())->toBe(1);
+    expect(DB::table('baskets')->where('kind', 'weekly')->where('state', 'draft')->count())->toBe(2);
+    expect(DB::table('baskets')->where('kind', 'weekly')->where('state', 'validated')->count())->toBe(1);
+    expect(DB::table('baskets')->where('kind', 'weekly')->where('state', 'collected')->count())->toBe(1);
     expect(DB::table('received_totals')->count())->toBeGreaterThan(0);
     expect(DB::table('stock_movements')->count())->toBe(2);
     expect(DB::table('wallet_movements')->count())->toBeGreaterThanOrEqual(5);
     Mail::assertNothingSent();
 });
 
+it('seeds one reception in each state the dashboard lists and reads them without writing', function () {
+    $this->seed(DemoSeeder::class);
+    $this->withoutVite();
+    $cycle = DB::table('cycles')->whereNull('settled_at')->orderBy('pickup_date')->value('id');
+    $producers = DB::table('producers')->orderBy('name')->pluck('id', 'name');
+    $validated = $producers['Hort de la Vall'];
+    $unopened = $producers['Forn del Barri'];
+    $defaulted = $producers['La Formatgeria'];
+
+    expect(DB::table('cycle_producers')->where('cycle_id', $cycle)->where('producer_id', $validated)->value('validated_at'))->not->toBeNull()
+        ->and(DB::table('cycle_producers')->where('cycle_id', $cycle)->where('producer_id', $defaulted)->value('validated_at'))->toBeNull()
+        ->and(DB::table('received_totals')->where('cycle_id', $cycle)->where('producer_id', $defaulted)->count())->toBeGreaterThan(0)
+        ->and(DB::table('received_totals')->where('cycle_id', $cycle)->where('producer_id', $unopened)->count())->toBe(0);
+
+    $totals = DB::table('received_totals')->count();
+    $manager = User::query()->where('email', 'gestora@demo.guixa.test')->firstOrFail();
+    $actions = collect($this->actingAs($manager)->get('/dashboard')->viewData('page')['props']['attention'])->keyBy('action');
+    expect($actions['mark_distributed']->href)->toBe("/receptions/{$cycle}/{$validated}")
+        ->and($actions['check_delivery_and_allocations']->count)->toBe(2)
+        ->and(DB::table('received_totals')->count())->toBe($totals);
+
+    $receiver = User::query()->where('email', 'biel@demo.guixa.test')->firstOrFail();
+    $receiverActions = collect($this->actingAs($receiver)->get('/dashboard')->viewData('page')['props']['attention'])->pluck('action')->all();
+    expect($receiverActions)->toContain('check_delivery_and_allocations')->not->toContain('mark_distributed');
+});
+
+it('seeds one closed, ordered, unsent producer with an account as the manager\'s only manual send, and shows it to no other role (R9, S8)', function () {
+    $this->seed(DemoSeeder::class);
+    $this->withoutVite();
+    $cycle = DB::table('cycles')->orderByDesc('pickup_date')->value('id');
+    $manager = User::query()->where('email', 'gestora@demo.guixa.test')->firstOrFail();
+
+    $sends = collect($this->actingAs($manager)->get('/dashboard')->viewData('page')['props']['attention'])->where('action', 'send_order');
+
+    expect($sends)->toHaveCount(1)
+        ->and($sends->first()->count)->toBe(1)
+        ->and($sends->first()->href)->toBe('/manage/cycles');
+
+    foreach (['anna@demo.guixa.test', 'biel@demo.guixa.test'] as $email) {
+        app('auth')->forgetGuards();
+        $user = User::query()->where('email', $email)->firstOrFail();
+        expect(collect($this->actingAs($user)->get('/dashboard')->viewData('page')['props']['attention'])->pluck('action'))->not->toContain('send_order');
+    }
+});
+
+it('shows Finance the demo cycle\'s drafts as validation work next to the pending collection', function () {
+    $this->seed(DemoSeeder::class);
+    $this->withoutVite();
+    $finance = User::query()->where('email', 'anna@demo.guixa.test')->firstOrFail();
+
+    $actions = collect($this->actingAs($finance)->get('/dashboard')->viewData('page')['props']['attention'])->keyBy('action');
+
+    expect($actions['validate_basket']->count)->toBe(2)
+        ->and($actions['validate_basket']->href)->toBe('/finance/baskets')
+        ->and($actions->has('collect_basket'))->toBeTrue()
+        ->and($actions->has('prepare_basket'))->toBeFalse();
+});
+
+it('shows each demo role its own opportunity below no false task: member ordering, producer review, Catalogue maintenance (R11, S3, S10)', function () {
+    $this->seed(DemoSeeder::class);
+    $this->withoutVite();
+    $kinds = function (string $email) {
+        app('auth')->forgetGuards();
+        $user = User::query()->where('email', $email)->firstOrFail();
+
+        return collect($this->actingAs($user)->get('/dashboard')->viewData('page')['props']['opportunities']);
+    };
+
+    $member = $kinds('carla@demo.guixa.test');
+    expect($member->pluck('kind')->all())->toBe(['member_order'])
+        ->and($member->first()->cutoffs)->not->toBeEmpty()
+        ->and($kinds('hort@demo.guixa.test')->pluck('kind')->unique()->all())->toBe(['producer_summary'])
+        ->and($kinds('biel@demo.guixa.test')->pluck('kind')->all())->toContain('catalogue_maintenance');
+});
+
+it('seeds the Catalogue states', function () {
+    $this->seed(DemoSeeder::class);
+    $this->withoutVite();
+    $deactivated = DB::table('producers')->where('active', false)->pluck('id');
+    $unsentCycle = DB::table('cycles')->orderByDesc('pickup_date')->value('id');
+
+    expect($deactivated)->toHaveCount(1)
+        ->and(DB::table('cycle_producers')->where('producer_id', $deactivated->first())->count())->toBe(0);
+
+    $inactiveProducts = DB::table('products')->where('active', false)->pluck('id');
+    expect($inactiveProducts)->toHaveCount(1)
+        ->and(DB::table('order_lines')->where('product_id', $inactiveProducts->first())->count())->toBe(0);
+
+    $unavailable = DB::table('product_unavailabilities')->get();
+    expect($unavailable)->toHaveCount(1)
+        ->and($unavailable->first()->cycle_id)->toBe($unsentCycle)
+        ->and(DB::table('cycle_producers')->where('cycle_id', $unsentCycle)
+            ->where('producer_id', DB::table('products')->where('id', $unavailable->first()->product_id)->value('producer_id'))
+            ->value('sent_at'))->toBeNull();
+
+    expect(DB::table('return_items')->count())->toBe(2)
+        ->and(DB::table('return_items')->where('active', false)->count())->toBe(1);
+
+    $this->actingAs(User::query()->where('email', 'biel@demo.guixa.test')->firstOrFail());
+    $producer = DB::table('products')->where('id', $unavailable->first()->product_id)->value('producer_id');
+    foreach (['/catalogue/producers', "/catalogue/producers/{$producer}/products", "/catalogue/producers/{$producer}/availability", '/catalogue/return-items'] as $path) {
+        $this->get($path)->assertOk();
+    }
+});
+
+it('seeds staff role holders besides the manager', function () {
+    $this->seed(DemoSeeder::class);
+
+    $holders = DB::table('account_roles')->join('users', 'users.id', '=', 'account_roles.user_id')
+        ->whereIn('role', ['finance', 'catalogue', 'receiver'])
+        ->orderBy('users.email')->get()->groupBy('role')->map(fn ($rows) => $rows->pluck('email')->all())->sortKeys()->all();
+
+    expect($holders)->toBe([
+        'catalogue' => ['biel@demo.guixa.test'],
+        'finance' => ['anna@demo.guixa.test'],
+        'receiver' => ['anna@demo.guixa.test', 'biel@demo.guixa.test'],
+    ]);
+    expect(DB::table('role_changes')->count())->toBe(4);
+});
+
+it('shows the combined member, Finance and Receiver demo account one collection group, the unlinked account an explanation, and caught-up members their opportunity instead (S1, S10, R14)', function () {
+    $this->seed(DemoSeeder::class);
+    $this->withoutVite();
+    $props = function (string $email) {
+        app('auth')->forgetGuards();
+
+        return $this->actingAs(User::query()->where('email', $email)->firstOrFail())->get('/dashboard')->viewData('page')['props'];
+    };
+
+    $combined = $props('anna@demo.guixa.test');
+    $collections = collect($combined['attention'])->where('action', 'collect_basket');
+    expect($collections)->toHaveCount(1)
+        ->and($combined['can']['showCaughtUp'])->toBeFalse()
+        ->and(collect($combined['attention'])->pluck('key')->unique()->count())->toBe(count($combined['attention']));
+
+    $unlinked = $props('eva@demo.guixa.test');
+    expect($unlinked['attention'])->toBe([])
+        ->and($unlinked['opportunities'])->toBe([])
+        ->and($unlinked['can'])->toMatchArray(['showCaughtUp' => false, 'showNoContext' => true])
+        ->and(DB::table('users')->where('email', 'eva@demo.guixa.test')->value('household_id'))->toBeNull()
+        ->and(DB::table('account_roles')->join('users', 'users.id', '=', 'account_roles.user_id')->where('email', 'eva@demo.guixa.test')->count())->toBe(0);
+
+    foreach (['carla@demo.guixa.test', 'david@demo.guixa.test'] as $email) {
+        $caughtUp = $props($email);
+        expect($caughtUp['attention'])->toBe([])
+            ->and($caughtUp['can'])->toMatchArray(['showCaughtUp' => true, 'showNoContext' => false])
+            ->and(collect($caughtUp['opportunities'])->pluck('kind')->all())->toBe(['member_order']);
+    }
+});
+
 it('lets every demo role log in and open its main screens', function (string $email, array $paths) {
     $this->seed(DemoSeeder::class);
     $this->withoutVite();
 
-    $this->post('/login', ['email' => $email, 'password' => 'demo-password'])->assertRedirect();
+    $this->post('/login', ['email' => $email, 'password' => 'password'])->assertRedirect();
     $this->assertAuthenticatedAs(User::query()->where('email', $email)->firstOrFail());
 
     foreach ($paths as $path) {
@@ -51,14 +202,18 @@ it('lets every demo role log in and open its main screens', function (string $em
     }
     if ($email === 'gestora@demo.guixa.test') {
         $cycle = DB::table('cycles')->whereNotNull('settled_at')->value('id');
-        $household = DB::table('orders')->where('cycle_id', $cycle)->where('pickup_status', 'pending')->value('household_id');
         $producer = DB::table('producers')->value('id');
-        $this->get(route('manage.cycles.receptions.show', [$cycle, $producer]))->assertOk();
-        $this->get(route('manage.cycles.pickups.show', [$cycle, $household]))->assertOk();
+        $this->get(route('receptions.show', [$cycle, $producer]))->assertOk();
+    }
+    if ($email === 'biel@demo.guixa.test') {
+        $cycle = DB::table('cycles')->whereNotNull('settled_at')->value('id');
+        $producer = DB::table('producers')->value('id');
+        $this->get(route('receptions.show', [$cycle, $producer]))->assertOk();
     }
 })->with([
     'manager' => ['gestora@demo.guixa.test', ['/dashboard', '/manage/households', '/manage/producers', '/manage/cycles', '/manage/stock']],
     'member' => ['anna@demo.guixa.test', ['/dashboard', '/', '/wallet']],
+    'receiver' => ['biel@demo.guixa.test', ['/dashboard', '/receptions']],
     'producer' => ['hort@demo.guixa.test', ['/dashboard', '/producer/products']],
 ]);
 
@@ -71,7 +226,7 @@ it('can be repeated without duplicating data or resetting demo edits', function 
     $cycle = DB::table('cycles')->orderByDesc('pickup_date')->value('id');
     $product = DB::table('products')->where('name', 'Pastanagues')->value('id');
     app(SetOrderLine::class)(app(ActorResolver::class)->forAccount($user->id), $cycle, $product, '3.250');
-    $tables = ['users', 'households', 'producers', 'products', 'cycles', 'orders', 'order_lines', 'wallet_movements', 'stock_movements', 'received_totals'];
+    $tables = ['users', 'households', 'producers', 'products', 'cycles', 'orders', 'order_lines', 'wallet_movements', 'stock_movements', 'received_totals', 'return_items', 'product_unavailabilities'];
     $counts = array_map(fn (string $table) => DB::table($table)->count(), $tables);
 
     $this->seed(DemoSeeder::class);

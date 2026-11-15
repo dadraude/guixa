@@ -1,112 +1,185 @@
 <script setup lang="ts">
-import { PackageCheck, ShoppingBasket, UsersRound } from '@lucide/vue';
 import { trans } from 'laravel-vue-i18n';
-import AppLogoIcon from '@/components/AppLogoIcon.vue';
-import { Button } from '@/components/ui/button';
+import LandingContact from '@/components/welcome/LandingContact.vue';
+import LandingHeader from '@/components/welcome/LandingHeader.vue';
+import LandingHero from '@/components/welcome/LandingHero.vue';
+import LandingStory from '@/components/welcome/LandingStory.vue';
 
-defineProps<{
-    authenticated: boolean;
-    actionHref: string;
-}>();
+defineProps<{ actionHref: string }>();
 </script>
 
 <template>
-    <div
-        class="pilot-theme reference-style-welcome min-h-svh bg-background text-foreground"
-        data-visual-root
-    >
-        <div
-            class="mx-auto flex min-h-svh w-full max-w-6xl flex-col px-5 py-6 sm:px-8 lg:px-12"
-        >
-            <header class="flex items-center gap-3">
-                <span
-                    class="flex size-11 items-center justify-center rounded-xl bg-primary text-primary-foreground"
-                >
-                    <AppLogoIcon class="size-6" aria-hidden="true" />
-                </span>
-                <span class="text-xl font-bold tracking-tight">Guixa</span>
-            </header>
-
-            <main
-                class="grid flex-1 items-center gap-10 py-12 sm:py-16 xl:grid-cols-[minmax(0,1fr)_minmax(18rem,0.8fr)] xl:gap-16"
-            >
-                <section class="min-w-0">
-                    <p class="text-sm font-semibold tracking-wide text-primary">
-                        {{ trans('For your cooperative') }}
-                    </p>
-                    <h1
-                        class="mt-4 max-w-2xl text-4xl font-semibold tracking-tight text-balance sm:text-5xl"
-                    >
-                        {{ trans('A clearer way to work together.') }}
-                    </h1>
-                    <p
-                        class="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground"
-                    >
-                        {{
-                            trans(
-                                'Plan orders, coordinate pickups and keep households connected in one place.',
-                            )
-                        }}
-                    </p>
-                    <Button as-child size="lg" class="mt-8 min-h-11">
-                        <a id="welcome-action" :href="actionHref">
-                            {{
-                                authenticated
-                                    ? trans('Open dashboard')
-                                    : trans('Log in')
-                            }}
-                        </a>
-                    </Button>
-                </section>
-
-                <section
-                    class="grid min-w-0 gap-5 rounded-2xl border border-border bg-card p-4 shadow-sm sm:p-7"
-                    data-visual-panel
-                    :aria-label="trans('Your work, organized')"
-                >
-                    <h2 class="text-lg font-semibold">
-                        {{ trans('Your work, organized') }}
-                    </h2>
-                    <ul class="grid min-w-0 gap-3">
-                        <li
-                            class="flex min-w-0 flex-wrap items-center gap-2 rounded-xl bg-muted p-2"
-                        >
-                            <ShoppingBasket
-                                class="size-5 shrink-0 text-primary"
-                                aria-hidden="true"
-                            />
-                            <span
-                                class="min-w-0 flex-[1_1_8rem] font-medium [overflow-wrap:anywhere]"
-                                >{{ trans('Orders') }}</span
-                            >
-                        </li>
-                        <li
-                            class="flex min-w-0 flex-wrap items-center gap-2 rounded-xl bg-muted p-2"
-                        >
-                            <PackageCheck
-                                class="size-5 shrink-0 text-primary"
-                                aria-hidden="true"
-                            />
-                            <span
-                                class="min-w-0 flex-[1_1_8rem] font-medium [overflow-wrap:anywhere]"
-                                >{{ trans('Pickups') }}</span
-                            >
-                        </li>
-                        <li
-                            class="flex min-w-0 flex-wrap items-center gap-2 rounded-xl bg-muted p-2"
-                        >
-                            <UsersRound
-                                class="size-5 shrink-0 text-primary"
-                                aria-hidden="true"
-                            />
-                            <span
-                                class="min-w-0 flex-[1_1_8rem] font-medium [overflow-wrap:anywhere]"
-                                >{{ trans('Households') }}</span
-                            >
-                        </li>
-                    </ul>
-                </section>
-            </main>
+    <div class="welcome-page pilot-theme min-h-svh" data-visual-root>
+        <div class="welcome-shell">
+            <LandingHeader :action-href="actionHref" />
+        </div>
+        <main>
+            <div class="welcome-hero-band">
+                <div class="welcome-shell">
+                    <LandingHero />
+                </div>
+            </div>
+            <div class="welcome-shell welcome-story-shell">
+                <LandingStory />
+            </div>
+            <LandingContact />
+        </main>
+        <div class="welcome-shell">
+            <footer class="welcome-footer">
+                <a class="welcome-brand welcome-footer-brand" href="#top">
+                    {{ trans('la guixa') }}
+                </a>
+                <span class="welcome-footer-divider" aria-hidden="true"></span>
+                <p>{{ trans('Agroecological consumer cooperative') }}</p>
+            </footer>
         </div>
     </div>
 </template>
+
+<style scoped>
+.welcome-page {
+    --welcome-paper: #faf1dc;
+    --welcome-ink: #2c2c2b;
+    --welcome-blue: #286585;
+    --welcome-blue-hover: #1d526f;
+    --welcome-blue-soft: #e7f0f3;
+    --welcome-feature-surface: #286585;
+    --welcome-feature-cream: #faf1dc;
+    --welcome-ochre: #a05a10;
+    --welcome-border: #d8d7d1;
+    --welcome-focus: #a85f12;
+    color: var(--welcome-ink);
+    background: var(--welcome-paper);
+    font-family: var(--font-body);
+}
+
+:global(.dark .welcome-page) {
+    --welcome-paper: #1c201f;
+    --welcome-ink: #f2f0e9;
+    --welcome-blue: #8fc5df;
+    --welcome-blue-hover: #b2d9e8;
+    --welcome-blue-soft: #27363d;
+    --welcome-feature-surface: #23485c;
+    --welcome-ochre: #e5a650;
+    --welcome-border: #4f5a5d;
+    --welcome-focus: #f1bd6e;
+}
+
+.welcome-shell {
+    width: min(100% - 2.5rem, 72rem);
+    margin-inline: auto;
+    container-type: inline-size;
+}
+
+.welcome-hero-band {
+    --welcome-hero-cream: var(--welcome-feature-cream);
+    --welcome-focus: var(--welcome-feature-cream);
+    position: relative;
+    color: var(--welcome-feature-cream);
+    background: var(--welcome-feature-surface);
+}
+
+.welcome-hero-band::before {
+    position: absolute;
+    inset: 0;
+    background: var(--welcome-paper);
+    opacity: 1;
+    mask-image: url('../../images/welcome/hero-wear-subtle-mask.png');
+    mask-mode: luminance;
+    mask-position: center;
+    mask-repeat: no-repeat;
+    mask-size: 100% 100%;
+    pointer-events: none;
+    content: '';
+}
+
+.welcome-hero-band > .welcome-shell {
+    position: relative;
+    z-index: 1;
+}
+
+.welcome-story-shell {
+    padding-top: clamp(3rem, 6vw, 4.5rem);
+}
+
+.welcome-brand {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    color: var(--welcome-ink);
+    font-size: 2.25rem;
+    font-weight: 900;
+    letter-spacing: -0.07em;
+    line-height: 1;
+    text-decoration: none;
+}
+
+.welcome-footer {
+    display: flex;
+    flex-wrap: wrap;
+    min-height: 5rem;
+    align-items: center;
+    gap: 1.25rem;
+    padding-block: 1.25rem;
+}
+
+.welcome-footer-brand {
+    flex-shrink: 0;
+    font-size: 1.75rem;
+    white-space: nowrap;
+}
+
+.welcome-footer-divider {
+    width: 1px;
+    align-self: stretch;
+    background: var(--welcome-border);
+}
+
+.welcome-footer p {
+    margin: 0;
+    color: var(--welcome-ink);
+    font-size: 0.9375rem;
+}
+
+:deep(:focus-visible) {
+    outline: 3px solid var(--welcome-focus);
+    outline-offset: 3px;
+}
+
+@media (min-width: 48rem) {
+    .welcome-shell {
+        width: min(100% - 4rem, 72rem);
+    }
+}
+
+@media (max-width: 25rem) {
+    .welcome-shell {
+        width: min(100% - 2rem, 72rem);
+    }
+}
+
+@media (max-width: 47.999rem) {
+    .welcome-hero-band::before {
+        bottom: auto;
+        height: 48px;
+        mask-position: left top;
+        mask-size: 200% 250px;
+    }
+
+    .welcome-hero-band::after {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        height: 48px;
+        background: var(--welcome-paper);
+        mask-image: url('../../images/welcome/hero-wear-subtle-mask.png');
+        mask-mode: luminance;
+        mask-position: left bottom;
+        mask-repeat: no-repeat;
+        mask-size: 200% 250px;
+        pointer-events: none;
+        content: '';
+    }
+}
+</style>

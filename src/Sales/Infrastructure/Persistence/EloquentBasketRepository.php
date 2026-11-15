@@ -4,8 +4,14 @@ namespace Guixa\Sales\Infrastructure\Persistence;
 
 use DateTimeImmutable;
 use Guixa\Sales\Domain\Basket;
+use Guixa\Sales\Domain\BasketAdjustment;
+use Guixa\Sales\Domain\BasketAdjustmentLine;
+use Guixa\Sales\Domain\BasketCollectionEvent;
+use Guixa\Sales\Domain\BasketKind;
 use Guixa\Sales\Domain\BasketLine;
+use Guixa\Sales\Domain\BasketLineKind;
 use Guixa\Sales\Domain\BasketRepository;
+use Guixa\Sales\Domain\BasketState;
 use Guixa\Sales\Domain\Error\BasketNotEditable;
 use Guixa\Shared\Domain\Quantity;
 use Illuminate\Support\Facades\DB;
@@ -27,15 +33,17 @@ final class EloquentBasketRepository implements BasketRepository
     private function persist(Basket $basket): void
     {
         $stored = BasketModel::query()->whereKey($basket->id)->lockForUpdate()->first();
-        if ($stored !== null && in_array($stored->state, ['validated', 'collected', 'cancelled'], true)) {
+        if ($stored !== null && BasketState::from($stored->state)->isFinal()) {
             $this->assertProtectedSnapshot($this->toDomain($stored), $basket);
         }
 
         BasketModel::query()->updateOrCreate(['id' => $basket->id], [
             'household_id' => $basket->householdId,
             'household_name' => $basket->householdName,
-            'kind' => 'stock',
-            'state' => $basket->state,
+            'kind' => $basket->kind->value,
+            'source_order_id' => $basket->sourceOrderId,
+            'late' => $basket->late,
+            'state' => $basket->state->value,
             'created_by' => $basket->createdBy,
             'created_at' => $basket->createdAt->format(DATE_ATOM),
             'validated_by' => $basket->validatedBy,
@@ -50,9 +58,12 @@ final class EloquentBasketRepository implements BasketRepository
         foreach ($basket->lines as $line) {
             BasketLineModel::query()->updateOrCreate(['id' => $line->id], [
                 'basket_id' => $basket->id,
-                'kind' => $line->kind,
+                'kind' => $line->kind->value,
                 'product_id' => $line->productId,
                 'return_item_id' => $line->returnItemId,
+                'source_order_line_id' => $line->sourceOrderLineId,
+                'ordered_quantity' => $line->orderedQuantity?->toString(),
+                'allocated_quantity' => $line->allocatedQuantity?->toString(),
                 'name' => $line->name,
                 'unit' => $line->unit,
                 'price_cents' => $line->priceCents,
@@ -64,23 +75,73 @@ final class EloquentBasketRepository implements BasketRepository
             ]);
         }
 
-        if ($basket->collectedAt !== null && ! BasketCollectionEventModel::query()->where('basket_id', $basket->id)->exists()) {
+        foreach ($basket->adjustments as $adjustment) {
+            $row = BasketAdjustmentModel::query()->firstOrCreate(['id' => $adjustment->id], [
+                'basket_id' => $basket->id,
+                'amount_cents' => $adjustment->amountCents,
+                'reason' => $adjustment->reason,
+                'recorded_by' => $adjustment->recordedBy,
+                'occurred_at' => $adjustment->occurredAt->format(DATE_ATOM),
+            ]);
+            if (! $row->wasRecentlyCreated) {
+                continue;
+            }
+            foreach ($adjustment->lines as $line) {
+                BasketAdjustmentLineModel::query()->create(['adjustment_id' => $adjustment->id,
+                    'product_id' => $line->productId,
+                    'quantity_delta' => $line->quantityDelta()]);
+            }
+        }
+
+        $nextCollectionSequence = ((int) BasketCollectionEventModel::query()->where('basket_id', $basket->id)->max('sequence')) + 1;
+        if ($basket->collectedAt !== null && $nextCollectionSequence === 1
+            && $basket->collectionEvents === []) {
             BasketCollectionEventModel::query()->create([
                 'id' => $this->nextId(), 'basket_id' => $basket->id, 'type' => 'collected',
                 'recorded_by' => $basket->collectedBy, 'occurred_at' => $basket->collectedAt->format(DATE_ATOM),
+                'sequence' => $nextCollectionSequence++,
+            ]);
+        }
+        foreach ($basket->collectionEvents as $event) {
+            $existing = BasketCollectionEventModel::query()->find($event->id);
+            if ($existing !== null) {
+                if ($existing->basket_id !== $event->basketId || $existing->type !== $event->type
+                    || $existing->recorded_by !== $event->recordedBy || $existing->reason !== $event->reason
+                    || $this->instant(new DateTimeImmutable($existing->occurred_at)) !== $this->instant($event->occurredAt)) {
+                    throw BasketNotEditable::create();
+                }
+
+                continue;
+            }
+            BasketCollectionEventModel::query()->create([
+                'id' => $event->id, 'basket_id' => $basket->id, 'type' => $event->type,
+                'recorded_by' => $event->recordedBy, 'occurred_at' => $event->occurredAt->format(DATE_ATOM),
+                'reason' => $event->reason,
+                'sequence' => $nextCollectionSequence++,
             ]);
         }
     }
 
     private function assertProtectedSnapshot(Basket $stored, Basket $incoming): void
     {
-        $collectionTransition = $stored->state === 'validated' && $incoming->state === 'collected'
+        $collectionTransition = $stored->state->isValidated() && $incoming->state->isCollected()
             && $incoming->collectedAt !== null && $incoming->collectedBy !== null;
+        $correctionTransition = $stored->state->isCollected() && $incoming->state->isValidated()
+            && count($incoming->collectionEvents) === count($stored->collectionEvents) + 1
+            && $this->latestCollectionEventType($incoming) === 'corrected';
         $sameState = $stored->state === $incoming->state;
+        $appendedEvents = count($incoming->collectionEvents) - count($stored->collectionEvents);
+        $validCollectionEvents = $correctionTransition || ($sameState && $appendedEvents === 0)
+            || ($collectionTransition && (($stored->collectedAt === null && $appendedEvents <= 1)
+                || ($stored->collectedAt !== null && $appendedEvents === 1))
+                && ($appendedEvents === 0 || $this->latestCollectionEventType($incoming) === 'collected'));
         $sameCollection = $stored->collectedBy === $incoming->collectedBy
             && $this->instant($stored->collectedAt) === $this->instant($incoming->collectedAt);
 
-        if ((! $sameState && ! $collectionTransition) || ($sameState && ! $sameCollection)
+        if ((! $sameState && ! $collectionTransition && ! $correctionTransition) || ! $validCollectionEvents
+            || (! $sameCollection && ! ($collectionTransition && $stored->collectedAt === null))
+            || ! $this->retainsAdjustments($stored, $incoming)
+            || ! $this->retainsCollectionEvents($stored, $incoming)
             || $stored->householdId !== $incoming->householdId
             || $stored->householdName !== $incoming->householdName
             || $stored->createdBy !== $incoming->createdBy
@@ -95,19 +156,62 @@ final class EloquentBasketRepository implements BasketRepository
         }
     }
 
+    private function retainsAdjustments(Basket $stored, Basket $incoming): bool
+    {
+        if (count($incoming->adjustments) < count($stored->adjustments)) {
+            return false;
+        }
+        foreach ($stored->adjustments as $index => $adjustment) {
+            $candidate = $incoming->adjustments[$index];
+            if (! $adjustment->matches($candidate)
+                || $this->instant($adjustment->occurredAt) !== $this->instant($candidate->occurredAt)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private function retainsCollectionEvents(Basket $stored, Basket $incoming): bool
+    {
+        if (count($incoming->collectionEvents) < count($stored->collectionEvents)) {
+            return false;
+        }
+        foreach ($stored->collectionEvents as $index => $event) {
+            $candidate = $incoming->collectionEvents[$index];
+            if (! $event->matches($candidate)
+                || $this->instant($event->occurredAt) !== $this->instant($candidate->occurredAt)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private function latestCollectionEventType(Basket $basket): ?string
+    {
+        $type = null;
+        foreach ($basket->collectionEvents as $event) {
+            $type = $event->type;
+        }
+
+        return $type;
+    }
+
     private function instant(?DateTimeImmutable $instant): ?string
     {
         return $instant?->format('Y-m-d H:i:s.uP');
     }
 
-    /** @return array<string, array{string, string, ?string, ?string, string, string, int, bool, ?string, string, ?string, ?string}> */
+    /** @return array<string, list<string|int|bool|null>> */
     private function lineSnapshots(Basket $basket): array
     {
         $snapshots = [];
         foreach ($basket->lines as $line) {
-            $snapshots[$line->id] = [$line->basketId, $line->kind, $line->productId, $line->returnItemId, $line->name, $line->unit,
+            $snapshots[$line->id] = [$line->basketId, $line->kind->value, $line->productId, $line->returnItemId, $line->name, $line->unit,
                 $line->priceCents, $line->variable, $line->containersPerUnit,
-                $line->quantity->toString(), $this->instant($line->createdAt), $this->instant($line->removedAt)];
+                $line->quantity->toString(), $this->instant($line->createdAt), $this->instant($line->removedAt),
+                $line->sourceOrderLineId, $line->orderedQuantity?->toString(), $line->allocatedQuantity?->toString()];
         }
         ksort($snapshots);
 
@@ -121,6 +225,31 @@ final class EloquentBasketRepository implements BasketRepository
         return $model === null ? null : $this->toDomain($model);
     }
 
+    public function getBySourceOrder(string $orderId): ?Basket
+    {
+        $model = BasketModel::query()->where('source_order_id', $orderId)->where('late', false)->first();
+
+        return $model === null ? null : $this->toDomain($model);
+    }
+
+    public function getOpenLateBySourceOrder(string $orderId): ?Basket
+    {
+        $model = BasketModel::query()->where('source_order_id', $orderId)->where('late', true)->whereIn('state', [BasketState::Draft->value, BasketState::NothingToCollect->value])->first();
+
+        return $model === null ? null : $this->toDomain($model);
+    }
+
+    public function weeklyOfSourceOrders(array $sourceOrderIds): array
+    {
+        if ($sourceOrderIds === []) {
+            return [];
+        }
+
+        return array_values(BasketModel::query()->where('kind', BasketKind::Weekly->value)->whereIn('source_order_id', $sourceOrderIds)
+            ->with(['lines', 'adjustments.lines', 'collectionEvents'])->orderBy('id')->get()
+            ->map(fn (BasketModel $model) => $this->toDomain($model))->all());
+    }
+
     public function lock(string $id): ?Basket
     {
         $model = BasketModel::query()->whereKey($id)->lockForUpdate()->first();
@@ -130,7 +259,49 @@ final class EloquentBasketRepository implements BasketRepository
 
     public function list(): array
     {
-        return array_values(BasketModel::query()->with('lines')->orderByDesc('created_at')->orderByDesc('id')->get()
+        return array_values(BasketModel::query()->with(['lines', 'adjustments.lines', 'collectionEvents'])->orderByDesc('created_at')->orderByDesc('id')->get()
+            ->map(fn (BasketModel $model) => $this->toDomain($model))->all());
+    }
+
+    public function getForHousehold(string $id, string $householdId): ?Basket
+    {
+        $model = BasketModel::query()->whereKey($id)->where('household_id', $householdId)->first();
+
+        return $model === null ? null : $this->toDomain($model);
+    }
+
+    public function listForHousehold(string $householdId): array
+    {
+        return array_values(BasketModel::query()->where('household_id', $householdId)->with(['lines', 'adjustments.lines', 'collectionEvents'])
+            ->orderByDesc('created_at')->orderByDesc('id')->get()
+            ->map(fn (BasketModel $model) => $this->toDomain($model))->all());
+    }
+
+    public function settledForHouseholds(array $householdIds): array
+    {
+        if ($householdIds === []) {
+            return [];
+        }
+
+        return array_values(BasketModel::query()->whereIn('household_id', $householdIds)
+            ->whereIn('state', [BasketState::Validated->value, BasketState::Collected->value])
+            ->with(['lines', 'adjustments.lines', 'collectionEvents'])->orderBy('id')->get()
+            ->map(fn (BasketModel $model) => $this->toDomain($model))->all());
+    }
+
+    public function pendingCollections(?string $householdId = null): array
+    {
+        return array_values(BasketModel::query()->where('state', BasketState::Validated->value)
+            ->when($householdId !== null, fn ($query) => $query->where('household_id', $householdId))
+            ->with(['lines', 'adjustments.lines', 'collectionEvents'])->orderBy('validated_at')->orderBy('id')->get()
+            ->map(fn (BasketModel $model) => $this->toDomain($model))
+            ->filter(fn (Basket $basket) => $basket->isPendingCollection())->all());
+    }
+
+    public function drafts(): array
+    {
+        return array_values(BasketModel::query()->where('state', BasketState::Draft->value)
+            ->with(['lines', 'adjustments.lines', 'collectionEvents'])->orderBy('created_at')->orderBy('id')->get()
             ->map(fn (BasketModel $model) => $this->toDomain($model))->all());
     }
 
@@ -146,15 +317,26 @@ final class EloquentBasketRepository implements BasketRepository
                 $line->name, $line->unit, (int) $line->price_cents, (bool) $line->variable,
                 $this->containerSnapshot($line), Quantity::fromString((string) $line->quantity),
                 new DateTimeImmutable($line->created_at), $line->removed_at === null ? null : new DateTimeImmutable($line->removed_at),
-                $line->kind, $line->return_item_id))
+                BasketLineKind::from($line->kind), $line->return_item_id, $line->source_order_line_id,
+                $line->ordered_quantity === null ? null : Quantity::fromString((string) $line->ordered_quantity),
+                $line->allocated_quantity === null ? null : Quantity::fromString((string) $line->allocated_quantity)))
             ->all();
 
-        return new Basket($model->id, $model->household_id, $model->household_name, $model->state,
+        return new Basket($model->id, $model->household_id, $model->household_name, BasketState::from($model->state),
             $model->created_by, new DateTimeImmutable($model->created_at), array_values($lines),
             $model->validated_by, $model->validated_at === null ? null : new DateTimeImmutable($model->validated_at),
             $model->validated_total_cents === null ? null : (int) $model->validated_total_cents,
             $model->collected_by, $model->collected_at === null ? null : new DateTimeImmutable($model->collected_at),
-            $model->cancelled_by, $model->cancelled_at === null ? null : new DateTimeImmutable($model->cancelled_at));
+            $model->cancelled_by, $model->cancelled_at === null ? null : new DateTimeImmutable($model->cancelled_at),
+            array_values($model->adjustments->map(fn (BasketAdjustmentModel $adjustment) => new BasketAdjustment(
+                $adjustment->id, $adjustment->basket_id, (int) $adjustment->amount_cents,
+                $adjustment->reason, $adjustment->recorded_by, new DateTimeImmutable($adjustment->occurred_at),
+                array_values($adjustment->lines->map(fn (BasketAdjustmentLineModel $line) => BasketAdjustmentLine::fromDecimal(
+                    $line->product_id, (string) $line->quantity_delta))->all())))->all()),
+            array_values($model->collectionEvents->map(fn (BasketCollectionEventModel $event) => new BasketCollectionEvent(
+                $event->id, $event->basket_id, $event->type, $event->recorded_by,
+                new DateTimeImmutable($event->occurred_at), $event->reason))->all()),
+            BasketKind::from($model->kind), $model->source_order_id, (bool) $model->late);
     }
 
     private function containerSnapshot(BasketLineModel $line): ?string

@@ -13,7 +13,7 @@ final class ListProducers
     /** @return list<ProducerData> */
     public function __invoke(Actor $actor): array
     {
-        Gate::forUser($actor)->authorize('manage');
+        Gate::forUser($actor)->authorize('view-producers');
 
         return array_map(ProducerData::of(...), $this->producers->list());
     }

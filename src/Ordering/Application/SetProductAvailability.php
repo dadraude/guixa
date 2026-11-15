@@ -21,11 +21,11 @@ final class SetProductAvailability
         private readonly TransactionRunner $transactions,
     ) {}
 
-    /** The producer marks its own product unavailable in a cycle, or available again, while its order is not sent (R3c). */
+    /** The producer, or whoever administers the catalogue, marks a product unavailable in a cycle, or available again, while its order is not sent (R3c). */
     public function __invoke(Actor $actor, string $cycleId, string $productId, bool $available): void
     {
         $product = $this->catalog->orderable($productId) ?? throw ProductNotOrderable::withId($productId);
-        Gate::forUser($actor)->authorize('owns', ['producer', $product->producerId]);
+        Gate::forUser($actor)->authorize('set-availability', $product->producerId);
 
         $this->transactions->run(function () use ($cycleId, $productId, $available, $product) {
             // Shared lock on the cycle: a send cannot slip in while the mark changes (R3c).

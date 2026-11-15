@@ -11,8 +11,12 @@ final class RoleAreas
         'member' => ['label' => 'Orders', 'href' => '/'],
         'producer' => ['label' => 'Producer', 'href' => '/producer/products'],
         'finance' => ['label' => 'Finance', 'href' => '/finance/baskets'],
+        'catalogue' => ['label' => 'Catalogue', 'href' => '/catalogue/producers'],
+        'receiver' => ['label' => 'Reception', 'href' => '/receptions'],
         'manager' => ['label' => 'Management', 'href' => '/manage/cycles'],
     ];
+
+    private const SHORTCUT_ONLY = ['catalogue', 'receiver'];
 
     /** @return list<RoleArea> */
     public static function for(Actor $actor): array
@@ -26,5 +30,18 @@ final class RoleAreas
         }
 
         return $areas;
+    }
+
+    /**
+     * Areas with no dashboard card of their own: a header link is their whole entry (R15).
+     *
+     * @return list<RoleArea>
+     */
+    public static function shortcuts(Actor $actor): array
+    {
+        return array_values(array_filter(
+            self::for($actor),
+            fn (RoleArea $area) => in_array($area->role, self::SHORTCUT_ONLY, true),
+        ));
     }
 }

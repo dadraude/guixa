@@ -26,6 +26,8 @@ decisions to that implementer without consuming an independent review round.
 Inspect the first vertical checkpoint's behavioral and persisted/rendered evidence before broad
 implementation; class existence, test counts and a green geometry report do not establish acceptance.
 Return a missing invariant to the same owner without creating another independent review round.
+For changed contracts, check the consumer inventory before implementation widens: graph callers,
+exact literals, fixtures and dynamic HTTP paths, with exclusions explained in the check plan.
 
 Accept `committed` only after comparing actual paths with admitted scope. A scope request pauses writes
 until the coordinator readmits it; a product question goes to the user. `stopped` goes to Stop.
@@ -93,6 +95,23 @@ or send an already-pushed branch into the pre-push amend/rebase loop. Never forc
 
 Record the confirmed PR as `pending-ci`, retaining its worktree, database and reservation. Publication
 is not full validation. A feature-branch push alone does not trigger the configured PR workflow.
+
+### Sync requirements documents
+
+Once the task PR is confirmed, the implementation owner compares its full diff against the profile's
+requirements documents and returns `none`, or each requirement/scenario the code now contradicts or
+extends, with code evidence. Plan/task deviations the profile lets the task PR carry stay in it.
+
+When a requirements document must change, the implementation owner writes those edits and their
+history entries in the profile's spec-sync worktree, on the spec-sync branch created from the task
+branch. A fresh reviewer checks that the edits describe the published code and add no new behaviour.
+A publisher then opens a stacked PR whose base is the task branch, and links each PR from the other.
+The stacked PR is the proposal; accepting the requirement change stays the user's decision.
+
+New task commits that change behaviour repeat the comparison: merge the task branch into the
+spec-sync branch as a new commit and update its edits. Record the spec-sync PR, or `none`, with the
+task; an unrun comparison is missing proof. After the task PR integrates, retarget the stacked PR to
+the configured base before the user merges it.
 
 ## 7. Observe CI and close
 
@@ -166,6 +185,10 @@ changes product failures, review counts, scope, permissions or the fresh indepen
 Do not edit counters to grant an exception.
 Substantive and mechanical review counts remain separate. Repeated failures of the same stage and
 mechanism cannot be relabeled to reset a budget. Missing, pending or stale evidence is never success.
+Before declaring recovery exhausted or requesting an exception, query
+`node skills/agent-workflow/scripts/state.mjs status OWNER_JSON STAGE MECHANISM` and retain its
+read-only admission result. A successful focused `recovery-result` closes that attempt; a later
+full-validation failure is a new failure event, not a retroactive change to the result.
 Budget exhaustion stops the task with preserved evidence; restarting a session or rebasing resets none.
 
 Use `node skills/agent-workflow/scripts/state.mjs OWNER_JSON EVENT_JSON` from the task worktree.

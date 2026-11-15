@@ -17,7 +17,12 @@ final class InMemoryStockMovementRepositoryTest extends TestCase
         return new InMemoryStockMovementRepository;
     }
 
-    protected function stockProductId(): string
+    protected function productId(): string
+    {
+        return (string) Str::uuid7();
+    }
+
+    protected function correctionFor(string $basket): string
     {
         return (string) Str::uuid7();
     }

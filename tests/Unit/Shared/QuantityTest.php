@@ -49,3 +49,15 @@ it('compares by value', function () {
     expect(Quantity::fromString('1.5')->equals(Quantity::ofThousandths(1500)))->toBeTrue()
         ->and(Quantity::fromString('1.5')->equals(Quantity::fromString('1.501')))->toBeFalse();
 });
+
+it('rounds the containers a quantity needs up (R18a)', function (string $quantity, string $rate, int $expected) {
+    expect(Quantity::fromString($quantity)->containersAt(Quantity::fromString($rate)))->toBe($expected);
+})->with([
+    ['1.300', '2', 3],
+    ['0.500', '2', 1],
+    ['3', '1', 3],
+    ['0.001', '0.001', 1],
+    ['0', '5', 0],
+    ['1', '0', 0],
+    ['9999999.999', '9999999.999', 99999999980001],
+]);

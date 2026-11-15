@@ -21,8 +21,11 @@ profile's standing authorization.
 | Draft a ticket batch        | `$<prefix>-to-tickets`             | `/to-tickets`                   |
 
 Codex names take the profile's prefix to avoid collisions with personal/global skills. Keep
-explicit-only invocation in each entrypoint's metadata. No global installation or symlink is required. If a running client does not discover new skills,
-reload its skills or start a fresh session; do not claim discovery from the registry alone.
+explicit-only invocation for these execution and ticket entrypoints in their metadata. Projects may
+also add automatically discoverable spec flow and gap review entries in both clients, pointing to
+project references. No global installation or symlink is required. If a running client does not
+discover new skills, reload its skills or start a fresh session; do not claim discovery from the
+registry alone.
 
 ## Guarantees
 
@@ -39,7 +42,7 @@ reload its skills or start a fresh session; do not claim discovery from the regi
 
 To add a runtime, implement capability mappings in an adapter and a thin entrypoint. Do not fork the
 core or claim that every AI chat service can run it: it needs repository access, required execution
-and delegation capabilities, and authorized connectors. Keep explicit-only invocation in its metadata.
+and delegation capabilities, and authorized connectors. Preserve its intended invocation policy in metadata.
 
 ## Planning
 

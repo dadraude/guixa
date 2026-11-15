@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
 import { trans } from 'laravel-vue-i18n';
-import PickupController from '@/actions/App/Http/Controllers/Manage/PickupController';
+import BasketController from '@/actions/App/Http/Controllers/Finance/BasketController';
 import { formatMoney, formatPickupDate } from '@/lib/locale';
 
 defineProps<{ settlement: App.Http.HouseholdSettlementRow }>();
+
+const statusLabel = (status: string) =>
+    status === 'draft' ? trans('Draft') : trans('Validated');
 
 const euros = (cents: number) => formatMoney((cents / 100).toFixed(2));
 </script>
@@ -16,30 +19,26 @@ const euros = (cents: number) => formatMoney((cents / 100).toFixed(2));
             <dd>{{ euros(settlement.balanceCents) }}</dd>
         </div>
         <div>
-            <dt class="font-medium">{{ trans('Pending pickups') }}:</dt>
-            <dd v-if="settlement.pendingPickups.length === 0">
+            <dt class="font-medium">{{ trans('Open baskets') }}:</dt>
+            <dd v-if="settlement.openBaskets.length === 0">
                 {{ trans('None') }}
             </dd>
             <dd v-else>
                 <ul class="mt-2 grid gap-2">
                     <li
-                        v-for="pickup in settlement.pendingPickups"
-                        :key="pickup.cycleId"
+                        v-for="basket in settlement.openBaskets"
+                        :key="basket.basketId"
                     >
                         <Link
-                            :href="
-                                PickupController.show({
-                                    cycle: pickup.cycleId,
-                                    household: settlement.householdId,
-                                })
-                            "
+                            :href="BasketController.show(basket.basketId)"
                             class="inline-flex min-h-11 items-center rounded-md underline underline-offset-4"
                         >
                             {{
-                                trans('Pickup on :date', {
-                                    date: formatPickupDate(pickup.pickupDate),
+                                trans('Basket of :date', {
+                                    date: formatPickupDate(basket.date),
                                 })
                             }}
+                            ({{ statusLabel(basket.status) }})
                         </Link>
                     </li>
                 </ul>

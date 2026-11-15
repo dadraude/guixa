@@ -3,27 +3,38 @@ import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import { trans } from 'laravel-vue-i18n';
 import { computed, ref } from 'vue';
 import BasketCollectionController from '@/actions/App/Http/Controllers/Finance/BasketCollectionController';
+import BasketCollectionCorrectionController from '@/actions/App/Http/Controllers/Finance/BasketCollectionCorrectionController';
+import BasketCorrectionController from '@/actions/App/Http/Controllers/Finance/BasketCorrectionController';
 import BasketController from '@/actions/App/Http/Controllers/Finance/BasketController';
 import BasketStockController from '@/actions/App/Http/Controllers/Finance/BasketStockController';
+import BasketWeeklyLineController from '@/actions/App/Http/Controllers/Finance/BasketWeeklyLineController';
 import BasketReturnController from '@/actions/App/Http/Controllers/Finance/BasketReturnController';
 import BasketValidationController from '@/actions/App/Http/Controllers/Finance/BasketValidationController';
 import HouseholdWalletController from '@/actions/App/Http/Controllers/Finance/HouseholdWalletController';
 import Heading from '@/components/Heading.vue';
+import WeeklyLines from '@/components/baskets/WeeklyLines.vue';
+import AmountAdjustments from '@/components/baskets/AmountAdjustments.vue';
+import BasketCollectionHistory from '@/components/baskets/BasketCollectionHistory.vue';
 import InputError from '@/components/InputError.vue';
 import StockLines from '@/components/pickup/StockLines.vue';
 import ReturnLines from '@/components/pickup/ReturnLines.vue';
 import { euros } from '@/components/pickup/euros';
+import { formatQuantity } from '@/lib/locale';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { useTemplateRef } from 'vue';
 
 const props = defineProps<{
     basket: App.Http.BasketRow;
+    containerBalance: number;
     stockProducts: App.Http.StockLevelRow[];
     returnItems: App.Http.ReturnItemRow[];
 }>();
 const page = usePage();
 const errors = computed(() => page.props.errors as Record<string, string>);
 const processing = ref(false);
+const adjustmentPanel = useTemplateRef('adjustmentPanel');
+const collectionPanel = useTemplateRef('collectionPanel');
 const options = {
     preserveScroll: true,
     onStart: () => (processing.value = true),
@@ -57,6 +68,21 @@ const removeReturn = (returnItemId: string) =>
         }),
         options,
     );
+const saveActual = (productId: string, quantity: string) =>
+    router.put(
+        BasketWeeklyLineController.update.url({
+            basket: props.basket.id,
+            product: productId,
+        }),
+        { quantity },
+        options,
+    );
+const hasContents = computed(
+    () =>
+        props.basket.weeklyLines.length > 0 ||
+        props.basket.stockLines.length > 0 ||
+        props.basket.returnLines.length > 0,
+);
 const validate = () =>
     router.post(
         BasketValidationController.store.url({ basket: props.basket.id }),
@@ -75,8 +101,54 @@ const cancel = () =>
         {},
         options,
     );
+const correct = (
+    amountCents: number,
+    reason: string,
+    correctionId: string,
+    returnedGoods: { stock_product_id: string; quantity: string }[],
+) =>
+    router.post(
+        BasketCorrectionController.store.url({ basket: props.basket.id }),
+        {
+            amount_cents: amountCents,
+            reason,
+            correction_id: correctionId,
+            ...(returnedGoods.length > 0
+                ? { returned_goods: returnedGoods }
+                : {}),
+        },
+        { ...options, onSuccess: () => adjustmentPanel.value?.reset() },
+    );
+const correctCollection = (reason: string, correctionId: string) =>
+    router.post(
+        BasketCollectionCorrectionController.store.url({
+            basket: props.basket.id,
+        }),
+        { reason, correction_id: correctionId },
+        { ...options, onSuccess: () => collectionPanel.value?.reset() },
+    );
+const notices: Record<string, { test: string; text: string }> = {
+    reversed: {
+        test: 'goods-reversed',
+        text: trans('All goods were returned; nothing is left to collect.'),
+    },
+    collected: {
+        test: 'collected',
+        text: trans('This basket was collected.'),
+    },
+    nothing_to_collect: {
+        test: 'nothing-to-collect',
+        text: trans('There is nothing to collect in this basket.'),
+    },
+    cancelled: {
+        test: 'cancelled',
+        text: trans('This draft was cancelled.'),
+    },
+};
 const statusLabels: Record<string, string> = {
     draft: trans('Draft'),
+    nothing_to_collect: trans('Nothing to collect'),
+    reversed: trans('Goods fully reversed'),
     validated: trans('Pending collection'),
     collected: trans('Collected'),
     cancelled: trans('Cancelled'),
@@ -88,7 +160,13 @@ const statusLabels: Record<string, string> = {
     <div class="pilot-page pilot-layout-page pilot-manager-page">
         <Heading
             :title="trans('Basket: :name', { name: basket.householdName })"
-            :description="trans('Independent basket')"
+            :description="
+                !basket.weekly
+                    ? trans('Independent basket')
+                    : basket.late
+                      ? trans('Late basket')
+                      : trans('Weekly basket')
+            "
         />
         <Link
             :href="BasketController.index.url()"
@@ -100,14 +178,22 @@ const statusLabels: Record<string, string> = {
         <InputError :message="errors.domain" data-test="domain-error" />
         <Badge
             variant="secondary"
-            :data-test="`basket-status-${basket.state}`"
-            >{{ statusLabels[basket.state] ?? basket.state }}</Badge
+            :data-test="`basket-status-${basket.status}`"
+            >{{ statusLabels[basket.status] ?? basket.status }}</Badge
         >
+
+        <WeeklyLines
+            v-if="basket.weekly"
+            :lines="basket.weeklyLines"
+            :editable="basket.can.edit"
+            :processing="processing"
+            @save="saveActual"
+        />
 
         <StockLines
             :lines="basket.stockLines"
             :options="stockProducts"
-            :editable="basket.state === 'draft'"
+            :editable="basket.can.edit"
             :processing="processing"
             :errors="errors"
             :empty-message="trans('No stock has been added to this basket.')"
@@ -118,7 +204,7 @@ const statusLabels: Record<string, string> = {
         <ReturnLines
             :lines="basket.returnLines"
             :options="returnItems"
-            :editable="basket.state === 'draft'"
+            :editable="basket.can.edit"
             :processing="processing"
             :errors="errors"
             :empty-message="trans('No returns have been added to this basket.')"
@@ -128,7 +214,7 @@ const statusLabels: Record<string, string> = {
 
         <section class="pilot-layout-panel">
             <dl
-                class="grid grid-cols-2 gap-4 text-sm sm:grid-cols-3"
+                class="grid grid-cols-1 gap-4 text-sm sm:grid-cols-3"
                 data-test="basket-balance"
             >
                 <div>
@@ -143,11 +229,17 @@ const statusLabels: Record<string, string> = {
                     </dt>
                     <dd>{{ euros(basket.totalCents) }}</dd>
                 </div>
-                <div v-if="basket.state === 'draft'">
+                <div v-if="basket.projectedBalanceCents !== null">
                     <dt class="text-muted-foreground">
                         {{ trans('Projected balance') }}
                     </dt>
                     <dd>{{ euros(basket.projectedBalanceCents) }}</dd>
+                </div>
+                <div data-test="container-balance">
+                    <dt class="text-muted-foreground">
+                        {{ trans('Containers to return') }}
+                    </dt>
+                    <dd>{{ formatQuantity(String(containerBalance)) }}</dd>
                 </div>
             </dl>
             <Link
@@ -163,19 +255,39 @@ const statusLabels: Record<string, string> = {
             </Link>
         </section>
 
+        <AmountAdjustments
+            v-if="basket.settled"
+            ref="adjustmentPanel"
+            :original-cents="basket.totalCents"
+            :effective-cents="basket.effectiveTotalCents"
+            :adjustments="basket.adjustments"
+            :editable="basket.can.correct"
+            :stock-lines="basket.stockLines"
+            :processing="processing"
+            :errors="errors"
+            @submit="correct"
+        />
+
+        <BasketCollectionHistory
+            v-if="basket.settled"
+            ref="collectionPanel"
+            :collected="basket.collected"
+            :events="basket.collectionEvents ?? []"
+            :editable="basket.can.correctCollection"
+            :processing="processing"
+            :errors="errors"
+            @submit="correctCollection"
+        />
+
         <div
-            v-if="basket.state === 'draft'"
+            v-if="basket.can.validate"
             class="flex flex-wrap gap-2"
             data-test="draft-actions"
         >
             <Button
                 type="button"
                 class="min-h-11"
-                :disabled="
-                    processing ||
-                    (basket.stockLines.length === 0 &&
-                        basket.returnLines.length === 0)
-                "
+                :disabled="processing || !hasContents"
                 data-test="validate-basket"
                 @click="validate"
                 data-visual-page-focus-last
@@ -183,6 +295,7 @@ const statusLabels: Record<string, string> = {
                 {{ trans('Validate basket') }}
             </Button>
             <Button
+                v-if="basket.can.cancel"
                 type="button"
                 variant="outline"
                 class="min-h-11"
@@ -192,7 +305,7 @@ const statusLabels: Record<string, string> = {
             >
         </div>
         <div
-            v-else-if="basket.state === 'validated'"
+            v-else-if="basket.can.markCollected"
             class="flex flex-col items-start gap-2"
             data-test="pending-collection"
         >
@@ -211,20 +324,12 @@ const statusLabels: Record<string, string> = {
             </Button>
         </div>
         <p
-            v-else-if="basket.state === 'collected'"
-            class="text-sm text-muted-foreground"
-            data-test="collected"
-            data-visual-page-focus-last
-        >
-            {{ trans('This basket was collected.') }}
-        </p>
-        <p
             v-else
             class="text-sm text-muted-foreground"
-            data-test="cancelled"
+            :data-test="notices[basket.status]?.test"
             data-visual-page-focus-last
         >
-            {{ trans('This draft was cancelled.') }}
+            {{ notices[basket.status]?.text }}
         </p>
     </div>
 </template>

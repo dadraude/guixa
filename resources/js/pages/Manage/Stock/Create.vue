@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import { trans } from 'laravel-vue-i18n';
 import { Form, Head } from '@inertiajs/vue3';
-import StockProductController from '@/actions/App/Http/Controllers/Manage/StockProductController';
+import ProducerController from '@/actions/App/Http/Controllers/Catalogue/ProducerController';
+import StockProductController from '@/actions/App/Http/Controllers/Catalogue/StockProductController';
 import Heading from '@/components/Heading.vue';
 import StockProductFields from '@/components/StockProductFields.vue';
 import { Button } from '@/components/ui/button';
 
 defineOptions({
     layout: {
-        breadcrumbs: [{ title: 'Stock', href: StockProductController.index() }],
+        breadcrumbs: [{ title: 'Producers', href: ProducerController.index() }],
     },
 });
 

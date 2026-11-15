@@ -5,7 +5,7 @@ import { nextTick } from 'vue';
 import { usePage } from '@inertiajs/vue3';
 import AppLayout from '@/layouts/AppLayout.vue';
 import AuthLayout from '@/layouts/AuthLayout.vue';
-import { isPilotThemePage } from './pilotTheme';
+import { isPilotThemePage, pilotVariantFor } from './pilotTheme';
 
 vi.mock('@inertiajs/vue3', async () => {
     const { reactive } = await import('vue');
@@ -17,10 +17,15 @@ vi.mock('@/layouts/app/AppSidebarLayout.vue', async () => {
     const { defineComponent, h } = await import('vue');
     return {
         default: defineComponent({
-            props: { pilotTheme: Boolean, managerTheme: Boolean },
+            props: {
+                pilotTheme: Boolean,
+                managerTheme: Boolean,
+                pilotVariant: String,
+            },
             setup(props) {
                 return () =>
                     h('div', {
+                        'data-variant': String(props.pilotVariant ?? ''),
                         'data-pilot': String(props.pilotTheme),
                         'data-manager': String(props.managerTheme),
                     });
@@ -132,19 +137,27 @@ describe('pilot theme page selection', () => {
         ['Manage/Households/Index', true],
         ['Manage/Households/Show', true],
         ['Manage/Producers/Index', true],
+        ['Catalogue/Producers/Index', true],
+        ['Catalogue/Producers/Products', true],
+        ['Catalogue/Producers/Availability', true],
+        ['Catalogue/Producers/WeeklyProduct/Create', true],
+        ['Catalogue/Producers/WeeklyProduct/Edit', true],
         ['Manage/Cycles/Index', true],
         ['Manage/Cycles/Show', true],
-        ['Manage/Pickups/Index', true],
-        ['Manage/Pickups/Show', true],
-        ['Manage/Reception/Show', true],
+        ['Receptions/Index', true],
+        ['Receptions/Show', true],
         ['Manage/Settings', true],
         ['Manage/Stock/Index', true],
         ['Manage/Stock/Create', true],
         ['Manage/Stock/Edit', true],
         ['Manage/Stock/Movements', true],
+        ['Finance/Stock/Index', true],
+        ['Finance/Stock/Movements', true],
+        ['Producer/Stock/Movements', true],
         ['Manage/ReturnItems/Index', true],
         ['Manage/ReturnItems/Create', true],
         ['Manage/ReturnItems/Edit', true],
+        ['Catalogue/Stock/Movements', true],
         ['Finance/Baskets/Index', true],
         ['Finance/Baskets/Create', true],
         ['Finance/Baskets/Show', true],
@@ -164,5 +177,136 @@ describe('pilot theme page selection', () => {
         ['Orders/Other', false],
     ])('%s is pilot: %s', (page, expected) => {
         expect(isPilotThemePage(page)).toBe(expected);
+    });
+});
+
+describe('landing variant admission', () => {
+    it.each([
+        ['Manage/Stock/Index', 'landing'],
+        ['Manage/Stock/Create', 'landing'],
+        ['Manage/Stock/Create/Extra', null],
+        ['Manage/Stock/Edit', 'landing'],
+        ['Manage/Stock/Edit/Extra', null],
+        ['Manage/Stock/Movements', null],
+        ['Manage/Stock/Index/Extra', null],
+        ['Manage/Stock/IndexOld', null],
+        ['manage/stock/index', null],
+        ['Manage/', null],
+        ['Manage/Accounts/Index', null],
+        ['Stock/Index', null],
+        ['Finance/Stock/Index', null],
+        ['Orders/Index', 'landing'],
+        ['Orders/Edit', 'landing'],
+        ['Orders/Other', null],
+        ['Orders/Index/Extra', null],
+        ['Orders/', null],
+        ['Catalogue/Producers/Index', 'landing'],
+        ['Catalogue/Producers/Index/Extra', null],
+        ['Catalogue/Producers', null],
+        ['Catalogue/Producers/Products', 'landing'],
+        ['Catalogue/Producers/Products/Extra', null],
+        ['Catalogue/Producers/Product', null],
+        ['Catalogue/Producers/Availability', 'landing'],
+        ['Catalogue/Producers/Availability/Extra', null],
+        ['Catalogue/Producers/WeeklyProduct/Create', 'landing'],
+        ['Catalogue/Producers/WeeklyProduct/Create/Extra', null],
+        ['Catalogue/Producers/WeeklyProduct/Edit', 'landing'],
+        ['Catalogue/Producers/WeeklyProduct/Edit/Extra', null],
+        ['Manage/ReturnItems/Index', 'landing'],
+        ['Manage/ReturnItems/Index/Extra', null],
+        ['Manage/ReturnItems/Create', 'landing'],
+        ['Manage/ReturnItems/Create/Extra', null],
+        ['Manage/ReturnItems/Edit', 'landing'],
+        ['Manage/ReturnItems/Edit/Extra', null],
+        ['Catalogue/Stock/Movements', 'landing'],
+        ['Catalogue/Stock/Movements/Extra', null],
+        ['Catalogue/Stock', null],
+        ['Producer/Stock/Movements', null],
+        ['Finance/Stock/Movements', null],
+        ['Producer/Products/Create', null],
+        ['Producer/Products/Edit', null],
+        ['Welcome', null],
+    ])('%s -> %s', (page, expected) => {
+        expect(pilotVariantFor(page)).toBe(expected);
+    });
+
+    it('passes the variant through the actual AppLayout only on the exact page and clears it on leaving', async () => {
+        const page = usePage();
+        const wrapper = mount(AppLayout);
+        const variant = () =>
+            wrapper.get('[data-pilot]').attributes('data-variant');
+        for (const component of [
+            'Orders/Other',
+            'Catalogue/Producers/Index/Extra',
+            'Catalogue/Producers',
+            'Catalogue/Producers/Products/Extra',
+            'Catalogue/Producers/Product',
+            'Catalogue/Producers/Availability/Extra',
+            'Catalogue/Producers/WeeklyProduct/Create/Extra',
+            'Producer/Products/Edit',
+            'Manage/Stock/Movements',
+            'Producer/Stock/Movements',
+            'Finance/Stock/Movements',
+            'Catalogue/Stock/Movements/Extra',
+            'Manage/Accounts/Index',
+            'Manage/Stock/Create/Extra',
+            'Welcome',
+        ]) {
+            page.component = component;
+            await nextTick();
+            expect(variant()).toBe('');
+        }
+        page.component = 'Catalogue/Producers/Index';
+        await nextTick();
+        expect(variant()).toBe('landing');
+        page.component = 'Catalogue/Producers/Products';
+        await nextTick();
+        expect(variant()).toBe('landing');
+        page.component = 'Catalogue/Producers/Availability';
+        await nextTick();
+        expect(variant()).toBe('landing');
+        page.component = 'Catalogue/Producers/WeeklyProduct/Create';
+        await nextTick();
+        expect(variant()).toBe('landing');
+        page.component = 'Catalogue/Producers/WeeklyProduct/Edit';
+        await nextTick();
+        expect(variant()).toBe('landing');
+        page.component = 'Catalogue/Stock/Movements';
+        await nextTick();
+        expect(variant()).toBe('landing');
+        page.component = 'Manage/Stock/Index';
+        await nextTick();
+        expect(variant()).toBe('landing');
+        page.component = 'Manage/Stock/Create';
+        await nextTick();
+        expect(variant()).toBe('landing');
+        page.component = 'Manage/Stock/Edit';
+        await nextTick();
+        expect(variant()).toBe('landing');
+        page.component = 'Orders/Other';
+        await nextTick();
+        expect(variant()).toBe('');
+        page.component = 'Manage/Stock/Index';
+        await nextTick();
+        expect(variant()).toBe('landing');
+        wrapper.unmount();
+        page.component = 'Orders/Other';
+    });
+
+    it('carries the variant through AppLayout on both member order pages', async () => {
+        const page = usePage();
+        const wrapper = mount(AppLayout);
+        for (const component of ['Orders/Index', 'Orders/Edit']) {
+            page.component = component;
+            await nextTick();
+            expect(
+                wrapper.get('[data-pilot]').attributes('data-variant'),
+                component,
+            ).toBe('landing');
+        }
+        page.component = 'Orders/Other';
+        await nextTick();
+        expect(wrapper.get('[data-pilot]').attributes('data-variant')).toBe('');
+        wrapper.unmount();
     });
 });

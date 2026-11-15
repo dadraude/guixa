@@ -9,6 +9,12 @@ are reconciled below and T64–T68 are accepted additions; existing issue identi
 T64–T68 map to DRA-224–DRA-228. The [review and publication delta](tasks/reslicing-review.md) separates the current tracker snapshot
 from the accepted graph. Product requirements and plan decisions are unchanged. Implementation status belongs to Linear, not this table.
 
+**2026-11-11 — Identitat de la landing:** pla acceptat per l’usuari; **T84 acceptada (2026-11-11)**.
+Només es detalla el pilot d’Estoc de gestió. La resta del desplegament conserva el full de ruta del pla
+fins a la revisió del pilot. No hi ha autorització d’implementació ni de publicació de tiquets.
+
+**2026-11-13 — Fase 2, comandes del membre:** T85 acceptada per l’usuari i implementada i integrada (PR #413); decisió B (tres captures d’`Orders/Edit`) aprovada visualment per l’usuari el 2026-11-13.
+
 Source: [spec](spec.md) and areas · [plan](plan.md) · [coverage allocation](tasks/coverage.md).
 
 ## File map
@@ -19,7 +25,13 @@ Source: [spec](spec.md) and areas · [plan](plan.md) · [coverage allocation](ta
 | [tasks/catalog.md](tasks/catalog.md) | T52–T54: unified producer catalogue, safe history and stock visibility |
 | [tasks/sales.md](tasks/sales.md) | T55–T58 and T64–T66/T68: independent basket, Finance, returns, receipts, member reads and corrections |
 | [tasks/weekly-and-collection.md](tasks/weekly-and-collection.md) | T59–T63/T67: weekly cutover, supplements, collection, indicators, lifecycle and cleanup; T33 closure |
-| [tasks/coverage.md](tasks/coverage.md) | All 65 requirements and 90 scenarios: retained responsibility and amendment responsibility |
+| [tasks/coverage.md](tasks/coverage.md) | All 66 requirements and 92 scenarios (S1–S93, S90 retired): retained responsibility and amendment responsibility |
+| [tasks/traceability.md](tasks/traceability.md) | T33 audit: assertion-level evidence and verdict for every requirement and scenario, closure prerequisites and gaps filled |
+| [tasks/audit-2026-11-05.md](tasks/audit-2026-11-05.md) | T69–T76: follow-up tasks from the 2026-11-05 SDD↔code audit (documents, bugfixes, refactors, tests, send button, movement history) |
+| [tasks/recorder-names.md](tasks/recorder-names.md) | T82: recorder names instead of account ids in the wallet statement and basket histories |
+| [tasks/landing.md](tasks/landing.md) | T83: approved light cooperative public landing |
+| [tasks/landing-style-pilot.md](tasks/landing-style-pilot.md) | T84: pilot d’Estoc de gestió amb la identitat de la landing; acceptada, preparació i cobertura parcial |
+| [tasks/landing-orders.md](tasks/landing-orders.md) | T85: fase 2, comandes del membre amb la identitat de la landing; implementada i integrada (PR #413); decisió B aprovada (2026-11-13) |
 | [tasks/baseline.md](tasks/baseline.md) | Historical T01–T51 scopes, approval gates and dated evidence; superseded behavior is explicitly historical |
 
 IDs are feature-global. Detail files do not start separate numbering or redefine dependencies.
@@ -69,7 +81,7 @@ See [current translation contracts](plan.md#translations); the linked T36 baseli
 ## Canonical task registry
 
 For T01–T51 except T33, linked scopes are historical: keep delivered behavior that the amendment
-preserves; implement changed behavior through T52–T68. Existing issue IDs keep their lineage; explicit scope narrowing below is accepted, never a silent repurposing.
+preserves; implement changed behavior through T52–T68; T69–T76 are the 2026-11-05 audit follow-ups. Existing issue IDs keep their lineage; explicit scope narrowing below is accepted, never a silent repurposing.
 
 | ID | Task | Covers | After |
 | --- | --- | --- | --- |
@@ -105,7 +117,7 @@ preserves; implement changed behavior through T52–T68. Existing issue IDs keep
 | T30 | <a id="t30"></a>[Pickup resolution and redistribution](tasks/baseline.md#t30) | [Retained scope](tasks/baseline.md#t30) | T29 |
 | T31 | <a id="t31"></a>[Container counts](tasks/baseline.md#t31) | [Retained scope](tasks/baseline.md#t31) | T29, T20 |
 | T32 | <a id="t32"></a>[Household deactivation and to-settle list](tasks/baseline.md#t32) | [Retained scope](tasks/baseline.md#t32) | T07, T30 |
-| T33 | <a id="t33"></a>[Current traceability audit and feature closure](tasks/weekly-and-collection.md#t33) | All 65 R# and S1–S90; semantic test audit | T02, T14, T17, T19, T31, T32, T34, T35, T36, T37, T38, T42, T44, T46, T48, T50, T51, T63 |
+| T33 | <a id="t33"></a>[Current traceability audit and feature closure](tasks/weekly-and-collection.md#t33) | All 65 R# and S1–S92 (S90 retired); semantic test audit | T02, T14, T17, T19, T31, T32, T34, T35, T36, T37, T38, T42, T44, T46, T48, T50, T51, T63 |
 | T34 | <a id="t34"></a>[First manager installation command](tasks/baseline.md#t34) | [Retained scope](tasks/baseline.md#t34) | T06 |
 | T35 | <a id="t35"></a>[Cancelled cycle summary](tasks/baseline.md#t35) | [Retained scope](tasks/baseline.md#t35) | T17, T20 |
 | T36 | <a id="t36"></a>[Remaining app-wide Catalan translations](tasks/baseline.md#t36) | [Retained scope](tasks/baseline.md#t36) | T38 |
@@ -131,16 +143,44 @@ preserves; implement changed behavior through T52–T68. Existing issue IDs keep
 | T56 | <a id="t56"></a>[Grant Finance access to existing basket operations](tasks/sales.md#t56) | R19a, R21, R31, R36a, R36b, R36c; S78/S79 (Finance), S84 (basket access) | T55, T07, T38 |
 | T57 | <a id="t57"></a>[Validate return-only and mixed stock-return baskets](tasks/sales.md#t57) | R19b, R20a, R21, R22, R24a; S41, S53 (returns), S88 (real contents) | T56 |
 | T58 | <a id="t58"></a>[Append amount-only basket corrections](tasks/sales.md#t58) | R23, R31, R32; amount-only correction invariants; S85 regression | T64, T65 |
-| T59 | <a id="t59"></a>[Weekly basket cutover and redistribution](tasks/weekly-and-collection.md#t59) | R4, R12a, R18, R19, R19a, R22–R24b; S9, S14–S16 (weekly), S19 (validation), S20, S27–S30, S39, S40, S42, S46, S47, S53, S54, S61, S63, S64, S78, S83 (closure), S88 (no contents), S89 | T68, T66, T23, T30 |
-| T60 | <a id="t60"></a>[Late supplements and container attribution](tasks/weekly-and-collection.md#t60) | R18a, R19, R24b; S60, S80, S90 | T59, T31 |
+| T59 | <a id="t59"></a>[Weekly basket cutover and redistribution](tasks/weekly-and-collection.md#t59) | R4, R12a, R18, R19, R19a, R22–R24b; S9, S14–S16 (weekly), S19 (validation), S20, S27–S30, S39, S40, S42, S46, S47, S53, S54, S61, S63, S64, S78, S83 (closure), S88 (no contents), S89, S91 | T68, T66, T23, T30 |
+| T60 | <a id="t60"></a>[Household container balance](tasks/weekly-and-collection.md#t60) | R18a, R19, R24b; S60, S80, S92 | T59, T31 |
 | T61 | <a id="t61"></a>[Collect an own-household validated basket](tasks/weekly-and-collection.md#t61) | R19a, R23a, R23b, R35; S26 (action), S82 | T66 |
 | T62 | <a id="t62"></a>[Household obligations across lifecycle changes](tasks/weekly-and-collection.md#t62) | R35, R35a, R36b; S43, S58, S59 | T59, T32 |
-| T63 | <a id="t63"></a>[Remove superseded pickup ownership and schema](tasks/weekly-and-collection.md#t63) | Plan: final context/schema/route contracts; S1–S90 regression boundary | T54, T67, T62 |
+| T63 | <a id="t63"></a>[Remove superseded pickup ownership and schema](tasks/weekly-and-collection.md#t63) | Plan: final context/schema/route contracts; S1–S92 regression boundary (S90 retired) | T54, T67, T62 |
 | T64 | <a id="t64"></a>[Record and correct confirmed global receipts](tasks/sales.md#t64) | R21, R29–R32, R36c; S19 (receipt), S24, S84 (receipts), S85 | T56 |
 | T65 | <a id="t65"></a>[Read own-household basket contents and status](tasks/sales.md#t65) | R19a, R21, R23a, R24a, R31, R35; own-household read and privacy invariants | T55, T38 |
 | T66 | <a id="t66"></a>[Correct collection marks without financial effects](tasks/sales.md#t66) | R23b, R24a; collection correction, history and replay invariants | T56, T65 |
-| T67 | <a id="t67"></a>[Keep pending collection visible across pages and cycle closure](tasks/weekly-and-collection.md#t67) | R23a, R24, R24b, R35; S26/S42/S54/S83 (indicators) | T60, T61 |
+| T67 | <a id="t67"></a>[Keep pending collection visible across pages and cycle closure](tasks/weekly-and-collection.md#t67) | R23a, R24, R24b, R35; S26/S42/S54/S83 (indicators; one shared `pendingCollections` query) | T60, T61 |
 | T68 | <a id="t68"></a>[Correct physical goods and effective basket quantities](tasks/sales.md#t68) | R23, R24a, R27, R28, R32; S86; full-reversal and signed-quantity invariants | T58, T57 |
+| T69 | <a id="t69"></a>[Align 001 documents with the delivered code](tasks/audit-2026-11-05.md#t69) | Documents only: plan; R4b, R12a, R14, R17, R18, R23b, R27, R31 wording; dashboard interim description | T68 |
+| T70 | <a id="t70"></a>[Refuse adding a producer to a settled cycle](tasks/audit-2026-11-05.md#t70) | R4a; S51 (settled boundary) | T69 |
+| T71 | <a id="t71"></a>[Inventory count inside the stock lock](tasks/audit-2026-11-05.md#t71) | R27, R28; S23 | T69 |
+| T72 | <a id="t72"></a>[Remove the duplicate manager wallet and cycle pickups index](tasks/audit-2026-11-05.md#t72) | R31; household wallet and cycle pickups routes | T69 |
+| T73 | <a id="t73"></a>[Delete dead cycle code and fix stale docblocks](tasks/audit-2026-11-05.md#t73) | R4b; code hygiene, no behaviour change | T69 |
+| T74 | <a id="t74"></a>[Fill the audited test gaps](tasks/audit-2026-11-05.md#t74) | S27, S61, S69, S87 | T69 |
+| T75 | <a id="t75"></a>[Manager send button for producer orders](tasks/audit-2026-11-05.md#t75) | R12a; S36 | T69 |
+| T76 | <a id="t76"></a>[Stock movement history](tasks/audit-2026-11-05.md#t76) | R25b, R28a, R36c; S93 | T69 |
+| T82 | <a id="t82"></a>[Show recorder names instead of account ids](tasks/recorder-names.md#t82) | R23a, R31 (recorder names) | T76 |
+| T83 | <a id="t83"></a>[Implement approved light cooperative landing](tasks/landing.md#t83) | Plan: Public Welcome landing direction | — |
+| T84 | <a id="t84"></a>[Aplicar la identitat de la landing al pilot d’Estoc de gestió](tasks/landing-style-pilot.md#t84) | Pla: llenguatge visual de la portada; regressió parcial 001 R25/R27/R28/R28a, S23/S71/S93; permisos 003 R4 | — (base integrada; sense autorització d’execució) |
+| T85 | <a id="t85"></a>[Aplicar la identitat de la landing a les comandes del membre](tasks/landing-orders.md#t85) | Pla: llenguatge visual de la portada, fase 2; regressió parcial 001 R3b, R4b, R7–R10, R23a, R35; S2/S4/S32/S33/S37/S48/S49 | T84 (integrada). Estat: integrada (PR #413); decisió B aprovada (2026-11-13) |
+
+## Linear mapping — 2026-11-05 audit tasks
+
+All eight are children of the non-executable parent
+[DRA-239](https://linear.app/draude/issue/DRA-239) (no Tnn, no ready label), like DRA-206 for T52–T63.
+
+| Task | Linear issue | After |
+| --- | --- | --- |
+| [T69](#t69) | [DRA-231](https://linear.app/draude/issue/DRA-231) | T68 |
+| [T70](#t70) | [DRA-232](https://linear.app/draude/issue/DRA-232) | T69 |
+| [T71](#t71) | [DRA-233](https://linear.app/draude/issue/DRA-233) | T69 |
+| [T72](#t72) | [DRA-234](https://linear.app/draude/issue/DRA-234) | T69 |
+| [T73](#t73) | [DRA-235](https://linear.app/draude/issue/DRA-235) | T69 |
+| [T74](#t74) | [DRA-236](https://linear.app/draude/issue/DRA-236) | T69 |
+| [T75](#t75) | [DRA-237](https://linear.app/draude/issue/DRA-237) | T69 |
+| [T76](#t76) | [DRA-238](https://linear.app/draude/issue/DRA-238) | T69 |
 
 ## Linear publication and current gates
 
@@ -170,8 +210,8 @@ does not block any child. Existing issues keep their original parents.
 | [T57](#t57) | [DRA-212](https://linear.app/draude/issue/DRA-212/t57-basket-contents-returns-and-member-view) | DRA-211 | — |
 | [T58](#t58) | [DRA-213](https://linear.app/draude/issue/DRA-213/t58-append-only-basket-corrections) | DRA-212 | — |
 | [T59](#t59) | [DRA-214](https://linear.app/draude/issue/DRA-214/t59-weekly-basket-cutover-and-redistribution) | DRA-180, DRA-176, DRA-213 | — |
-| [T60](#t60) | [DRA-215](https://linear.app/draude/issue/DRA-215/t60-late-supplements-and-container-attribution) | DRA-214, DRA-181 | — |
-| [T61](#t61) | [DRA-216](https://linear.app/draude/issue/DRA-216/t61-self-collection-and-persistent-pending-indicators) | DRA-215 | DRA-202, DRA-203 (context only) |
+| [T60](#t60) | [DRA-215](https://linear.app/draude/issue/DRA-215/t60-household-container-balance) | DRA-214, DRA-181 | — |
+| [T61](#t61) | [DRA-216](https://linear.app/draude/issue/DRA-216/t61-collect-an-own-household-validated-basket) | DRA-215 | DRA-202, DRA-203 (context only) |
 | [T62](#t62) | [DRA-217](https://linear.app/draude/issue/DRA-217/t62-household-obligations-across-lifecycle-changes) | DRA-214, DRA-182 | — |
 | [T63](#t63) | [DRA-218](https://linear.app/draude/issue/DRA-218/t63-remove-superseded-pickup-ownership-and-schema) | DRA-209, DRA-216, DRA-217 | — |
 
@@ -180,7 +220,7 @@ links to feature-002 dashboard data tasks DRA-202/DRA-203 supply context; they a
 and this publication implements no feature-002 work.
 
 [T33 / DRA-183](https://linear.app/draude/issue/DRA-183/t33-traceability-check-and-close-feature-001) now describes the semantic audit of all 65 requirements
-and S1–S90. Its 11 existing native blockers remain: T38/DRA-194, T37/DRA-195, T36/DRA-205,
+and S1–S92 (S90 retired). Its 11 existing native blockers remain: T38/DRA-194, T37/DRA-195, T36/DRA-205,
 T42/DRA-193, T35/DRA-187, T32/DRA-182, T19/DRA-174, T31/DRA-181, T14/DRA-168,
 T17/DRA-170 and T34/DRA-158. Added blockers: T02/DRA-151, T44/DRA-198, T46/DRA-200
 and T63/DRA-218, giving 15 native blockers. Identity, title, project, Todo status, milestone,
@@ -237,7 +277,27 @@ and producer views omit the role query and default to member navigation; Welcome
 See the linked record for exact routes, candidates/bases, tests, approvals and bounded follow-up.
 These evidence gaps do not authorize repeating the redesign.
 
+## Linear mapping — T83 landing
+
+T83 is a standalone Coop task for the approved static public landing. It does not change the weekly
+ordering requirements or scenarios and has no prerequisite task.
+
+| Task | Linear issue | After |
+| --- | --- | --- |
+| [T83](#t83) | [DRA-264](https://linear.app/draude/issue/DRA-264/t83-implement-approved-light-cooperative-landing) | — |
+
 Descriptions record the reconciliation; only T47 changes status. Fields and native relations
 outside that authorized tracking update remain intact. T33 stays Todo with all 18 blockers;
 T48/T50/T51 remain closure gates. The historical baseline remains byte-identical. No T52 work,
 feature closure, deployment or PR merge is performed by this reconciliation.
+
+## Linear mapping — landing rollout
+
+T84 and T85 are standalone Coop tasks of the landing style rollout; neither has a parent. They do not
+change the weekly ordering requirements or scenarios. T85 follows the integrated T84 (PR #408), which is
+context, not a native blocking relation.
+
+| Task | Linear issue | After |
+| --- | --- | --- |
+| [T84](#t84) | [DRA-265](https://linear.app/draude/issue/DRA-265/t84-aplicar-la-identitat-de-la-landing-al-pilot-destoc-de-gestio) | — |
+| [T85](#t85) | [DRA-269](https://linear.app/draude/issue/DRA-269/t85-aplicar-la-identitat-de-la-landing-a-les-comandes-del-membre) | T84 (integrated) |

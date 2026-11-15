@@ -9,11 +9,14 @@ Weekly base and independent stock baskets, actual contents, validation, global W
 - **R19** **Baskets and their source.** Once the cycle first settles, each household order with eligible allocations produces one base
   basket draft, initially containing its allocated quantities and original ordered product snapshots.
   Creating the draft does not charge money. Creation/synchronization is idempotent by source order.
+  A late arrival (R18) for a household whose weekly baskets in the cycle are all validated creates one
+  late weekly basket draft from the same source order with only the late lines; a household has at
+  most one unvalidated weekly draft per cycle, and later late arrivals add to it.
   Finance or Manager can create additional stock baskets for any active household, including one
   without a weekly order, at any time and without requiring an open or settled cycle.
-  A supplement originating from a collection can reference that original cycle, even if already closed;
-  independent purchases may have no cycle. The reference groups sales and container counts and does not
-  reopen the cycle, block closure, duplicate the weekly contents or backdate movements.
+  While a basket is not validated, additions go to it; once validated, anything added creates a new
+  independent basket with no cycle attribution, which does not reopen the cycle, block closure,
+  duplicate the weekly contents or backdate movements.
 - **R19a** **Draft contents and access.** Only Finance or Manager creates/edits stock basket drafts, adjusts actual weekly quantities and
   adds/removes stock and return lines. Preserve ordered quantities separately; actual quantities obey
   the source product's whole-unit/0.001 step and may be zero for weekly lines. Members can consult
@@ -47,34 +50,35 @@ Weekly base and independent stock baskets, actual contents, validation, global W
   append correcting quantity/amount/stock movements with a mandatory reason and original source link;
   preserve the original basket and ledger records. Correct actual money/goods errors without silently
   returning stock that was not returned. Cross-context corrections are atomic and cannot make stock
-  negative. Existing explicit redistribution choices append signed basket/Wallet adjustments before
-  weekly cycle closure, without reselling stock/returns. Ordinary sale/receipt corrections may reference
+  negative. Reception redistribution never adjusts validated baskets (R18): staff correct each
+  affected validated basket individually with these corrections. Ordinary sale/receipt corrections may reference
   a closed cycle without reopening weekly contents. A mistaken collection mark may be corrected by
   staff with a reason and retained original history, without financial effects.
 - **R23a** **What people see.** Members see their own ordered-versus-actual contents, draft/validated/collection status, adjustments,
   charges and global Wallet balance. Finance/Manager see the households needed to operate baskets and
   receipts. Keep a visual pending-collection indication after the planned date and after cycle closure:
   own baskets for members, all for staff, and a badge/link on the referenced closed cycle. Drafts are
-  labelled in preparation rather than ready to collect. No new push/email reminder is implied.
+  labelled in preparation rather than ready to collect. Adjustments and collection marks, including
+  their corrections, show who recorded them by name (kept after that account is deactivated), never an
+  account identifier. No new push/email reminder is implied.
 - **R23b** **Collection.** Finance, Manager or a current member of the basket's own household may mark a validated basket
   collected. Record who/when; repeated marking preserves the first record and has no money/stock effect.
   A member cannot mark another household's basket, validate a draft or record a receipt. An already
   physically taken stock purchase reported later can be registered, validated and marked collected by
-  staff, preserving the recording date and origin-cycle reference.
+  staff, preserving the recording date.
 - **R24** **Delayed collection.** A validated basket stays pending until physically collected or explicitly resolved through justified
   correction. Passing the pickup date alone is not abandonment, cancellation, a refund or return of stock.
   Collection can be recorded on a later day and does not depend on whether the global Wallet is in debt.
 - **R24a** **No contents and draft cancellation.** Preserve the existing nothing-to-collect case: no positive weekly allocation and no stock/return
-  contents needs no charge or physical collection. If a permitted later redistribution produces goods
+  contents needs no charge or physical collection. If a later late arrival or permitted redistribution (R18) produces goods
   while the weekly cycle remains open, its base returns to draft and requires validation. A zero-price
   or net-zero basket with real goods/returns may still be validated. Retain cancelled stock drafts and
   removed lines as history. No automatic terminal not-collected/abandonment state is created by a date;
   replace the old charge-on-not-collected command with the separate validation/collection flow.
   A full justified contents reversal leaves no effective goods pending physical collection.
-- **R24b** **Weekly closure.** A cycle closes once settled, every participating reception is distributed and every base basket is
-  validated or has nothing to collect. Physical collection is independent and remains actionable after
-  closure. Supplementary/cycleless stock baskets never gate weekly closure. A reference from a later
-  stock purchase does not permit reopening or editing frozen weekly orders/receptions.
+- **R24b** **Weekly closure.** A cycle closes once settled, every participating reception is distributed and every base and late weekly
+  basket is validated or has nothing to collect. Physical collection is independent and remains actionable after
+  closure. Supplementary/cycleless stock baskets never gate weekly closure.
 
 ## Acceptance scenarios
 
@@ -193,7 +197,7 @@ Then the sale and charge belong to that basket without a cycle, and collection r
 **S80 — Late supplementary basket** (R19, R22, R23b, R24b)
 Given the weekly basket is validated and its cycle closed
 When a member collects next day, reports extra honey taken, and Finance records a separate honey basket
-with the original cycle reference, validates it and marks it collected
+with no cycle, validates it and marks it collected
 Then the original basket/charge and cycle closure are unchanged, the new basket charges/sells honey once,
 and its recording date is not the old planned pickup date.
 
@@ -245,15 +249,15 @@ When Finance processes their validation/no-contents state
 Then the return-only basket credits the Wallet, the net-zero basket has no money movement but can be
 collected, and the empty source needs no collection or charge and does not block cycle closure.
 
-**S89 — Redistribution uses validation, not collection** (R18, R23, R24b)
-Given A's basket is validated but pending collection, B's is draft and the weekly cycle remains open
-When a reopened reception changes allocations
-Then the existing explicit drafts-only/all choice treats A as financially frozen
-And all appends signed adjustments/Wallet corrections without rewriting A or reselling stock/returns,
-while a closed weekly cycle still rejects reception reopening.
+**S89 — Validation, not collection, freezes a basket** (R18, R23, R24b)
+Given A's basket containing beef is validated but pending collection, B's is draft and the weekly cycle remains open
+When a reopened reception changes beef's allocations
+Then it is rejected exactly as for a collected basket, without rewriting A or reselling stock/returns
+And a closed weekly cycle still rejects reception reopening.
 
-**S90 — Supplementary containers retain cycle attribution** (R18a, R19, R24b)
-Given a weekly basket with 2 containers and a later stock supplement with 1 container referring to its closed cycle
-When the cycle's container summary is read
-Then the household/cycle count is 3 without reopening the cycle
-And an unrelated stock basket without a cycle has its own count and is not attributed to that cycle.
+**S91 — Successive late arrivals share one open draft** (R18, R19, R24b)
+Given H's base is validated and its late weekly basket draft holds 1 kg cherries in an open cycle
+When strawberries received as 0 arrive and the manager reopens their producer and allocates 1 kg to H
+Then they are added to that late draft; H still has two weekly baskets and one charge per validation.
+
+**S90 — retired (see history entry)**

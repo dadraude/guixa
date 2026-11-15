@@ -15,10 +15,9 @@ class ReceptionReceivedController extends Controller
         $data = $request->validate([
             'received' => ['required', 'string'],
             'overwrite_manual' => ['nullable', 'boolean'],
-            'include_completed' => ['nullable', 'boolean'],
         ]);
 
-        $setReceivedTotal($actor, $cycle, $producer, $product, $data['received'], (bool) ($data['overwrite_manual'] ?? false), isset($data['include_completed']) ? (bool) $data['include_completed'] : null);
+        $setReceivedTotal($actor, $cycle, $producer, $product, $data['received'], (bool) ($data['overwrite_manual'] ?? false));
 
         return back();
     }

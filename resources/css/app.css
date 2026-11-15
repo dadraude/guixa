@@ -1287,6 +1287,10 @@ html[data-font-fallback='true'] .pilot-theme {
 @container pilot-wallet (max-width: 52rem) {
     .pilot-theme .pilot-t44-page .pilot-wallet-table tbody tr {
         margin-bottom: 1rem;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        column-gap: 0.75rem;
+        padding: 0.75rem;
     }
 
     .pilot-theme .pilot-t44-page .pilot-wallet-table tbody tr:last-child {
@@ -1294,7 +1298,64 @@ html[data-font-fallback='true'] .pilot-theme {
     }
 
     .pilot-theme .pilot-t44-page .pilot-wallet-table .pilot-cell-label {
-        margin-bottom: 0.5rem;
+        margin-bottom: 0;
+    }
+
+    .pilot-theme .pilot-t44-page .pilot-wallet-table tbody tr td,
+    .pilot-theme
+        .pilot-t44-page
+        .pilot-wallet-table
+        tbody
+        tr:not(:last-child)
+        td {
+        min-width: 0;
+        padding: 0.25rem 0;
+    }
+
+    .pilot-theme .pilot-t44-page .pilot-wallet-table td:first-child,
+    .pilot-theme .pilot-t44-page .pilot-wallet-table td:nth-child(3),
+    .pilot-theme .pilot-t44-page .pilot-wallet-table td:nth-child(4) {
+        grid-column: 1 / -1;
+    }
+
+    .pilot-theme .pilot-t44-page .pilot-wallet-table td.pilot-amount {
+        grid-column: 2;
+        grid-row: 2;
+        white-space: nowrap;
+    }
+
+    .pilot-theme
+        .pilot-t44-page
+        .pilot-wallet-table
+        td:is(.pilot-wallet-empty-note, .pilot-wallet-empty-source) {
+        display: none;
+    }
+
+    .pilot-theme
+        .pilot-t44-page
+        .pilot-wallet-table
+        td:first-child
+        .pilot-cell-label,
+    .pilot-theme
+        .pilot-t44-page
+        .pilot-wallet-table
+        td:nth-child(2)
+        .pilot-cell-label,
+    .pilot-theme
+        .pilot-t44-page
+        .pilot-wallet-table
+        td.pilot-amount
+        .pilot-cell-label {
+        display: none;
+    }
+
+    .pilot-theme
+        .pilot-t44-page
+        .pilot-wallet-table
+        td:is(:nth-child(3), :nth-child(4))
+        .pilot-cell-label {
+        display: inline;
+        margin-right: 0.375rem;
     }
 }
 
@@ -1800,6 +1861,12 @@ html:has(.coop-manager-shell) {
     color: var(--sidebar-foreground);
 }
 
+/* The global focus ring is the brand green, the sidebar's own background. */
+.reference-style [data-sidebar='sidebar'],
+html:has(.reference-style) [data-sidebar='sidebar'][data-mobile='true'] {
+    --ring: var(--sidebar-foreground);
+}
+
 /* The mobile sheet is portalled under body, outside .reference-style. */
 html:has(.reference-style) [data-sidebar='sidebar'][data-mobile='true'] {
     --sidebar-background: var(--palette-brand);
@@ -1830,6 +1897,7 @@ html.dark:has(.reference-style) [data-sidebar='sidebar'][data-mobile='true'] {
     min-height: 2.75rem;
     overflow: visible;
     white-space: normal;
+    cursor: pointer;
 }
 
 :is(
@@ -2032,4 +2100,310 @@ html.dark:has(.reference-style) [data-sidebar='sidebar'][data-mobile='true'] {
         width: 2rem;
         height: 2rem;
     }
+}
+
+@keyframes welcome-enter {
+    from {
+        opacity: 0;
+        transform: translateY(0.5rem);
+    }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .reference-style-welcome .welcome-enter {
+        animation: welcome-enter 240ms ease-out;
+    }
+}
+
+/*
+ * landing: the landing identity (cream paper, blue, Nunito) for the stock page and the member order pages (T84, T85).
+ * The class is admitted by exact page match (lib/pilotTheme.ts) and carried by the shell and the
+ * portalled overlays, so nothing here touches :root, Welcome or any other route. The --welcome-*
+ * values mirror WelcomePage.vue; keep both in step.
+ */
+.landing {
+    --welcome-paper: #faf1dc;
+    --welcome-ink: #2c2c2b;
+    --welcome-blue: #286585;
+    --welcome-blue-hover: #1d526f;
+    --welcome-blue-soft: #e7f0f3;
+    --welcome-feature-surface: #286585;
+    --welcome-feature-cream: #faf1dc;
+    --welcome-ochre: #a05a10;
+    --welcome-border: #d8d7d1;
+    --welcome-focus: #a85f12;
+    --landing-surface: #fffaf0;
+    --landing-muted: #f3e9d0;
+    --landing-muted-ink: #5b5850;
+    --landing-field-border: #78756c;
+    --landing-danger: #a33a2f;
+
+    --background: var(--welcome-paper);
+    --foreground: var(--welcome-ink);
+    --card: var(--landing-surface);
+    --card-foreground: var(--welcome-ink);
+    --popover: var(--landing-surface);
+    --popover-foreground: var(--welcome-ink);
+    --primary: var(--welcome-blue);
+    --primary-foreground: #ffffff;
+    --secondary: var(--welcome-blue-soft);
+    --secondary-foreground: var(--welcome-blue-hover);
+    --muted: var(--landing-muted);
+    --muted-foreground: var(--landing-muted-ink);
+    --accent: var(--welcome-blue-soft);
+    --accent-foreground: var(--welcome-blue-hover);
+    --destructive: var(--landing-danger);
+    --destructive-foreground: #ffffff;
+    --border: var(--welcome-border);
+    --input: var(--landing-field-border);
+    --ring: var(--welcome-focus);
+}
+
+.dark .landing {
+    --welcome-paper: #1c201f;
+    --welcome-ink: #f2f0e9;
+    --welcome-blue: #8fc5df;
+    --welcome-blue-hover: #b2d9e8;
+    --welcome-blue-soft: #27363d;
+    --welcome-feature-surface: #23485c;
+    --welcome-ochre: #e5a650;
+    --welcome-border: #4f5a5d;
+    --welcome-focus: #f1bd6e;
+    --landing-surface: #242a29;
+    --landing-muted: #2a3130;
+    --landing-muted-ink: #bfc4bd;
+    --landing-field-border: #8b9698;
+    --landing-danger: #f0a199;
+
+    --primary-foreground: #10222c;
+    --destructive-foreground: #2b1210;
+}
+
+/*
+ * The shell element also carries .reference-style, whose .dark rule (0,2,0) would win over a plain
+ * .landing, so the sidebar tokens are restated for both modes at equal specificity, later in the file.
+ */
+.landing,
+.dark .landing {
+    --sidebar: var(--welcome-feature-surface);
+    --sidebar-background: var(--welcome-feature-surface);
+    --sidebar-foreground: var(--welcome-feature-cream);
+    --sidebar-primary: var(--welcome-feature-cream);
+    --sidebar-primary-foreground: var(--welcome-feature-surface);
+    --sidebar-accent-foreground: var(--welcome-feature-cream);
+    --sidebar-border: color-mix(
+        in srgb,
+        var(--welcome-feature-cream) 28%,
+        var(--welcome-feature-surface)
+    );
+    --sidebar-ring: var(--welcome-feature-cream);
+    --material-selected-container: var(--sidebar-accent);
+}
+
+.landing {
+    /* Active menu item: darker than the sidebar so cream text keeps 4.5:1 (7.4:1 here). */
+    --sidebar-accent: var(--welcome-blue-hover);
+}
+
+.dark .landing {
+    /* Cream at 14% over the dark feature surface, as a literal so contrast can be measured. */
+    --sidebar-accent: #41606e;
+}
+
+/* theme-colors.css loads after this file and sets the pilot status tokens on .pilot-theme: out-rank it. */
+.pilot-theme.landing {
+    --pilot-success: var(--welcome-blue-hover);
+    --pilot-success-foreground: #ffffff;
+    --pilot-warning: var(--welcome-ochre);
+    --pilot-warning-foreground: #ffffff;
+}
+
+.dark .pilot-theme.landing {
+    --pilot-success: var(--welcome-blue-hover);
+    --pilot-warning: var(--welcome-ochre);
+    --pilot-success-foreground: #10222c;
+    --pilot-warning-foreground: #302417;
+    --pilot-input-fill: var(--welcome-blue-soft);
+}
+
+.landing .manager-dialog {
+    border-color: var(--welcome-border);
+    box-shadow: 0 20px 60px rgb(44 44 43 / 25%);
+}
+
+/* The mobile sidebar is the portalled SheetContent itself (it carries .landing and data-mobile). */
+html:has(.reference-style)
+    [data-sidebar='sidebar'][data-mobile='true'].landing {
+    --sidebar-background: var(--welcome-feature-surface);
+    --sidebar-foreground: var(--welcome-feature-cream);
+    --sidebar-accent: var(--welcome-blue-hover);
+    --sidebar-accent-foreground: var(--welcome-feature-cream);
+    --ring: var(--welcome-feature-cream);
+}
+
+html.dark:has(.reference-style)
+    [data-sidebar='sidebar'][data-mobile='true'].landing {
+    --sidebar-accent: #41606e;
+}
+
+/*
+ * 005 T03: producer products list (Catalogue/Producers/Products). Only what a measurement showed missing:
+ * price and available quantity are plain text lines without .pilot-amount, so they get tabular figures here.
+ * The dialog of ProductAdministrationActions inherits the landing tokens through the shell DOM and needs no rule.
+ */
+.landing .pilot-manager-page .pilot-list > li.space-y-4 .min-w-0 > p {
+    font-variant-numeric: tabular-nums;
+}
+
+/* 005 T06 */
+/*
+ * Stock product create and edit (Manage/Stock/{Create,Edit}, served to Catalogue). The pages carry the Manager
+ * classes, so .coop-manager-shell sizes them differently from the weekly forms (D3). A cross-page probe showed
+ * the palette, font family/weight and field border already equal; only scale and width differed, so they are
+ * equalised here and nowhere else. Scoped by the form's save button so Manage/Stock/Index is untouched.
+ */
+.landing .pilot-manager-page:has(> form [data-test='save-stock-product']) {
+    max-width: 48rem;
+    margin-inline: 0;
+}
+
+.landing
+    .pilot-manager-page:has(> form [data-test='save-stock-product'])
+    > header {
+    margin-bottom: 0;
+}
+
+.landing
+    .pilot-manager-page:has(> form [data-test='save-stock-product'])
+    h1.pilot-heading {
+    font-size: 1.5rem;
+    line-height: 2rem;
+}
+
+.landing
+    .pilot-manager-page:has(> form [data-test='save-stock-product'])
+    > header[class~='space-y-0.5']:has(> p)
+    > h1.pilot-heading {
+    margin-bottom: 0.5rem;
+}
+
+.landing .pilot-manager-page > form:has([data-test='save-stock-product']) {
+    max-width: 36rem;
+}
+
+@media (min-width: 48rem) {
+    .landing .pilot-manager-page > form:has([data-test='save-stock-product']) {
+        padding: 1.5rem;
+    }
+
+    .landing
+        .pilot-manager-page:has(> form [data-test='save-stock-product'])
+        input:not([type='checkbox'], [type='radio'], [type='hidden']) {
+        font-size: 0.875rem;
+    }
+}
+
+/* 005 T07 */
+/*
+ * Return items (Manage/ReturnItems/Index). Measured at 200% text: the visually hidden table header keeps
+ * its cells on one line, so their text sits outside the viewport and the page reads as overflowing; and the
+ * non-wrapping create button is wider than a phone at 32px. Both are scoped to this page by its create link.
+ */
+@container pilot-manager (max-width: 58rem) {
+    .landing
+        .pilot-manager-page:has(> div > a[href$='/return-items/create'])
+        .pilot-manager-table
+        thead
+        th {
+        display: block;
+        white-space: normal;
+    }
+}
+
+.landing
+    .pilot-manager-page
+    > div
+    > a[data-slot='button'][href$='/return-items/create'] {
+    max-width: 100%;
+    height: auto;
+    min-height: 44px;
+    white-space: normal;
+}
+
+/* Amounts line up on their decimal point only when right-aligned; the phone card keeps its left-aligned label/value pairs. */
+@container pilot-manager (min-width: 58.001rem) {
+    .landing
+        .pilot-manager-page:has(> div > a[href$='/return-items/create'])
+        .pilot-manager-table
+        :is(th, td):nth-child(3) {
+        text-align: right;
+        padding-right: 2rem;
+    }
+}
+
+/* 005 T08 */
+/*
+ * Stock movement history (Catalogue/Stock/Movements). The phone card of the shared wallet table was written for
+ * the wallet statement: it spans columns 1, 3 and 4 and sets both amounts on grid row 2, so on the eight-column
+ * history the quantity and the balance overlap, and a long figure squeezes the first grid track to zero width
+ * (measured at 375 px and at 1024 px/200 % text). This block gives the history its own card, scoped to the
+ * history table. Unmigrated consumers (Producer, Finance, Manage) keep the previous rules.
+ */
+@container pilot-wallet (max-width: 52rem) {
+    .landing .pilot-wallet-table[data-test='movement-history'] thead th {
+        display: block;
+        white-space: normal;
+    }
+
+    .landing
+        .pilot-t44-page
+        .pilot-wallet-table[data-test='movement-history']
+        tbody
+        tr {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .landing
+        .pilot-t44-page
+        .pilot-wallet-table[data-test='movement-history']
+        tbody
+        tr
+        td {
+        grid-column: 1 / -1;
+        grid-row: auto;
+        white-space: normal;
+        text-align: start;
+    }
+
+    .landing
+        .pilot-t44-page
+        .pilot-wallet-table[data-test='movement-history']
+        td.pilot-amount
+        .pilot-cell-label {
+        display: block;
+        margin-right: 0;
+    }
+}
+
+/* Quantity and balance share a row only where each half still holds a seven-digit figure at the current text size. */
+@container pilot-wallet (min-width: 17rem) and (max-width: 52rem) {
+    .landing
+        .pilot-t44-page
+        .pilot-wallet-table[data-test='movement-history']
+        tbody
+        tr
+        td.pilot-amount {
+        grid-column: auto;
+    }
+}
+
+/* 005 T09 */
+/*
+ * One page-title size across the Catalogue pages (R3). The generic .reference-style title (1.75-2.5rem) applied to the
+ * list and return-item pages while the weekly and stock forms and the movement history use 1.5rem (.pilot-t44-page, T06).
+ * The pages that still carried the larger size take the same 1.5rem; widths and spacing are left as they are.
+ */
+.landing .pilot-title-compact h1.pilot-heading {
+    font-size: 1.5rem;
+    line-height: 2rem;
 }

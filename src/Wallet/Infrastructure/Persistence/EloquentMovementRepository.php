@@ -5,7 +5,7 @@ namespace Guixa\Wallet\Infrastructure\Persistence;
 use DateTimeImmutable;
 use Guixa\Shared\Domain\Money;
 use Guixa\Wallet\Domain\Error\BasketAlreadyCharged;
-use Guixa\Wallet\Domain\Error\PickupAlreadyCharged;
+use Guixa\Wallet\Domain\Error\CorrectionIdentityConflict;
 use Guixa\Wallet\Domain\Movement;
 use Guixa\Wallet\Domain\MovementRepository;
 use Guixa\Wallet\Domain\MovementType;
@@ -34,10 +34,17 @@ final class EloquentMovementRepository implements MovementRepository
                 'note' => $movement->note,
                 'cycle_id' => $movement->cycleId,
                 'basket_id' => $movement->basketId,
+                'source_movement_id' => $movement->sourceMovementId,
             ]));
         } catch (UniqueConstraintViolationException $e) {
-            if ($movement->isChargeOrCredit() && str_contains($e->getMessage(), 'wallet_movements_one_charge_per_cycle')) {
-                throw PickupAlreadyCharged::create();
+            if ($movement->type === MovementType::Correction && str_contains($e->getMessage(), 'wallet_movements_pkey')) {
+                // The inner transaction/savepoint has rolled back before this read.
+                $existing = $this->findById($movement->id);
+                if ($existing !== null && $existing->matchesCorrectionReplay($movement)) {
+                    return;
+                }
+
+                throw CorrectionIdentityConflict::create();
             }
 
             if ($movement->isChargeOrCredit() && str_contains($e->getMessage(), 'wallet_movements_one_charge_per_basket')) {
@@ -46,6 +53,13 @@ final class EloquentMovementRepository implements MovementRepository
 
             throw $e;
         }
+    }
+
+    public function findById(string $movementId): ?Movement
+    {
+        $model = MovementModel::query()->find($movementId);
+
+        return $model === null ? null : $this->toDomain($model);
     }
 
     public function balanceOf(string $householdId): Money
@@ -78,6 +92,7 @@ final class EloquentMovementRepository implements MovementRepository
             $model->note,
             $model->cycle_id,
             $model->basket_id,
+            $model->source_movement_id,
         );
     }
 }

@@ -24,6 +24,7 @@ const props = defineProps<{
     required?: boolean;
     disabled?: boolean;
     class?: HTMLAttributes['class'];
+    contentClass?: HTMLAttributes['class'];
 }>();
 
 const emit = defineEmits<{
@@ -61,7 +62,7 @@ const labelFor = (value: unknown): string =>
                 labelFor(currentValue)
             }}</SelectValue>
         </SelectTrigger>
-        <SelectContent class="max-h-64">
+        <SelectContent :class="cn('max-h-64', props.contentClass)">
             <SelectItem
                 v-for="option in options"
                 :key="option.value"

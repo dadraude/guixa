@@ -53,9 +53,11 @@ describe('manager list presentation', () => {
         expect(html).toContain('aria-label="Edita Producte 0"');
         expect(html).toContain('aria-label="Moviments: Producte 0"');
         expect(html).toContain(
-            '/manage/producers/producer-1/products/stock-0/reactivation',
+            '/catalogue/producers/producer-1/products/stock/stock-0/reactivation',
         );
-        expect(html).toContain('/manage/producers/producer-1/products/stock-1');
+        expect(html).toContain(
+            '/catalogue/producers/producer-1/products/stock/stock-1',
+        );
         expect(html).toContain('<dialog');
     });
 

@@ -1,0 +1,81 @@
+{
+    "schemaVersion": 1,
+    "slice": {
+        "id": "producer-role-complete",
+        "scopeRefs": [
+            "R14",
+            "R15",
+            "R16",
+            "R17",
+            "R18",
+            "R19",
+            "S13",
+            "S14",
+            "S15",
+            "S16",
+            "S17",
+            "S18"
+        ],
+        "deferredRefs": []
+    },
+    "stages": {
+        "discovery": {
+            "request": {
+                "path": "specs/005-landing-identity-rollout/history/2026-11-13T12-57-09.202Z-no-task-a7e056a1-17df-4a2c-9747-dafdb895bf58.md",
+                "sha256": "4d57efb4de77f47b4efb25f2543c1a05911f5ecba347a4354fc0052daaea4b3d"
+            },
+            "discovery": {
+                "path": "specs/005-landing-identity-rollout/discovery.md",
+                "sha256": "d746d359bc8e25860f91c2a17c30d2cbd838fc977c1f9302e75dbabd975e24f0"
+            }
+        },
+        "scope": {
+            "sliceId": "producer-role-complete",
+            "slices": {
+                "path": "specs/005-landing-identity-rollout/discovery.md",
+                "sha256": "d746d359bc8e25860f91c2a17c30d2cbd838fc977c1f9302e75dbabd975e24f0"
+            },
+            "selectionDecision": {
+                "path": "specs/005-landing-identity-rollout/history/2026-11-15T08-23-34.985Z-no-task-17b0745b-964f-4287-a4a5-8307b8e3e296.md",
+                "sha256": "721b5c91641229b22bc6b5f44e285c5924db35a6e43674912501b13ba66f5865"
+            }
+        },
+        "spec": {
+            "sliceId": "producer-role-complete",
+            "specification": {
+                "path": "specs/005-landing-identity-rollout/spec.md",
+                "sha256": "b7bc0684455861c878866cb358b800f8fad0170fcc470494d7aff835f8d88790"
+            },
+            "gapReview": {
+                "path": "specs/005-landing-identity-rollout/history/2026-11-15T08-26-01.379Z-no-task-50c2da68-e551-475f-a8bb-1cc5851e2945.md",
+                "sha256": "e80c0a7cc936244307fe7259484694832278a70a06736e910cc24626b3689c79"
+            },
+            "acceptance": {
+                "path": "specs/005-landing-identity-rollout/history/2026-11-15T13-31-17.058Z-no-task-0ecc312b-0fc7-4adf-bd2a-2048bd5af3e4.md",
+                "sha256": "b12d8245d13f2f0bebdfbe739c0f709a69911f8b043e0cfd9e099046556ee787"
+            }
+        },
+        "plan": {
+            "sliceId": "producer-role-complete",
+            "plan": {
+                "path": "specs/005-landing-identity-rollout/plan.md",
+                "sha256": "b8cd8ed4939978cad8d1e16c609d4950c7cd45cc0a3281a91083c54487572084"
+            },
+            "acceptance": {
+                "path": "specs/005-landing-identity-rollout/history/2026-11-15T13-56-45.673Z-no-task-84b1a0a7-c263-44b8-8c75-155d475d01f0.md",
+                "sha256": "13934e843fac4ecdacf681544fa13a6856dfbb47df552197c74a274c803fd6dd"
+            }
+        },
+        "tasks": {
+            "sliceId": "producer-role-complete",
+            "tasks": {
+                "path": "specs/005-landing-identity-rollout/tasks.md",
+                "sha256": "8b3249b8f8d269148960670e97b5a50c9951b821ebd58470eac2d9e5bd7fc9cb"
+            },
+            "acceptance": {
+                "path": "specs/005-landing-identity-rollout/history/2026-11-15T14-47-30.537Z-no-task-2feff354-70b9-4f8c-b652-d03ad329ac47.md",
+                "sha256": "6b042e7e86e99d4c301f3522596aad43febc01243e1a0cc0cbe31139b32120cc"
+            }
+        }
+    }
+}

@@ -102,39 +102,11 @@ const cycle = {
         },
     ],
 };
-const pickup = {
-    cycleId,
-    pickupDate,
-    householdId,
-    householdName: household.name,
-    status: 'pending',
-    lines: [
-        {
-            productId,
-            name: product.name,
-            unit: product.unit,
-            variable: product.variable,
-            unitPriceCents: 320,
-            ordered: '2',
-            allocated: '2',
-            delivered: '2',
-            adjusted: false,
-            amountCents: 640,
-        },
-    ],
-    totalCents: 640,
-    balanceCents: 2000,
-    resultingBalanceCents: 1360,
-    stockLines: [],
-    returnLines: [],
-    adjustments: [],
-    originalChargeCents: null,
-};
 const settlement = {
     householdId,
     householdName: household.name,
     balanceCents: 2000,
-    pendingPickups: [{ cycleId, pickupDate }],
+    openBaskets: [{ basketId: 'basket-1', status: 'draft', date: pickupDate }],
 };
 const reception = {
     cycleId,
@@ -158,7 +130,6 @@ const reception = {
             balancedForDistribution: true,
             hasManualAllocations: false,
             hasAdjustments: false,
-            hasDonePickups: false,
             allocations: [
                 {
                     householdId,
@@ -198,7 +169,7 @@ const order = {
             notDelivered: false,
         },
     ],
-    pickup: null,
+    basketId: null,
 };
 
 const pageProps: Record<string, Record<string, unknown>> = {
@@ -206,20 +177,29 @@ const pageProps: Record<string, Record<string, unknown>> = {
         roles: ['manager', 'member', 'producer'],
         isManager: true,
         isMember: true,
-        nextPickup: pickupDate,
-        openCycles: 1,
-        balance: 2000,
-        pendingPickups: [{ cycleId, pickupDate }],
-        managerSummary: {
-            cycles: 1,
-            activeCycles: 1,
-            households: 1,
-            activeHouseholds: 1,
-            accounts: 1,
-            pendingInvitations: 0,
-            producers: 1,
-            activeProducers: 1,
-        },
+        opportunities: [],
+        attention: [
+            {
+                key: 'collect_basket:cycle:visual-cycle',
+                action: 'collect_basket',
+                cycleId: 'visual-cycle',
+                scheduledDate: pickupDate,
+                count: 3,
+                href: '/finance/baskets?pending=1',
+                producerName: null,
+                allocationDifferenceCount: 0,
+            },
+            {
+                key: 'collect_basket:no-cycle',
+                action: 'collect_basket',
+                cycleId: null,
+                scheduledDate: null,
+                count: 1,
+                href: '/baskets/visual-stock-basket',
+                producerName: null,
+                allocationDifferenceCount: 0,
+            },
+        ],
     },
     'Manage/Accounts/Index': {
         accounts: [
@@ -240,8 +220,13 @@ const pageProps: Record<string, Record<string, unknown>> = {
         cycles: [cycle],
         producers: [{ id: producerId, name: producer.name }],
         pickupWeekday: 4,
+        pendingCollections: { [cycleId]: 2 },
     },
     'Manage/Cycles/Show': {
+        pendingCollections: {
+            count: 2,
+            href: `/finance/baskets?pending=1&cycle=${cycleId}`,
+        },
         summary: {
             cycleId,
             pickupDate,
@@ -271,7 +256,12 @@ const pageProps: Record<string, Record<string, unknown>> = {
         containers: {
             total: 2,
             households: [
-                { householdId, householdName: household.name, count: 2 },
+                {
+                    householdId,
+                    householdName: household.name,
+                    count: 2,
+                    balance: 3,
+                },
             ],
         },
     },
@@ -289,27 +279,10 @@ const pageProps: Record<string, Record<string, unknown>> = {
         otherHouseholds: [],
         deactivationWarning: settlement,
     },
-    'Manage/Pickups/Index': {
-        cycleId,
-        closed: false,
-        pickups: [
-            {
-                householdId,
-                householdName: household.name,
-                status: 'pending',
-                totalCents: 640,
-            },
-        ],
-        households: [household],
-    },
-    'Manage/Pickups/Show': {
-        pickup,
-        stockProducts: [stockProduct],
-        returnItems: [returnItem],
-    },
     'Manage/Producers/Index': { producers: [producer] },
-    'Manage/Reception/Show': {
+    'Receptions/Show': {
         reception,
+        can: { edit: true, validate: true, distribute: false, reopen: false },
         distribution: {
             validated: false,
             distributed: false,
@@ -327,8 +300,9 @@ const pageProps: Record<string, Record<string, unknown>> = {
     'Manage/Stock/Movements': {
         product: stockProduct,
         cycles: [{ id: cycleId, pickupDate }],
+        history: { lines: [], total: 0, page: 1, prevUrl: null, nextUrl: null },
     },
-    'Orders/Edit': { order },
+    'Orders/Edit': { order, preview: { totalCents: 0, amountCents: {} } },
     'Orders/Index': {
         cycles: [
             { cycleId, pickupDate, open: true, cancelled: false, lineCount: 1 },
@@ -364,6 +338,26 @@ const pageProps: Record<string, Record<string, unknown>> = {
                     occurredAt: '2026-10-27 12:00',
                     note: null,
                     cycleId: null,
+                    authorName: 'Maria Soler',
+                },
+                {
+                    id: 'movement-2',
+                    type: 'charge',
+                    amount: '-25.00',
+                    occurredAt: '2026-10-28 12:00',
+                    note: null,
+                    basketId: '019a0000-0000-7000-8000-000000000099',
+                    cycleId: null,
+                    authorName: 'Maria Soler',
+                },
+                {
+                    id: 'movement-3',
+                    type: 'credit',
+                    amount: '25.00',
+                    occurredAt: '2026-10-29 12:00',
+                    note: 'Ajust',
+                    cycleId: null,
+                    authorName: 'Maria Soler',
                 },
             ],
         },
@@ -441,7 +435,17 @@ const page = {
                           label: 'Cooperative',
                           href: '/manage/cycles',
                       },
+                      {
+                          role: 'finance',
+                          label: 'Finance',
+                          href: '/finance/baskets',
+                      },
                       { role: 'member', label: 'Member', href: '/orders' },
+                      {
+                          role: 'catalogue',
+                          label: 'Catalogue',
+                          href: '/catalogue/producers',
+                      },
                       {
                           role: 'producer',
                           label: 'Producer',
@@ -521,13 +525,253 @@ if (pageName === 'Dashboard') {
     visualProps.roles = [role];
     visualProps.isManager = role === 'manager';
     visualProps.isMember = role === 'member';
-    visualProps.managerSummary =
-        role === 'manager' ? visualProps.managerSummary : null;
-    visualProps.pendingPickups =
-        role === 'member' ? visualProps.pendingPickups : [];
-    visualProps.nextPickup = role === 'member' ? visualProps.nextPickup : null;
-    visualProps.openCycles = role === 'member' ? visualProps.openCycles : 0;
-    visualProps.balance = role === 'member' ? visualProps.balance : null;
+    visualProps.attention =
+        role === 'member'
+            ? visualProps.attention.map((group: Record<string, unknown>) => ({
+                  ...group,
+                  count: 1,
+                  href: '/baskets/visual-basket',
+              }))
+            : role === 'manager' || role === 'finance'
+              ? visualProps.attention
+              : [];
+    if (state === 'baskets') {
+        // The server's order: dated groups first, then undated; validation before collection within a date.
+        const [datedCollection, ...undatedCollection] = visualProps.attention;
+        visualProps.attention = [
+            {
+                key: 'validate_basket:cycle:visual-cycle',
+                action: 'validate_basket',
+                cycleId: 'visual-cycle',
+                scheduledDate: pickupDate,
+                count: 2,
+                href: '/finance/baskets',
+                producerName: null,
+                allocationDifferenceCount: 0,
+            },
+            datedCollection,
+            {
+                key: 'validate_basket:no-cycle',
+                action: 'validate_basket',
+                cycleId: null,
+                scheduledDate: null,
+                count: 1,
+                href: '/finance/baskets/visual-stock-draft',
+                producerName: null,
+                allocationDifferenceCount: 0,
+            },
+            ...undatedCollection,
+        ];
+    }
+    if (
+        state === 'opportunities' ||
+        state === 'opportunities-repeated' ||
+        state === 'caught-up'
+    ) {
+        // Below the attention list and never counted as pending: ordering with cutoffs, a sent-order review, product maintenance.
+        const opportunities: Record<string, Record<string, unknown>> = {
+            member: {
+                key: 'member_order:cycle:visual-cycle',
+                kind: 'member_order',
+                scheduledDate: pickupDate,
+                href: '/cycles/visual-cycle/order',
+                cutoffs: [
+                    {
+                        producerName: 'Forn del Barri',
+                        closesAt: '2026-11-02 20:00',
+                    },
+                    {
+                        producerName: 'La Figuera del barri de la Vall',
+                        closesAt: '2026-11-03 12:00',
+                    },
+                ],
+            },
+            producer: {
+                key: 'producer_summary:cycle:visual-cycle',
+                kind: 'producer_summary',
+                scheduledDate: pickupDate,
+                href: '/producer/cycles/visual-cycle',
+                cutoffs: [],
+            },
+            catalogue: {
+                key: 'catalogue_maintenance',
+                kind: 'catalogue_maintenance',
+                scheduledDate: null,
+                href: '/catalogue/producers',
+                cutoffs: [],
+            },
+        };
+        visualProps.opportunities = opportunities[role]
+            ? [opportunities[role]]
+            : [];
+        if (state === 'caught-up') visualProps.attention = [];
+        if (state === 'opportunities-repeated')
+            visualProps.opportunities.push({
+                ...opportunities[role],
+                key: 'producer_summary:cycle:visual-cycle-2',
+                scheduledDate: '2026-11-12',
+                href: '/producer/cycles/visual-cycle-2',
+            });
+    }
+    if (state === 'manual-send') {
+        // The server's order for one pickup date: sending, then reception, then the baskets already listed. Only a manager is offered the send.
+        visualProps.attention = [
+            ...(role === 'manager'
+                ? [
+                      {
+                          key: 'send_order:cycle:visual-cycle',
+                          action: 'send_order',
+                          cycleId: 'visual-cycle',
+                          scheduledDate: pickupDate,
+                          count: 1,
+                          href: '/manage/cycles',
+                          producerName: 'Forn del Barri',
+                          allocationDifferenceCount: 0,
+                      },
+                  ]
+                : []),
+            {
+                key: 'check_delivery_and_allocations:cycle:visual-cycle',
+                action: 'check_delivery_and_allocations',
+                cycleId: 'visual-cycle',
+                scheduledDate: pickupDate,
+                count: 1,
+                href: '/receptions/visual-cycle/visual-producer',
+                producerName: 'Hort de la Vall',
+                allocationDifferenceCount: 0,
+            },
+            ...visualProps.attention,
+        ];
+    }
+    if (state === 'reception' || state === 'reception-long-name') {
+        const longName = state === 'reception-long-name';
+        visualProps.attention = [
+            {
+                key: 'check_delivery_and_allocations:cycle:visual-cycle',
+                action: 'check_delivery_and_allocations',
+                cycleId: 'visual-cycle',
+                scheduledDate: pickupDate,
+                count: 1,
+                href: '/receptions/visual-cycle/visual-producer',
+                producerName: longName
+                    ? 'Cooperativa Agrícola i Ramadera de la Figuera del barri de la Vall'
+                    : 'Forn del Barri',
+                allocationDifferenceCount: 1,
+            },
+            {
+                key: 'mark_distributed:cycle:visual-cycle',
+                action: 'mark_distributed',
+                cycleId: 'visual-cycle',
+                scheduledDate: pickupDate,
+                count: 2,
+                href: '/receptions',
+                producerName: null,
+                allocationDifferenceCount: 0,
+            },
+            ...visualProps.attention,
+        ];
+    }
+}
+if (pageName === 'Dashboard') {
+    // Every dashboard state counts requests, so "no idle request" and "no write request" are measured, not assumed (R15).
+    const freshProps = {
+        readFailed: false,
+        lastUpdatedAt: '2026-11-12T09:30:00+01:00',
+    };
+    Object.assign(visualProps, freshProps);
+    // The server's flags: caught up only with a context and no pending work; no-context only without any context (R14).
+    if (state === 'combined') {
+        // A member who is also Finance and Receiver: the same basket collection is one staff-wide group, and reception work is not repeated per role.
+        visualProps.roles = ['member', 'finance', 'receiver'];
+        visualProps.isMember = true;
+        visualProps.isManager = false;
+        visualProps.attention = [
+            {
+                key: 'check_delivery_and_allocations:cycle:visual-cycle',
+                action: 'check_delivery_and_allocations',
+                cycleId: 'visual-cycle',
+                scheduledDate: pickupDate,
+                count: 1,
+                href: '/receptions/visual-cycle/visual-producer',
+                producerName: 'Hort de la Vall',
+                allocationDifferenceCount: 0,
+            },
+            visualProps.attention[0],
+        ];
+    }
+    if (state === 'no-context') {
+        visualProps.roles = [];
+        visualProps.isMember = false;
+        visualProps.isManager = false;
+        visualProps.attention = [];
+        visualProps.opportunities = [];
+    }
+    const noPending = visualProps.attention?.length === 0;
+    visualProps.can = {
+        showCaughtUp: noPending && state !== 'no-context',
+        showNoContext: state === 'no-context',
+    };
+    document.body.dataset.visualRequests = '0';
+    document.body.dataset.visualWrites = '0';
+    if (state === 'initial-error') {
+        Object.assign(visualProps, {
+            readFailed: true,
+            lastUpdatedAt: null,
+            attention: null,
+            opportunities: null,
+        });
+    }
+    http.setClient({
+        request: async (config: { method?: string; url?: unknown }) => {
+            const log = ((
+                window as unknown as Record<string, unknown>
+            ).visualRequestLog ??= []) as string[];
+            log.push(`${config.method ?? 'get'} ${String(config.url)}`);
+            const requests = Number(document.body.dataset.visualRequests) + 1;
+            document.body.dataset.visualRequests = String(requests);
+            if ((config.method ?? 'get').toLowerCase() !== 'get')
+                document.body.dataset.visualWrites = String(
+                    Number(document.body.dataset.visualWrites) + 1,
+                );
+            if (state === 'history-probe') {
+                // In-app history probe: a visit to /settings/appearance, and a dashboard read that advances the time.
+                const toAppearance = String(config.url).includes('/finance/');
+                return {
+                    status: 200,
+                    data: JSON.stringify({
+                        ...page,
+                        component: toAppearance
+                            ? 'settings/Appearance'
+                            : 'Dashboard',
+                        url: toAppearance
+                            ? '/settings/appearance'
+                            : window.location.pathname + window.location.search,
+                        props: {
+                            ...page.props,
+                            lastUpdatedAt: '2026-11-12T09:45:00+01:00',
+                        },
+                    }),
+                    headers: { 'x-inertia': 'true' },
+                };
+            }
+            if (state !== 'stale-error') return new Promise(() => {});
+            return {
+                status: 200,
+                data: JSON.stringify({
+                    ...page,
+                    url: window.location.pathname + window.location.search,
+                    props: {
+                        ...page.props,
+                        readFailed: true,
+                        lastUpdatedAt: null,
+                        attention: null,
+                        opportunities: null,
+                    },
+                }),
+                headers: { 'x-inertia': 'true' },
+            };
+        },
+    });
 }
 if (pageName === 'Wallet/Statement') {
     visualProps.household = role === 'manager' ? household : null;
@@ -539,7 +783,6 @@ if (state === 'empty') {
             'Manage/Accounts/Index': 'accounts',
             'Manage/Cycles/Index': 'cycles',
             'Manage/Households/Index': 'households',
-            'Manage/Pickups/Index': 'pickups',
             'Manage/Producers/Index': 'producers',
             'Manage/ReturnItems/Index': 'items',
             'Manage/Stock/Index': 'products',
@@ -550,26 +793,11 @@ if (state === 'empty') {
     if (collection) visualProps[collection] = [];
     if (pageName === 'Manage/Households/Index') visualProps.toSettle = [];
     if (pageName === 'Dashboard') {
-        visualProps.nextPickup = null;
-        visualProps.openCycles = 0;
-        visualProps.pendingPickups = [];
-        if (role === 'manager') {
-            visualProps.managerSummary = {
-                cycles: 0,
-                activeCycles: 0,
-                households: 0,
-                activeHouseholds: 0,
-                accounts: 0,
-                pendingInvitations: 0,
-                producers: 0,
-                activeProducers: 0,
-            };
-        }
+        visualProps.attention = [];
+        visualProps.can = { showCaughtUp: true, showNoContext: false };
     }
     if (pageName === 'Manage/Cycles/Show') visualProps.summary.producers = [];
-    if (pageName === 'Manage/Pickups/Show') visualProps.pickup.lines = [];
-    if (pageName === 'Manage/Reception/Show')
-        visualProps.reception.products = [];
+    if (pageName === 'Receptions/Show') visualProps.reception.products = [];
     if (pageName === 'Manage/Stock/Movements') visualProps.cycles = [];
     if (pageName === 'Orders/Edit') {
         visualProps.order.lines = [];
@@ -624,43 +852,24 @@ if (state === 'inactive-household' && pageName === 'Manage/Households/Show') {
     visualProps.household.active = false;
 }
 if (state === 'settlement-details' && pageName === 'Manage/Households/Index') {
-    visualProps.toSettle[0].pendingPickups = [
-        { cycleId, pickupDate },
-        { cycleId: 'cycle-2', pickupDate: '2026-11-12' },
+    visualProps.toSettle[0].openBaskets = [
+        { basketId: 'basket-1', status: 'draft', date: pickupDate },
+        { basketId: 'basket-2', status: 'validated', date: '2026-11-12' },
     ];
     visualProps.toSettle[0].balanceCents = -1200;
 }
-if (state === 'completed' && pageName === 'Manage/Pickups/Show')
-    visualProps.pickup.status = 'completed';
 if (state === 'status') {
     visualProps.status = 'verification-link-sent';
+    if (pageName === 'auth/VerifyEmail') {
+        visualProps.verificationLinkSent = true;
+    }
     if (pageName === 'settings/Profile') {
         visualProps.mustVerifyEmail = true;
+        visualProps.verificationLinkSent = true;
         visualProps.auth.user.email_verified_at = null;
     }
 }
-if (state === 'stock-lines' && pageName === 'Manage/Pickups/Show')
-    visualProps.pickup.stockLines = [
-        {
-            stockProductId: stockId,
-            name: stockProduct.name,
-            unit: stockProduct.unit,
-            quantity: '1',
-            unitPriceCents: 250,
-            amountCents: 250,
-        },
-    ];
-if (state === 'return-lines' && pageName === 'Manage/Pickups/Show')
-    visualProps.pickup.returnLines = [
-        {
-            returnItemId: returnItem.id,
-            name: returnItem.name,
-            quantity: '1',
-            amountCents: 50,
-            creditCents: 50,
-        },
-    ];
-if (pageName === 'Manage/Reception/Show') {
+if (pageName === 'Receptions/Show') {
     if (query.get('receptionBranch') === 'unordered') {
         visualProps.reception.products[0].nobodyOrdered = true;
         visualProps.reception.products[0].ordered = '0';
@@ -677,16 +886,13 @@ if (pageName === 'Manage/Reception/Show') {
         });
     }
 }
-if (query.get('adjusted') === '1' && pageName === 'Manage/Reception/Show')
+if (query.get('adjusted') === '1' && pageName === 'Receptions/Show')
     visualProps.reception.products[0].hasAdjustments = true;
-if (state === 'manual-allocation' && pageName === 'Manage/Reception/Show') {
+if (state === 'manual-allocation' && pageName === 'Receptions/Show') {
     visualProps.reception.products[0].hasManualAllocations = true;
     visualProps.reception.products[0].allocations[0].byHand = true;
 }
-if (
-    pageName === 'Manage/Reception/Show' &&
-    ['received-overwrite', 'received-scope-choice'].includes(state)
-) {
+if (pageName === 'Receptions/Show' && state === 'received-overwrite') {
     visualProps.reception.products[0].name =
         'Arròs integral de la cooperativa de la Vall de les Hortes';
     visualProps.reception.products[0].allocations[0].householdName =
@@ -695,8 +901,6 @@ if (
         state === 'received-overwrite';
     visualProps.reception.products[0].allocations[0].byHand =
         state === 'received-overwrite';
-    visualProps.reception.products[0].hasDonePickups =
-        state === 'received-scope-choice';
 }
 if (pageName === 'Manage/Cycles/Index' && state === 'create-no-weekday')
     visualProps.pickupWeekday = null;
@@ -707,6 +911,10 @@ if (
     visualProps.cycles[0].closed = state === 'closed-cycle';
     visualProps.cycles[0].cancelled = state === 'cancelled-cycle';
 }
+if (pageName === 'Manage/Cycles/Index' && state === 'no-pending')
+    visualProps.pendingCollections = {};
+if (pageName === 'Manage/Cycles/Show' && state === 'no-pending')
+    visualProps.pendingCollections = { count: 0, href: null };
 if (pageName === 'Manage/Cycles/Show' && state === 'cancelled-cycle')
     visualProps.summary.cancelled = true;
 if (pageName === 'Orders/Index' && state === 'closed-and-cancelled')
@@ -829,11 +1037,7 @@ void createInertiaApp({
     };
     if (
         ['error', 'disabled'].includes(state) &&
-        ![
-            'Manage/Pickups/Show',
-            'Manage/Reception/Show',
-            'Orders/Edit',
-        ].includes(pageName)
+        !['Receptions/Show', 'Orders/Edit'].includes(pageName)
     ) {
         const forms = [
             ...document.querySelectorAll<HTMLFormElement>(
@@ -933,10 +1137,7 @@ void createInertiaApp({
             ).click();
         }
     }
-    if (
-        pageName === 'Manage/Reception/Show' &&
-        ['received-overwrite', 'received-scope-choice'].includes(state)
-    ) {
+    if (pageName === 'Receptions/Show' && state === 'received-overwrite') {
         const form = (await waitForElement(
             '[data-test="received-form-product-1"]',
         )) as HTMLFormElement;
@@ -1012,11 +1213,8 @@ void createInertiaApp({
             'Manage/Cycles/Index': 'No cycles yet.',
             'Manage/Cycles/Show': 'Nobody has ordered yet.',
             'Manage/Households/Index': 'There are no households yet.',
-            'Manage/Pickups/Index':
-                'No household has a pickup in this cycle yet.',
-            'Manage/Pickups/Show': 'This pickup has no order lines.',
             'Manage/Producers/Index': 'No producers yet.',
-            'Manage/Reception/Show': 'Nothing was ordered from this producer.',
+            'Receptions/Show': 'Nothing was ordered from this producer.',
             'Manage/ReturnItems/Index': 'No return items yet.',
             'Manage/Stock/Index': 'No stock products yet.',
             'Orders/Edit': 'No producer takes part in this cycle yet.',
@@ -1043,12 +1241,59 @@ void createInertiaApp({
                 return true;
             case 'empty':
                 if (pageName === 'Dashboard')
-                    return role === 'manager'
-                        ? mainText().includes('0') && !mainText().includes('1')
-                        : mainText().includes(trans('None'));
+                    return (
+                        visible('[data-test="caught-up"]') &&
+                        !visible('[data-test="attention-list"]')
+                    );
                 return (
                     !!emptyMessage && mainText().includes(trans(emptyMessage))
                 );
+            case 'history-probe':
+                return document.body.dataset.visualReturnReads !== undefined;
+            case 'refresh-busy':
+                return (
+                    document.body.dataset.visualRequests === '1' &&
+                    visible('[data-test="refresh-busy"]') &&
+                    mainText().includes(trans('Updating pending work…')) &&
+                    document.querySelector(
+                        '[data-test="refresh-button"][aria-disabled="true"]',
+                    ) !== null
+                );
+            case 'stale-error':
+                return (
+                    visible('[data-test="freshness-stale"]') &&
+                    visible('[role="alert"]') &&
+                    visible('[data-test="attention-group"]')
+                );
+            case 'initial-error':
+                return (
+                    visible('[role="alert"]') &&
+                    !visible('[data-test="attention-group"]')
+                );
+            case 'opportunities':
+            case 'opportunities-repeated':
+                return visible('[data-test="opportunity"]');
+            case 'caught-up':
+                return (
+                    visible('[data-test="caught-up"]') &&
+                    !visible('[data-test="attention-group"]')
+                );
+            case 'no-context':
+                return (
+                    visible('[data-test="no-context"]') &&
+                    !visible('[data-test="caught-up"]')
+                );
+            case 'combined':
+                return (
+                    document.querySelectorAll('[data-test="attention-group"]')
+                        .length === 2 && !visible('[data-test="caught-up"]')
+                );
+            case 'baskets':
+            case 'manual-send':
+                return visible('[data-test="attention-group"]');
+            case 'reception':
+            case 'reception-long-name':
+                return visible('[data-test="attention-blocker"]');
             case 'long-content':
                 return pageName === 'Orders/Index'
                     ? document.querySelectorAll('#main-content li').length >= 6
@@ -1157,15 +1402,6 @@ void createInertiaApp({
                         '[role="dialog"] button[data-variant="destructive"]:not(:disabled)',
                     ) !== null
                 );
-            case 'received-scope-choice':
-                return (
-                    visible('[role="dialog"]') &&
-                    document
-                        .querySelector('[role="dialog"]')
-                        ?.textContent?.includes(
-                            trans('Which pickups should change?'),
-                        ) === true
-                );
             case 'received-overwrite':
                 return (
                     visible('[role="dialog"]') &&
@@ -1260,6 +1496,14 @@ void createInertiaApp({
                     mainText().includes(trans('Disable 2FA')) &&
                     mainText().includes(trans('2FA recovery codes'))
                 );
+            case 'no-pending':
+                return (
+                    visible(
+                        pageName === 'Manage/Cycles/Index'
+                            ? '[data-test="cycle-cycle-1"]'
+                            : '[data-test="container-counts"]',
+                    ) && !visible('[data-test="pending-collections"]')
+                );
             case 'closed-cycle':
                 return (
                     visible('[data-test="cycle-cycle-1"]') &&
@@ -1311,6 +1555,56 @@ void createInertiaApp({
                 cancelable: true,
             }),
         );
+    }
+    if (
+        pageName === 'Dashboard' &&
+        ['refresh-busy', 'stale-error'].includes(state)
+    ) {
+        // The person's own explicit refresh: the only request these states make.
+        for (let attempt = 0; attempt < 100; attempt++) {
+            const refresh = document.querySelector<HTMLElement>(
+                '[data-test="refresh-button"]',
+            );
+            if (refresh) {
+                refresh.click();
+                break;
+            }
+            await new Promise((resolve) => window.setTimeout(resolve, 25));
+        }
+    }
+    if (pageName === 'Dashboard' && state === 'history-probe') {
+        // Drives the real Inertia router: leave through an in-app link, then browser Back. Only the HTTP client is mocked.
+        const wait = async (until: () => boolean) => {
+            for (let attempt = 0; !until() && attempt < 100; attempt++)
+                await new Promise((resolve) => window.setTimeout(resolve, 25));
+        };
+        const dashboardReads = () =>
+            (
+                (window as unknown as Record<string, string[]>)
+                    .visualRequestLog ?? []
+            ).filter((entry) => !entry.includes('/finance/')).length;
+        await wait(
+            () => !!document.querySelector('[data-test="freshness-time"]'),
+        );
+        await new Promise((resolve) => window.setTimeout(resolve, 500));
+        document.body.dataset.visualIdleReads = String(dashboardReads());
+        document
+            .querySelector<HTMLElement>('[data-test="attention-group"] a')
+            ?.click();
+        await wait(() => window.location.pathname === '/settings/appearance');
+        window.history.back();
+        await wait(
+            () =>
+                document
+                    .querySelector('[data-test="freshness-time"]')
+                    ?.textContent?.includes('09:45') === true,
+        );
+        await new Promise((resolve) => window.setTimeout(resolve, 500));
+        document.body.dataset.visualReturnReads = String(dashboardReads());
+        document.body.dataset.visualReturnTime =
+            document
+                .querySelector('[data-test="freshness-time"]')
+                ?.textContent?.trim() ?? '';
     }
     if (state !== 'default') {
         let ready = stateReady();
@@ -1397,7 +1691,6 @@ void createInertiaApp({
             'passkey-remove',
             'passkey-remove-pending',
             'passkey-remove-error',
-            'received-scope-choice',
             'received-overwrite',
         ].includes(state)
     )

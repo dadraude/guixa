@@ -7,8 +7,10 @@ use App\Http\Controllers\Controller;
 use App\Http\CycleRow;
 use App\Http\CycleSummaryRow;
 use App\Http\ProducerOptionRow;
+use Guixa\Catalog\Application\ListActiveProducers;
 use Guixa\Catalog\Application\ListProducers;
 use Guixa\Catalog\Application\ProducerData;
+use Guixa\Ordering\Application\CountPendingCollectionsByCycle;
 use Guixa\Ordering\Application\GetContainerCount;
 use Guixa\Ordering\Application\GetCycleSummary;
 use Guixa\Ordering\Application\GetPickupWeekday;
@@ -23,20 +25,20 @@ use Inertia\Response;
 
 class CycleController extends Controller
 {
-    public function index(Actor $actor, ListCycles $listCycles, ListProducers $listProducers, GetPickupWeekday $getPickupWeekday): Response
+    public function index(Actor $actor, ListCycles $listCycles, ListProducers $listProducers, ListActiveProducers $listActiveProducers, GetPickupWeekday $getPickupWeekday, CountPendingCollectionsByCycle $pendingCollections): Response
     {
         $producers = $listProducers($actor);
         $names = array_column(array_map(fn (ProducerData $producer) => ['id' => $producer->id, 'name' => $producer->name], $producers), 'name', 'id');
-        $active = array_filter($producers, fn (ProducerData $producer) => $producer->active);
 
         return Inertia::render('Manage/Cycles/Index', [
             'cycles' => array_map(fn ($cycle) => CycleRow::from($cycle, $names), $listCycles($actor)),
-            'producers' => array_map(ProducerOptionRow::from(...), array_values($active)),
+            'producers' => array_map(ProducerOptionRow::from(...), $listActiveProducers($actor)),
             'pickupWeekday' => $getPickupWeekday($actor),
+            'pendingCollections' => $pendingCollections($actor),
         ]);
     }
 
-    public function show(string $cycle, Actor $actor, GetCycleSummary $getCycleSummary, GetContainerCount $getContainerCount, ListProducers $listProducers): Response
+    public function show(string $cycle, Actor $actor, GetCycleSummary $getCycleSummary, GetContainerCount $getContainerCount, ListProducers $listProducers, CountPendingCollectionsByCycle $pendingCollections): Response
     {
         try {
             $summary = $getCycleSummary($actor, $cycle);
@@ -50,6 +52,7 @@ class CycleController extends Controller
         return Inertia::render('Manage/Cycles/Show', [
             'summary' => CycleSummaryRow::from($summary, $names),
             'containers' => ContainerCountRow::from($containers),
+            'pendingCollections' => $this->pendingCollectionsLink($pendingCollections($actor)[$cycle] ?? 0, $cycle),
         ]);
     }
 
@@ -72,5 +75,14 @@ class CycleController extends Controller
         );
 
         return to_route('manage.cycles.index');
+    }
+
+    /** @return array{count: int, href: ?string} */
+    private function pendingCollectionsLink(int $count, string $cycle): array
+    {
+        return [
+            'count' => $count,
+            'href' => $count === 0 ? null : route('finance.baskets.index', ['pending' => 1, 'cycle' => $cycle], false),
+        ];
     }
 }

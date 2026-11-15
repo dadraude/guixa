@@ -10,7 +10,7 @@
     "views": [
         {
             "id": "dashboard",
-            "path": "/visual-reference-all-pages.html",
+            "path": "/resources/visual/reference-all-pages.html",
             "query": {
                 "page": "Dashboard"
             },
@@ -59,7 +59,7 @@
         },
         {
             "id": "manage-accounts-index",
-            "path": "/visual-reference-all-pages.html",
+            "path": "/resources/visual/reference-all-pages.html",
             "query": {
                 "page": "Manage/Accounts/Index"
             },
@@ -98,7 +98,7 @@
         },
         {
             "id": "manage-cycles-index",
-            "path": "/visual-reference-all-pages.html",
+            "path": "/resources/visual/reference-all-pages.html",
             "query": {
                 "page": "Manage/Cycles/Index"
             },
@@ -147,7 +147,7 @@
         },
         {
             "id": "manage-cycles-show",
-            "path": "/visual-reference-all-pages.html",
+            "path": "/resources/visual/reference-all-pages.html",
             "query": {
                 "page": "Manage/Cycles/Show"
             },
@@ -186,7 +186,7 @@
         },
         {
             "id": "manage-households-index",
-            "path": "/visual-reference-all-pages.html",
+            "path": "/resources/visual/reference-all-pages.html",
             "query": {
                 "page": "Manage/Households/Index"
             },
@@ -225,7 +225,7 @@
         },
         {
             "id": "manage-households-show",
-            "path": "/visual-reference-all-pages.html",
+            "path": "/resources/visual/reference-all-pages.html",
             "query": {
                 "page": "Manage/Households/Show"
             },
@@ -263,96 +263,8 @@
             ]
         },
         {
-            "id": "manage-pickups-index",
-            "path": "/visual-reference-all-pages.html",
-            "query": {
-                "page": "Manage/Pickups/Index"
-            },
-            "root": ".reference-style",
-            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
-            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
-            "fonts": ["16px Nunito Variable"],
-            "focus": ["button[data-sidebar=\"trigger\"]"],
-            "states": [
-                {
-                    "id": "default",
-                    "cases": [
-                        {
-                            "width": 375,
-                            "mode": "light",
-                            "text": 100
-                        },
-                        {
-                            "width": 375,
-                            "mode": "dark",
-                            "text": 100
-                        },
-                        {
-                            "width": 1280,
-                            "mode": "light",
-                            "text": 100
-                        },
-                        {
-                            "width": 1280,
-                            "mode": "dark",
-                            "text": 100
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "id": "manage-pickups-show",
-            "path": "/visual-reference-all-pages.html",
-            "query": {
-                "page": "Manage/Pickups/Show"
-            },
-            "root": ".reference-style",
-            "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
-            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content h3,#main-content label,#main-content input,#main-content a,#main-content button:not([data-sidebar=\"trigger\"]):not([id^=\"reka-dropdown-menu-trigger\"])",
-            "fonts": ["16px Nunito Variable"],
-            "focus": ["button[data-sidebar=\"trigger\"]"],
-            "states": [
-                {
-                    "id": "default",
-                    "cases": [
-                        {
-                            "width": 375,
-                            "mode": "light",
-                            "text": 100
-                        },
-                        {
-                            "width": 375,
-                            "mode": "dark",
-                            "text": 100
-                        },
-                        {
-                            "width": 1280,
-                            "mode": "light",
-                            "text": 100
-                        },
-                        {
-                            "width": 1280,
-                            "mode": "dark",
-                            "text": 100
-                        },
-                        {
-                            "width": 1024,
-                            "mode": "light",
-                            "text": 200
-                        },
-                        {
-                            "width": 1024,
-                            "mode": "dark",
-                            "text": 200
-                        }
-                    ]
-                }
-            ]
-        },
-        {
             "id": "manage-producers-index",
-            "path": "/visual-reference-all-pages.html",
+            "path": "/resources/visual/reference-all-pages.html",
             "query": {
                 "page": "Manage/Producers/Index"
             },
@@ -391,9 +303,9 @@
         },
         {
             "id": "manage-reception-show",
-            "path": "/visual-reference-all-pages.html",
+            "path": "/resources/visual/reference-all-pages.html",
             "query": {
-                "page": "Manage/Reception/Show"
+                "page": "Receptions/Show"
             },
             "root": ".reference-style",
             "panels": "#main-content .pilot-layout-panel, #main-content .pilot-panel, #main-content .pilot-manager-page > :is(form, section, ul), #main-content .pilot-data-table tbody tr, [data-sidebar=\"sidebar\"]",
@@ -430,7 +342,7 @@
         },
         {
             "id": "manage-returnitems-create",
-            "path": "/visual-reference-all-pages.html",
+            "path": "/resources/visual/reference-all-pages.html",
             "query": {
                 "page": "Manage/ReturnItems/Create"
             },
@@ -469,7 +381,7 @@
         },
         {
             "id": "manage-returnitems-edit",
-            "path": "/visual-reference-all-pages.html",
+            "path": "/resources/visual/reference-all-pages.html",
             "query": {
                 "page": "Manage/ReturnItems/Edit"
             },
@@ -508,7 +420,7 @@
         },
         {
             "id": "manage-returnitems-index",
-            "path": "/visual-reference-all-pages.html",
+            "path": "/resources/visual/reference-all-pages.html",
             "query": {
                 "page": "Manage/ReturnItems/Index"
             },
@@ -547,7 +459,7 @@
         },
         {
             "id": "manage-settings",
-            "path": "/visual-reference-all-pages.html",
+            "path": "/resources/visual/reference-all-pages.html",
             "query": {
                 "page": "Manage/Settings"
             },
@@ -586,7 +498,7 @@
         },
         {
             "id": "manage-stock-create",
-            "path": "/visual-reference-all-pages.html",
+            "path": "/resources/visual/reference-all-pages.html",
             "query": {
                 "page": "Manage/Stock/Create"
             },
@@ -625,7 +537,7 @@
         },
         {
             "id": "manage-stock-edit",
-            "path": "/visual-reference-all-pages.html",
+            "path": "/resources/visual/reference-all-pages.html",
             "query": {
                 "page": "Manage/Stock/Edit"
             },
@@ -664,7 +576,7 @@
         },
         {
             "id": "manage-stock-index",
-            "path": "/visual-reference-all-pages.html",
+            "path": "/resources/visual/reference-all-pages.html",
             "query": {
                 "page": "Manage/Stock/Index"
             },
@@ -703,7 +615,7 @@
         },
         {
             "id": "manage-stock-movements",
-            "path": "/visual-reference-all-pages.html",
+            "path": "/resources/visual/reference-all-pages.html",
             "query": {
                 "page": "Manage/Stock/Movements"
             },
@@ -742,7 +654,7 @@
         },
         {
             "id": "orders-edit",
-            "path": "/visual-reference-all-pages.html",
+            "path": "/resources/visual/reference-all-pages.html",
             "query": {
                 "page": "Orders/Edit"
             },
@@ -791,7 +703,7 @@
         },
         {
             "id": "orders-index",
-            "path": "/visual-reference-all-pages.html",
+            "path": "/resources/visual/reference-all-pages.html",
             "query": {
                 "page": "Orders/Index"
             },
@@ -830,7 +742,7 @@
         },
         {
             "id": "producer-cutoff",
-            "path": "/visual-reference-all-pages.html",
+            "path": "/resources/visual/reference-all-pages.html",
             "query": {
                 "page": "Producer/Cutoff"
             },
@@ -869,7 +781,7 @@
         },
         {
             "id": "producer-cyclesummary",
-            "path": "/visual-reference-all-pages.html",
+            "path": "/resources/visual/reference-all-pages.html",
             "query": {
                 "page": "Producer/CycleSummary"
             },
@@ -908,7 +820,7 @@
         },
         {
             "id": "producer-products-create",
-            "path": "/visual-reference-all-pages.html",
+            "path": "/resources/visual/reference-all-pages.html",
             "query": {
                 "page": "Producer/Products/Create"
             },
@@ -947,7 +859,7 @@
         },
         {
             "id": "producer-products-edit",
-            "path": "/visual-reference-all-pages.html",
+            "path": "/resources/visual/reference-all-pages.html",
             "query": {
                 "page": "Producer/Products/Edit"
             },
@@ -996,7 +908,7 @@
         },
         {
             "id": "producer-products-index",
-            "path": "/visual-reference-all-pages.html",
+            "path": "/resources/visual/reference-all-pages.html",
             "query": {
                 "page": "Producer/Products/Index"
             },
@@ -1035,7 +947,7 @@
         },
         {
             "id": "wallet-statement",
-            "path": "/visual-reference-all-pages.html",
+            "path": "/resources/visual/reference-all-pages.html",
             "query": {
                 "page": "Wallet/Statement"
             },
@@ -1074,7 +986,7 @@
         },
         {
             "id": "welcome",
-            "path": "/visual-reference-all-pages.html",
+            "path": "/resources/visual/reference-all-pages.html",
             "query": {
                 "page": "Welcome"
             },
@@ -1123,7 +1035,7 @@
         },
         {
             "id": "auth-acceptinvitation",
-            "path": "/visual-reference-all-pages.html",
+            "path": "/resources/visual/reference-all-pages.html",
             "query": {
                 "page": "auth/AcceptInvitation"
             },
@@ -1162,7 +1074,7 @@
         },
         {
             "id": "auth-confirmpassword",
-            "path": "/visual-reference-all-pages.html",
+            "path": "/resources/visual/reference-all-pages.html",
             "query": {
                 "page": "auth/ConfirmPassword"
             },
@@ -1201,7 +1113,7 @@
         },
         {
             "id": "auth-forgotpassword",
-            "path": "/visual-reference-all-pages.html",
+            "path": "/resources/visual/reference-all-pages.html",
             "query": {
                 "page": "auth/ForgotPassword"
             },
@@ -1240,7 +1152,7 @@
         },
         {
             "id": "auth-login",
-            "path": "/visual-reference-all-pages.html",
+            "path": "/resources/visual/reference-all-pages.html",
             "query": {
                 "page": "auth/Login"
             },
@@ -1289,7 +1201,7 @@
         },
         {
             "id": "auth-resetpassword",
-            "path": "/visual-reference-all-pages.html",
+            "path": "/resources/visual/reference-all-pages.html",
             "query": {
                 "page": "auth/ResetPassword"
             },
@@ -1328,7 +1240,7 @@
         },
         {
             "id": "auth-twofactorchallenge",
-            "path": "/visual-reference-all-pages.html",
+            "path": "/resources/visual/reference-all-pages.html",
             "query": {
                 "page": "auth/TwoFactorChallenge"
             },
@@ -1368,7 +1280,7 @@
         },
         {
             "id": "auth-verifyemail",
-            "path": "/visual-reference-all-pages.html",
+            "path": "/resources/visual/reference-all-pages.html",
             "query": {
                 "page": "auth/VerifyEmail"
             },
@@ -1407,7 +1319,7 @@
         },
         {
             "id": "settings-appearance",
-            "path": "/visual-reference-all-pages.html",
+            "path": "/resources/visual/reference-all-pages.html",
             "query": {
                 "page": "settings/Appearance"
             },
@@ -1446,7 +1358,7 @@
         },
         {
             "id": "settings-profile",
-            "path": "/visual-reference-all-pages.html",
+            "path": "/resources/visual/reference-all-pages.html",
             "query": {
                 "page": "settings/Profile"
             },
@@ -1485,7 +1397,7 @@
         },
         {
             "id": "settings-security",
-            "path": "/visual-reference-all-pages.html",
+            "path": "/resources/visual/reference-all-pages.html",
             "query": {
                 "page": "settings/Security"
             },

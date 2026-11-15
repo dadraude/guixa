@@ -1,0 +1,217 @@
+{
+    "baseUrl": "http://127.0.0.1:5254",
+    "height": 900,
+    "rootFontPx": 16,
+    "darkSelector": "html.dark",
+    "matrix": {
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark"],
+        "text": [100, 200]
+    },
+    "views": [
+        {
+            "id": "availability-catalogue",
+            "path": "/.vitest/dra254-visual/index.html",
+            "query": {
+                "role": "catalogue"
+            },
+            "root": "html[data-visual-ready=\"true\"] .pilot-page",
+            "panels": ".pilot-layout-panel",
+            "fonts": ["16px \"Nunito Variable\""],
+            "focus": [
+                "[data-test=\"toggle-product-1-0\"]",
+                "[data-test=\"toggle-product-3-3\"]"
+            ],
+            "assertions": [
+                {
+                    "selector": "[data-test^=\"toggle-\"]",
+                    "minHeight": 44,
+                    "minWidth": 44
+                },
+                {
+                    "selector": "[data-test=\"availability\"]",
+                    "contrast": 4.5
+                },
+                {
+                    "selector": "h2",
+                    "contrast": 4.5
+                }
+            ],
+            "content": "h1:not(.sr-only),h2,h3,p,button:not(:has(> .sr-only)),a:not(:has(.sr-only)),span:not(.sr-only)",
+            "states": [
+                {
+                    "id": "populated",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "deactivated",
+                    "query": {
+                        "state": "deactivated"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "focus": ["[data-test=\"toggle-product-1-0\"]"]
+                    }
+                },
+                {
+                    "id": "empty",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "panels": ".pilot-page",
+                        "assertions": [
+                            {
+                                "selector": "[data-test=\"no-cycles\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-test^=\"toggle-\"]",
+                                "count": 0
+                            }
+                        ],
+                        "focus": [],
+                        "noFocusReason": "No cycles, so no controls"
+                    }
+                },
+                {
+                    "id": "long-name",
+                    "query": {
+                        "state": "long"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "focus": ["[data-test=\"toggle-product-1-0\"]"]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "availability-manager",
+            "path": "/.vitest/dra254-visual/index.html",
+            "query": {
+                "role": "manager"
+            },
+            "root": "html[data-visual-ready=\"true\"] .pilot-page",
+            "panels": ".pilot-layout-panel",
+            "fonts": ["16px \"Nunito Variable\""],
+            "focus": [
+                "[data-test=\"toggle-product-1-0\"]",
+                "[data-test=\"toggle-product-3-3\"]"
+            ],
+            "assertions": [
+                {
+                    "selector": "[data-test^=\"toggle-\"]",
+                    "minHeight": 44,
+                    "minWidth": 44
+                },
+                {
+                    "selector": "[data-test=\"availability\"]",
+                    "contrast": 4.5
+                },
+                {
+                    "selector": "h2",
+                    "contrast": 4.5
+                }
+            ],
+            "content": "h1:not(.sr-only),h2,h3,p,button:not(:has(> .sr-only)),a:not(:has(.sr-only)),span:not(.sr-only)",
+            "states": [
+                {
+                    "id": "populated",
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

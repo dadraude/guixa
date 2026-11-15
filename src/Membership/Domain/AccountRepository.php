@@ -3,6 +3,7 @@
 namespace Guixa\Membership\Domain;
 
 use Guixa\Membership\Domain\ValueObject\Email;
+use Guixa\Shared\Domain\Role;
 
 interface AccountRepository
 {
@@ -15,6 +16,12 @@ interface AccountRepository
     public function saveHouseholdLink(Account $account): void;
 
     public function get(string $id): ?Account;
+
+    /**
+     * @param  list<string>  $ids
+     * @return array<string, string> name by account id in one read, deactivated accounts included; unknown ids are left out
+     */
+    public function namesByIds(array $ids): array;
 
     public function emailIsTaken(Email $email): bool;
 
@@ -34,7 +41,7 @@ interface AccountRepository
     /** @return list<Account> */
     public function membersOf(string $householdId): array;
 
-    /** Whether an account other than this one holds the manager role and is not deactivated. Call it after `lockManagers()`. */
+    /** Whether an account other than this one holds the manager role, accepted its invitation and is not deactivated. Call it after `lockManagers()`. */
     public function hasOtherActiveManager(string $accountId): bool;
 
     /**
@@ -42,4 +49,18 @@ interface AccountRepository
      * "is this the last manager" run one after the other (R36a, R36b). Call it before `hasOtherActiveManager()`.
      */
     public function lockManagers(): void;
+
+    /**
+     * @return array<string, list<AccountListing>> the holders of every staff role by role value, deactivated accounts
+     *                                             included, each list by name then email (R9)
+     */
+    public function listStaffRoleHolders(): array;
+
+    /**
+     * Accounts whose name or email contains the query, case-insensitive, that are not deactivated and do not hold
+     * the role, by name then email. An empty query finds nothing (R10).
+     *
+     * @return list<AccountListing>
+     */
+    public function searchStaffRoleCandidates(Role $role, string $query, int $limit): array;
 }

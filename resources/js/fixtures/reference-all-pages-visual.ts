@@ -97,39 +97,11 @@ const cycle = {
         },
     ],
 };
-const pickup = {
-    cycleId,
-    pickupDate,
-    householdId,
-    householdName: household.name,
-    status: 'pending',
-    lines: [
-        {
-            productId,
-            name: product.name,
-            unit: product.unit,
-            variable: product.variable,
-            unitPriceCents: 320,
-            ordered: '2',
-            allocated: '2',
-            delivered: '2',
-            adjusted: false,
-            amountCents: 640,
-        },
-    ],
-    totalCents: 640,
-    balanceCents: 2000,
-    resultingBalanceCents: 1360,
-    stockLines: [],
-    returnLines: [],
-    adjustments: [],
-    originalChargeCents: null,
-};
 const settlement = {
     householdId,
     householdName: household.name,
     balanceCents: 2000,
-    pendingPickups: [{ cycleId, pickupDate }],
+    openBaskets: [{ basketId: 'basket-1', status: 'draft', date: pickupDate }],
 };
 const reception = {
     cycleId,
@@ -153,7 +125,6 @@ const reception = {
             balancedForDistribution: true,
             hasManualAllocations: false,
             hasAdjustments: false,
-            hasDonePickups: false,
             allocations: [
                 {
                     householdId,
@@ -193,7 +164,7 @@ const order = {
             notDelivered: false,
         },
     ],
-    pickup: null,
+    basketId: null,
 };
 
 const pageProps: Record<string, Record<string, unknown>> = {
@@ -201,20 +172,7 @@ const pageProps: Record<string, Record<string, unknown>> = {
         roles: ['manager', 'member', 'producer'],
         isManager: true,
         isMember: true,
-        nextPickup: pickupDate,
-        openCycles: 1,
-        balance: 2000,
-        pendingPickups: [{ cycleId, pickupDate }],
-        managerSummary: {
-            cycles: 1,
-            activeCycles: 1,
-            households: 1,
-            activeHouseholds: 1,
-            accounts: 1,
-            pendingInvitations: 0,
-            producers: 1,
-            activeProducers: 1,
-        },
+        can: { showCaughtUp: true, showNoContext: false },
     },
     'Manage/Accounts/Index': {
         accounts: [
@@ -235,8 +193,13 @@ const pageProps: Record<string, Record<string, unknown>> = {
         cycles: [cycle],
         producers: [{ id: producerId, name: producer.name }],
         pickupWeekday: 4,
+        pendingCollections: { [cycleId]: 2 },
     },
     'Manage/Cycles/Show': {
+        pendingCollections: {
+            count: 2,
+            href: `/finance/baskets?pending=1&cycle=${cycleId}`,
+        },
         summary: {
             cycleId,
             pickupDate,
@@ -266,7 +229,12 @@ const pageProps: Record<string, Record<string, unknown>> = {
         containers: {
             total: 2,
             households: [
-                { householdId, householdName: household.name, count: 2 },
+                {
+                    householdId,
+                    householdName: household.name,
+                    count: 2,
+                    balance: -2,
+                },
             ],
         },
     },
@@ -284,27 +252,10 @@ const pageProps: Record<string, Record<string, unknown>> = {
         otherHouseholds: [],
         deactivationWarning: settlement,
     },
-    'Manage/Pickups/Index': {
-        cycleId,
-        closed: false,
-        pickups: [
-            {
-                householdId,
-                householdName: household.name,
-                status: 'pending',
-                totalCents: 640,
-            },
-        ],
-        households: [household],
-    },
-    'Manage/Pickups/Show': {
-        pickup,
-        stockProducts: [stockProduct],
-        returnItems: [returnItem],
-    },
     'Manage/Producers/Index': { producers: [producer] },
-    'Manage/Reception/Show': {
+    'Receptions/Show': {
         reception,
+        can: { edit: true, validate: true, distribute: false, reopen: false },
         distribution: {
             validated: false,
             distributed: false,
@@ -321,8 +272,9 @@ const pageProps: Record<string, Record<string, unknown>> = {
     'Manage/Stock/Movements': {
         product: stockProduct,
         cycles: [{ id: cycleId, pickupDate }],
+        history: { lines: [], total: 0, page: 1, prevUrl: null, nextUrl: null },
     },
-    'Orders/Edit': { order },
+    'Orders/Edit': { order, preview: { totalCents: 0, amountCents: {} } },
     'Orders/Index': {
         cycles: [
             { cycleId, pickupDate, open: true, cancelled: false, lineCount: 1 },

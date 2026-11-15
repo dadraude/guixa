@@ -9,6 +9,67 @@ const stages = [
     'ci',
     'decision-wait',
 ];
+export function recoveryStatus(owner, stage, mechanism) {
+    const state = owner.pipeline;
+    const ledger = state?.recoveryLedger;
+    const knownLedger =
+        ledger?.version === 1 && Number.isInteger(state?.limits?.recoveryTotal);
+    const key = stage + ':' + mechanism;
+    const failures = knownLedger ? (ledger.failures[key] ?? 0) : null;
+    const stageAttempts = state?.counters?.recovery
+        ? (state.counters.recovery[stage] ?? 0)
+        : null;
+    const extra = knownLedger
+        ? (ledger.authorizations[key]?.additionalAttempts ?? 0)
+        : null;
+    const stageExtra = knownLedger
+        ? Object.values(ledger.authorizations)
+              .filter((entry) => entry.stage === stage)
+              .reduce((sum, entry) => sum + entry.additionalAttempts, 0)
+        : null;
+    const pending = ledger?.pending ?? null;
+    let reason = 'allowed';
+    if (!['local', 'visual', 'ci'].includes(stage) || !mechanism?.trim())
+        reason = 'invalid-target';
+    else if (!state || !knownLedger) reason = 'legacy-history';
+    else if (pending) reason = 'pending';
+    else if (state.blocker)
+        reason =
+            state.recoveryBlocker?.key === key &&
+            state.blocker === `Validation budget exhausted: ${stage}/recovery`
+                ? 'exhausted'
+                : 'blocked';
+    else if (state.mechanisms[key] === 'product') reason = 'product-mechanism';
+    else if (!ledger.diagnosed[key]) reason = 'diagnosis-required';
+    else if (
+        failures >= state.limits.recovery + extra ||
+        stageAttempts >= state.limits.recoveryTotal + stageExtra ||
+        (stageAttempts >= state.limits.recoveryTotal &&
+            (ledger.extraUsed[key] ?? 0) >= extra)
+    )
+        reason = 'exhausted';
+    return {
+        canRetry: reason === 'allowed',
+        reason,
+        stage,
+        mechanism,
+        failures,
+        failureLimit:
+            !knownLedger || state?.limits?.recovery == null
+                ? null
+                : state.limits.recovery + extra,
+        stageAttempts,
+        stageAttemptLimit:
+            !knownLedger || state?.limits?.recoveryTotal == null
+                ? null
+                : state.limits.recoveryTotal + stageExtra,
+        extraUsed: knownLedger ? (ledger.extraUsed[key] ?? 0) : null,
+        authorizedAttempts: extra,
+        diagnosed: knownLedger ? ledger.diagnosed[key] === true : null,
+        pending,
+        blocker: state?.blocker ?? null,
+    };
+}
 export function applyEvent(owner, event) {
     const next = structuredClone(owner);
     if (!next.pipeline) {
@@ -231,8 +292,6 @@ export function applyEvent(owner, event) {
             event.classification === 'product' ? 'product' : 'recovery';
         const current = state.counters[counter][event.stage] ?? 0;
         if (event.type === 'recovery') {
-            if (state.blocker)
-                throw new Error('Validation budget already exhausted');
             const ledger = state.recoveryLedger;
             if (
                 !ledger ||
@@ -251,18 +310,14 @@ export function applyEvent(owner, event) {
                 throw new Error(
                     'Recovery requires non-product diagnosis, focused reproduction and correction evidence',
                 );
-            if (!ledger.diagnosed[key])
+            const admission = recoveryStatus(
+                next,
+                event.stage,
+                event.mechanism,
+            );
+            if (admission.reason === 'diagnosis-required')
                 throw new Error('Recovery requires a prior diagnosed failure');
-            const extra = ledger.authorizations[key]?.additionalAttempts ?? 0;
-            const stageExtra = Object.values(ledger.authorizations)
-                .filter((entry) => entry.stage === event.stage)
-                .reduce((sum, entry) => sum + entry.additionalAttempts, 0);
-            if (
-                (ledger.failures[key] ?? 0) >= state.limits.recovery + extra ||
-                current >= state.limits.recoveryTotal + stageExtra ||
-                (current >= state.limits.recoveryTotal &&
-                    (ledger.extraUsed[key] ?? 0) >= extra)
-            )
+            if (!admission.canRetry)
                 throw new Error('Validation budget already exhausted');
             state.counters.recovery[event.stage] = current + 1;
             if (current >= state.limits.recoveryTotal)
@@ -370,6 +425,23 @@ if (
     resolve(process.argv[1]) === fileURLToPath(import.meta.url)
 ) {
     try {
+        if (process.argv[2] === 'status') {
+            const [, , , ownerPath, stage, mechanism] = process.argv;
+            if (!ownerPath || !stage || !mechanism)
+                throw new Error(
+                    'Usage: node state.mjs status <implementation-owner.json> <stage> <mechanism>',
+                );
+            console.log(
+                JSON.stringify(
+                    recoveryStatus(
+                        JSON.parse(readFileSync(ownerPath)),
+                        stage,
+                        mechanism,
+                    ),
+                ),
+            );
+            process.exit();
+        }
         const [ownerPath, eventPath] = process.argv.slice(2);
         if (!ownerPath || !eventPath)
             throw new Error(

@@ -21,4 +21,16 @@ final class BasketModel extends Model
     {
         return $this->hasMany(BasketLineModel::class, 'basket_id')->orderBy('created_at')->orderBy('id');
     }
+
+    /** @return HasMany<BasketAdjustmentModel, $this> */
+    public function adjustments(): HasMany
+    {
+        return $this->hasMany(BasketAdjustmentModel::class, 'basket_id')->orderBy('occurred_at')->orderBy('id');
+    }
+
+    /** @return HasMany<BasketCollectionEventModel, $this> */
+    public function collectionEvents(): HasMany
+    {
+        return $this->hasMany(BasketCollectionEventModel::class, 'basket_id')->orderBy('sequence');
+    }
 }

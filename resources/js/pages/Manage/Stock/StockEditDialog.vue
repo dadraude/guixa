@@ -3,7 +3,7 @@ import { trans } from 'laravel-vue-i18n';
 import { Link, router } from '@inertiajs/vue3';
 import { shallowRef, watch } from 'vue';
 import StockMovementController from '@/actions/App/Http/Controllers/Manage/StockMovementController';
-import StockProductController from '@/actions/App/Http/Controllers/Manage/StockProductController';
+import StockProductController from '@/actions/App/Http/Controllers/Catalogue/StockProductController';
 import InputError from '@/components/InputError.vue';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';

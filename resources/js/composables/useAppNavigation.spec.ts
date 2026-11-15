@@ -16,7 +16,7 @@ describe('shared app navigation', () => {
         expect(member.map((item) => item.title)).toContain('Wallet');
         expect(member.map((item) => item.title)).toContain('Stock catalogue');
         expect(member.map((item) => item.title)).not.toContain('Stock');
-        expect(member.map((item) => item.title)).not.toContain('Baskets');
+        expect(member.map((item) => item.title)).toContain('My baskets');
         expect(
             navigationItemsFor([{ role: 'producer' }]).map(
                 (item) => item.title,
@@ -48,10 +48,10 @@ describe('shared app navigation', () => {
             sections.map((section) => section.items.map((item) => item.title)),
         ).toEqual([
             ['Dashboard'],
-            ['Orders', 'Stock catalogue', 'Wallet'],
-            ['Cycles', 'Households', 'Baskets'],
+            ['Orders', 'My baskets', 'Stock catalogue', 'Wallet'],
+            ['Cycles', 'Receptions', 'Households', 'Baskets'],
             ['Producers', 'Stock', 'Return items'],
-            ['Accounts', 'Settings'],
+            ['Accounts', 'Roles', 'Settings'],
             ['Products', 'Default cutoff'],
         ]);
         const titles = navigationItemsFor([
@@ -59,12 +59,13 @@ describe('shared app navigation', () => {
             { role: 'manager' },
             { role: 'producer' },
         ]).map((item) => item.title);
-        expect(titles).toHaveLength(14);
+        expect(titles).toHaveLength(17);
         expect(new Set(titles).size).toBe(titles.length);
     });
 
     it('keeps the parent destination selected on detail pages', () => {
         const items = navigationItemsFor([{ role: 'manager' }]);
+        const memberItems = navigationItemsFor([{ role: 'member' }]);
 
         expect(
             currentNavigationItem(
@@ -78,5 +79,106 @@ describe('shared app navigation', () => {
         expect(
             currentNavigationItem(items, '/finance/baskets/example')?.title,
         ).toBe('Baskets');
+        expect(
+            currentNavigationItem(memberItems, '/baskets/example')?.title,
+        ).toBe('My baskets');
+    });
+
+    it('gives Finance-only users a Stock entry that stays selected on a product history', () => {
+        const finance = navigationItemsFor([{ role: 'finance' }]);
+        const history =
+            '/finance/stock/12345678-1234-1234-1234-123456789abc/movements';
+
+        expect(finance.map((item) => item.title)).toEqual([
+            'Dashboard',
+            'Baskets',
+            'Stock',
+            'Receptions',
+        ]);
+        expect(currentNavigationItem(finance, history)?.title).toBe('Stock');
+    });
+
+    it('keeps Households selected for a manager on the shared Finance wallet, and leaves Finance-only users unchanged', () => {
+        const wallet =
+            '/finance/households/12345678-1234-1234-1234-123456789abc/wallet';
+
+        expect(
+            currentNavigationItem(
+                navigationItemsFor([{ role: 'manager' }]),
+                wallet,
+            )?.title,
+        ).toBe('Households');
+        expect(
+            currentNavigationItem(
+                navigationItemsFor([{ role: 'finance' }]),
+                wallet,
+            ),
+        ).toBeUndefined();
+    });
+
+    it('gives Catalogue-only users a Catalogue section with Producers, and the Manager keeps Producers selected on the Catàleg pages', () => {
+        const catalogue = navigationSectionsFor([{ role: 'catalogue' }]);
+
+        expect(
+            catalogue.map((section) => [
+                section.title,
+                section.items.map((item) => item.title),
+            ]),
+        ).toEqual([
+            ['Overview', ['Dashboard']],
+            ['Catalogue', ['Producers', 'Return items']],
+        ]);
+        expect(
+            navigationSectionsFor([
+                { role: 'manager' },
+                { role: 'catalogue' },
+            ]).filter((section) => section.title === 'Catalogue'),
+        ).toEqual([]);
+        expect(
+            currentNavigationItem(
+                navigationItemsFor([{ role: 'manager' }]),
+                '/catalogue/producers/12345678-1234-1234-1234-123456789abc/products',
+            )?.title,
+        ).toBe('Producers');
+        expect(
+            currentNavigationItem(
+                navigationItemsFor([{ role: 'catalogue' }]),
+                '/catalogue/producers/12345678-1234-1234-1234-123456789abc/products',
+            )?.title,
+        ).toBe('Producers');
+        expect(
+            currentNavigationItem(
+                navigationItemsFor([{ role: 'manager' }]),
+                '/catalogue/return-items',
+            )?.title,
+        ).toBe('Return items');
+    });
+
+    it('gives a Receiver-only account a Reception section and Finance or Manager the Receptions item once', () => {
+        const receiver = navigationSectionsFor([{ role: 'receiver' }]);
+
+        expect(receiver.map((section) => section.title)).toEqual([
+            'Overview',
+            'Reception',
+        ]);
+        expect(
+            navigationItemsFor([{ role: 'finance' }, { role: 'receiver' }])
+                .map((item) => item.title)
+                .filter((title) => title === 'Receptions'),
+        ).toHaveLength(1);
+    });
+
+    it('gives a Receiver-only account a Reception section and Finance or Manager the Receptions item once', () => {
+        const receiver = navigationSectionsFor([{ role: 'receiver' }]);
+
+        expect(receiver.map((section) => section.title)).toEqual([
+            'Overview',
+            'Reception',
+        ]);
+        expect(
+            navigationItemsFor([{ role: 'finance' }, { role: 'receiver' }])
+                .map((item) => item.title)
+                .filter((title) => title === 'Receptions'),
+        ).toHaveLength(1);
     });
 });

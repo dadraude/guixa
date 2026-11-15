@@ -21,17 +21,11 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-    save: [
-        received: string,
-        overwriteManual: boolean,
-        includeCompleted?: boolean,
-    ];
+    save: [received: string, overwriteManual: boolean];
 }>();
 
 const received = ref(props.product.received);
 const warning = ref(false);
-const choosingScope = ref(false);
-const includeCompleted = ref<boolean | undefined>(undefined);
 
 watch(
     () => props.product.received,
@@ -51,42 +45,20 @@ const onOpenChange = (open: boolean) => {
 
     if (!open) {
         received.value = props.product.received;
-        includeCompleted.value = undefined;
-        choosingScope.value = false;
     }
 };
 
 const save = (overwriteManual: boolean) => {
     warning.value = false;
-    if (includeCompleted.value === undefined) {
-        emit('save', received.value, overwriteManual);
-        return;
-    }
-    emit('save', received.value, overwriteManual, includeCompleted.value);
+    emit('save', received.value, overwriteManual);
 };
 
-const confirmManualOrSave = () => {
-    choosingScope.value = false;
+const submit = () => {
     if (props.product.hasManualAllocations) {
         warning.value = true;
         return;
     }
     save(false);
-};
-
-const submit = () => {
-    includeCompleted.value = undefined;
-    if (props.product.hasDonePickups) {
-        choosingScope.value = true;
-        warning.value = true;
-        return;
-    }
-    confirmManualOrSave();
-};
-
-const chooseScope = (includeDone: boolean) => {
-    includeCompleted.value = includeDone;
-    confirmManualOrSave();
 };
 
 const confirm = () => save(true);
@@ -122,73 +94,41 @@ const confirm = () => save(true);
 
     <Dialog :open="warning" @update:open="onOpenChange">
         <DialogContent :show-close-button="false">
-            <template v-if="choosingScope">
-                <DialogHeader>
-                    <DialogTitle>{{
-                        trans('Which pickups should change?')
-                    }}</DialogTitle>
-                    <DialogDescription>{{
+            <DialogHeader class="space-y-3">
+                <DialogTitle>{{
+                    trans('Replace the manual allocations?')
+                }}</DialogTitle>
+                <DialogDescription>
+                    {{
                         trans(
-                            'Unfinished pickups are updated. Including done pickups adds separate adjustment lines and wallet charges or credits; original lines stay unchanged.',
+                            'The allocations of :households for :product were set by hand. Setting the received total to :received re-allocates everything from the ordered quantities and those manual allocations will be lost.',
+                            {
+                                households: manualHouseholds,
+                                product: product.name,
+                                received: formatQuantity(received),
+                            },
                         )
-                    }}</DialogDescription>
-                </DialogHeader>
-                <DialogFooter class="flex-col gap-2 sm:flex-col">
+                    }}
+                </DialogDescription>
+            </DialogHeader>
+            <DialogFooter class="gap-2">
+                <DialogClose as-child>
                     <Button
-                        class="min-h-11 whitespace-normal"
-                        @click="chooseScope(false)"
-                        >{{ trans('Unfinished pickups only') }}</Button
+                        variant="secondary"
+                        :data-test="`cancel-overwrite-${product.productId}`"
                     >
-                    <Button
-                        variant="outline"
-                        class="min-h-11 whitespace-normal"
-                        @click="chooseScope(true)"
-                        >{{ trans('All pickups') }}</Button
-                    >
-                    <DialogClose as-child
-                        ><Button variant="secondary" class="min-h-11">{{
-                            trans('Cancel')
-                        }}</Button></DialogClose
-                    >
-                </DialogFooter>
-            </template>
-            <template v-else>
-                <DialogHeader class="space-y-3">
-                    <DialogTitle>{{
-                        trans('Replace the manual allocations?')
-                    }}</DialogTitle>
-                    <DialogDescription>
-                        {{
-                            trans(
-                                'The allocations of :households for :product were set by hand. Setting the received total to :received re-allocates everything from the ordered quantities and those manual allocations will be lost.',
-                                {
-                                    households: manualHouseholds,
-                                    product: product.name,
-                                    received: formatQuantity(received),
-                                },
-                            )
-                        }}
-                    </DialogDescription>
-                </DialogHeader>
-                <DialogFooter class="gap-2">
-                    <DialogClose as-child>
-                        <Button
-                            variant="secondary"
-                            :data-test="`cancel-overwrite-${product.productId}`"
-                        >
-                            {{ trans('Cancel') }}
-                        </Button>
-                    </DialogClose>
-                    <Button
-                        variant="destructive"
-                        :disabled="processing"
-                        :data-test="`confirm-overwrite-${product.productId}`"
-                        @click="confirm"
-                    >
-                        {{ trans('Replace them') }}
+                        {{ trans('Cancel') }}
                     </Button>
-                </DialogFooter>
-            </template>
+                </DialogClose>
+                <Button
+                    variant="destructive"
+                    :disabled="processing"
+                    :data-test="`confirm-overwrite-${product.productId}`"
+                    @click="confirm"
+                >
+                    {{ trans('Replace them') }}
+                </Button>
+            </DialogFooter>
         </DialogContent>
     </Dialog>
 </template>

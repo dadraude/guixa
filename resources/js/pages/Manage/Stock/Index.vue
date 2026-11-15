@@ -3,6 +3,7 @@ import { Form, Head, Link } from '@inertiajs/vue3';
 import { computed, shallowRef } from 'vue';
 import { History, Pencil, Plus } from '@lucide/vue';
 import StockProductController from '@/actions/App/Http/Controllers/Manage/StockProductController';
+import CatalogueStockProductController from '@/actions/App/Http/Controllers/Catalogue/StockProductController';
 import ProducerController from '@/actions/App/Http/Controllers/Manage/ProducerController';
 import StockMovementController from '@/actions/App/Http/Controllers/Manage/StockMovementController';
 import StockEditDialog from './StockEditDialog.vue';
@@ -108,14 +109,16 @@ function editProduct(product: App.Http.StockLevelRow, event: MouseEvent) {
                     <Form
                         v-bind="
                             product.active
-                                ? StockProductController.destroy.form({
+                                ? CatalogueStockProductController.destroy.form({
                                       producer: product.producerId,
                                       stockProduct: product.id,
                                   })
-                                : StockProductController.reactivate.form({
-                                      producer: product.producerId,
-                                      stockProduct: product.id,
-                                  })
+                                : CatalogueStockProductController.reactivate.form(
+                                      {
+                                          producer: product.producerId,
+                                          stockProduct: product.id,
+                                      },
+                                  )
                         "
                         v-slot="{ processing }"
                         class="pilot-status-switch-form shrink-0"
@@ -193,14 +196,14 @@ function editProduct(product: App.Http.StockLevelRow, event: MouseEvent) {
                                 <Form
                                     v-bind="
                                         product.active
-                                            ? StockProductController.destroy.form(
+                                            ? CatalogueStockProductController.destroy.form(
                                                   {
                                                       producer:
                                                           product.producerId,
                                                       stockProduct: product.id,
                                                   },
                                               )
-                                            : StockProductController.reactivate.form(
+                                            : CatalogueStockProductController.reactivate.form(
                                                   {
                                                       producer:
                                                           product.producerId,

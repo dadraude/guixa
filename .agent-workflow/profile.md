@@ -16,15 +16,19 @@ Pre-authorized:
 - Read the project's issues, relations, PRs, checks and CI runs.
 - Dispatch every admitted task (dependency-ready, compatible, within Limits).
 - Set an admitted issue `In Progress`; on Stop, comment the blocker and return it to `Todo`.
+- Set a grouping parent `Done` once every child is `Done` and nothing else remains open under it; this is tracker closure, not product acceptance.
 - Create and clean up task worktrees, branches and `guixa_test_draNN*` databases.
 - Push the task branch, open its PR against `main`, and push new commits for CI fixes and
   merges of `main` when the PR conflicts.
 - Edit admitted `plan.md`/`tasks.md` and create one Deviation file per entry in `history/` (see `specs/README.md#history`).
+- Create the spec-sync worktree and branch, edit `spec.md`/area files there with their Change entries,
+  open its stacked PR against the task branch, and retarget it to `main` once the task PR merges.
+  Merging it is the user's acceptance of the spec change.
 
 Ask first:
 
 - Merging any PR (the user merges).
-- Product decisions: `spec.md` changes, OQ answers, behaviour changes.
+- Product decisions: `spec.md` changes outside a spec-sync PR, OQ answers, behaviour changes.
 - Publishing new tickets; reorganizing existing tickets, relations, labels or automations.
 - Force-push, pushing to `main`, rewriting published history, other remotes, workspaces or credentials,
   deleting branches or tickets, the `guixa`/`guixa_test` databases, machine configuration.
@@ -40,12 +44,15 @@ Ask first:
 | Executable task                           | `Tnn` title prefix matching a row in `specs/*/tasks.md`; title format `Tnn — Title`                                                                                                                                                 |
 | Ready label                               | `ready-for-agent`, executable mapped leaves only                                                                                                                                                                                    |
 | Relation fields                           | `parentId`, `blockedBy`/`blocks`, `relatedTo` on `save_issue`, where exposed                                                                                                                                                        |
-| Codex entrypoint prefix                   | `agent-workflow` (`$agent-workflow-implement-session`, `$agent-workflow-implement-task DRA-NN`, `$agent-workflow-to-tickets`)                                                                                                       |
+| Codex entrypoint prefix                   | `agent-workflow` (`$agent-workflow-implement-session`, `$agent-workflow-implement-task DRA-NN`, `$agent-workflow-to-tickets`, `$agent-workflow-spec-flow`, `$agent-workflow-spec-gaps`)                                             |
 | Remote / base                             | `origin` / `main`                                                                                                                                                                                                                   |
 | Task branch                               | `feature/dra-NN-<3-6 title words>`; `chore/` for tooling, test support or CI; `docs/` for documents only                                                                                                                            |
 | Worktree root                             | Sibling of the selected repository: `<repo-parent>/<repo-name>-worktrees`                                                                                                                                                           |
 | Task worktree                             | `<worktree-root>/dra-NN`                                                                                                                                                                                                            |
+| Requirements documents                    | The feature's `specs/NNN-feature/spec.md` and its area files; `plan.md`/`tasks.md` deviations stay in the task PR                                                                                                                   |
+| Spec-sync branch / worktree               | `docs/NNN-tnn-spec-sync` (no `DRA-NN`: Linear would move the issue on merge) / `<worktree-root>/dra-NN-spec-sync`                                                                                                                   |
 | Implementation owner record               | `<worktree>/.agent-workflow/implementation-owner.json` (ignored runtime state; retain until integration)                                                                                                                            |
+| Task handoff                              | `<worktree>/.agent-workflow/handoff-tnn.md` (ignored runtime state; retain until integration)                                                                                                                                       |
 | Test database                             | `guixa_test_draNN`; parallel workers may add `_test_N`                                                                                                                                                                              |
 | Limits                                    | 3 pipelines; 3 substantive reviews; 2 mechanical follow-up reviews; 2 consecutive product failures per stage; 2 unsuccessful corrections per stable mechanism (`recovery`); 8 total correction attempts per stage (`recoveryTotal`) |
 
@@ -73,6 +80,20 @@ Codex pins each tier in `.codex/agents/agent-workflow-<tier>.toml` (efforts: low
 | Standard | Implementer, Preparation                             | `sonnet`    | `gpt-6-sol`   |
 | Strong   | Reviewer                                             | `opus`      | `gpt-6-astra` |
 
+The spec-side skills (`spec-flow`, `spec-gaps`) and ticket drafting reuse these roles, so no step runs
+on a model above its tier. The session model only coordinates: routing, every question to the user,
+phase gates and the final write of anything that needs a decision.
+
+| Spec-side work                                                                                                                                       | Role        |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| Read history, roadmap/feature tables, glossary and decision records; find collisions, prior art, outcomes, users and dependencies for discovery      | Discovery   |
+| Gather code-vs-plan evidence for a task close; read back and diff published tickets                                                                  | Discovery   |
+| Draft delivery-slice boundaries from discovery evidence; walk gap families over selected requirements; draft `plan.md`, `tasks.md` and ticket bodies | Preparation |
+| Review a spec that claims to be complete (fresh worker, not the author)                                                                              | Reviewer    |
+
+A worker returns a digest with `path:line` references (at most 40 lines), never file dumps. It does not
+edit a spec document, ask the user or delegate; the coordinator applies and logs every edit.
+
 ## Tracker constraints
 
 Linear rules the ticket gates rely on:
@@ -92,14 +113,17 @@ Each worker command sets its own cwd and environment; never rely on shell state 
 cd "$WORKTREE" && PATH="$WORKTREE_ROOT/.bin:$PATH" node .agent-workflow/scripts/task-command.mjs "$NN" -- <executable> <arguments>
 ```
 
-Before setup, privately copy `$REPO_ROOT/.env` to the new task worktree, replace its `DB_DATABASE`
-with `TEST_DB`, and verify the replacement without logging credentials. Never change the source `.env`.
+Task worktrees have no `.env`: never read, copy or create any `.env*` file (user policy denies it).
+The coordinator generates one throwaway key with `php -r 'echo "base64:".base64_encode(random_bytes(32));'`
+and passes it as `APP_KEY`, with `DB_USERNAME=postgres`, in the environment of the wrapper command
+above; the wrapper sets `DB_DATABASE` to `TEST_DB` and `phpunit.xml` supplies the rest. The coordinator
+creates `TEST_DB` on the local Postgres before dispatch.
 All setup, tests and artisan commands use the guarded worktree prefix above; the user's `guixa` database and
 shared `guixa_test` are not task databases. If isolated database configuration cannot be verified, stop.
 
 | Operation                 | Command in the task worktree                                                                                                                                                                                             |
 | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Setup                     | `composer install && pnpm install --frozen-lockfile`; build only for a focused-test prerequisite or build reproduction                                                                                                   |
+| Setup                     | `composer install && pnpm install --frozen-lockfile`; build only for a focused-test prerequisite or build reproduction; documents/tooling only: `pnpm install --frozen-lockfile`                                         |
 | Focused test              | `php artisan test --filter=<test>` (run serially initially)                                                                                                                                                              |
 | Focused checks            | Tests for affected behavior and every changed test file; select frontend files/tests using the installed runner's supported selectors; format all changed supported code/docs; type checks when needed                   |
 | Full validation (CI only) | `.github/workflows/tests.yml`: selected `frontend`, `backend` and `tooling` jobs plus the always-on `docs` lint/format check; `ci` aggregates their results; resolve commands from the workflow and dependency manifests |
@@ -139,7 +163,10 @@ the diff-derived check selection; omit `--plan` to execute it in the guarded env
 task-local check plan has `tests` (exact executable test paths), `changedContracts` (each with
 `name`, changed `path`, source/discovery `evidence` and existing `consumers` test paths), or an empty
 contract list plus `noContractChangesReason`. The coordinator checks discovery completeness; the
-helper cannot infer every dynamic consumer. Missing consumer mappings block readiness. Changed
+helper cannot infer every dynamic consumer. Missing consumer mappings block readiness. Discover changed
+contracts through graph callers plus exact literal routes, props, error-class/translation keys,
+fixtures and dynamic HTTP consumers; record evidence and intentional exclusions in `changedContracts`.
+Graph callers alone cannot find string or runtime consumers. Changed
 executable tests are always included. Formatter exclusions from the checked-in Vite format config
 are reported, preserving append-only specs and generated files; unsupported types need their own
 structural check. Retain the helper's JSON selection/results bound to HEAD/base in task artifacts.
@@ -156,9 +183,9 @@ and run relevant structural checks. Never report an omitted check as passed.
 
 The current CI triggers on PRs and pushes to `main`, not a feature-branch push alone. Resolve expected
 checks from the current workflow (currently `ci` in `tests`) plus branch requirements before accepting
-results. The `tooling` job covers workflow-skill structural and helper tests for agent-tooling changes. Run
-the focused offline checks in `skills/agent-workflow/tests` and `.agent-workflow/tests` locally when
-these instruction documents change; CI also runs them when `.github/` changes.
+results. The `tooling` job covers workflow-skill structural and helper tests for agent-tooling changes. When
+these instruction documents change, run its checks locally: `python3 .github/scripts/test_commands.py`
+with `selection`, `contracts` and `helpers` (`helpers` needs `CHROME_BIN`). CI also runs them when `.github/` changes.
 
 The prefix's `PGTZ=UTC` matches CI; a local Europe/Madrid database session can hide timestamp failures.
 Discover affected generators from the repository scripts before regenerating; do not invent a command.
@@ -166,17 +193,26 @@ Only the coordinator runs shared `git fetch origin`, `git worktree add/remove`, 
 Create worktrees with `git worktree add "$WORKTREE" -b "$BRANCH" "$BASE_REF"`.
 
 After the task's PR is merged and its merged commit is contained in `origin/main`, remove only the
-clean, task-owned worktree (never `--force`) and run the existing guarded cleanup helper from the
-coordinator with the verified PHP runtime:
+clean, task-owned worktree (never `--force`), delete its local branch with `git branch -d` (never `-D`;
+a refusal means it is not integrated, so keep and report it) and run the existing guarded cleanup helper
+from the coordinator with the verified PHP runtime:
 `php .agent-workflow/scripts/drop-test-databases.php NN`.
 Its allowed namespace is `guixa_test_draNN` and its suffixed worker databases. A cleanup failure is
 reported, not retried destructively.
 
 ## Project conventions
 
-- Read `specs/README.md`, `specs/constitution.md`, the task row, its phase's Done when, and every linked
+- Read `specs/README.md`, `specs/constitution.md`, the feature's `discovery.md` when present, the task row, its phase's Done when, and every linked
   `R#` and scenario. The feature's `plan.md` records design; history uses immutable files in `history/`.
   Consult legacy `log.md` plus all relevant new entries with the history helper before changing a feature.
+- At task close, retain a slice acceptance record in the task handoff/PR: each allocated `R#`/`S#`,
+  task row, observable scenario, test assertion and result, reviewed code/commit, verdict and named
+  remainder owner. Partial slices say what is still pending; a passing test is evidence only for its
+  assertions. Use this mapping for the feature-wide review after integration.
+- After each delivery slice integrates, review its allocated acceptance and shared-invariant regression;
+  after all in-scope slices integrate, follow [feature acceptance](references/feature-acceptance.md)
+  on the current base and report the feature verdict separately from grouping-parent status. Retired 002
+  dashboard content is excluded; do not revive it through a generic feature gate.
 - At task close, reconcile code/tests with those documents. Record authorized design mismatches in
   the affected document and a new Deviation file; preserve existing entries and legacy logs byte-for-byte. Missing
   original Request or a behavior change needs the user's decision, not an invented requirement/log.
@@ -200,3 +236,8 @@ reported, not retried destructively.
   the existing branch/type convention. PR body: delivered behavior, covered R#/scenarios, review rounds,
   Deviations (or None). Do not add provider attribution.
 - Read Linear status back after integration rather than assuming the merge moved it.
+- Coverage ratchet: CI fails below the `--min` in the `test:coverage` script (`composer.json`). When a
+  task changes or builds on existing `app/` or `src/` code whose tests are thin, add meaningful tests
+  for that code's uncovered behavior in the same task, within the touched files and their direct
+  collaborators. Do not pad with assertion-free tests. Report the CI coverage total in the PR body and,
+  when it rose, raise `--min` to the new total rounded down. Never lower it without the user's decision.

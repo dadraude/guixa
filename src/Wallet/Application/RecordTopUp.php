@@ -19,7 +19,7 @@ final class RecordTopUp
     /** @return string the new movement's id */
     public function __invoke(Actor $actor, string $householdId, int $amountCents, ?string $note = null): string
     {
-        Gate::forUser($actor)->authorize('manage');
+        Gate::forUser($actor)->authorize('manage-wallet');
 
         $movement = Movement::topUp(
             $this->movements->nextId(),
