@@ -1,0 +1,1707 @@
+{
+    "baseUrl": "http://127.0.0.1:5281",
+    "rootFontPx": 16,
+    "darkSelector": "html.dark",
+    "matrix": {
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark", "system-light", "system-dark"],
+        "text": [100, 200]
+    },
+    "views": [
+        {
+            "id": "products-default",
+            "path": "/resources/js/fixtures/producer-landing.html",
+            "query": {
+                "page": "Producer/Products/Index",
+                "role": "producer",
+                "state": "default"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content button,#main-content .pilot-status-switch,#main-content td,#main-content li",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "#main-content a[data-slot=\"button\"]",
+                "#main-content .pilot-status-switch input"
+            ],
+            "states": [
+                {
+                    "id": "light",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(40, 101, 133)",
+                                    "data-now-shell-bg": "rgb(250, 241, 220)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content header p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h2",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-product-table tbody tr",
+                                "count": 3
+                            },
+                            {
+                                "selector": "#main-content .pilot-status-switch",
+                                "count": 3,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "#main-content .pilot-status-switch span",
+                                "count": 3,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content td.pilot-amount",
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content a[data-slot=\"button\"]",
+                                "count": 7,
+                                "contrast": 4.5,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "#main-content a[aria-label^=\"Edita:\"]",
+                                "count": 3
+                            },
+                            {
+                                "selector": "[data-test=\"producer-stock-product\"]",
+                                "count": 3
+                            },
+                            {
+                                "selector": "#main-content label:has([data-test=\"reactivate-product-3\"]) span",
+                                "count": 1,
+                                "text": "Desactivat",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"producer-stock-product\"] .tabular-nums",
+                                "count": 3,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "[data-test=\"producer-stock-inactive\"]",
+                                "count": 1,
+                                "text": "Inactiu",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"producer-stock-sold-out\"]",
+                                "count": 1,
+                                "text": "Esgotat",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-border-ok": "true",
+                                    "data-ev-switch-ok": "true",
+                                    "data-ev-thumb-ok": "true",
+                                    "data-ev-focus-ok": "true"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(143, 197, 223)",
+                                    "data-now-shell-bg": "rgb(28, 32, 31)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content header p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h2",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-product-table tbody tr",
+                                "count": 3
+                            },
+                            {
+                                "selector": "#main-content .pilot-status-switch",
+                                "count": 3,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "#main-content .pilot-status-switch span",
+                                "count": 3,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content td.pilot-amount",
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content a[data-slot=\"button\"]",
+                                "count": 7,
+                                "contrast": 4.5,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "#main-content a[aria-label^=\"Edita:\"]",
+                                "count": 3
+                            },
+                            {
+                                "selector": "[data-test=\"producer-stock-product\"]",
+                                "count": 3
+                            },
+                            {
+                                "selector": "#main-content label:has([data-test=\"reactivate-product-3\"]) span",
+                                "count": 1,
+                                "text": "Desactivat",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"producer-stock-product\"] .tabular-nums",
+                                "count": 3,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "[data-test=\"producer-stock-inactive\"]",
+                                "count": 1,
+                                "text": "Inactiu",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"producer-stock-sold-out\"]",
+                                "count": 1,
+                                "text": "Esgotat",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-border-ok": "true",
+                                    "data-ev-switch-ok": "true",
+                                    "data-ev-thumb-ok": "true",
+                                    "data-ev-focus-ok": "true"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "products-appearance",
+            "path": "/resources/js/fixtures/producer-landing.html",
+            "query": {
+                "page": "Producer/Products/Index",
+                "role": "producer",
+                "state": "default"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content button,#main-content .pilot-status-switch,#main-content td,#main-content li",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "#main-content a[data-slot=\"button\"]",
+                "#main-content .pilot-status-switch input"
+            ],
+            "states": [
+                {
+                    "id": "system-light",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "system-light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(40, 101, 133)",
+                                    "data-now-shell-bg": "rgb(250, 241, 220)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content header p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h2",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-product-table tbody tr",
+                                "count": 3
+                            },
+                            {
+                                "selector": "#main-content .pilot-status-switch",
+                                "count": 3,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "#main-content .pilot-status-switch span",
+                                "count": 3,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content td.pilot-amount",
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content a[data-slot=\"button\"]",
+                                "count": 7,
+                                "contrast": 4.5,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "#main-content a[aria-label^=\"Edita:\"]",
+                                "count": 3
+                            },
+                            {
+                                "selector": "[data-test=\"producer-stock-product\"]",
+                                "count": 3
+                            },
+                            {
+                                "selector": "#main-content label:has([data-test=\"reactivate-product-3\"]) span",
+                                "count": 1,
+                                "text": "Desactivat",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"producer-stock-product\"] .tabular-nums",
+                                "count": 3,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "[data-test=\"producer-stock-inactive\"]",
+                                "count": 1,
+                                "text": "Inactiu",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"producer-stock-sold-out\"]",
+                                "count": 1,
+                                "text": "Esgotat",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-border-ok": "true",
+                                    "data-ev-switch-ok": "true",
+                                    "data-ev-thumb-ok": "true",
+                                    "data-ev-focus-ok": "true"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "system-dark",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "system-dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(143, 197, 223)",
+                                    "data-now-shell-bg": "rgb(28, 32, 31)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content header p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h2",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-product-table tbody tr",
+                                "count": 3
+                            },
+                            {
+                                "selector": "#main-content .pilot-status-switch",
+                                "count": 3,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "#main-content .pilot-status-switch span",
+                                "count": 3,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content td.pilot-amount",
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content a[data-slot=\"button\"]",
+                                "count": 7,
+                                "contrast": 4.5,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "#main-content a[aria-label^=\"Edita:\"]",
+                                "count": 3
+                            },
+                            {
+                                "selector": "[data-test=\"producer-stock-product\"]",
+                                "count": 3
+                            },
+                            {
+                                "selector": "#main-content label:has([data-test=\"reactivate-product-3\"]) span",
+                                "count": 1,
+                                "text": "Desactivat",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"producer-stock-product\"] .tabular-nums",
+                                "count": 3,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "[data-test=\"producer-stock-inactive\"]",
+                                "count": 1,
+                                "text": "Inactiu",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"producer-stock-sold-out\"]",
+                                "count": 1,
+                                "text": "Esgotat",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-border-ok": "true",
+                                    "data-ev-switch-ok": "true",
+                                    "data-ev-thumb-ok": "true",
+                                    "data-ev-focus-ok": "true"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "reduced-motion",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "reducedMotion": true,
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(40, 101, 133)",
+                                    "data-now-shell-bg": "rgb(250, 241, 220)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content header p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h2",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-product-table tbody tr",
+                                "count": 3
+                            },
+                            {
+                                "selector": "#main-content .pilot-status-switch",
+                                "count": 3,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "#main-content .pilot-status-switch span",
+                                "count": 3,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content td.pilot-amount",
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content a[data-slot=\"button\"]",
+                                "count": 7,
+                                "contrast": 4.5,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "#main-content a[aria-label^=\"Edita:\"]",
+                                "count": 3
+                            },
+                            {
+                                "selector": "[data-test=\"producer-stock-product\"]",
+                                "count": 3
+                            },
+                            {
+                                "selector": "#main-content label:has([data-test=\"reactivate-product-3\"]) span",
+                                "count": 1,
+                                "text": "Desactivat",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"producer-stock-product\"] .tabular-nums",
+                                "count": 3,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "[data-test=\"producer-stock-inactive\"]",
+                                "count": 1,
+                                "text": "Inactiu",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"producer-stock-sold-out\"]",
+                                "count": 1,
+                                "text": "Esgotat",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-border-ok": "true",
+                                    "data-ev-switch-ok": "true",
+                                    "data-ev-thumb-ok": "true",
+                                    "data-ev-focus-ok": "true"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "products-empty",
+            "path": "/resources/js/fixtures/producer-landing.html",
+            "query": {
+                "page": "Producer/Products/Index",
+                "role": "producer",
+                "state": "empty"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content button,#main-content .pilot-status-switch,#main-content td,#main-content li",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["#main-content a[data-slot=\"button\"]"],
+            "states": [
+                {
+                    "id": "light",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(40, 101, 133)",
+                                    "data-now-shell-bg": "rgb(250, 241, 220)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-product-table",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content .pilot-layout-notice",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"producer-stock-empty\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content a[data-slot=\"button\"]",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(143, 197, 223)",
+                                    "data-now-shell-bg": "rgb(28, 32, 31)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-product-table",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content .pilot-layout-notice",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"producer-stock-empty\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content a[data-slot=\"button\"]",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "products-no-stock",
+            "path": "/resources/js/fixtures/producer-landing.html",
+            "query": {
+                "page": "Producer/Products/Index",
+                "role": "producer",
+                "state": "no-stock"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content button,#main-content .pilot-status-switch,#main-content td,#main-content li",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["#main-content a[data-slot=\"button\"]"],
+            "states": [
+                {
+                    "id": "light",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content header p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h2",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-product-table tbody tr",
+                                "count": 3
+                            },
+                            {
+                                "selector": "#main-content .pilot-status-switch",
+                                "count": 3,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "#main-content .pilot-status-switch span",
+                                "count": 3,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content td.pilot-amount",
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content a[data-slot=\"button\"]",
+                                "count": 4,
+                                "contrast": 4.5,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "#main-content a[aria-label^=\"Edita:\"]",
+                                "count": 3
+                            },
+                            {
+                                "selector": "#main-content label:has([data-test=\"reactivate-product-3\"]) span",
+                                "count": 1,
+                                "text": "Desactivat",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"producer-stock-empty\"]",
+                                "count": 1,
+                                "contrast": 4.5
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "products-long-name",
+            "path": "/resources/js/fixtures/producer-landing.html",
+            "query": {
+                "page": "Producer/Products/Index",
+                "role": "producer",
+                "state": "long-name"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content button,#main-content .pilot-status-switch,#main-content td,#main-content li",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "#main-content a[data-slot=\"button\"]",
+                "#main-content .pilot-status-switch input"
+            ],
+            "states": [
+                {
+                    "id": "light-375",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(40, 101, 133)",
+                                    "data-now-shell-bg": "rgb(250, 241, 220)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-product-table tbody tr",
+                                "count": 2
+                            },
+                            {
+                                "selector": "#main-content td",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"producer-stock-product\"]",
+                                "count": 2
+                            },
+                            {
+                                "selector": "#main-content a[data-slot=\"button\"]",
+                                "count": 5,
+                                "contrast": 4.5,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"producer-stock-inactive\"]",
+                                "count": 1,
+                                "text": "Inactiu",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content label:has([data-test=\"reactivate-product-3\"]) span",
+                                "count": 1,
+                                "text": "Desactivat",
+                                "contrast": 4.5
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark-375-200",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(143, 197, 223)",
+                                    "data-now-shell-bg": "rgb(28, 32, 31)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-product-table tbody tr",
+                                "count": 2
+                            },
+                            {
+                                "selector": "#main-content td",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"producer-stock-product\"]",
+                                "count": 2
+                            },
+                            {
+                                "selector": "#main-content a[data-slot=\"button\"]",
+                                "count": 5,
+                                "contrast": 4.5,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"producer-stock-inactive\"]",
+                                "count": 1,
+                                "text": "Inactiu",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content label:has([data-test=\"reactivate-product-3\"]) span",
+                                "count": 1,
+                                "text": "Desactivat",
+                                "contrast": 4.5
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "light-1280",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(40, 101, 133)",
+                                    "data-now-shell-bg": "rgb(250, 241, 220)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-product-table tbody tr",
+                                "count": 2
+                            },
+                            {
+                                "selector": "#main-content td",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"producer-stock-product\"]",
+                                "count": 2
+                            },
+                            {
+                                "selector": "#main-content a[data-slot=\"button\"]",
+                                "count": 5,
+                                "contrast": 4.5,
+                                "minWidth": 44,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "[data-test=\"producer-stock-inactive\"]",
+                                "count": 1,
+                                "text": "Inactiu",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content label:has([data-test=\"reactivate-product-3\"]) span",
+                                "count": 1,
+                                "text": "Desactivat",
+                                "contrast": 4.5
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "products-fallback-font",
+            "path": "/resources/js/fixtures/producer-landing.html",
+            "query": {
+                "page": "Producer/Products/Index",
+                "role": "producer",
+                "state": "long-name",
+                "fallback": "1"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content button,#main-content .pilot-status-switch,#main-content td,#main-content li",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "#main-content a[data-slot=\"button\"]",
+                "#main-content .pilot-status-switch input"
+            ],
+            "states": [
+                {
+                    "id": "fallback",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "products-toggle",
+            "path": "/resources/js/fixtures/producer-landing.html",
+            "query": {
+                "page": "Producer/Products/Index",
+                "role": "producer",
+                "state": "toggle"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content button,#main-content .pilot-status-switch,#main-content td,#main-content li",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "#main-content a[data-slot=\"button\"]",
+                "#main-content .pilot-status-switch input"
+            ],
+            "states": [
+                {
+                    "id": "light",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(40, 101, 133)",
+                                    "data-now-shell-bg": "rgb(250, 241, 220)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-status-switch span",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-before": "Desactivat",
+                                    "data-ev-after-reactivate": "Actiu",
+                                    "data-ev-after-deactivate": "Desactivat",
+                                    "data-ev-match": "true"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(143, 197, 223)",
+                                    "data-now-shell-bg": "rgb(28, 32, 31)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-status-switch span",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-before": "Desactivat",
+                                    "data-ev-after-reactivate": "Actiu",
+                                    "data-ev-after-deactivate": "Desactivat",
+                                    "data-ev-match": "true"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "products-busy",
+            "path": "/resources/js/fixtures/producer-landing.html",
+            "query": {
+                "page": "Producer/Products/Index",
+                "role": "producer",
+                "state": "busy"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content button,#main-content .pilot-status-switch,#main-content td,#main-content li",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "#main-content a[data-slot=\"button\"]",
+                "#main-content .pilot-status-switch input"
+            ],
+            "states": [
+                {
+                    "id": "light",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(40, 101, 133)",
+                                    "data-now-shell-bg": "rgb(250, 241, 220)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content label:has([data-test=\"deactivate-product-1\"]) span",
+                                "count": 1,
+                                "text": "Actiu",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-status-switch span",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content td",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"deactivate-product-1\"]",
+                                "attributes": {
+                                    "disabled": ""
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(143, 197, 223)",
+                                    "data-now-shell-bg": "rgb(28, 32, 31)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content label:has([data-test=\"deactivate-product-1\"]) span",
+                                "count": 1,
+                                "text": "Actiu",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-status-switch span",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content td",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"deactivate-product-1\"]",
+                                "attributes": {
+                                    "disabled": ""
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "products-error",
+            "path": "/resources/js/fixtures/producer-landing.html",
+            "query": {
+                "page": "Producer/Products/Index",
+                "role": "producer",
+                "state": "error"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content button,#main-content .pilot-status-switch,#main-content td,#main-content li",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "#main-content a[data-slot=\"button\"]",
+                "#main-content .pilot-status-switch input"
+            ],
+            "states": [
+                {
+                    "id": "light",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(40, 101, 133)",
+                                    "data-now-shell-bg": "rgb(250, 241, 220)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content label:has([data-test=\"deactivate-product-1\"]) span",
+                                "count": 1,
+                                "text": "Actiu",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-status-switch span",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content td",
+                                "contrast": 4.5
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(143, 197, 223)",
+                                    "data-now-shell-bg": "rgb(28, 32, 31)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content label:has([data-test=\"deactivate-product-1\"]) span",
+                                "count": 1,
+                                "text": "Actiu",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-status-switch span",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content td",
+                                "contrast": 4.5
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -444,31 +444,12 @@ const pageProps: Record<string, Record<string, unknown>> = {
         product: movementProduct,
         history: movementHistory,
     },
-    'Producer/Stock/Movements': {
-        product: movementProduct,
-        history: movementHistory,
-    },
     'Finance/Stock/Movements': {
         product: movementProduct,
         history: movementHistory,
     },
     // --- end T08
-    // Unmigrated consumers of the shared dialog, for the leakage probe.
-    // --- T05 (DRA-277): shared-consumer probe, WeeklyProductFields consumer left unmigrated
-    'Producer/Products/Create': {},
-    // --- end T05
-    'Producer/Products/Edit': {
-        product: {
-            id: 'product-1',
-            name: 'Pa de pagès',
-            unit: 'unitat',
-            price: '3.50',
-            variable: false,
-            containersPerUnit: null,
-            active: true,
-        },
-        used: false,
-    },
+    // Unmigrated consumer of the shared dialog, for the leakage probe.
     'Manage/Cycles/Index': {
         cycles: [],
         producers: [],
@@ -503,7 +484,6 @@ const urls: Record<string, string> = {
         '/catalogue/producers/producer-1/products/weekly/create',
     'Catalogue/Producers/WeeklyProduct/Edit':
         '/catalogue/producers/producer-1/products/weekly/product-1/edit',
-    'Producer/Products/Create': '/producer/products/create',
     // --- end T05
     // --- T06 (DRA-278)
     'Manage/Stock/Create':
@@ -514,7 +494,6 @@ const urls: Record<string, string> = {
     // --- end T06
     // --- T08 (DRA-276)
     'Catalogue/Stock/Movements': '/catalogue/stock/stock-1/movements',
-    'Producer/Stock/Movements': '/producer/stock/stock-1/movements',
     'Finance/Stock/Movements': '/finance/stock/stock-1/movements',
     // --- end T08
     // --- T07 (DRA-275)
@@ -522,7 +501,6 @@ const urls: Record<string, string> = {
     'Manage/ReturnItems/Create': '/catalogue/return-items/create',
     'Manage/ReturnItems/Edit': '/catalogue/return-items/item-1/edit',
     // --- end T07
-    'Producer/Products/Edit': '/producer/products/product-1/edit',
     'Manage/Cycles/Index': '/manage/cycles',
     'Manage/Accounts/Index': '/manage/accounts',
     Welcome: '/',
