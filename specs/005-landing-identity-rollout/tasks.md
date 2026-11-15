@@ -711,3 +711,17 @@ Published 2026-11-13 ([record](linear-publication.md)). Parent: DRA-270 (no task
 | T07 | DRA-275 |
 | T08 | DRA-276 |
 | T09 | DRA-279 |
+
+## Linear mapping — slice 2
+
+Published 2026-11-15 ([record](linear-publication.md#slice-2-producer-role-complete)). Parent: DRA-280 (no task ID, no label).
+
+| Task | Issue   |
+| ---- | ------- |
+| T10  | DRA-281 |
+| T11  | DRA-283 |
+| T12  | DRA-284 |
+| T13  | DRA-285 |
+| T14  | DRA-286 |
+| T15  | DRA-282 |
+| T16  | DRA-287 |
