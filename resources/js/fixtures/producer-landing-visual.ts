@@ -223,6 +223,9 @@ const page = {
 // Request spy: every request the real router sends, so the switch is proven to send what it always sent.
 const requestLog: string[] = [];
 const switchRequests: string[] = [];
+// Create/Edit forms and delete-unused (spec 005 T11): requests the real router sends for those pages.
+const formRequests: string[] = [];
+const formStates = ['form-invalid', 'form-busy', 'delete-busy', 'delete-error'];
 const pagesByPath: Record<string, string> = {
     '/manage/accounts': 'Manage/Accounts/Index',
     '/producer/products': 'Producer/Products/Index',
@@ -237,6 +240,27 @@ http.setClient({
             data: JSON.stringify(body),
             headers: { 'x-inertia': 'true' },
         });
+        const isFormRequest =
+            method !== 'get' &&
+            (url.pathname === '/producer/products' ||
+                url.pathname.endsWith('/unused'));
+        if (formStates.includes(state) && isFormRequest) {
+            formRequests.push(`${method} ${url.pathname}${url.search}`);
+            // Busy: the request never answers, so the page stays in `processing`.
+            if (state.endsWith('-busy')) return new Promise(() => {});
+            return reply({
+                ...page,
+                props: {
+                    ...page.props,
+                    errors:
+                        state === 'delete-error'
+                            ? { domain: 'No s’ha pogut eliminar el producte.' }
+                            : {
+                                  name: 'Ja existeix un producte amb aquest nom.',
+                              },
+                },
+            });
+        }
         if (
             url.pathname.startsWith('/producer/products/') &&
             method !== 'get'
@@ -544,6 +568,59 @@ const recordControlContrast = () => {
     );
 };
 
+// Non-text contrast of the Create/Edit form controls. A text field's border is measured against the
+// page backdrop and against its own fill (`dark:bg-input/30`), keeping the weaker ratio.
+const recordFormContrast = () => {
+    const nodes = (selector: string) => [
+        ...document.querySelectorAll<HTMLElement>(`#main-content ${selector}`),
+    ];
+    const report = (name: string, ratios: number[]) => {
+        const weakest = ratios.length ? Math.min(...ratios) : 0;
+        const set = (key: string, value: string) =>
+            document.body.setAttribute(`data-ev-${name}-${key}`, value);
+        set('count', String(ratios.length));
+        set('ratio', weakest.toFixed(2));
+        set('ok', String(ratios.length > 0 && weakest >= 3));
+    };
+    const edge = (node: HTMLElement) => {
+        const border = over(
+            toRgba(getComputedStyle(node).borderTopColor),
+            backdropOf(node),
+        );
+        const fill = over(
+            toRgba(getComputedStyle(node).backgroundColor),
+            backdropOf(node),
+        );
+        return Math.min(ratio(border, backdropOf(node)), ratio(border, fill));
+    };
+    report(
+        'field',
+        nodes('input:not([type="checkbox"]):not([type="hidden"])').map(edge),
+    );
+    report('checkbox', nodes('input[type="checkbox"]').map(edge));
+    const outlined = nodes('[data-slot="button"]').filter(
+        (button) => parseFloat(getComputedStyle(button).borderTopWidth) > 0,
+    );
+    report(
+        'border',
+        outlined.map((button) =>
+            against(getComputedStyle(button).borderTopColor, button),
+        ),
+    );
+    const focusable = nodes('a, button, input').filter(visible);
+    report(
+        'focus',
+        focusable.flatMap((node) => {
+            const colour = focusOutlineColour(node);
+            return colour ? [against(colour, node)] : [];
+        }),
+    );
+    document.body.setAttribute(
+        'data-ev-focus-targets',
+        String(focusable.length),
+    );
+};
+
 // The switch is a real Form: clicking it must send exactly what ProductController defines.
 const requestFor = (id: string, active: boolean) => {
     const form = (
@@ -570,6 +647,91 @@ const clickSwitch = async (kind: string, id: string, settledLabel: string) => {
     );
     await sleep(150);
 };
+// Create/Edit helpers. A scripted click on a focused button stands in for Enter/Space activation,
+// which the browser turns into the same click; the dialog's native Escape is stood in by close().
+const formRequestsText = () => formRequests.join(' ; ');
+const setEvidence = (key: string, value: string) =>
+    document.body.setAttribute(`data-ev-${key}`, value);
+const byTest = (name: string) =>
+    waitFor(() => document.querySelector<HTMLElement>(`[data-test="${name}"]`));
+const openDialog = async () => {
+    const opener = await byTest('delete-unused-product');
+    opener.focus();
+    opener.click();
+    await waitFor(() => document.querySelector('dialog[open]'));
+    await sleep(200);
+    return opener;
+};
+const fillAndSubmitCreate = async () => {
+    const values: Record<string, string> = {
+        name: 'Pa de pagès',
+        unit: 'unitat',
+        price: '3.50',
+    };
+    for (const [id, value] of Object.entries(values))
+        (
+            await waitFor(() =>
+                document.querySelector<HTMLInputElement>(`#${id}`),
+            )
+        ).value = value;
+    (await byTest('save-product')).click();
+};
+const expectedStore = () => {
+    const form = ProductController.store.form() as {
+        action: string;
+        method: string;
+    };
+    const target = new URL(form.action, window.location.origin);
+    return `${form.method.toLowerCase()} ${target.pathname}${target.search}`;
+};
+const expectedDelete = () => {
+    const target = new URL(
+        ProductController.deleteUnused.url('product-1'),
+        window.location.origin,
+    );
+    return `delete ${target.pathname}${target.search}`;
+};
+const runFormState = async () => {
+    if (state === 'form-invalid' || state === 'form-busy') {
+        await fillAndSubmitCreate();
+        await waitFor(() => (formRequests.length ? document.body : null));
+        if (state === 'form-invalid')
+            await waitFor(() =>
+                document.querySelector('#name ~ div .text-destructive'),
+            );
+        await sleep(400);
+        setEvidence('requests', formRequestsText());
+        setEvidence('expected', expectedStore());
+        setEvidence('match', String(formRequestsText() === expectedStore()));
+    }
+    if (state === 'dialog') await openDialog();
+    if (state === 'dialog-close') {
+        const opener = await openDialog();
+        const dialog = document.querySelector<HTMLDialogElement>('dialog')!;
+        dialog.close();
+        await sleep(200);
+        setEvidence('escape-open', String(dialog.open));
+        setEvidence('escape-focus', String(document.activeElement === opener));
+        await openDialog();
+        (await byTest('cancel-product-action')).click();
+        await sleep(200);
+        setEvidence('cancel-open', String(dialog.open));
+        setEvidence('cancel-focus', String(document.activeElement === opener));
+        setEvidence('requests', formRequestsText() || 'none');
+    }
+    if (state === 'delete-busy' || state === 'delete-error') {
+        await openDialog();
+        (await byTest('confirm-product-action')).click();
+        await waitFor(() => (formRequests.length ? document.body : null));
+        if (state === 'delete-error')
+            await waitFor(() => document.querySelector('[role="alert"] p'));
+        await sleep(400);
+        setEvidence('requests', formRequestsText());
+        setEvidence('expected', expectedDelete());
+        setEvidence('match', String(formRequestsText() === expectedDelete()));
+    }
+};
+
 const runToggle = async () => {
     // Product 3 is inactive first: reactivate it, then deactivate product 1, as a person would.
     document.body.setAttribute('data-ev-before', switchLabel('product-3'));
@@ -639,6 +801,11 @@ void createInertiaApp({
             requestFor('product-1', true),
         );
     }
+    if (
+        pageName.startsWith('Producer/Products/') &&
+        pageName !== 'Producer/Products/Index'
+    )
+        await runFormState();
     if (state === 'account-menu') await openMenu();
     if (query.get('drawer') === '1') await openSheet();
     await snapshot('now');
@@ -648,6 +815,13 @@ void createInertiaApp({
         !document.querySelector(measured.menu)
     )
         recordControlContrast();
+    if (
+        pageName.startsWith('Producer/Products/') &&
+        pageName !== 'Producer/Products/Index' &&
+        !document.querySelector(measured.sheet) &&
+        !document.querySelector(measured.menu)
+    )
+        recordFormContrast();
     document.body.dataset.requests = String(requestLog.length);
     document.body.dataset.visualReady = state;
     const restore = () =>

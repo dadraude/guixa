@@ -536,14 +536,14 @@
                                 "fontSizeRem": 1.5
                             },
                             {
-                                "selector": ".landing",
-                                "count": 0
+                                "selector": ".reference-style.landing",
+                                "count": 1
                             },
                             {
                                 "selector": "body",
                                 "attributes": {
-                                    "data-now-shell-primary": "rgb(36, 107, 87)",
-                                    "data-now-shell-bg": "rgb(248, 247, 244)"
+                                    "data-now-shell-primary": "rgb(40, 101, 133)",
+                                    "data-now-shell-bg": "rgb(250, 241, 220)"
                                 }
                             }
                         ]
@@ -569,14 +569,14 @@
                                 "fontSizeRem": 1.5
                             },
                             {
-                                "selector": ".landing",
-                                "count": 0
+                                "selector": ".reference-style.landing",
+                                "count": 1
                             },
                             {
                                 "selector": "body",
                                 "attributes": {
-                                    "data-now-shell-primary": "rgb(167, 215, 193)",
-                                    "data-now-shell-bg": "rgb(27, 30, 28)"
+                                    "data-now-shell-primary": "rgb(143, 197, 223)",
+                                    "data-now-shell-bg": "rgb(28, 32, 31)"
                                 }
                             }
                         ]
@@ -602,14 +602,14 @@
                                 "fontSizeRem": 1.5
                             },
                             {
-                                "selector": ".landing",
-                                "count": 0
+                                "selector": ".reference-style.landing",
+                                "count": 1
                             },
                             {
                                 "selector": "body",
                                 "attributes": {
-                                    "data-now-shell-primary": "rgb(36, 107, 87)",
-                                    "data-now-shell-bg": "rgb(248, 247, 244)"
+                                    "data-now-shell-primary": "rgb(40, 101, 133)",
+                                    "data-now-shell-bg": "rgb(250, 241, 220)"
                                 }
                             }
                         ]
@@ -635,14 +635,14 @@
                                 "fontSizeRem": 1.5
                             },
                             {
-                                "selector": ".landing",
-                                "count": 0
+                                "selector": ".reference-style.landing",
+                                "count": 1
                             },
                             {
                                 "selector": "body",
                                 "attributes": {
-                                    "data-now-shell-primary": "rgb(167, 215, 193)",
-                                    "data-now-shell-bg": "rgb(27, 30, 28)"
+                                    "data-now-shell-primary": "rgb(143, 197, 223)",
+                                    "data-now-shell-bg": "rgb(28, 32, 31)"
                                 }
                             }
                         ]
@@ -684,14 +684,14 @@
                                 "fontSizeRem": 1.5
                             },
                             {
-                                "selector": ".landing",
-                                "count": 0
+                                "selector": ".reference-style.landing",
+                                "count": 1
                             },
                             {
                                 "selector": "body",
                                 "attributes": {
-                                    "data-now-shell-primary": "rgb(36, 107, 87)",
-                                    "data-now-shell-bg": "rgb(248, 247, 244)"
+                                    "data-now-shell-primary": "rgb(40, 101, 133)",
+                                    "data-now-shell-bg": "rgb(250, 241, 220)"
                                 }
                             }
                         ]
@@ -717,14 +717,14 @@
                                 "fontSizeRem": 1.5
                             },
                             {
-                                "selector": ".landing",
-                                "count": 0
+                                "selector": ".reference-style.landing",
+                                "count": 1
                             },
                             {
                                 "selector": "body",
                                 "attributes": {
-                                    "data-now-shell-primary": "rgb(167, 215, 193)",
-                                    "data-now-shell-bg": "rgb(27, 30, 28)"
+                                    "data-now-shell-primary": "rgb(143, 197, 223)",
+                                    "data-now-shell-bg": "rgb(28, 32, 31)"
                                 }
                             }
                         ]
@@ -750,14 +750,14 @@
                                 "fontSizeRem": 1.5
                             },
                             {
-                                "selector": ".landing",
-                                "count": 0
+                                "selector": ".reference-style.landing",
+                                "count": 1
                             },
                             {
                                 "selector": "body",
                                 "attributes": {
-                                    "data-now-shell-primary": "rgb(36, 107, 87)",
-                                    "data-now-shell-bg": "rgb(248, 247, 244)"
+                                    "data-now-shell-primary": "rgb(40, 101, 133)",
+                                    "data-now-shell-bg": "rgb(250, 241, 220)"
                                 }
                             }
                         ]
@@ -783,14 +783,14 @@
                                 "fontSizeRem": 1.5
                             },
                             {
-                                "selector": ".landing",
-                                "count": 0
+                                "selector": ".reference-style.landing",
+                                "count": 1
                             },
                             {
                                 "selector": "body",
                                 "attributes": {
-                                    "data-now-shell-primary": "rgb(167, 215, 193)",
-                                    "data-now-shell-bg": "rgb(27, 30, 28)"
+                                    "data-now-shell-primary": "rgb(143, 197, 223)",
+                                    "data-now-shell-bg": "rgb(28, 32, 31)"
                                 }
                             }
                         ]
