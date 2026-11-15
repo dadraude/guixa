@@ -1771,12 +1771,12 @@
             ]
         },
         {
-            "id": "producer-edit-unchanged",
+            "id": "cycles-dialog-unchanged",
             "path": "/resources/js/fixtures/catalogue-landing.html",
             "query": {
-                "page": "Producer/Products/Edit",
-                "role": "producer",
-                "dialog": "delete"
+                "page": "Manage/Cycles/Index",
+                "role": "manager",
+                "dialog": "create"
             },
             "root": ".reference-style",
             "panels": "#main-content",
@@ -1814,7 +1814,7 @@
                                     "data-now-dialog-bg": "rgb(255, 255, 255)",
                                     "data-now-dialog-ink": "rgb(32, 43, 38)",
                                     "data-now-dialog-border": "rgb(214, 222, 216)",
-                                    "data-now-dialog-buttons": "rgb(255, 255, 255) | rgb(32, 43, 38) | rgb(120, 138, 125) | 1px ; rgb(255, 255, 255) | rgb(32, 43, 38) | rgb(120, 138, 125) | 1px ; rgb(36, 107, 87) | rgb(255, 255, 255) | rgb(214, 222, 216) | 0px"
+                                    "data-now-dialog-buttons": "rgb(255, 255, 255) | rgb(32, 43, 38) | rgb(120, 138, 125) | 1px ; rgb(255, 255, 255) | rgb(32, 43, 38) | rgb(120, 138, 125) | 1px ; rgb(255, 255, 255) | rgb(32, 43, 38) | rgb(120, 138, 125) | 1px ; rgb(36, 107, 87) | rgb(255, 255, 255) | rgb(36, 107, 87) | 1px"
                                 }
                             }
                         ]
@@ -1849,7 +1849,7 @@
                                     "data-now-dialog-bg": "rgb(37, 42, 39)",
                                     "data-now-dialog-ink": "rgb(236, 242, 237)",
                                     "data-now-dialog-border": "rgb(107, 120, 111)",
-                                    "data-now-dialog-buttons": "rgb(37, 42, 39) | rgb(236, 242, 237) | rgb(149, 169, 155) | 1px ; rgb(37, 42, 39) | rgb(236, 242, 237) | rgb(149, 169, 155) | 1px ; rgb(167, 215, 193) | rgb(27, 48, 38) | rgb(107, 120, 111) | 0px"
+                                    "data-now-dialog-buttons": "rgb(37, 42, 39) | rgb(236, 242, 237) | rgb(149, 169, 155) | 1px ; rgb(37, 42, 39) | rgb(236, 242, 237) | rgb(149, 169, 155) | 1px ; rgb(37, 42, 39) | rgb(236, 242, 237) | rgb(149, 169, 155) | 1px ; rgb(167, 215, 193) | rgb(27, 48, 38) | rgb(167, 215, 193) | 1px"
                                 }
                             }
                         ]

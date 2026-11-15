@@ -80,7 +80,7 @@ No Linear column: tickets are not published. "After" lists genuine prerequisites
 | T07 | <a id="t07"></a>[Show the return-item list and forms in the landing identity](#t07-show-the-return-item-list-and-forms-in-the-landing-identity) | R1/R4–R9 for `Manage/ReturnItems/*`; S3 return-item portion; S4 table portion; S10 specs `Index`, `Create`, `Edit` | T01 |
 | T08 | <a id="t08"></a>[Show the stock movement history in the landing identity](#t08-show-the-stock-movement-history-in-the-landing-identity) | R1/R4–R9 for `Catalogue/Stock/Movements`; S6; S10 spec `Movements` | T01 |
 | T09 | <a id="t09"></a>[Record slice acceptance and request visual approval](#t09-record-slice-acceptance-and-request-visual-approval) | R3 (area-wide), R10, R11, R12; S1, S2, S8 (re-run), S9, S10, S11 (aggregate), S12 | T02–T08 |
-| T10 | <a id="t10"></a>[Show the producer product list in the landing identity, with fixture and controls re-pointed](#t10-show-the-producer-product-list-in-the-landing-identity-with-fixture-and-controls-re-pointed) | R14/R15 (title measurement)/R16/R17 for `Producer/Products/Index`; S13 (start), S14 (list), S16 (toggle, reactivate, delete busy and error), S17 (first states) | — |
+| T10 | <a id="t10"></a>[Show the producer product list in the landing identity, with fixture and controls re-pointed](#t10-show-the-producer-product-list-in-the-landing-identity-with-fixture-and-controls-re-pointed) | R14/R15 (title measurement)/R16/R17 for `Producer/Products/Index`; S13 (start), S14 (list), S16 (toggle, reactivate busy and error), S17 (first states) | — |
 | T11 | <a id="t11"></a>[Show the producer product forms and classification dialog in the landing identity](#t11-show-the-producer-product-forms-and-classification-dialog-in-the-landing-identity) | R14–R16 for `Producer/Products/{Create,Edit}`; R18 (specs `Create`, `Edit`); S14 (forms), S16 (dialog) | T10 |
 | T12 | <a id="t12"></a>[Show the producer default cutoff in the landing identity](#t12-show-the-producer-default-cutoff-in-the-landing-identity) | R14–R16 for `Producer/Cutoff`; R18 (spec `Cutoff`); S15 (cutoff valid and invalid) | T10 |
 | T13 | <a id="t13"></a>[Show the producer cycle summary in the landing identity](#t13-show-the-producer-cycle-summary-in-the-landing-identity) | R14–R16 for `Producer/CycleSummary`; R18 (spec `CycleSummary`); S15 (summary, availability toggle) | T10 |
@@ -164,7 +164,7 @@ global promotion and Dashboard restyle are outside.
 | S13 | T10 starts; each page task adds its page; complete in T16 (needs all six pages on the integrated base). |
 | S14 | Split: list T10; forms T11. Complete when T11 merges; T15 supplies the seeded rows; T16 confirms. |
 | S15 | Split: cutoff T12; summary and availability toggle T13. Complete when both merge; T16 confirms. |
-| S16 | Split: toggle, reactivate, delete busy and error T10; dialog T11; history T14. Complete when T14 merges; T16 confirms. |
+| S16 | Split: toggle, reactivate busy and error T10; dialog and delete-unused busy and error T11; history T14. Complete when T14 merges; T16 confirms. |
 | S17 | T10 (first navigation and leak states, re-pointed controls); T16 completes (multi-role navigation, access refusals read from existing guards). |
 | S18 | T16 only. |
 
@@ -434,9 +434,9 @@ Pages are under `resources/js/pages/` (lowercase). Each page task states in its 
   overlays, while the re-pointed unmigrated controls, Welcome, the slice 1 pages and the other five Producer pages are
   unchanged. This is also the tracer for every later Producer page task.
 - **Requirements/scenarios.** R14, R15 (title measurement of the six pages, D6), R16 and R17 for `Products/Index`; S13
-  start; S14 list (no products, several, very long name, inactive product, no/inactive/sold-out stock product); S16 toggle,
-  reactivate and delete-unused with busy and error states; S17 first navigation states. Remainder: S13/S17/R15 final -> T16;
-  forms -> T11; other pages -> T12–T14.
+  start; S14 list (no products, several, very long name, inactive product, no/inactive/sold-out stock product); S16 toggle
+  and reactivate with busy and error states; S17 first navigation states. Remainder: S13/S17/R15 final -> T16;
+  forms and delete-unused busy and error (on `Products/Edit`) -> T11; other pages -> T12–T14.
 - **Plan sections.** Architecture overview (Title size, Shared consumers); Contract for admitting a Producer page; R14,
   R15, R16 (product list), R17; Test plan; Visual evidence plan incl. First checkpoint; Risks; D6, D7, D8, D9.
 - **Files/surfaces reserved.** Edit: `resources/js/lib/pilotTheme.ts` (`landingPages` row for `Producer/Products/Index`),
@@ -469,7 +469,7 @@ Pages are under `resources/js/pages/` (lowercase). Each page task states in its 
     targets >= 44 px (including `ActiveSwitch` and stock table controls), no horizontal overflow, real-Tab focus order.
   - Given no products, several, very long name and unit, inactive product, no stock products, inactive and sold-out stock
     product: text "Deactivated" is present on the inactive row, `Inactive` and `Sold out` are text badges, and nothing clips.
-  - Given toggle Active, reactivate and delete-unused, the busy and error states keep text and contrast; the real router
+  - Given toggle Active and reactivate, the busy and error states keep text and contrast; the real router
     in a focused probe sends the same requests as before (R17).
   - Given navigation Producer products -> `Manage/Accounts/Index` -> back, with the mobile sheet and with the account menu
     open, light and dark and system preference, the control keeps green and `Index` recovers the landing colours (S17 first
@@ -485,15 +485,15 @@ Pages are under `resources/js/pages/` (lowercase). Each page task states in its 
   other five pages is the first item to cut if the diff passes ~400 lines.
 - **Limits.** No other Producer page admitted. No shared-bootstrap extraction (D5/D9). No markup change in `ActiveSwitch`.
 - **Acceptance record.** Required at close: R14/R16/R17 for `Products/Index`, R15 title measurement, S14 list, S16
-  toggle/reactivate/delete, S17 first states, evidence, verdict, remainder owners above.
+  toggle/reactivate, S17 first states, evidence, verdict, remainder owners above.
 
 ### T11 Show the producer product forms and classification dialog in the landing identity
 
 - **Outcome.** `Producer/Products/Create` and `Edit`, and the `ProductAdministrationActions` dialog opened on `Edit`,
   show the landing identity; fields, errors and busy state meet R5/R6; the new page specs exist.
 - **Requirements/scenarios.** R14–R16 for both forms and the dialog; R17; R18 specs `Create`, `Edit`; S14 forms (invalid and
-  valid submit); S16 dialog (opened by keyboard, Escape closes with no request, focus returns). Remainder: S14/S16 final
-  -> T16.
+  valid submit); S16 dialog (opened by keyboard, Escape closes with no request, focus returns) and delete-unused busy and error on `Edit`
+  (reallocated from T10). Remainder: S14/S16 final -> T16.
 - **Plan sections.** R14 (overlays), R16 (product form and dialog), Test plan rows `Products/Create`, `Products/Edit`; D7,
   D8; Shared consumers (`WeeklyProductFields`, `ProductAdministrationActions` now fully migrated).
 - **Files/surfaces reserved.** `lib/pilotTheme.ts` rows (2); `lib/pilotTheme.spec.ts` and `composables/usePilotTheme.spec.ts`
@@ -515,6 +515,8 @@ Pages are under `resources/js/pages/` (lowercase). Each page task states in its 
   - Dialog opened by keyboard on the producer role: landing surface/ink/focus, Escape sends no request, focus returns to
     the opener, `NativeDialog.spec.ts` green (the toast is the synthetic Sonner probe already accepted in the slice 1 T03
     Deviation, cited, not repeated).
+  - Given delete-unused on `Edit`, the busy and error states keep text and contrast, and the real router in a focused probe
+    sends the same request as before (same assertions as the T10 toggle; R17).
   - Shared-consumer probe: `NativeDialog` base on `Manage/Cycles/Index` unchanged. R10 guards pass.
 - **First checkpoint.** Failing `errors.name` spec for `Create`, then the measured Name field border on `Create` before
   and after admission.

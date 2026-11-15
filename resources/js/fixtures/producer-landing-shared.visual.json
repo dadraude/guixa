@@ -1,0 +1,1584 @@
+{
+    "baseUrl": "http://127.0.0.1:5281",
+    "rootFontPx": 16,
+    "darkSelector": "html.dark",
+    "matrix": {
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark", "system-light", "system-dark"],
+        "text": [100, 200]
+    },
+    "views": [
+        {
+            "id": "products-checkpoint",
+            "path": "/resources/js/fixtures/producer-landing.html",
+            "query": {
+                "page": "Producer/Products/Index",
+                "role": "producer",
+                "state": "checkpoint"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content button,#main-content .pilot-status-switch,#main-content td,#main-content li",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "#main-content a[data-slot=\"button\"]",
+                "#main-content .pilot-status-switch input"
+            ],
+            "states": [
+                {
+                    "id": "light",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(40, 101, 133)",
+                                    "data-now-shell-bg": "rgb(250, 241, 220)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-border-ok": "true",
+                                    "data-ev-focus-ok": "true"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(143, 197, 223)",
+                                    "data-now-shell-bg": "rgb(28, 32, 31)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-border-ok": "true",
+                                    "data-ev-focus-ok": "true"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "products-variant-off",
+            "path": "/resources/js/fixtures/producer-landing.html",
+            "query": {
+                "page": "Producer/Products/Index",
+                "role": "producer",
+                "state": "variant-off"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content h1:not(.sr-only)",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content button,#main-content .pilot-status-switch,#main-content td,#main-content li",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Reversion fixture; only the exact pre-slice colours are checked.",
+            "states": [
+                {
+                    "id": "light",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(36, 107, 87)",
+                                    "data-now-shell-bg": "rgb(248, 247, 244)"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(167, 215, 193)",
+                                    "data-now-shell-bg": "rgb(27, 30, 28)"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "title-cutoff",
+            "path": "/resources/js/fixtures/producer-landing.html",
+            "query": {
+                "page": "Producer/Cutoff",
+                "role": "producer"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content h1:not(.sr-only)",
+            "content": "#main-content h1:not(.sr-only)",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Title measurement (R15): only the heading size and the unchanged look are checked.",
+            "states": [
+                {
+                    "id": "light-375",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(36, 107, 87)",
+                                    "data-now-shell-bg": "rgb(248, 247, 244)"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark-375",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(167, 215, 193)",
+                                    "data-now-shell-bg": "rgb(27, 30, 28)"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "light-1280",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(36, 107, 87)",
+                                    "data-now-shell-bg": "rgb(248, 247, 244)"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark-1280",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(167, 215, 193)",
+                                    "data-now-shell-bg": "rgb(27, 30, 28)"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "title-cycle-summary",
+            "path": "/resources/js/fixtures/producer-landing.html",
+            "query": {
+                "page": "Producer/CycleSummary",
+                "role": "producer"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content h1:not(.sr-only)",
+            "content": "#main-content h1:not(.sr-only)",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Title measurement (R15): only the heading size and the unchanged look are checked.",
+            "states": [
+                {
+                    "id": "light-375",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(36, 107, 87)",
+                                    "data-now-shell-bg": "rgb(248, 247, 244)"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark-375",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(167, 215, 193)",
+                                    "data-now-shell-bg": "rgb(27, 30, 28)"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "light-1280",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(36, 107, 87)",
+                                    "data-now-shell-bg": "rgb(248, 247, 244)"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark-1280",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(167, 215, 193)",
+                                    "data-now-shell-bg": "rgb(27, 30, 28)"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "title-product-create",
+            "path": "/resources/js/fixtures/producer-landing.html",
+            "query": {
+                "page": "Producer/Products/Create",
+                "role": "producer"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content h1:not(.sr-only)",
+            "content": "#main-content h1:not(.sr-only)",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Title measurement (R15): only the heading size and the unchanged look are checked.",
+            "states": [
+                {
+                    "id": "light-375",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(36, 107, 87)",
+                                    "data-now-shell-bg": "rgb(248, 247, 244)"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark-375",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(167, 215, 193)",
+                                    "data-now-shell-bg": "rgb(27, 30, 28)"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "light-1280",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(36, 107, 87)",
+                                    "data-now-shell-bg": "rgb(248, 247, 244)"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark-1280",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(167, 215, 193)",
+                                    "data-now-shell-bg": "rgb(27, 30, 28)"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "title-product-edit",
+            "path": "/resources/js/fixtures/producer-landing.html",
+            "query": {
+                "page": "Producer/Products/Edit",
+                "role": "producer"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content h1:not(.sr-only)",
+            "content": "#main-content h1:not(.sr-only)",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Title measurement (R15): only the heading size and the unchanged look are checked.",
+            "states": [
+                {
+                    "id": "light-375",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(36, 107, 87)",
+                                    "data-now-shell-bg": "rgb(248, 247, 244)"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark-375",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(167, 215, 193)",
+                                    "data-now-shell-bg": "rgb(27, 30, 28)"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "light-1280",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(36, 107, 87)",
+                                    "data-now-shell-bg": "rgb(248, 247, 244)"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark-1280",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(167, 215, 193)",
+                                    "data-now-shell-bg": "rgb(27, 30, 28)"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "title-stock-movements",
+            "path": "/resources/js/fixtures/producer-landing.html",
+            "query": {
+                "page": "Producer/Stock/Movements",
+                "role": "producer"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content h1:not(.sr-only)",
+            "content": "#main-content h1:not(.sr-only)",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Title measurement (R15): only the heading size and the unchanged look are checked.",
+            "states": [
+                {
+                    "id": "light-375",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(36, 107, 87)",
+                                    "data-now-shell-bg": "rgb(248, 247, 244)"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark-375",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(167, 215, 193)",
+                                    "data-now-shell-bg": "rgb(27, 30, 28)"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "light-1280",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(36, 107, 87)",
+                                    "data-now-shell-bg": "rgb(248, 247, 244)"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark-1280",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(167, 215, 193)",
+                                    "data-now-shell-bg": "rgb(27, 30, 28)"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "title-product-list",
+            "path": "/resources/js/fixtures/producer-landing.html",
+            "query": {
+                "page": "Producer/Products/Index",
+                "role": "producer",
+                "state": "checkpoint"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content h1:not(.sr-only)",
+            "content": "#main-content h1:not(.sr-only)",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Title measurement (R15): focus order is covered by products-checkpoint.",
+            "states": [
+                {
+                    "id": "light-375",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark-375",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "light-1280",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark-1280",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "accounts-unmigrated",
+            "path": "/resources/js/fixtures/producer-landing.html",
+            "query": {
+                "page": "Manage/Accounts/Index",
+                "role": "manager"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content button,#main-content .pilot-status-switch,#main-content td,#main-content li",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Unmigrated Manager-only route; only the absence of landing is checked.",
+            "states": [
+                {
+                    "id": "light",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(36, 107, 87)",
+                                    "data-now-shell-bg": "rgb(248, 247, 244)"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(167, 215, 193)",
+                                    "data-now-shell-bg": "rgb(27, 30, 28)"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "welcome-unchanged",
+            "path": "/resources/js/fixtures/producer-landing.html",
+            "query": {
+                "page": "Welcome",
+                "role": "producer"
+            },
+            "root": ".welcome-page",
+            "panels": ".welcome-page main",
+            "content": "h1,a",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Welcome is outside the area; only the absence of landing is checked.",
+            "states": [
+                {
+                    "id": "light",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".welcome-page"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 1
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "products-navigation",
+            "path": "/resources/js/fixtures/producer-landing.html",
+            "query": {
+                "page": "Producer/Products/Index",
+                "role": "producer"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content button,#main-content .pilot-status-switch,#main-content td,#main-content li",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Navigation probe: focus order is covered by products-default.",
+            "states": [
+                {
+                    "id": "nav-sheet-light",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "query": {
+                        "state": "nav-sheet"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-s1-shell-primary": "rgb(40, 101, 133)",
+                                    "data-s1-shell-bg": "rgb(250, 241, 220)",
+                                    "data-s2-shell-primary": "rgb(36, 107, 87)",
+                                    "data-s2-shell-bg": "rgb(248, 247, 244)",
+                                    "data-s3-shell-primary": "rgb(40, 101, 133)",
+                                    "data-s3-shell-bg": "rgb(250, 241, 220)",
+                                    "data-nav-requests": "get /manage/accounts,get /producer/products"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "nav-sheet-dark",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "query": {
+                        "state": "nav-sheet"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-s1-shell-primary": "rgb(143, 197, 223)",
+                                    "data-s1-shell-bg": "rgb(28, 32, 31)",
+                                    "data-s2-shell-primary": "rgb(167, 215, 193)",
+                                    "data-s2-shell-bg": "rgb(27, 30, 28)",
+                                    "data-s3-shell-primary": "rgb(143, 197, 223)",
+                                    "data-s3-shell-bg": "rgb(28, 32, 31)",
+                                    "data-nav-requests": "get /manage/accounts,get /producer/products"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "nav-menu-light",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "query": {
+                        "state": "nav-menu"
+                    },
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-s1-shell-primary": "rgb(40, 101, 133)",
+                                    "data-s1-shell-bg": "rgb(250, 241, 220)",
+                                    "data-s2-shell-primary": "rgb(36, 107, 87)",
+                                    "data-s2-shell-bg": "rgb(248, 247, 244)",
+                                    "data-s3-shell-primary": "rgb(40, 101, 133)",
+                                    "data-s3-shell-bg": "rgb(250, 241, 220)",
+                                    "data-nav-requests": "get /manage/accounts,get /producer/products"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "nav-menu-dark",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "query": {
+                        "state": "nav-menu"
+                    },
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-s1-shell-primary": "rgb(143, 197, 223)",
+                                    "data-s1-shell-bg": "rgb(28, 32, 31)",
+                                    "data-s2-shell-primary": "rgb(167, 215, 193)",
+                                    "data-s2-shell-bg": "rgb(27, 30, 28)",
+                                    "data-s3-shell-primary": "rgb(143, 197, 223)",
+                                    "data-s3-shell-bg": "rgb(28, 32, 31)",
+                                    "data-nav-requests": "get /manage/accounts,get /producer/products"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "nav-sheet-system-dark",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "query": {
+                        "state": "nav-sheet"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "system-dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-s1-shell-primary": "rgb(143, 197, 223)",
+                                    "data-s1-shell-bg": "rgb(28, 32, 31)",
+                                    "data-s2-shell-primary": "rgb(167, 215, 193)",
+                                    "data-s2-shell-bg": "rgb(27, 30, 28)",
+                                    "data-s3-shell-primary": "rgb(143, 197, 223)",
+                                    "data-s3-shell-bg": "rgb(28, 32, 31)",
+                                    "data-nav-requests": "get /manage/accounts,get /producer/products"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "nav-menu-system-light",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "query": {
+                        "state": "nav-menu"
+                    },
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "system-light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-s1-shell-primary": "rgb(40, 101, 133)",
+                                    "data-s1-shell-bg": "rgb(250, 241, 220)",
+                                    "data-s2-shell-primary": "rgb(36, 107, 87)",
+                                    "data-s2-shell-bg": "rgb(248, 247, 244)",
+                                    "data-s3-shell-primary": "rgb(40, 101, 133)",
+                                    "data-s3-shell-bg": "rgb(250, 241, 220)",
+                                    "data-nav-requests": "get /manage/accounts,get /producer/products"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "products-navigation-multi-role",
+            "path": "/resources/js/fixtures/producer-landing.html",
+            "query": {
+                "page": "Producer/Products/Index",
+                "role": "producer,manager"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content button,#main-content .pilot-status-switch,#main-content td,#main-content li",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Multi-role navigation probe: the other area keeps its own look.",
+            "states": [
+                {
+                    "id": "nav-menu-light",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "query": {
+                        "state": "nav-menu"
+                    },
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-s1-shell-primary": "rgb(40, 101, 133)",
+                                    "data-s1-shell-bg": "rgb(250, 241, 220)",
+                                    "data-s2-shell-primary": "rgb(36, 107, 87)",
+                                    "data-s2-shell-bg": "rgb(248, 247, 244)",
+                                    "data-s3-shell-primary": "rgb(40, 101, 133)",
+                                    "data-s3-shell-bg": "rgb(250, 241, 220)",
+                                    "data-nav-requests": "get /manage/accounts,get /producer/products"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "products-overlays",
+            "path": "/resources/js/fixtures/producer-landing.html",
+            "query": {
+                "page": "Producer/Products/Index",
+                "role": "producer"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content button,#main-content .pilot-status-switch,#main-content td,#main-content li",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Overlay probe: only the landing class and colours of the portalled surfaces are checked.",
+            "states": [
+                {
+                    "id": "drawer-light",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "query": {
+                        "drawer": "1"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "html.dark",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-sidebar=\"sidebar\"][data-mobile=\"true\"].landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(40, 101, 133)",
+                                    "data-now-sheet-primary": "rgb(40, 101, 133)"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "drawer-dark",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "query": {
+                        "drawer": "1"
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "html.dark",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-sidebar=\"sidebar\"][data-mobile=\"true\"].landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(143, 197, 223)",
+                                    "data-now-sheet-primary": "rgb(143, 197, 223)"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "menu-light",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "query": {
+                        "state": "account-menu"
+                    },
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "html.dark",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-slot=\"dropdown-menu-content\"].landing",
+                                "count": 1
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "menu-dark",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "query": {
+                        "state": "account-menu"
+                    },
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "html.dark",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-slot=\"dropdown-menu-content\"].landing",
+                                "count": 1
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -221,6 +221,9 @@ describe('landing variant admission', () => {
         ['Catalogue/Stock/Movements', 'landing'],
         ['Catalogue/Stock/Movements/Extra', null],
         ['Catalogue/Stock', null],
+        ['Producer/Products/Index', 'landing'],
+        ['Producer/Products/Index/Extra', null],
+        ['Producer/Products', null],
         ['Producer/Stock/Movements', null],
         ['Finance/Stock/Movements', null],
         ['Producer/Products/Create', null],
@@ -248,6 +251,7 @@ describe('landing variant admission', () => {
             'Producer/Stock/Movements',
             'Finance/Stock/Movements',
             'Catalogue/Stock/Movements/Extra',
+            'Producer/Products/Index/Extra',
             'Manage/Accounts/Index',
             'Manage/Stock/Create/Extra',
             'Welcome',
@@ -272,6 +276,9 @@ describe('landing variant admission', () => {
         await nextTick();
         expect(variant()).toBe('landing');
         page.component = 'Catalogue/Stock/Movements';
+        await nextTick();
+        expect(variant()).toBe('landing');
+        page.component = 'Producer/Products/Index';
         await nextTick();
         expect(variant()).toBe('landing');
         page.component = 'Manage/Stock/Index';

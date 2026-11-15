@@ -254,6 +254,7 @@ describe('pilot theme layout and portal', () => {
             'Manage/Stock/Movements',
             'Producer/Stock/Movements',
             'Finance/Stock/Movements',
+            'Producer/Products/Index/Extra',
             'Manage/Stock/Create/Extra',
             'Manage/ReturnItems/Index/Extra',
             'Catalogue/Stock/Movements/Extra',
@@ -285,6 +286,7 @@ describe('pilot theme layout and portal', () => {
             'Manage/ReturnItems/Create',
             'Manage/ReturnItems/Edit',
             'Catalogue/Stock/Movements',
+            'Producer/Products/Index',
         ]) {
             page.component = component;
             await nextTick();
@@ -376,6 +378,7 @@ describe('pilot theme layout and portal', () => {
             'Manage/Stock/Movements',
             'Producer/Stock/Movements',
             'Finance/Stock/Movements',
+            'Producer/Products/Index/Extra',
             'Catalogue/Stock/Movements/Extra',
         ]) {
             page.component = component;
@@ -397,6 +400,7 @@ describe('pilot theme layout and portal', () => {
             'Manage/ReturnItems/Create',
             'Manage/ReturnItems/Edit',
             'Catalogue/Stock/Movements',
+            'Producer/Products/Index',
         ]) {
             page.component = component;
             await nextTick();

@@ -2407,3 +2407,37 @@ html.dark:has(.reference-style)
     font-size: 1.5rem;
     line-height: 2rem;
 }
+
+/* 005 T10 */
+/*
+ * Producer product list at phone width (R6). The visually hidden table header lays its six labels out as one table row, so
+ * their text runs past the viewport and the page reads as horizontally clipped. Stacking the labels keeps them inside the
+ * page, as the cards below already do; the visible card reflow and the desktop table are untouched.
+ */
+@container pilot-products (max-width: 58rem) {
+    .landing .pilot-product-table thead tr,
+    .landing .pilot-product-table thead th {
+        display: block;
+    }
+
+    .landing .pilot-product-table thead th {
+        padding: 0;
+        white-space: normal;
+    }
+}
+
+/*
+ * Producer stock rows at enlarged text (R6). The row switches to two columns at the viewport's `sm` width, which does not
+ * account for the sidebar or for 200% text, so the name column was squeezed to about 35px and its unit and price spilled
+ * out of their box. Letting the actions wrap under the name once they no longer fit keeps both readable at every width.
+ */
+.landing [data-test='producer-stock-product'] {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.landing [data-test='producer-stock-product'] > :first-child {
+    flex: 1 1 12rem;
+}
