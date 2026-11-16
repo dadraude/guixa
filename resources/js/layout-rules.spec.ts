@@ -10,6 +10,7 @@ export const checkedFiles = [
     'pages/Stock/Index.vue',
     'pages/Producer/Cutoff.vue',
     'pages/Producer/CycleSummary.vue',
+    'pages/Producer/Stock/Movements.vue',
     'pages/Producer/Products/Index.vue',
     'pages/Producer/Products/Create.vue',
     'pages/Producer/Products/Edit.vue',

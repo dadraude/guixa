@@ -170,18 +170,66 @@ const cycleSummary = {
         ...row,
     })),
 };
-const movementLine = (id: string, type: string, quantity: string) => ({
+const movementLine = (
+    id: string,
+    type: string,
+    quantity: string,
+    balanceAfter = '12.000',
+    over: Partial<{ note: string; authorName: string }> = {},
+) => ({
     id,
     occurredAt: '2026-11-10 09:30',
     type,
     quantity,
-    balanceAfter: '12.000',
+    balanceAfter,
     note: null as string | null,
     authorName: 'Maria Soler',
     cycleId: 'cycle-1',
     pickupDate: '2026-11-14',
     basketId: null as string | null,
+    ...over,
 });
+// Producer stock movement history (spec 005 T14): populated, empty, long content and paged.
+const movementPage = (
+    lines: ReturnType<typeof movementLine>[],
+    paging: {
+        total?: number;
+        page?: number;
+        prevUrl?: string;
+        nextUrl?: string;
+    } = {},
+) => ({
+    lines,
+    total: paging.total ?? lines.length,
+    page: paging.page ?? 1,
+    prevUrl: paging.prevUrl ?? null,
+    nextUrl: paging.nextUrl ?? null,
+});
+const movementHistoriesByState: Record<
+    string,
+    ReturnType<typeof movementPage>
+> = {
+    default: movementPage([
+        movementLine('line-1', 'sale', '-3.000'),
+        movementLine('line-2', 'entry', '10.500'),
+    ]),
+    empty: movementPage([]),
+    'long-content': movementPage([
+        movementLine('line-1', 'adjustment', '-1234567.000', '1234567.500', {
+            note: `Ajust per inventari complet del magatzem de ${longName}`,
+            authorName: longName,
+        }),
+        movementLine('line-2', 'entry', '1234567.000', '2469134.500'),
+    ]),
+    paged: movementPage([movementLine('line-1', 'sale', '-3.000')], {
+        total: 60,
+        page: 2,
+        prevUrl: '/producer/stock/stock-1/movements?page=1',
+        nextUrl: '/producer/stock/stock-1/movements?page=3',
+    }),
+};
+const movementHistory =
+    movementHistoriesByState[state] ?? movementHistoriesByState.default;
 const pageProps: Record<string, Record<string, unknown>> = {
     'Producer/Products/Index': {
         products: productRows,
@@ -192,17 +240,12 @@ const pageProps: Record<string, Record<string, unknown>> = {
     'Producer/Cutoff': { cutoff: { daysBefore: 3, time: '20:00' } },
     'Producer/CycleSummary': { summary: cycleSummary },
     'Producer/Stock/Movements': {
-        product: { name: 'Mel de farigola', unit: 'pot', available: '12.000' },
-        history: {
-            lines: [
-                movementLine('line-1', 'sale', '-3.000'),
-                movementLine('line-2', 'entry', '10.500'),
-            ],
-            total: 2,
-            page: 1,
-            prevUrl: null,
-            nextUrl: null,
+        product: {
+            name: state === 'long-content' ? longName : 'Mel de farigola',
+            unit: 'pot',
+            available: state === 'long-content' ? '1234567.500' : '12.000',
         },
+        history: movementHistory,
     },
     // Unmigrated neighbour: the navigation target that must keep its own look.
     'Manage/Accounts/Index': { accounts: [], households: [] },

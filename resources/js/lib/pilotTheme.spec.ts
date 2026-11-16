@@ -232,7 +232,8 @@ describe('landing variant admission', () => {
         ['Producer/Products/Edit', 'landing'],
         ['Producer/Products/Edit/Extra', null],
         ['Producer/Products', null],
-        ['Producer/Stock/Movements', null],
+        ['Producer/Stock/Movements', 'landing'],
+        ['Producer/Stock/Movements/Extra', null],
         ['Finance/Stock/Movements', null],
         ['Welcome', null],
     ])('%s -> %s', (page, expected) => {
@@ -253,8 +254,8 @@ describe('landing variant admission', () => {
             'Catalogue/Producers/Availability/Extra',
             'Catalogue/Producers/WeeklyProduct/Create/Extra',
             'Manage/Stock/Movements',
-            'Producer/Stock/Movements',
             'Finance/Stock/Movements',
+            'Producer/Stock/Movements/Extra',
             'Catalogue/Stock/Movements/Extra',
             'Producer/Cutoff/Extra',
             'Producer/CycleSummary/Extra',
@@ -293,6 +294,7 @@ describe('landing variant admission', () => {
         for (const component of [
             'Producer/Cutoff',
             'Producer/CycleSummary',
+            'Producer/Stock/Movements',
             'Producer/Products/Create',
             'Producer/Products/Edit',
         ]) {
