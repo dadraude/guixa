@@ -97,7 +97,7 @@ Reason for one slice: the user wants the whole app on the landing identity in on
 | C5         | 7               | No old-theme route remains; global token promotion and `pilotPages` removal done                       |
 
 - C5 depends on C1–C4 and is last because global promotion is only safe when every consumer is reviewed.
-- C4 touches no role files, so it may run in parallel with C1–C3 when no shared files are in edit.
+- C4 touches no role files, but the checkpoints run in order C1 to C5 (spec R20); running C4 in parallel needs the user's explicit decision at that time.
 - Pages on no list today are already assigned by the candidate boundaries: `Manage/Roles/Index` and the overlays to C2, `Member/Baskets/{Index,Show}` to C3.
 - Open decision for the spec: the C2 split (cycles/households versus accounts/roles/settings), and whether `pilotPages` is removed in C5 or kept as a reversible exit.
 - Reconcile every accepted `R#`/`S#` of slices 1 and 2 with this scope; later checkpoints add requirements without renumbering.
