@@ -1253,3 +1253,17 @@ Published 2026-11-15 ([record](linear-publication.md#slice-2-producer-role-compl
 | T14  | DRA-286 |
 | T15  | DRA-282 |
 | T16  | DRA-287 |
+
+## Linear mapping — slices 3-7, checkpoint C1
+
+Published 2026-11-16 ([record](linear-publication.md#slices-3-7-checkpoint-c1-finance-and-reception)). Parent: DRA-288 (no task ID, no label).
+
+| Task | Issue   |
+| ---- | ------- |
+| T17  | DRA-289 |
+| T18  | DRA-291 |
+| T19  | DRA-292 |
+| T20  | DRA-293 |
+| T21  | DRA-294 |
+| T22  | DRA-290 |
+| T23  | DRA-295 |
