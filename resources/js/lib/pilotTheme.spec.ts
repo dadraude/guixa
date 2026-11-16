@@ -223,6 +223,8 @@ describe('landing variant admission', () => {
         ['Catalogue/Stock', null],
         ['Producer/Cutoff', 'landing'],
         ['Producer/Cutoff/Extra', null],
+        ['Producer/CycleSummary', 'landing'],
+        ['Producer/CycleSummary/Extra', null],
         ['Producer/Products/Index', 'landing'],
         ['Producer/Products/Index/Extra', null],
         ['Producer/Products/Create', 'landing'],
@@ -255,6 +257,7 @@ describe('landing variant admission', () => {
             'Finance/Stock/Movements',
             'Catalogue/Stock/Movements/Extra',
             'Producer/Cutoff/Extra',
+            'Producer/CycleSummary/Extra',
             'Producer/Products/Index/Extra',
             'Producer/Products/Create/Extra',
             'Producer/Products/Edit/Extra',
@@ -289,6 +292,7 @@ describe('landing variant admission', () => {
         expect(variant()).toBe('landing');
         for (const component of [
             'Producer/Cutoff',
+            'Producer/CycleSummary',
             'Producer/Products/Create',
             'Producer/Products/Edit',
         ]) {
