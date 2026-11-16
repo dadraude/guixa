@@ -82,6 +82,26 @@ Each leaves a role or audience able to use all its screens in the landing style.
 
 **Recommended first slice: 1, Catalogue role complete.** It matches the accepted plan order (`plan.md:1297`, step 3), reduces the most uncertainty (first form hierarchy, an unthemed page, selects) at low business risk, and its patterns are consumed by all later slices. Alternatives: slice 2 (smaller, one audience, the same form uncertainty with fewer pages); slice 3 (highest daily value for volunteers but the highest risk: money and tables); slice 6 (visible to every user at sign-in and parallel-safe, but little new pattern learning).
 
+## Selected slice: 3–7 as one slice (2026-11-16)
+
+Slices 1 and 2 are accepted (PR #416, #435; slice 2 approved with S18). The user chose to deliver the remaining candidate slices 3–7 as a single selected slice, with checkpoints per area and one PR per task (Q&A of 2026-11-16, same request: "hem de continuar amb el canvi d'estil de la app segons la landing. Podem fer el canvi total de l'aplicació?"). Selection does not authorize a spec, plan, tasks or tickets; the next step is its spec, after this discovery is accepted.
+
+Reason for one slice: the user wants the whole app on the landing identity in one initiative. Because that is a larger cut than the candidates above, it is bounded by these checkpoints. Each checkpoint leaves one audience able to use all its screens in the landing style and has its own acceptance record, review and integration before the next starts:
+
+| Checkpoint | Candidate slice | Observable completion                                                                                  |
+| ---------- | --------------- | ------------------------------------------------------------------------------------------------------ |
+| C1         | 3               | Finance and Receiver use baskets, finance stock and receptions in the landing identity                 |
+| C2         | 4               | Manager uses accounts, households, producers, cycles, roles, settings and their dialogs in the landing identity |
+| C3         | 5               | Member and staff use wallet, stock, `Member/Baskets/*` and stock/return movements in the landing identity |
+| C4         | 6               | Sign-in, invitation, password, two-factor, verification and settings pages match the landing           |
+| C5         | 7               | No old-theme route remains; global token promotion and `pilotPages` removal done                       |
+
+- C5 depends on C1–C4 and is last because global promotion is only safe when every consumer is reviewed.
+- C4 touches no role files, so it may run in parallel with C1–C3 when no shared files are in edit.
+- Pages on no list today are already assigned by the candidate boundaries: `Manage/Roles/Index` and the overlays to C2, `Member/Baskets/{Index,Show}` to C3.
+- Open decision for the spec: the C2 split (cycles/households versus accounts/roles/settings), and whether `pilotPages` is removed in C5 or kept as a reversible exit.
+- Reconcile every accepted `R#`/`S#` of slices 1 and 2 with this scope; later checkpoints add requirements without renumbering.
+
 ## Decisions before and after first-slice selection
 
 **Before the first slice (settled 2026-11-13, see Q&A history):** 1 own R1/S1/T01 numbering; 2 slice 1 Catalogue selected; 3 T85 visual approval gates the slice 1 spec; 4 slice 1 owns theming SelectContent; 5 takeover recorded by a 001 Change plus a pointer in the 001 plan; 6 the next authorized step is the slice 1 spec only (no Linear mapping or tickets). Original wording:
