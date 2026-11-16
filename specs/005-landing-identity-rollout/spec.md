@@ -414,13 +414,13 @@ templates (Laravel defaults, decided 2026-11-13); new copy beyond what a visual 
 
 ## Open questions
 
-Raised by the gap check of 2026-11-16 (R20 to R30), none answered yet. Recommendations are proposals, not decisions:
+None open. Answered 2026-11-16 (see history):
 
-- **OQ5 — A checkpoint is rejected or the approval does not come (G3; blocks R20, S30).** What happens when the user asks for changes at a checkpoint? Recommended: the checkpoint stays open, its rework is tasks in the same checkpoint with the same evidence rules, and later checkpoints stay blocked; a new approval Q&A names the new evidence.
-- **OQ6 — A later change touches an approved checkpoint's page (G5, G6; blocks R20, R23, R30, S30).** A defect found in an approved page, or a shared-component change that alters its computed style. Recommended: the fix goes in the current checkpoint's PR with a Deviation, R30 re-measures the affected pages, and the earlier approval stands unless a computed colour, font or size of the approved page changes; then the user re-approves that page only.
-- **OQ7 — Flash on first paint before C5 (G11; blocks R28, S24).** The first-paint background is set in C5, but C4 approves the sign-in pages earlier. Recommended: as in slices 1 and 2, the first-paint flash is accepted until C5; S24 is measured at C4 for navigation after hydration and fully at C5.
-- **OQ8 — Source of the "no old-theme page" inventory (G13; blocks R29, S29).** Recommended: `resources/js/pages/**`, `resources/views/**` and the overlay components listed in Scope; a page added during the slice joins the checkpoint of its audience, and the plan re-verifies the list at each checkpoint start.
-- **OQ4 — Tab icons in C5.** Which files make "the tab icons follow the landing identity" (R28, S28)? `app.blade.php` links only `favicon.svg`; `public/` also has `favicon.ico` and `apple-touch-icon.png` that are not linked. Recommended: recolour the existing three to the landing palette and link all three; no new icon design. Decide before C5's tasks.
+- **OQ5 — A checkpoint is rejected or the approval does not come (R20, S30).** The checkpoint stays open; its rework is tasks in the same checkpoint with the same evidence rules; later checkpoints stay blocked; a new approval Q&A names the new evidence.
+- **OQ6 — A later change touches an approved checkpoint's page (R20, R23, R30, S30).** The fix goes in the current checkpoint's PR with a Deviation and R30 re-measures the affected pages. The earlier approval stands unless a computed colour, font or size of the approved page changes; then the user re-approves that page only.
+- **OQ7 — Flash on first paint before C5 (R28, S24).** Accepted until C5, as in slices 1 and 2; S24 is measured at C4 for navigation after hydration and fully at C5.
+- **OQ8 — Source of the "no old-theme page" inventory (R29, S29).** `resources/js/pages/**`, `resources/views/**` and the overlay components listed in Scope; a page added during the slice joins the checkpoint of its audience, and the plan re-verifies the list at each checkpoint start.
+- **OQ4 — Tab icons in C5 (R28, S28).** Recolour `favicon.svg`, `favicon.ico` and `apple-touch-icon.png` to the landing palette and link all three in `app.blade.php`; no new icon design.
 
 Answered 2026-11-16: slice 3-7 delivered as one slice in checkpoints C1 to C5; visual approval at each checkpoint; the older green opt-in is removed at C5 (see history). The split of the C2 pages into tasks is a plan matter, not a spec question.
 
