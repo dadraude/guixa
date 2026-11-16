@@ -2441,3 +2441,16 @@ html.dark:has(.reference-style)
 .landing [data-test='producer-stock-product'] > :first-child {
     flex: 1 1 12rem;
 }
+
+/* 005 T13 */
+/*
+ * Producer cycle summary toggle at phone width with enlarged text (R6). The button label ("Marca com a no disponible") is
+ * `whitespace-nowrap`, so at 375px and 200% text it ran past the viewport and clipped the page. Letting the label wrap inside
+ * the button keeps it readable; the 44px minimum height still comes from `.pilot-t44-page`, and the label is unchanged.
+ */
+.landing .pilot-cycle-products [data-slot='button'] {
+    max-width: 100%;
+    height: auto;
+    white-space: normal;
+    text-align: center;
+}

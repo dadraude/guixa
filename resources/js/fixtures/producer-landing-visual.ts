@@ -3,6 +3,7 @@ import '../../../public/theme-colors.css';
 import { createInertiaApp, http, router } from '@inertiajs/vue3';
 import { defineComponent, h, type DefineComponent } from 'vue';
 import CutoffController from '@/actions/App/Http/Controllers/Producer/CutoffController';
+import ProductAvailabilityController from '@/actions/App/Http/Controllers/Producer/ProductAvailabilityController';
 import ProductController from '@/actions/App/Http/Controllers/Producer/ProductController';
 import AppLayout from '@/layouts/AppLayout.vue';
 import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
@@ -122,6 +123,53 @@ const productRows = (productsByState[listKey] ?? productsByState.default).map(
 );
 const stockRows =
     state === 'no-stock' ? [] : (stockByState[listKey] ?? stockByState.default);
+// Cycle summary (spec 005 T13): sent with lines, sent with nothing to deliver, not sent (mixed
+// availability), no products, long name and unit. The toggle changes `available` like the real action.
+const cycleLine = (
+    id: string,
+    name: string,
+    over: Record<string, unknown> = {},
+) => ({
+    productId: id,
+    name,
+    unit: 'kg',
+    available: true,
+    quantity: null as string | null,
+    ...over,
+});
+const cycleProducts: Record<string, ReturnType<typeof cycleLine>[]> = {
+    default: [
+        cycleLine('p-1', 'Tomàquet de pera'),
+        cycleLine('p-2', 'Pastanaga', { available: false }),
+    ],
+    sent: [
+        cycleLine('p-1', 'Tomàquet de pera', { quantity: '12.500' }),
+        cycleLine('p-2', 'Pastanaga', { quantity: '1234.000' }),
+        cycleLine('p-3', 'Enciam', { unit: 'unitat', quantity: null }),
+    ],
+    'sent-empty': [],
+    'no-products': [],
+    'long-name': [
+        cycleLine('p-1', longName, { unit: longUnit }),
+        cycleLine('p-2', longName, { available: false, unit: longUnit }),
+    ],
+    'sent-long': [
+        cycleLine('p-1', longName, {
+            unit: longUnit,
+            quantity: '1234567.500',
+        }),
+    ],
+};
+const cycleKey = state === 'cycle-toggle' ? 'default' : state;
+const cycleSent = state.startsWith('sent');
+const cycleSummary = {
+    cycleId: 'cycle-1',
+    pickupDate: '2026-11-14',
+    sent: cycleSent,
+    products: (cycleProducts[cycleKey] ?? cycleProducts.default).map((row) => ({
+        ...row,
+    })),
+};
 const movementLine = (id: string, type: string, quantity: string) => ({
     id,
     occurredAt: '2026-11-10 09:30',
@@ -142,22 +190,7 @@ const pageProps: Record<string, Record<string, unknown>> = {
     'Producer/Products/Create': {},
     'Producer/Products/Edit': { product: productRows[0], used: false },
     'Producer/Cutoff': { cutoff: { daysBefore: 3, time: '20:00' } },
-    'Producer/CycleSummary': {
-        summary: {
-            cycleId: 'cycle-1',
-            pickupDate: '2026-11-14',
-            sent: false,
-            products: [
-                {
-                    productId: 'p-1',
-                    name: 'Tomàquet de pera',
-                    unit: 'kg',
-                    available: true,
-                    quantity: null,
-                },
-            ],
-        },
-    },
+    'Producer/CycleSummary': { summary: cycleSummary },
     'Producer/Stock/Movements': {
         product: { name: 'Mel de farigola', unit: 'pot', available: '12.000' },
         history: {
@@ -230,6 +263,8 @@ const formStates = ['form-invalid', 'form-busy', 'delete-busy', 'delete-error'];
 // Default cutoff form (spec 005 T12): the PUT the real router sends for Producer/Cutoff.
 const cutoffRequests: string[] = [];
 const cutoffStates = ['cutoff-invalid', 'cutoff-busy'];
+// Cycle summary availability toggle (spec 005 T13): the PUT the real router sends for a not-sent cycle.
+const availabilityRequests: string[] = [];
 const pagesByPath: Record<string, string> = {
     '/manage/accounts': 'Manage/Accounts/Index',
     '/producer/products': 'Producer/Products/Index',
@@ -261,6 +296,21 @@ http.setClient({
                         domain: 'L’hora de tancament no és vàlida.',
                     },
                 },
+            });
+        }
+        if (
+            state === 'cycle-toggle' &&
+            method !== 'get' &&
+            url.pathname.endsWith('/availability')
+        ) {
+            availabilityRequests.push(`${method} ${url.pathname}${url.search}`);
+            const row = cycleSummary.products.find((line) =>
+                url.pathname.includes(`/products/${line.productId}/`),
+            );
+            if (row) row.available = !row.available;
+            return reply({
+                ...page,
+                props: { ...page.props, summary: cycleSummary },
             });
         }
         const isFormRequest =
@@ -777,6 +827,45 @@ const runCutoffState = async () => {
     setEvidence('match', String(requests === expectedCutoffUpdate()));
 };
 
+const expectedAvailability = (product: string) => {
+    const form = ProductAvailabilityController.update.form({
+        cycle: 'cycle-1',
+        product,
+    }) as { action: string; method: string };
+    const target = new URL(form.action, window.location.origin);
+    return `${form.method.toLowerCase()} ${target.pathname}${target.search}`;
+};
+const runCycleToggle = async () => {
+    // Product p-1 is available: its button offers "Marca com a no disponible" and submits `available=0`.
+    const label = () =>
+        document
+            .querySelector(
+                '[data-test="product-p-1"] [data-test="availability"]',
+            )
+            ?.textContent?.trim() ?? 'none';
+    setEvidence('before', label());
+    setEvidence(
+        'sent-value',
+        document.querySelector<HTMLInputElement>(
+            '[data-test="product-p-1"] input[name="available"]',
+        )!.value,
+    );
+    const button = await byTest('toggle-p-1');
+    button.focus();
+    button.click();
+    await waitFor(() => (label() === 'No disponible' ? document.body : null));
+    await sleep(150);
+    setEvidence('after', label());
+    setEvidence(
+        'button-after',
+        (await byTest('toggle-p-1')).textContent!.trim(),
+    );
+    const requests = availabilityRequests.join(' ; ');
+    setEvidence('requests', requests);
+    setEvidence('expected', expectedAvailability('p-1'));
+    setEvidence('match', String(requests === expectedAvailability('p-1')));
+};
+
 const runToggle = async () => {
     // Product 3 is inactive first: reactivate it, then deactivate product 1, as a person would.
     document.body.setAttribute('data-ev-before', switchLabel('product-3'));
@@ -853,6 +942,8 @@ void createInertiaApp({
         await runFormState();
     if (pageName === 'Producer/Cutoff' && cutoffStates.includes(state))
         await runCutoffState();
+    if (pageName === 'Producer/CycleSummary' && state === 'cycle-toggle')
+        await runCycleToggle();
     if (state === 'account-menu') await openMenu();
     if (query.get('drawer') === '1') await openSheet();
     await snapshot('now');
@@ -865,7 +956,8 @@ void createInertiaApp({
     if (
         ((pageName.startsWith('Producer/Products/') &&
             pageName !== 'Producer/Products/Index') ||
-            pageName === 'Producer/Cutoff') &&
+            pageName === 'Producer/Cutoff' ||
+            pageName === 'Producer/CycleSummary') &&
         !document.querySelector(measured.sheet) &&
         !document.querySelector(measured.menu)
     )

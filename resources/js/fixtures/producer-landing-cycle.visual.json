@@ -1,0 +1,1124 @@
+{
+    "baseUrl": "http://127.0.0.1:5284",
+    "rootFontPx": 16,
+    "darkSelector": "html.dark",
+    "matrix": {
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark"],
+        "text": [100, 200]
+    },
+    "views": [
+        {
+            "id": "cycle-sent",
+            "path": "/resources/js/fixtures/producer-landing.html",
+            "query": {
+                "page": "Producer/CycleSummary",
+                "role": "producer",
+                "state": "sent"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content p,#main-content span,#main-content button,#main-content a",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "states": [
+                {
+                    "id": "light",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(40, 101, 133)",
+                                    "data-now-shell-bg": "rgb(250, 241, 220)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-amount",
+                                "count": 3,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "[data-test=\"quantity\"]",
+                                "count": 3
+                            },
+                            {
+                                "selector": "[data-test=\"availability\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content button",
+                                "count": 0
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(143, 197, 223)",
+                                    "data-now-shell-bg": "rgb(28, 32, 31)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-amount",
+                                "count": 3,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "[data-test=\"quantity\"]",
+                                "count": 3
+                            },
+                            {
+                                "selector": "[data-test=\"availability\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content button",
+                                "count": 0
+                            }
+                        ]
+                    }
+                }
+            ],
+            "noFocusReason": "Read-only state: the page has no interactive element in the main content."
+        },
+        {
+            "id": "cycle-sent-empty",
+            "path": "/resources/js/fixtures/producer-landing.html",
+            "query": {
+                "page": "Producer/CycleSummary",
+                "role": "producer",
+                "state": "sent-empty"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content p,#main-content span,#main-content button,#main-content a",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "states": [
+                {
+                    "id": "light",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(40, 101, 133)",
+                                    "data-now-shell-bg": "rgb(250, 241, 220)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "[data-test=\"no-products\"]",
+                                "count": 1,
+                                "text": "No hi ha res per lliurar.",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"quantity\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content button",
+                                "count": 0
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(143, 197, 223)",
+                                    "data-now-shell-bg": "rgb(28, 32, 31)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "[data-test=\"no-products\"]",
+                                "count": 1,
+                                "text": "No hi ha res per lliurar.",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"quantity\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content button",
+                                "count": 0
+                            }
+                        ]
+                    }
+                }
+            ],
+            "noFocusReason": "Read-only state: the page has no interactive element in the main content."
+        },
+        {
+            "id": "cycle-unsent",
+            "path": "/resources/js/fixtures/producer-landing.html",
+            "query": {
+                "page": "Producer/CycleSummary",
+                "role": "producer",
+                "state": "default"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content p,#main-content span,#main-content button,#main-content a",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "#main-content [data-test=\"toggle-p-1\"]",
+                "#main-content [data-test=\"toggle-p-2\"]"
+            ],
+            "states": [
+                {
+                    "id": "light",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(40, 101, 133)",
+                                    "data-now-shell-bg": "rgb(250, 241, 220)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "[data-test=\"product-p-1\"] [data-test=\"availability\"]",
+                                "count": 1,
+                                "text": "Disponible",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"product-p-2\"] [data-test=\"availability\"]",
+                                "count": 1,
+                                "text": "No disponible",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"toggle-p-1\"]",
+                                "count": 1,
+                                "text": "Marca com a no disponible",
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"toggle-p-2\"]",
+                                "count": 1,
+                                "text": "Marca com a disponible",
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"quantity\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-border-ok": "true",
+                                    "data-ev-focus-ok": "true"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(143, 197, 223)",
+                                    "data-now-shell-bg": "rgb(28, 32, 31)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "[data-test=\"product-p-1\"] [data-test=\"availability\"]",
+                                "count": 1,
+                                "text": "Disponible",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"product-p-2\"] [data-test=\"availability\"]",
+                                "count": 1,
+                                "text": "No disponible",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"toggle-p-1\"]",
+                                "count": 1,
+                                "text": "Marca com a no disponible",
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"toggle-p-2\"]",
+                                "count": 1,
+                                "text": "Marca com a disponible",
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"quantity\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-border-ok": "true",
+                                    "data-ev-focus-ok": "true"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "cycle-no-products",
+            "path": "/resources/js/fixtures/producer-landing.html",
+            "query": {
+                "page": "Producer/CycleSummary",
+                "role": "producer",
+                "state": "no-products"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content p,#main-content span,#main-content button,#main-content a",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "states": [
+                {
+                    "id": "light",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(40, 101, 133)",
+                                    "data-now-shell-bg": "rgb(250, 241, 220)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "[data-test=\"no-products\"]",
+                                "count": 1,
+                                "text": "No tens cap producte per oferir.",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"availability\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content button",
+                                "count": 0
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(143, 197, 223)",
+                                    "data-now-shell-bg": "rgb(28, 32, 31)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "[data-test=\"no-products\"]",
+                                "count": 1,
+                                "text": "No tens cap producte per oferir.",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"availability\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content button",
+                                "count": 0
+                            }
+                        ]
+                    }
+                }
+            ],
+            "noFocusReason": "Read-only state: the page has no interactive element in the main content."
+        },
+        {
+            "id": "cycle-long-name",
+            "path": "/resources/js/fixtures/producer-landing.html",
+            "query": {
+                "page": "Producer/CycleSummary",
+                "role": "producer",
+                "state": "long-name"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content p,#main-content span,#main-content button,#main-content a",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "#main-content [data-test=\"toggle-p-1\"]",
+                "#main-content [data-test=\"toggle-p-2\"]"
+            ],
+            "states": [
+                {
+                    "id": "light",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(40, 101, 133)",
+                                    "data-now-shell-bg": "rgb(250, 241, 220)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "[data-test=\"toggle-p-1\"]",
+                                "count": 1,
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"toggle-p-2\"]",
+                                "count": 1,
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"availability\"]",
+                                "count": 2,
+                                "contrast": 4.5
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(143, 197, 223)",
+                                    "data-now-shell-bg": "rgb(28, 32, 31)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "[data-test=\"toggle-p-1\"]",
+                                "count": 1,
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"toggle-p-2\"]",
+                                "count": 1,
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"availability\"]",
+                                "count": 2,
+                                "contrast": 4.5
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "cycle-sent-long",
+            "path": "/resources/js/fixtures/producer-landing.html",
+            "query": {
+                "page": "Producer/CycleSummary",
+                "role": "producer",
+                "state": "sent-long"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content p,#main-content span,#main-content button,#main-content a",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "states": [
+                {
+                    "id": "light",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(40, 101, 133)",
+                                    "data-now-shell-bg": "rgb(250, 241, 220)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-amount",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(143, 197, 223)",
+                                    "data-now-shell-bg": "rgb(28, 32, 31)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-amount",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ],
+            "noFocusReason": "Read-only state: the page has no interactive element in the main content."
+        },
+        {
+            "id": "cycle-toggle",
+            "path": "/resources/js/fixtures/producer-landing.html",
+            "query": {
+                "page": "Producer/CycleSummary",
+                "role": "producer",
+                "state": "cycle-toggle"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content p,#main-content span,#main-content button,#main-content a",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "#main-content [data-test=\"toggle-p-1\"]",
+                "#main-content [data-test=\"toggle-p-2\"]"
+            ],
+            "states": [
+                {
+                    "id": "light",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(40, 101, 133)",
+                                    "data-now-shell-bg": "rgb(250, 241, 220)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-before": "Disponible",
+                                    "data-ev-sent-value": "0",
+                                    "data-ev-after": "No disponible",
+                                    "data-ev-button-after": "Marca com a disponible",
+                                    "data-ev-match": "true"
+                                }
+                            },
+                            {
+                                "selector": "[data-test=\"product-p-1\"] [data-test=\"availability\"]",
+                                "count": 1,
+                                "text": "No disponible",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"toggle-p-1\"]",
+                                "count": 1,
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "contrast": 4.5
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(143, 197, 223)",
+                                    "data-now-shell-bg": "rgb(28, 32, 31)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-before": "Disponible",
+                                    "data-ev-sent-value": "0",
+                                    "data-ev-after": "No disponible",
+                                    "data-ev-button-after": "Marca com a disponible",
+                                    "data-ev-match": "true"
+                                }
+                            },
+                            {
+                                "selector": "[data-test=\"product-p-1\"] [data-test=\"availability\"]",
+                                "count": 1,
+                                "text": "No disponible",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-test=\"toggle-p-1\"]",
+                                "count": 1,
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "contrast": 4.5
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    ]
+}
