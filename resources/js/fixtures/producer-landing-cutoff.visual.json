@@ -1,0 +1,618 @@
+{
+    "baseUrl": "http://127.0.0.1:5284",
+    "rootFontPx": 16,
+    "darkSelector": "html.dark",
+    "matrix": {
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark"],
+        "text": [100, 200]
+    },
+    "views": [
+        {
+            "id": "cutoff-default",
+            "path": "/resources/js/fixtures/producer-landing.html",
+            "query": {
+                "page": "Producer/Cutoff",
+                "role": "producer",
+                "state": "default"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content label,#main-content input:not([type=\"hidden\"]),#main-content p,#main-content button,#main-content a",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "#main-content #days_before",
+                "#main-content #time",
+                "#main-content [data-test=\"save-cutoff\"]"
+            ],
+            "states": [
+                {
+                    "id": "light",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(40, 101, 133)",
+                                    "data-now-shell-bg": "rgb(250, 241, 220)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content label",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content label[for]",
+                                "count": 2
+                            },
+                            {
+                                "selector": "#main-content input",
+                                "count": 2,
+                                "contrast": 4.5,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-field-count": "2",
+                                    "data-ev-field-ok": "true"
+                                }
+                            },
+                            {
+                                "selector": "[data-test=\"save-cutoff\"]",
+                                "count": 1,
+                                "text": "Desa",
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "contrast": 4.5,
+                                "attributes": {
+                                    "disabled": null
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(143, 197, 223)",
+                                    "data-now-shell-bg": "rgb(28, 32, 31)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content label",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content label[for]",
+                                "count": 2
+                            },
+                            {
+                                "selector": "#main-content input",
+                                "count": 2,
+                                "contrast": 4.5,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-field-count": "2",
+                                    "data-ev-field-ok": "true"
+                                }
+                            },
+                            {
+                                "selector": "[data-test=\"save-cutoff\"]",
+                                "count": 1,
+                                "text": "Desa",
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "contrast": 4.5,
+                                "attributes": {
+                                    "disabled": null
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "cutoff-invalid",
+            "path": "/resources/js/fixtures/producer-landing.html",
+            "query": {
+                "page": "Producer/Cutoff",
+                "role": "producer",
+                "state": "cutoff-invalid"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content label,#main-content input:not([type=\"hidden\"]),#main-content p,#main-content button,#main-content a",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "#main-content #days_before",
+                "#main-content #time",
+                "#main-content [data-test=\"save-cutoff\"]"
+            ],
+            "states": [
+                {
+                    "id": "light",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(40, 101, 133)",
+                                    "data-now-shell-bg": "rgb(250, 241, 220)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content label",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content label[for]",
+                                "count": 2
+                            },
+                            {
+                                "selector": "#main-content input",
+                                "count": 2,
+                                "contrast": 4.5,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-field-count": "2",
+                                    "data-ev-field-ok": "true"
+                                }
+                            },
+                            {
+                                "selector": "#days_before + div p",
+                                "count": 1,
+                                "text": "Els dies han de ser entre 1 i 6.",
+                                "contrast": 4.5,
+                                "minHeight": 16
+                            },
+                            {
+                                "selector": "#time + div p",
+                                "count": 1,
+                                "text": "L’hora de tancament no és vàlida.",
+                                "contrast": 4.5,
+                                "minHeight": 16
+                            },
+                            {
+                                "selector": "[data-test=\"save-cutoff\"]",
+                                "count": 1,
+                                "text": "Desa",
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "contrast": 4.5,
+                                "attributes": {
+                                    "disabled": null
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-match": "true"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(143, 197, 223)",
+                                    "data-now-shell-bg": "rgb(28, 32, 31)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content label",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content label[for]",
+                                "count": 2
+                            },
+                            {
+                                "selector": "#main-content input",
+                                "count": 2,
+                                "contrast": 4.5,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-field-count": "2",
+                                    "data-ev-field-ok": "true"
+                                }
+                            },
+                            {
+                                "selector": "#days_before + div p",
+                                "count": 1,
+                                "text": "Els dies han de ser entre 1 i 6.",
+                                "contrast": 4.5,
+                                "minHeight": 16
+                            },
+                            {
+                                "selector": "#time + div p",
+                                "count": 1,
+                                "text": "L’hora de tancament no és vàlida.",
+                                "contrast": 4.5,
+                                "minHeight": 16
+                            },
+                            {
+                                "selector": "[data-test=\"save-cutoff\"]",
+                                "count": 1,
+                                "text": "Desa",
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "contrast": 4.5,
+                                "attributes": {
+                                    "disabled": null
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-match": "true"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "cutoff-busy",
+            "path": "/resources/js/fixtures/producer-landing.html",
+            "query": {
+                "page": "Producer/Cutoff",
+                "role": "producer",
+                "state": "cutoff-busy"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content label,#main-content input:not([type=\"hidden\"]),#main-content p,#main-content button,#main-content a",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["#main-content #days_before", "#main-content #time"],
+            "states": [
+                {
+                    "id": "light",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(40, 101, 133)",
+                                    "data-now-shell-bg": "rgb(250, 241, 220)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content label",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content label[for]",
+                                "count": 2
+                            },
+                            {
+                                "selector": "#main-content input",
+                                "count": 2,
+                                "contrast": 4.5,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-field-count": "2",
+                                    "data-ev-field-ok": "true"
+                                }
+                            },
+                            {
+                                "selector": "[data-test=\"save-cutoff\"]",
+                                "count": 1,
+                                "text": "Desa",
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "attributes": {
+                                    "disabled": ""
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-match": "true"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(143, 197, 223)",
+                                    "data-now-shell-bg": "rgb(28, 32, 31)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content label",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content label[for]",
+                                "count": 2
+                            },
+                            {
+                                "selector": "#main-content input",
+                                "count": 2,
+                                "contrast": 4.5,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-field-count": "2",
+                                    "data-ev-field-ok": "true"
+                                }
+                            },
+                            {
+                                "selector": "[data-test=\"save-cutoff\"]",
+                                "count": 1,
+                                "text": "Desa",
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "attributes": {
+                                    "disabled": ""
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-match": "true"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    ]
+}

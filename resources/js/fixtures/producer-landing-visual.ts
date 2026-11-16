@@ -2,6 +2,7 @@ import '@/../css/app.css';
 import '../../../public/theme-colors.css';
 import { createInertiaApp, http, router } from '@inertiajs/vue3';
 import { defineComponent, h, type DefineComponent } from 'vue';
+import CutoffController from '@/actions/App/Http/Controllers/Producer/CutoffController';
 import ProductController from '@/actions/App/Http/Controllers/Producer/ProductController';
 import AppLayout from '@/layouts/AppLayout.vue';
 import AppSidebarLayout from '@/layouts/app/AppSidebarLayout.vue';
@@ -226,6 +227,9 @@ const switchRequests: string[] = [];
 // Create/Edit forms and delete-unused (spec 005 T11): requests the real router sends for those pages.
 const formRequests: string[] = [];
 const formStates = ['form-invalid', 'form-busy', 'delete-busy', 'delete-error'];
+// Default cutoff form (spec 005 T12): the PUT the real router sends for Producer/Cutoff.
+const cutoffRequests: string[] = [];
+const cutoffStates = ['cutoff-invalid', 'cutoff-busy'];
 const pagesByPath: Record<string, string> = {
     '/manage/accounts': 'Manage/Accounts/Index',
     '/producer/products': 'Producer/Products/Index',
@@ -240,6 +244,25 @@ http.setClient({
             data: JSON.stringify(body),
             headers: { 'x-inertia': 'true' },
         });
+        if (
+            cutoffStates.includes(state) &&
+            method !== 'get' &&
+            url.pathname === '/producer/cutoff'
+        ) {
+            cutoffRequests.push(`${method} ${url.pathname}${url.search}`);
+            // Busy: the request never answers, so the page stays in `processing`.
+            if (state === 'cutoff-busy') return new Promise(() => {});
+            return reply({
+                ...page,
+                props: {
+                    ...page.props,
+                    errors: {
+                        days_before: 'Els dies han de ser entre 1 i 6.',
+                        domain: 'L’hora de tancament no és vàlida.',
+                    },
+                },
+            });
+        }
         const isFormRequest =
             method !== 'get' &&
             (url.pathname === '/producer/products' ||
@@ -732,6 +755,28 @@ const runFormState = async () => {
     }
 };
 
+const expectedCutoffUpdate = () => {
+    const form = CutoffController.update.form() as {
+        action: string;
+        method: string;
+    };
+    const target = new URL(form.action, window.location.origin);
+    return `${form.method.toLowerCase()} ${target.pathname}${target.search}`;
+};
+const runCutoffState = async () => {
+    (await byTest('save-cutoff')).click();
+    await waitFor(() => (cutoffRequests.length ? document.body : null));
+    if (state === 'cutoff-invalid')
+        await waitFor(() =>
+            document.querySelector('#time ~ div .text-destructive'),
+        );
+    await sleep(400);
+    const requests = cutoffRequests.join(' ; ');
+    setEvidence('requests', requests);
+    setEvidence('expected', expectedCutoffUpdate());
+    setEvidence('match', String(requests === expectedCutoffUpdate()));
+};
+
 const runToggle = async () => {
     // Product 3 is inactive first: reactivate it, then deactivate product 1, as a person would.
     document.body.setAttribute('data-ev-before', switchLabel('product-3'));
@@ -806,6 +851,8 @@ void createInertiaApp({
         pageName !== 'Producer/Products/Index'
     )
         await runFormState();
+    if (pageName === 'Producer/Cutoff' && cutoffStates.includes(state))
+        await runCutoffState();
     if (state === 'account-menu') await openMenu();
     if (query.get('drawer') === '1') await openSheet();
     await snapshot('now');
@@ -816,8 +863,9 @@ void createInertiaApp({
     )
         recordControlContrast();
     if (
-        pageName.startsWith('Producer/Products/') &&
-        pageName !== 'Producer/Products/Index' &&
+        ((pageName.startsWith('Producer/Products/') &&
+            pageName !== 'Producer/Products/Index') ||
+            pageName === 'Producer/Cutoff') &&
         !document.querySelector(measured.sheet) &&
         !document.querySelector(measured.menu)
     )

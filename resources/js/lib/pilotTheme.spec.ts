@@ -221,6 +221,8 @@ describe('landing variant admission', () => {
         ['Catalogue/Stock/Movements', 'landing'],
         ['Catalogue/Stock/Movements/Extra', null],
         ['Catalogue/Stock', null],
+        ['Producer/Cutoff', 'landing'],
+        ['Producer/Cutoff/Extra', null],
         ['Producer/Products/Index', 'landing'],
         ['Producer/Products/Index/Extra', null],
         ['Producer/Products/Create', 'landing'],
@@ -252,6 +254,7 @@ describe('landing variant admission', () => {
             'Producer/Stock/Movements',
             'Finance/Stock/Movements',
             'Catalogue/Stock/Movements/Extra',
+            'Producer/Cutoff/Extra',
             'Producer/Products/Index/Extra',
             'Producer/Products/Create/Extra',
             'Producer/Products/Edit/Extra',
@@ -285,6 +288,7 @@ describe('landing variant admission', () => {
         await nextTick();
         expect(variant()).toBe('landing');
         for (const component of [
+            'Producer/Cutoff',
             'Producer/Products/Create',
             'Producer/Products/Edit',
         ]) {
