@@ -1,7 +1,7 @@
 # 005 — Landing identity rollout: Catalogue role complete
 
-**Status: Slice 1 accepted (2026-11-13, merge of PR #416); slice 2 accepted 2026-11-15 (merge of PR #435; no open questions).** Slices 1 and 2 specified. The
-[discovery](discovery.md) keeps slices 2-7 as a roadmap; they get no requirements here. Slice selection
+**Status: Slice 1 accepted (2026-11-13, merge of PR #416); slice 2 accepted 2026-11-15 (merge of PR #435; no open questions).** Slices 1 and 2 specified; slice 3-7 (the rest of the application, five checkpoints) is drafted below
+and awaits acceptance. The [discovery](discovery.md) holds its selection and boundary. Slice selection
 and boundary are recorded in [history](history/) (Q&A 2026-11-13: slice 1 selected; T85 visual approval
 granted; Manage stock and return-item pages moved into slice 1). Accepting this spec authorizes no plan,
 tasks, tickets or implementation.
@@ -273,13 +273,121 @@ reach, then access is refused as before.
 **S18 — Visual approval gate (R19).** Given the measurement record for the six pages, when the user has not
 recorded visual approval, then the slice is not complete and no later slice is specified or built.
 
+## Slice 3-7 — Rest of the application
+
+**Status: Draft, awaiting acceptance.** Selected 2026-11-16 (history, Q&A "Which slice of 005 do we select next"): the remaining
+candidate slices 3 to 7 of the [discovery](discovery.md) are delivered as one slice in five checkpoints, C1 to C5, one PR per task. It adds
+to the requirements above and keeps them: R1 to R19 apply unchanged to the pages of slices 1 and 2, and R5 to R9 (the shared
+invariants) and R12 apply to every page below. "Catalogue" in those requirements reads as the audience of the checkpoint in question.
+Accepting this section authorizes no plan, tasks, tickets or implementation.
+
+After this slice every screen a person can reach, for every role and for visitors who are not signed in, shows the landing identity in light and
+dark, behaves as before, and the app reads as one cooperative product.
+
+### Language of slice 3-7
+
+| Term | Meaning |
+| --- | --- |
+| Checkpoint | One of C1 to C5: the pages of one audience, delivered by their own tasks and PRs, with their own acceptance record and visual approval (R20). |
+| Old-theme page | A page that is not in the landing page set. Today every page of the tables below, until its checkpoint is approved. |
+
+### Scope of slice 3-7
+
+Pages from `resources/js/pages` not in `landingPages` (`resources/js/lib/pilotTheme.ts`) and routes in `routes/web.php`, `routes/settings.php` and the
+Fortify provider. Verified against `main` at 1ea9af88: 56 page files, 20 already landing, 36 here (32 pages and 4 overlay components).
+
+| Checkpoint | Audience | Pages |
+| --- | --- | --- |
+| C1 Finance and reception | Finance, Receiver, Manager | `Finance/Baskets/{Index,Create,Show}`, `Finance/Stock/{Index,Movements}`, `Receptions/{Index,Show}` (role `manager,finance` and `manager,finance,receiver`); overlay `ReceivedTotalForm` (reception total dialog) |
+| C2 Manager administration | Manager | `Manage/Accounts/Index`, `Manage/Households/{Index,Show}`, `Manage/Producers/Index`, `Manage/Cycles/{Index,Show}`, `Manage/Roles/Index`, `Manage/Settings`, `Manage/Stock/Movements`; overlays `CycleCreateDialog`, `CycleManageDialog`, `SettlementDetails`, `StockEditDialog` |
+| C3 Member and stock | Household member | `Wallet/Statement` (also served to Manager and Finance for a household), `Stock/Index`, `Member/Baskets/{Index,Show}` |
+| C4 Access and account settings | Visitors and every signed-in account | `auth/{Login,ForgotPassword,ResetPassword,VerifyEmail,ConfirmPassword,TwoFactorChallenge,AcceptInvitation}`, `settings/{Profile,Security,Appearance}` with the two-factor, passkey and delete-account dialogs |
+| C5 Closure | Everyone | `Dashboard`, `Welcome` and its transition to sign-in and the app, `resources/views/errors/minimal.blade.php`, the first-paint background and the tab icons in `resources/views/app.blade.php`, the global theme, the removal of the older green opt-in and of the orphan layouts |
+
+Shared components used by pages of several checkpoints (`ui/button`, `ui/input`, `ui/label`, `ui/badge`, `Heading`, `InputError`, `StatusIndicator`,
+`ActiveSwitch`, `NativeDialog`, `MovementHistory`, `ui/dialog`, the toast, the shell menus, sheet and tooltips) change only under the landing rules; the pages that still use
+them outside the landing page set keep their current look until their checkpoint (R2, R23).
+
+### Requirements of slice 3-7
+
+- **R20 — Checkpoints, order and gate.** The checkpoints run in the order C1, C2, C3, C4, C5. A checkpoint is complete only when its acceptance
+  record shows R5 to R9 for its pages as measured text (R12) and the user records visual approval of those pages in light and dark; the next
+  checkpoint does not start before that approval. Each approval is a Q&A that names the evidence it covered. The approval of one checkpoint is
+  never inferred from another's.
+- **R21 — Every page of a checkpoint in the landing page set.** Each page in the checkpoint's table meets R1 to R4 for its audience: shell and
+  content, the dialogs, sheets, dropdowns, tooltips and toasts it opens, in light and dark. A page enters `landingPages` only in its checkpoint; no role, prefix
+  or area is migrated by implication. After the checkpoint no page of that checkpoint keeps the previous green look.
+- **R22 — Measurable conditions per composition.** R5 to R9 hold on every page, as measured text. R7's compositions are, per checkpoint: C1 baskets
+  list and form, basket detail with amounts, finance stock and movement history, reception list and detail, reception total dialog; C2 account and household
+  tables, household detail with settlement, producer table, cycle list and detail with its dialogs, role groups and holder-removal dialog, settings form, stock movement history;
+  C3 wallet statement, stock list, basket list and detail; C4 sign-in and recovery cards, invitation form, profile, security (two-factor, passkey, password) and appearance
+  forms, delete-account dialog; C5 dashboard, landing transition, error page. Amounts, balances, quantities and dates keep their alignment and tabular
+  figures. R8 states include, as each page has them: empty, long names and amounts, invalid and server-error forms, busy and disabled actions, a sent and an unsent
+  basket, an unpaid and a settled balance, a deactivated account or household, a role with no holder.
+- **R23 — Shared components change page-scoped until C5.** A change to a component used by pages outside the checkpoint is made through the landing
+  scope, so that those pages keep their computed colours and fonts (R2). The check compares computed styles on a page of another checkpoint before and after.
+  Slice 1 and 2 pages keep their identity (regression, R30).
+- **R24 — The select takes the identity.** The first checkpoint that uses a select (C1: `Finance/Baskets/Create`, `Receptions/Show`, `pickup/StockLines`, `pickup/ReturnLines` and `reception/AddAllocationForm`) owns
+  theming `ui/select`, including its popup, which renders outside the page. Later checkpoints (C2, C3) reuse it. The popup shows the landing identity on a landing
+  page and its current look on an old-theme page, in both appearances; keyboard selection, focus return and the options shown are unchanged.
+- **R25 — Behaviour, access and money unchanged.** R10 holds for every page: routes, URLs, props, validation, messages, copy, data, calculations and authorization are unchanged. In particular: amounts, balances and
+  totals (001 wallet and finance rules) are the same to the cent; validate, distribute and receive actions have the same effects; role assignment and removal (003) behave as before; a multi-role
+  account sees a page in the landing identity only when that page is migrated, whichever role reached it (`Wallet/Statement` for a member, a manager or finance); sign-in,
+  invitation, recovery, verification, password confirmation, two-factor and passkey flows, their destinations after success and the light, dark and system preference are unchanged.
+  Visual corrections that the work uncovers are allowed and recorded as a Deviation.
+- **R26 — Tests stay green; gaps get coverage.** The existing PHP and Vitest tests of each checkpoint pass unchanged in meaning (R11). The pages without a page spec today
+  (C1 `Finance/Baskets/Create`, `Finance/Stock/Movements`, `Receptions/Index`; C2 `Manage/Households/{Index,Show}`, `Manage/Producers/Index`, `Manage/Roles/Index` and `Manage/Settings`; C3 `Stock/Index`; every C4 page; C5 `Welcome`) get regression coverage for what the scenarios of their
+  checkpoint observe (title, one primary action, error display) before they are declared done.
+- **R27 — Evidence, approval, demo data.** Each checkpoint's acceptance record follows R12 for its pages. The demo seeder shows the states R22 needs for that checkpoint (or the handoff says it already does),
+  extended with its test where it is not (R13).
+- **R28 — Dashboard, welcome, errors and tab icons: presentation only.** In C5 the dashboard keeps the capability and behaviour owned by 004 and gets only the
+  landing identity. The transition from the public landing to sign-in and to the app, and from error pages back, shows no flash of another palette (the first-paint background in light and dark follows the landing). The error page uses landing palette and type only,
+  with no illustration (R4). The tab icons follow the landing identity; no new asset is required when the existing icons already do.
+- **R29 — Global promotion and removal of the older opt-in.** In C5, once every page is migrated and approved, the landing values become the application's theme, the older green opt-in `pilotPages` and the
+  page-by-page `landingPages` boundary are removed, and the orphan layouts and components with no importer (`layouts/app/AppHeaderLayout`, `layouts/auth/{AuthCardLayout,AuthSplitLayout}`, `components/AppHeader.vue`) are deleted. The way back is reverting C5's
+  PR. An inventory shows no old-theme page; the rendered look of every page of C1 to C4 and of slices 1 and 2 is unchanged by the promotion (computed colours and fonts before and after).
+- **R30 — Earlier scope kept.** R1 to R19 and S1 to S18 stay accepted and their pages keep their evidence; each checkpoint's record cites the shared-invariant regression on the integrated base (R5 to R9 re-measured on at least one page of slices 1 and 2 after any shared-component change).
+
+### Scenarios of slice 3-7
+
+"Measured" means by the evidence kinds in R12.
+
+**S19 — Finance and Receiver work one area in one identity (R21, R22, R25).** Given a Finance account and a Receiver account, when each opens baskets, a basket, finance stock, its movements, the receptions list and a reception in turn, in light and dark, then every page shows the landing identity, amounts, totals and balances are the same to the cent, and validate, distribute and receive have the same effects as before.
+
+**S20 — Select popups (R24).** Given a form with a select (new basket, reception allocation, `pickup/StockLines`), when it is opened by keyboard and by touch, in light and dark, then the popup uses the landing identity, an option is chosen with the same result as before, Escape closes it and focus returns to the select; on an old-theme page the popup keeps its current look.
+
+**S21 — Manager administers in one identity (R21, R22, R25).** Given a Manager, when it opens accounts, households, a household's settlement, producers, cycles, a cycle's dialogs, roles, settings and stock movements, then every page shows the landing identity, an account holding another role keeps the pages of that role as they are in its own checkpoint, and role holders are added and removed with the same results and refusals (003).
+
+**S22 — Dialogs and destructive actions (R6, R21).** Given the cycle create and manage dialogs, the settlement detail, the stock edit dialog, the reception total dialog and the role-holder removal, when each is opened by keyboard, then surface, text, buttons and focus use the landing identity, Escape closes it with no request, focus returns to the opener, and destructive actions are not styled as primary actions.
+
+**S23 — Member journey (R21, R22, R25).** Given a household member, when it goes from Orders to a basket, its detail, the wallet statement and stock in turn, then the whole journey shows one identity and the statement balance and lines are unchanged. Given a Manager or Finance account opening a household's wallet statement, then the page shows the same identity.
+
+**S24 — Sign-in to app (R21, R25, R28).** Given a visitor, when it goes from the public landing to sign-in, recovery, an invitation, verification and, after signing in, to the app, then every page shows the landing identity with no flash of another palette, and the destination after sign-in is unchanged. Given an account with two-factor, when it signs in and confirms a password for a sensitive action, then the challenge and confirmation look the same as the rest and work as before.
+
+**S25 — Account settings and security overlays (R21, R22, R25).** Given a signed-in account, when it edits its profile, changes its appearance (light, dark, system), sets up two-factor, adds and removes a passkey and opens delete-account, then each page and dialog shows the landing identity, errors appear after their field, Escape closes dialogs with no request, and the saved values, messages and the chosen appearance are the same as before.
+
+**S26 — No leakage between checkpoints (R2, R23).** Given a checkpoint in progress, when an account navigates from a migrated page to a page of a later checkpoint and back with the menu open, then each page keeps its own look, and a page of another checkpoint has the same computed colours and fonts as before any shared component changed.
+
+**S27 — Measurable invariants (R5 to R9, R22).** Given each page in Scope, when measured at 375 and 1280 px in light and dark and at 1024 px with 200% text per composition, then every text, border and focus pair meets R5, every target is 44 x 44 px or larger, there is no clipping or horizontal overflow, and the states of R22 are legible.
+
+**S28 — Dashboard, errors and tab icons (R28).** Given any account, when it opens the dashboard, an unknown URL, a forbidden page and a server-error page, then they show the landing identity with no illustration, the dashboard offers what 004 gives and no more, and the tab icon matches the landing identity in light and dark.
+
+**S29 — Closure and promotion (R29, R30).** Given every checkpoint approved, when the global theme is promoted and the older opt-in removed, then an inventory lists no old-theme page, the computed colours and fonts of one page of each of C1 to C4 and of slices 1 and 2 are the same before and after, a page reached after Inertia navigation with the mobile menu open keeps the identity in both appearances, and the orphan layouts no longer exist. Reverting C5 restores the page-by-page boundary.
+
+**S30 — Checkpoint approval gate (R20).** Given the measurement record of a checkpoint, when the user has not recorded visual approval of its pages, then the checkpoint is not complete and the next one does not start. When the user approves, the approval is logged in history with the evidence it covered. Given C5, when the user approves, then the feature acceptance review of the whole initiative may run.
+
 ## Non-goals
+
+Non-goals of slices 1 and 2 as written below keep their wording for those slices; slice 3-7 lifts only the exclusion of the pages in its Scope. For slice 3-7 the non-goals are: routes, roles,
+permissions, props, validation, copy, data and calculations (R25); new pages, components, fields or actions where an existing pattern serves; hero composition, basket illustration or
+texture on operating surfaces and error pages; a revival of the retired 002 dashboard or of the "Reference style refresh" green direction; new dashboard capability (004 owns it); mail
+templates (Laravel defaults, decided 2026-11-13); new copy beyond what a visual correction needs.
 
 - Any page outside Scope: producer, finance, reception, other Manager, member, access and settings pages,
   dashboard, `Manage/Stock/Index` and `Manage/Stock/Movements`, `Manage/Roles/Index`.
 - Routes, roles, permissions, props, validation, copy, data, calculations (R10). No new page, component,
   field or action where an existing pattern serves.
-- A select control: no page in Scope uses one (verified 2026-11-13). The first slice that does owns theming
+- A select control, for slices 1 and 2: no page in their Scope uses one (verified 2026-11-13; C1 of slice 3-7 owns it, R24). The first slice that does owns theming
   `ui/select`.
 - Promoting landing values to the global theme, removing the older green opt-in, deleting orphan layouts,
   error pages, mail templates, first-paint background and favicon: slice 7 and the 001 plan inventory.
@@ -298,10 +406,25 @@ recorded visual approval, then the slice is not complete and no later slice is s
 | Landing visual direction, invariants, containment | 001 plan "Llenguatge visual de la portada a tota l'aplicació", T83-T85 | Language, R1-R9, R12 |
 | Slice boundary and selection | [discovery](discovery.md), Q&A 2026-11-13 | Scope |
 | Visual approval before moving on | discovery decision 3; T84/T85 precedent | R12, S12 |
+| Remaining slices as one slice, five checkpoints, one PR per task | Q&A 2026-11-16, [discovery](discovery.md) "Selected slice: 3–7" | Slice 3-7, R20 |
+| Visual approval at each checkpoint | Q&A 2026-11-16 | R20, S30 |
+| Older green opt-in removed at C5, revert as the way back | Q&A 2026-11-16 | R29, S29 |
+| Money, access and security flows unchanged | 001 wallet and finance rules, 003 R14, R16 | R25, S19, S23-S25 |
+| Dashboard behaviour stays with 004 | 004 spec, discovery non-goals | R28, S28 |
 
 ## Open questions
 
-None open. Answered 2026-11-15:
+Raised by the gap check of 2026-11-16 (R20 to R30), none answered yet. Recommendations are proposals, not decisions:
+
+- **OQ5 — A checkpoint is rejected or the approval does not come (G3; blocks R20, S30).** What happens when the user asks for changes at a checkpoint? Recommended: the checkpoint stays open, its rework is tasks in the same checkpoint with the same evidence rules, and later checkpoints stay blocked; a new approval Q&A names the new evidence.
+- **OQ6 — A later change touches an approved checkpoint's page (G5, G6; blocks R20, R23, R30, S30).** A defect found in an approved page, or a shared-component change that alters its computed style. Recommended: the fix goes in the current checkpoint's PR with a Deviation, R30 re-measures the affected pages, and the earlier approval stands unless a computed colour, font or size of the approved page changes; then the user re-approves that page only.
+- **OQ7 — Flash on first paint before C5 (G11; blocks R28, S24).** The first-paint background is set in C5, but C4 approves the sign-in pages earlier. Recommended: as in slices 1 and 2, the first-paint flash is accepted until C5; S24 is measured at C4 for navigation after hydration and fully at C5.
+- **OQ8 — Source of the "no old-theme page" inventory (G13; blocks R29, S29).** Recommended: `resources/js/pages/**`, `resources/views/**` and the overlay components listed in Scope; a page added during the slice joins the checkpoint of its audience, and the plan re-verifies the list at each checkpoint start.
+- **OQ4 — Tab icons in C5.** Which files make "the tab icons follow the landing identity" (R28, S28)? `app.blade.php` links only `favicon.svg`; `public/` also has `favicon.ico` and `apple-touch-icon.png` that are not linked. Recommended: recolour the existing three to the landing palette and link all three; no new icon design. Decide before C5's tasks.
+
+Answered 2026-11-16: slice 3-7 delivered as one slice in checkpoints C1 to C5; visual approval at each checkpoint; the older green opt-in is removed at C5 (see history). The split of the C2 pages into tasks is a plan matter, not a spec question.
+
+Answered 2026-11-15:
 
 - **OQ3 — Page-title size on Producer pages.** One 24 px title at every width, as in slice 1 (Deviation T09); the six Producer pages follow it (R15). Confirmed by the user.
 
