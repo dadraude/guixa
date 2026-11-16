@@ -255,6 +255,8 @@ describe('pilot theme layout and portal', () => {
             'Producer/Stock/Movements',
             'Finance/Stock/Movements',
             'Producer/Products/Index/Extra',
+            'Producer/Products/Create/Extra',
+            'Producer/Products/Edit/Extra',
             'Manage/Stock/Create/Extra',
             'Manage/ReturnItems/Index/Extra',
             'Catalogue/Stock/Movements/Extra',
@@ -287,6 +289,8 @@ describe('pilot theme layout and portal', () => {
             'Manage/ReturnItems/Edit',
             'Catalogue/Stock/Movements',
             'Producer/Products/Index',
+            'Producer/Products/Create',
+            'Producer/Products/Edit',
         ]) {
             page.component = component;
             await nextTick();
@@ -379,6 +383,8 @@ describe('pilot theme layout and portal', () => {
             'Producer/Stock/Movements',
             'Finance/Stock/Movements',
             'Producer/Products/Index/Extra',
+            'Producer/Products/Create/Extra',
+            'Producer/Products/Edit/Extra',
             'Catalogue/Stock/Movements/Extra',
         ]) {
             page.component = component;
@@ -401,6 +407,8 @@ describe('pilot theme layout and portal', () => {
             'Manage/ReturnItems/Edit',
             'Catalogue/Stock/Movements',
             'Producer/Products/Index',
+            'Producer/Products/Create',
+            'Producer/Products/Edit',
         ]) {
             page.component = component;
             await nextTick();

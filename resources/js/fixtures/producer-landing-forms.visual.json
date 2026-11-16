@@ -1,0 +1,1652 @@
+{
+    "baseUrl": "http://127.0.0.1:5283",
+    "rootFontPx": 16,
+    "darkSelector": "html.dark",
+    "matrix": {
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark"],
+        "text": [100, 200]
+    },
+    "views": [
+        {
+            "id": "create-default",
+            "path": "/resources/js/fixtures/producer-landing.html",
+            "query": {
+                "page": "Producer/Products/Create",
+                "role": "producer",
+                "state": "default"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content label,#main-content input:not([type=\"hidden\"]),#main-content p,#main-content button,#main-content a,#main-content dialog h2",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "#main-content #name",
+                "#main-content #unit",
+                "#main-content #price",
+                "#main-content #variable",
+                "#main-content #containers_per_unit",
+                "#main-content [data-test=\"save-product\"]"
+            ],
+            "states": [
+                {
+                    "id": "light",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(40, 101, 133)",
+                                    "data-now-shell-bg": "rgb(250, 241, 220)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content label",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content label[for]",
+                                "count": 5
+                            },
+                            {
+                                "selector": "#main-content input:not([type=\"checkbox\"]):not([type=\"hidden\"])",
+                                "count": 4,
+                                "contrast": 4.5,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-field-count": "4",
+                                    "data-ev-field-ok": "true"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-checkbox-count": "1",
+                                    "data-ev-checkbox-ok": "true"
+                                }
+                            },
+                            {
+                                "selector": "[data-test=\"save-product\"]",
+                                "count": 1,
+                                "text": "Crea",
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "contrast": 4.5,
+                                "attributes": {
+                                    "disabled": null
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(143, 197, 223)",
+                                    "data-now-shell-bg": "rgb(28, 32, 31)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content label",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content label[for]",
+                                "count": 5
+                            },
+                            {
+                                "selector": "#main-content input:not([type=\"checkbox\"]):not([type=\"hidden\"])",
+                                "count": 4,
+                                "contrast": 4.5,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-field-count": "4",
+                                    "data-ev-field-ok": "true"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-checkbox-count": "1",
+                                    "data-ev-checkbox-ok": "true"
+                                }
+                            },
+                            {
+                                "selector": "[data-test=\"save-product\"]",
+                                "count": 1,
+                                "text": "Crea",
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "contrast": 4.5,
+                                "attributes": {
+                                    "disabled": null
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "create-invalid",
+            "path": "/resources/js/fixtures/producer-landing.html",
+            "query": {
+                "page": "Producer/Products/Create",
+                "role": "producer",
+                "state": "form-invalid"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content label,#main-content input:not([type=\"hidden\"]),#main-content p,#main-content button,#main-content a,#main-content dialog h2",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "#main-content #name",
+                "#main-content #unit",
+                "#main-content #price",
+                "#main-content #variable",
+                "#main-content #containers_per_unit",
+                "#main-content [data-test=\"save-product\"]"
+            ],
+            "states": [
+                {
+                    "id": "light",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(40, 101, 133)",
+                                    "data-now-shell-bg": "rgb(250, 241, 220)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content label",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content label[for]",
+                                "count": 5
+                            },
+                            {
+                                "selector": "#main-content input:not([type=\"checkbox\"]):not([type=\"hidden\"])",
+                                "count": 4,
+                                "contrast": 4.5,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-field-count": "4",
+                                    "data-ev-field-ok": "true"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-checkbox-count": "1",
+                                    "data-ev-checkbox-ok": "true"
+                                }
+                            },
+                            {
+                                "selector": "#name + div p",
+                                "count": 1,
+                                "text": "Ja existeix un producte amb aquest nom.",
+                                "contrast": 4.5,
+                                "minHeight": 16
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-match": "true"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(143, 197, 223)",
+                                    "data-now-shell-bg": "rgb(28, 32, 31)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content label",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content label[for]",
+                                "count": 5
+                            },
+                            {
+                                "selector": "#main-content input:not([type=\"checkbox\"]):not([type=\"hidden\"])",
+                                "count": 4,
+                                "contrast": 4.5,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-field-count": "4",
+                                    "data-ev-field-ok": "true"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-checkbox-count": "1",
+                                    "data-ev-checkbox-ok": "true"
+                                }
+                            },
+                            {
+                                "selector": "#name + div p",
+                                "count": 1,
+                                "text": "Ja existeix un producte amb aquest nom.",
+                                "contrast": 4.5,
+                                "minHeight": 16
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-match": "true"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "create-processing",
+            "path": "/resources/js/fixtures/producer-landing.html",
+            "query": {
+                "page": "Producer/Products/Create",
+                "role": "producer",
+                "state": "form-busy"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content label,#main-content input:not([type=\"hidden\"]),#main-content p,#main-content button,#main-content a,#main-content dialog h2",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "#main-content #name",
+                "#main-content #unit",
+                "#main-content #price",
+                "#main-content #variable",
+                "#main-content #containers_per_unit"
+            ],
+            "states": [
+                {
+                    "id": "light",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(40, 101, 133)",
+                                    "data-now-shell-bg": "rgb(250, 241, 220)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content label",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content label[for]",
+                                "count": 5
+                            },
+                            {
+                                "selector": "#main-content input:not([type=\"checkbox\"]):not([type=\"hidden\"])",
+                                "count": 4,
+                                "contrast": 4.5,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-field-count": "4",
+                                    "data-ev-field-ok": "true"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-checkbox-count": "1",
+                                    "data-ev-checkbox-ok": "true"
+                                }
+                            },
+                            {
+                                "selector": "[data-test=\"save-product\"]",
+                                "count": 1,
+                                "text": "Crea",
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "attributes": {
+                                    "disabled": ""
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-match": "true"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(143, 197, 223)",
+                                    "data-now-shell-bg": "rgb(28, 32, 31)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content label",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content label[for]",
+                                "count": 5
+                            },
+                            {
+                                "selector": "#main-content input:not([type=\"checkbox\"]):not([type=\"hidden\"])",
+                                "count": 4,
+                                "contrast": 4.5,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-field-count": "4",
+                                    "data-ev-field-ok": "true"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-checkbox-count": "1",
+                                    "data-ev-checkbox-ok": "true"
+                                }
+                            },
+                            {
+                                "selector": "[data-test=\"save-product\"]",
+                                "count": 1,
+                                "text": "Crea",
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "attributes": {
+                                    "disabled": ""
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-match": "true"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "edit-default",
+            "path": "/resources/js/fixtures/producer-landing.html",
+            "query": {
+                "page": "Producer/Products/Edit",
+                "role": "producer",
+                "state": "default"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content label,#main-content input:not([type=\"hidden\"]),#main-content p,#main-content button,#main-content a,#main-content dialog h2",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "#main-content #name",
+                "#main-content #unit",
+                "#main-content #price",
+                "#main-content #variable",
+                "#main-content #containers_per_unit",
+                "#main-content [data-test=\"save-product\"]",
+                "#main-content [data-test=\"delete-unused-product\"]"
+            ],
+            "states": [
+                {
+                    "id": "light",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(40, 101, 133)",
+                                    "data-now-shell-bg": "rgb(250, 241, 220)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content label",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content label[for]",
+                                "count": 5
+                            },
+                            {
+                                "selector": "#main-content input:not([type=\"checkbox\"]):not([type=\"hidden\"])",
+                                "count": 4,
+                                "contrast": 4.5,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-field-count": "4",
+                                    "data-ev-field-ok": "true"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-checkbox-count": "1",
+                                    "data-ev-checkbox-ok": "true"
+                                }
+                            },
+                            {
+                                "selector": "[data-test=\"save-product\"]",
+                                "count": 1,
+                                "text": "Desa",
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "contrast": 4.5,
+                                "attributes": {
+                                    "disabled": null
+                                }
+                            },
+                            {
+                                "selector": "[data-test=\"delete-unused-product\"]",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "minHeight": 44
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(143, 197, 223)",
+                                    "data-now-shell-bg": "rgb(28, 32, 31)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content label",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content label[for]",
+                                "count": 5
+                            },
+                            {
+                                "selector": "#main-content input:not([type=\"checkbox\"]):not([type=\"hidden\"])",
+                                "count": 4,
+                                "contrast": 4.5,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-field-count": "4",
+                                    "data-ev-field-ok": "true"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-checkbox-count": "1",
+                                    "data-ev-checkbox-ok": "true"
+                                }
+                            },
+                            {
+                                "selector": "[data-test=\"save-product\"]",
+                                "count": 1,
+                                "text": "Desa",
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "contrast": 4.5,
+                                "attributes": {
+                                    "disabled": null
+                                }
+                            },
+                            {
+                                "selector": "[data-test=\"delete-unused-product\"]",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "minHeight": 44
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "edit-long-name",
+            "path": "/resources/js/fixtures/producer-landing.html",
+            "query": {
+                "page": "Producer/Products/Edit",
+                "role": "producer",
+                "state": "long-name"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content label,#main-content input:not([type=\"hidden\"]),#main-content p,#main-content button,#main-content a,#main-content dialog h2",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "#main-content #name",
+                "#main-content #unit",
+                "#main-content #price",
+                "#main-content #variable",
+                "#main-content #containers_per_unit",
+                "#main-content [data-test=\"save-product\"]",
+                "#main-content [data-test=\"delete-unused-product\"]"
+            ],
+            "states": [
+                {
+                    "id": "light",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(40, 101, 133)",
+                                    "data-now-shell-bg": "rgb(250, 241, 220)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content label",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content label[for]",
+                                "count": 5
+                            },
+                            {
+                                "selector": "#main-content input:not([type=\"checkbox\"]):not([type=\"hidden\"])",
+                                "count": 4,
+                                "contrast": 4.5,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-field-count": "4",
+                                    "data-ev-field-ok": "true"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-checkbox-count": "1",
+                                    "data-ev-checkbox-ok": "true"
+                                }
+                            },
+                            {
+                                "selector": "[data-test=\"save-product\"]",
+                                "count": 1,
+                                "text": "Desa",
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "contrast": 4.5,
+                                "attributes": {
+                                    "disabled": null
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(143, 197, 223)",
+                                    "data-now-shell-bg": "rgb(28, 32, 31)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "#main-content label",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content label[for]",
+                                "count": 5
+                            },
+                            {
+                                "selector": "#main-content input:not([type=\"checkbox\"]):not([type=\"hidden\"])",
+                                "count": 4,
+                                "contrast": 4.5,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-field-count": "4",
+                                    "data-ev-field-ok": "true"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-checkbox-count": "1",
+                                    "data-ev-checkbox-ok": "true"
+                                }
+                            },
+                            {
+                                "selector": "[data-test=\"save-product\"]",
+                                "count": 1,
+                                "text": "Desa",
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "contrast": 4.5,
+                                "attributes": {
+                                    "disabled": null
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "edit-dialog",
+            "path": "/resources/js/fixtures/producer-landing.html",
+            "query": {
+                "page": "Producer/Products/Edit",
+                "role": "producer",
+                "state": "dialog"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content label,#main-content input:not([type=\"hidden\"]),#main-content p,#main-content button,#main-content a,#main-content dialog h2",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "dialog[open] [data-test=\"cancel-product-action\"]",
+                "dialog[open] [data-test=\"confirm-product-action\"]"
+            ],
+            "states": [
+                {
+                    "id": "light",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(40, 101, 133)",
+                                    "data-now-shell-bg": "rgb(250, 241, 220)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "dialog[open]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "dialog[open] h2",
+                                "count": 1,
+                                "text": "Elimina",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "dialog[open] p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "dialog[open] button[data-test]",
+                                "count": 2,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "dialog[open] form button",
+                                "count": 1,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-border-count": "1",
+                                    "data-ev-border-ok": "true"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(143, 197, 223)",
+                                    "data-now-shell-bg": "rgb(28, 32, 31)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "dialog[open]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "dialog[open] h2",
+                                "count": 1,
+                                "text": "Elimina",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "dialog[open] p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "dialog[open] button[data-test]",
+                                "count": 2,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "dialog[open] form button",
+                                "count": 1,
+                                "minHeight": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-border-count": "1",
+                                    "data-ev-border-ok": "true"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "edit-dialog-close",
+            "path": "/resources/js/fixtures/producer-landing.html",
+            "query": {
+                "page": "Producer/Products/Edit",
+                "role": "producer",
+                "state": "dialog-close"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content label,#main-content input:not([type=\"hidden\"]),#main-content p,#main-content button,#main-content a,#main-content dialog h2",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "#main-content #name",
+                "#main-content #unit",
+                "#main-content #price",
+                "#main-content #variable",
+                "#main-content #containers_per_unit",
+                "#main-content [data-test=\"save-product\"]",
+                "#main-content [data-test=\"delete-unused-product\"]"
+            ],
+            "states": [
+                {
+                    "id": "light",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(40, 101, 133)",
+                                    "data-now-shell-bg": "rgb(250, 241, 220)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "dialog[open]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-escape-open": "false",
+                                    "data-ev-escape-focus": "true",
+                                    "data-ev-cancel-open": "false",
+                                    "data-ev-cancel-focus": "true",
+                                    "data-ev-requests": "none"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "edit-delete-busy",
+            "path": "/resources/js/fixtures/producer-landing.html",
+            "query": {
+                "page": "Producer/Products/Edit",
+                "role": "producer",
+                "state": "delete-busy"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content label,#main-content input:not([type=\"hidden\"]),#main-content p,#main-content button,#main-content a,#main-content dialog h2",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "#main-content #name",
+                "#main-content #unit",
+                "#main-content #price",
+                "#main-content #variable",
+                "#main-content #containers_per_unit",
+                "#main-content [data-test=\"save-product\"]"
+            ],
+            "states": [
+                {
+                    "id": "light",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(40, 101, 133)",
+                                    "data-now-shell-bg": "rgb(250, 241, 220)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "dialog[open]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"delete-unused-product\"]",
+                                "count": 1,
+                                "text": "Elimina el producte sense ús",
+                                "minHeight": 44,
+                                "attributes": {
+                                    "disabled": ""
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-match": "true"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(143, 197, 223)",
+                                    "data-now-shell-bg": "rgb(28, 32, 31)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "dialog[open]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"delete-unused-product\"]",
+                                "count": 1,
+                                "text": "Elimina el producte sense ús",
+                                "minHeight": 44,
+                                "attributes": {
+                                    "disabled": ""
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-match": "true"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "edit-delete-error",
+            "path": "/resources/js/fixtures/producer-landing.html",
+            "query": {
+                "page": "Producer/Products/Edit",
+                "role": "producer",
+                "state": "delete-error"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content label,#main-content input:not([type=\"hidden\"]),#main-content p,#main-content button,#main-content a,#main-content dialog h2",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "#main-content #name",
+                "#main-content #unit",
+                "#main-content #price",
+                "#main-content #variable",
+                "#main-content #containers_per_unit",
+                "#main-content [data-test=\"save-product\"]"
+            ],
+            "states": [
+                {
+                    "id": "light",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(40, 101, 133)",
+                                    "data-now-shell-bg": "rgb(250, 241, 220)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "dialog[open]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"delete-unused-product\"]",
+                                "count": 1,
+                                "text": "Elimina el producte sense ús",
+                                "minHeight": 44,
+                                "contrast": 4.5,
+                                "attributes": {
+                                    "disabled": null
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-match": "true"
+                                }
+                            },
+                            {
+                                "selector": "[role=\"alert\"] p",
+                                "count": 1,
+                                "text": "No s’ha pogut eliminar el producte.",
+                                "contrast": 4.5
+                            }
+                        ]
+                    }
+                },
+                {
+                    "id": "dark",
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-now-shell-primary": "rgb(143, 197, 223)",
+                                    "data-now-shell-bg": "rgb(28, 32, 31)"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5
+                            },
+                            {
+                                "selector": "dialog[open]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-test=\"delete-unused-product\"]",
+                                "count": 1,
+                                "text": "Elimina el producte sense ús",
+                                "minHeight": 44,
+                                "contrast": 4.5,
+                                "attributes": {
+                                    "disabled": null
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-match": "true"
+                                }
+                            },
+                            {
+                                "selector": "[role=\"alert\"] p",
+                                "count": 1,
+                                "text": "No s’ha pogut eliminar el producte.",
+                                "contrast": 4.5
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    ]
+}
