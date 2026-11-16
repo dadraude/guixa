@@ -762,3 +762,393 @@ tests-first, ships code, specs, manifest states and history entries together, an
 Covers 005 slice 2, R14–R19/S13–S18, only. Slices 3–7, mail, error pages, the Dashboard links to these pages, first paint,
 favicon and global promotion stay outside. Plan acceptance, the task breakdown, publication and implementation are separate
 user decisions; the slice 2 spec acceptance gate stands first.
+
+# Slice 3-7 — Rest of the application · Plan
+
+**Status: Draft, awaiting acceptance.** Covers the [spec](spec.md) section "Slice 3-7" only (R20-R30, S19-S30; OQ4-OQ8
+answered 2026-11-16) and inherits slices 1 and 2, whose plan parts above stay as written. It authorizes no tasks, tickets or
+implementation; the spec acceptance gate stands first. Paths are relative to the repository root; the pages directory is
+`resources/js/pages/`. Everything marked *unverified* was not run or measured while drafting: no test, build or browser check
+was executed for this section (code reading only, worktree at `origin/main` c43a1f43).
+
+## Readiness for this plan (slice 3-7)
+
+| Concern                | State                       | Evidence and limit                                                                                                                                                                                                                                                |
+| ---------------------- | --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Behavior               | Ready                       | R20-R30 and S19-S30 are specific; OQ4-OQ8 answered (`spec.md:419-423`). The spec is Draft until the user accepts it (`spec.md:278`); planning proceeds on that draft and stops at acceptance.                                                                   |
+| Decisions              | Ready, with 8 plan choices  | No open question. D12-D19 below are design choices the plan proposes; none changes a requirement. Corrections 1-4 need a Change entry before tasks.                                                                                                              |
+| Design                 | Ready, with 2 new seams     | Admission, tokens and overlay carriers exist (slices 1 and 2). New work: the select popup (no `usePilotVariantClass` today), the auth shell (no variant plumbing today), the page-less first-paint and error page, the global promotion. All designed below.   |
+| External prerequisites | Ready                       | None: no service, package, credential or migration. Slices 1 and 2 integrated and approved.                                                                                                                                                                       |
+| Paths                  | Ready                       | The 36 pages/overlays, controllers' routes and shared components verified below; new files marked *(planned)*. OQ8 requires a re-verification at each checkpoint start (D19).                                                                                     |
+| Verification           | Ready, planned              | Visual runner (`skills/agent-workflow/scripts/visual/run.mjs`), Vitest and Pest exist; fixtures `catalogue-landing-visual.ts` and `producer-landing-visual.ts` are the model. Nothing run for this draft.                                                        |
+| Seeder                 | Not ready                   | `database/seeders/DemoSeeder.php` lacks four R22 states (deactivated household, deactivated member account, role with no holder, account with two-factor/passkey); settled-vs-unpaid balance unverified. Closed by seeder tasks, not by a decision (see *Seeder decision, slice 3-7*). |
+| Page-spec coverage     | Not ready                   | 22 pages/overlays have no Vitest spec today (R26; list in *Test plan*). Closed inside the page tasks, tests first.                                                                                                                                                |
+| Tracking               | Not ready                   | `tasks.md` has no slice 3-7 tasks; the 5-checkpoint gate (R20) needs one acceptance task per checkpoint. Closed by the task breakdown after plan acceptance.                                                                                                      |
+
+### Corrections (for the coordinator to log as a Change; this section does not edit `spec.md`)
+
+1. **Overlay count.** `spec.md:297` says "4 overlay components"; the C1 and C2 rows name five. Four are page-directory
+   components (`pages/Manage/Cycles/CycleCreateDialog.vue`, `CycleManageDialog.vue`, `pages/Manage/Households/SettlementDetails.vue`,
+   `pages/Manage/Stock/StockEditDialog.vue`); `ReceivedTotalForm` is `components/reception/ReceivedTotalForm.vue`. Proposed: "5 overlay components".
+2. **`StockEditDialog` is already under a landing page.** Its only consumer is `Manage/Stock/Index`, admitted in slice 1.
+   It is not an admission: C2 only measures it (S22) and adds the missing spec. Proposed wording: "overlay already rendered by a landing page".
+3. **`WelcomePage` is not in Scope.** `pages/Welcome.vue` is a thin wrapper (`Welcome.vue:3,9`); the visible page is
+   `components/WelcomePage.vue` (+ `WelcomePage.spec.ts`, `fixtures/welcome-visual.ts`). Proposed: C5 covers `Welcome` through
+   `WelcomePage` (D18), as the landing source of truth, not a restyle.
+4. **Overlays not named by path.** `components/DeleteUser.vue` (delete-account dialog, used by `settings/Profile.vue`),
+   `components/TwoFactorSetupModal.vue`, `components/ManagePasskeys.vue`, `PasskeyRegister.vue` (C4 row says "dialogs") and
+   `components/roles/RoleHolderRemove.vue` (used by `RoleGroup.vue`, C2 row says "holder-removal dialog") are the overlays; assigned to C4 and C2.
+5. **OQ8 inventory scope.** `resources/views/**` also holds `mail/invitation.blade.php` and `mail/producer-order.blade.php`;
+   mail is a non-goal (`spec.md:383`), so the inventory excludes `resources/views/mail/**`. The inventory covers pages, `app.blade.php`,
+   `errors/minimal.blade.php` and the overlay components.
+6. **`pilotPages` gaps.** `Manage/Roles/Index`, `Member/Baskets/Index` and `Member/Baskets/Show` are in neither set
+   (`lib/pilotTheme.ts:1-53` verified by name), so they are not on the older green look but on the global look. Their admission
+   adds the name to both sets (contract point 2); "previous look" in R21 means the global look for these three.
+7. **Paths and counts.** Spec Scope counts 56 page files, 20 landing, 36 here; re-counted at each checkpoint start (D19).
+
+## Architecture overview (slice 3-7, source-backed)
+
+**What already works.** Admission is one exact-name entry in `landingPages` (`lib/pilotTheme.ts:55-76`, 20 names); a page
+must also be in `pilotPages` (`:1-53`). `AppLayout.vue:12-13` derives `pilotTheme` (older green) and `pilotVariant` (`landing`)
+from the Inertia page name and passes them to `AppSidebarLayout.vue`, which provides them (`:33-34`) and adds the classes
+`pilot-theme ... landing` to the shell (`:60`). Portalled content takes the class through `usePilotVariantClass`
+(`composables/usePilotTheme.ts`) in `ui/dialog/{DialogContent,DialogOverlay}`, `ui/dropdown-menu/{DropdownMenuContent,DropdownMenuSubContent}`,
+`ui/sheet/{SheetContent,SheetOverlay}`, `ui/tooltip/TooltipContent`, `ui/sonner/Sonner`. Landing CSS sits only under `.landing` /
+`.dark .landing` (`resources/css/app.css:2124-2237` and the sub-blocks of slices 1 and 2); tokens mirror `components/WelcomePage.vue`.
+
+**First missing behaviors (the reason for the task order).**
+
+| Gap | Source | Consequence |
+| --- | --- | --- |
+| `ui/select` popup has no variant class | `components/ui/select/SelectContent.vue` wraps `SelectPortal` (`:32`); no `usePilotVariantClass` in `ui/select/*` | the popup would render in the global look on a landing page; R24 owned by C1. `FormSelect.vue` wraps `ui/select` (`:2-10`), so one change reaches its 10 consumers (below) |
+| Auth shell has no variant | `layouts/AuthLayout.vue:12` passes only `pilotTheme`; `layouts/auth/AuthSimpleLayout.vue:17` provides only the theme; no `landing` class on `.material-auth` | auth pages (C4) can only reach the older green today; C4's first task adds the variant plumbing |
+| `settings/*` use `AppLayout` + `SettingsLayout` | `app.ts:13-22`; `layouts/settings/Layout.vue:27` (`pilot-settings`) | settings pages are admitted like app pages; the settings layout is a shared component (R23) |
+| Error page is outside Vite | `resources/views/errors/minimal.blade.php` (inline Tailwind v1 CSS, white page, grey text, no `app.css`) | cannot use `.landing`; needs its own palette literals mirrored from the landing tokens (D16) |
+| First paint | `resources/views/app.blade.php:19-26` (`html` background from `--background`, fallbacks `#fff`/`#1b1e1c`); `public/theme-colors.css` sets the global green palette on `:root` | until C5 the background before hydration is the global palette (OQ7); C5 changes `:root` |
+| Tab icons | `app.blade.php:30` links only `/favicon.svg`; `public/{favicon.svg,favicon.ico,apple-touch-icon.png}` exist | OQ4: recolour the three files and link all three |
+
+**Pages by checkpoint (verified against `main`).** All 36 exist. "Gate" is the current state in `lib/pilotTheme.ts`.
+
+| Checkpoint | Pages and overlays | Gate today | Specs today | PHP coverage (verified) |
+| --- | --- | --- | --- | --- |
+| C1 | `Finance/Baskets/{Index,Create,Show}`, `Finance/Stock/{Index,Movements}`, `Receptions/{Index,Show}`; `ReceivedTotalForm` | all in `pilotPages` | `Baskets/Index`, `Baskets/Show`, `Stock/Index`, `Receptions/Show`, `ReceivedTotalForm`; **none** for `Baskets/Create`, `Stock/Movements`, `Receptions/Index` | `tests/Feature/Sales/BasketPagesTest.php:24-29` and `Finance/FinanceBasketAccessTest.php:49` (Create); `Ordering/ReceptionPageTest.php:254-255,304` (Index, OK + component); `Stock/StockMovementHistoryPagesTest.php` |
+| C2 | `Manage/{Accounts/Index, Households/{Index,Show}, Producers/Index, Cycles/{Index,Show}, Roles/Index, Settings, Stock/Movements}`; `CycleCreateDialog`, `CycleManageDialog`, `SettlementDetails`, `StockEditDialog` (+ `RoleHolderRemove`) | all in `pilotPages` except `Manage/Roles/Index` (Correction 6) | `Accounts/Index`, `Cycles/{Index,Show}`, `CycleManageDialog`, `Stock/Movements`, `RoleHolderRemove`; **none** for `Households/{Index,Show}`, `Producers/Index`, `Roles/Index`, `Settings`, `CycleCreateDialog`, `SettlementDetails`, `StockEditDialog` | `Manage/RolesPageTest`, `Membership/{HouseholdPagesTest,AccountPagesTest}`, `Ordering/CyclesPagesTest` |
+| C3 | `Wallet/Statement`, `Stock/Index`, `Member/Baskets/{Index,Show}` | `Wallet/Statement`, `Stock/Index` in `pilotPages`; `Member/*` in neither | `Statement`, `Member/Baskets/{Index,Show}`; **none** for `Stock/Index` | `Wallet/WalletPagesTest`, `Stock/StockDiscoveryTest`, `Sales/MemberBasketReadTest` |
+| C4 | `auth/{Login,ForgotPassword,ResetPassword,VerifyEmail,ConfirmPassword,TwoFactorChallenge,AcceptInvitation}`, `settings/{Profile,Security,Appearance}`; `DeleteUser`, `TwoFactorSetupModal`, `ManagePasskeys`, `PasskeyRegister` | all in `pilotPages` | `PasskeyRegister`, `PasskeyVerify` only; **none** for the 10 pages | `Auth/*`, `Settings/{SecurityTest,ProfileUpdateTest}`; `Membership/InvitationFlowTest` exercises `invitations/{token}` (routes `web.php:111-112`) but no test asserts the `auth/AcceptInvitation` component name (*confirm in the C4 task*) |
+| C5 | `Dashboard`, `Welcome` (+ `WelcomePage`), `errors/minimal.blade.php`, `app.blade.php`, tab icons, global theme, orphans | `Dashboard` in `pilotPages`; `Welcome` in neither | `Dashboard.spec.ts`, `WelcomePage.spec.ts`; **none** for `pages/Welcome.vue` | `DashboardTest` |
+
+**Select users (R24, `FormSelect` or `ui/select`).** C1: `Finance/Baskets/Create`, `Receptions/Show`, `pickup/StockLines`, `pickup/ReturnLines`,
+`reception/AddAllocationForm`. C2: `Manage/Accounts/Index`, `Manage/Households/Show`, `Manage/Settings`, `Manage/Stock/Movements`, `CycleCreateDialog`.
+C3: `Wallet/Statement`. Fixtures only: `fixtures/{SelectVisual,ManagerFieldsVisual}.vue`, `select-visual.ts`, `selects.visual.json` (existing manifest: the
+old-theme popup baseline, kept as the "current look" control, D13). `FormSelect.spec.ts` exists; `ui/select` has no spec.
+
+**Orphans for C5 (re-verified).** `rg` over `resources` and `tests` finds no importer of `layouts/auth/AuthCardLayout.vue` or
+`layouts/auth/AuthSplitLayout.vue`; `layouts/app/AppHeaderLayout.vue` is imported by nobody and itself imports `components/AppHeader.vue`
+(`AppHeaderLayout.vue:3`), whose only importer is that layout. Delete the four together (R29). *Re-run the search in the task; a page added meanwhile may import them.*
+
+**Shared-component leakage (R2, R23).** Landing styling lands only under `.landing`; no markup, class or prop change in a
+shared component unless a probe shows unmigrated consumers' computed values unchanged. The unmigrated probe set shrinks per
+checkpoint; the probe is always "a page of a later checkpoint", chosen from the table below, never a synthetic page.
+
+| Checkpoint ending | Probe pages (still old-theme) for shared-component changes |
+| --- | --- |
+| C1 | `Manage/Accounts/Index` (select, `ActiveSwitch`), `Manage/Cycles/Index` (`NativeDialog`), `Manage/Stock/Movements` (`MovementHistory`), `Wallet/Statement` (select), `auth/Login` |
+| C2 | `Wallet/Statement`, `Member/Baskets/Index`, `settings/Profile`, `auth/Login`, `Dashboard` |
+| C3 | `settings/Profile`, `auth/Login`, `Dashboard` |
+| C4 | `Dashboard`, `Welcome` (landing already; negative control for `.welcome-page`) |
+| C5 | none: global promotion; the check is before/after on one page of each checkpoint (S29) |
+
+## Contract for admitting a page (reuse)
+
+The seven-point contract of slices 1 and 2 applies unchanged: exact name; also in `pilotPages` (Correction 6: add both for
+`Manage/Roles/Index`, `Member/Baskets/{Index,Show}`); measured before merge; tests flipped in the same change
+(`lib/pilotTheme.spec.ts`, `composables/usePilotTheme.spec.ts`, per-page specs that assert `pilotVariantFor`); controls re-pointed
+if a probe page is admitted; shared-consumer probe from the table above; reversible (one name per entry, D8 precedent).
+Specifics:
+
+- Point 5: the existing probes in `catalogue-landing-visual.ts` and `producer-landing-visual.ts` (and their manifests) point to
+  `Manage/Stock/Movements`, `Finance/Stock/Movements`, `Manage/Cycles/Index`, `Manage/Accounts/Index`. Admitting those pages
+  removes the control: re-point **before** the admitting task, to the next-later page (table above), in the same PR (D14).
+- Point 4 also covers `layout-rules.spec.ts`: it lists landing pages for the 8 px grid check (`:6-13`); each admitted page joins.
+- Auth pages (C4) cannot be admitted by name alone: they need the shell variant first (D15).
+
+## Per-requirement design
+
+### R20 — Checkpoints, order and gate (S30)
+
+One acceptance task per checkpoint (C1..C4 closure, C5 closure) records R5-R9 as measured text for its pages, then asks the user
+for visual approval in light and dark and logs it as a Q&A naming the evidence. No task records the approval on the user's behalf.
+Later checkpoints are blocked by that Q&A (OQ5: rework stays in the same checkpoint; OQ6: a fix to an approved page goes in the
+current checkpoint's PR as a Deviation with R30 re-measurement). Task statuses show the block; no code mechanism.
+
+### R21 — Every page of a checkpoint in the landing page set (S19, S21, S23-S25)
+
+One `landingPages` entry per page, in the page's task (D8). Overlays inherit `.landing` from the shell (modal) or through
+`usePilotVariantClass` (portalled); the cycle, settlement and reception dialogs use `NativeDialog`
+(`components/manager/NativeDialog.vue`), already measured on slices 1 and 2. No change to `AppLayout.vue`, `AppSidebarLayout.vue`
+or `usePilotTheme.ts` for app pages. For auth pages see R22/C4 design below.
+
+### R22 — Measurable conditions per composition (S27)
+
+Method of slices 1 and 2 per page, as measured text: contrast pairs, 44 px minimums, tabular figures on amounts/balances/quantities
+(`pilot-amount`, `tabular-nums`; probe which cells carry them), text for states (`Deactivated`, `Sold out`, `Sent`, `Settled`...;
+colour never the only signal), no overflow at 375 px and 1024 px/200 %. Composition-specific design:
+
+| Checkpoint | Composition | Probe first (likely issue) |
+| --- | --- | --- |
+| C1 | basket list/form/detail with amounts | `Finance/Baskets/Create` select and amount fields; row layout in `components/baskets/*`, `financeBasketRow.ts` fixture; money columns right-aligned and tabular |
+| C1 | finance stock and movement history | `MovementHistory` shared with `Manage/Stock/Movements` (still old-theme): leakage probe mandatory |
+| C1 | reception list/detail, total dialog | `reception/AllocationRow.vue`, `pickup/*Lines` tables at 375 px; `ReceivedTotalForm` dialog by keyboard |
+| C2 | account and household tables | `ActiveSwitch` and `.pilot-status-switch` already measured (slice 1); deactivated rows read as text |
+| C2 | household detail with settlement | `SettlementDetails` (overlay); unpaid vs settled balance as text plus amount |
+| C2 | producer table, settings form | tables at 375 px; `Manage/Settings` select and invalid/server-error states |
+| C2 | cycle list/detail and dialogs | `CycleCreateDialog` (select + dialog), `CycleManageDialog`; busy/disabled actions |
+| C2 | role groups, holder removal | `RoleGroup` empty group ("role with no holder"); destructive removal not styled primary (S22) |
+| C3 | wallet statement | amounts to the cent, running balance, tabular; multi-role access (R25) |
+| C3 | stock list, member baskets | sent/unsent basket as text; empty and long names |
+| C4 | sign-in/recovery cards, invitation | `AuthSimpleLayout` card on the landing paper background; server-error and invalid forms |
+| C4 | profile, security, appearance, dialogs | two-factor setup modal (QR, codes), passkey add/remove, delete-account dialog by keyboard |
+| C5 | dashboard, transition, error page | dashboard cards keep 004 capability; error page is static HTML, measured by fetching the rendered view |
+
+### R23 — Shared components change page-scoped until C5 (S26)
+
+Every CSS change is under `.landing`. A component whose template must change (the select popup, the auth shell) gets a class
+added only when the variant is active (empty string otherwise, as `usePilotVariantClass` does), so old-theme output is byte-identical.
+The check for each task: computed colours and fonts of the probe page (table above) before and after on the integrated base.
+The probe set shrinks to none at C5 (promotion); R30 re-measures one slice 1 and one slice 2 page after any shared-component change.
+
+### R24 — The select takes the identity (S20)
+
+**Design.** Add `usePilotVariantClass` to `ui/select/SelectContent.vue` (the popup root, inside `SelectPortal`), exactly as
+`DialogContent.vue` and `DropdownMenuContent.vue` do (*read them in the task and copy the pattern*). The landing look is CSS
+under `.landing` for the popup surface, items (highlight/selected), scroll buttons and the trigger focus ring; text and surface
+pairs meet R5. Trigger styling inside a landing page already follows tokens (`--input`, `--ring`). `FormSelect.vue` needs no change
+unless its `contentClass` overrides colours (*read first*). Keyboard selection, Escape and focus return are Reka UI behaviour
+(unchanged); the task proves them with a keyboard case, not by assumption. **Owner: the first C1 task that reaches a select (D12).**
+Evidence: popup open on a landing page (light/dark, keyboard and touch), the same on `Manage/Accounts/Index` (old-theme control) with
+computed values equal to the baseline in `selects.visual.json`. Later checkpoints (C2, C3) add their pages to the existing
+cases, they do not edit the select.
+
+### R25 — Behaviour, access and money unchanged (S19, S21, S23-S25)
+
+Presentation only; no PHP, route, prop, validation, translation or calculation edit. Guards: the Pest suites named above run
+unchanged per task (their ordering names the assertions of money and access). Multi-role navigation (`Wallet/Statement` reached by
+a member, a manager, finance): the variant derives from the page name, so by construction; one navigation case per checkpoint
+measures it. For C4: no test change to sign-in/two-factor/passkey/destinations; the Pest `Auth/*` and `Settings/*` run unchanged; the
+appearance preference (light, dark, system) is covered by an `Appearance` spec asserting the three options and the stored value are untouched.
+Visual corrections found are recorded as a Deviation (R25 last sentence).
+
+### R26 — Tests stay green; gaps get coverage (S27)
+
+See *Test plan, slice 3-7*.
+
+### R27 — Evidence, approval, demo data
+
+See *Visual evidence plan* and *Seeder decision*. Each checkpoint's closure task builds the R12 map and asks for approval (S30).
+
+### R28 — Dashboard, welcome, errors and tab icons (S28)
+
+- **Dashboard.** `pages/Dashboard.vue` (already in `pilotPages`) enters `landingPages` with the same contract; `Dashboard.spec.ts` stays green. Capability stays 004 (no card added, removed or reordered).
+- **Transition without flash.** Welcome renders no layout (`app.ts:13-14`) and uses its own CSS; the app shell paints `html` from
+  `--background` (`app.blade.php:19-26`). After C5's promotion `--background` is the landing paper in light and dark, so both ends match; the fallbacks `#fff` / `#1b1e1c` in the inline
+  style change to the landing values (`#faf1dc` / `#1c201f`) so a missing stylesheet does not flash either (D17). Measured: `getComputedStyle(html).backgroundColor`
+  at first paint against the landing token, light and dark, on `/`, `/login` and `/dashboard`.
+- **Error page.** `errors/minimal.blade.php` has no Vite assets; it is restyled with inline CSS using the landing palette literals (paper, ink, blue, border) and the
+  font stack the app resolves, light and dark through `prefers-color-scheme`; no illustration. Copy, status codes and the `@yield` structure stay. Measured by rendering the view for 403, 404, 500 and reading computed styles (D16).
+- **Tab icons.** Recolour `public/favicon.svg`, `public/favicon.ico`, `public/apple-touch-icon.png` to the landing palette (OQ4) and add the two missing `<link>` tags in `app.blade.php`. The `.svg` may carry a `prefers-color-scheme` variant for dark tabs; `.ico` and `.png` are static (the light-palette version). Evidence: file dimensions, dominant colours read from the files as text (no screenshot).
+
+### R29 — Global promotion and removal of the older opt-in (S29)
+
+Last task of C5 after every other checkpoint is approved. Design:
+
+1. Move the landing values from `.landing` to the application theme: the `:root` palette in `public/theme-colors.css` and the token blocks in `resources/css/app.css`
+   (`.landing` / `.dark .landing`, `:2124-2237`) become the global values; sidebar tokens included.
+2. Remove `pilotPages` and `landingPages`, `pilotVariantFor`, `isPilotThemePage`; `AppLayout.vue`, `AuthLayout.vue`, `AppSidebarLayout.vue`, `AuthSimpleLayout.vue` and
+   `composables/usePilotTheme.ts` keep the class on the shell only if a CSS rule still needs it (D15, D17); otherwise drop the props. Specs for the removed functions are deleted with them; the page specs lose their `pilotVariantFor` assertions.
+3. Rename-or-keep: the `.pilot-*` classes and `.landing` rules stay as plain rules (renaming is out of scope; no refactor beyond the promotion).
+4. Delete the four orphans (R29).
+5. The way back is `git revert` of C5's promotion PR; the PR keeps the promotion in one commit-sized change so the revert is clean (D17).
+6. "No old-theme page" inventory (OQ8): script over `resources/js/pages/**` and overlay components listed in Scope, plus `resources/views/{app,errors/minimal}.blade.php` and not `views/mail/**` (Correction 5), asserting each page resolves the landing identity; run again at each checkpoint start (D19).
+
+Evidence: computed colours and fonts of one page per checkpoint before and after (S29), a navigation case with the mobile menu open (Inertia navigation, light and dark).
+
+### R30 — Earlier scope kept (S29)
+
+Slice 1 and 2 pages keep their evidence. Each checkpoint's closure re-runs the slice 1 and slice 2 manifests (`catalogue-landing-*`, `producer-landing-*`) on the integrated base after any shared-component change (select, auth shell, `ui/*`, `MovementHistory`), citing the result. The existing `reference-*`, `dra-*` manifests stay manual-only and unrun (precedent, slice 2 risks).
+
+## Test plan, slice 3-7 (TDD per scenario)
+
+One failing check per rule or scenario before the minimum change. Behaviour does not change, so the executable specs are Vitest
+(admission, page regression, select), Pest suites already named (unchanged) and the visual runner (presentation). A test that only reads a CSS class is not evidence of look.
+
+**Existing tests that stay green unchanged in meaning (R26/R11):** every spec listed under "Specs today" above; `lib/pilotTheme.spec.ts`,
+`composables/usePilotTheme.spec.ts`, `layout-rules.spec.ts` (edited only as the contract says); `FormSelect.spec.ts`; `components/manager/NativeDialog.spec.ts`;
+the Pest suites listed under "PHP coverage" above, run once per task whose page they cover; slice 1 and slice 2 Vitest specs.
+
+| Scenario / rule | Failing check first | Where |
+| --- | --- | --- |
+| R21/S19, S21, S23, S24 admission (per page) | `pilotVariantFor('<page>') === 'landing'`; shell and portalled content get `landing` and lose it on leaving | `lib/pilotTheme.spec.ts`, `composables/usePilotTheme.spec.ts` |
+| R24/S20 select | `SelectContent` adds the variant class when a variant is provided and none otherwise (SSR render with `providePilotVariant`) | `components/ui/select/SelectContent.spec.ts` *(planned)* |
+| R24/S20 keyboard | Escape closes, focus returns, same option chosen, on a landing and an old-theme page | visual runner interaction case (not unit testable in SSR) |
+| R26/S19 C1 specless | `Baskets/Create`: title, one primary action, household select, error shown through `InputError`; `Stock/Movements`: title, `MovementHistory`, entry/adjust controls only for the permitted role; `Receptions/Index`: title, rows, empty state | `pages/Finance/Baskets/Create.spec.ts`, `pages/Finance/Stock/Movements.spec.ts`, `pages/Receptions/Index.spec.ts` *(planned)* |
+| R26/S21 C2 specless | `Households/Index`, `Households/Show` (settlement shown, deactivated row text, `SettlementDetails`), `Producers/Index`, `Roles/Index` (role with no holder text, remove control), `Settings` (form, errors), `CycleCreateDialog`, `SettlementDetails`, `StockEditDialog` | one `*.spec.ts` beside each *(planned)* |
+| R26/S23 C3 specless | `Stock/Index`: title, list, empty state, no write control | `pages/Stock/Index.spec.ts` *(planned)* |
+| R26/S24, S25 C4 specless | each of the 7 `auth/*` and 3 `settings/*` pages: title, one primary action, `InputError` after its field, busy state disables submit; `Appearance`: three options present and unchanged | `pages/auth/*.spec.ts`, `pages/settings/*.spec.ts` *(planned)* |
+| R26/S28 C5 specless | `pages/Welcome.vue` renders `WelcomePage` (title, sign-in link); `Dashboard.spec.ts` stays | `pages/Welcome.spec.ts` *(planned)* |
+| R15/S24 auth shell variant | `AuthSimpleLayout` carries `landing` only when the variant is provided; unchanged otherwise | `layouts/auth/AuthSimpleLayout.spec.ts` *(planned)* |
+| R29/S29 inventory | script: no page resolves old-theme; mail excluded; orphans absent | `resources/js/layout-rules.spec.ts` or a new inventory spec *(planned, D19)* |
+| R28/S28 error page | the view renders for 403/404/500 with the landing literals and no `<img>`/`<svg>` illustration | `tests/Feature/ErrorPagesTest.php` *(planned; confirm none exists)* |
+| R25 guards | no new test; Pest suites above re-run; handoff states "no PHP behaviour changed" | existing |
+| R27 seeder | new states asserted | `tests/Feature/Database/DemoSeederTest.php` |
+
+Spec pattern to mirror: `pages/Producer/Products/Index.spec.ts` and `pages/Manage/Stock/Edit.spec.ts` (SSR `renderToString` of the real component with `installTranslations`).
+
+## Visual evidence plan (measurement first, per AGENTS.md "Measure before screenshot")
+
+Follows `skills/agent-workflow/references/visual.md`: DOM, `getComputedStyle`, `getBoundingClientRect` and `measure.mjs` first;
+no screenshot unless an unexplained failure, a new direction or the user asks (then one, cropped or scale 0.3-0.5). Fixtures
+*(planned)*, modelled on `catalogue-landing-visual.ts` and `producer-landing-visual.ts` (real `createInertiaApp`, real layouts, deterministic props), one per checkpoint so a
+failed measurement blocks one checkpoint: `rest-c1-landing`, `rest-c2-landing`, `rest-c3-landing`, `rest-c4-landing` (auth shell and settings), `rest-c5-landing` (dashboard, transition, error page by static render). No shared-bootstrap
+extraction (D9 stands; revisit at the fifth copy, which this is: see D13). Runs are bound to a base SHA in an ignored `.atl/<task>/visual` directory. Fixtures prove presentation only, never persistence or authorization.
+
+**Dimensions per checkpoint (explicit `cases`; estimates uncertain, `run.mjs plan` decides):**
+
+| Checkpoint | Baseline (pages × 375/1280 × light/dark) | 200 % text at 1024 (per composition × 2 appearances) | Risk states (375 light + 1280 dark) | Overlays and select | Leak, regression, system | Estimate |
+| --- | --- | --- | --- | --- | --- | --- |
+| C1 | 7 pages = 28 | 5 compositions = 10 | basket empty, long name, big amount, sent/unsent, busy submit, reception states, validation errors ≈ 24 | select popup (keyboard, touch), total dialog, account menu, sheet, toast ≈ 14 | old-theme select control, probe pages, slice 1/2 re-measure ≈ 14 | ≈ 90-120 |
+| C2 | 9 pages = 36 | 8 compositions = 16 | deactivated account/household, unpaid/settled balance, role with no holder, long names, cycle states, errors ≈ 30 | 5 overlays by keyboard, select ≈ 16 | probes, slice 1/2 re-measure, multi-role ≈ 14 | ≈ 110-140 |
+| C3 | 4 pages = 16 | 3 compositions = 6 | wallet empty/negative, long lines, sent/unsent basket, empty stock ≈ 12 | select on statement ≈ 4 | multi-role navigation (member, manager, finance), probes ≈ 10 | ≈ 45-60 |
+| C4 | 10 pages = 40 | 6 compositions = 12 | invalid/server-error forms, busy, 2FA setup, passkey list, delete dialog ≈ 24 | dialogs by keyboard ≈ 10 | system appearance, reduced motion, auth→app navigation ≈ 12 | ≈ 95-120 |
+| C5 | dashboard 4 + 3 error statuses × 2 appearances = 10 | 2 = 4 | per role dashboard ≈ 8 | none | first paint on `/`, `/login`, `/dashboard`, before/after promotion on one page per checkpoint (8), mobile menu navigation, icons ≈ 24 | ≈ 50-70 |
+
+**Assertions (per page, as slices 1 and 2):** `.reference-style.landing` count 1 on app pages (auth shell: its `landing` carrier, D15); `.pilot-theme:not(.landing)` count 0 on migrated pages; `.welcome-page` count 0 off Welcome;
+`#main-content h1:not(.sr-only)` size per composition (24 px under `pilot-t44-page`, else `pilot-title-compact`, D6 precedent); contrast on H1, muted, error, buttons, badges, field border, select popup item and highlight; 44 px
+`minWidth/minHeight` on interactive elements; tabular figures on money cells; state texts; no `background-image` in `#main-content`; real-Tab `focus` list; no horizontal overflow; for portalled content, the carrier class on the popup root.
+
+**First checkpoint per checkpoint (the tracer task):**
+
+- C1: `Receptions/Show` at 375 px light still shows green on the select popup and primary action (record the failing value), then admit it and the select, and re-measure the landing blue (`rgb(40, 101, 133)`), with the old-theme control `Manage/Accounts/Index` unchanged.
+- C4: `auth/Login` still green, then landing after the shell variant lands, with `settings/Profile` unchanged until its task.
+- C5 promotion: record before values for one page per checkpoint, promote, re-measure equal (S29).
+
+## Seeder decision, slice 3-7
+
+Read: `database/seeders/DemoSeeder.php`, `tests/Feature/Database/DemoSeederTest.php`. Already seeded (from the brief and `DemoSeeder.php`): staff role holders, reception states, sold-out/retired stock, a long stock history, an unsent cycle with an unavailable
+product, deactivated producer and product, an unlinked former member account, settlement drafts, opening balances (`:264-269`, top-ups through `RecordTopUp`). **Decision (per `AGENTS.md` "Demo seeder"): the seeder must change** for states that R22 needs and the demo does not show; the rest it already shows (no change).
+
+| State needed (R22) | Pages | Seeded today | Proposal |
+| --- | --- | --- | --- |
+| Sent and unsent basket; reception states; sold-out stock; long history | C1, C3 | yes | none; the handoff says so (verify the member has both a sent and an unsent basket, *unverified*) |
+| Unpaid and settled household balance | C2 `Households/Show`, C3 `Wallet/Statement` | opening balances only (*settled vs unpaid unverified*) | confirm by reading; if absent, add one settled and one unpaid household through existing use cases (D20 gives the placement) |
+| Deactivated household | C2 `Households/*` | no | add through the existing deactivation use case (*find it in `src/Membership/Application`*) |
+| Deactivated member account | C2 `Accounts/Index` | no (an *unlinked former* account exists, different state) | add through the existing account-deactivation use case |
+| Role with no holder | C2 `Roles/Index` | no (all staff roles held) | one role left without a holder (e.g. a staff role that has none after seeding), asserted |
+| Account with two-factor or passkey | C4 `settings/Security` | no | one account with two-factor enabled; a passkey record needs WebAuthn data, so seed only the two-factor secret and recovery codes through the Fortify action and measure passkeys from the fixture (D21) |
+| Long names | all | partly | covered by the fixtures (deterministic props); not seeded |
+| Server-error and invalid forms, busy | all | no | not seedable; covered by fixtures and Vitest |
+
+Names are fixed so reruns stay idempotent (the seeder is guarded by the demo transaction; confirm with the existing idempotency test). New rows are created after the cycles, as in slice 2, so cycles, orders, receptions and dashboard assertions stay as they are. `DemoSeederTest.php`: update counts, add one test per seeded state, extend the role path lists with each new C1-C4 URL (run the whole file; unverified).
+
+## Risks (slice 3-7)
+
+| Risk | Evidence | Mitigation |
+| --- | --- | --- |
+| Select theming leaks to old-theme pages | `FormSelect.vue` has 10 consumers; `ui/select/SelectContent.vue` is portalled | class only when the variant is provided; control `Manage/Accounts/Index` before/after; keyboard case |
+| Auth pages cannot reach `landing` without shell plumbing | `AuthLayout.vue:12`, `AuthSimpleLayout.vue:17` | C4 first task adds a variant prop and class carrier; `settings/*` use `AppLayout` and are unaffected |
+| Probe pages are admitted and break earlier evidence | probes at `catalogue-landing-visual.ts`, `producer-landing-visual.ts` point to C1/C2 pages | D14: re-point first, in the admitting PR |
+| Error page and `app.blade.php` are outside Vite/CSS tokens | `errors/minimal.blade.php` is standalone; first paint uses `--background` fallback | D16/D17; measure the rendered view; test with CSS unloaded for first paint |
+| Global promotion changes pages that were not re-measured | `public/theme-colors.css` `:root` is the only source for old-theme pages | S29 before/after on one page per checkpoint plus the inventory; one reversible PR |
+| `MovementHistory` and `NativeDialog` restyle reaches unmigrated pages | `Manage/Stock/Movements`, `Manage/Cycles/*` consumers | probes per checkpoint (table above); C2 consumes the last probe |
+| 22 specless pages block definition of done | R26 | specs written first, inside the page task; no separate "coverage" task |
+| Large C2 and C4 checkpoints are slow to approve | 9 pages + 5 overlays; 10 pages + 4 overlays | task slicing below; user approval is per checkpoint (R20), not per task |
+| Fixture bootstrap duplicated a fifth time | `catalogue-landing-visual.ts` ~1650 lines | D13: one fixture per checkpoint now; extraction as a separate refactor task proposal, not in scope |
+| Orphan list changes during the slice | OQ8 | D19: re-run `rg` at each checkpoint start and at C5 |
+| Seeder additions change dashboard counts | `DemoSeederTest.php` (slice 2 note) | create after cycles; run the whole file |
+| Behaviour regression on money/auth | R25 | presentation-only diff review; Pest suites unchanged and listed per task |
+| Mail templates touched by the inventory | `views/mail/*.blade.php` | excluded (Correction 5); non-goal |
+
+## Decisions the plan proposes (to confirm)
+
+Numbering continues from slice 2 (D6-D11).
+
+- **D12 — Select owner and shape.** Recommendation: the first C1 task that reaches a select adds `usePilotVariantClass` to
+  `ui/select/SelectContent.vue` and the `.landing` select CSS (same pattern as `ui/dialog`); `FormSelect` unchanged. Alternative (a wrapper `LandingSelect`) rejected: a second component for one behaviour.
+- **D13 — Fixtures.** Recommendation: one fixture per checkpoint (`rest-c1..c5-landing`), reuse the select baseline in `selects.visual.json` as the old-theme control; no bootstrap extraction now. Alternative: extract the shared bootstrap first as a prefactor task (a fifth copy is where D9 said to revisit).
+- **D14 — Probe re-pointing.** Recommendation: the PR that admits a probe page re-points that probe in slice 1/2 fixtures and manifests to the next later page (table in *Architecture overview*), as in slice 2 D7. Alternative: a permanent synthetic control page (rejected, D4/D7).
+- **D15 — Auth shell variant.** Recommendation: add `pilotVariant` to `AuthLayout.vue` and `AuthSimpleLayout.vue` (provide it, add the class to the `.material-auth` root and to portalled overlays via `usePilotVariantClass`), with `landing` CSS under `.landing`; no new layout. Alternative: a dedicated `AuthLandingLayout` (rejected: duplicates the shell).
+- **D16 — Error page.** Recommendation: restyle `errors/minimal.blade.php` with inline CSS in landing palette literals, `prefers-color-scheme` for dark, no Vite assets; copy unchanged. Alternative: render the error as an Inertia page (rejected: new component, changes behaviour on failures).
+- **D17 — Promotion shape.** Recommendation: one PR that (a) moves the tokens to `:root` and `theme-colors.css`, (b) removes both sets and the helper functions, (c) deletes the orphans; the `.landing` selectors and `.pilot-*` classes are kept as plain rules this slice (no renaming); fallback colours in `app.blade.php` move in the same PR. Alternative: orphans deleted in an earlier C5 task (acceptable, independent) and promotion split in two PRs; the revert story is then two reverts.
+- **D18 — `Welcome` coverage.** Recommendation: C5 admits `Welcome` as already landing (no restyle), adds `pages/Welcome.spec.ts`, and measures the transition; `WelcomePage.vue` is edited only if the transition measurement fails (Deviation). Alternative: add `WelcomePage.vue` to Scope formally (a spec edit).
+- **D19 — Inventory.** Recommendation: a script/spec listing `resources/js/pages/**` plus overlay components, run at each checkpoint start and fail on a page not in the checkpoint table nor in `landingPages`; mail excluded. Alternative: a manual `rg` list in each closure record (cheaper, drifts).
+- **D20 — Seeder placement.** Recommendation: three seeder tasks, one per checkpoint with a gap (C2, C4, and C1 only if a read shows a missing state), each created after the cycles; no single big seeder task up front. Alternative: one seeder task in C1 (earlier demo for all checkpoints; but it ships states before their pages exist).
+- **D21 — Passkey demo state.** Recommendation: seed two-factor only; passkey states are covered by the fixture and `PasskeyRegister.spec.ts`/`PasskeyVerify.spec.ts` (WebAuthn data is not realistic to seed). Alternative: seed a fake passkey record (rejected: wrong data in the demo).
+- **D22 — Approval granularity.** Recommendation: closure task per checkpoint presents the per-page measurement as text and asks one approval for the whole checkpoint in light and dark (R20 text); a page the user rejects is reworked inside the checkpoint (OQ5).
+- **D23 — `Member/Baskets/*` and `Manage/Roles/Index` admission.** Recommendation: add each name to both sets in its page task (Correction 6); no separate "bring to green first" step, since the intermediate look is the global look the page has today.
+
+## Ordering and dependencies
+
+Strict checkpoint order C1 → C2 → C3 → C4 → C5; each closure task needs every task of its checkpoint merged and the previous checkpoint's approval (R20).
+Inside a checkpoint, the first task is the tracer (fixture, shared change, first admission); the other page tasks need only that task.
+Seeder tasks are independent of UI tasks and are needed before the closure task of their checkpoint.
+
+```
+C1:  C1-tracer ──► C1-list, C1-baskets-form, C1-finance-stock, C1-receptions-list ──► C1-closure
+     C1-seeder (if needed) ───────────────────────────────────────────────────────────┘
+C2:  C2-tracer ──► C2-households, C2-producers-settings, C2-cycles, C2-stock-history ──► C2-closure
+     C2-seeder ─────────────────────────────────────────────────────────────────────────┘
+C3:  C3-wallet ──► C3-member-pages ──► C3-closure         (wallet first: multi-role, select reuse)
+C4:  C4-tracer (auth shell + sign-in) ──► C4-auth-flows, C4-profile, C4-security ──► C4-closure
+     C4-seeder ───────────────────────────────────────────────────────────────────────┘
+C5:  C5-dashboard, C5-orphans (independent) ──► C5-promotion ──► C5-closure
+     C5-errors-icons-paint, C5-welcome (independent) ──────────┘
+```
+
+Page tasks inside a checkpoint are independent of each other once the tracer merges (different files; each adds its fixture cases and spec). If two touch the same `.landing` block, the later one re-runs the earlier one's cases as its probe.
+`C5-promotion` needs all pages admitted and approved (C1-C4 closed), the error page, paint and icons done, and the orphans removed or untouched.
+
+## Proposed task slicing (names, allocation of R#/S# only; no task text, no Tnn IDs)
+
+Names are proposals. IDs continue after T16 in `tasks.md` only after plan acceptance. Each task is one PR, tests first, within the 400-line review prompt
+(`skills/agent-workflow/references/planning.md`: a prompt, not a quota; estimates are uncertain). Tasks marked * are the likeliest to exceed it and may split once measured.
+
+| Name | Checkpoint | Requirements / scenarios | Dependency reason |
+| --- | --- | --- | --- |
+| `c1-reception-detail-select-total-dialog`* | C1 | R21, R22, R23, R24, R25, R26; S19 (reception), S20, S22 (total dialog), S26 | Tracer: fixture `rest-c1`, select theming (D12), `Receptions/Show` admission, `ReceivedTotalForm`. First dependency of the rest |
+| `c1-receptions-list` | C1 | R21, R22, R26 (`Index` spec); S19 | Needs the C1 fixture |
+| `c1-finance-baskets-list-detail` | C1 | R21, R22, R25, R26; S19 (baskets, amounts to the cent) | Needs the fixture; `Baskets/Index`, `Baskets/Show` |
+| `c1-finance-new-basket-form` | C1 | R21, R22, R24 (select reuse), R26 (`Create` spec); S19, S20 | Needs the select from the tracer |
+| `c1-finance-stock-and-history` | C1 | R21, R22, R23, R26 (`Movements` spec); S19, S26 | Needs the fixture; `MovementHistory` leakage probe |
+| `c1-demo-seeder-states` (only if a read shows a gap) | C1 | R27; supports S19 | Independent |
+| `c1-acceptance-and-visual-approval` | C1 | R20, R27, R30; S19, S20, S26, S27, S30 | All C1 tasks merged |
+| `c2-roles-and-accounts`* | C2 | R21, R22, R24, R25, R26 (`Roles/Index` spec), R23; S21, S22 (holder removal), S26 | Tracer: fixture `rest-c2`, `Accounts/Index` (select) and `Roles/Index` with `RoleHolderRemove`; admits `Roles/Index` to both sets |
+| `c2-households-and-settlement`* | C2 | R21, R22, R24, R25, R26 (two specs, `SettlementDetails`); S21, S22 | Needs the fixture; `Households/{Index,Show}` |
+| `c2-producers-and-settings` | C2 | R21, R22, R24, R26 (two specs); S21 | Needs the fixture; `Producers/Index`, `Settings` |
+| `c2-cycles-and-dialogs` | C2 | R21, R22, R24, R26 (`CycleCreateDialog` spec); S21, S22 | Needs the fixture; `Cycles/{Index,Show}`, create and manage dialogs |
+| `c2-stock-movements-and-edit-dialog` | C2 | R21, R22, R23, R24, R26 (`StockEditDialog` spec); S21, S22 | Needs the fixture; last consumer of `MovementHistory` probe |
+| `c2-demo-seeder-states` | C2 | R27; supports S21 | Independent: deactivated household/account, role with no holder, settled/unpaid |
+| `c2-acceptance-and-visual-approval` | C2 | R20, R27, R30; S21, S22, S26, S27, S30 | All C2 tasks merged |
+| `c3-wallet-statement-all-audiences` | C3 | R21, R22, R24, R25 (multi-role, cents); S23 | Tracer: fixture `rest-c3`; multi-role navigation |
+| `c3-member-baskets-and-stock-list` | C3 | R21, R22, R26 (`Stock/Index` spec); S23 | Needs the fixture; admits `Member/Baskets/*` to both sets (D23) |
+| `c3-acceptance-and-visual-approval` | C3 | R20, R27, R30; S23, S26, S27, S30 | All C3 tasks merged; seeder: handoff states "no change" if verified |
+| `c4-auth-shell-and-sign-in-cards`* | C4 | R21, R22, R23, R26 (`Login`, `ForgotPassword`, `ResetPassword` specs); S24, S26 | Tracer: variant plumbing for `AuthLayout` (D15), fixture `rest-c4`, three pages |
+| `c4-verification-confirmation-invitation` | C4 | R21, R22, R25, R26 (four specs); S24 | Needs the auth shell; `VerifyEmail`, `ConfirmPassword`, `TwoFactorChallenge`, `AcceptInvitation` |
+| `c4-profile-appearance-delete-account` | C4 | R21, R22, R25, R26 (`Profile`, `Appearance` specs); S25 | Needs the fixture; `DeleteUser` dialog |
+| `c4-security-two-factor-passkeys`* | C4 | R21, R22, R25, R26 (`Security` spec); S24 (two-factor), S25 | Needs the fixture; `TwoFactorSetupModal`, `ManagePasskeys`, `PasskeyRegister` |
+| `c4-demo-seeder-two-factor` | C4 | R27; supports S25 | Independent (D21) |
+| `c4-acceptance-and-visual-approval` | C4 | R20, R27, R30; S24, S25, S26, S27, S30 | All C4 tasks merged; S24 measured after hydration (OQ7) |
+| `c5-dashboard-landing` | C5 | R21, R28, R22; S28 | Needs C4 approved; fixture `rest-c5` |
+| `c5-error-page-first-paint-tab-icons` | C5 | R28; S28 | Independent of the dashboard; D16, D17, OQ4 |
+| `c5-welcome-transition-coverage` | C5 | R26 (`Welcome` spec), R28; S24 (full), S28 | Independent; D18 |
+| `c5-remove-orphan-layouts` | C5 | R29; S29 | Independent; re-verify with `rg` |
+| `c5-global-theme-promotion` | C5 | R29, R30; S29 | All pages admitted and approved; error page, paint and icons done |
+| `c5-closure-and-feature-acceptance` | C5 | R20, R27, R30; S27-S30 | All C5 tasks merged; user approval allows the feature acceptance review |
+
+Allocation check: R20 and R30 in each closure task; R21-R22 in each page task; R23 in the tracer and shared-component tasks; R24 in `c1-reception-detail-select-total-dialog`
+(owner) and the C2/C3 select pages (reuse); R25 per page task; R26 in the page task that adds the spec; R27 in the seeder and closure tasks;
+R28 in the three C5 tasks; R29 in `c5-remove-orphan-layouts` and `c5-global-theme-promotion`. S19 in C1, S20 in the C1 tracer and `c1-finance-new-basket-form`, S21-S22 in C2, S23 in C3, S24-S25 in C4,
+S26 in the tracer and closure of each checkpoint, S27 in each closure task, S28-S29 in C5, S30 in every closure task. Nothing is deferred.
+
+## Limits (slice 3-7)
+
+Covers 005 slice 3-7, R20-R30/S19-S30, only; slices 1 and 2 keep their plan parts. Mail templates, new dashboard capability (004), new pages, routes and copy stay outside. Estimates, line counts and measured
+values marked *unverified* were not run. Plan acceptance, the Change entry for Corrections 1-7, the task breakdown, publication and implementation are separate user decisions; the spec acceptance gate stands first.

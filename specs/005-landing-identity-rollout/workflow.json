@@ -1,81 +1,81 @@
 {
-    "schemaVersion": 1,
-    "slice": {
-        "id": "producer-role-complete",
-        "scopeRefs": [
-            "R14",
-            "R15",
-            "R16",
-            "R17",
-            "R18",
-            "R19",
-            "S13",
-            "S14",
-            "S15",
-            "S16",
-            "S17",
-            "S18"
-        ],
-        "deferredRefs": []
+  "schemaVersion": 1,
+  "slice": {
+    "id": "rest-of-application",
+    "scopeRefs": [
+      "R20",
+      "R21",
+      "R22",
+      "R23",
+      "R24",
+      "R25",
+      "R26",
+      "R27",
+      "R28",
+      "R29",
+      "R30",
+      "S19",
+      "S20",
+      "S21",
+      "S22",
+      "S23",
+      "S24",
+      "S25",
+      "S26",
+      "S27",
+      "S28",
+      "S29",
+      "S30"
+    ],
+    "deferredRefs": []
+  },
+  "stages": {
+    "discovery": {
+      "request": {
+        "path": "specs/005-landing-identity-rollout/history/2026-11-13T12-57-09.202Z-no-task-a7e056a1-17df-4a2c-9747-dafdb895bf58.md",
+        "sha256": "4d57efb4de77f47b4efb25f2543c1a05911f5ecba347a4354fc0052daaea4b3d"
+      },
+      "discovery": {
+        "path": "specs/005-landing-identity-rollout/discovery.md",
+        "sha256": "2074b4f04380cd1aedff57fb626445abf69934849b85272c6b93392a77be9af4"
+      }
     },
-    "stages": {
-        "discovery": {
-            "request": {
-                "path": "specs/005-landing-identity-rollout/history/2026-11-13T12-57-09.202Z-no-task-a7e056a1-17df-4a2c-9747-dafdb895bf58.md",
-                "sha256": "4d57efb4de77f47b4efb25f2543c1a05911f5ecba347a4354fc0052daaea4b3d"
-            },
-            "discovery": {
-                "path": "specs/005-landing-identity-rollout/discovery.md",
-                "sha256": "d746d359bc8e25860f91c2a17c30d2cbd838fc977c1f9302e75dbabd975e24f0"
-            }
-        },
-        "scope": {
-            "sliceId": "producer-role-complete",
-            "slices": {
-                "path": "specs/005-landing-identity-rollout/discovery.md",
-                "sha256": "d746d359bc8e25860f91c2a17c30d2cbd838fc977c1f9302e75dbabd975e24f0"
-            },
-            "selectionDecision": {
-                "path": "specs/005-landing-identity-rollout/history/2026-11-15T08-23-34.985Z-no-task-17b0745b-964f-4287-a4a5-8307b8e3e296.md",
-                "sha256": "721b5c91641229b22bc6b5f44e285c5924db35a6e43674912501b13ba66f5865"
-            }
-        },
-        "spec": {
-            "sliceId": "producer-role-complete",
-            "specification": {
-                "path": "specs/005-landing-identity-rollout/spec.md",
-                "sha256": "b7bc0684455861c878866cb358b800f8fad0170fcc470494d7aff835f8d88790"
-            },
-            "gapReview": {
-                "path": "specs/005-landing-identity-rollout/history/2026-11-15T08-26-01.379Z-no-task-50c2da68-e551-475f-a8bb-1cc5851e2945.md",
-                "sha256": "e80c0a7cc936244307fe7259484694832278a70a06736e910cc24626b3689c79"
-            },
-            "acceptance": {
-                "path": "specs/005-landing-identity-rollout/history/2026-11-15T13-31-17.058Z-no-task-0ecc312b-0fc7-4adf-bd2a-2048bd5af3e4.md",
-                "sha256": "b12d8245d13f2f0bebdfbe739c0f709a69911f8b043e0cfd9e099046556ee787"
-            }
-        },
-        "plan": {
-            "sliceId": "producer-role-complete",
-            "plan": {
-                "path": "specs/005-landing-identity-rollout/plan.md",
-                "sha256": "b8cd8ed4939978cad8d1e16c609d4950c7cd45cc0a3281a91083c54487572084"
-            },
-            "acceptance": {
-                "path": "specs/005-landing-identity-rollout/history/2026-11-15T13-56-45.673Z-no-task-84b1a0a7-c263-44b8-8c75-155d475d01f0.md",
-                "sha256": "13934e843fac4ecdacf681544fa13a6856dfbb47df552197c74a274c803fd6dd"
-            }
-        },
-        "tasks": {
-            "sliceId": "producer-role-complete",
-            "tasks": {
-                "path": "specs/005-landing-identity-rollout/tasks.md",
-                "sha256": "a69c17d578be64d485e43f374eb5b13348c2ab5223741d6befa6bbfaf7d42924"
-            },
-            "acceptance": {
-                "path": "specs/005-landing-identity-rollout/history/2026-11-15T14-47-30.537Z-no-task-2feff354-70b9-4f8c-b652-d03ad329ac47.md",
-                "sha256": "6b042e7e86e99d4c301f3522596aad43febc01243e1a0cc0cbe31139b32120cc"
-            }
-        }
+    "scope": {
+      "sliceId": "rest-of-application",
+      "slices": {
+        "path": "specs/005-landing-identity-rollout/discovery.md",
+        "sha256": "2074b4f04380cd1aedff57fb626445abf69934849b85272c6b93392a77be9af4"
+      },
+      "selectionDecision": {
+        "path": "specs/005-landing-identity-rollout/history/2026-11-16T11-18-16.592Z-no-task-6109c928-e2c2-46bf-8502-4fd4668e89b7.md",
+        "sha256": "5e8e76875e81c7bc7cb1b6b6e8bc9f28ebbac726707ce9a33d33ac737d33a019"
+      }
+    },
+    "spec": {
+      "sliceId": "rest-of-application",
+      "specification": {
+        "path": "specs/005-landing-identity-rollout/spec.md",
+        "sha256": "0e8e5683f44a6f89a3724872a13d014dfbf7cc20b05705afcae8c30175051ff7"
+      },
+      "gapReview": {
+        "path": "specs/005-landing-identity-rollout/history/2026-11-16T14-07-42.297Z-no-task-079a7e5d-a7db-4623-b02b-d5ad9d39b09d.md",
+        "sha256": "9071fa9eef0a61d1ccba9c214bd576bb7250666cb6672e9f9b13906c9132e2d2"
+      },
+      "acceptance": {
+        "path": "specs/005-landing-identity-rollout/history/2026-11-16T15-10-57.601Z-no-task-51fd94ae-5955-43ac-ade4-bf3335f63fdd.md",
+        "sha256": "de83bed38ca17441bbb43af3b92cc92eb06c899e012063822cfd31b278338586"
+      }
+    },
+    "plan": {
+      "sliceId": "rest-of-application",
+      "plan": {
+        "path": "specs/005-landing-identity-rollout/plan.md",
+        "sha256": "667af62b96a7e31c07ff749a412dc578f3ff1cb52811ec3d2a13b9481b9bdb84"
+      },
+      "acceptance": {
+        "path": "specs/005-landing-identity-rollout/history/2026-11-16T16-01-30.625Z-no-task-b7dafb8b-49f4-47cc-8301-db32bd5456cc.md",
+        "sha256": "66b8cd666dbc80759c3c65f823084b32219a4c348919183aa665ae6f369024af"
+      }
     }
+  }
 }
