@@ -76,6 +76,17 @@
         "path": "specs/005-landing-identity-rollout/history/2026-11-16T16-01-30.625Z-no-task-b7dafb8b-49f4-47cc-8301-db32bd5456cc.md",
         "sha256": "66b8cd666dbc80759c3c65f823084b32219a4c348919183aa665ae6f369024af"
       }
+    },
+    "tasks": {
+      "sliceId": "rest-of-application",
+      "tasks": {
+        "path": "specs/005-landing-identity-rollout/tasks.md",
+        "sha256": "2798eb1f179de7054c032891a0939bcdd13e63fa605b3fff7d0fed3220828e3e"
+      },
+      "acceptance": {
+        "path": "specs/005-landing-identity-rollout/history/2026-11-16T22-11-06.551Z-no-task-2f20515a-ffcb-4dd1-ab04-9f42696a36dc.md",
+        "sha256": "a778f4e03a81162870aaa7e51d4586abbc9b4aa9b74e2b5ffdb98696bf2c001a"
+      }
     }
   }
 }
