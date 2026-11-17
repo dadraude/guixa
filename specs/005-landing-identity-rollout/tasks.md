@@ -1253,3 +1253,21 @@ Published 2026-11-15 ([record](linear-publication.md#slice-2-producer-role-compl
 | T14  | DRA-286 |
 | T15  | DRA-282 |
 | T16  | DRA-287 |
+
+## Linear mapping — slices 3-7, checkpoints C2 to C5
+
+Published 2026-11-17 ([record](linear-publication.md#slices-3-7-checkpoints-c2-to-c5)). Parents: DRA-296 (C2), DRA-297 (C3), DRA-298 (C4), DRA-299 (C5); none has a task ID or label.
+
+| Task | Issue   | Task | Issue   |
+| ---- | ------- | ---- | ------- |
+| T24  | DRA-300 | T35  | DRA-312 |
+| T25  | DRA-302 | T36  | DRA-313 |
+| T26  | DRA-303 | T37  | DRA-314 |
+| T27  | DRA-304 | T38  | DRA-310 |
+| T28  | DRA-305 | T39  | DRA-315 |
+| T29  | DRA-301 | T40  | DRA-316 |
+| T30  | DRA-306 | T41  | DRA-317 |
+| T31  | DRA-307 | T42  | DRA-318 |
+| T32  | DRA-308 | T43  | DRA-319 |
+| T33  | DRA-309 | T44  | DRA-320 |
+| T34  | DRA-311 | T45  | DRA-321 |
