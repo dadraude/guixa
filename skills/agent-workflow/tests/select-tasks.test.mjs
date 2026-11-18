@@ -263,3 +263,32 @@ void test('paths overlap by prefix, segment suffix or glob, never by a shared na
         false,
     );
 });
+
+void test('preflight evidence, when supplied, must be ready, fresh and on the same base', () => {
+    const tasks = [task('T1', 1)];
+    const environment = {
+        verified_at: '2026-11-18T11:58:00Z',
+        base_sha: 'abc',
+        ready: true,
+        checks: [],
+    };
+    const run = (overrides) =>
+        decisions(
+            select(
+                tasks,
+                evidence([issue('DRA-1', 'T1')], {
+                    environment: { ...environment, ...overrides },
+                }),
+            ),
+        ).T1;
+    assert.equal(run({}), 'eligible');
+    assert.equal(
+        run({ ready: false, checks: [{ id: 'postgres', ok: false }] }),
+        'needs-environment',
+    );
+    assert.equal(
+        run({ verified_at: '2026-11-18T11:00:00Z' }),
+        'needs-environment',
+    );
+    assert.equal(run({ base_sha: 'old' }), 'needs-environment');
+});

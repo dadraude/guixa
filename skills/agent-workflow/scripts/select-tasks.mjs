@@ -93,6 +93,23 @@ function validateEvidence(evidence, now) {
     return issues;
 }
 
+// Preflight evidence is optional input; when present it must be fresh, ready and bound to this base.
+function environmentFinding(evidence, now) {
+    const environment = evidence.environment;
+    if (environment === undefined) return null;
+    if (!isFresh(environment?.verified_at, now))
+        return 'Preflight evidence is missing a time or older than 15 minutes';
+    if (environment.base_sha !== evidence.base?.sha)
+        return 'Preflight evidence was taken on another base';
+    if (environment.ready !== true) {
+        const failed = (environment.checks ?? [])
+            .filter((entry) => !entry.ok)
+            .map((entry) => entry.id);
+        return `Preflight not ready: ${failed.join(', ') || 'unknown check'}`;
+    }
+    return null;
+}
+
 const DEFAULT_POLICY = {
     capacity: 3,
     largeLimit: 2,
@@ -118,6 +135,7 @@ export function selectTasks(tasks, evidence, options = {}) {
     const integrated = (taskId) => Boolean(evidence.integrated?.[taskId]);
     const baseReady =
         evidence.base?.sha && evidence.base.sha === evidence.base.remote_sha;
+    const environmentProblem = environmentFinding(evidence, now);
     const warnings = [];
 
     const active = new Map(
@@ -243,6 +261,7 @@ export function selectTasks(tasks, evidence, options = {}) {
                 'needs-environment',
                 'Local base does not match the remote base; fetch and collect again',
             );
+        if (environmentProblem) reject('needs-environment', environmentProblem);
         const collision = reservations.find(
             (reservation) =>
                 reservation.owner !== issue.id &&

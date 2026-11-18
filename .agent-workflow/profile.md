@@ -24,6 +24,10 @@ Pre-authorized:
 - Create the spec-sync worktree and branch, edit `spec.md`/area files there with their Change entries,
   open its stacked PR against the task branch, and retarget it to `main` once the task PR merges.
   Merging it is the user's acceptance of the spec change.
+- Stack a task on an open predecessor PR under [stacking](../skills/agent-workflow/core/stacking.md):
+  branch from the predecessor's verified HEAD, open the PR against the predecessor branch, and retarget
+  it to `main` once the predecessor merges.
+- In an unattended session, comment once on a parked issue with the question and the default answer.
 
 Ask first:
 
@@ -78,7 +82,7 @@ Codex pins each tier in `.codex/agents/agent-workflow-<tier>.toml` (efforts: low
 | -------- | ---------------------------------------------------- | ----------- | ------------- |
 | Light    | Discovery, Local check runner, Publisher/CI observer | `haiku`     | `gpt-6-luna`  |
 | Standard | Implementer, Preparation                             | `sonnet`    | `gpt-6-sol`   |
-| Strong   | Reviewer                                             | `opus`      | `gpt-6-astra` |
+| Strong   | Reviewer, Retrospective                              | `opus`      | `gpt-6-astra` |
 
 Reviewer B, when required, is the Reviewer role on the alternate review model so it differs from A:
 `sonnet` in Claude Code, `gpt-6-sol` in Codex (an explicit `model` override on the Strong agent).
@@ -140,6 +144,8 @@ Task selection and plan validation run from the main checkout, read-only:
 node .agent-workflow/scripts/next-task.mjs --feature NNN-slug --tracker TRACKER_JSON --save-evidence EVIDENCE_JSON
 node .agent-workflow/scripts/next-task.mjs --feature NNN-slug --evidence EVIDENCE_JSON   # replay
 node .agent-workflow/scripts/validate-plan.mjs NNN-slug
+node .agent-workflow/scripts/preflight.mjs --out ENVIRONMENT_JSON   # pass to next-task with --environment
+node skills/agent-workflow/scripts/predecessor-readiness.mjs --evidence PREDECESSOR_JSON
 ```
 
 `TRACKER_JSON` is written by the coordinator from the connected Linear tools, one entry per leaf of the

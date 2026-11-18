@@ -226,6 +226,7 @@ function parseArguments(args) {
         '--evidence',
         '--save-evidence',
         '--limit',
+        '--environment',
     ]);
     const options = {};
     for (let n = 0; n < args.length; n++) {
@@ -290,8 +291,20 @@ export function main(args) {
             { revision, digest, baseSha },
         );
     }
+    // Preflight output is applied at selection time and never saved into tracker evidence.
+    if (options['--environment'])
+        evidence = {
+            ...evidence,
+            environment: JSON.parse(
+                readFileSync(resolve(options['--environment']), 'utf8'),
+            ),
+        };
     const limit = options['--limit'] ? Number(options['--limit']) : undefined;
     const report = selectTasks(tasks, evidence, { ...POLICY, limit });
+    if (!options['--environment'])
+        report.warnings.push(
+            'No --environment preflight evidence: machine readiness is unverified',
+        );
     report.feature = feature;
     report.mode = options['--tracker'] ? 'live' : 'replay';
     if (report.mode === 'replay')

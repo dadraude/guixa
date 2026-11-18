@@ -152,6 +152,7 @@ Preserve the worktree and changes. Post the exact blocker/question on the issue 
 profile's stopped status. A failed
 status update is pending, not a reason to retry publication. Keep the task reservation and report status,
 HEAD/base, checks/review rounds, remote outcomes and the exact decision or missing capability needed.
+A stopped or CI-failed task gets a [retrospective](retrospective.md).
 
 ## Correction budgets and recovery
 
@@ -211,10 +212,16 @@ classification `product|harness|infrastructure|mechanical`, stable `mechanism`),
 `recovery-result` and `recovery-authorization` as described above,
 `disposition` (value and decision `evidence`), `reservations` (paths and ownership `evidence`),
 `tier` (`S|M|L` and `reason`; refused if lower than the current tier),
+`worktree-path` (`previous_worktree`, `worktree`, `reason`, `evidence`; the CLI first verifies the new path
+is a registered worktree and the old one is not; accepted while a correction is pending),
+`replacement` (`implementer_id`, `reason`, `handoff_path`, `previous_cannot_write: true`, `evidence`;
+appends `replacement_history` under [implementation ownership](handoff.md#implementation-ownership)),
 and `start|end` (stage `implementation|verification|review|ci|decision-wait`).
 Optional `at` is an ISO timestamp; otherwise use current UTC time. A nonzero result may mean the
 record was successfully saved with an exhausted-budget blocker; read it before deciding next action.
-The helper preserves implementation identity and writes atomically. It is recovery evidence, not a lock.
+The helper preserves implementation identity and writes atomically under an exclusive record-write
+lock; a leftover `.lock` is inspected, never removed automatically. The lock serializes writes only; it
+is not a task claim.
 
 Record stage starts/ends as they occur. Report completed durations, open periods, first-pass CI
 success, review counts and repeated verification; do not invent missing historical timings.

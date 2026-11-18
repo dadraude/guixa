@@ -38,7 +38,8 @@ Do not claim that this in-session table is a cross-session lock.
 Keep each task's code, tests and required spec updates together. A shared behavioral artifact has one active owner;
 serialize its writers through integration instead of splitting code and documentation into independent
 deliveries. Apply only the bounded mechanical-overlap exception below. Do not silently transfer ownership, discard another task's edits, or use last-writer-wins.
-Stacked branches are an explicitly agreed alternative, not an automatic fallback.
+A candidate held only by an unmerged predecessor may [stack](stacking.md) on it when the profile
+authorizes stacking and the predecessor passes its readiness check; otherwise it waits.
 
 ## Handoff and scope changes
 

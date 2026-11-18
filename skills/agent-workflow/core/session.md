@@ -4,6 +4,25 @@ Use the selected runtime adapter and [project profile](../../../.agent-workflow/
 once discovery returns a dependency-ready candidate; cleanup and discovery need only this file. These rules are shared by every runtime; one coordinator owns a feature across
 all sessions and runtimes. An in-session table is not a cross-process lock.
 
+## Preflight
+
+Run the [preflight](preflight.md) before discovery and keep its evidence for the selector. A failed
+check is reported with its fix line; never repair it in the session.
+
+If the user started the session unattended, it never asks or waits; the first rule that applies
+settles what is missing:
+
+1. **Default.** Requirements silent or contradictory and a conservative reading exists (narrower
+   behavior, nothing irreversible, no quoted requirement contradicted): take it, record a Deviation
+   entry, and list it under **Decisions taken by default** in the PR body. The user's merge accepts it.
+2. **Park the task.** No such default, or an operation outside the standing authorization or denied by
+   the host: only that task stops. Apply the task's Stop, record a `deferred` disposition, and comment once
+   on its issue with the exact question, the options and the answer the session would take.
+3. **Skip.** Tasks a failed preflight check affects are `needs-environment` for the session.
+4. **End.** Only missing delegation or a failed check that affects every task ends the session.
+
+The user answers between sessions; the next session resumes from that answer.
+
 ## Discover and admit
 
 Read the configured tracker project through the adapter, verifying workspace/team/project identities.
@@ -72,4 +91,6 @@ resume that worker for corrections instead of dispatching a new implementer.
 Return one table: task, outcome (pending-ci/ci-failed/ci-passed/stopped/waiting-integration), PR, spec-sync PR (or `none`), review rounds, deviations, retained
 worktree, reserved surfaces and predecessor PRs. Include pending checks, unresolved decisions and observed stage durations from the retained task record.
 Report missing historical timings explicitly; preserve holds and deferred ownership across sessions.
+For each stopped or CI-failed task, run a [retrospective](retrospective.md) and link it; report every
+open question and default decision under **Outstanding decisions**.
 A PR is not an integrated task. Do not mark missing proof as passed.

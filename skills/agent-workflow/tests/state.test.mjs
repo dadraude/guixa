@@ -681,3 +681,117 @@ void test('tier events keep a history and never lower the tier', () => {
         /S, M or L/,
     );
 });
+void test('worktree-path and replacement update identity with history and survive a pending correction', () => {
+    let owner = applyEvent(
+        { worktree: '/w/dra-1', implementer_id: 'agent-a' },
+        {
+            type: 'initialize',
+            evidence: 'New admission',
+            counters: {
+                substantive: 0,
+                mechanical: 0,
+                product: {},
+                recovery: {},
+            },
+        },
+    );
+    owner = applyEvent(owner, failure('harness'));
+    owner = applyEvent(owner, recovery());
+    owner = applyEvent(owner, {
+        type: 'worktree-path',
+        previous_worktree: '/w/dra-1',
+        worktree: '/w2/dra-1',
+        reason: 'Worktree root moved',
+        evidence: 'git worktree list shows /w2/dra-1 on the task branch',
+    });
+    assert.equal(owner.worktree, '/w2/dra-1');
+    assert.deepEqual(
+        owner.worktree_history.map((entry) => entry.from),
+        ['/w/dra-1'],
+    );
+    assert.throws(
+        () =>
+            applyEvent(owner, {
+                type: 'worktree-path',
+                previous_worktree: '/w/other',
+                worktree: '/w3',
+                reason: 'x',
+                evidence: 'y',
+            }),
+        /does not match the record/,
+    );
+    assert.throws(
+        () =>
+            applyEvent(owner, {
+                type: 'replacement',
+                implementer_id: 'agent-b',
+                reason: 'Host lost',
+                handoff_path: '/w2/h.md',
+                previous_cannot_write: true,
+                evidence: 'x',
+            }),
+        /pending recovery/,
+    );
+    owner = applyEvent(owner, result('fixture-ready', 'success'));
+    assert.throws(
+        () =>
+            applyEvent(owner, {
+                type: 'replacement',
+                implementer_id: 'agent-b',
+                reason: 'Host lost',
+                handoff_path: '/w2/h.md',
+                evidence: 'x',
+            }),
+        /previous_cannot_write/,
+    );
+    owner = applyEvent(owner, {
+        type: 'replacement',
+        implementer_id: 'agent-b',
+        reason: 'Host lost the worker after a restart',
+        handoff_path: '/w2/dra-1/.agent-workflow/handoff-t01.md',
+        previous_cannot_write: true,
+        evidence: 'Resume returned unknown agent; old session closed',
+    });
+    assert.equal(owner.implementer_id, 'agent-b');
+    assert.deepEqual(
+        owner.replacement_history.map((entry) => [entry.old_id, entry.new_id]),
+        [['agent-a', 'agent-b']],
+    );
+    assert.equal(
+        owner.pipeline.recoveryLedger.failures['visual:fixture-ready'],
+        undefined,
+    );
+});
+
+void test('CLI refuses to write while another writer holds the record lock', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'workflow-lock-'));
+    try {
+        const ownerPath = join(dir, 'owner.json');
+        const eventPath = join(dir, 'event.json');
+        writeFileSync(ownerPath, JSON.stringify(initialize()));
+        writeFileSync(
+            eventPath,
+            JSON.stringify({
+                type: 'disposition',
+                value: 'deferred',
+                evidence: 'User asked to pause',
+            }),
+        );
+        writeFileSync(ownerPath + '.lock', 'other writer');
+        const before = readFileSync(ownerPath, 'utf8');
+        const run = spawnSync(
+            process.execPath,
+            ['skills/agent-workflow/scripts/state.mjs', ownerPath, eventPath],
+            {
+                cwd: new URL('../../..', import.meta.url),
+                encoding: 'utf8',
+            },
+        );
+        assert.equal(run.status, 1);
+        assert.match(run.stderr, /being written/);
+        assert.equal(readFileSync(ownerPath, 'utf8'), before);
+        assert.equal(readFileSync(ownerPath + '.lock', 'utf8'), 'other writer');
+    } finally {
+        rmSync(dir, { recursive: true, force: true });
+    }
+});

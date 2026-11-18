@@ -81,7 +81,7 @@ class WorkflowLayoutTest(unittest.TestCase):
         files = list((WORKFLOW / "core").glob("*.md"))
         self.assertEqual({file.stem for file in files},
                          {"session", "task", "scheduling", "implementer", "reviewer", "tickets", "handoff",
-                          "effort"})
+                          "effort", "stacking", "preflight", "retrospective"})
         for file in files:
             with self.subTest(source=file):
                 self.assertNotRegex(file.read_text(),
