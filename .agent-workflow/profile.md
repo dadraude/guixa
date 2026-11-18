@@ -134,6 +134,20 @@ shared `guixa_test` are not task databases. If isolated database configuration c
 | Focused checks            | Tests for affected behavior and every changed test file; select frontend files/tests using the installed runner's supported selectors; format all changed supported code/docs; type checks when needed                   |
 | Full validation (CI only) | `.github/workflows/tests.yml`: selected `frontend`, `backend` and `tooling` jobs plus the always-on `docs` lint/format check; `ci` aggregates their results; resolve commands from the workflow and dependency manifests |
 
+Task selection and plan validation run from the main checkout, read-only:
+
+```sh
+node .agent-workflow/scripts/next-task.mjs --feature NNN-slug --tracker TRACKER_JSON --save-evidence EVIDENCE_JSON
+node .agent-workflow/scripts/next-task.mjs --feature NNN-slug --evidence EVIDENCE_JSON   # replay
+node .agent-workflow/scripts/validate-plan.mjs NNN-slug
+```
+
+`TRACKER_JSON` is written by the coordinator from the connected Linear tools, one entry per leaf of the
+feature's grouping parents (format at the top of `next-task.mjs`; `task` is the `Tnn` title prefix,
+`blockers` the native blocked-by identifiers). The selector adds the base, merged and open PRs, task
+worktrees and owner records itself. Limits: 3 pipelines, at most 2 L-tier tasks. Add `--json` for full
+reasons; `--working-tree` previews an uncommitted plan and never authorizes dispatch.
+
 For visual tasks, use the [shared visual workflow](../skills/agent-workflow/references/visual.md).
 Start the task-owned fixture server separately in the isolated worktree after the guarded task
 environment is prepared. The installed package script is `dev: vp dev`; the installed `vp dev --help`

@@ -16,6 +16,13 @@ and authorized open PR evidence to establish edit surfaces and actual prerequisi
 each candidate as eligible, waiting-integration, needs-scope or blocked-dependency. Done alone is not
 proof that prerequisite code exists in the base. Missing tooling/evidence keeps affected tasks waiting.
 
+Classify with the profile's selector rather than by hand: write the tracker snapshot it describes from
+the paginated read, run it live, and keep the saved evidence. It ranks by priority, tasks unblocked and
+plan order, and queues overlapping or over-capacity work. Its result is advisory, never a claim:
+recalculate from saved evidence while it is under 15 minutes old and its catalog and base still match,
+and re-read the selected issue's status and ownership immediately before setting it active. Report its
+warnings (unmapped issues, done without integration, undeclared blockers) with the batch.
+
 ## Clean up merged tasks
 
 Before admitting new work, check each live task worktree's PR. When its integration is verified as in

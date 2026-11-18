@@ -3,7 +3,8 @@
 ## Before dispatch
 
 Build a transient coordinator table from the task/spec, current source, existing worktrees and open PR
-diffs. Reconstruct it on resume. Do not write scheduling dependencies into tracker blocking relations.
+diffs, starting from the selector result (see [session](session.md#discover-and-admit)), which already
+applies the admission rules below to planned paths. Reconstruct it on resume. Do not write scheduling dependencies into tracker blocking relations.
 
 For each candidate record:
 

@@ -67,6 +67,9 @@ not shell strings; establish effective isolated settings before install hooks, t
 | Focused checks            | <diff-derived formatting/test helper; changed-contract consumer mappings; explicit exclusions> |
 | Full validation (CI only) | <workflow and commands>                                                                        |
 
+<Task selector and plan validation commands: how the tracker snapshot is written, how the catalog is
+read from the task registry, and the pipeline and L-tier limits passed to the shared selector.>
+
 <Default UI review uses measurement/DOM/interaction reports. Previews are reserved for new design,
 unexplained failures or user requests. Reuse visual evidence only with reviewed, unchanged rendering
 inputs and current verification; full application CI remains candidate-bound.>
