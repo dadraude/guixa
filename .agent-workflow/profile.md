@@ -229,6 +229,9 @@ reported, not retried destructively.
   `resources/js/components/ui/`, and shared layouts/tokens. Record exact component paths before
   implementation; extend existing variants before adding components. Repeated patterns need a shared
   component, and a new component needs the concrete gap and inspected alternatives in its task handoff.
+- Demo data: when a task adds or alters data a user sees, update `database/seeders/DemoSeeder.php`
+  and extend `tests/Feature/Database/DemoSeederTest.php`; otherwise the report's `demo_data` says why
+  no change was needed.
 - Shared hotspots: route/provider registration, repository interfaces/implementations, test contracts
   and fixtures, dependency manifests/locks, `resources/js/generated/`, feature plan/tasks and legacy logs. Distinct new `history/` entry files do not share a write surface;
   reserve their exact new paths, while retaining reservations on any shared spec/plan/task edits.
