@@ -43,3 +43,25 @@ Every child has DRA-280 as its native parent. The dependency frontier is T10 (DR
 ### Verification
 
 A duplicate search in DRA/Coop ("Producer", full pagination) found no slice 2 issues before creation. The first create of the parent failed with a connection reset; a search of issues created in the last hour found nothing, so it was retried once. Read-back of the children list (titles, parent, status, labels) and of the relations on DRA-280 and DRA-287 matched the approved graph. No pending operation.
+
+## Slices 3-7, checkpoint C1 (Finance and reception)
+
+**Published 2026-11-16 after the user asked to draft and publish the C1 tickets**, from the accepted breakdown (PR #450, evidence PR #451). Same workspace, team and project. All seven issues are Backlog, unassigned, with no labels, cycle, milestone, due date or priority. Publication does not authorize implementation. Bodies link to the spec, plan and tasks at `origin/main` commit `e40826b9`.
+
+Parent: [DRA-288 — Landing identity: Finance and reception (slices 3-7, checkpoint C1)](https://linear.app/draude/issue/DRA-288). Related context only, never a blocker: DRA-280 (slice 2). One parent per checkpoint; C2 to C5 parents and tickets are not published.
+
+| Task | Published issue                                    | Blocked by                |
+| ---- | -------------------------------------------------- | ------------------------- |
+| T17  | [DRA-289](https://linear.app/draude/issue/DRA-289) | none                      |
+| T18  | [DRA-291](https://linear.app/draude/issue/DRA-291) | DRA-289                   |
+| T19  | [DRA-292](https://linear.app/draude/issue/DRA-292) | DRA-289                   |
+| T20  | [DRA-293](https://linear.app/draude/issue/DRA-293) | DRA-289                   |
+| T21  | [DRA-294](https://linear.app/draude/issue/DRA-294) | DRA-289                   |
+| T22  | [DRA-290](https://linear.app/draude/issue/DRA-290) | none                      |
+| T23  | [DRA-295](https://linear.app/draude/issue/DRA-295) | DRA-289 to DRA-294        |
+
+Every child has DRA-288 as its native parent. The dependency frontier is T17 (DRA-289) and T22 (DRA-290). No task is admitted or marked ready-for-agent.
+
+### Verification
+
+A duplicate search in DRA/Coop ("Landing identity" with full pagination, and "T17") found no slices 3-7 issues before creation. The parent and then the children were created serially in dependency order with native `parentId`, `blockedBy` and `relatedTo`; no body contains a tracker identifier. Read-back of the children list (titles, parent, status, labels) and of the relations on DRA-288, DRA-294 and DRA-295 matched the approved graph. No pending operation.
