@@ -27,6 +27,12 @@ while checking the impact of the correction across the whole affected pattern. M
 regression probes and a complete instance sweep before another review. A focused mechanical follow-up
 must establish unchanged production behavior and assertions; otherwise use substantive review.
 
+The handoff assigns Reviewer A or B and states whether B is required ([Reviewer B condition](effort.md#reviewer-b-condition)).
+A reviews Spec, Red-proof, Test economy, Correctness and Integration; B reviews Standards, Responsibility
+and Security; without B, A covers every area. List unassigned areas under `coverage` as not inspected. If
+the diff meets a B condition the handoff missed, report the missing review. Do not read the other
+reviewer's conclusions before returning your own.
+
 Check the whole diff for:
 
 - Spec: public-use-case tests prove each linked rule/scenario; code and design/spec agree; authorized
@@ -44,6 +50,8 @@ Check the whole diff for:
   belongs in. A class past about 500 lines is a signal to check against its `class_size` line, not a
   defect; never ask to restructure code the diff does not change.
 - Correctness: bugs, specified edge cases, authorization/input handling and relevant concurrency.
+- Security: authorization and tenancy, secret handling, validation of untrusted input and destructive
+  operations at the changed trust boundaries; no unrelated hardening requests.
 - Integration: paths stay within admitted surfaces/owners, prerequisites exist in the base, generated
   files match source and no peer changes disappear. Require focused evidence for the current HEAD/base,
   not an earlier candidate. CI may still be pending before publication; this alone is not a review defect.

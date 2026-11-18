@@ -358,6 +358,17 @@ export function applyEvent(owner, event) {
         state.disposition = event.value;
         state.dispositionEvidence = event.evidence;
         // Recording abandonment is not proof that a previous worker stopped writing.
+    } else if (event.type === 'tier') {
+        const order = ['S', 'M', 'L'];
+        if (!order.includes(event.tier) || !event.reason?.trim())
+            throw new Error('Tier requires S, M or L and a reason');
+        if (state.tier && order.indexOf(event.tier) < order.indexOf(state.tier))
+            throw new Error('A tier never drops mid-task');
+        state.tier = event.tier;
+        state.tierHistory = [
+            ...(state.tierHistory ?? []),
+            { tier: event.tier, reason: event.reason, at },
+        ];
     } else if (event.type === 'reservations') {
         if (!Array.isArray(event.paths) || !event.evidence?.trim())
             throw new Error(

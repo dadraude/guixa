@@ -10,6 +10,8 @@ Read the issue before updating it. Verify an executable leaf, matching task row,
 integration evidence and compatible allowed edit surfaces using [scheduling](scheduling.md). Validate
 required runtime capabilities, and that the proposed operations fall within the profile's standing authorization.
 On a wait or missing scope/capability, report it before any mutation. Then set the admitted issue active.
+Classify its [tier and Reviewer B condition](effort.md) and record the tier with a `tier` event once the
+owner record is initialized.
 
 ## 2. Prepare and implement
 
@@ -56,8 +58,9 @@ Missing coverage returns to implementation before launching a reviewer; it is no
 
 ## 4. Independent review
 
-Launch a fresh read-only reviewer using [the reviewer brief](reviewer.md), fixed base and scheduling
-handoff. Aim for one complete review of the prepared candidate. Additional rounds address concrete
+Launch a fresh read-only Reviewer A using [the reviewer brief](reviewer.md), fixed base and scheduling
+handoff, plus a fresh Reviewer B in parallel when the [B condition](effort.md#reviewer-b-condition)
+holds; merge and dedupe their findings as one round. Aim for one complete review of the prepared candidate. Additional rounds address concrete
 findings or behavioral changes, within the profile's substantive review budget including post-integration reviews; never
 reset counters on rebase. Verified mechanical corrections use the separate focused follow-up budget.
 Save each round's findings verbatim, never condensed, with stable IDs to `review<N>-findings.md` next to
@@ -207,6 +210,7 @@ existing pipeline limits/counters are retained. JSON events support `review` (cl
 classification `product|harness|infrastructure|mechanical`, stable `mechanism`), `preparation`,
 `recovery-result` and `recovery-authorization` as described above,
 `disposition` (value and decision `evidence`), `reservations` (paths and ownership `evidence`),
+`tier` (`S|M|L` and `reason`; refused if lower than the current tier),
 and `start|end` (stage `implementation|verification|review|ci|decision-wait`).
 Optional `at` is an ISO timestamp; otherwise use current UTC time. A nonzero result may mean the
 record was successfully saved with an exhausted-budget blocker; read it before deciding next action.

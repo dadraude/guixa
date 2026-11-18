@@ -653,3 +653,31 @@ void test('CLI persists the paired attempt and result across invocations', () =>
         rmSync(dir, { recursive: true, force: true });
     }
 });
+void test('tier events keep a history and never lower the tier', () => {
+    let owner = initialize({}, '2026-11-18T10:00:00Z');
+    owner = applyEvent(owner, {
+        type: 'tier',
+        tier: 'M',
+        reason: 'Stated medium, 9 done-when rows',
+        at: '2026-11-18T10:01:00Z',
+    });
+    owner = applyEvent(owner, {
+        type: 'tier',
+        tier: 'L',
+        reason: 'First checkpoint showed a second contract consumer',
+        at: '2026-11-18T11:00:00Z',
+    });
+    assert.equal(owner.pipeline.tier, 'L');
+    assert.deepEqual(
+        owner.pipeline.tierHistory.map((entry) => entry.tier),
+        ['M', 'L'],
+    );
+    assert.throws(
+        () => applyEvent(owner, { type: 'tier', tier: 'S', reason: 'Smaller' }),
+        /never drops/,
+    );
+    assert.throws(
+        () => applyEvent(owner, { type: 'tier', tier: 'XL', reason: 'Huge' }),
+        /S, M or L/,
+    );
+});

@@ -12,8 +12,11 @@ completion mechanism and verify a terminal result before a dependent step; parti
 For fixes, use the host's supported resume mechanism; `SendMessage` is usable only when actually exposed
 and applicable to that worker. Do not assume `ToolSearch`, team messaging or background tools exist.
 
-Pass the role's model from the profile's Model routing on every `Agent` call; an omitted `model`
-inherits the coordinator's and spends a higher tier. Host/user policy wins; if a requested model is
+Dispatch each role as the profile's project agent for its tier (`subagent_type`), whose definition fixes
+model and effort; the Strong agent's `disallowedTools` enforces read-only review for Edit/Write, while its
+brief covers shell writes. Without a tier agent, pass the role's model from the profile's Model routing
+on every `Agent` call; an omitted `model` inherits the coordinator's and spends a higher tier. Reviewer B
+is the Strong agent with the profile's alternate review model passed as `model`. Host/user policy wins; if a requested model is
 unavailable, report it and use only an explicitly permitted fallback. Do not silently weaken independent
 review or invent a model. No nested delegation, even when the host would allow it. Any skill that delegates, including the
 spec and ticket skills outside the task pipeline, follows this model rule.
@@ -30,6 +33,12 @@ implementation before mutation; ticket drafting alone does not require delegatio
 Use `Bash`, `Read` and `Edit` only if exposed, with explicit worktree cwd/paths and the configured
 environment. Respect permission denials, native approvals and the profile's standing authorization; never
 change permission modes, reuse ambient credentials or invoke another tool to bypass a refusal.
+A prompt nobody answers is a denial: an unattended run needs the profile's permission rules merged into
+the main checkout's ignored local settings, with the worktree root under `additionalDirectories`, by
+the user in an attended run. The deny rules stop an accident, not an adversary.
+
+CI observation: use one background `gh pr checks <number> --watch` per PR, started only once
+`gh pr checks <number>` lists a check (it exits early while the workflow registers). Do not busy-poll.
 
 ## Tracker and questions
 

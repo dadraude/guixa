@@ -80,6 +80,12 @@ Codex pins each tier in `.codex/agents/agent-workflow-<tier>.toml` (efforts: low
 | Standard | Implementer, Preparation                             | `sonnet`    | `gpt-6-sol`   |
 | Strong   | Reviewer                                             | `opus`      | `gpt-6-astra` |
 
+Reviewer B, when required, is the Reviewer role on the alternate review model so it differs from A:
+`sonnet` in Claude Code, `gpt-6-sol` in Codex (an explicit `model` override on the Strong agent).
+Claude Code dispatches each tier as the project agent `.claude/agents/agent-workflow-<tier>.md`; the
+Strong agent cannot Edit or Write. Unattended Claude Code runs merge
+[claude-code-permissions.json](claude-code-permissions.json) into `.claude/settings.local.json`.
+
 The spec-side skills (`spec-flow`, `spec-gaps`) and ticket drafting reuse these roles, so no step runs
 on a model above its tier. The session model only coordinates: routing, every question to the user,
 phase gates and the final write of anything that needs a decision.
@@ -232,6 +238,8 @@ reported, not retried destructively.
 - Demo data: when a task adds or alters data a user sees, update `database/seeders/DemoSeeder.php`
   and extend `tests/Feature/Database/DemoSeederTest.php`; otherwise the report's `demo_data` says why
   no change was needed.
+- Tier L signals: a policy or gate change, a migration that alters existing rows, a change to
+  `resources/js/generated/` consumed by two or more pages, or a task detail whose **Size.** says large.
 - Shared hotspots: route/provider registration, repository interfaces/implementations, test contracts
   and fixtures, dependency manifests/locks, `resources/js/generated/`, feature plan/tasks and legacy logs. Distinct new `history/` entry files do not share a write surface;
   reserve their exact new paths, while retaining reservations on any shared spec/plan/task edits.

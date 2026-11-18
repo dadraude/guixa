@@ -1,0 +1,24 @@
+{
+    "permissions": {
+        "allow": [
+            "Bash(git:*)",
+            "Bash(gh:*)",
+            "Bash(node:*)",
+            "Bash(pnpm:*)",
+            "Bash(composer:*)",
+            "Bash(php:*)",
+            "Bash(rg:*)",
+            "Bash(fd:*)"
+        ],
+        "deny": [
+            "Bash(gh pr merge:*)",
+            "Bash(git push --force:*)",
+            "Bash(git push -f:*)",
+            "Bash(git push --force-with-lease:*)",
+            "Bash(git reset --hard:*)",
+            "Bash(git clean:*)",
+            "Bash(git branch -D:*)",
+            "Bash(git commit --no-verify:*)"
+        ]
+    }
+}

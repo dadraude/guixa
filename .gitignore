@@ -45,6 +45,9 @@ yarn-error.log
 /.claude/*
 !/.claude/settings.json
 !/.claude/hooks/
+!/.claude/agents/
+/.claude/agents/*
+!/.claude/agents/agent-workflow-*.md
 !/.claude/skills/
 /.claude/skills/*
 !/.claude/skills/implement-session/

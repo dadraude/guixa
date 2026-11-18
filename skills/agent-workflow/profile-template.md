@@ -83,5 +83,6 @@ the shared state helper with profile limits `recovery` and `recoveryTotal`.>
 - <Documents to read before a task and how to reconcile them at close.>
 - <Test-first and code style rules.>
 - <Demo data the implementer keeps current, or none.>
+- <Tier L signals specific to the project.>
 - <Shared hotspots.>
 - <Commit message and PR body format.>

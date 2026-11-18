@@ -28,6 +28,13 @@ assigned implementation owner. Use collaboration workers for subtasks, never use
 A reviewer must be a fresh independent worker, not the writer with a different label. If required
 delegation is unavailable, stop the affected implementation before mutation. A read-only ticket draft does not require a subagent merely to compensate for that absence.
 
+Reviewer B is the Strong agent spawned with the profile's alternate review model as an explicit `model`
+override. The agent format has no tool restriction, so read-only review lives in the Strong agent's
+instructions. Under `workspace-write`, Codex keeps `<writable_root>/.git` read-only, so `git commit` and
+`git worktree add` from a worktree fail; an unattended run needs network access and both the worktree
+root and the main checkout's `.git` directory as writable roots in the user's Codex config, applied by
+the user in an attended run.
+
 Use shell/file tools with explicit cwd/absolute paths. Honor sandbox refusals and the host approval
 mechanism; never weaken permissions or reroute through another tool to bypass a denial. Runtime approval
 covers the host; the profile's standing authorization covers destinations and operations.
