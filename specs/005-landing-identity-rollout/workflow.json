@@ -81,7 +81,7 @@
       "sliceId": "rest-of-application",
       "tasks": {
         "path": "specs/005-landing-identity-rollout/tasks.md",
-        "sha256": "2798eb1f179de7054c032891a0939bcdd13e63fa605b3fff7d0fed3220828e3e"
+        "sha256": "8edcaa29e1c4bfef3cf5cae823061b4dcda1324b08a8e4a9a5d6e78072cbc1ab"
       },
       "acceptance": {
         "path": "specs/005-landing-identity-rollout/history/2026-11-16T22-11-06.551Z-no-task-2f20515a-ffcb-4dd1-ab04-9f42696a36dc.md",
