@@ -8,6 +8,8 @@ IDs are local to 005 and start at T01; 001 items are cited as "001 T84". This do
 ticket publication and no Linear writes. Everything marked *unverified* was not run; this draft is from code reading
 of the plan and spec only (worktree `origin/main`).
 
+**Checkpoint C1 (T17–T23): awaiting approval.** T23 (DRA-295) recorded the C1 acceptance and asked the user for visual approval of the seven C1 pages and the received-total dialog in light and dark (Q&A `history/2026-11-19T21-23-30.594Z-DRA-295-5b4045f8-9319-41c0-b8cc-a38da89b3c85.md`). No approval is recorded; C2 (T24) does not start until it is (S30).
+
 ## Architecture and safe sequence
 
 A page joins the landing look only by exact name in `landingPages` (`resources/js/lib/pilotTheme.ts`); the shell and
@@ -895,6 +897,7 @@ PHP guards for C1 (run unchanged per task that covers the page): `tests/Feature/
   - Approval requested of the user; logged only after the decision. Until then "awaiting approval" and C2 does not start (S30).
 - **First checkpoint.** Run the shared C1 manifest on the integrated base. **Size.** Documentation and evidence only. **Limits.** Does not approve on the user's behalf; no C2 work.
 - **Acceptance record.** This task's output is the C1 record; verdict "pending approval" until the user answers.
+- **Status.** Awaiting approval. Record (R20, R21–R26, R27, R30; S19, S20, S22, S26, S27, S30; R28, R29 have no C1 allocation; per-page R5–R9 text, manifest counts 122 + 272 + 146, Vitest 506, Pest guards green) is in the Q&A cited in the status line at the top; verdict pending approval, remainder owner: the user's decision, then T24.
 
 ## Checkpoint C2 — Manager administration (T24–T30)
 
