@@ -11,6 +11,8 @@ use Guixa\Catalog\Application\DeactivateProducer;
 use Guixa\Catalog\Application\DeactivateProduct;
 use Guixa\Catalog\Application\DeactivateStockProduct;
 use Guixa\Membership\Application\CreateHousehold;
+use Guixa\Membership\Application\DeactivateAccount;
+use Guixa\Membership\Application\DeactivateHousehold;
 use Guixa\Membership\Application\GrantStaffRole;
 use Guixa\Membership\Domain\Account;
 use Guixa\Membership\Domain\AccountPasswords;
@@ -55,6 +57,12 @@ final class DemoSeeder extends Seeder
 
     private const string UNLINKED_EMAIL = 'eva@demo.guixa.test';
 
+    private const string FORMER_HOUSEHOLD_NAME = 'Can Tancada';
+
+    private const string FORMER_MEMBER_NAME = 'Jan Roca';
+
+    private const string FORMER_MEMBER_EMAIL = 'jan@demo.guixa.test';
+
     private const array HOUSEHOLDS = [
         ['Can Roca', 'Anna Roca', 'anna@demo.guixa.test', 10000],
         ['La Plaça', 'Biel Soler', 'biel@demo.guixa.test', 7500],
@@ -63,12 +71,12 @@ final class DemoSeeder extends Seeder
     ];
 
     /**
-     * Staff roles granted to the households' accounts, by household index, so the role screen has holders. The first account is
-     * member, Finance and Receiver at once, the combined-role dashboard (one collection group, no duplicated role rows).
+     * Staff roles granted to the households' accounts, by household index, so the role screen has holders. Receiver is granted
+     * to nobody, the role-with-no-holder state; the first account is member and Finance at once (one collection group).
      */
     private const array STAFF_ROLES = [
-        0 => [Role::Finance, Role::Receiver],
-        1 => [Role::Catalogue, Role::Receiver],
+        0 => [Role::Finance],
+        1 => [Role::Catalogue],
     ];
 
     private const array PRODUCERS = [
@@ -158,6 +166,23 @@ final class DemoSeeder extends Seeder
 
         $this->createCatalogueStates($manager, $cycles[2], $catalog);
         $this->createProducerStates($manager, $catalog);
+        $this->createManagerStates($manager, $members[0]['householdId']);
+    }
+
+    /**
+     * Created after the cycles, like the catalogue and producer states, so no cycle, order, reception or dashboard count changes:
+     * the new household has no basket or movement, and the deactivated account leaves its household active through the first
+     * member. The staff role with no holder is left by the grants in STAFF_ROLES. The unpaid and settled balances already show:
+     * the first household's basket is collected and charged, the third and fourth have open drafts.
+     */
+    private function createManagerStates(Actor $manager, string $activeHouseholdId): void
+    {
+        app(DeactivateHousehold::class)($manager, app(CreateHousehold::class)($manager, self::FORMER_HOUSEHOLD_NAME));
+
+        $former = $this->createAccount(Account::inviteMember(
+            app(AccountRepository::class)->nextId(), self::FORMER_MEMBER_NAME, Email::from(self::FORMER_MEMBER_EMAIL), $activeHouseholdId,
+        ));
+        app(DeactivateAccount::class)($manager, $former->accountId);
     }
 
     /**
