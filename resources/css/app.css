@@ -2478,3 +2478,19 @@ html.dark:has(.reference-style)
     > span.text-muted-foreground {
     font-variant-numeric: tabular-nums;
 }
+
+/* 005 T20 */
+/*
+ * Select popup with a long option (Finance/Baskets/Create at 375px and 200% text). The popup follows its widest option
+ * and is portalled outside the page root, so a long household name made it 1038px wide in a 375px viewport and most of
+ * the name was off-screen. The popup (which carries `landing`) is capped at the width Reka reports as available and the
+ * option text wraps; the 44px item height and the trigger-width minimum are unchanged.
+ */
+.landing[data-slot='select-content'] {
+    max-width: var(--reka-select-content-available-width);
+}
+
+.landing[data-slot='select-content'] [data-slot='select-item'] {
+    white-space: normal;
+    overflow-wrap: anywhere;
+}

@@ -266,7 +266,6 @@ describe('pilot theme layout and portal', () => {
             'Receptions/Index/Extra',
             'Finance/Baskets/Index/Extra',
             'Finance/Baskets/Show/Extra',
-            'Finance/Baskets/Create',
             'Welcome',
         ]) {
             page.component = component;
@@ -304,6 +303,7 @@ describe('pilot theme layout and portal', () => {
             'Receptions/Index',
             'Receptions/Show',
             'Finance/Baskets/Index',
+            'Finance/Baskets/Create',
             'Finance/Baskets/Show',
         ]) {
             page.component = component;
