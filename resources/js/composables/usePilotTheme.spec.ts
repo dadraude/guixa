@@ -263,7 +263,7 @@ describe('pilot theme layout and portal', () => {
             'Manage/ReturnItems/Index/Extra',
             'Catalogue/Stock/Movements/Extra',
             'Receptions/Show/Extra',
-            'Receptions/Index',
+            'Receptions/Index/Extra',
             'Welcome',
         ]) {
             page.component = component;
@@ -298,6 +298,7 @@ describe('pilot theme layout and portal', () => {
             'Producer/Products/Index',
             'Producer/Products/Create',
             'Producer/Products/Edit',
+            'Receptions/Index',
             'Receptions/Show',
         ]) {
             page.component = component;
