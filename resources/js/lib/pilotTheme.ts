@@ -73,6 +73,7 @@ const landingPages = new Set([
     'Producer/Cutoff',
     'Producer/CycleSummary',
     'Producer/Stock/Movements',
+    'Receptions/Index',
     'Receptions/Show',
 ]);
 

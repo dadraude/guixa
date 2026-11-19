@@ -128,7 +128,47 @@ const accounts = [
         invitationPending: false,
     },
 ];
+// Reception list states (T18): empty, one row, many rows, long supplier name; `default` is a mixed cycle.
+const listProducer = (id: string, name: string, listState: string) => ({
+    producerId: id,
+    producerName: name,
+    state: listState,
+});
+const listProducers: Record<string, ReturnType<typeof listProducer>[]> = {
+    default: [
+        listProducer('producer-1', 'Hort de la Plana', 'sent'),
+        listProducer('producer-2', 'Forn del Poble', 'validated'),
+        listProducer('producer-3', 'Formatges de la Vall', 'distributed'),
+    ],
+    one: [listProducer('producer-1', 'Hort de la Plana', 'sent')],
+    'long-content': [listProducer('producer-1', longName, 'validated')],
+};
+const manyCycles = Array.from({ length: 8 }, (_, index) => ({
+    cycleId: `cycle-${index + 1}`,
+    pickupDate: `2026-11-${String(14 - index).padStart(2, '0')}`,
+    closed: index > 0,
+    producers: listProducers.default,
+}));
+const listCycles = () => {
+    if (state === 'empty') return [];
+    if (state === 'many') return manyCycles;
+    if (!listProducers[state]) throw new Error(`Unknown list state: ${state}`);
+    return [
+        {
+            cycleId: 'cycle-1',
+            pickupDate: '2026-11-14',
+            closed: false,
+            producers: listProducers[state],
+        },
+    ];
+};
 const pageProps: Record<string, Record<string, unknown>> = {
+    // Lazy: other pages use their own states (`busy`, `received`...), which are not list states.
+    'Receptions/Index': {
+        get cycles() {
+            return listCycles();
+        },
+    },
     'Receptions/Show': {
         reception: {
             cycleId: 'cycle-1',
@@ -171,6 +211,7 @@ const pageProps: Record<string, Record<string, unknown>> = {
     },
 };
 const urls: Record<string, string> = {
+    'Receptions/Index': '/receptions',
     'Receptions/Show': '/receptions/cycle-1/producer-1',
     'Manage/Accounts/Index': '/manage/accounts',
 };
