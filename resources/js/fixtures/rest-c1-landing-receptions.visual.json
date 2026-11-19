@@ -70,7 +70,9 @@
                                 "selector": "body",
                                 "attributes": {
                                     "data-ev-error": null,
-                                    "data-ev-primary-bg": "rgb(40, 101, 133)"
+                                    "data-ev-primary-bg": "rgb(40, 101, 133)",
+                                    "data-ev-panel-padding": "12px",
+                                    "data-ev-panel-gap": "12px"
                                 }
                             }
                         ]
@@ -138,7 +140,9 @@
                                 "selector": "body",
                                 "attributes": {
                                     "data-ev-error": null,
-                                    "data-ev-primary-bg": "rgb(143, 197, 223)"
+                                    "data-ev-primary-bg": "rgb(143, 197, 223)",
+                                    "data-ev-panel-padding": "12px",
+                                    "data-ev-panel-gap": "12px"
                                 }
                             }
                         ]
@@ -708,9 +712,149 @@
                                 "selector": "body",
                                 "attributes": {
                                     "data-ev-error": null,
-                                    "data-ev-opened-by-enter": "true",
+                                    "data-ev-opened-by": "Enter",
+                                    "data-ev-arrowed": "Ceba tendra (manat)",
+                                    "data-ev-chosen": "Ceba tendra (manat)",
+                                    "data-ev-chosen-matches": "true",
                                     "data-ev-changed": "true",
-                                    "data-ev-active-after-arrow": "Ceba tendra (manat)",
+                                    "data-ev-focus-returned-after-choice": "true",
+                                    "data-ev-escape-closed": "true",
+                                    "data-ev-focus-returned-after-escape": "true",
+                                    "data-ev-active-highlight-bg": "rgb(231, 240, 243)",
+                                    "data-ev-active-highlight-fg": "rgb(29, 82, 111)"
+                                }
+                            }
+                        ],
+                        "focus": [],
+                        "noFocusReason": "Focus order is the default state; this state drives the select with dispatched events."
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "select-space",
+                    "query": {
+                        "state": "select-space"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h2,#main-content dt,#main-content dd,#main-content label",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-page button:not([disabled]),#main-content .pilot-page input:not([type=hidden]),#main-content .pilot-page a",
+                                "minHeight": 44,
+                                "minWidth": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-opened-by": "Space",
+                                    "data-ev-arrowed": "Ceba tendra (manat)",
+                                    "data-ev-chosen": "Ceba tendra (manat)",
+                                    "data-ev-chosen-matches": "true",
+                                    "data-ev-changed": "true",
+                                    "data-ev-focus-returned-after-choice": "true",
+                                    "data-ev-escape-closed": "true",
+                                    "data-ev-focus-returned-after-escape": "true",
+                                    "data-ev-active-highlight-bg": "rgb(231, 240, 243)",
+                                    "data-ev-active-highlight-fg": "rgb(29, 82, 111)"
+                                }
+                            }
+                        ],
+                        "focus": [],
+                        "noFocusReason": "Focus order is the default state; this state drives the select with dispatched events."
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "select-pointer",
+                    "query": {
+                        "state": "select-pointer"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h2,#main-content dt,#main-content dd,#main-content label",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-page button:not([disabled]),#main-content .pilot-page input:not([type=hidden]),#main-content .pilot-page a",
+                                "minHeight": 44,
+                                "minWidth": 44
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-opened-by": "pointer",
+                                    "data-ev-arrowed": "Ceba tendra (manat)",
+                                    "data-ev-chosen": "Ceba tendra (manat)",
+                                    "data-ev-chosen-matches": "true",
+                                    "data-ev-changed": "true",
                                     "data-ev-focus-returned-after-choice": "true",
                                     "data-ev-escape-closed": "true",
                                     "data-ev-focus-returned-after-escape": "true"
@@ -718,7 +862,7 @@
                             }
                         ],
                         "focus": [],
-                        "noFocusReason": "Focus order is the default state; this state drives the select with dispatched key events."
+                        "noFocusReason": "Focus order is the default state; this state drives the select with dispatched events."
                     },
                     "cases": [
                         {

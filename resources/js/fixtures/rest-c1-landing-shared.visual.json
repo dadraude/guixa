@@ -117,7 +117,7 @@
                     "settled": [".reference-style"],
                     "checks": {
                         "focus": [],
-                        "noFocusReason": "Keyboard model driven by dispatched key events.",
+                        "noFocusReason": "Interaction driven by dispatched events.",
                         "assertions": [
                             {
                                 "selector": ".landing",
@@ -127,7 +127,92 @@
                                 "selector": "body",
                                 "attributes": {
                                     "data-ev-error": null,
-                                    "data-ev-opened-by-enter": "true",
+                                    "data-ev-opened-by": "Enter",
+                                    "data-ev-arrowed": "Família Puig",
+                                    "data-ev-chosen": "Família Puig",
+                                    "data-ev-chosen-matches": "true",
+                                    "data-ev-changed": "true",
+                                    "data-ev-focus-returned-after-choice": "true",
+                                    "data-ev-focus-returned-after-escape": "true",
+                                    "data-ev-escape-closed": "true",
+                                    "data-ev-active-highlight-bg": "rgb(236, 234, 229)",
+                                    "data-ev-active-highlight-fg": "rgb(54, 70, 62)"
+                                }
+                            }
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "select-space",
+                    "query": {
+                        "state": "select-space"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "focus": [],
+                        "noFocusReason": "Interaction driven by dispatched events.",
+                        "assertions": [
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-opened-by": "Space",
+                                    "data-ev-arrowed": "Família Puig",
+                                    "data-ev-chosen": "Família Puig",
+                                    "data-ev-chosen-matches": "true",
+                                    "data-ev-changed": "true",
+                                    "data-ev-focus-returned-after-choice": "true",
+                                    "data-ev-focus-returned-after-escape": "true",
+                                    "data-ev-escape-closed": "true",
+                                    "data-ev-active-highlight-bg": "rgb(236, 234, 229)",
+                                    "data-ev-active-highlight-fg": "rgb(54, 70, 62)"
+                                }
+                            }
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "select-pointer",
+                    "query": {
+                        "state": "select-pointer"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "focus": [],
+                        "noFocusReason": "Interaction driven by dispatched events.",
+                        "assertions": [
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-opened-by": "pointer",
+                                    "data-ev-arrowed": "Família Vidal",
+                                    "data-ev-chosen": "Família Vidal",
+                                    "data-ev-chosen-matches": "true",
                                     "data-ev-changed": "true",
                                     "data-ev-focus-returned-after-choice": "true",
                                     "data-ev-focus-returned-after-escape": "true",

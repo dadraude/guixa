@@ -85,10 +85,11 @@ const sources = import.meta.glob<string>('/resources/js/**/*.vue', {
 
 const excludedFromChecks = ['components/ui/', 'pages/Welcome.vue'];
 
-// T46: existing spacing retained after rendered before/after review.
-// The allowlist is exact by file and class; new off-grid values still fail.
+// Existing spacing retained by exact file and class; new off-grid values still fail.
+// T46 entries were kept after a rendered before/after review. The Receptions/Show entry is a separate
+// 005 T17 exception decided by the user (see its Deviation history entries), not a T46 review.
 const retainedT46Spacing: Record<string, readonly string[]> = {
-    // 005 T17: 12 px panel padding and gap kept; changing them would alter the reception layout, not just its identity.
+    // 005 T17 exception: 12 px panel padding and gap, measured unchanged by the fixture (data-ev-panel-padding/gap).
     'pages/Receptions/Show.vue': ['gap-3', 'p-3'],
     'pages/auth/Login.vue': ['space-x-3'],
     'layouts/auth/AuthSimpleLayout.vue': ['md:p-10'],

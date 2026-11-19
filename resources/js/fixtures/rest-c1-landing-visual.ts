@@ -307,6 +307,16 @@ const recordPrimary = () => {
     ].find(visible);
     if (button) set('primary-bg', getComputedStyle(button).backgroundColor);
 };
+// gap-3 and p-3 of the product panel are a retained exception (layout-rules.spec.ts): record what they compute to.
+const recordPanel = () => {
+    const panel = document.querySelector<HTMLElement>(
+        '#main-content section[data-test^="product-"]',
+    );
+    if (!panel) return;
+    const style = getComputedStyle(panel);
+    set('panel-padding', style.paddingTop);
+    set('panel-gap', style.rowGap);
+};
 const recordPopup = (popup: HTMLElement) => {
     const surface = getComputedStyle(popup);
     set('popup-bg', surface.backgroundColor);
@@ -344,10 +354,26 @@ const recordPopup = (popup: HTMLElement) => {
     );
     probe.remove();
 };
-const openSelect = async () => {
+type OpenBy = 'Enter' | ' ' | 'pointer';
+// Reka ignores a release close to the opening press, so the events carry the element's real position.
+const pointer = (target: Element, type: string) => {
+    const box = target.getBoundingClientRect();
+    return target.dispatchEvent(
+        new PointerEvent(type, {
+            bubbles: true,
+            cancelable: true,
+            button: 0,
+            pointerType: 'mouse',
+            clientX: box.left + box.width / 2,
+            clientY: box.top + box.height / 2,
+        }),
+    );
+};
+const openSelect = async (by: OpenBy = 'Enter') => {
     const trigger = await waitFor(firstTrigger);
     trigger.focus();
-    key(trigger, 'Enter');
+    if (by === 'pointer') pointer(trigger, 'pointerdown');
+    else key(trigger, by);
     const popup = await waitFor(() =>
         document.querySelector<HTMLElement>(popupSelector),
     );
@@ -355,36 +381,70 @@ const openSelect = async () => {
     await sleep(200);
     return { trigger, popup };
 };
-// Keyboard model: Enter opens, ArrowDown moves, Enter chooses, Escape closes and focus returns.
-const runSelectKeyboard = async () => {
-    const trigger = await waitFor(firstTrigger);
-    const before = trigger.textContent?.trim() ?? '';
-    const { popup } = await openSelect();
-    set('opened-by-enter', 'true');
-    // The key goes to the focused item and bubbles to the popup, as from a keyboard.
-    key(document.activeElement ?? popup, 'ArrowDown');
-    await sleep(150);
-    set(
-        'active-after-arrow',
-        document.activeElement?.textContent?.trim() ?? 'none',
-    );
-    // The focused item receives Enter, as it does from a keyboard.
-    key(document.activeElement!, 'Enter');
-    await waitFor(() =>
+const closedPopup = () =>
+    waitFor(() =>
         document.querySelector(popupSelector) ? null : document.body,
     );
+// The highlight of the item the keyboard reached: its own computed pair. When the headless page has no
+// OS focus the `focus:` utilities do not match, so the token pair is recorded instead and says so.
+const recordHighlight = (item: HTMLElement) => {
+    const own = getComputedStyle(item);
+    const transparent = own.backgroundColor === 'rgba(0, 0, 0, 0)';
+    const probe = document.createElement('span');
+    probe.style.backgroundColor = 'var(--accent)';
+    probe.style.color = 'var(--accent-foreground)';
+    item.append(probe);
+    const resolved = getComputedStyle(probe);
+    const bg = transparent ? resolved.backgroundColor : own.backgroundColor;
+    const fg = transparent ? resolved.color : own.color;
+    probe.remove();
+    set('active-highlight-source', transparent ? 'token-fallback' : 'item');
+    set('active-highlight-bg', bg);
+    set('active-highlight-fg', fg);
+    set('active-highlight-contrast', contrast(fg, bg).toFixed(2));
+};
+// Keyboard model: Enter or Space opens, ArrowDown moves, Enter chooses, Escape closes and focus returns.
+// The pointer variant opens with a mouse press and chooses by pressing and releasing on the item.
+const runSelectKeyboard = async (by: OpenBy) => {
+    const trigger = await waitFor(firstTrigger);
+    const before = trigger.textContent?.trim() ?? '';
+    const { popup } = await openSelect(by);
+    set('opened-by', by === ' ' ? 'Space' : by);
+    let arrowed: string;
+    if (by === 'pointer') {
+        const items = [
+            ...popup.querySelectorAll<HTMLElement>('[data-slot="select-item"]'),
+        ];
+        const target = items[items.length - 1];
+        arrowed = target.textContent?.trim() ?? '';
+        pointer(target, 'pointermove');
+        pointer(target, 'pointerdown');
+        pointer(target, 'pointerup');
+        // A mouse release is followed by a click, which Reka also listens for.
+        target.click();
+    } else {
+        // The key goes to the focused item and bubbles to the popup, as from a keyboard.
+        key(document.activeElement ?? popup, 'ArrowDown');
+        await sleep(150);
+        const active = document.activeElement as HTMLElement;
+        arrowed = active.textContent?.trim() ?? 'none';
+        recordHighlight(active);
+        key(active, 'Enter');
+    }
+    await closedPopup();
     await sleep(200);
-    set('chosen', trigger.textContent?.trim() ?? '');
-    set('changed', String((trigger.textContent?.trim() ?? '') !== before));
+    const chosen = trigger.textContent?.trim() ?? '';
+    set('arrowed', arrowed);
+    set('chosen', chosen);
+    set('chosen-matches', String(chosen === arrowed));
+    set('changed', String(chosen !== before));
     set(
         'focus-returned-after-choice',
         String(document.activeElement === trigger),
     );
-    const reopened = await openSelect();
+    const reopened = await openSelect(by);
     key(reopened.popup, 'Escape');
-    await waitFor(() =>
-        document.querySelector(popupSelector) ? null : document.body,
-    );
+    await closedPopup();
     await sleep(200);
     set('escape-closed', 'true');
     set(
@@ -497,7 +557,9 @@ void createInertiaApp({
                 String(popup.classList.contains('landing')),
             );
         }
-        if (state === 'select-keyboard') await runSelectKeyboard();
+        if (state === 'select-keyboard') await runSelectKeyboard('Enter');
+        if (state === 'select-space') await runSelectKeyboard(' ');
+        if (state === 'select-pointer') await runSelectKeyboard('pointer');
         if (state === 'total-dialog') await runTotalDialog();
         if (state === 'toast') await runToast();
         if (state === 'account-menu') await runAccountMenu();
@@ -506,6 +568,7 @@ void createInertiaApp({
     } catch (error) {
         set('error', String(error));
     }
+    recordPanel();
     recordPrimary();
     document.body.dataset.requests = String(requests.length);
     document.body.dataset.visualReady = state;
