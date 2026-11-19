@@ -2,7 +2,7 @@
 
 **Status: Accepted (2026-11-13, PR #418).** Accepting it authorized no implementation or ticket publication; the ticket batch is drafted in [ticket-drafts.md](ticket-drafts.md). Source: [accepted spec](spec.md) R1–R13/S1–S12
 
-**Slices 3-7 (T17–T45): Draft, awaiting acceptance (2026-11-16).** Drafted from the accepted slice 3-7 spec and plan (PRs #447–#449). The breakdown authorizes no implementation, ticket publication or Linear writes; slices 1 and 2 (T01–T16) keep their accepted status.
+**Slices 3-7 (T17–T45): Accepted (2026-11-16, PR #450).** Drafted from the accepted slice 3-7 spec and plan (PRs #447–#449). Acceptance authorized ticket publication (done: [linear-publication.md](linear-publication.md)) and starting C1 tasks T17 and T22; each later checkpoint waits for the user's approval of the previous one (R20). Slices 1 and 2 (T01–T16) keep their accepted status.
 (slice 1 only); [plan](plan.md) (accepted, PR #417); [constitution](../constitution.md).
 IDs are local to 005 and start at T01; 001 items are cited as "001 T84". This document authorizes no implementation, no
 ticket publication and no Linear writes. Everything marked *unverified* was not run; this draft is from code reading
@@ -1187,7 +1187,7 @@ PHP guards for C5: `tests/Feature/Dashboard/DashboardTest.php` (*path to confirm
 4. **Unverified items carried from the plan:** dialog inheritance in the top layer, `pilot-amount` cell coverage, switch
    contrast, seeder table names (`return_items`, `producer_cycle_availability`), runner path with no command run, and
    the ~150–170 case estimate (`run.mjs plan` decides). Pest test names and filters not run.
-5. No Linear publication, branch/worktree or implementation authorization is implied; no tracker column exists yet.
+5. When drafted, no Linear publication, branch/worktree or implementation authorization was implied; acceptance on 2026-11-16 and the C1–C5 publication (see the status line) superseded this.
 6. **Slice 2 decisions D6–D11 are accepted** by the user, 2026-11-15 (plan, "Decisions the plan proposes, slice 2"):
    D6 no `pilot-title-compact` on Producer pages unless a page measures other than 24 px (then a Deviation); D7 the three
    slice 1 probes naming Producer pages are re-pointed once, in T10, before any admission (history probe to
