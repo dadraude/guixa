@@ -17,8 +17,8 @@ it('seeds a usable cooperative with accounts, orders, reception and pickups', fu
     Mail::fake();
     $this->seed(DatabaseSeeder::class);
 
-    expect(User::count())->toBe(10);
-    $this->assertDatabaseCount('households', 4);
+    expect(User::count())->toBe(11);
+    $this->assertDatabaseCount('households', 5);
     $this->assertDatabaseCount('producers', 5);
     $this->assertDatabaseCount('products', 13);
     $this->assertDatabaseCount('cycles', 3);
@@ -55,9 +55,10 @@ it('seeds one reception in each state the dashboard lists and reads them without
         ->and($actions['check_delivery_and_allocations']->count)->toBe(2)
         ->and(DB::table('received_totals')->count())->toBe($totals);
 
-    $receiver = User::query()->where('email', 'biel@demo.guixa.test')->firstOrFail();
-    $receiverActions = collect($this->actingAs($receiver)->get('/dashboard')->viewData('page')['props']['attention'])->pluck('action')->all();
-    expect($receiverActions)->toContain('check_delivery_and_allocations')->not->toContain('mark_distributed');
+    // Nobody holds Receiver; Finance, which can receive and settle, is the demo account that sees the reception work.
+    $finance = User::query()->where('email', 'anna@demo.guixa.test')->firstOrFail();
+    $financeActions = collect($this->actingAs($finance)->get('/dashboard')->viewData('page')['props']['attention'])->pluck('action')->all();
+    expect($financeActions)->toContain('check_delivery_and_allocations')->toContain('mark_distributed');
 });
 
 it('seeds one closed, ordered, unsent producer with an account as the manager\'s only manual send, and shows it to no other role (R9, S8)', function () {
@@ -185,12 +186,34 @@ it('seeds staff role holders besides the manager', function () {
     expect($holders)->toBe([
         'catalogue' => ['biel@demo.guixa.test'],
         'finance' => ['anna@demo.guixa.test'],
-        'receiver' => ['anna@demo.guixa.test', 'biel@demo.guixa.test'],
     ]);
-    expect(DB::table('role_changes')->count())->toBe(4);
+    expect(DB::table('role_changes')->count())->toBe(2);
 });
 
-it('shows the combined member, Finance and Receiver demo account one collection group, the unlinked account an explanation, and caught-up members their opportunity instead (S1, S10, R14)', function () {
+it('seeds the Manager states: a role with no holder, a deactivated household and a deactivated member account (R27)', function () {
+    $this->seed(DemoSeeder::class);
+    $this->withoutVite();
+    $manager = User::query()->where('email', 'gestora@demo.guixa.test')->firstOrFail();
+
+    $groups = collect($this->actingAs($manager)->get('/manage/roles')->viewData('page')['props']['groups'])->keyBy('role');
+    expect($groups['receiver']->holders)->toBe([])
+        ->and($groups->only(['manager', 'finance', 'catalogue'])->every(fn ($group) => $group->holders !== []))->toBeTrue();
+
+    $household = DB::table('households')->whereNotNull('deactivated_at')->get();
+    expect($household)->toHaveCount(1)
+        ->and(DB::table('users')->where('household_id', $household->first()->id)->count())->toBe(0);
+    $this->get("/manage/households/{$household->first()->id}")->assertOk();
+
+    $account = DB::table('users')->whereNotNull('deactivated_at')->get();
+    expect($account)->toHaveCount(1)
+        ->and($account->first()->household_id)->toBeNull()
+        ->and(DB::table('users')->where('email', 'anna@demo.guixa.test')->value('household_id'))->not->toBeNull();
+    $accounts = collect($this->get('/manage/accounts')->viewData('page')['props']['accounts'])->keyBy('email');
+    expect($accounts['jan@demo.guixa.test']->active)->toBeFalse()
+        ->and($accounts['anna@demo.guixa.test']->active)->toBeTrue();
+});
+
+it('shows the combined member and Finance demo account one collection group, the unlinked account an explanation, and caught-up members their opportunity instead (S1, S10, R14)', function () {
     $this->seed(DemoSeeder::class);
     $this->withoutVite();
     $props = function (string $email) {
@@ -235,11 +258,14 @@ it('lets every demo role log in and open its main screens', function (string $em
         foreach (DB::table('cycles')->pluck('id') as $cycleId) {
             $this->get(route('orders.edit', $cycleId))->assertOk();
         }
+        $this->get(route('receptions.show', [DB::table('cycles')->whereNotNull('settled_at')->value('id'), DB::table('producers')->value('id')]))->assertOk();
     }
     if ($email === 'gestora@demo.guixa.test') {
         $cycle = DB::table('cycles')->whereNotNull('settled_at')->value('id');
         $producer = DB::table('producers')->value('id');
         $this->get(route('receptions.show', [$cycle, $producer]))->assertOk();
+        $this->get('/manage/cycles/'.DB::table('cycles')->orderByDesc('pickup_date')->value('id'))->assertOk();
+        $this->get('/manage/stock/'.DB::table('products')->where('name', 'Arròs integral')->value('id').'/movements')->assertOk();
     }
     if ($email === 'hort@demo.guixa.test') {
         $cycle = DB::table('cycles')->orderBy('pickup_date')->value('id');
@@ -249,15 +275,10 @@ it('lets every demo role log in and open its main screens', function (string $em
         }
         expect(data_get($this->get("{$history}?page=2")->assertOk()->viewData('page')['props'], 'history.lines'))->not->toBeEmpty();
     }
-    if ($email === 'biel@demo.guixa.test') {
-        $cycle = DB::table('cycles')->whereNotNull('settled_at')->value('id');
-        $producer = DB::table('producers')->value('id');
-        $this->get(route('receptions.show', [$cycle, $producer]))->assertOk();
-    }
 })->with([
-    'manager' => ['gestora@demo.guixa.test', ['/dashboard', '/manage/households', '/manage/producers', '/manage/cycles', '/manage/stock']],
-    'member' => ['anna@demo.guixa.test', ['/dashboard', '/', '/wallet']],
-    'receiver' => ['biel@demo.guixa.test', ['/dashboard', '/receptions']],
+    'manager' => ['gestora@demo.guixa.test', ['/dashboard', '/manage/households', '/manage/producers', '/manage/cycles', '/manage/stock', '/manage/roles', '/manage/accounts', '/manage/settings']],
+    'member and Finance' => ['anna@demo.guixa.test', ['/dashboard', '/', '/wallet', '/receptions']],
+    'catalogue' => ['biel@demo.guixa.test', ['/dashboard', '/catalogue/producers']],
     'producer' => ['hort@demo.guixa.test', ['/dashboard', '/producer/products']],
     'producer without products' => ['sense-productes@demo.guixa.test', ['/dashboard', '/producer/products']],
 ]);
