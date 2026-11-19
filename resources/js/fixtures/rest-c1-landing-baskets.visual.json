@@ -1,0 +1,1214 @@
+{
+    "baseUrl": "http://127.0.0.1:5292",
+    "rootFontPx": 16,
+    "darkSelector": "html.dark",
+    "matrix": {
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark", "system-light", "system-dark"],
+        "text": [100, 200]
+    },
+    "views": [
+        {
+            "id": "basket-list",
+            "path": "/resources/js/fixtures/rest-c1-landing.html",
+            "query": {
+                "page": "Finance/Baskets/Index",
+                "role": "finance"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content li span,#main-content dt,#main-content dd",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["#main-content .pilot-page a"],
+            "states": [
+                {
+                    "id": "mixed-light",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-page button:not([disabled]),#main-content .pilot-page a",
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-list\"] li",
+                                "count": 5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-list\"] .pilot-amount",
+                                "styles": {
+                                    "text-align": "end",
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"status-draft\"]",
+                                "text": "Esborrany"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"status-validated\"]",
+                                "text": "Pendent de recollida"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"status-collected\"]",
+                                "text": "Recollida"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-list\"] li:nth-child(1) .pilot-amount",
+                                "text": "12,50 €"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-list\"] li:nth-child(2) .pilot-amount",
+                                "text": "23,00 €"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-list\"] li:nth-child(3) .pilot-amount",
+                                "text": "45,90 €"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-list\"] li:nth-child(4) .pilot-amount",
+                                "text": "0,00 €"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-list\"] li:nth-child(5) .pilot-amount",
+                                "text": "8,00 €"
+                            },
+                            {
+                                "selector": "#main-content [data-test^=\"status-\"]",
+                                "contrast": 4.5
+                            }
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "mixed-dark",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-page button:not([disabled]),#main-content .pilot-page a",
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-list\"] li",
+                                "count": 5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-list\"] .pilot-amount",
+                                "styles": {
+                                    "text-align": "end",
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test^=\"status-\"]",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-list\"] li:nth-child(3) .pilot-amount",
+                                "text": "45,90 €"
+                            }
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "pending",
+                    "query": {
+                        "state": "pending"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-page button:not([disabled]),#main-content .pilot-page a",
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-list\"] li",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"all-baskets\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"validated-at\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-list\"] .pilot-amount",
+                                "styles": {
+                                    "text-align": "end",
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-list\"] li:nth-child(1) .pilot-amount",
+                                "text": "23,00 €"
+                            }
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "empty",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-page button:not([disabled]),#main-content .pilot-page a",
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"empty-baskets\"]",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "text": "Encara no hi ha cap cistella."
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-list\"]",
+                                "count": 0
+                            }
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "long-name",
+                    "query": {
+                        "state": "long-content"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-page button:not([disabled]),#main-content .pilot-page a",
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-list\"] li",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-list\"] .pilot-amount",
+                                "styles": {
+                                    "text-align": "end",
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-list\"] li:nth-child(1) .pilot-amount",
+                                "text": "23,00 €"
+                            }
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "large-amount",
+                    "query": {
+                        "state": "large-amount"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-page button:not([disabled]),#main-content .pilot-page a",
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-list\"] li",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-list\"] .pilot-amount",
+                                "styles": {
+                                    "text-align": "end",
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-list\"] li:nth-child(1) .pilot-amount",
+                                "text": "1.234.567,89 €"
+                            }
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "basket-detail",
+            "path": "/resources/js/fixtures/rest-c1-landing.html",
+            "query": {
+                "page": "Finance/Baskets/Show",
+                "role": "finance"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content li span,#main-content dt,#main-content dd",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["#main-content .pilot-page a"],
+            "states": [
+                {
+                    "id": "sent-light",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-page button:not([disabled]),#main-content .pilot-page a",
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-balance\"] dd",
+                                "styles": {
+                                    "text-align": "start",
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-amount",
+                                "styles": {
+                                    "text-align": "end",
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content :is([data-test^=\"stock-line-\"],[data-test^=\"weekly-line-\"],[data-test^=\"return-line-\"]) .pilot-list-row-body > span.text-muted-foreground",
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content dd[data-test$=\"-basket-total\"]",
+                                "styles": {
+                                    "text-align": "start",
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test^=\"basket-status-\"]",
+                                "text": "Pendent de recollida",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-balance\"] > div:nth-child(1) dd",
+                                "text": "-23,00 €"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-balance\"] > div:nth-child(2) dd",
+                                "text": "23,00 €"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"amount\"]",
+                                "text": "23,00 €"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"original-basket-total\"]",
+                                "text": "23,00 €"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"effective-basket-total\"]",
+                                "text": "23,00 €"
+                            }
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "sent-dark",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-page button:not([disabled]),#main-content .pilot-page a",
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-balance\"] dd",
+                                "styles": {
+                                    "text-align": "start",
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-amount",
+                                "styles": {
+                                    "text-align": "end",
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content :is([data-test^=\"stock-line-\"],[data-test^=\"weekly-line-\"],[data-test^=\"return-line-\"]) .pilot-list-row-body > span.text-muted-foreground",
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content dd[data-test$=\"-basket-total\"]",
+                                "styles": {
+                                    "text-align": "start",
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test^=\"basket-status-\"]",
+                                "text": "Pendent de recollida",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-balance\"] > div:nth-child(2) dd",
+                                "text": "23,00 €"
+                            }
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "unsent",
+                    "query": {
+                        "state": "draft"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-page button:not([disabled]),#main-content .pilot-page a",
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-balance\"] dd",
+                                "styles": {
+                                    "text-align": "start",
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-amount",
+                                "styles": {
+                                    "text-align": "end",
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content :is([data-test^=\"stock-line-\"],[data-test^=\"weekly-line-\"],[data-test^=\"return-line-\"]) .pilot-list-row-body > span.text-muted-foreground",
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test^=\"basket-status-\"]",
+                                "text": "Esborrany",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-balance\"] > div:nth-child(1) dd",
+                                "text": "-23,00 €"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-balance\"] > div:nth-child(2) dd",
+                                "text": "23,00 €"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-balance\"] > div:nth-child(3) dd",
+                                "text": "-46,00 €"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"amount\"]",
+                                "text": "23,00 €"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"validate-basket\"]",
+                                "count": 1
+                            }
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "collected",
+                    "query": {
+                        "state": "collected"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-page button:not([disabled]),#main-content .pilot-page a",
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-balance\"] dd",
+                                "styles": {
+                                    "text-align": "start",
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-amount",
+                                "styles": {
+                                    "text-align": "end",
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content :is([data-test^=\"stock-line-\"],[data-test^=\"weekly-line-\"],[data-test^=\"return-line-\"]) .pilot-list-row-body > span.text-muted-foreground",
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content dd[data-test$=\"-basket-total\"]",
+                                "styles": {
+                                    "text-align": "start",
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test^=\"basket-status-\"]",
+                                "text": "Recollida",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"original-basket-total\"]",
+                                "text": "23,00 €"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"effective-basket-total\"]",
+                                "text": "20,00 €"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"return-line-jar\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"return-line-jar\"] .pilot-list-row-body > span.text-muted-foreground",
+                                "count": 1,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"return-line-jar\"] [data-test=\"credit\"]",
+                                "text": "−3,00 €",
+                                "styles": {
+                                    "text-align": "end",
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            }
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "weekly",
+                    "query": {
+                        "state": "weekly"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-page button:not([disabled]),#main-content .pilot-page a",
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-balance\"] dd",
+                                "styles": {
+                                    "text-align": "start",
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-amount",
+                                "styles": {
+                                    "text-align": "end",
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content :is([data-test^=\"stock-line-\"],[data-test^=\"weekly-line-\"],[data-test^=\"return-line-\"]) .pilot-list-row-body > span.text-muted-foreground",
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"weekly-amount\"]",
+                                "text": "6,00 €"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"amount\"]",
+                                "text": "23,00 €"
+                            }
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "long-name",
+                    "query": {
+                        "state": "long-content"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-page button:not([disabled]),#main-content .pilot-page a",
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-balance\"] dd",
+                                "styles": {
+                                    "text-align": "start",
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-amount",
+                                "styles": {
+                                    "text-align": "end",
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content :is([data-test^=\"stock-line-\"],[data-test^=\"weekly-line-\"],[data-test^=\"return-line-\"]) .pilot-list-row-body > span.text-muted-foreground",
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"amount\"]",
+                                "text": "23,00 €"
+                            }
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "large-amount",
+                    "query": {
+                        "state": "large-amount"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content .pilot-page button:not([disabled]),#main-content .pilot-page a",
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-balance\"] dd",
+                                "styles": {
+                                    "text-align": "start",
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content .pilot-amount",
+                                "styles": {
+                                    "text-align": "end",
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content :is([data-test^=\"stock-line-\"],[data-test^=\"weekly-line-\"],[data-test^=\"return-line-\"]) .pilot-list-row-body > span.text-muted-foreground",
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-balance\"] > div:nth-child(1) dd",
+                                "text": "-1.234.567,89 €"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"basket-balance\"] > div:nth-child(2) dd",
+                                "text": "1.234.567,89 €"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"amount\"]",
+                                "text": "1.234.567,89 €"
+                            }
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
