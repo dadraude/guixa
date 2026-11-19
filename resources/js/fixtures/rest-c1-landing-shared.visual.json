@@ -228,6 +228,45 @@
                             "text": 100
                         }
                     ]
+                },
+                {
+                    "id": "select-touch",
+                    "query": {
+                        "state": "select-touch"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "focus": [],
+                        "noFocusReason": "Interaction driven by dispatched events.",
+                        "assertions": [
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-opened-by": "touch",
+                                    "data-ev-arrowed": "Família Vidal",
+                                    "data-ev-chosen": "Família Vidal",
+                                    "data-ev-chosen-matches": "true",
+                                    "data-ev-changed": "true",
+                                    "data-ev-focus-returned-after-choice": "true",
+                                    "data-ev-focus-returned-after-escape": "true",
+                                    "data-ev-escape-closed": "true"
+                                }
+                            }
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
                 }
             ]
         },

@@ -317,6 +317,14 @@ const recordPanel = () => {
     const rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
     set('panel-padding-rem', String(parseFloat(style.paddingTop) / rem));
     set('panel-gap-rem', String(parseFloat(style.rowGap) / rem));
+    const header = document.querySelector<HTMLElement>(
+        '#main-content [data-test="distribution"]',
+    );
+    if (header)
+        set(
+            'header-gap-rem',
+            String(parseFloat(getComputedStyle(header).rowGap) / rem),
+        );
 };
 const recordPopup = (popup: HTMLElement) => {
     const surface = getComputedStyle(popup);
@@ -355,16 +363,20 @@ const recordPopup = (popup: HTMLElement) => {
     );
     probe.remove();
 };
-type OpenBy = 'Enter' | ' ' | 'pointer';
+type OpenBy = 'Enter' | ' ' | 'pointer' | 'touch';
 // Reka ignores a release close to the opening press, so the events carry the element's real position.
-const pointer = (target: Element, type: string) => {
+const pointer = (
+    target: Element,
+    type: string,
+    pointerType: 'mouse' | 'touch' = 'mouse',
+) => {
     const box = target.getBoundingClientRect();
     return target.dispatchEvent(
         new PointerEvent(type, {
             bubbles: true,
             cancelable: true,
             button: 0,
-            pointerType: 'mouse',
+            pointerType,
             clientX: box.left + box.width / 2,
             clientY: box.top + box.height / 2,
         }),
@@ -374,7 +386,12 @@ const openSelect = async (by: OpenBy = 'Enter') => {
     const trigger = await waitFor(firstTrigger);
     trigger.focus();
     if (by === 'pointer') pointer(trigger, 'pointerdown');
-    else key(trigger, by);
+    else if (by === 'touch') {
+        // Reka ignores a touch press on the trigger and opens on the release.
+        pointer(trigger, 'pointerdown', 'touch');
+        pointer(trigger, 'pointerup', 'touch');
+        trigger.click();
+    } else key(trigger, by);
     const popup = await waitFor(() =>
         document.querySelector<HTMLElement>(popupSelector),
     );
@@ -412,16 +429,17 @@ const runSelectKeyboard = async (by: OpenBy) => {
     const { popup } = await openSelect(by);
     set('opened-by', by === ' ' ? 'Space' : by);
     let arrowed: string;
-    if (by === 'pointer') {
+    if (by === 'pointer' || by === 'touch') {
+        const touch = by === 'touch' ? 'touch' : 'mouse';
         const items = [
             ...popup.querySelectorAll<HTMLElement>('[data-slot="select-item"]'),
         ];
         const target = items[items.length - 1];
         arrowed = target.textContent?.trim() ?? '';
-        pointer(target, 'pointermove');
-        pointer(target, 'pointerdown');
-        pointer(target, 'pointerup');
-        // A mouse release is followed by a click, which Reka also listens for.
+        pointer(target, 'pointermove', touch);
+        pointer(target, 'pointerdown', touch);
+        pointer(target, 'pointerup', touch);
+        // A release is followed by a click; Reka selects a touch item on it.
         target.click();
     } else {
         // The key goes to the focused item and bubbles to the popup, as from a keyboard.
@@ -561,6 +579,7 @@ void createInertiaApp({
         if (state === 'select-keyboard') await runSelectKeyboard('Enter');
         if (state === 'select-space') await runSelectKeyboard(' ');
         if (state === 'select-pointer') await runSelectKeyboard('pointer');
+        if (state === 'select-touch') await runSelectKeyboard('touch');
         if (state === 'total-dialog') await runTotalDialog();
         if (state === 'toast') await runToast();
         if (state === 'account-menu') await runAccountMenu();
