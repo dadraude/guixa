@@ -4,6 +4,7 @@ import { mount } from '@vue/test-utils';
 import { defineComponent, h } from 'vue';
 import Index from './Index.vue';
 import { installTranslations } from '@/lib/i18n';
+import { pilotVariantFor } from '@/lib/pilotTheme';
 
 vi.mock('@inertiajs/vue3', () => ({
     Head: () => null,
@@ -55,5 +56,10 @@ describe('finance stock list', () => {
             'Inactiu',
         );
         expect(rows[1].get('a').attributes('href')).toContain('oil');
+    });
+
+    it('is shown in the landing identity on its exact page name only (005 R21)', () => {
+        expect(pilotVariantFor('Finance/Stock/Index')).toBe('landing');
+        expect(pilotVariantFor('Finance/Stock/Index/Extra')).toBeNull();
     });
 });

@@ -19,6 +19,8 @@ export const checkedFiles = [
     'pages/Finance/Baskets/Index.vue',
     'pages/Finance/Baskets/Create.vue',
     'pages/Finance/Baskets/Show.vue',
+    'pages/Finance/Stock/Index.vue',
+    'pages/Finance/Stock/Movements.vue',
     'pages/Receptions/Index.vue',
     'pages/Receptions/Show.vue',
     'pages/Orders/Index.vue',
@@ -102,6 +104,9 @@ const retainedT46Spacing: Record<string, readonly string[]> = {
     // fixture asserts all three (data-ev-header-gap-rem, panel-gap-rem, panel-padding-rem); T17 does not
     // change them.
     'pages/Receptions/Show.vue': ['gap-3', 'p-3'],
+    // 005 T21 exception, by file and class: gap-3 on each stock row's action group (0.75rem). The manifest asserts it
+    // (rest-c1-landing-stock, stock-list); T21 does not change it.
+    'pages/Finance/Stock/Index.vue': ['gap-3'],
     'pages/auth/Login.vue': ['space-x-3'],
     'layouts/auth/AuthSimpleLayout.vue': ['md:p-10'],
     'components/Heading.vue': ['space-y-0.5', 'mb-0.5'],

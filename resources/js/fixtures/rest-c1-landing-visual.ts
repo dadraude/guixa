@@ -319,6 +319,113 @@ const basketShowProps = () => {
         returnItems: [],
     };
 };
+// Finance stock list and movement history (T21). Index: `default` mixes an active and an inactive product,
+// `empty` has none, `long-content` a long name with a seven-figure quantity. Movements: `default`, `empty`,
+// `long-content` and `paged` (the pagination links) are history states of the same read-only page.
+const stockProduct = (
+    id: string,
+    name: string,
+    over: Record<string, unknown> = {},
+) => ({
+    id,
+    producerId: 'producer-1',
+    name,
+    unit: 'pot',
+    price: '6.50',
+    variable: false,
+    containersPerUnit: null,
+    active: true,
+    available: '12.000',
+    ...over,
+});
+const stockProductsByState: Record<string, ReturnType<typeof stockProduct>[]> =
+    {
+        default: [
+            stockProduct('stock-1', 'Mel de farigola'),
+            stockProduct('stock-2', 'Oli d’oliva', {
+                unit: 'ampolla',
+                price: '9.00',
+                active: false,
+                available: '0.000',
+            }),
+        ],
+        empty: [],
+        'long-content': [
+            stockProduct('stock-1', longName, {
+                unit: 'safata de cartró reciclat',
+                available: '1234567.500',
+            }),
+        ],
+    };
+const movementLine = (
+    id: string,
+    type: string,
+    quantity: string,
+    balanceAfter: string,
+    over: Record<string, unknown> = {},
+) => ({
+    id,
+    occurredAt: '2026-11-10 09:30',
+    type,
+    quantity,
+    balanceAfter,
+    note: null as string | null,
+    authorName: 'Maria Soler',
+    cycleId: 'cycle-1',
+    pickupDate: '2026-11-14',
+    basketId: null as string | null,
+    ...over,
+});
+const movementHistoriesByState: Record<string, object> = {
+    default: {
+        lines: [
+            movementLine('line-1', 'sale', '-3.000', '12.000', {
+                basketId: 'basket-1',
+            }),
+            movementLine('line-2', 'entry', '10.500', '15.000', {
+                note: 'Recepció setmanal',
+            }),
+        ],
+        total: 2,
+        page: 1,
+        prevUrl: null,
+        nextUrl: null,
+    },
+    empty: { lines: [], total: 0, page: 1, prevUrl: null, nextUrl: null },
+    'long-content': {
+        lines: [
+            movementLine(
+                'line-1',
+                'adjustment',
+                '-1234567.000',
+                '1234567.500',
+                {
+                    note: `Ajust per inventari complet del magatzem de ${longName}`,
+                    authorName: longName,
+                },
+            ),
+            movementLine('line-2', 'entry', '1234567.000', '2469134.500', {
+                basketId: 'basket-1',
+            }),
+        ],
+        total: 2,
+        page: 1,
+        prevUrl: null,
+        nextUrl: null,
+    },
+    paged: {
+        lines: [movementLine('line-1', 'sale', '-3.000', '12.000')],
+        total: 60,
+        page: 2,
+        prevUrl: '/finance/stock/stock-1/movements?page=1',
+        nextUrl: '/finance/stock/stock-1/movements?page=3',
+    },
+};
+const movementProduct = {
+    name: state === 'long-content' ? longName : 'Mel de farigola',
+    unit: 'pot',
+    available: state === 'long-content' ? '1234567.500' : '12.000',
+};
 const pageProps: Record<string, Record<string, unknown>> = {
     // Lazy: other pages use their own states (`busy`, `received`...), which are not list states.
     'Receptions/Index': {
@@ -352,6 +459,14 @@ const pageProps: Record<string, Record<string, unknown>> = {
         get households() {
             return basketHouseholds();
         },
+    },
+    'Finance/Stock/Index': {
+        products: stockProductsByState[state] ?? stockProductsByState.default,
+    },
+    'Finance/Stock/Movements': {
+        product: movementProduct,
+        history:
+            movementHistoriesByState[state] ?? movementHistoriesByState.default,
     },
     'Receptions/Show': {
         reception: {
@@ -399,6 +514,8 @@ const urls: Record<string, string> = {
     'Finance/Baskets/Index': '/finance/baskets',
     'Finance/Baskets/Show': '/finance/baskets/basket-1',
     'Finance/Baskets/Create': '/finance/baskets/create',
+    'Finance/Stock/Index': '/finance/stock',
+    'Finance/Stock/Movements': '/finance/stock/stock-1/movements',
     'Receptions/Show': '/receptions/cycle-1/producer-1',
     'Manage/Accounts/Index': '/manage/accounts',
 };
