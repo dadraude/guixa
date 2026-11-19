@@ -10,6 +10,8 @@ Read the issue before updating it. Verify an executable leaf, matching task row,
 integration evidence and compatible allowed edit surfaces using [scheduling](scheduling.md). Validate
 required runtime capabilities, and that the proposed operations fall within the profile's standing authorization.
 On a wait or missing scope/capability, report it before any mutation. Then set the admitted issue active.
+Classify its [tier and Reviewer B condition](effort.md) and record the tier with a `tier` event once the
+owner record is initialized.
 
 ## 2. Prepare and implement
 
@@ -56,10 +58,14 @@ Missing coverage returns to implementation before launching a reviewer; it is no
 
 ## 4. Independent review
 
-Launch a fresh read-only reviewer using [the reviewer brief](reviewer.md), fixed base and scheduling
-handoff. Aim for one complete review of the prepared candidate. Additional rounds address concrete
+Launch a fresh read-only Reviewer A using [the reviewer brief](reviewer.md), fixed base and scheduling
+handoff, plus a fresh Reviewer B in parallel when the [B condition](effort.md#reviewer-b-condition)
+holds; merge and dedupe their findings as one round. Aim for one complete review of the prepared candidate. Additional rounds address concrete
 findings or behavioral changes, within the profile's substantive review budget including post-integration reviews; never
 reset counters on rebase. Verified mechanical corrections use the separate focused follow-up budget.
+Save each round's findings verbatim, never condensed, with stable IDs to `review<N>-findings.md` next to
+the task handoff before dispatching a fix; record each fix's reproducing test, evidence, commit and
+recheck result there, and pass the file to the next reviewer.
 Clean proceeds to preparation for publication. Product questions stop. Fixes while the applicable budget remains return to
 the implementer for the [whole-pattern correction](../references/visual.md#correct-a-defect-pattern)
 when visual findings apply, then focused verification, then a fresh reviewer. Require the instance
@@ -127,15 +133,14 @@ CI evidence. A green badge or an unrelated/stale run is insufficient.
   busy-poll or run the full suite locally as a substitute. Resume observation when results are available.
 - Failed CI: report `ci-failed` with failed check names and bounded sanitized excerpts. Within the
   existing correction/review budgets, return to the implementer for a focused reproduction and fix.
-  Recheck focused evidence and independently review the changed candidate before another push;
-  proven mechanical corrections use focused follow-up review under the separate budget. Use new
+  Recheck focused evidence and independently review the changed candidate before another push. Use new
   commits on the published branch, never the pre-publication amend/rebase loop. New commits restart CI
   evidence collection.
 
 Do not mark the task validated, clean up its environment or release its reservation while CI is pending
 or failed. Missing CI capability remains missing proof, not permission to skip full validation. If the
 PR conflicts with a moved base, merge the configured base into the task branch as a new commit, rerun focused
-checks, get an independent review for behavioral/contract changes, then push. Do not reset correction/review counters after publishing or restarting a session.
+checks, get an independent review for behavioral/contract changes, then push.
 
 After `ci-passed`, keep the worktree, database and reservation while the PR is open: review feedback,
 conflicts or a new CI run reuse them. Delivery ends at a CI-validated PR; the user merges. Cleanup runs
@@ -147,6 +152,7 @@ Preserve the worktree and changes. Post the exact blocker/question on the issue 
 profile's stopped status. A failed
 status update is pending, not a reason to retry publication. Keep the task reservation and report status,
 HEAD/base, checks/review rounds, remote outcomes and the exact decision or missing capability needed.
+A stopped or CI-failed task gets a [retrospective](retrospective.md).
 
 ## Correction budgets and recovery
 
@@ -174,7 +180,7 @@ including successful corrections, so changing mechanism names cannot create unli
 Neither a non-product result nor a non-product validation success resets a product failure streak:
 only a product success at that stage does. An initial harness failure alone does not consume a
 recovery attempt. A failed final allowed correction stops the task; another attempt beyond either
-limit is refused. These are pilot defaults, not a measured speed improvement.
+limit is refused.
 
 If an explicitly authorized extra correction is needed, record `recovery-authorization` with
 `stage`, stable `mechanism`, `additionalAttempts` (one or two), `authorization` and decision `evidence`.
@@ -183,13 +189,13 @@ stage. Only the named mechanism can spend those extra stage attempts. It extends
 mechanism's unsuccessful limit and that stage's total limit; it never
 changes product failures, review counts, scope, permissions or the fresh independent review gate.
 Do not edit counters to grant an exception.
-Substantive and mechanical review counts remain separate. Repeated failures of the same stage and
-mechanism cannot be relabeled to reset a budget. Missing, pending or stale evidence is never success.
+Substantive and mechanical review counts remain separate. Missing, pending or stale evidence is never success.
 Before declaring recovery exhausted or requesting an exception, query
 `node skills/agent-workflow/scripts/state.mjs status OWNER_JSON STAGE MECHANISM` and retain its
 read-only admission result. A successful focused `recovery-result` closes that attempt; a later
 full-validation failure is a new failure event, not a retroactive change to the result.
-Budget exhaustion stops the task with preserved evidence; restarting a session or rebasing resets none.
+Budget exhaustion stops the task with preserved evidence; publishing, restarting a session or
+rebasing resets no correction or review counter.
 
 Use `node skills/agent-workflow/scripts/state.mjs OWNER_JSON EVENT_JSON` from the task worktree.
 The coordinator alone writes this record. First send an `initialize` event with admission/recovery
@@ -205,10 +211,17 @@ existing pipeline limits/counters are retained. JSON events support `review` (cl
 classification `product|harness|infrastructure|mechanical`, stable `mechanism`), `preparation`,
 `recovery-result` and `recovery-authorization` as described above,
 `disposition` (value and decision `evidence`), `reservations` (paths and ownership `evidence`),
+`tier` (`S|M|L` and `reason`; refused if lower than the current tier),
+`worktree-path` (`previous_worktree`, `worktree`, `reason`, `evidence`; the CLI first verifies the new path
+is a registered worktree and the old one is not; accepted while a correction is pending),
+`replacement` (`implementer_id`, `reason`, `handoff_path`, `previous_cannot_write: true`, `evidence`;
+appends `replacement_history` under [implementation ownership](handoff.md#implementation-ownership)),
 and `start|end` (stage `implementation|verification|review|ci|decision-wait`).
 Optional `at` is an ISO timestamp; otherwise use current UTC time. A nonzero result may mean the
 record was successfully saved with an exhausted-budget blocker; read it before deciding next action.
-The helper preserves implementation identity and writes atomically. It is recovery evidence, not a lock.
+The helper preserves implementation identity and writes atomically under an exclusive record-write
+lock; a leftover `.lock` is inspected, never removed automatically. The lock serializes writes only; it
+is not a task claim.
 
 Record stage starts/ends as they occur. Report completed durations, open periods, first-pass CI
 success, review counts and repeated verification; do not invent missing historical timings.

@@ -1,4 +1,12 @@
-import { readFileSync, writeFileSync, renameSync } from 'node:fs';
+import {
+    closeSync,
+    openSync,
+    readFileSync,
+    renameSync,
+    unlinkSync,
+    writeFileSync,
+} from 'node:fs';
+import { execFileSync } from 'node:child_process';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -134,6 +142,7 @@ export function applyEvent(owner, event) {
             'reservations',
             'start',
             'end',
+            'worktree-path',
         ].includes(event.type)
     )
         throw new Error('Resolve pending recovery result before another event');
@@ -358,6 +367,63 @@ export function applyEvent(owner, event) {
         state.disposition = event.value;
         state.dispositionEvidence = event.evidence;
         // Recording abandonment is not proof that a previous worker stopped writing.
+    } else if (event.type === 'worktree-path') {
+        // Repairs metadata after an external move; the CLI caller verifies Git registration first.
+        if (
+            !event.worktree?.trim() ||
+            !event.reason?.trim() ||
+            !event.evidence?.trim()
+        )
+            throw new Error(
+                'Worktree path requires worktree, reason and evidence',
+            );
+        if (event.previous_worktree !== next.worktree)
+            throw new Error('previous_worktree does not match the record');
+        next.worktree_history = [
+            ...(next.worktree_history ?? []),
+            {
+                from: next.worktree,
+                to: event.worktree,
+                reason: event.reason,
+                at,
+            },
+        ];
+        next.worktree = event.worktree;
+    } else if (event.type === 'replacement') {
+        if (
+            !event.implementer_id?.trim() ||
+            !event.reason?.trim() ||
+            !event.handoff_path?.trim() ||
+            !event.evidence?.trim()
+        )
+            throw new Error(
+                'Replacement requires implementer_id, reason, handoff_path and evidence',
+            );
+        if (event.previous_cannot_write !== true)
+            throw new Error('Replacement requires previous_cannot_write: true');
+        next.replacement_history = [
+            ...(next.replacement_history ?? []),
+            {
+                old_id: next.implementer_id ?? null,
+                new_id: event.implementer_id,
+                reason: event.reason,
+                handoff_path: event.handoff_path,
+                at,
+            },
+        ];
+        next.implementer_id = event.implementer_id;
+        next.handoff_path = event.handoff_path;
+    } else if (event.type === 'tier') {
+        const order = ['S', 'M', 'L'];
+        if (!order.includes(event.tier) || !event.reason?.trim())
+            throw new Error('Tier requires S, M or L and a reason');
+        if (state.tier && order.indexOf(event.tier) < order.indexOf(state.tier))
+            throw new Error('A tier never drops mid-task');
+        state.tier = event.tier;
+        state.tierHistory = [
+            ...(state.tierHistory ?? []),
+            { tier: event.tier, reason: event.reason, at },
+        ];
     } else if (event.type === 'reservations') {
         if (!Array.isArray(event.paths) || !event.evidence?.trim())
             throw new Error(
@@ -393,6 +459,47 @@ export function applyEvent(owner, event) {
         ]),
     );
     return next;
+}
+
+function verifyWorktreeMove(event) {
+    const listing = execFileSync('git', ['worktree', 'list', '--porcelain'], {
+        cwd: event.worktree,
+        encoding: 'utf8',
+    });
+    const registered = listing
+        .split('\n')
+        .filter((line) => line.startsWith('worktree '))
+        .map((line) => resolve(line.slice(9)));
+    if (!registered.includes(resolve(event.worktree)))
+        throw new Error('The new worktree is not a registered Git worktree');
+    if (
+        event.previous_worktree &&
+        registered.includes(resolve(event.previous_worktree))
+    )
+        throw new Error(
+            'The previous worktree is still registered; investigate before moving',
+        );
+}
+
+// Serializes record writes only; it is not a task claim. A leftover lock is inspected by a person,
+// never removed automatically.
+function withRecordLock(ownerPath, write) {
+    let descriptor;
+    try {
+        descriptor = openSync(ownerPath + '.lock', 'wx', 0o600);
+    } catch (error) {
+        if (error.code === 'EEXIST')
+            throw new Error(
+                'Owner record is being written by another process; do not remove its lock automatically',
+            );
+        throw error;
+    }
+    try {
+        return write();
+    } finally {
+        closeSync(descriptor);
+        unlinkSync(ownerPath + '.lock');
+    }
 }
 
 export function translationAdditions(base, candidate) {
@@ -447,14 +554,21 @@ if (
             throw new Error(
                 'Usage: node state.mjs <implementation-owner.json> <event.json>',
             );
-        const state = applyEvent(
-            JSON.parse(readFileSync(ownerPath)),
-            JSON.parse(readFileSync(eventPath)),
-        );
-        writeFileSync(ownerPath + '.tmp', JSON.stringify(state, null, 2), {
-            mode: 0o600,
+        const state = withRecordLock(ownerPath, () => {
+            const event = JSON.parse(readFileSync(eventPath));
+            if (event.type === 'worktree-path') verifyWorktreeMove(event);
+            const updated = applyEvent(
+                JSON.parse(readFileSync(ownerPath)),
+                event,
+            );
+            writeFileSync(
+                ownerPath + '.tmp',
+                JSON.stringify(updated, null, 2),
+                { mode: 0o600 },
+            );
+            renameSync(ownerPath + '.tmp', ownerPath);
+            return updated;
         });
-        renameSync(ownerPath + '.tmp', ownerPath);
         console.log(
             JSON.stringify({
                 disposition: state.pipeline.disposition,

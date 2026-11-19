@@ -107,6 +107,12 @@ Scale detail to the task; use Not applicable with a reason where a concern is ab
   Include relevant configuration defaults/scopes and UI states/component paths when applicable.
 - **Dependencies:** task IDs or existing issue identifiers, with a reason per edge; related context
   stays distinct. None means no implementation prerequisite, not automatic admission to execution.
+  The registry's prerequisite column is what the selector enforces: every ID there is a start gate
+  (Done and contained in the base) unless marked `(integration)`, an edge checked after merge that
+  never blocks the start. Name each of those IDs in this field too.
+- **Reserved paths:** every repository-relative path or narrow glob the task may write, in backticks,
+  including tests, fixtures and generated files. The selector reserves exactly these; a task without
+  them is `needs-scope`.
 - **Done when:** concrete Given/When/Then observations and focused tests/checks with expected results.
   For persistence-dependent behavior, verify write/read through the real adapter; for UI behavior,
   identify the visible result and required visual evidence. Planned checks are not passing results.
@@ -130,6 +136,7 @@ from links alone. A source change requires reconciliation of affected drafts bef
 - Task quality and batch slicing meet the rules above; rework failures before presenting.
 - Each executable task maps to the canonical registry and has a bounded outcome and verifiable Done
   when. Planned paths and partial requirement coverage are explicit.
+- The profile's plan validation command passes, or each remaining finding is reported with its reason.
 - Every scoped requirement/scenario has an owner, or is explicitly deferred with the reason. A shared
   criterion is not claimed complete by each partial slice. Out-of-scope text does not contradict it.
 - Blockers resolve to batch tasks or existing issues. There are no missing endpoints, self-links or

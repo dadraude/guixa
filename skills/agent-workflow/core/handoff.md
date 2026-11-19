@@ -17,14 +17,15 @@ Include exact source paths, section headings and relevant excerpts for supplied 
 requirements so missing or contradictory evidence can be checked without loading unrelated documents. Host permissions still
 apply; missing required inputs stop the affected action rather than inviting guesses.
 
-| Role                    | Load / receive                                                                                                                                                                                                                      |
-| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Discovery               | Selected task rows, tracker identity/status/mapping settings, authorized read scope; relevant source only to establish prerequisites and edit surfaces.                                                                             |
-| Implementer             | [Implementer brief](implementer.md), linked acceptance/requirements/scenarios/design and applicable standards; resolved environment, isolation/setup/focused commands, commit convention; scheduling evidence and allowed surfaces. |
-| Reviewer                | [Reviewer brief](reviewer.md), the same requirements/standards and allowed surfaces, fixed diff, predecessor/ownership evidence, deviation entries and focused results; no setup, tracker or publication instructions.              |
-| Local check runner      | Exact focused commands, environment/isolation constraints, expected HEAD/base and result format; no implementation or review process.                                                                                               |
-| Preparation             | Task pipeline's preparation section, root/worktree/base, allowed surfaces, generator commands, prior evidence and conflict rules.                                                                                                   |
-| Publisher / CI observer | Task pipeline's publication/CI sections, exact candidate and PR identity, verified authorization, expected CI checks and status/report contract; no implementation history or credentials in prompts.                               |
+| Role                    | Load / receive                                                                                                                                                                                                                                                                                      |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Discovery               | Selected task rows, tracker identity/status/mapping settings, authorized read scope; relevant source only to establish prerequisites and edit surfaces.                                                                                                                                             |
+| Implementer             | [Implementer brief](implementer.md), the tier's [context pack](effort.md#context-packs), linked acceptance/requirements/scenarios/design and applicable standards; resolved environment, isolation/setup/focused commands, commit convention; scheduling evidence and allowed surfaces.             |
+| Reviewer                | [Reviewer brief](reviewer.md), role A or conditional B with the tier's reviewer pack, prior findings files, the same requirements/standards and allowed surfaces, fixed diff, predecessor/ownership evidence, deviation entries and focused results; no setup, tracker or publication instructions. |
+| Local check runner      | Exact focused commands, environment/isolation constraints, expected HEAD/base and result format; no implementation or review process.                                                                                                                                                               |
+| Preparation             | Task pipeline's preparation section, root/worktree/base, allowed surfaces, generator commands, prior evidence and conflict rules.                                                                                                                                                                   |
+| Publisher / CI observer | Task pipeline's publication/CI sections, exact candidate and PR identity, verified authorization, expected CI checks and status/report contract; no implementation history or credentials in prompts.                                                                                               |
+| Retrospective           | [Retrospective brief](retrospective.md), task/PR identities, fixed HEAD/base and bounded artifact paths; read-only, returns a digest. Only for a stopped or CI-failed task.                                                                                                                         |
 
 For code-writing roles, include the profile's Project conventions and only relevant project standards.
 Pass exact new history-entry paths and the project's combined-history reading command; legacy archives
@@ -46,6 +47,16 @@ and any visual check runner. Pass the declared matrix/inventory, manifest, curre
 selected case count/rationale plus focused acceptance results. Fix handoffs carry the accumulated
 finding ledger and pattern sweep, not just the most recent defect. Keep the actual total review count
 through publication and CI corrections.
+
+## Task handoff file
+
+The coordinator writes the profile's task handoff with these sections, in order: `## Read` (the tier's
+context pack as exact paths and heading anchors), `## Conventions`, `## Commands` (resolved setup,
+isolation and focused checks), `## Allowed edit surfaces`, `## First contract case` (the
+[minimum contract case](implementer.md#minimum-contract-case), or `not required` when the first
+done-when row's test is the checkpoint) and `## Evidence` (contract consumers, check plan, findings
+files). A worker reads its `## Read` list and opens anything else only for a named gap. Update the file
+on every continuation rather than restating it in messages.
 
 ## Implementation ownership
 

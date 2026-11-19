@@ -24,6 +24,10 @@ Pre-authorized:
 - Create the spec-sync worktree and branch, edit `spec.md`/area files there with their Change entries,
   open its stacked PR against the task branch, and retarget it to `main` once the task PR merges.
   Merging it is the user's acceptance of the spec change.
+- Stack a task on an open predecessor PR under [stacking](../skills/agent-workflow/core/stacking.md):
+  branch from the predecessor's verified HEAD, open the PR against the predecessor branch, and retarget
+  it to `main` once the predecessor merges.
+- In an unattended session, comment once on a parked issue with the question and the default answer.
 
 Ask first:
 
@@ -78,7 +82,13 @@ Codex pins each tier in `.codex/agents/agent-workflow-<tier>.toml` (efforts: low
 | -------- | ---------------------------------------------------- | ----------- | ------------- |
 | Light    | Discovery, Local check runner, Publisher/CI observer | `haiku`     | `gpt-6-luna`  |
 | Standard | Implementer, Preparation                             | `sonnet`    | `gpt-6-sol`   |
-| Strong   | Reviewer                                             | `opus`      | `gpt-6-astra` |
+| Strong   | Reviewer, Retrospective                              | `opus`      | `gpt-6-astra` |
+
+Reviewer B, when required, is the Reviewer role on the alternate review model so it differs from A:
+`sonnet` in Claude Code, `gpt-6-sol` in Codex (an explicit `model` override on the Strong agent).
+Claude Code dispatches each tier as the project agent `.claude/agents/agent-workflow-<tier>.md`; the
+Strong agent cannot Edit or Write. Unattended Claude Code runs merge
+[claude-code-permissions.json](claude-code-permissions.json) into `.claude/settings.local.json`.
 
 The spec-side skills (`spec-flow`, `spec-gaps`) and ticket drafting reuse these roles, so no step runs
 on a model above its tier. The session model only coordinates: routing, every question to the user,
@@ -127,6 +137,22 @@ shared `guixa_test` are not task databases. If isolated database configuration c
 | Focused test              | `php artisan test --filter=<test>` (run serially initially)                                                                                                                                                              |
 | Focused checks            | Tests for affected behavior and every changed test file; select frontend files/tests using the installed runner's supported selectors; format all changed supported code/docs; type checks when needed                   |
 | Full validation (CI only) | `.github/workflows/tests.yml`: selected `frontend`, `backend` and `tooling` jobs plus the always-on `docs` lint/format check; `ci` aggregates their results; resolve commands from the workflow and dependency manifests |
+
+Task selection and plan validation run from the main checkout, read-only:
+
+```sh
+node .agent-workflow/scripts/next-task.mjs --feature NNN-slug --tracker TRACKER_JSON --save-evidence EVIDENCE_JSON
+node .agent-workflow/scripts/next-task.mjs --feature NNN-slug --evidence EVIDENCE_JSON   # replay
+node .agent-workflow/scripts/validate-plan.mjs NNN-slug
+node .agent-workflow/scripts/preflight.mjs --out ENVIRONMENT_JSON   # pass to next-task with --environment
+node skills/agent-workflow/scripts/predecessor-readiness.mjs --evidence PREDECESSOR_JSON
+```
+
+`TRACKER_JSON` is written by the coordinator from the connected Linear tools, one entry per leaf of the
+feature's grouping parents (format at the top of `next-task.mjs`; `task` is the `Tnn` title prefix,
+`blockers` the native blocked-by identifiers). The selector adds the base, merged and open PRs, task
+worktrees and owner records itself. Limits: 3 pipelines, at most 2 L-tier tasks. Add `--json` for full
+reasons; `--working-tree` previews an uncommitted plan and never authorizes dispatch.
 
 For visual tasks, use the [shared visual workflow](../skills/agent-workflow/references/visual.md).
 Start the task-owned fixture server separately in the isolated worktree after the guarded task
@@ -229,6 +255,11 @@ reported, not retried destructively.
   `resources/js/components/ui/`, and shared layouts/tokens. Record exact component paths before
   implementation; extend existing variants before adding components. Repeated patterns need a shared
   component, and a new component needs the concrete gap and inspected alternatives in its task handoff.
+- Demo data: when a task adds or alters data a user sees, update `database/seeders/DemoSeeder.php`
+  and extend `tests/Feature/Database/DemoSeederTest.php`; otherwise the report's `demo_data` says why
+  no change was needed.
+- Tier L signals: a policy or gate change, a migration that alters existing rows, a change to
+  `resources/js/generated/` consumed by two or more pages, or a task detail whose **Size.** says large.
 - Shared hotspots: route/provider registration, repository interfaces/implementations, test contracts
   and fixtures, dependency manifests/locks, `resources/js/generated/`, feature plan/tasks and legacy logs. Distinct new `history/` entry files do not share a write surface;
   reserve their exact new paths, while retaining reservations on any shared spec/plan/task edits.

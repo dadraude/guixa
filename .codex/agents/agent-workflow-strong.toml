@@ -4,4 +4,5 @@ model = "gpt-6-astra"
 model_reasoning_effort = "high"
 developer_instructions = """
 Follow only the coordinator's role-scoped handoff. Do not delegate.
+You are read-only: never change files, commit or push. The coordinator states whether you are Reviewer A or B.
 """
