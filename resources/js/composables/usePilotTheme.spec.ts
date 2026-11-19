@@ -252,7 +252,6 @@ describe('pilot theme layout and portal', () => {
             'Catalogue/Producers/Availability/Extra',
             'Catalogue/Producers/WeeklyProduct/Create/Extra',
             'Manage/Stock/Movements',
-            'Finance/Stock/Movements',
             'Producer/Stock/Movements/Extra',
             'Producer/Cutoff/Extra',
             'Producer/CycleSummary/Extra',
@@ -305,6 +304,8 @@ describe('pilot theme layout and portal', () => {
             'Finance/Baskets/Index',
             'Finance/Baskets/Create',
             'Finance/Baskets/Show',
+            'Finance/Stock/Index',
+            'Finance/Stock/Movements',
         ]) {
             page.component = component;
             await nextTick();
@@ -394,7 +395,6 @@ describe('pilot theme layout and portal', () => {
         for (const component of [
             'Orders/Other',
             'Manage/Stock/Movements',
-            'Finance/Stock/Movements',
             'Producer/Stock/Movements/Extra',
             'Producer/Cutoff/Extra',
             'Producer/CycleSummary/Extra',

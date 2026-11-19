@@ -2494,3 +2494,29 @@ html.dark:has(.reference-style)
     white-space: normal;
     overflow-wrap: anywhere;
 }
+
+/* 005 T21 */
+/*
+ * Finance stock rows at enlarged text (R6). Same defect and fix as the producer stock rows (T10): the row switches to two
+ * columns at the viewport's `sm` width, which ignores the sidebar and 200% text, so at 1024px and 200% the name column
+ * collapsed to zero width and its unit and price spilled out of the box. The actions wrap under the name once they no
+ * longer fit; the markup, the 44px link height and the tabular quantity are unchanged.
+ */
+.landing [data-test='finance-stock-product'] {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.landing [data-test='finance-stock-product'] > :first-child {
+    flex: 1 1 12rem;
+}
+
+/*
+ * The unit and price line under each product name (`ampolla · 9,00 €`) is plain text with proportional figures. Prices
+ * take tabular figures under `.landing` as the basket unit-price lines do (T19); the quantity already has them.
+ */
+.landing [data-test='finance-stock-product'] > :first-child > p {
+    font-variant-numeric: tabular-nums;
+}

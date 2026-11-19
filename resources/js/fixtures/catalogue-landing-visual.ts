@@ -444,10 +444,6 @@ const pageProps: Record<string, Record<string, unknown>> = {
         product: movementProduct,
         history: movementHistory,
     },
-    'Finance/Stock/Movements': {
-        product: movementProduct,
-        history: movementHistory,
-    },
     // --- end T08
     // Unmigrated consumer of the shared dialog, for the leakage probe.
     'Manage/Cycles/Index': {
@@ -494,7 +490,6 @@ const urls: Record<string, string> = {
     // --- end T06
     // --- T08 (DRA-276)
     'Catalogue/Stock/Movements': '/catalogue/stock/stock-1/movements',
-    'Finance/Stock/Movements': '/finance/stock/stock-1/movements',
     // --- end T08
     // --- T07 (DRA-275)
     'Manage/ReturnItems/Index': '/catalogue/return-items',

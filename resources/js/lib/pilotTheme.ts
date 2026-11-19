@@ -78,6 +78,8 @@ const landingPages = new Set([
     'Finance/Baskets/Index',
     'Finance/Baskets/Create',
     'Finance/Baskets/Show',
+    'Finance/Stock/Index',
+    'Finance/Stock/Movements',
 ]);
 
 export function pilotVariantFor(pageName: string): PilotVariant | null {

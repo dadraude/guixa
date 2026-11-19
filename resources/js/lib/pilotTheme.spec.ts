@@ -194,7 +194,7 @@ describe('landing variant admission', () => {
         ['Manage/', null],
         ['Manage/Accounts/Index', null],
         ['Stock/Index', null],
-        ['Finance/Stock/Index', null],
+        ['Finance/Stock/Index', 'landing'],
         ['Orders/Index', 'landing'],
         ['Orders/Edit', 'landing'],
         ['Orders/Other', null],
@@ -243,7 +243,7 @@ describe('landing variant admission', () => {
         ['Finance/Baskets/Index/Extra', null],
         ['Finance/Baskets/Show/Extra', null],
         ['Finance/Baskets/Create', 'landing'],
-        ['Finance/Stock/Movements', null],
+        ['Finance/Stock/Movements', 'landing'],
         ['Welcome', null],
     ])('%s -> %s', (page, expected) => {
         expect(pilotVariantFor(page)).toBe(expected);
@@ -263,7 +263,6 @@ describe('landing variant admission', () => {
             'Catalogue/Producers/Availability/Extra',
             'Catalogue/Producers/WeeklyProduct/Create/Extra',
             'Manage/Stock/Movements',
-            'Finance/Stock/Movements',
             'Producer/Stock/Movements/Extra',
             'Catalogue/Stock/Movements/Extra',
             'Receptions/Show/Extra',
@@ -315,6 +314,8 @@ describe('landing variant admission', () => {
             'Finance/Baskets/Index',
             'Finance/Baskets/Create',
             'Finance/Baskets/Show',
+            'Finance/Stock/Index',
+            'Finance/Stock/Movements',
         ]) {
             page.component = component;
             await nextTick();

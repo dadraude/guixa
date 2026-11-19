@@ -1,0 +1,860 @@
+{
+    "baseUrl": "http://127.0.0.1:5376",
+    "rootFontPx": 16,
+    "darkSelector": "html.dark",
+    "matrix": {
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark"],
+        "text": [100, 200]
+    },
+    "views": [
+        {
+            "id": "movements-populated",
+            "path": "/resources/js/fixtures/rest-c1-landing.html",
+            "query": {
+                "page": "Finance/Stock/Movements",
+                "role": "finance",
+                "state": "default"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content td",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["#main-content [data-test=\"movement-basket-link\"]"],
+            "states": [
+                {
+                    "id": "default",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5,
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "#main-content header p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h2#movement-history",
+                                "count": 1,
+                                "text": "Historial de moviments",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form, #main-content input, #main-content select, #main-content textarea, #main-content button",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content a[href*=\"entry\"], #main-content a[href*=\"adjust\"], #main-content a[href*=\"count\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-line\"]",
+                                "count": 2
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-line\"] td",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-line\"] td.pilot-amount",
+                                "count": 4,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-line\"] [data-slot=\"badge\"]",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content header p",
+                                "text": "12,000 pot disponibles"
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "text": "Mel de farigola"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-basket-link\"]",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "minHeight": 44,
+                                "minWidth": 44
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "movements-empty",
+            "path": "/resources/js/fixtures/rest-c1-landing.html",
+            "query": {
+                "page": "Finance/Stock/Movements",
+                "role": "manager",
+                "state": "empty"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content td",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "The empty history has no interactive control: it is read-only text and the page offers no entry, adjustment or count action (001 R28a).",
+            "states": [
+                {
+                    "id": "empty",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5,
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "#main-content header p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h2#movement-history",
+                                "count": 1,
+                                "text": "Historial de moviments",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content a[href*=\"entry\"], #main-content a[href*=\"adjust\"], #main-content a[href*=\"count\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-history-empty\"]",
+                                "count": 1,
+                                "text": "Encara no hi ha moviments.",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-line\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content table",
+                                "count": 0
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "movements-long",
+            "path": "/resources/js/fixtures/rest-c1-landing.html",
+            "query": {
+                "page": "Finance/Stock/Movements",
+                "role": "manager",
+                "state": "long-content"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content td",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["#main-content [data-test=\"movement-basket-link\"]"],
+            "states": [
+                {
+                    "id": "long-content",
+                    "query": {
+                        "state": "long-content"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5,
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "#main-content header p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h2#movement-history",
+                                "count": 1,
+                                "text": "Historial de moviments",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content a[href*=\"entry\"], #main-content a[href*=\"adjust\"], #main-content a[href*=\"count\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-line\"]",
+                                "count": 2
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-line\"] td",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-line\"] td.pilot-amount",
+                                "count": 4,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-line\"] [data-slot=\"badge\"]",
+                                "count": 2,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-basket-link\"]",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "minHeight": 44,
+                                "minWidth": 44
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "movements-paged",
+            "path": "/resources/js/fixtures/rest-c1-landing.html",
+            "query": {
+                "page": "Finance/Stock/Movements",
+                "role": "manager",
+                "state": "paged"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content td",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [
+                "#main-content a[rel=\"prev\"]",
+                "#main-content a[rel=\"next\"]"
+            ],
+            "states": [
+                {
+                    "id": "paged",
+                    "query": {
+                        "state": "paged"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5,
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                }
+                            },
+                            {
+                                "selector": "#main-content header p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h2#movement-history",
+                                "count": 1,
+                                "text": "Historial de moviments",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content a[href*=\"entry\"], #main-content a[href*=\"adjust\"], #main-content a[href*=\"count\"]",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-line\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-line\"] td",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-line\"] td.pilot-amount",
+                                "count": 2,
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-line\"] [data-slot=\"badge\"]",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-paging\"] a",
+                                "count": 2,
+                                "contrast": 4.5,
+                                "minHeight": 44,
+                                "minWidth": 44
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"movement-paging\"] > span.text-sm",
+                                "count": 1,
+                                "contrast": 4.5
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "stock-list",
+            "path": "/resources/js/fixtures/rest-c1-landing.html",
+            "query": {
+                "page": "Finance/Stock/Index",
+                "role": "finance",
+                "state": "default"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content span",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["#main-content [data-test=\"finance-stock-product\"] a"],
+            "states": [
+                {
+                    "id": "default",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "dark",
+                            "text": 200
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5,
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                },
+                                "text": "Estoc"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"finance-stock-product\"]",
+                                "count": 2
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"finance-stock-product\"] .tabular-nums",
+                                "count": 2,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                },
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"finance-stock-inactive\"]",
+                                "count": 1,
+                                "text": "Inactiu"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"finance-stock-product\"] a",
+                                "count": 2,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"finance-stock-product\"] h2",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"finance-stock-product\"] > div:last-child",
+                                "count": 2,
+                                "gapRem": 0.75
+                            },
+                            {
+                                "selector": "#main-content header p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"finance-stock-product\"] > div:first-child p",
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"finance-stock-inactive\"]",
+                                "contrast": 4.5
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "stock-empty",
+            "path": "/resources/js/fixtures/rest-c1-landing.html",
+            "query": {
+                "page": "Finance/Stock/Index",
+                "role": "manager",
+                "state": "empty"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content span",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "states": [
+                {
+                    "id": "empty",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5,
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                },
+                                "text": "Estoc"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"finance-stock-empty\"]",
+                                "count": 1,
+                                "text": "Encara no hi ha productes d’estoc.",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"finance-stock-product\"]",
+                                "count": 0
+                            }
+                        ]
+                    }
+                }
+            ],
+            "noFocusReason": "The empty list has no interactive control."
+        },
+        {
+            "id": "stock-long",
+            "path": "/resources/js/fixtures/rest-c1-landing.html",
+            "query": {
+                "page": "Finance/Stock/Index",
+                "role": "manager",
+                "state": "long-content"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content a,#main-content span",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["#main-content [data-test=\"finance-stock-product\"] a"],
+            "states": [
+                {
+                    "id": "long-content",
+                    "query": {
+                        "state": "long-content"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".reference-style.pilot-theme",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5,
+                                "fontSizeRem": 1.5,
+                                "styles": {
+                                    "font-family": "\"Nunito Variable\", ui-sans-serif, system-ui, sans-serif"
+                                },
+                                "text": "Estoc"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"finance-stock-product\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"finance-stock-product\"] .tabular-nums",
+                                "count": 1,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                },
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"finance-stock-product\"] a",
+                                "count": 1,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content header p",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"finance-stock-product\"] > div:first-child p",
+                                "contrast": 4.5,
+                                "styles": {
+                                    "font-variant-numeric": "tabular-nums"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    ]
+}
