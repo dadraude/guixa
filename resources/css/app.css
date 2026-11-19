@@ -2454,3 +2454,27 @@ html.dark:has(.reference-style)
     white-space: normal;
     text-align: center;
 }
+
+/* 005 T19 */
+/*
+ * Finance basket detail (Finance/Baskets/Show). A probe showed the list amounts already end-aligned with tabular
+ * figures through .pilot-amount, but the balance and total summaries are plain `dd` cells and the unit-price lines
+ * are plain text with proportional figures. Summary values stay start-aligned under their labels and only gain
+ * tabular figures; the unit-price lines are limited to the stock, weekly and return line rows, so the date lines
+ * of the basket list (Finance/Baskets/Index) keep their computed style.
+ */
+.landing [data-test='basket-balance'] dd,
+.landing dd[data-test$='-basket-total'] {
+    font-variant-numeric: tabular-nums;
+}
+
+.landing
+    :is(
+        [data-test^='stock-line-'],
+        [data-test^='weekly-line-'],
+        [data-test^='return-line-']
+    )
+    .pilot-list-row-body
+    > span.text-muted-foreground {
+    font-variant-numeric: tabular-nums;
+}

@@ -16,6 +16,8 @@ export const checkedFiles = [
     'pages/Producer/Products/Edit.vue',
     'components/StockProductFields.vue',
     'components/WeeklyProductFields.vue',
+    'pages/Finance/Baskets/Index.vue',
+    'pages/Finance/Baskets/Show.vue',
     'pages/Receptions/Index.vue',
     'pages/Receptions/Show.vue',
     'pages/Orders/Index.vue',

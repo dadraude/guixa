@@ -4,6 +4,7 @@ import { createInertiaApp, http } from '@inertiajs/vue3';
 import type { DefineComponent } from 'vue';
 import { toast } from 'vue-sonner';
 import AppLayout from '@/layouts/AppLayout.vue';
+import { financeBasketRow } from '@/fixtures/financeBasketRow';
 import { initializeTheme } from '@/composables/useAppearance';
 import { installTranslations } from '@/lib/i18n';
 
@@ -162,11 +163,176 @@ const listCycles = () => {
         },
     ];
 };
+// Finance basket states (T19), lazy per page. Index: `default` mixes every status, plus pending, empty,
+// long name and large amount. Show: `default` pending collection, `draft` (unsent), `collected`
+// with an adjustment and a return line, long name and large amount. Amounts are asserted against these cents.
+const basketSummary = (
+    id: string,
+    householdName: string,
+    basketState: string,
+    totalCents: number,
+    over: Record<string, unknown> = {},
+) => ({
+    id,
+    householdName,
+    state: basketState,
+    status: basketState,
+    totalCents,
+    createdAt: '2026-11-10 10:00',
+    validatedAt: basketState === 'draft' ? null : '2026-11-12 08:15',
+    pendingCollection: basketState === 'validated',
+    ...over,
+});
+const basketLists: Record<string, ReturnType<typeof basketSummary>[]> = {
+    default: [
+        basketSummary('basket-1', 'Família Soler', 'draft', 1250),
+        basketSummary('basket-2', 'Família Puig', 'validated', 2300),
+        basketSummary('basket-3', 'Família Vidal', 'collected', 4590),
+        basketSummary('basket-4', 'Família Roca', 'validated', 0, {
+            status: 'reversed',
+            pendingCollection: false,
+        }),
+        basketSummary('basket-5', 'Família Serra', 'cancelled', 800),
+    ],
+    'long-content': [basketSummary('basket-1', longName, 'validated', 2300)],
+    'large-amount': [
+        basketSummary('basket-1', 'Família Soler', 'validated', 123456789),
+    ],
+};
+basketLists.pending = basketLists.default.filter(
+    (basket) => basket.pendingCollection,
+);
+const basketIndexProps = () => {
+    if (state === 'empty') return { baskets: [], pending: false };
+    if (!basketLists[state])
+        throw new Error(`Unknown basket list state: ${state}`);
+    return { baskets: basketLists[state], pending: state === 'pending' };
+};
+const basketStockLine = (id: string, name: string, cents: number) => ({
+    stockProductId: id,
+    name,
+    unit: 'ampolla',
+    quantity: '2.000',
+    unitPriceCents: cents / 2,
+    amountCents: cents,
+});
+const basketShowProps = () => {
+    const known = [
+        'default',
+        'draft',
+        'collected',
+        'weekly',
+        'long-content',
+        'large-amount',
+    ];
+    if (!known.includes(state))
+        throw new Error(`Unknown basket state: ${state}`);
+    const cents = state === 'large-amount' ? 123456789 : 2300;
+    const settled = state === 'default' || state === 'collected';
+    const rowState =
+        state === 'draft'
+            ? 'draft'
+            : state === 'collected'
+              ? 'collected'
+              : 'validated';
+    return {
+        basket: financeBasketRow({
+            id: 'basket-1',
+            householdId: 'household-1',
+            householdName:
+                state === 'long-content' ? longName : 'Família Soler',
+            state: rowState,
+            kind: state === 'weekly' ? 'weekly' : 'stock',
+            weeklyLines:
+                state === 'weekly'
+                    ? [
+                          {
+                              productId: 'tomato',
+                              name: 'Tomàquet de pera',
+                              unit: 'kg',
+                              ordered: '2.000',
+                              allocated: '2.000',
+                              quantity: '1.500',
+                              unitPriceCents: 400,
+                              amountCents: 600,
+                              effectiveQuantity: '1.500',
+                              effectiveAmountCents: 600,
+                              differsFromAllocation: true,
+                          },
+                      ]
+                    : [],
+            returnLines:
+                state === 'collected'
+                    ? [
+                          {
+                              returnItemId: 'jar',
+                              name: 'Pot de vidre',
+                              amountCents: 150,
+                              quantity: 2,
+                              creditCents: 300,
+                          },
+                      ]
+                    : [],
+            stockLines: [
+                basketStockLine(
+                    'stock-1',
+                    state === 'long-content' ? longName : 'Oli',
+                    cents,
+                ),
+            ],
+            totalCents: cents,
+            effectiveTotalCents: state === 'collected' ? cents - 300 : cents,
+            adjustments:
+                state === 'collected'
+                    ? [
+                          {
+                              id: 'adjustment-1',
+                              amountCents: -300,
+                              reason: 'Ampolla trencada',
+                              authorName: 'Maria Soler',
+                              occurredAt: '2026-11-13T09:00:00+00:00',
+                              lines: [],
+                          },
+                      ]
+                    : [],
+            balanceCents: -cents,
+            projectedBalanceCents: null,
+            validatedAt: settled ? '2026-11-12T08:15:00+00:00' : null,
+            collectedAt:
+                state === 'collected' ? '2026-11-13T09:00:00+00:00' : null,
+        }),
+        containerBalance: 3,
+        stockProducts: [],
+        returnItems: [],
+    };
+};
 const pageProps: Record<string, Record<string, unknown>> = {
     // Lazy: other pages use their own states (`busy`, `received`...), which are not list states.
     'Receptions/Index': {
         get cycles() {
             return listCycles();
+        },
+    },
+    'Finance/Baskets/Index': {
+        get baskets() {
+            return basketIndexProps().baskets;
+        },
+        get pending() {
+            return basketIndexProps().pending;
+        },
+    },
+    'Finance/Baskets/Show': {
+        get basket() {
+            return basketShowProps().basket;
+        },
+        get containerBalance() {
+            return basketShowProps().containerBalance;
+        },
+        get stockProducts() {
+            return basketShowProps().stockProducts;
+        },
+        get returnItems() {
+            return basketShowProps().returnItems;
         },
     },
     'Receptions/Show': {
@@ -212,6 +378,8 @@ const pageProps: Record<string, Record<string, unknown>> = {
 };
 const urls: Record<string, string> = {
     'Receptions/Index': '/receptions',
+    'Finance/Baskets/Index': '/finance/baskets',
+    'Finance/Baskets/Show': '/finance/baskets/basket-1',
     'Receptions/Show': '/receptions/cycle-1/producer-1',
     'Manage/Accounts/Index': '/manage/accounts',
 };
