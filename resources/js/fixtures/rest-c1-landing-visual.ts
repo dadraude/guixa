@@ -117,6 +117,19 @@ const households = [
     { id: 'household-2', name: 'Família Puig' },
     { id: 'household-3', name: 'Família Vidal' },
 ];
+// Finance basket form (T20): `empty` has no active household, `long-content` a long household name. The
+// `invalid`, `error` and `busy` states submit the form after choosing a household.
+const basketHouseholds = () => {
+    if (state === 'empty') return [];
+    if (state === 'long-content')
+        // Second place: the keyboard path (ArrowDown) chooses it, so the closed trigger shows the long name.
+        return [
+            households[0],
+            { id: 'household-2', name: longName },
+            households[2],
+        ];
+    return households;
+};
 const accounts = [
     {
         accountId: 'account-2',
@@ -335,6 +348,11 @@ const pageProps: Record<string, Record<string, unknown>> = {
             return basketShowProps().returnItems;
         },
     },
+    'Finance/Baskets/Create': {
+        get households() {
+            return basketHouseholds();
+        },
+    },
     'Receptions/Show': {
         reception: {
             cycleId: 'cycle-1',
@@ -380,6 +398,7 @@ const urls: Record<string, string> = {
     'Receptions/Index': '/receptions',
     'Finance/Baskets/Index': '/finance/baskets',
     'Finance/Baskets/Show': '/finance/baskets/basket-1',
+    'Finance/Baskets/Create': '/finance/baskets/create',
     'Receptions/Show': '/receptions/cycle-1/producer-1',
     'Manage/Accounts/Index': '/manage/accounts',
 };
@@ -430,7 +449,18 @@ http.setClient({
                 ...page,
                 props: {
                     ...page.props,
-                    errors: { domain: 'No s’ha pogut desar la recepció.' },
+                    errors:
+                        state === 'invalid'
+                            ? {
+                                  household_id:
+                                      'El camp unitat de convivència és obligatori.',
+                              }
+                            : {
+                                  domain:
+                                      pageName === 'Finance/Baskets/Create'
+                                          ? 'Tria una llar activa.'
+                                          : 'No s’ha pogut desar la recepció.',
+                              },
                 },
             });
         }
@@ -542,6 +572,14 @@ const recordPopup = (popup: HTMLElement) => {
     set('popup-border', surface.borderTopColor);
     set('popup-shadow', surface.boxShadow);
     set('popup-radius', surface.borderTopLeftRadius);
+    // The popup is portalled outside the measured root, so the runner never bounds it: record it here.
+    const box = popup.getBoundingClientRect();
+    set('popup-left', String(Math.round(box.left)));
+    set('popup-right', String(Math.round(box.right)));
+    set(
+        'popup-inside-viewport',
+        String(box.left >= 0 && box.right <= window.innerWidth),
+    );
     set(
         'popup-text-contrast',
         contrast(surface.color, surface.backgroundColor).toFixed(2),
@@ -756,10 +794,19 @@ const runAccountMenu = async () => {
     set('menu-landing', String(menu.classList.contains('landing')));
 };
 const runBusyOrError = async () => {
-    const save = await byTest('save-received-tomato');
+    const basketForm = pageName === 'Finance/Baskets/Create';
+    // A required select blocks the submit until a household is chosen: use the real keyboard path first.
+    if (basketForm) await runSelectKeyboard('Enter');
+    const save = await byTest(
+        basketForm ? 'create-basket' : 'save-received-tomato',
+    );
     save.click();
     await waitFor(() => (requests.length ? document.body : null));
-    if (state === 'error')
+    if (basketForm && state !== 'busy')
+        await waitFor(() =>
+            document.querySelector('#main-content .text-destructive'),
+        );
+    else if (state === 'error')
         await waitFor(() =>
             document.querySelector('[data-test="domain-error"]:not(:empty)'),
         );
@@ -786,6 +833,10 @@ void createInertiaApp({
             );
         }
         if (state === 'select-keyboard') await runSelectKeyboard('Enter');
+        if (state === 'long-content' && pageName === 'Finance/Baskets/Create') {
+            await runSelectKeyboard('Enter');
+            recordPopup((await openSelect()).popup);
+        }
         if (state === 'select-space') await runSelectKeyboard(' ');
         if (state === 'select-pointer') await runSelectKeyboard('pointer');
         if (state === 'select-touch') await runSelectKeyboard('touch');
@@ -793,7 +844,8 @@ void createInertiaApp({
         if (state === 'toast') await runToast();
         if (state === 'account-menu') await runAccountMenu();
         if (state === 'nav-sheet') await runNavSheet();
-        if (state === 'busy' || state === 'error') await runBusyOrError();
+        if (['busy', 'error', 'invalid'].includes(state))
+            await runBusyOrError();
     } catch (error) {
         set('error', String(error));
     }

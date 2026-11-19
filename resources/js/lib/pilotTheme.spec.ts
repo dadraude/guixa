@@ -242,7 +242,7 @@ describe('landing variant admission', () => {
         ['Finance/Baskets/Show', 'landing'],
         ['Finance/Baskets/Index/Extra', null],
         ['Finance/Baskets/Show/Extra', null],
-        ['Finance/Baskets/Create', null],
+        ['Finance/Baskets/Create', 'landing'],
         ['Finance/Stock/Movements', null],
         ['Welcome', null],
     ])('%s -> %s', (page, expected) => {
@@ -270,7 +270,6 @@ describe('landing variant admission', () => {
             'Receptions/Index/Extra',
             'Finance/Baskets/Index/Extra',
             'Finance/Baskets/Show/Extra',
-            'Finance/Baskets/Create',
             'Producer/Cutoff/Extra',
             'Producer/CycleSummary/Extra',
             'Producer/Products/Index/Extra',
@@ -314,6 +313,7 @@ describe('landing variant admission', () => {
             'Receptions/Index',
             'Receptions/Show',
             'Finance/Baskets/Index',
+            'Finance/Baskets/Create',
             'Finance/Baskets/Show',
         ]) {
             page.component = component;

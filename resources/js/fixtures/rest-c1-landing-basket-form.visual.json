@@ -1,0 +1,1020 @@
+{
+    "baseUrl": "http://127.0.0.1:5293",
+    "rootFontPx": 16,
+    "darkSelector": "html.dark",
+    "matrix": {
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark", "system-light", "system-dark"],
+        "text": [100, 200]
+    },
+    "views": [
+        {
+            "id": "basket-form",
+            "path": "/resources/js/fixtures/rest-c1-landing.html",
+            "query": {
+                "page": "Finance/Baskets/Create",
+                "role": "finance"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content label,#main-content p,#main-content a,#main-content button,#main-content [data-slot=\"select-trigger\"]",
+            "fonts": ["16px Nunito Variable"],
+            "focus": ["#main-content .pilot-page a"],
+            "states": [
+                {
+                    "id": "default",
+                    "query": {
+                        "state": "default"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "text": "Crea una cistella"
+                            },
+                            {
+                                "selector": "#main-content .pilot-page button:not([disabled]),#main-content .pilot-page a",
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content label",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content form [data-slot=\"select-trigger\"]",
+                                "count": 1,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form label[for=\"basket-household\"]",
+                                "text": "Unitat de convivència"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"create-basket\"]",
+                                "count": 1,
+                                "minHeight": 44,
+                                "minWidth": 44
+                            },
+                            {
+                                "selector": "#main-content button[type=\"submit\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            }
+                        ],
+                        "focus": [
+                            "#main-content .pilot-page a",
+                            "#main-content [data-slot=\"select-trigger\"]",
+                            "#main-content [data-test=\"create-basket\"]"
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1024,
+                            "mode": "light",
+                            "text": 200
+                        }
+                    ]
+                },
+                {
+                    "id": "empty",
+                    "query": {
+                        "state": "empty"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "text": "Crea una cistella"
+                            },
+                            {
+                                "selector": "#main-content .pilot-page button:not([disabled]),#main-content .pilot-page a",
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"no-households\"]",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null
+                                }
+                            }
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "long-content",
+                    "query": {
+                        "state": "long-content"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [
+                        ".reference-style",
+                        "[data-slot=select-content][data-state=open]"
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "text": "Crea una cistella"
+                            },
+                            {
+                                "selector": "#main-content .pilot-page button:not([disabled]),#main-content .pilot-page a",
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content label",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content form [data-slot=\"select-trigger\"]",
+                                "count": 1,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form label[for=\"basket-household\"]",
+                                "text": "Unitat de convivència"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"create-basket\"]",
+                                "count": 1,
+                                "minHeight": 44,
+                                "minWidth": 44
+                            },
+                            {
+                                "selector": "#main-content button[type=\"submit\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content [data-slot=\"select-trigger\"]",
+                                "text": "Cooperativa agrícola de la Vall de les Hortes i del Ganxet tradicional de la plana"
+                            },
+                            {
+                                "selector": "[data-slot=\"select-content\"][data-state=\"open\"]",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-slot=\"select-content\"][data-state=\"open\"] [data-slot=\"select-item\"]",
+                                "count": 3,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-popup-inside-viewport": "true",
+                                    "data-ev-item-count": "3",
+                                    "data-ev-chosen": "Cooperativa agrícola de la Vall de les Hortes i del Ganxet tradicional de la plana"
+                                }
+                            }
+                        ],
+                        "focus": [],
+                        "noFocusReason": "The open popup or dispatched events drive this state; the default state checks the focus order."
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "select-light",
+                    "query": {
+                        "state": "select"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [
+                        ".reference-style",
+                        "[data-slot=select-content][data-state=open]"
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "text": "Crea una cistella"
+                            },
+                            {
+                                "selector": "#main-content .pilot-page button:not([disabled]),#main-content .pilot-page a",
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content label",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content form [data-slot=\"select-trigger\"]",
+                                "count": 1,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form label[for=\"basket-household\"]",
+                                "text": "Unitat de convivència"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"create-basket\"]",
+                                "count": 1,
+                                "minHeight": 44,
+                                "minWidth": 44
+                            },
+                            {
+                                "selector": "#main-content button[type=\"submit\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-slot=\"select-content\"][data-state=\"open\"]",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-slot=\"select-content\"][data-state=\"open\"] [data-slot=\"select-item\"]",
+                                "count": 3,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-popup-carries-landing": "true",
+                                    "data-ev-popup-inside-viewport": "true",
+                                    "data-ev-item-count": "3",
+                                    "data-ev-item-min-height": "44",
+                                    "data-ev-popup-bg": "rgb(255, 250, 240)",
+                                    "data-ev-popup-fg": "rgb(44, 44, 43)",
+                                    "data-ev-highlight-bg": "rgb(231, 240, 243)",
+                                    "data-ev-highlight-fg": "rgb(29, 82, 111)"
+                                }
+                            }
+                        ],
+                        "focus": [],
+                        "noFocusReason": "The open popup or dispatched events drive this state; the default state checks the focus order."
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "select-dark",
+                    "query": {
+                        "state": "select"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [
+                        ".reference-style",
+                        "[data-slot=select-content][data-state=open]"
+                    ],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "text": "Crea una cistella"
+                            },
+                            {
+                                "selector": "#main-content .pilot-page button:not([disabled]),#main-content .pilot-page a",
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content label",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content form [data-slot=\"select-trigger\"]",
+                                "count": 1,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form label[for=\"basket-household\"]",
+                                "text": "Unitat de convivència"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"create-basket\"]",
+                                "count": 1,
+                                "minHeight": 44,
+                                "minWidth": 44
+                            },
+                            {
+                                "selector": "#main-content button[type=\"submit\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "[data-slot=\"select-content\"][data-state=\"open\"]",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "[data-slot=\"select-content\"][data-state=\"open\"] [data-slot=\"select-item\"]",
+                                "count": 3,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-popup-carries-landing": "true",
+                                    "data-ev-popup-inside-viewport": "true",
+                                    "data-ev-item-count": "3",
+                                    "data-ev-item-min-height": "44",
+                                    "data-ev-popup-bg": "rgb(36, 42, 41)",
+                                    "data-ev-popup-fg": "rgb(242, 240, 233)",
+                                    "data-ev-highlight-bg": "rgb(39, 54, 61)",
+                                    "data-ev-highlight-fg": "rgb(178, 217, 232)"
+                                }
+                            }
+                        ],
+                        "focus": [],
+                        "noFocusReason": "The open popup or dispatched events drive this state; the default state checks the focus order."
+                    },
+                    "cases": [
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "select-keyboard",
+                    "query": {
+                        "state": "select-keyboard"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "text": "Crea una cistella"
+                            },
+                            {
+                                "selector": "#main-content .pilot-page button:not([disabled]),#main-content .pilot-page a",
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content label",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content form [data-slot=\"select-trigger\"]",
+                                "count": 1,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form label[for=\"basket-household\"]",
+                                "text": "Unitat de convivència"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"create-basket\"]",
+                                "count": 1,
+                                "minHeight": 44,
+                                "minWidth": 44
+                            },
+                            {
+                                "selector": "#main-content button[type=\"submit\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-opened-by": "Enter",
+                                    "data-ev-arrowed": "Família Puig",
+                                    "data-ev-chosen": "Família Puig",
+                                    "data-ev-chosen-matches": "true",
+                                    "data-ev-changed": "true",
+                                    "data-ev-focus-returned-after-choice": "true",
+                                    "data-ev-escape-closed": "true",
+                                    "data-ev-focus-returned-after-escape": "true",
+                                    "data-ev-active-highlight-bg": "rgb(231, 240, 243)",
+                                    "data-ev-active-highlight-fg": "rgb(29, 82, 111)"
+                                }
+                            }
+                        ],
+                        "focus": [],
+                        "noFocusReason": "Interaction driven by dispatched events; the default state checks the focus order."
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "select-touch",
+                    "query": {
+                        "state": "select-touch"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "text": "Crea una cistella"
+                            },
+                            {
+                                "selector": "#main-content .pilot-page button:not([disabled]),#main-content .pilot-page a",
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content label",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content form [data-slot=\"select-trigger\"]",
+                                "count": 1,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form label[for=\"basket-household\"]",
+                                "text": "Unitat de convivència"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"create-basket\"]",
+                                "count": 1,
+                                "minHeight": 44,
+                                "minWidth": 44
+                            },
+                            {
+                                "selector": "#main-content button[type=\"submit\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-opened-by": "touch",
+                                    "data-ev-arrowed": "Família Vidal",
+                                    "data-ev-chosen": "Família Vidal",
+                                    "data-ev-chosen-matches": "true",
+                                    "data-ev-changed": "true",
+                                    "data-ev-focus-returned-after-choice": "true",
+                                    "data-ev-escape-closed": "true",
+                                    "data-ev-focus-returned-after-escape": "true"
+                                }
+                            }
+                        ],
+                        "focus": [],
+                        "noFocusReason": "The open popup or dispatched events drive this state; the default state checks the focus order."
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "invalid",
+                    "query": {
+                        "state": "invalid"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "text": "Crea una cistella"
+                            },
+                            {
+                                "selector": "#main-content .pilot-page button:not([disabled]),#main-content .pilot-page a",
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content label",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content form [data-slot=\"select-trigger\"]",
+                                "count": 1,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form label[for=\"basket-household\"]",
+                                "text": "Unitat de convivència"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"create-basket\"]",
+                                "count": 1,
+                                "minHeight": 44,
+                                "minWidth": 44
+                            },
+                            {
+                                "selector": "#main-content button[type=\"submit\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content form .text-destructive",
+                                "text": "El camp unitat de convivència és obligatori.",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-requests": "post /finance/baskets"
+                                }
+                            }
+                        ],
+                        "focus": [
+                            "#main-content .pilot-page a",
+                            "#main-content [data-slot=\"select-trigger\"]",
+                            "#main-content [data-test=\"create-basket\"]"
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "error",
+                    "query": {
+                        "state": "error"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "text": "Crea una cistella"
+                            },
+                            {
+                                "selector": "#main-content .pilot-page button:not([disabled]),#main-content .pilot-page a",
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content label",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content form [data-slot=\"select-trigger\"]",
+                                "count": 1,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form label[for=\"basket-household\"]",
+                                "text": "Unitat de convivència"
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"create-basket\"]",
+                                "count": 1,
+                                "minHeight": 44,
+                                "minWidth": 44
+                            },
+                            {
+                                "selector": "#main-content button[type=\"submit\"]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content form .text-destructive",
+                                "text": "Tria una llar activa.",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-requests": "post /finance/baskets"
+                                }
+                            }
+                        ],
+                        "focus": [
+                            "#main-content .pilot-page a",
+                            "#main-content [data-slot=\"select-trigger\"]",
+                            "#main-content [data-test=\"create-basket\"]"
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 200
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "busy",
+                    "query": {
+                        "state": "busy"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": ".pilot-theme:not(.landing)",
+                                "count": 0
+                            },
+                            {
+                                "selector": ".welcome-page",
+                                "count": 0
+                            },
+                            {
+                                "selector": "#main-content *",
+                                "styles": {
+                                    "background-image": "none"
+                                }
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "count": 1,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content h1:not(.sr-only)",
+                                "text": "Crea una cistella"
+                            },
+                            {
+                                "selector": "#main-content label",
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content form",
+                                "count": 1
+                            },
+                            {
+                                "selector": "#main-content form [data-slot=\"select-trigger\"]",
+                                "count": 1,
+                                "minHeight": 44,
+                                "contrast": 4.5
+                            },
+                            {
+                                "selector": "#main-content [data-test=\"create-basket\"]",
+                                "count": 1,
+                                "minHeight": 44,
+                                "minWidth": 44,
+                                "text": "Crea una cistella",
+                                "attributes": {
+                                    "disabled": ""
+                                }
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-requests": "post /finance/baskets"
+                                }
+                            }
+                        ],
+                        "focus": ["#main-content .pilot-page a"]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 1280,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

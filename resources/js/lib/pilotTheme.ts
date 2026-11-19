@@ -76,6 +76,7 @@ const landingPages = new Set([
     'Receptions/Index',
     'Receptions/Show',
     'Finance/Baskets/Index',
+    'Finance/Baskets/Create',
     'Finance/Baskets/Show',
 ]);
 
