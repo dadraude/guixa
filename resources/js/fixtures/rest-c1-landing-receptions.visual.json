@@ -71,8 +71,8 @@
                                 "attributes": {
                                     "data-ev-error": null,
                                     "data-ev-primary-bg": "rgb(40, 101, 133)",
-                                    "data-ev-panel-padding": "12px",
-                                    "data-ev-panel-gap": "12px"
+                                    "data-ev-panel-padding-rem": "1",
+                                    "data-ev-panel-gap-rem": "0.75"
                                 }
                             }
                         ]
@@ -141,8 +141,8 @@
                                 "attributes": {
                                     "data-ev-error": null,
                                     "data-ev-primary-bg": "rgb(143, 197, 223)",
-                                    "data-ev-panel-padding": "12px",
-                                    "data-ev-panel-gap": "12px"
+                                    "data-ev-panel-padding-rem": "1",
+                                    "data-ev-panel-gap-rem": "0.75"
                                 }
                             }
                         ]

@@ -89,7 +89,7 @@ const excludedFromChecks = ['components/ui/', 'pages/Welcome.vue'];
 // T46 entries were kept after a rendered before/after review. The Receptions/Show entry is a separate
 // 005 T17 exception decided by the user (see its Deviation history entries), not a T46 review.
 const retainedT46Spacing: Record<string, readonly string[]> = {
-    // 005 T17 exception: 12 px panel padding and gap, measured unchanged by the fixture (data-ev-panel-padding/gap).
+    // 005 T17 exception: gap-3 computes to 0.75rem; the panel padding computes to 1rem (the page CSS wins over p-3). Both asserted by the fixture (data-ev-panel-*-rem) and unchanged by T17.
     'pages/Receptions/Show.vue': ['gap-3', 'p-3'],
     'pages/auth/Login.vue': ['space-x-3'],
     'layouts/auth/AuthSimpleLayout.vue': ['md:p-10'],

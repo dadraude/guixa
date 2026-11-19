@@ -314,8 +314,9 @@ const recordPanel = () => {
     );
     if (!panel) return;
     const style = getComputedStyle(panel);
-    set('panel-padding', style.paddingTop);
-    set('panel-gap', style.rowGap);
+    const rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
+    set('panel-padding-rem', String(parseFloat(style.paddingTop) / rem));
+    set('panel-gap-rem', String(parseFloat(style.rowGap) / rem));
 };
 const recordPopup = (popup: HTMLElement) => {
     const surface = getComputedStyle(popup);
