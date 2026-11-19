@@ -16,6 +16,7 @@ export const checkedFiles = [
     'pages/Producer/Products/Edit.vue',
     'components/StockProductFields.vue',
     'components/WeeklyProductFields.vue',
+    'pages/Receptions/Show.vue',
     'pages/Orders/Index.vue',
     'pages/Orders/Edit.vue',
     'components/orders/CycleCard.vue',
@@ -84,9 +85,15 @@ const sources = import.meta.glob<string>('/resources/js/**/*.vue', {
 
 const excludedFromChecks = ['components/ui/', 'pages/Welcome.vue'];
 
-// T46: existing spacing retained after rendered before/after review.
-// The allowlist is exact by file and class; new off-grid values still fail.
+// Existing spacing retained by exact file and class; new off-grid values still fail.
+// T46 entries were kept after a rendered before/after review. The Receptions/Show entry is a separate
+// 005 T17 exception decided by the user (see its Deviation history entries), not a T46 review.
 const retainedT46Spacing: Record<string, readonly string[]> = {
+    // 005 T17 exception, by file and class: gap-3 on the distribution header row (0.75rem) and on the
+    // product panel (0.75rem), and p-3 on the panel (computes to 1rem, the page CSS wins over p-3). The
+    // fixture asserts all three (data-ev-header-gap-rem, panel-gap-rem, panel-padding-rem); T17 does not
+    // change them.
+    'pages/Receptions/Show.vue': ['gap-3', 'p-3'],
     'pages/auth/Login.vue': ['space-x-3'],
     'layouts/auth/AuthSimpleLayout.vue': ['md:p-10'],
     'components/Heading.vue': ['space-y-0.5', 'mb-0.5'],

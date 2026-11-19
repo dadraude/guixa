@@ -1,0 +1,327 @@
+{
+    "baseUrl": "http://127.0.0.1:5289",
+    "rootFontPx": 16,
+    "darkSelector": "html.dark",
+    "matrix": {
+        "widths": [375, 1024, 1280],
+        "modes": ["light", "dark", "system-light", "system-dark"],
+        "text": [100, 200]
+    },
+    "views": [
+        {
+            "id": "accounts-control",
+            "path": "/resources/js/fixtures/rest-c1-landing.html",
+            "query": {
+                "page": "Manage/Accounts/Index",
+                "role": "manager"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only),#main-content h2,#main-content p,#main-content button",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Old-theme control: only the select popup computed values are compared.",
+            "states": [
+                {
+                    "id": "select-light",
+                    "query": {
+                        "state": "select"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [
+                        ".reference-style",
+                        "[data-slot=select-content][data-state=open]"
+                    ],
+                    "checks": {
+                        "focus": [],
+                        "noFocusReason": "The open popup captures focus.",
+                        "assertions": [
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-slot=select-content][data-state=open]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-item-min-height": "44",
+                                    "data-ev-popup-carries-landing": "false",
+                                    "data-ev-error": null,
+                                    "data-ev-popup-bg": "rgb(255, 255, 255)",
+                                    "data-ev-popup-fg": "rgb(32, 43, 38)",
+                                    "data-ev-popup-border": "rgb(214, 222, 216)"
+                                }
+                            }
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "select-dark",
+                    "query": {
+                        "state": "select"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [
+                        ".reference-style",
+                        "[data-slot=select-content][data-state=open]"
+                    ],
+                    "checks": {
+                        "focus": [],
+                        "noFocusReason": "The open popup captures focus.",
+                        "assertions": [
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": "[data-slot=select-content][data-state=open]",
+                                "count": 1
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-item-min-height": "44",
+                                    "data-ev-popup-carries-landing": "false",
+                                    "data-ev-error": null,
+                                    "data-ev-popup-bg": "rgb(37, 42, 39)",
+                                    "data-ev-popup-fg": "rgb(236, 242, 237)",
+                                    "data-ev-popup-border": "rgb(107, 120, 111)"
+                                }
+                            }
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "select-keyboard",
+                    "query": {
+                        "state": "select-keyboard"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "focus": [],
+                        "noFocusReason": "Interaction driven by dispatched events.",
+                        "assertions": [
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-opened-by": "Enter",
+                                    "data-ev-arrowed": "Família Puig",
+                                    "data-ev-chosen": "Família Puig",
+                                    "data-ev-chosen-matches": "true",
+                                    "data-ev-changed": "true",
+                                    "data-ev-focus-returned-after-choice": "true",
+                                    "data-ev-focus-returned-after-escape": "true",
+                                    "data-ev-escape-closed": "true",
+                                    "data-ev-active-highlight-bg": "rgb(236, 234, 229)",
+                                    "data-ev-active-highlight-fg": "rgb(54, 70, 62)"
+                                }
+                            }
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "select-space",
+                    "query": {
+                        "state": "select-space"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "focus": [],
+                        "noFocusReason": "Interaction driven by dispatched events.",
+                        "assertions": [
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-opened-by": "Space",
+                                    "data-ev-arrowed": "Família Puig",
+                                    "data-ev-chosen": "Família Puig",
+                                    "data-ev-chosen-matches": "true",
+                                    "data-ev-changed": "true",
+                                    "data-ev-focus-returned-after-choice": "true",
+                                    "data-ev-focus-returned-after-escape": "true",
+                                    "data-ev-escape-closed": "true",
+                                    "data-ev-active-highlight-bg": "rgb(236, 234, 229)",
+                                    "data-ev-active-highlight-fg": "rgb(54, 70, 62)"
+                                }
+                            }
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "select-pointer",
+                    "query": {
+                        "state": "select-pointer"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "focus": [],
+                        "noFocusReason": "Interaction driven by dispatched events.",
+                        "assertions": [
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-opened-by": "pointer",
+                                    "data-ev-arrowed": "Família Vidal",
+                                    "data-ev-chosen": "Família Vidal",
+                                    "data-ev-chosen-matches": "true",
+                                    "data-ev-changed": "true",
+                                    "data-ev-focus-returned-after-choice": "true",
+                                    "data-ev-focus-returned-after-escape": "true",
+                                    "data-ev-escape-closed": "true"
+                                }
+                            }
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                },
+                {
+                    "id": "select-touch",
+                    "query": {
+                        "state": "select-touch"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "focus": [],
+                        "noFocusReason": "Interaction driven by dispatched events.",
+                        "assertions": [
+                            {
+                                "selector": ".landing",
+                                "count": 0
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-opened-by": "touch",
+                                    "data-ev-arrowed": "Família Vidal",
+                                    "data-ev-chosen": "Família Vidal",
+                                    "data-ev-chosen-matches": "true",
+                                    "data-ev-changed": "true",
+                                    "data-ev-focus-returned-after-choice": "true",
+                                    "data-ev-focus-returned-after-escape": "true",
+                                    "data-ev-escape-closed": "true"
+                                }
+                            }
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "reception-shell",
+            "path": "/resources/js/fixtures/rest-c1-landing.html",
+            "query": {
+                "page": "Receptions/Show",
+                "role": "manager,receiver"
+            },
+            "root": ".reference-style",
+            "panels": "#main-content",
+            "content": "#main-content h1:not(.sr-only)",
+            "fonts": ["16px Nunito Variable"],
+            "focus": [],
+            "noFocusReason": "Shell overlays capture focus; focus order is covered by the reception-show view.",
+            "states": [
+                {
+                    "id": "nav-sheet",
+                    "query": {
+                        "state": "nav-sheet"
+                    },
+                    "ready": "body[data-visual-ready]",
+                    "settled": [".reference-style"],
+                    "checks": {
+                        "focus": [],
+                        "noFocusReason": "The open sheet captures focus.",
+                        "assertions": [
+                            {
+                                "selector": ".reference-style.landing",
+                                "count": 1
+                            },
+                            {
+                                "selector": "body",
+                                "attributes": {
+                                    "data-ev-error": null,
+                                    "data-ev-sheet-landing": "true"
+                                }
+                            }
+                        ]
+                    },
+                    "cases": [
+                        {
+                            "width": 375,
+                            "mode": "light",
+                            "text": 100
+                        },
+                        {
+                            "width": 375,
+                            "mode": "dark",
+                            "text": 100
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
