@@ -8,7 +8,7 @@ IDs are local to 005 and start at T01; 001 items are cited as "001 T84". This do
 ticket publication and no Linear writes. Everything marked *unverified* was not run; this draft is from code reading
 of the plan and spec only (worktree `origin/main`).
 
-**Checkpoint C1 (T17–T23): awaiting approval.** T23 (DRA-295) recorded the C1 acceptance and asked the user for visual approval of the seven C1 pages and the received-total dialog in light and dark (Q&A `history/2026-11-19T21-23-30.594Z-DRA-295-5b4045f8-9319-41c0-b8cc-a38da89b3c85.md`). No approval is recorded; C2 (T24) does not start until it is (S30).
+**Checkpoint C1 (T17–T23): approved (2026-11-19).** T23 (DRA-295) recorded the C1 acceptance and asked for visual approval (Q&A `history/2026-11-19T21-23-30.594Z-DRA-295-5b4045f8-9319-41c0-b8cc-a38da89b3c85.md`); the user approved the seven C1 pages and the received-total dialog in light and dark (Q&A `history/2026-11-19T22-22-49.544Z-DRA-295-18f726e1-6cd2-40fe-b0ff-b007f478fe5c.md`). C2 (T24) may start (S30).
 
 ## Architecture and safe sequence
 
